@@ -1,6 +1,3 @@
 [submodule "HighLo/HighLo/vendor/spdlog"]
 	path = HighLo/HighLo/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "HighLo/HighLo/vendor/glfw"]
-	path = HighLo/HighLo/vendor/glfw
-	url = https://github.com/glfw/glfw

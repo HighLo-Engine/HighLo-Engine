@@ -30,3 +30,25 @@
 *.exe
 *.out
 *.app
+
+# Directories
+.vs/
+Debug/
+Release/
+Dist/
+Debug-windows-x86_64/
+Release-windows-x86_64/
+Dist-windows-x86_64/
+bin/
+!vendor/bin/premake/
+bin-int/
+builds/
+
+# Visual Studio files
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+
+# Others
+*.log

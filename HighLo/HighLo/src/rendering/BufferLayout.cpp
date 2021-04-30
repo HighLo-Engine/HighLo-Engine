@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "BufferLayout.h"
 
 namespace highlo

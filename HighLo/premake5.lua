@@ -23,6 +23,9 @@ project "HighLo"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "HighLoPch.h"
+	pchsource "src/HighLoPch.cpp"
+
     files
     { 
         "%{prj.name}/src/**.h",

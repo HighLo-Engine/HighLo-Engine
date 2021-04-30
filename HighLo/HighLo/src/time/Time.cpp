@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "Time.h"
 
 namespace highlo

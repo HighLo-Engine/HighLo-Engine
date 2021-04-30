@@ -1,4 +1,6 @@
+#include "HighLoPch.h"
 #include "HLMath.h"
+
 #include <window/Window.h>
 
 namespace highlo

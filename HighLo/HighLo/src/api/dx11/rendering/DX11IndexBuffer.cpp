@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "DX11IndexBuffer.h"
 
 #ifdef HIGHLO_API_DX11

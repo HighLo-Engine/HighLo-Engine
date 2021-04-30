@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "OpenGLVertexArray.h"
 
 #ifdef HIGHLO_API_OPENGL

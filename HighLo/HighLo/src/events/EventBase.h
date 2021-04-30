@@ -1,9 +1,6 @@
 #pragma once
 
-#include <core/HLCore.h>
-#include <string>		// TODO: Move to precompiled header
-#include <sstream>		// TODO: Move to precompiled header
-#include <functional>	// TODO: Move to precompiled header
+#include "HighLoPch.h"
 
 // TODO: Move to Core file
 #define BIT(x) (1 << x)

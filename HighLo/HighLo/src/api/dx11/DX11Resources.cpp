@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "DX11Resources.h"
 
 #ifdef HIGHLO_API_DX11

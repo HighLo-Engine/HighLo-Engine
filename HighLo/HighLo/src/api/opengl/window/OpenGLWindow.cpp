@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "OpenGLWindow.h"
 
 #ifdef HIGHLO_API_OPENGL

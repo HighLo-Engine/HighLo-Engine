@@ -1,4 +1,6 @@
+#include "HighLoPch.h"
 #include "DX11VertexArray.h"
+
 #include "DX11VertexBuffer.h"
 
 #ifdef HIGHLO_API_DX11

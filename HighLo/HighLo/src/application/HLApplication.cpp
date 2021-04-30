@@ -1,4 +1,6 @@
+#include "HighLoPch.h"
 #include "HLApplication.h"
+
 #include <logging/Logger.h>
 
 namespace highlo

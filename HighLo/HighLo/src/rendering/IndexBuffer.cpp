@@ -1,3 +1,4 @@
+#include "HighLoPch.h"
 #include "IndexBuffer.h"
 
 #ifdef HIGHLO_API_OPENGL

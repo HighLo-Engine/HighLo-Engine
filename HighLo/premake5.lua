@@ -52,12 +52,6 @@ project "HighLo"
             "HL_PLATFORM_WINDOWS"
         }
 
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox"),
-            ("{COPY} %{cfg.buildtarget.relpath} %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor"),
-        }
-
     filter "configurations:Debug"
         defines "HL_DEBUG"
         symbols "On"

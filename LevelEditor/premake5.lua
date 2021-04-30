@@ -26,6 +26,12 @@ project "LevelEditor"
     {
         "HighLo"
     }
+	
+	postbuildcommands
+	{
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox"),
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor")
+	}
 
     filter "system:windows"
         cppdialect "C++17"

@@ -7,8 +7,10 @@ IncludeDir["GLFW"]   = "%{wks.location}/HighLo/vendor/glfw/include"
 IncludeDir["GLAD"]   = "%{wks.location}/HighLo/vendor/GLAD/include"
 IncludeDir["glm"]    = "%{wks.location}/HighLo/vendor/glm"
 IncludeDir["spdlog"] = "%{wks.location}/HighLo/vendor/spdlog/include"
+IncludeDir["assimp"] = "%{wks.location}/HighLo/vendor/assimp/include"
 
 LibDir = {}
+LibDir["assimp"]     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.lib"
 
 workspace "HighLo"
     architecture "x64"
@@ -24,6 +26,7 @@ workspace "HighLo"
 		include "HighLo/vendor/glfw"
 		include "HighLo/vendor/GLAD"
 		include "HighLo/vendor/glm"
+		include "HighLo/vendor/assimp"
 	group ""
 
 	group "Engine"

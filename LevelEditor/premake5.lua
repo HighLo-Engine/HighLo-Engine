@@ -35,6 +35,7 @@ project "LevelEditor"
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor/HighLo.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor/assimp-vc141-mtd.dll*")
 	}
 
     filter "system:windows"

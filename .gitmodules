@@ -7,3 +7,6 @@
 [submodule "HighLo/vendor/spdlog"]
 	path = HighLo/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "HighLo/vendor/assimp"]
+	path = HighLo/vendor/assimp
+	url = https://github.com/HighLo-Engine/assimp

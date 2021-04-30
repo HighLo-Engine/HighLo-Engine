@@ -9,15 +9,15 @@ namespace highlo
 
 	struct WindowData
 	{
-		unsigned int width;
-		unsigned int height;
-		const char* title;
-		bool fullscreen;
-		bool focused = false;
-		EventCallbackFn event_callback = nullptr;
+		uint32_t m_Width;
+		uint32_t m_Height;
+		const char* m_Title;
+		bool m_Fullscreen;
+		bool m_Focused = false;
+		EventCallbackFn m_EventCallback = nullptr;
 
 		WindowData(bool fullscreen = false, unsigned int width = 1270, unsigned int height = 860, const char* title = "InfraRed Engine")
-			: fullscreen(fullscreen), width(width), height(height), title(title) {}
+			: m_Fullscreen(fullscreen), m_Width(width), m_Height(height), m_Title(title) {}
 	};
 
 	class Window

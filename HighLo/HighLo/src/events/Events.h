@@ -1,4 +1,7 @@
 #pragma once
-#include "WindowEvents.h"
+
+#include "EventBase.h"
 #include "KeyboardEvents.h"
 #include "MouseEvents.h"
+#include "ApplicationEvents.h"
+

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <logging/Logger.h>
 #include <time/Time.h>
 #include <window/Window.h>
@@ -30,7 +31,7 @@ namespace highlo
 		HLAPI virtual void OnShutdown() {}
 		HLAPI virtual void OnEvent(Event& e) {}
 
-		HLAPI inline void Close() { m_Running = false; }
+		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings& settings) { m_StartupSettings = settings; }
 
 	private:
@@ -41,6 +42,9 @@ namespace highlo
 
 		UniqueRef<Window> m_Window;
 		void InitializeWindow();
+
+		bool OnWindowClose(WindowCloseEvent &event);
+		bool OnWindowReisze(WindowResizeEvent &event);
 
 	private:
 		void InternalEventHandler(Event& event);

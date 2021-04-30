@@ -12,6 +12,7 @@ IncludeDir["GLAD"] = "HighLo/vendor/GLAD/include"
 group "Dependencies"
     include "HighLo/vendor/glfw"
 	include "HighLo/vendor/GLAD"
+	include "HighLo/vendor/glm"
 group ""
 
 project "HighLo"

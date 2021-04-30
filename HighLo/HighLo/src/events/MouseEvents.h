@@ -1,18 +1,20 @@
 #pragma once
-#include "Event.h"
+
+#include "EventBase.h"
 
 namespace highlo
 {
-	class MouseMovedEvent : public Event
+	class HLAPI MouseMovedEvent : public Event
 	{
 	public:
-		MouseMovedEvent(float x, float y, float dx, float dy)
-			: m_MouseX(x), m_MouseY(y), m_MouseDX(dx), m_MouseDY(dy) {}
 
-		inline float GetX() const { return m_MouseX; }
-		inline float GetY() const { return m_MouseY; }
-		inline float GetDX() const { return m_MouseDX; }
-		inline float GetDY() const { return m_MouseDY; }
+		MouseMovedEvent(float xPos, float yPos, float dxPos, float dyPos)
+			: m_MouseX(xPos), m_MouseY(yPos), m_MouseDX(dxPos), m_MouseDY(dyPos) {}
+
+		inline float GetMouseX() const { return m_MouseX; }
+		inline float GetMouseY() const { return m_MouseY; }
+		inline float GetMouseDX() const { return m_MouseDX; }
+		inline float GetMouseDY() const { return m_MouseDY; }
 
 		std::string ToString() const override
 		{
@@ -21,16 +23,18 @@ namespace highlo
 			return ss.str();
 		}
 
-		REGISTER_EVT_CLASS_TYPE(MouseMoved)
-			REGISTER_EVT_CATEGORY(EventCategoryMouse | EventCategoryInput)
+		REGISTER_EVENT_CLASS_TYPE(MouseMoved)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 	private:
-		float m_MouseX, m_MouseY, m_MouseDX, m_MouseDY;
+		float m_MouseX, m_MouseY;
+		float m_MouseDX, m_MouseDY;
 	};
 
-	class MouseScrolledEvent : public Event
+	class HLAPI MouseScrolledEvent : public Event
 	{
 	public:
+
 		MouseScrolledEvent(float xOffset, float yOffset)
 			: m_XOffset(xOffset), m_YOffset(yOffset) {}
 
@@ -40,65 +44,64 @@ namespace highlo
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseScrolledEvent: " << GetXOffset() << ", " << GetYOffset();
+			ss << "MouseScrolledEvent: " << m_XOffset << ", " << m_YOffset;
 			return ss.str();
 		}
 
-		REGISTER_EVT_CLASS_TYPE(MouseScrolled)
-			REGISTER_EVT_CATEGORY(EventCategoryMouse | EventCategoryInput)
+		REGISTER_EVENT_CLASS_TYPE(MouseScrolled)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 	private:
 		float m_XOffset, m_YOffset;
 	};
 
-	enum class MouseButton
-	{
-		Left, Right, Middle
-	};
-
-	class MouseButtonEvent : public Event
+	class HLAPI MouseButton : public Event
 	{
 	public:
-		inline MouseButton GetMouseButton() const { return m_Button; }
+		
+		inline int32_t GetMouseButton() const { return m_MouseButton; }
 
-		REGISTER_EVT_CATEGORY(EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput)
 
 	protected:
-		MouseButtonEvent(MouseButton button)
-			: m_Button(button) {}
 
-		MouseButton m_Button;
+		MouseButton(int32_t mouseButton)
+			: m_MouseButton(mouseButton) {}
+
+		int32_t m_MouseButton;
 	};
 
-	class MouseButtonPressedEvent : public MouseButtonEvent
+	class HLAPI MouseButtonPressedEvent : public MouseButton
 	{
 	public:
-		MouseButtonPressedEvent(MouseButton button)
-			: MouseButtonEvent(button) {}
+		
+		MouseButtonPressedEvent(int32_t mouseButton)
+			: MouseButton(mouseButton) {}
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseButtonPressedEvent: " << (int)m_Button;
+			ss << "MouseButtonPressedEvent: " << m_MouseButton;
 			return ss.str();
 		}
 
-		REGISTER_EVT_CLASS_TYPE(MouseButtonPressed)
+		REGISTER_EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class MouseButtonReleasedEvent : public MouseButtonEvent
+	class HLAPI MouseButtonReleasedEvent : public MouseButton
 	{
 	public:
-		MouseButtonReleasedEvent(MouseButton button)
-			: MouseButtonEvent(button) {}
+
+		MouseButtonReleasedEvent(int32_t mouseButton)
+			: MouseButton(mouseButton) {}
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseButtonReleasedEvent: " << (int)m_Button;
+			ss << "MouseButtonReleasedEvent: " << m_MouseButton;
 			return ss.str();
 		}
 
-		REGISTER_EVT_CLASS_TYPE(MouseButtonReleased)
+		REGISTER_EVENT_CLASS_TYPE(MouseButtonReleased)
 	};
 }

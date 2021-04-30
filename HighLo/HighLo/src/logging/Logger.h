@@ -1,4 +1,5 @@
 #pragma once
+
 #include <core/HLCore.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>

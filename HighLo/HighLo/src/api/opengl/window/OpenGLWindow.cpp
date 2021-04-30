@@ -7,6 +7,8 @@
 
 namespace highlo
 {
+	static bool s_GLFWInitialized = false;
+
     static void GLFWErrorCallback(int error, const char* description)
     {
         HL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
@@ -27,7 +29,7 @@ namespace highlo
     
     void OpenGLWindow::SetEventCallback(const EventCallbackFn& callback)
     {
-        m_Properties.event_callback = callback;
+        m_Properties.m_EventCallback = callback;
     }
     
     void OpenGLWindow::Update()
@@ -38,12 +40,12 @@ namespace highlo
     
     unsigned int OpenGLWindow::GetWidth()
     {
-        return m_Properties.width;
+        return m_Properties.m_Width;
     }
     
     unsigned int OpenGLWindow::GetHeight()
     {
-        return m_Properties.height;
+        return m_Properties.m_Height;
     }
     
     void OpenGLWindow::SetCursorLocked(bool bLocked)
@@ -59,15 +61,18 @@ namespace highlo
     
     bool OpenGLWindow::IsFocused()
     {
-        return  m_Properties.focused;
+        return m_Properties.m_Focused;
     }
     
     void OpenGLWindow::Init()
     {
-		glfwInit();
-        glfwSetErrorCallback(GLFWErrorCallback);
+		if (!s_GLFWInitialized)
+		{
+			glfwInit();
+			glfwSetErrorCallback(GLFWErrorCallback);
+		}
 
-        m_NativeHandle = glfwCreateWindow((int)m_Properties.width, (int)m_Properties.height, m_Properties.title, nullptr, nullptr);
+        m_NativeHandle = glfwCreateWindow((int)m_Properties.m_Width, (int)m_Properties.m_Height, m_Properties.m_Title, nullptr, nullptr);
 
         m_Context = UniqueRef<RenderingContext>(new OpenGLContext((void*)m_NativeHandle));
         m_Context->Init();
@@ -83,11 +88,11 @@ namespace highlo
 		glfwSetWindowSizeCallback(m_NativeHandle, [](GLFWwindow* window, int width, int height)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.width = width;
-			data.height = height;
+			data.m_Width= width;
+			data.m_Height = height;
 
 			WindowResizeEvent event(width, height);
-			data.event_callback(event);
+			data.m_EventCallback(event);
 		});
 
 		glfwSetWindowCloseCallback(m_NativeHandle, [](GLFWwindow* window)
@@ -95,7 +100,7 @@ namespace highlo
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			WindowCloseEvent event;
-			data.event_callback(event);
+			data.m_EventCallback(event);
 		});
 
 		glfwSetKeyCallback(m_NativeHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -107,19 +112,19 @@ namespace highlo
 				case GLFW_PRESS:
 				{
 					KeyPressedEvent event(key, 0);
-					data.event_callback(event);
+					data.m_EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
 					KeyReleasedEvent event(key);
-					data.event_callback(event);
+					data.m_EventCallback(event);
 					break;
 				}
 				case GLFW_REPEAT:
 				{
 					KeyPressedEvent event(key, 1);
-					data.event_callback(event);
+					data.m_EventCallback(event);
 					break;
 				}
 			}
@@ -130,31 +135,25 @@ namespace highlo
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			KeyReleasedEvent event(keycode);
-			data.event_callback(event);
+			data.m_EventCallback(event);
 		});
 
 		glfwSetMouseButtonCallback(m_NativeHandle, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-			auto hl_button = MouseButton::Left;
-			if (button == GLFW_MOUSE_BUTTON_2)
-				hl_button = MouseButton::Right;
-			if (button == GLFW_MOUSE_BUTTON_3)
-				hl_button = MouseButton::Middle;
-
 			switch (action)
 			{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent event(hl_button);
-					data.event_callback(event);
+					MouseButtonPressedEvent event(button);
+					data.m_EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent event(hl_button);
-					data.event_callback(event);
+					MouseButtonReleasedEvent event(button);
+					data.m_EventCallback(event);
 					break;
 				}
 			}
@@ -165,7 +164,7 @@ namespace highlo
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			MouseScrolledEvent event((float)xOffset, (float)yOffset);
-			data.event_callback(event);
+			data.m_EventCallback(event);
 		});
 
 		glfwSetCursorPosCallback(m_NativeHandle, [](GLFWwindow* window, double xPos, double yPos)
@@ -178,7 +177,7 @@ namespace highlo
 			float dy = (float)yPos - previous_y_pos;
 
 			MouseMovedEvent event((float)xPos, (float)yPos, dx, dy);
-			data.event_callback(event);
+			data.m_EventCallback(event);
 
 			previous_x_pos = (float)xPos;
 			previous_y_pos = (float)yPos;
@@ -187,7 +186,7 @@ namespace highlo
 		glfwSetWindowFocusCallback(m_NativeHandle, [](GLFWwindow* window, int focused)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.focused = (bool)focused;
+			data.m_Focused = (bool)focused;
 		});
     }
 }

@@ -49,21 +49,35 @@ namespace highlo
 		Renderer::Init(m_Window.get());
 	}
 
+	bool HLApplication::OnWindowClose(WindowCloseEvent &event)
+		{
+		Close();
+		return true;
+		}
+
+	bool HLApplication::OnWindowReisze(WindowResizeEvent &event)
+		{
+		if (event.GetWidth() == 0 || event.GetHeight() == 0)
+			{
+			// Window is minimized
+			return false;
+			}
+
+		// TODO: Resize Framebuffers and Viewports
+
+		return true;
+		}
+
 	void HLApplication::InternalEventHandler(Event& event)
 	{
 		// Drop certain input events if the window is not in focus
 		if (!m_Window->IsFocused() && event.IsInCategory(EventCategory::EventCategoryInput))
 			return;
 
-		OnEvent(event);
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
 
-		if (event.GetEventType() == EventType::WindowClose)
-		{
-			Close();
-		}
-		else if (event.GetEventType() == EventType::WindowResize)
-		{
-			WindowResizeEvent& wre = static_cast<WindowResizeEvent&>(event);
-		}
+		OnEvent(event);
 	}
 }

@@ -1,0 +1,3 @@
+[submodule "HighLo/vendor/glm"]
+	path = HighLo/vendor/glm
+	url = https://github.com/HighLo-Engine/glm

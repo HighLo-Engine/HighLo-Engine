@@ -1,8 +1,6 @@
 #include "HighLoPch.h"
 #include "HLApplication.h"
 
-#include "Engine/Core/DataTypes/HLQueue.h"
-
 namespace highlo
 {
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&HLApplication::fn, this, std::placeholders::_1)
@@ -12,7 +10,6 @@ namespace highlo
 	HLApplication::HLApplication()
 	{
 		s_Instance = this;
-		test_assimp();
 	}
 
 	void HLApplication::Run()

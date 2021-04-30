@@ -2,5 +2,5 @@
 
 namespace highlo
 {
-	void test_assimp();
+
 }

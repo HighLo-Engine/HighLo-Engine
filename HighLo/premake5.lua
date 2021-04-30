@@ -54,8 +54,8 @@ project "HighLo"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} ../Sandbox/bin/" .. outputdir .. "/Sandbox"),
-            ("{COPY} %{cfg.buildtarget.relpath} ../LevelEditor/bin/" .. outputdir .. "/LevelEditor"),
+            ("{COPY} %{cfg.buildtarget.relpath} %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox"),
+            ("{COPY} %{cfg.buildtarget.relpath} %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor"),
         }
 
     filter "configurations:Debug"

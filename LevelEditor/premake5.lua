@@ -29,8 +29,7 @@ project "LevelEditor"
 	
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox"),
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor")
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor/HighLo.dll*"),
 	}
 
     filter "system:windows"

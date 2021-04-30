@@ -1,9 +1,9 @@
-[submodule "HighLo/HighLo/vendor/spdlog"]
-	path = HighLo/HighLo/vendor/spdlog
+[submodule "HighLo/vendor/spdlog"]
+	path = HighLo/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "HighLo/HighLo/vendor/glfw"]
-	path = HighLo/HighLo/vendor/glfw
+[submodule "HighLo/vendor/glfw"]
+	path = HighLo/vendor/glfw
 	url = https://github.com/HighLo-Engine/glfw.git
-[submodule "HighLo/HighLo/vendor/glm"]
-	path = HighLo/HighLo/vendor/glm
+[submodule "HighLo/vendor/glm"]
+	path = HighLo/vendor/glm
 	url = https://github.com/HighLo-Engine/glm

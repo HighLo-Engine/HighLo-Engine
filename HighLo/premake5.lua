@@ -1,24 +1,8 @@
-workspace "HighLo"
-    architecture "x64"
-    configurations { "Debug", "Release", "Dist" }
-    startproject "Sandbox"
-
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-IncludeDir = {}
-IncludeDir["GLFW"] = "HighLo/vendor/glfw/include"
-IncludeDir["GLAD"] = "HighLo/vendor/GLAD/include"
-
-group "Dependencies"
-    include "HighLo/vendor/glfw"
-	include "HighLo/vendor/GLAD"
-	include "HighLo/vendor/glm"
-group ""
-
 project "HighLo"
-    location "HighLo"
     kind "SharedLib"
     language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
@@ -28,15 +12,15 @@ project "HighLo"
 
     files
     { 
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "src/**.h",
+        "src/**.cpp"
     }
 
     includedirs
     {
-        "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include",
-        "%{prj.name}/vendor/glm",
+		"src",
+		"%{IncludeDir.spdlog}",
+        "%{IncludeDir.glm}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.GLAD}"
     }
@@ -70,58 +54,8 @@ project "HighLo"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
-        }
-
-    filter "configurations:Debug"
-        defines "HL_DEBUG"
-        symbols "On"
-
-    filter "configurations:Release"
-        defines "HL_RELEASE"
-        optimize "On"
-
-    filter "configurations:Dist"
-        defines "HL_DIST"
-        optimize "On"
-
-project "Sandbox"
-    location "Sandbox"
-    kind "ConsoleApp"
-    language "C++"
-
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
-
-    files
-    { 
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
-
-    includedirs
-    {
-        "HighLo/vendor/spdlog/include",
-        "HighLo/vendor/glm",
-        "HighLo/src"
-    }
-
-    links
-    {
-        "HighLo"
-    }
-
-    filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
-        systemversion "latest"
-        buildoptions "/MD"
-
-        disablewarnings { "5033" }
-
-        defines
-        {
-            "HL_PLATFORM_WINDOWS"
+            ("{COPY} %{cfg.buildtarget.relpath} ../Sandbox/bin/" .. outputdir .. "/Sandbox"),
+            ("{COPY} %{cfg.buildtarget.relpath} ../LevelEditor/bin/" .. outputdir .. "/LevelEditor"),
         }
 
     filter "configurations:Debug"

@@ -1,3 +1,2 @@
-cd HighLo
-call ..\vendor\bin\premake\premake5.exe vs2019
-pause
+call vendor\bin\premake\premake5.exe vs2019
+PAUSE

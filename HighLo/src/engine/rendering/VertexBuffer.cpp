@@ -16,7 +16,7 @@ namespace highlo
 		return Ref<VertexBuffer>(new OpenGLVertexBuffer(vertices));
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32_t stride)
+	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32 stride)
 	{
 		return Ref<VertexBuffer>(new OpenGLVertexBuffer(data, size, stride));
 	}
@@ -27,7 +27,7 @@ namespace highlo
 		return Ref<VertexBuffer>(new DX11VertexBuffer(vertices));
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32_t stride)
+	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32 stride)
 	{
 		return Ref<VertexBuffer>(new DX11VertexBuffer(data, size, stride));
 	}

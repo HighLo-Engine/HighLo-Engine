@@ -1,5 +1,7 @@
 #pragma once
-#include <engine/rendering/VertexBuffer.h>
+
+#include "engine/rendering/VertexBuffer.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_OPENGL
 
@@ -9,7 +11,7 @@ namespace highlo
 	{
 	public:
 		OpenGLVertexBuffer(const std::vector<Vertex>& vertices);
-		OpenGLVertexBuffer(void* data, size_t size, uint32_t stride);
+		OpenGLVertexBuffer(void* data, size_t size, uint32 stride);
 		~OpenGLVertexBuffer();
 
 		virtual void Bind() override;

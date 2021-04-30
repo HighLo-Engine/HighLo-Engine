@@ -1,6 +1,7 @@
 #pragma once
-#include <engine/core/HLCore.h>
-#include <engine/events/Events.h>
+
+#include "engine/core/HLCore.h"
+#include "engine/events/Events.h"
 
 namespace highlo
 {
@@ -8,14 +9,14 @@ namespace highlo
 
 	struct WindowData
 	{
-		uint32_t m_Width;
-		uint32_t m_Height;
+		uint32 m_Width;
+		uint32 m_Height;
 		const char* m_Title;
 		bool m_Fullscreen;
 		bool m_Focused = false;
 		EventCallbackFn m_EventCallback = nullptr;
 
-		WindowData(bool fullscreen = false, unsigned int width = 1270, unsigned int height = 860, const char* title = "InfraRed Engine")
+		WindowData(bool fullscreen = false, unsigned int width = 1270, unsigned int height = 860, const char* title = "HLEngine")
 			: m_Fullscreen(fullscreen), m_Width(width), m_Height(height), m_Title(title) {}
 	};
 

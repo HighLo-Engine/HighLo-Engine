@@ -27,6 +27,11 @@ project "Sandbox"
         "HighLo"
     }
 
+	defines
+	{
+		"HL_USE_DLL"
+	}
+
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/HighLo.dll*"),

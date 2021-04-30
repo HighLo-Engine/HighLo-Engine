@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/core/HLCore.h>
-#include <engine/math/HLMath.h>
+#include "engine/core/HLCore.h"
+#include "engine/math/HLMath.h"
 
 #include "VertexArray.h"
 
@@ -14,11 +14,11 @@ namespace highlo
 		virtual void ClearScreenBuffers() = 0;
 
 		virtual void DrawIndexed(const Ref<VertexArray>& va) = 0;
-		virtual void DrawInstanced(const Ref<VertexArray>& va, uint32_t count) = 0;
+		virtual void DrawInstanced(const Ref<VertexArray>& va, uint32 count) = 0;
 		virtual void DrawIndexedControlPointPatchList(const Ref<VertexArray>& va) = 0;
 
 		virtual void SetWireframe(bool wf) = 0;
 
-		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
+		virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;
 	};
 }

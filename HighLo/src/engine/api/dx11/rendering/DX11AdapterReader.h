@@ -1,5 +1,7 @@
 #pragma once
-#include <engine/core/HLCore.h>
+
+#include "engine/core/HLCore.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_DX11
 #include <api/dx11/DX11Resources.h>

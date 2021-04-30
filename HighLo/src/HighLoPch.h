@@ -22,7 +22,3 @@
 /* Streams */
 #include <fstream>
 #include <sstream>
-
-#include "engine/core/HLCore.h"
-#include "engine/core/defines/HLDefines.h"
-#include "engine/logging/Logger.h"

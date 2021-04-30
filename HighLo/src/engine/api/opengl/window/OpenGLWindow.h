@@ -1,9 +1,12 @@
 #pragma once
-#include <engine/window/Window.h>
+
+#include "engine/window/Window.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include <engine/rendering/RenderingContext.h>
 #include <GLFW/glfw3.h>
+
+#include "engine/rendering/RenderingContext.h"
 
 namespace highlo
 {

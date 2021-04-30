@@ -2,9 +2,6 @@
 
 #include "HighLoPch.h"
 
-// TODO: Move to Core file
-#define BIT(x) (1 << x)
-
 namespace highlo
 {
 	/*
@@ -27,11 +24,11 @@ namespace highlo
 	enum EventCategory
 	{
 		None = 0,
-		EventCategoryApplication = BIT(0),
-		EventCategoryInput = BIT(1),
-		EventCategoryKeyboard = BIT(2),
-		EventCategoryMouse = BIT(3),
-		EventCategoryMouseButton = BIT(4),
+		EventCategoryApplication = HL_BIT(0),
+		EventCategoryInput = HL_BIT(1),
+		EventCategoryKeyboard = HL_BIT(2),
+		EventCategoryMouse = HL_BIT(3),
+		EventCategoryMouseButton = HL_BIT(4),
 	};
 
 	template<typename T>

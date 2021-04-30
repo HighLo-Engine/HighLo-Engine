@@ -3,8 +3,8 @@
 
 namespace highlo
 {
-	std::shared_ptr<spdlog::logger> Logger::s_EngineLogger;
-	std::shared_ptr<spdlog::logger> Logger::s_ClientLogger;
+	Ref<spdlog::logger> Logger::s_EngineLogger = MakeRef<spdlog::logger>();
+	Ref<spdlog::logger> Logger::s_ClientLogger = MakeRef<spdlog::logger>();
 
 	void Logger::Init()
 	{

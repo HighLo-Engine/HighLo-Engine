@@ -13,7 +13,7 @@ namespace highlo
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, size_t size, uint32_t stride)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, size_t size, uint32 stride)
 	{
 		glGenBuffers(1, &m_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);

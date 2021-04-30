@@ -1,9 +1,10 @@
 #pragma once
-#include <engine/window/Window.h>
+
+#include "engine/window/Window.h"
 
 #ifdef HIGHLO_API_DX11
 #include <Windows.h>
-#include <rendering/RenderingContext.h>
+#include "rendering/RenderingContext.h"
 
 namespace highlo
 {

@@ -1,9 +1,10 @@
 #pragma once
-#include <engine/rendering/IndexBuffer.h>
+
+#include "engine/rendering/IndexBuffer.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_DX11
-#include <api/dx11/DX11Resources.h>
-#include <vector>
+#include "api/dx11/DX11Resources.h"
 
 namespace highlo
 {

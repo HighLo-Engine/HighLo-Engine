@@ -27,6 +27,11 @@ project "LevelEditor"
         "HighLo"
     }
 	
+	defines
+	{
+		"HL_USE_DLL"
+	}
+	
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor/HighLo.dll*"),

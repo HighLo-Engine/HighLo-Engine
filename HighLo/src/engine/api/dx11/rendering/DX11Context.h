@@ -1,9 +1,11 @@
 #pragma once
-#include <engine/rendering/RenderingContext.h>
+
+#include "engine/rendering/RenderingContext.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_DX11
-#include <api/dx11/DX11Resources.h>
-#include <api/dx11/window/DX11Window.h>
+#include "api/dx11/DX11Resources.h"
+#include "api/dx11/window/DX11Window.h"
 
 namespace highlo
 {

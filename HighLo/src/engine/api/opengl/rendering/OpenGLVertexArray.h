@@ -1,5 +1,7 @@
 #pragma once
-#include <engine/rendering/VertexArray.h>
+
+#include "engine/rendering/VertexArray.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_OPENGL
 
@@ -21,7 +23,7 @@ namespace highlo
 		virtual const Ref<IndexBuffer>& GetIndexBuffer() const override;
 
 	private:
-		uint32_t m_ID;
+		uint32 m_ID;
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 		Ref<IndexBuffer> m_IndexBuffer;
 	};

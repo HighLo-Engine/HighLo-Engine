@@ -1,15 +1,37 @@
 #pragma once
-#include <memory>
-#include <cinttypes>
 
-#ifdef HL_BUILD
-#define HLAPI __declspec(dllexport)
+#include "engine/logging/Logger.h"
+#include "engine/core/defines/HLCompiler.h"
+#include "engine/core/defines/HLBaseTypes.h"
+#include "engine/core/HLAssert.h"
+
+#ifdef HL_USE_DLL
+
+#ifdef HL_LIBRARY_EXPORT
+#define HLAPI HL_DLL_EXPORT
 #else
-#define HLAPI __declspec(dllimport)
+#define HLAPI HL_DLL_IMPORT
 #endif
 
-#define HIGHLO_API_OPENGL
-//#define HIGHLO_API_DX11
+#else
+
+#define HLAPI /* NOTHING */
+
+#endif
+
+#define HL_ENGINE_BUILD 154685
+#define HL_ENGINE_VERSION "1.0.154685"
+
+#define HL_MAX(A, B) ( ((A)  > (B)) ? (A) :  (B) )
+#define HL_MIN(A, B) ( ((A)  < (B)) ? (A) :  (B) )
+#define HL_ABS(A)    ( ((A)  >= 0 ) ? (A) : -(A) )
+#define HL_BIT(X)	 (1 << X)
+
+#define HL_BIND_EVENT_FUNCTION(fn) std::bind(&fn, this, std::placeholders::_1)
+#define HL_OUT_OF_MEMORY HL_CORE_FATAL("Out of memory error!\nFile: {0}\nLine: {1}", __FILE__, __LINE__)
+
+using HLRendererID = uint32;
+using Byte = unsigned char;
 
 namespace highlo
 {
@@ -33,4 +55,18 @@ namespace highlo
 	{
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
+
+	struct HLAllocationMetrics
+	{
+		uint32 TotalAllocated = 0;	/**< The total amount of bytes allocated by the program. */
+		uint32 TotalFreed = 0;		/**< The total amount of bytes freed by the program. */
+
+		/**
+		 *
+		 * Returns the current memory usage in bytes.
+		 *
+		 * @return Returns the current memory usage in bytes.
+		 */
+		inline uint32 CurrentUsage() { return TotalAllocated - TotalFreed; }
+	};
 }

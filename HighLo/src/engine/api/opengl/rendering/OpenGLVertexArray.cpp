@@ -60,7 +60,7 @@ namespace highlo
 		glBindVertexArray(m_ID);
 		vertex_buffer->Bind();
 
-		uint32_t index = 0;
+		uint32 index = 0;
 		const auto& layout = vertex_buffer->GetLayout();
 		for (const auto& element : layout)
 		{

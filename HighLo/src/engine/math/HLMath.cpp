@@ -20,9 +20,9 @@ namespace highlo
 		return os;
 	}
 
-	std::string vec3ToString(const glm::vec3& v)
+	HLString vec3ToString(const glm::vec3& v)
 	{
-		return std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z);
+		return HLString::ToString(v.x) + ", " + HLString::ToString(v.y) + ", " + HLString::ToString(v.z);
 	}
 
 	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset)

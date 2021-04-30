@@ -35,7 +35,10 @@ project "HighLo"
     defines
 	{
 		"_CRT_SECURE_NO_WARNINGS",
-		"GLFW_INCLUDE_NONE"
+		"GLFW_INCLUDE_NONE",
+		"HL_USE_DLL",
+		"HL_LIBRARY_EXPORT",
+		"HIGHLO_API_OPENGL"
 	}
 
     filter "system:windows"

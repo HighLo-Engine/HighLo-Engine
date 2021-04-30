@@ -5,7 +5,7 @@ namespace highlo
 {
 	void BufferLayout::CalculateOffsetsAndStride()
 	{
-		uint32_t offset = 0;
+		uint32 offset = 0;
 		m_Stride = 0;
 		for (auto& element : m_Elements)
 		{

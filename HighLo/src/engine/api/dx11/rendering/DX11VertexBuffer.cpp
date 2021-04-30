@@ -30,7 +30,7 @@ namespace highlo
 		DX11Resources::s_Device->CreateBuffer(&vbedsc, &vbdata, m_Buffer.GetAddressOf());
 	}
 
-	DX11VertexBuffer::DX11VertexBuffer(void* data, size_t size, uint32_t stride)
+	DX11VertexBuffer::DX11VertexBuffer(void* data, size_t size, uint32 stride)
 	{
 		if (m_Buffer.Get() != nullptr)
 			m_Buffer.Reset();

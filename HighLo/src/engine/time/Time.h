@@ -1,10 +1,26 @@
 #pragma once
 
 #include "engine/core/HLCore.h"
+#include "engine/core/dataTypes/HLString.h"
 
 namespace highlo
 {
 	typedef float Timestep;
+
+	enum class HLDateFormat
+	{
+		None = 0,
+		German,
+		English_US,
+		English_GB
+	};
+
+	enum class HLTimePrecision
+	{
+		None = 0,
+		Seconds,
+		Milliseconds
+	};
 
 	class Time
 	{
@@ -16,6 +32,9 @@ namespace highlo
 
 		HLAPI static Timestep	GetTimestep();
 		HLAPI static void		FrameUpdate();
+
+		HLAPI static double		GetSystemTime();
+		HLAPI static HLString GetCurrentTimeStamp(HLDateFormat format = HLDateFormat::English_US, HLTimePrecision precision = HLTimePrecision::Seconds);
 
 	private:
 		static float s_ElapsedTime;

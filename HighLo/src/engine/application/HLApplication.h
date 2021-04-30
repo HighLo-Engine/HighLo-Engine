@@ -11,8 +11,8 @@ namespace highlo
 	struct ApplicationStartupSettings
 	{
 		bool Fullscreen = false;
-		uint32_t WindowWidth = 1270;
-		uint32_t WindowHeight = 920;
+		uint32 WindowWidth = 1270;
+		uint32 WindowHeight = 920;
 		std::string WindowTitle = "HighLo Engine";
 	};
 

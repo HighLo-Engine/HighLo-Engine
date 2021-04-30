@@ -1,8 +1,10 @@
 #pragma once
-#include <engine/rendering/VertexBuffer.h>
+
+#include "engine/rendering/VertexBuffer.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_DX11
-#include <api/dx11/DX11Resources.h>
+#include "api/dx11/DX11Resources.h"
 
 namespace highlo
 {
@@ -10,7 +12,7 @@ namespace highlo
 	{
 	public:
 		DX11VertexBuffer(std::vector<Vertex>& vertices);
-		DX11VertexBuffer(void* data, size_t size, uint32_t stride);
+		DX11VertexBuffer(void* data, size_t size, uint32 stride);
 
 		virtual void Bind() override;
 		virtual void Unbind() override;

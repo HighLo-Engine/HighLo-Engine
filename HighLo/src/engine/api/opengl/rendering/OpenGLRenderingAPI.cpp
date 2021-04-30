@@ -21,7 +21,7 @@ namespace highlo
 		glDrawElements(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawInstanced(const Ref<VertexArray>& va, uint32_t count)
+	void OpenGLRenderingAPI::DrawInstanced(const Ref<VertexArray>& va, uint32 count)
 	{
 		glDrawElementsInstanced(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
 	}
@@ -36,7 +36,7 @@ namespace highlo
 		glPolygonMode(GL_FRONT_AND_BACK, wf ? GL_LINE : GL_FILL);
 	}
 	
-	void OpenGLRenderingAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	void OpenGLRenderingAPI::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 	{
 		glViewport(x, y, width, height);
 	}

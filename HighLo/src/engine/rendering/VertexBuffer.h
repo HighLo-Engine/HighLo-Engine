@@ -1,9 +1,8 @@
 #pragma once
 
-#include <engine/core/HLCore.h>
+#include "engine/core/HLCore.h"
 #include "VertexData.h"
 #include "BufferLayout.h"
-#include <vector>
 
 namespace highlo
 {
@@ -22,6 +21,6 @@ namespace highlo
 		virtual void UpdateContents(void* data, size_t size) = 0;
 
 		static Ref<VertexBuffer> Create(std::vector<Vertex>& vertices);
-		static Ref<VertexBuffer> Create(void* data, size_t size, uint32_t stride);
+		static Ref<VertexBuffer> Create(void* data, size_t size, uint32 stride);
 	};
 }

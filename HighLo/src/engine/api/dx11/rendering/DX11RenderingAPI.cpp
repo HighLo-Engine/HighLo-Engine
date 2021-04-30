@@ -27,7 +27,7 @@ namespace highlo
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawInstanced(const Ref<VertexArray>& va, uint32_t count)
+	void DX11RenderingAPI::DrawInstanced(const Ref<VertexArray>& va, uint32 count)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		DX11Resources::s_DeviceContext->DrawIndexedInstanced(va->GetIndexBuffer()->GetCount(), count, 0, 0, 0);
@@ -53,7 +53,7 @@ namespace highlo
 		DX11Resources::s_DeviceContext->RSSetState(DX11Resources::s_RasterizerState.Get());
 	}
 
-	void DX11RenderingAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	void DX11RenderingAPI::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 	{
 		D3D11_VIEWPORT viewport;
 		ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));

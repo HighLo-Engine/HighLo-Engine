@@ -32,7 +32,7 @@ namespace highlo
 		s_RenderingAPI->SetWireframe(wf);
 	}
 
-	void Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	void Renderer::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 	{
 		s_RenderingAPI->SetViewport(x, y, width, height);
 	}

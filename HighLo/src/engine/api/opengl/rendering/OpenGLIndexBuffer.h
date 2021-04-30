@@ -1,5 +1,7 @@
 #pragma once
-#include <engine/rendering/IndexBuffer.h>
+
+#include "engine/rendering/IndexBuffer.h"
+#include "engine/logging/Logger.h"
 
 #ifdef HIGHLO_API_OPENGL
 namespace highlo
@@ -15,8 +17,8 @@ namespace highlo
 		virtual int  GetCount() override { return (int)m_Count; }
 
 	private:
-		uint32_t m_ID;
-		uint32_t m_Count = 0;
+		uint32 m_ID;
+		uint32 m_Count = 0;
 	};
 }
 

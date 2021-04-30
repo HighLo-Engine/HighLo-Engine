@@ -5,6 +5,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "engine/core/HLCore.h"
+#include "engine/core/dataTypes/HLString.h"
 
 namespace highlo
 {
@@ -14,7 +15,7 @@ namespace highlo
 	float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 
 	std::ostream& operator<<(std::ostream& os, const glm::vec3& vec);
-	std::string vec3ToString(const glm::vec3& v);
+	HLString vec3ToString(const glm::vec3& v);
 
 	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
 	glm::vec3 WorldToScreen(glm::vec3 point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));

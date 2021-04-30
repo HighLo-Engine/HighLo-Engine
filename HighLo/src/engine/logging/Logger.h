@@ -12,12 +12,12 @@ namespace highlo
 	public:
 		HLAPI static void Init();
 
-		HLAPI inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_EngineLogger; }
-		HLAPI inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+		HLAPI inline static Ref<spdlog::logger> &GetCoreLogger() { return s_EngineLogger; }
+		HLAPI inline static Ref<spdlog::logger> &GetClientLogger() { return s_ClientLogger; }
 
 	private:
-		static std::shared_ptr<spdlog::logger> s_EngineLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
+		static Ref<spdlog::logger> s_EngineLogger;
+		static Ref<spdlog::logger> s_ClientLogger;
 	};
 }
 

@@ -4,6 +4,3 @@
 [submodule "HighLo/HighLo/vendor/glfw"]
 	path = HighLo/HighLo/vendor/glfw
 	url = https://github.com/HighLo-Engine/glfw.git
-[submodule "HighLo/HighLo/vendor/glm"]
-	path = /HighLo/HighLo/vendor/glm
-	url = https://github.com/HighLo-Engine/glm.git

@@ -22,7 +22,7 @@ namespace highlo
 
 		InitializeWindow();
 
-		HL_CORE_TRACE("Engine Initialized");
+		HL_CORE_INFO("Engine Initialized");
 		OnInitialize();
 
 		// Main Rendering Thread
@@ -32,8 +32,8 @@ namespace highlo
 
 			OnUpdate(Time::GetTimestep());
 
-			glClear(GL_COLOR_BUFFER_BIT);
-			glClearColor(0.1f, 0.4f, 0.2f, 1.0f);
+			/*glClear(GL_COLOR_BUFFER_BIT);
+			glClearColor(0.1f, 0.4f, 0.2f, 1.0f);*/
 
 			m_Window->Update();
 		}

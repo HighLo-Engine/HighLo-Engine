@@ -10,13 +10,6 @@ namespace highlo
 
 		REGISTER_EVT_CLASS_TYPE(WindowClose)
 		REGISTER_EVT_CATEGORY(EventCategoryWindow)
-
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "Window Closed";
-			return ss.str();
-		}
 	};
 
 	class WindowResizeEvent : public Event

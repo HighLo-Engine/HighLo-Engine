@@ -1,4 +1,6 @@
 #include "OpenGLContext.h"
+
+#ifdef HIGHLO_API_OPENGL
 #include <logging/Logger.h>
 
 #include <GLFW/glfw3.h>
@@ -18,10 +20,12 @@ namespace highlo
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			HL_CORE_FATAL("Failed to initialize OpenGL context");
 
-		HL_CORE_TRACE("OpenGL Info:");
-		HL_CORE_TRACE("    Vendor    : {0}", glGetString(GL_VENDOR));
-		HL_CORE_TRACE("    Renderer  : {0}", glGetString(GL_RENDERER));
-		HL_CORE_TRACE("    Version   : {0}\n\n", glGetString(GL_VERSION));
+		std::stringstream ss;
+		ss << "\nOpenGL Info:\n";
+		ss << "    Vendor    :  " << glGetString(GL_VENDOR) << "\n";
+		ss << "    Renderer  :  " << glGetString(GL_RENDERER) << "\n";
+		ss << "    Version   :  " << glGetString(GL_VERSION) << "\n";
+		HL_CORE_INFO(ss.str());
 	}
 
 	void OpenGLContext::SwapBuffers()
@@ -29,3 +33,4 @@ namespace highlo
 		glfwSwapBuffers((GLFWwindow*)m_OpenGLWindowHandle);
 	}
 }
+#endif // HIGHLO_API_OPENGL

@@ -2,7 +2,7 @@
 
 void Sandbox::OnInitialize()
 {
-	HL_INFO("Sandbox Initialized");
+	HL_TRACE("Sandbox Initialized");
 }
 
 void Sandbox::OnUpdate(Timestep timestep)
@@ -11,9 +11,11 @@ void Sandbox::OnUpdate(Timestep timestep)
 
 void Sandbox::OnShutdown()
 {
+	HL_TRACE("Sandbox Shutdown");
 }
 
 void Sandbox::OnEvent(Event& e)
 {
-	HL_INFO(e.ToString());
+	if (e.IsInCategory(EventCategory::EventCategoryWindow))
+		HL_TRACE(e.ToString());
 }

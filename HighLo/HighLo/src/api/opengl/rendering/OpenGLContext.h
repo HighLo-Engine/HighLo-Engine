@@ -1,5 +1,7 @@
 #pragma once
 #include <rendering/RenderingContext.h>
+
+#ifdef HIGHLO_API_OPENGL
 #include <window/Window.h>
 
 namespace highlo
@@ -16,3 +18,4 @@ namespace highlo
 		void* m_OpenGLWindowHandle;
 	};
 }
+#endif // #ifdef HIGHLO_API_OPENGL

@@ -1,17 +1,25 @@
 #pragma once
 #include <window/Window.h>
 
-#ifdef HIGHLO_API_OPENGL
+#ifdef HIGHLO_API_DX11
+#include <Windows.h>
 #include <rendering/RenderingContext.h>
-#include <GLFW/glfw3.h>
 
 namespace highlo
 {
-	class OpenGLWindow : public Window
+	class DX11Window;
+
+	struct WindowCallbackData
+	{
+		DX11Window* p_EngineWindow = nullptr;
+		EventCallbackFn EventCallback;
+	};
+
+	class DX11Window : public Window
 	{
 	public:
-		OpenGLWindow(const WindowData& properties);
-		~OpenGLWindow();
+		DX11Window(const WindowData& properties);
+		~DX11Window();
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) override;
 
@@ -26,18 +34,21 @@ namespace highlo
 
 		bool IsFocused() override;
 
+		// Specific to DX11Window
+		void OnResize(unsigned int width, unsigned int height);
+
 	private:
 		WindowData m_Properties;
 		void Init();
 
-		UniqueRef<RenderingContext> m_Context;
+		std::unique_ptr<RenderingContext> m_Context;
 
 	private:
-		GLFWwindow* m_NativeHandle = nullptr;
+		HWND m_NativeHandle = nullptr;
 		bool m_CursorLocked = false;
 
 	private:
-		void SetCallbacks();
+		WindowCallbackData m_CallbackData;
 	};
 }
-#endif // HIGHLO_API_OPENGL
+#endif // HIGHLO_API_DX11

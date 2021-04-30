@@ -53,6 +53,7 @@ project "HighLo"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
+        buildoptions "/MD"
 
         defines
         {
@@ -76,7 +77,6 @@ project "HighLo"
     filter "configurations:Dist"
         defines "HL_DIST"
         optimize "On"
-
 
 project "Sandbox"
     location "Sandbox"
@@ -107,6 +107,7 @@ project "Sandbox"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
+        buildoptions "/MD"
 
         defines
         {

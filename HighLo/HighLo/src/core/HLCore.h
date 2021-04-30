@@ -8,6 +8,9 @@
 #define HLAPI __declspec(dllimport)
 #endif
 
+#define HIGHLO_API_OPENGL
+//#define HIGHLO_API_DX11
+
 namespace highlo
 {
 	template <typename T>

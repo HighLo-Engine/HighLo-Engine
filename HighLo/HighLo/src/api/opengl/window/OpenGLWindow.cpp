@@ -1,4 +1,6 @@
 #include "OpenGLWindow.h"
+
+#ifdef HIGHLO_API_OPENGL
 #include <logging/Logger.h>
 #include <api/opengl/rendering/OpenGLContext.h>
 #include <events/Events.h>
@@ -8,18 +10,6 @@ namespace highlo
     static void GLFWErrorCallback(int error, const char* description)
     {
         HL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
-    }
-
-	Window* Window::s_WindowInstance = nullptr;
-
-    Window& Window::Get()
-    {
-        return *Window::s_WindowInstance;
-    }
-
-    Window* Window::Create(const WindowData& properties)
-    {
-        return new OpenGLWindow(properties);
     }
 
     OpenGLWindow::OpenGLWindow(const WindowData& properties)
@@ -108,7 +98,7 @@ namespace highlo
 			data.event_callback(event);
 		});
 
-		/*glfwSetKeyCallback(m_NativeHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(m_NativeHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -198,6 +188,7 @@ namespace highlo
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.focused = (bool)focused;
-		});*/
+		});
     }
 }
+#endif // HIGHLO_API_OPENGL

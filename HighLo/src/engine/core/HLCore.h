@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "engine/core/defines/HLCompiler.h"
-#include "engine/core/defines/HLBaseTypes.h"
-#include "engine/core/HLAssert.h"
+#include "Engine/Core/Defines/HLCompiler.h"
+#include "Engine/Core/Defines/HLBaseTypes.h"
+#include "Engine/Core/HLAssert.h"
 
 #ifdef HL_USE_DLL
 

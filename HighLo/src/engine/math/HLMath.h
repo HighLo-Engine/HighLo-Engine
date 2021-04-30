@@ -4,9 +4,9 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "engine/core/HLCore.h"
-#include "engine/core/dataTypes/HLString.h"
-#include "engine/core/Log.h"
+#include "Engine/Core/HLCore.h"
+#include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Core/HLLog.h"
 
 namespace highlo
 {

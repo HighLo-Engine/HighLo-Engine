@@ -1,10 +1,10 @@
 #pragma once
 
-#include "engine/core/Log.h"
-#include "engine/time/Time.h"
-#include "engine/window/Window.h"
-#include "engine/events/Events.h"
-#include "engine/rendering/Renderer.h"
+#include "Engine/Core/HLLog.h"
+#include "Engine/Core/HLTime.h"
+#include "Engine/Window/Window.h"
+#include "Engine/Events/Events.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace highlo
 {

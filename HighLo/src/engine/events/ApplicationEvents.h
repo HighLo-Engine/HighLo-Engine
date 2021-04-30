@@ -10,11 +10,9 @@ namespace highlo
 
 		WindowCloseEvent() {}
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "WindowCloseEvent";
-			return ss.str();
+			return HLString("WindowCloseEvent");
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(WindowClose)
@@ -31,11 +29,9 @@ namespace highlo
 		inline uint32 GetWidth() const { return m_Width; }
 		inline uint32 GetHeight() const { return m_Height; }
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "WindowResizeEvent: " << m_Width << ", " << m_Height;
-			return ss.str();
+			return HLString("WindowResizeEvent: ") << m_Width << ", " << m_Height;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(WindowResize)

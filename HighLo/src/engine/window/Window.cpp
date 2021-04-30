@@ -2,11 +2,11 @@
 #include "Window.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "engine/api/opengl/window/OpenGLWindow.h"
+#include "Engine/Platform/OpenGL/Window/OpenGLWindow.h"
 #endif // HIGHLO_API_OPENGL
 
 #ifdef HIGHLO_API_DX11
-#include "engine/api/dx11/window/DX11Window.h"
+#include "Engine/Platform/DX11/Window/DX11Window.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

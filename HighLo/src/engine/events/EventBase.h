@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HighLoPch.h"
+#include "Engine/Core/DataTypes/HLString.h"
 
 namespace highlo
 {
@@ -77,7 +78,7 @@ namespace highlo
 		 *
 		 * @return New FakeString with the Name of the correct EventName.
 		 */
-		virtual std::string ToString() const
+		virtual HLString ToString() const
 		{
 			return GetName();
 		}

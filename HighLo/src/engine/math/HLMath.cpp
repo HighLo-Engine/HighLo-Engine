@@ -1,7 +1,7 @@
 #include "HighLoPch.h"
 #include "HLMath.h"
 
-#include "engine/window/Window.h"
+#include "Engine/Window/Window.h"
 
 namespace highlo
 {

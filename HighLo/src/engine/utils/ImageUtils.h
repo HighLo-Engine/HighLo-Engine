@@ -4,10 +4,10 @@
 #include <math.h>
 #include <cmath>
 
-#include "engine/core/HLCore.h"
-#include "engine/core/Log.h"
-#include "engine/core/HLAssert.h"
-#include "engine/rendering/ImageFormat.h"
+#include "Engine/Core/HLCore.h"
+#include "Engine/Core/HLLog.h"
+#include "Engine/Core/HLAssert.h"
+#include "Engine/Renderer/ImageFormat.h"
 
 namespace highlo
 {

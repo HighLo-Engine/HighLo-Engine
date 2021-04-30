@@ -27,11 +27,9 @@ namespace highlo
 
 		inline int32_t GetRepeatCount() { return m_RepeatCount; }
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
-			return ss.str();
+			return HLString("KeyPressedEvent: ") << m_KeyCode << " (" << m_RepeatCount << " repeats)";
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(KeyPressed)
@@ -46,11 +44,9 @@ namespace highlo
 		KeyReleasedEvent(int32_t keyCode)
 			: KeyEvent(keyCode) {}
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "KeyReleasedEvent: " << m_KeyCode;
-			return ss.str();
+			return HLString("KeyReleasedEvent") << m_KeyCode;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(KeyReleased)

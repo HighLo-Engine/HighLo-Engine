@@ -16,11 +16,9 @@ namespace highlo
 		inline float GetMouseDX() const { return m_MouseDX; }
 		inline float GetMouseDY() const { return m_MouseDY; }
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "MouseMovedEvent: " << m_MouseDX << ", " << m_MouseDY;
-			return ss.str();
+			return HLString("MouseMovedEvent: ") << m_MouseDX << ", " << m_MouseDY;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseMoved)
@@ -41,11 +39,9 @@ namespace highlo
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "MouseScrolledEvent: " << m_XOffset << ", " << m_YOffset;
-			return ss.str();
+			return HLString("MouseScrolledEvent: ") << m_XOffset << ", " << m_YOffset;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseScrolled)
@@ -78,11 +74,9 @@ namespace highlo
 		MouseButtonPressedEvent(int32 mouseButton)
 			: MouseButton(mouseButton) {}
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "MouseButtonPressedEvent: " << m_MouseButton;
-			return ss.str();
+			return HLString("MouseButtonPressedEvent: ") << m_MouseButton;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseButtonPressed)
@@ -95,11 +89,9 @@ namespace highlo
 		MouseButtonReleasedEvent(int32_t mouseButton)
 			: MouseButton(mouseButton) {}
 
-		std::string ToString() const override
+		HLString ToString() const override
 		{
-			std::stringstream ss;
-			ss << "MouseButtonReleasedEvent: " << m_MouseButton;
-			return ss.str();
+			return HLString("MouseButtonReleasedEvent") << m_MouseButton;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseButtonReleased)

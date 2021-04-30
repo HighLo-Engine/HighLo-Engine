@@ -9,7 +9,7 @@ namespace highlo
 	Allocator::Allocator(Byte *data, uint32 size)
 		: m_Data(data), m_Size(size) {}
 
-	Allocator Allocator::Copy(void *data, uint32 size)
+	Allocator Allocator::Copy(const void *data, uint32 size)
 	{
 		Allocator buffer;
 		buffer.Allocate(size);
@@ -32,6 +32,13 @@ namespace highlo
 	void *Allocator::Allocate(uint64 size, uint64 alignment)
 	{
 		return _aligned_malloc((size_t)size, (size_t)alignment);
+	}
+
+	void Allocator::Release()
+	{
+		delete[] m_Data;
+		m_Data = nullptr;
+		m_Size = 0;
 	}
 
 	void Allocator::Free(void *memory)

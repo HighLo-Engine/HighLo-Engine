@@ -1,10 +1,10 @@
 #pragma once
 
+#ifdef HIGHLO_API_OPENGL
+
+#include "engine/window/Window.h"
 #include "engine/rendering/RenderingContext.h"
 #include "engine/core/Log.h"
-
-#ifdef HIGHLO_API_OPENGL
-#include "engine/window/Window.h"
 
 namespace highlo
 {

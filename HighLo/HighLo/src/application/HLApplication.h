@@ -3,6 +3,7 @@
 #include <time/Time.h>
 #include <window/Window.h>
 #include <events/Events.h>
+#include <rendering/Renderer.h>
 
 namespace highlo
 {

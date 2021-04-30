@@ -1,9 +1,6 @@
 #include "HLApplication.h"
 #include <logging/Logger.h>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 namespace highlo
 {
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&HLApplication::fn, this, std::placeholders::_1)
@@ -32,9 +29,6 @@ namespace highlo
 
 			OnUpdate(Time::GetTimestep());
 
-			/*glClear(GL_COLOR_BUFFER_BIT);
-			glClearColor(0.1f, 0.4f, 0.2f, 1.0f);*/
-
 			m_Window->Update();
 		}
 
@@ -51,6 +45,8 @@ namespace highlo
 		);
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+
+		Renderer::Init(m_Window.get());
 	}
 
 	void HLApplication::InternalEventHandler(Event& event)

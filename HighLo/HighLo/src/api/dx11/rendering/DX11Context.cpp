@@ -57,7 +57,7 @@ namespace highlo
 		swapchaindesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		swapchaindesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-		HRESULT result = D3D11CreateDeviceAndSwapChain(adapters[0].m_Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, NULL, NULL, 0, D3D11_SDK_VERSION, &swapchaindesc, m_SwapChain.GetAddressOf(), DirectXResources::s_Device.GetAddressOf(), NULL, DirectXResources::s_DeviceContext.GetAddressOf());
+		HRESULT result = D3D11CreateDeviceAndSwapChain(adapters[0].m_Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, NULL, NULL, 0, D3D11_SDK_VERSION, &swapchaindesc, m_SwapChain.GetAddressOf(), DX11Resources::s_Device.GetAddressOf(), NULL, DX11Resources::s_DeviceContext.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create ID3D11Device and IDXGISwapChain");
 
@@ -82,7 +82,7 @@ namespace highlo
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to get back buffer");
 
-		result = DirectXResources::s_Device->CreateRenderTargetView(back_buffer.Get(), NULL, DirectXResources::s_RenderTargetView.GetAddressOf());
+		result = DX11Resources::s_Device->CreateRenderTargetView(back_buffer.Get(), NULL, DX11Resources::s_RenderTargetView.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create RenderTargetView");
 	}
@@ -102,15 +102,15 @@ namespace highlo
 		depth_stencil_desc.CPUAccessFlags = 0;
 		depth_stencil_desc.MiscFlags = 0;
 
-		HRESULT result = DirectXResources::s_Device->CreateTexture2D(&depth_stencil_desc, NULL, m_DepthStencilBuffer.GetAddressOf());
+		HRESULT result = DX11Resources::s_Device->CreateTexture2D(&depth_stencil_desc, NULL, m_DepthStencilBuffer.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create depth stencil buffer");
 
-		result = DirectXResources::s_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), NULL, DirectXResources::s_DepthStencilView.GetAddressOf());
+		result = DX11Resources::s_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), NULL, DX11Resources::s_DepthStencilView.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create depth stencil view");
 
-		DirectXResources::s_DeviceContext->OMSetRenderTargets(1, DirectXResources::s_RenderTargetView.GetAddressOf(), DirectXResources::s_DepthStencilView.Get());
+		DX11Resources::s_DeviceContext->OMSetRenderTargets(1, DX11Resources::s_RenderTargetView.GetAddressOf(), DX11Resources::s_DepthStencilView.Get());
 	}
 
 	void DX11Context::InitializeDepthStencilState()
@@ -122,7 +122,7 @@ namespace highlo
 		depth_stencil_state_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
 		depth_stencil_state_desc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
 
-		HRESULT result = DirectXResources::s_Device->CreateDepthStencilState(&depth_stencil_state_desc, DirectXResources::s_DepthStencilState.GetAddressOf());
+		HRESULT result = DX11Resources::s_Device->CreateDepthStencilState(&depth_stencil_state_desc, DX11Resources::s_DepthStencilState.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create depth stencil state");
 	}
@@ -141,7 +141,7 @@ namespace highlo
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
 
-		DirectXResources::s_DeviceContext->RSSetViewports(1, &viewport);
+		DX11Resources::s_DeviceContext->RSSetViewports(1, &viewport);
 	}
 
 	void DX11Context::InitializeRasterizerState()
@@ -151,7 +151,7 @@ namespace highlo
 
 		rasterizerdesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
 		rasterizerdesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
-		HRESULT result = DirectXResources::s_Device->CreateRasterizerState(&rasterizerdesc, DirectXResources::s_RasterizerState.GetAddressOf());
+		HRESULT result = DX11Resources::s_Device->CreateRasterizerState(&rasterizerdesc, DX11Resources::s_RasterizerState.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create rasterizer state");
 	}
@@ -169,11 +169,11 @@ namespace highlo
 		om_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		om_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		HRESULT result = DirectXResources::s_Device->CreateBlendState(&om_desc, m_BlendState.GetAddressOf());
+		HRESULT result = DX11Resources::s_Device->CreateBlendState(&om_desc, m_BlendState.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create blend state");
 
-		DirectXResources::s_DeviceContext->OMSetBlendState(m_BlendState.Get(), 0, 0xffffffff);
+		DX11Resources::s_DeviceContext->OMSetBlendState(m_BlendState.Get(), 0, 0xffffffff);
 	}
 
 	void DX11Context::InitializeSamplerState()
@@ -189,26 +189,26 @@ namespace highlo
 		sampler_desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 		sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-		HRESULT result = DirectXResources::s_Device->CreateSamplerState(&sampler_desc, DirectXResources::s_SamplerState.GetAddressOf());
+		HRESULT result = DX11Resources::s_Device->CreateSamplerState(&sampler_desc, DX11Resources::s_SamplerState.GetAddressOf());
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create sampler state");
 	}
 
 	void DX11Context::InitializeAudioEngine()
 	{
-		HRESULT result = XAudio2Create(DirectXResources::s_XAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR);
+		HRESULT result = XAudio2Create(DX11Resources::s_XAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR);
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create XAudio2 resource");
 
-		result = DirectXResources::s_XAudio2->CreateMasteringVoice(&DirectXResources::s_XAudio2MasteringVoice);
+		result = DX11Resources::s_XAudio2->CreateMasteringVoice(&DX11Resources::s_XAudio2MasteringVoice);
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create XAudio2 mastering voice");
 	}
 
 	void DX11Context::ReleaseAudioEngine()
 	{
-		if (DirectXResources::s_XAudio2MasteringVoice)
-			DirectXResources::s_XAudio2MasteringVoice->DestroyVoice();
+		if (DX11Resources::s_XAudio2MasteringVoice)
+			DX11Resources::s_XAudio2MasteringVoice->DestroyVoice();
 	}
 }
 #endif // HIGHLO_API_DX11

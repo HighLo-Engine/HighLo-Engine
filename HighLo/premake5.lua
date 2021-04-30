@@ -32,6 +32,7 @@ project "HighLo"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
+        "%{prj.name}/vendor/glm",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.GLAD}"
     }
@@ -54,6 +55,8 @@ project "HighLo"
         staticruntime "On"
         systemversion "latest"
         buildoptions "/MD"
+
+        disablewarnings { "5033" }
 
         defines
         {
@@ -95,6 +98,7 @@ project "Sandbox"
     includedirs
     {
         "HighLo/vendor/spdlog/include",
+        "HighLo/vendor/glm",
         "HighLo/src"
     }
 
@@ -108,6 +112,8 @@ project "Sandbox"
         staticruntime "On"
         systemversion "latest"
         buildoptions "/MD"
+
+        disablewarnings { "5033" }
 
         defines
         {

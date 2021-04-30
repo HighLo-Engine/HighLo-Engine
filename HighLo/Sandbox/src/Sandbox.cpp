@@ -7,6 +7,8 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(Timestep timestep)
 {
+	Renderer::ClearScreenBuffers();
+	Renderer::ClearScreenColor(glm::vec4(0.2f, 0.06f, 0.06f, 1.0f));
 }
 
 void Sandbox::OnShutdown()

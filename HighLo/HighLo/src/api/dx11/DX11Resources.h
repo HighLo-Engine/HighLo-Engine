@@ -14,7 +14,7 @@ using namespace Microsoft::WRL;
 
 namespace highlo
 {
-	class DirectXResources
+	class DX11Resources
 	{
 	public:
 		static ComPtr<ID3D11Device>				s_Device;

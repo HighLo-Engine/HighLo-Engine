@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/Rendering/RenderingAPI.h"
-#include "engine/logging/Logger.h"
+#include "engine/core/Log.h"
 
 #ifdef HIGHLO_API_DX11
 

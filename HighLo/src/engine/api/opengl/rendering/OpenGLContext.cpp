@@ -2,7 +2,7 @@
 #include "OpenGLContext.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "engine/logging/Logger.h"
+#include "engine/core/Log.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>

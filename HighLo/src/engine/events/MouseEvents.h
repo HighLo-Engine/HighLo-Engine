@@ -75,7 +75,7 @@ namespace highlo
 	{
 	public:
 		
-		MouseButtonPressedEvent(int32_t mouseButton)
+		MouseButtonPressedEvent(int32 mouseButton)
 			: MouseButton(mouseButton) {}
 
 		std::string ToString() const override

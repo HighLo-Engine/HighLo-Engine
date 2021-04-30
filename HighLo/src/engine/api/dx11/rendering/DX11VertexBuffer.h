@@ -1,10 +1,11 @@
 #pragma once
 
 #include "engine/rendering/VertexBuffer.h"
-#include "engine/logging/Logger.h"
+#include "engine/core/Log.h"
 
 #ifdef HIGHLO_API_DX11
-#include "api/dx11/DX11Resources.h"
+
+#include "engine/api/dx11/DX11Resources.h"
 
 namespace highlo
 {

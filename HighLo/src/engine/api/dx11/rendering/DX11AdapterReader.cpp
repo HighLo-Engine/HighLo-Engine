@@ -2,7 +2,8 @@
 #include "DX11AdapterReader.h"
 
 #ifdef HIGHLO_API_DX11
-#include <logging/Logger.h>
+
+#include "engine/core/Log.h"
 
 namespace highlo
 {

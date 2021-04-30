@@ -2,8 +2,9 @@
 #include "DX11RenderingAPI.h"
 
 #ifdef HIGHLO_API_DX11
-#include <api/dx11/DX11Resources.h>
-#include <logging/Logger.h>
+
+#include "engine/api/dx11/DX11Resources.h"
+#include "engine/core/Log.h"
 
 namespace highlo
 {

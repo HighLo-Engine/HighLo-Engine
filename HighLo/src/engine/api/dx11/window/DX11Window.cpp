@@ -2,12 +2,15 @@
 #include "DX11Window.h"
 
 #ifdef HIGHLO_API_DX11
-#include <windowsx.h>
-#include <window/Window.h>
-#include <api/dx11/rendering/DX11Context.h>
 
-#include <logging/Logger.h>
-#include <events/Events.h>
+#include <windowsx.h>
+#include "engine/window/Window.h"
+#include "engine/api/dx11/rendering/DX11Context.h"
+
+#include "engine/core/Log.h"
+#include "engine/events/Events.h"
+#include "engine/core/defines/HLKeyCodes.h"
+#include "engine/core/defines/HLMouseButtonCodes.h"
 
 namespace highlo
 {
@@ -53,13 +56,13 @@ namespace highlo
 		RECT window_rect;
 		window_rect.left = 0;
 		window_rect.top = 30;
-		window_rect.right = window_rect.left + m_Properties.width;
-		window_rect.bottom = window_rect.top + m_Properties.height;
+		window_rect.right = window_rect.left + m_Properties.m_Width;
+		window_rect.bottom = window_rect.top + m_Properties.m_Height;
 
 		AdjustWindowRect(&window_rect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
 
 		HWND hwnd = CreateWindowExA(
-			WS_EX_OVERLAPPEDWINDOW, "HLEngineWindowClass", m_Properties.title, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
+			WS_EX_OVERLAPPEDWINDOW, "HLEngineWindowClass", m_Properties.m_Title, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
 			window_rect.left, window_rect.top, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top,
 			NULL, NULL, NULL, &m_Properties
 		);
@@ -71,7 +74,7 @@ namespace highlo
 
 		m_NativeHandle = hwnd;
 
-		if (m_Properties.fullscreen)
+		if (m_Properties.m_Fullscreen)
 		{
 			auto WindowHDC = GetDC(hwnd);
 			auto FullscreenWidth = GetDeviceCaps(WindowHDC, DESKTOPHORZRES);
@@ -86,8 +89,8 @@ namespace highlo
 			ShowWindow(hwnd, SW_MAXIMIZE);
 			UpdateWindow(hwnd);
 
-			m_Properties.width = FullscreenWidth;
-			m_Properties.height = FullscreenHeight;
+			m_Properties.m_Width = FullscreenWidth;
+			m_Properties.m_Height = FullscreenHeight;
 		}
 		else
 		{
@@ -123,12 +126,12 @@ namespace highlo
 
 	unsigned int DX11Window::GetWidth()
 	{
-		return m_Properties.width;
+		return m_Properties.m_Width;
 	}
 
 	unsigned int DX11Window::GetHeight()
 	{
-		return m_Properties.height;
+		return m_Properties.m_Height;
 	}
 
 	void DX11Window::SetCursorLocked(bool bLocked)
@@ -149,8 +152,8 @@ namespace highlo
 
 	void DX11Window::OnResize(unsigned int width, unsigned int height)
 	{
-		m_Properties.width = width;
-		m_Properties.height = height;
+		m_Properties.m_Width = width;
+		m_Properties.m_Height = height;
 	}
 
 	void DX11Window::Update()
@@ -278,7 +281,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				MouseButtonPressedEvent event(MouseButton::Left);
+				MouseButtonPressedEvent event((int32)HLMouseButtonCode::BUTTON_LEFT);
 				data->EventCallback(event);
 			}
 			break;
@@ -288,7 +291,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				MouseButtonPressedEvent event(MouseButton::Right);
+				MouseButtonPressedEvent event((int32)HLMouseButtonCode::BUTTON_RIGHT);
 				data->EventCallback(event);
 			}
 			break;
@@ -298,7 +301,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				MouseButtonPressedEvent event(MouseButton::Middle);
+				MouseButtonPressedEvent event((int32)HLMouseButtonCode::BUTTON_MIDDLE);
 				data->EventCallback(event);
 			}
 			break;
@@ -308,7 +311,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				MouseButtonReleasedEvent event(MouseButton::Left);
+				MouseButtonReleasedEvent event((int32)HLMouseButtonCode::BUTTON_LEFT);
 				data->EventCallback(event);
 			}
 			break;
@@ -318,7 +321,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				MouseButtonReleasedEvent event(MouseButton::Right);
+				MouseButtonReleasedEvent event((int32)HLMouseButtonCode::BUTTON_RIGHT);
 				data->EventCallback(event);
 			}
 			break;
@@ -328,7 +331,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				MouseButtonReleasedEvent event(MouseButton::Middle);
+				MouseButtonReleasedEvent event((int32)HLMouseButtonCode::BUTTON_MIDDLE);
 				data->EventCallback(event);
 			}
 			break;

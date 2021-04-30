@@ -1,6 +1,7 @@
 #pragma once
 
-#include "engine/logging/Logger.h"
+#include <memory>
+
 #include "engine/core/defines/HLCompiler.h"
 #include "engine/core/defines/HLBaseTypes.h"
 #include "engine/core/HLAssert.h"
@@ -18,9 +19,6 @@
 #define HLAPI /* NOTHING */
 
 #endif
-
-#define HL_ENGINE_BUILD 154685
-#define HL_ENGINE_VERSION "1.0.154685"
 
 #define HL_MAX(A, B) ( ((A)  > (B)) ? (A) :  (B) )
 #define HL_MIN(A, B) ( ((A)  < (B)) ? (A) :  (B) )
@@ -67,6 +65,6 @@ namespace highlo
 		 *
 		 * @return Returns the current memory usage in bytes.
 		 */
-		inline uint32 CurrentUsage() { return TotalAllocated - TotalFreed; }
+		HLAPI inline uint32 CurrentUsage() { return TotalAllocated - TotalFreed; }
 	};
 }

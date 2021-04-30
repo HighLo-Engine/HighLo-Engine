@@ -38,7 +38,7 @@ project "HighLo"
 		"GLFW_INCLUDE_NONE",
 		"HL_USE_DLL",
 		"HL_LIBRARY_EXPORT",
-		"HIGHLO_API_OPENGL"
+		"HIGHLO_API_DX11"
 	}
 
     filter "system:windows"

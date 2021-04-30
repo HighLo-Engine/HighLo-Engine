@@ -1,7 +1,5 @@
 #pragma once
 
-#include "engine/logging/Logger.h"
-
 #ifdef HL_DEBUG
 #define HL_ENABLE_ASSERTS
 #endif

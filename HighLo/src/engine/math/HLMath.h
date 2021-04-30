@@ -6,6 +6,7 @@
 
 #include "engine/core/HLCore.h"
 #include "engine/core/dataTypes/HLString.h"
+#include "engine/core/Log.h"
 
 namespace highlo
 {

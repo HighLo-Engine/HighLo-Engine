@@ -2,9 +2,10 @@
 #include "OpenGLWindow.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include <engine/logging/Logger.h>
-#include <engine/api/opengl/rendering/OpenGLContext.h>
-#include <engine/events/Events.h>
+
+#include "engine/core/Log.h"
+#include "engine/api/opengl/rendering/OpenGLContext.h"
+#include "engine/events/Events.h"
 
 namespace highlo
 {

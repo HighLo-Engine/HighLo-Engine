@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef _MSC_VER
 
 #if _MSC_VER < 1900

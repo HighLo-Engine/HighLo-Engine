@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 
 #include "engine/rendering/BufferLayout.h"
-#include "engine/logging/Logger.h"
+#include "engine/core/Log.h"
 
 namespace highlo
 {

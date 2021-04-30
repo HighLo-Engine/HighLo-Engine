@@ -2,8 +2,9 @@
 #include "DX11Context.h"
 
 #ifdef HIGHLO_API_DX11
+
 #include "DX11AdapterReader.h"
-#include <logging/Logger.h>
+#include "engine/core/Log.h"
 
 namespace highlo
 {
@@ -45,8 +46,8 @@ namespace highlo
 		ZeroMemory(&swapchaindesc, sizeof(swapchaindesc));
 
 		swapchaindesc.BufferCount = 1;
-		swapchaindesc.BufferDesc.Width = m_WindowProperties.width;
-		swapchaindesc.BufferDesc.Height = m_WindowProperties.height;
+		swapchaindesc.BufferDesc.Width = m_WindowProperties.m_Width;
+		swapchaindesc.BufferDesc.Height = m_WindowProperties.m_Height;
 		swapchaindesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapchaindesc.BufferDesc.RefreshRate.Numerator = 144;
 		swapchaindesc.BufferDesc.RefreshRate.Denominator = 1;
@@ -54,7 +55,7 @@ namespace highlo
 		swapchaindesc.OutputWindow = m_hwnd;
 		swapchaindesc.SampleDesc.Count = 1;
 		swapchaindesc.SampleDesc.Quality = 0;
-		swapchaindesc.Windowed = !m_WindowProperties.fullscreen;
+		swapchaindesc.Windowed = !m_WindowProperties.m_Fullscreen;
 		swapchaindesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		swapchaindesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -62,7 +63,7 @@ namespace highlo
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create ID3D11Device and IDXGISwapChain");
 
-		m_SwapChain->SetFullscreenState(m_WindowProperties.fullscreen, NULL);
+		m_SwapChain->SetFullscreenState(m_WindowProperties.m_Fullscreen, NULL);
 
 		auto adapter_description = adapters[0].m_Description;
 		char adapter_description_str[128];
@@ -91,8 +92,8 @@ namespace highlo
 	void DX11Context::InitializeDepthStencilViewAndBuffer()
 	{
 		D3D11_TEXTURE2D_DESC depth_stencil_desc;
-		depth_stencil_desc.Width = m_WindowProperties.width;
-		depth_stencil_desc.Height = m_WindowProperties.height;
+		depth_stencil_desc.Width = m_WindowProperties.m_Width;
+		depth_stencil_desc.Height = m_WindowProperties.m_Height;
 		depth_stencil_desc.MipLevels = 1;
 		depth_stencil_desc.ArraySize = 1;
 		depth_stencil_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -136,8 +137,8 @@ namespace highlo
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
 
-		viewport.Width = (FLOAT)m_WindowProperties.width;
-		viewport.Height = (FLOAT)m_WindowProperties.height;
+		viewport.Width = (FLOAT)m_WindowProperties.m_Width;
+		viewport.Height = (FLOAT)m_WindowProperties.m_Height;
 
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;

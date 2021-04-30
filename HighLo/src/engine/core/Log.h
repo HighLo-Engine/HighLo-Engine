@@ -1,9 +1,9 @@
 #pragma once
 
+#include "HLCore.h"
+
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-
-#include "engine/core/HLCore.h"
 
 namespace highlo
 {
@@ -12,8 +12,8 @@ namespace highlo
 	public:
 		HLAPI static void Init();
 
-		HLAPI inline static Ref<spdlog::logger> &GetCoreLogger() { return s_EngineLogger; }
-		HLAPI inline static Ref<spdlog::logger> &GetClientLogger() { return s_ClientLogger; }
+		HLAPI static Ref<spdlog::logger> &GetCoreLogger();
+		HLAPI static Ref<spdlog::logger> &GetClientLogger();
 
 	private:
 		static Ref<spdlog::logger> s_EngineLogger;

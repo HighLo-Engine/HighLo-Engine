@@ -1,6 +1,8 @@
 #pragma once
 
 #include "engine/core/HLCore.h"
+#include "engine/core/Log.h"
+#include "engine/core/dataTypes/HLString.h"
 
 namespace highlo
 {

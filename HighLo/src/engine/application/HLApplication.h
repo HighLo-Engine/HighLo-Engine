@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/logging/Logger.h"
+#include "engine/core/Log.h"
 #include "engine/time/Time.h"
 #include "engine/window/Window.h"
 #include "engine/events/Events.h"

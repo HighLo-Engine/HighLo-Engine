@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/window/Window.h"
-#include "engine/logging/Logger.h"
+#include "engine/core/Log.h"
 
 #ifdef HIGHLO_API_OPENGL
 #include <GLFW/glfw3.h>

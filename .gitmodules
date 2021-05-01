@@ -10,3 +10,6 @@
 [submodule "HighLo/vendor/assimp"]
 	path = HighLo/vendor/assimp
 	url = https://github.com/HighLo-Engine/assimp
+[submodule "HighLo/vendor/imgui"]
+	path = HighLo/vendor/imgui
+	url = https://github.com/HighLo-Engine/imgui

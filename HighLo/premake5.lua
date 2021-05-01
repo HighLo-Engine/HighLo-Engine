@@ -23,13 +23,15 @@ project "HighLo"
         "%{IncludeDir.glm}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.GLAD}",
-        "%{IncludeDir.assimp}"
+        "%{IncludeDir.assimp}",
+        "%{IncludeDir.imgui}"
     }
 
     links
     {
         "GLFW",
         "GLAD",
+        "ImGui",
         "%{LibDir.assimp}",
         "opengl32.lib"
     }

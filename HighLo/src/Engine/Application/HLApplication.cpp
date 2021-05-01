@@ -1,6 +1,8 @@
 #include "HighLoPch.h"
 #include "HLApplication.h"
 
+#include "Engine/Core/HLVirtualFileSystem.h"
+
 namespace highlo
 {
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&HLApplication::fn, this, std::placeholders::_1)
@@ -10,6 +12,7 @@ namespace highlo
 	HLApplication::HLApplication()
 	{
 		s_Instance = this;
+		VirtualFileSystem::Init();
 	}
 
 	void HLApplication::Run()
@@ -33,6 +36,8 @@ namespace highlo
 		}
 
 		OnShutdown();
+
+		VirtualFileSystem::Shutdown();
 	}
 
 	void HLApplication::InitializeWindow()

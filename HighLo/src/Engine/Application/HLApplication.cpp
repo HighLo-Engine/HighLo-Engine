@@ -2,6 +2,8 @@
 #include "HLApplication.h"
 
 #include "Engine/Core/HLVirtualFileSystem.h"
+#include "Engine/Core/HLInput.h"
+#include "Engine/Renderer/Framebuffer.h"
 
 namespace highlo
 {
@@ -12,13 +14,13 @@ namespace highlo
 	HLApplication::HLApplication()
 	{
 		s_Instance = this;
-		VirtualFileSystem::Init();
 	}
 
 	void HLApplication::Run()
 	{
 		Logger::Init();
 		m_Running = true;
+		VirtualFileSystem::Init();
 
 		InitializeWindow();
 
@@ -29,6 +31,11 @@ namespace highlo
 		while (m_Running)
 		{
 			Time::FrameUpdate();
+
+		#ifdef HL_DEBUG
+			if (Input::IsKeyPressed(HL_KEY_ESCAPE))
+				break;
+		#endif
 
 			OnUpdate(Time::GetTimestep());
 
@@ -55,23 +62,29 @@ namespace highlo
 	}
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &event)
-		{
+	{
 		Close();
 		return true;
-		}
+	}
 
 	bool HLApplication::OnWindowReisze(WindowResizeEvent &event)
-		{
+	{
 		if (event.GetWidth() == 0 || event.GetHeight() == 0)
-			{
+		{
 			// Window is minimized
 			return false;
-			}
+		}
 
 		// TODO: Resize Framebuffers and Viewports
+		auto &fbs = FramebufferPool::GetGlobal()->GetAll();
+		for (auto &fb : fbs)
+		{
+			if (!fb->GetSpecification().NoResize)
+				fb->Resize(event.GetWidth(), event.GetHeight());
+		}
 
 		return true;
-		}
+	}
 
 	void HLApplication::InternalEventHandler(Event& event)
 	{

@@ -19,7 +19,8 @@ namespace highlo
 	class HLApplication
 	{
 	public:
-		HLAPI HLApplication& Get() { return *s_Instance; }
+		HLAPI static HLApplication& Get() { return *s_Instance; }
+		HLAPI Window &GetWindow() { return *m_Window; }
 
 		HLAPI HLApplication();
 		HLAPI ~HLApplication() = default;

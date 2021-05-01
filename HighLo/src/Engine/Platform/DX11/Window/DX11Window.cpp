@@ -10,6 +10,7 @@
 #include "Engine/Events/Events.h"
 #include "Engine/Core/Defines/HLKeyCodes.h"
 #include "Engine/Core/Defines/HLMouseButtonCodes.h"
+#include "Engine/Utils/InputUtils.h"
 
 namespace highlo
 {
@@ -341,7 +342,7 @@ namespace highlo
 			if (data)
 			{
 				int repeat = (int)(HIWORD(lParam) & KF_REPEAT) ? 1 : 0;
-				KeyPressedEvent event((int)wParam, repeat);
+				KeyPressedEvent event(utils::InputHelperWindowsKeyCodeToHL((int)wParam), repeat);
 				data->EventCallback(event);
 			}
 			break;
@@ -351,7 +352,7 @@ namespace highlo
 			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (data)
 			{
-				KeyReleasedEvent event((int)wParam);
+				KeyReleasedEvent event(utils::InputHelperWindowsKeyCodeToHL((int) wParam));
 				data->EventCallback(event);
 			}
 			break;

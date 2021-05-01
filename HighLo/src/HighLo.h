@@ -10,6 +10,7 @@
 #include "Engine/Core/HLLog.h"
 #include "Engine/Math/HLMath.h"
 #include "Engine/Window/Window.h"
+#include "Engine/Core/HLInput.h"
 #include "Engine/Core/HLTime.h"
 #include "Engine/Core/HLTimer.h"
 

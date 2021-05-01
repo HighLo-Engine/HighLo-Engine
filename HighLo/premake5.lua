@@ -42,6 +42,7 @@ project "HighLo"
 		"GLFW_INCLUDE_NONE",
 		"HL_USE_DLL",
 		"HL_LIBRARY_EXPORT",
+		"HL_ENABLE_PROFILER",
 		"HIGHLO_API_OPENGL"
 	}
 

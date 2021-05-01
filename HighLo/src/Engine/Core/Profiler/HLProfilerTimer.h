@@ -70,8 +70,7 @@ namespace highlo
 		std::chrono::time_point<std::chrono::steady_clock> m_StartPoint;
 	};
 
-// TODO
-#ifdef HL_PLATFORM_WINDOWS
+#ifdef HL_ENABLE_PROFILER
 
 #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
 #define HL_FUNC_SIG __PRETTY_FUNCTION__

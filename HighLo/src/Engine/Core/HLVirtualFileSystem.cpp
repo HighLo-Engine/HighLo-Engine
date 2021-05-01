@@ -189,15 +189,15 @@ namespace highlo
 	}
 
 	HLString VirtualFileSystem::GetAbsoluteFilePath(const HLString &path)
-		{
+	{
 		HLString physicalPath;
 		HLString p = path;
 		ResolvePhysicalPath(p, physicalPath);
 		return physicalPath;
-		}
+	}
 
 	VirtualFileSystem *VirtualFileSystem::Get()
-		{
+	{
 		return s_Instance;
-		}
+	}
 }

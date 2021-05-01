@@ -13,6 +13,8 @@
 #include "Engine/Core/HLInput.h"
 #include "Engine/Core/HLTime.h"
 #include "Engine/Core/HLTimer.h"
+#include "Engine/Core/Profiler/HLProfiler.h"
+#include "Engine/Core/Profiler/HLProfilerTimer.h"
 
 #include "Engine/Renderer/BufferLayout.h"
 #include "Engine/Renderer/RenderingContext.h"

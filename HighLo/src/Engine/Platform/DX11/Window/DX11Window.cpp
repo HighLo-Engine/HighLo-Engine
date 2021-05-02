@@ -219,6 +219,12 @@ namespace highlo
 		return MessageBoxW(m_NativeHandle, msg.W_Str(), title.W_Str(), iconFlags | buttonFlags);
 	}
 
+	void DX11Window::SetMenuBar(const Ref<MenuBar> &bar)
+	{
+		m_MenuBar = bar;
+		SetMenu(m_NativeHandle, (HMENU)m_MenuBar->GetNativeMenuBar());
+	}
+
 	void DX11Window::SetVSync(bool bEnabled)
 	{
 		m_Properties.m_VSync = bEnabled;

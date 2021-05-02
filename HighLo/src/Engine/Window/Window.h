@@ -4,6 +4,7 @@
 #include "Engine/Events/Events.h"
 #include "Engine/Core/HLLog.h"
 #include "Engine/Core/dataTypes/HLString.h"
+#include "MenuBar.h"
 
 namespace highlo
 {
@@ -67,8 +68,7 @@ namespace highlo
 		virtual void CloseWindow() = 0;
 
 		virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) = 0;
-
-		// virtual void SetMenuBar() = 0;
+		virtual void SetMenuBar(const Ref<MenuBar> &bar) = 0;
 
 		virtual void SetVSync(bool bEnabled) = 0;
 		virtual void SetVisible(bool bVisible) = 0;

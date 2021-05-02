@@ -27,3 +27,12 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderingAPI.h"
 
+#include "Engine/Window/Window.h"
+#include "Engine/Window/FileDialogue.h"
+#include "Engine/Window/FileDialogueFilter.h"
+#include "Engine/Window/MenuItem.h"
+#include "Engine/Window/PopupMenuItem.h"
+#include "Engine/Window/FileMenu.h"
+#include "Engine/Window/PopupMenu.h"
+#include "Engine/Window/MenuBar.h"
+

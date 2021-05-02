@@ -30,6 +30,7 @@ namespace highlo
 		virtual void CloseWindow() override;
 
 		virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) override;
+		virtual void SetMenuBar(const Ref<MenuBar> &bar) override;
 
 		virtual void SetVSync(bool bEnabled) override;
 		virtual void SetVisible(bool bVisible) override;

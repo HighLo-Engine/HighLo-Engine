@@ -86,6 +86,11 @@ namespace highlo
 		return -1;
 	}
 
+	void OpenGLWindow::SetMenuBar(const Ref<MenuBar> &bar)
+	{
+		HL_ASSERT(false, "Not supported with this platform!");
+	}
+
 	void OpenGLWindow::SetVSync(bool bEnabled)
 	{
 		m_Properties.m_VSync = bEnabled;

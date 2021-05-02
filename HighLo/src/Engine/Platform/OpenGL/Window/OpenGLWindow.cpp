@@ -38,32 +38,144 @@ namespace highlo
 		glfwPollEvents();
 		m_Context->SwapBuffers();
     }
-    
-    unsigned int OpenGLWindow::GetWidth()
-    {
-        return m_Properties.m_Width;
-    }
-    
-    unsigned int OpenGLWindow::GetHeight()
-    {
-        return m_Properties.m_Height;
-    }
-    
-    void OpenGLWindow::SetCursorLocked(bool bLocked)
-    {
-		glfwSetInputMode(m_NativeHandle, GLFW_CURSOR, bLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
-		m_CursorLocked = bLocked;
-    }
-    
-    bool OpenGLWindow::IsCursorLocked()
-    {
-        return m_CursorLocked;
-    }
-    
-    bool OpenGLWindow::IsFocused()
-    {
-        return m_Properties.m_Focused;
-    }
+
+	void OpenGLWindow::SetWindowIcon(const HLString &path)
+	{
+		HL_CORE_INFO("Loading Window Icon: {0}", *path);
+
+		// TODO: Add stb_image
+		/*
+		int32 width, height;
+		stbi_set_flip_vertically_on_load(1);
+		stbi_uc *img = stbi_load(*path, &width, &height, 0, 4);
+
+		GLFWimage icons[1];
+		icons[0].width = width;
+		icons[0].height = height;
+		icons[0].pixels = img;
+
+		glfwSetWindowIcon(m_NativeHandle, 1, icons);
+		stbi_image_free(icons[0].pixels);
+		*/
+	}
+
+	std::pair<int32, int32> OpenGLWindow::GetWindowDimensions()
+	{
+		const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		return { mode->width, mode->height };
+	}
+
+	std::pair<int32, int32> OpenGLWindow::GetWindowPosition()
+	{
+		int32 monitorX, monitorY;
+		glfwGetMonitorPos(glfwGetPrimaryMonitor(), &monitorX, &monitorY);
+		return { monitorX, monitorY };
+	}
+
+	void OpenGLWindow::CloseWindow()
+	{
+		WindowCloseEvent event;
+		m_Properties.m_EventCallback(event);
+		glfwDestroyWindow(m_NativeHandle);
+		glfwTerminate();
+	}
+
+	int32 OpenGLWindow::ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType, WindowMessageIcon icon)
+	{
+		HL_ASSERT(false, "Not supported with this platform!");
+		return -1;
+	}
+
+	void OpenGLWindow::SetVSync(bool bEnabled)
+	{
+		m_Properties.m_VSync = bEnabled;
+		glfwSwapInterval(bEnabled);
+	}
+
+	void OpenGLWindow::SetVisible(bool bVisible)
+	{
+		m_Properties.m_Visible = bVisible;
+		if (bVisible)
+			glfwShowWindow(m_NativeHandle);
+		else
+			glfwHideWindow(m_NativeHandle);
+	}
+
+	void OpenGLWindow::SetFocus(bool bEnabled)
+	{
+		m_Properties.m_Focused = bEnabled;
+		if (bEnabled)
+			glfwFocusWindow(m_NativeHandle);
+		else
+			glfwRestoreWindow(m_NativeHandle);
+	}
+
+	void OpenGLWindow::SetFullscreen(bool bEnabled)
+	{
+		m_Properties.m_Fullscreen = bEnabled;
+
+		if (bEnabled)
+			{
+			// backup window position and window size
+			glfwGetWindowPos(m_NativeHandle, &m_Placement.WindowPosX, &m_Placement.WindowPosY);
+			glfwGetWindowSize(m_NativeHandle, &m_Placement.WindowWidth, &m_Placement.WindowHeight);
+
+			// get resolution of monitor
+			const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+			// switch to full screen
+			glfwSetWindowMonitor(m_NativeHandle, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
+			}
+		else
+			{
+			// restore last window size and position
+			glfwSetWindowMonitor(m_NativeHandle, nullptr, m_Placement.WindowPosX, m_Placement.WindowPosY, m_Placement.WindowWidth, m_Placement.WindowHeight, 0);
+			}
+	}
+
+	void OpenGLWindow::ShowCursor()
+	{
+		m_Properties.m_CursorVisible = true;
+		glfwSetInputMode(m_NativeHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+
+	void OpenGLWindow::HideCursor()
+	{
+		m_Properties.m_CursorVisible = false;
+		glfwSetInputMode(m_NativeHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
+	void OpenGLWindow::Maximize()
+	{
+		m_Properties.m_Maximized = true;
+		glfwMaximizeWindow(m_NativeHandle);
+	}
+
+	void OpenGLWindow::CenterWindow()
+	{
+		m_Properties.m_Centered = true;
+
+		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+
+		int32 monitorX, monitorY;
+		glfwGetMonitorPos(monitor, &monitorX, &monitorY);
+
+		int32 width, height;
+		glfwGetWindowSize(m_NativeHandle, &width, &height);
+
+		int32 windowXPos = monitorX + (mode->width - width) / 2;
+		int32 windowYPos = monitorY + (mode->height - height) / 2;
+		glfwSetWindowPos(m_NativeHandle, windowXPos, windowYPos);
+		m_Placement.WindowPosX = windowXPos;
+		m_Placement.WindowPosY = windowYPos;
+	}
+
+	void OpenGLWindow::SetTitle(const HLString &title)
+	{
+		m_Properties.m_Title = title;
+		glfwSetWindowTitle(m_NativeHandle, *title);
+	}
     
     void OpenGLWindow::Init()
     {

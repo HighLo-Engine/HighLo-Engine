@@ -16,6 +16,7 @@ namespace highlo
 {
 	static POINTFLOAT s_PreviousMousePos;
 	static bool s_ShouldRegisterMouseMovedCallback = false;
+	DX11Window::WNDPlacement DX11Window::m_Placement;
 
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -98,21 +99,6 @@ namespace highlo
 			UpdateWindow(hwnd);
 		}
 
-#pragma warning (push)
-#pragma warning (disable: 4302)
-#pragma warning (disable: 6387)
-		//HANDLE hIcon = LoadImage(0, L"assets\\logo\\InfraRedIcon.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
-		//if (hIcon) {
-		//	//Change both icons to the same icon handle.
-		//	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-		//	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-
-		//	//This will ensure that the application icon gets changed too.
-		//	SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-		//	SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-		//}
-#pragma warning (pop)
-
 		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, hwnd));
 		m_Context->Init();
 	}
@@ -124,33 +110,204 @@ namespace highlo
 		SetWindowLongPtr(m_NativeHandle, GWLP_USERDATA, (DWORD_PTR)&m_CallbackData);
 	}
 
-	unsigned int DX11Window::GetWidth()
+	void DX11Window::SetWindowIcon(const HLString &path)
 	{
-		return m_Properties.m_Width;
+		HANDLE hIcon = LoadImage(0, path.W_Str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+		if (hIcon)
+		{
+			// Change both icons to the same icon handle.
+			SendMessage(m_NativeHandle, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+			SendMessage(m_NativeHandle, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		
+			// This will ensure that the application icon gets changed too.
+			SendMessage(GetWindow(m_NativeHandle, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+			SendMessage(GetWindow(m_NativeHandle, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+		}
 	}
 
-	unsigned int DX11Window::GetHeight()
+	std::pair<int32, int32> DX11Window::GetWindowDimensions()
 	{
-		return m_Properties.m_Height;
+		HDC windowHDC = GetDC(m_NativeHandle);
+		int32 width = GetDeviceCaps(windowHDC, DESKTOPHORZRES);
+		int32 height = GetDeviceCaps(windowHDC, DESKTOPVERTRES);
+		return { width, height };
 	}
 
-	void DX11Window::SetCursorLocked(bool bLocked)
+	std::pair<int32, int32> DX11Window::GetWindowPosition()
 	{
-		m_CursorLocked = bLocked;
-		ShowCursor(!bLocked);
+		RECT windowRect;
+		GetWindowRect(m_NativeHandle, &windowRect);
+		return { windowRect.left, windowRect.top };
 	}
 
-	bool DX11Window::IsCursorLocked()
+	void DX11Window::CloseWindow()
 	{
-		return m_CursorLocked;
+		WindowCloseEvent event;
+		m_Properties.m_EventCallback(event);
+		PostQuitMessage(0);
 	}
 
-	bool DX11Window::IsFocused()
+	int32 DX11Window::ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType, WindowMessageIcon icon)
 	{
-		return (GetFocus() == m_NativeHandle);
+		uint32 iconFlags;
+		uint32 buttonFlags;
+
+		switch (btnType)
+		{
+			case WindowMessageButtonType::BTN_ABORT_RETRY_IGNORE:
+				iconFlags = MB_ABORTRETRYIGNORE;
+				break;
+
+			case WindowMessageButtonType::BTN_CANCEL_TRY_CONTINUE:
+				iconFlags = MB_CANCELTRYCONTINUE;
+				break;
+
+			case WindowMessageButtonType::BTN_HELP:
+				iconFlags = MB_HELP;
+				break;
+
+			case WindowMessageButtonType::BTN_OK:
+				iconFlags = MB_OK;
+				break;
+
+			case WindowMessageButtonType::BTN_OK_CANCEL:
+				iconFlags = MB_OKCANCEL;
+				break;
+
+			case WindowMessageButtonType::BTN_RETRY_CANCEL:
+				iconFlags = MB_RETRYCANCEL;
+				break;
+
+			case WindowMessageButtonType::BTN_YES_NO:
+				iconFlags = MB_YESNO;
+				break;
+
+			case WindowMessageButtonType::BTN_YES_NO_CANCEL:
+				iconFlags = MB_YESNOCANCEL;
+				break;
+
+			case WindowMessageButtonType::None:
+			default:
+				iconFlags = MB_YESNO;
+				break;
+		}
+
+		switch (icon)
+		{
+			case WindowMessageIcon::ICON_ERROR:
+				buttonFlags = MB_ICONERROR;
+				break;
+
+			case WindowMessageIcon::ICON_INFORMATION:
+				buttonFlags = MB_ICONINFORMATION;
+				break;
+
+			case WindowMessageIcon::ICON_QUESTION:
+				buttonFlags = MB_ICONQUESTION;
+				break;
+
+			case WindowMessageIcon::ICON_WARNING:
+				buttonFlags = MB_ICONWARNING;
+				break;
+
+			case WindowMessageIcon::None:
+			default:
+				buttonFlags = MB_ICONINFORMATION;
+				break;
+		}
+
+		return MessageBoxW(m_NativeHandle, msg.W_Str(), title.W_Str(), iconFlags | buttonFlags);
 	}
 
-	void DX11Window::OnResize(unsigned int width, unsigned int height)
+	void DX11Window::SetVSync(bool bEnabled)
+	{
+		m_Properties.m_VSync = bEnabled;
+		// TODO: Set VSync properly
+	}
+
+	void DX11Window::SetVisible(bool bVisible)
+	{
+		m_Properties.m_Visible = bVisible;
+		ShowWindow(m_NativeHandle, bVisible);
+	}
+
+	void DX11Window::SetFocus(bool bEnabled)
+	{
+		m_Properties.m_Focused = bEnabled;
+		if (bEnabled)
+			::SetFocus(m_NativeHandle);
+		else
+			::ShowWindow(m_NativeHandle, SW_MINIMIZE);
+	}
+
+	void DX11Window::SetFullscreen(bool bEnabled)
+	{
+		m_Properties.m_Fullscreen = bEnabled;
+		if (bEnabled)
+			{
+			auto [width, height] = GetWindowDimensions();
+
+			GetWindowPlacement(m_NativeHandle, &m_Placement.Placement);
+			m_Placement.WindowWidth = width;
+			m_Placement.WindowHeight = height;
+
+			SetWindowLongPtrW(m_NativeHandle, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST);
+			SetWindowLongPtrW(m_NativeHandle, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+			SetWindowPos(m_NativeHandle, HWND_TOPMOST, 0, 0, width, height, SWP_SHOWWINDOW);
+
+			ShowWindow(m_NativeHandle, SW_MAXIMIZE);
+			UpdateWindow(m_NativeHandle);
+			}
+		else
+			{
+			SetWindowPlacement(m_NativeHandle, &m_Placement.Placement);
+			SetWindowLongPtrW(m_NativeHandle, GWL_EXSTYLE, WS_EX_OVERLAPPEDWINDOW);
+			SetWindowLongPtrW(m_NativeHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME);
+
+			ShowWindow(m_NativeHandle, true);
+			UpdateWindow(m_NativeHandle);
+			}
+	}
+
+	void DX11Window::ShowCursor()
+	{
+		m_Properties.m_CursorVisible = true;
+		SetCursor(m_Cursor);
+		::ShowCursor(true);
+	}
+
+	void DX11Window::HideCursor()
+	{
+		m_Properties.m_CursorVisible = false;
+		SetCursor(NULL);
+		::ShowCursor(false);
+	}
+
+	void DX11Window::Maximize()
+	{
+		m_Properties.m_Maximized = true;
+		ShowWindow(m_NativeHandle, SW_MAXIMIZE);
+	}
+
+	void DX11Window::CenterWindow()
+	{
+		m_Properties.m_Centered = true;
+
+		RECT windowRect;
+		GetWindowRect(m_NativeHandle, &windowRect);
+
+		int32 xPos = (GetSystemMetrics(SM_CXSCREEN) - windowRect.right) / 2;
+		int32 yPos = (GetSystemMetrics(SM_CYSCREEN) - windowRect.bottom) / 2;
+		SetWindowPos(m_NativeHandle, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	}
+
+	void DX11Window::SetTitle(const HLString &title)
+	{
+		m_Properties.m_Title = title;
+		SetWindowTextW(m_NativeHandle, title.W_Str());
+	}
+
+	void DX11Window::OnResize(uint32 width, uint32 height)
 	{
 		m_Properties.m_Width = width;
 		m_Properties.m_Height = height;
@@ -223,9 +380,9 @@ namespace highlo
 				float xPos = (float)GET_X_LPARAM(lParam);
 				float yPos = (float)GET_Y_LPARAM(lParam);
 
-				// if cursor is not locked, simply process the event,
+				// if cursor is not hidden, simply process the event,
 				// otherwise process the logic for the event when cursor is locked
-				if (!data->p_EngineWindow->IsCursorLocked())
+				if (!data->p_EngineWindow->IsCursorHidden())
 				{
 					float deltaX = xPos - s_PreviousMousePos.x;
 					float deltaY = yPos - s_PreviousMousePos.y;

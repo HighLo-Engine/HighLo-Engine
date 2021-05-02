@@ -57,7 +57,7 @@ namespace highlo
 		);
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
-
+		m_Window->CenterWindow();
 		Renderer::Init(m_Window.get());
 	}
 

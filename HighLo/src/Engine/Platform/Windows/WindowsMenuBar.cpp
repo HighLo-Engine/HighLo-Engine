@@ -12,6 +12,7 @@ namespace highlo
 
 	WindowsMenuBar::~WindowsMenuBar()
 	{
+		DestroyMenu(m_NativeHandle);
 	}
 
 	void WindowsMenuBar::AddMenu(const Ref<FileMenu> &menu)

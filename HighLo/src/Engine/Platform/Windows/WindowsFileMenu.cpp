@@ -6,12 +6,21 @@
 namespace highlo
 {
 	WindowsFileMenu::WindowsFileMenu(const HLString &name)
-		: m_Name(name) {}
+		: m_Name(name)
+	{
+		m_NativeHandle = CreatePopupMenu();
+	}
 	
-	WindowsFileMenu::~WindowsFileMenu() {}
+	WindowsFileMenu::~WindowsFileMenu()
+	{
+		DestroyMenu(m_NativeHandle);
+	}
 
 	void WindowsFileMenu::AddMenuItem(const Ref<MenuItem> &item)
 	{
+		if (!m_NativeHandle)
+			return;
+
 		if (item->Visible)
 			AppendMenuW(m_NativeHandle, MF_STRING, item->ID, item->Name.W_Str());
 		else
@@ -20,6 +29,9 @@ namespace highlo
 
 	void WindowsFileMenu::AddMenuItem(const MenuItem &item)
 	{
+		if (!m_NativeHandle)
+			return;
+
 		if (item.Visible)
 			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, item.Name.W_Str());
 		else
@@ -28,6 +40,9 @@ namespace highlo
 	
 	void WindowsFileMenu::AddMenuItem(const HLString &name, int32 id, bool visible)
 	{
+		if (!m_NativeHandle)
+			return;
+
 		MenuItem item;
 		item.Name = name;
 		item.ID = id;

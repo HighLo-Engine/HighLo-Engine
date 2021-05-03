@@ -43,12 +43,11 @@ project "HighLo"
 		"HL_USE_DLL",
 		"HL_LIBRARY_EXPORT",
 		"HL_ENABLE_PROFILER",
-		"HIGHLO_API_OPENGL"
+		"HIGHLO_API_OPENGL",
+		--"HIGHLO_API_GLFW"
 	}
 
     filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
         buildoptions "/MD"
 

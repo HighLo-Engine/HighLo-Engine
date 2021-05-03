@@ -2,10 +2,10 @@
 #include "VertexBuffer.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/Opengl/Rendering/OpenGLVertexBuffer.h"
+#include "Engine/Platform/Opengl/OpenGLVertexBuffer.h"
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-#include "Engine/Platform/DX11/Rendering/DX11VertexBuffer.h"
+#include "Engine/Platform/DX11/DX11VertexBuffer.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

@@ -1,7 +1,7 @@
 #include "HighLoPch.h"
 #include "Engine/Core/HLInput.h"
 
-#ifdef HIGHLO_API_OPENGL
+#ifdef HIGHLO_API_GLFW
 
 #include <GLFW/glfw3.h>
 #include "Engine/Application/HLApplication.h"
@@ -10,21 +10,21 @@ namespace highlo
 {
 	bool Input::IsKeyPressed(HLKeyCode keyCode)
 	{
-		GLFWwindow *window = static_cast<GLFWwindow*>(HLApplication::Get().GetWindow().GetNativeHandle());
+		GLFWwindow *window = static_cast<GLFWwindow *>(HLApplication::Get().GetWindow().GetNativeHandle());
 		int32 state = glfwGetKey(window, static_cast<int32>(keyCode));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
 	bool Input::IsMouseButtonPressed(HLMouseButtonCode mouseButtonCode)
 	{
-		GLFWwindow *window = static_cast<GLFWwindow*>(HLApplication::Get().GetWindow().GetNativeHandle());
+		GLFWwindow *window = static_cast<GLFWwindow *>(HLApplication::Get().GetWindow().GetNativeHandle());
 		int32 state = glfwGetMouseButton(window, static_cast<int32>(mouseButtonCode));
 		return state == GLFW_PRESS;
 	}
 
 	std::pair<double, double> Input::GetMousePosition()
 	{
-		GLFWwindow *window = static_cast<GLFWwindow*>(HLApplication::Get().GetWindow().GetNativeHandle());
+		GLFWwindow *window = static_cast<GLFWwindow *>(HLApplication::Get().GetWindow().GetNativeHandle());
 
 		double xPos, yPos;
 		glfwGetCursorPos(window, &xPos, &yPos);
@@ -47,7 +47,7 @@ namespace highlo
 
 	std::pair<double, double> Input::GetAbsoluteMousePosition()
 	{
-		GLFWwindow *window = static_cast<GLFWwindow*>(HLApplication::Get().GetWindow().GetNativeHandle());
+		GLFWwindow *window = static_cast<GLFWwindow *>(HLApplication::Get().GetWindow().GetNativeHandle());
 
 		double xPos, yPos;
 		glfwGetCursorPos(window, &xPos, &yPos);
@@ -80,4 +80,4 @@ namespace highlo
 	}
 }
 
-#endif // HIGHLO_API_OPENGL
+#endif // HIGHLO_API_GLFW

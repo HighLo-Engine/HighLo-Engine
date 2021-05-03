@@ -1,36 +1,35 @@
 #pragma once
 
-#include "Engine/Window/Window.h"
-#include "Engine/Core/HLLog.h"
-
-#ifdef HIGHLO_API_DX11
-
 #include <Windows.h>
+#include "Engine/Window/Window.h"
 #include "Engine/Renderer/RenderingContext.h"
+
+#ifndef HIGHLO_API_GLFW
 
 namespace highlo
 {
-	class DX11Window;
+	class WindowsWindow;
 
 	struct WindowCallbackData
 	{
-		DX11Window* p_EngineWindow = nullptr;
+		WindowsWindow *p_EngineWindow = nullptr;
 		EventCallbackFn EventCallback;
 	};
 
-	class DX11Window : public Window
+	class WindowsWindow : public Window
 	{
 	public:
-		DX11Window(const WindowData& properties);
-		~DX11Window();
 
-		virtual void SetEventCallback(const EventCallbackFn& callback) override;
+		WindowsWindow(const WindowData &properties);
+		~WindowsWindow();
+
+		virtual void SetEventCallback(const EventCallbackFn &callback) override;
 
 		virtual void Update() override;
 
 		virtual uint32 GetWidth() override { return m_Properties.m_Width; }
 		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
-		virtual void* GetNativeHandle() override { return (void*)m_NativeHandle; }
+		virtual void *GetNativeHandle() override { return (void *) m_NativeHandle; }
 
 		virtual void SetWindowIcon(const HLString &path) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
@@ -69,7 +68,6 @@ namespace highlo
 			WINDOWPLACEMENT Placement;
 		};
 
-	private:
 		WindowData m_Properties;
 		static WNDPlacement m_Placement;
 
@@ -77,15 +75,14 @@ namespace highlo
 
 		std::unique_ptr<RenderingContext> m_Context;
 
-	private:
 		HWND m_NativeHandle = nullptr;
 		HICON m_WindowIcon = NULL;
 		HCURSOR m_Cursor = NULL;
 		Ref<MenuBar> m_MenuBar;
 		bool m_CursorLocked = false;
 
-	private:
 		WindowCallbackData m_CallbackData;
 	};
 }
-#endif // HIGHLO_API_DX11
+
+#endif // HIGHLO_API_GLFW

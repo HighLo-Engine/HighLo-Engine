@@ -12,9 +12,11 @@ namespace highlo
 	{
 	public:
 		OpenGLContext(void* handle);
+		virtual ~OpenGLContext();
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
+		virtual void SetSwapInterval(bool bEnabled) override;
 
 	private:
 		void* m_OpenGLWindowHandle;

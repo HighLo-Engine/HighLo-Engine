@@ -1,28 +1,27 @@
 #pragma once
 
-#include "Engine/Window/Window.h"
-#include "Engine/Core/HLLog.h"
+#ifdef HIGHLO_API_GLFW
 
-#ifdef HIGHLO_API_OPENGL
 #include <GLFW/glfw3.h>
 
+#include "Engine/Window/Window.h"
 #include "Engine/Renderer/RenderingContext.h"
 
 namespace highlo
 {
-	class OpenGLWindow : public Window
+	class GLFWWindow : public Window
 	{
 	public:
-		OpenGLWindow(const WindowData& properties);
-		~OpenGLWindow();
+		GLFWWindow(const WindowData &properties);
+		~GLFWWindow();
 
-		virtual void SetEventCallback(const EventCallbackFn& callback) override;
+		virtual void SetEventCallback(const EventCallbackFn &callback) override;
 
 		virtual void Update() override;
 
 		virtual uint32 GetWidth() override { return m_Properties.m_Width; }
 		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
-		virtual void* GetNativeHandle() override { return (void*)m_NativeHandle; }
+		virtual void *GetNativeHandle() override { return (void*)m_NativeHandle; }
 
 		virtual void SetWindowIcon(const HLString &path) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
@@ -58,20 +57,18 @@ namespace highlo
 			int32 WindowPosX = 0, WindowPosY = 0;
 		};
 
-	private:
 		WindowData m_Properties;
 		WNDPlacement m_Placement;
 
-		void Init();
 
 		UniqueRef<RenderingContext> m_Context;
 
-	private:
-		GLFWwindow* m_NativeHandle = nullptr;
+		GLFWwindow *m_NativeHandle = nullptr;
 		bool m_CursorLocked = false;
 
-	private:
 		void SetCallbacks();
+		void Init();
 	};
 }
-#endif // HIGHLO_API_OPENGL
+
+#endif // HIGHLO_API_GLFW

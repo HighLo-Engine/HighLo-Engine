@@ -37,6 +37,11 @@ namespace highlo
 		m_SwapChain->Present(0, NULL);
 	}
 
+	void DX11Context::SetSwapInterval(bool bEnabled)
+	{
+		// TODO: @FlareCoding
+	}
+
 	void DX11Context::InitializeSwapChain()
 	{
 		std::vector<AdapterData> adapters = AdapterReader::GetAdapters();

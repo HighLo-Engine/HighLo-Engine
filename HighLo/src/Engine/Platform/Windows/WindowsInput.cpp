@@ -1,7 +1,7 @@
 #include "HighLoPch.h"
 #include "Engine/Core/HLInput.h"
 
-#ifdef HIGHLO_API_DX11
+#ifndef HIGHLO_API_GLFW
 
 #include <Windows.h>
 #include "Engine/Application/HLApplication.h"
@@ -45,14 +45,14 @@ namespace highlo
 		else if (pos.y < 0L)
 			pos.y = 0L;
 
-		return { (double)pos.x, (double)pos.y };
+		return { (double) pos.x, (double) pos.y };
 	}
 
 	std::pair<double, double> Input::GetAbsoluteMousePosition()
 	{
 		POINT pos;
 		GetCursorPos(&pos);
-		return { (double)pos.x, (double)pos.y };
+		return { (double) pos.x, (double) pos.y };
 	}
 
 	double Input::GetMouseX()
@@ -80,4 +80,4 @@ namespace highlo
 	}
 }
 
-#endif // HIGHLO_API_DX11
+#endif // HIGHLO_API_GLFW

@@ -2,10 +2,10 @@
 #include "Image.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/Rendering/OpenGLImage.h"
+#include "Engine/Platform/OpenGL/OpenGLImage.h"
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-#include "Engine/Platform/DX11/Rendering/DX11Image.h"
+#include "Engine/Platform/DX11/DX11Image.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

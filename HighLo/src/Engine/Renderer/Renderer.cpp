@@ -2,10 +2,10 @@
 #include "Renderer.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/Rendering/OpenGLRenderingAPI.h"
+#include "Engine/Platform/OpenGL/OpenGLRenderingAPI.h"
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-#include "Engine/Platform/DX11/Rendering/DX11RenderingAPI.h"
+#include "Engine/Platform/DX11/DX11RenderingAPI.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

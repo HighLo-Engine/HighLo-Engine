@@ -2,10 +2,10 @@
 #include "Framebuffer.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/Rendering/OpenGLFramebuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLFramebuffer.h"
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-#include "Engine/Platform/DX11/Rendering/DX11Framebuffer.h"
+#include "Engine/Platform/DX11/DX11Framebuffer.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

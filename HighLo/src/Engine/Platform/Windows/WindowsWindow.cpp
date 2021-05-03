@@ -1,11 +1,15 @@
 #include "HighLoPch.h"
-#include "DX11Window.h"
+#include "WindowsWindow.h"
 
-#ifdef HIGHLO_API_DX11
+#ifndef HIGHLO_API_GLFW
 
 #include <windowsx.h>
-#include "Engine/Window/Window.h"
-#include "Engine/Platform/DX11/Rendering/DX11Context.h"
+
+#ifdef HIGHLO_API_DX11
+#include "Engine/Platform/DX11/DX11Context.h"
+#elif HIGHLO_API_OPENGL
+#include "Engine/Platform/OpenGL/OpenGLContext.h"
+#endif // HIGHLO_API_DX11
 
 #include "Engine/Events/Events.h"
 #include "Engine/Core/Defines/HLKeyCodes.h"
@@ -16,24 +20,24 @@ namespace highlo
 {
 	static POINTFLOAT s_PreviousMousePos;
 	static bool s_ShouldRegisterMouseMovedCallback = false;
-	DX11Window::WNDPlacement DX11Window::m_Placement;
+	WindowsWindow::WNDPlacement WindowsWindow::m_Placement;
 
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	DX11Window::DX11Window(const WindowData& properties)
+	WindowsWindow::WindowsWindow(const WindowData &properties)
 	{
 		Window::s_WindowInstance = this;
 		m_Properties = properties;
 		Init();
 	}
 
-	DX11Window::~DX11Window()
+	WindowsWindow::~WindowsWindow()
 	{
 		if (m_NativeHandle)
 			DestroyWindow(m_NativeHandle);
 	}
 
-	void DX11Window::Init()
+	void WindowsWindow::Init()
 	{
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 
@@ -42,7 +46,7 @@ namespace highlo
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.cbClsExtra = NULL;
 		wc.cbWndExtra = NULL;
-		wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+		wc.hbrBackground = (HBRUSH) COLOR_WINDOW;
 		wc.hInstance = NULL;
 		wc.lpszClassName = L"HLEngineWindowClass";
 		wc.lpszMenuName = L"";
@@ -99,33 +103,38 @@ namespace highlo
 			UpdateWindow(hwnd);
 		}
 
+	#ifdef HIGHLO_API_DX11
 		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, hwnd));
 		m_Context->Init();
-	}
+	#elif HIGHLO_API_OPENGL
+		m_Context = UniqueRef<RenderingContext>(new OpenGLContext(hwnd));
+		m_Context->Init();
+	#endif // HIGHLO_API_DX11
+		}
 
-	void DX11Window::SetEventCallback(const EventCallbackFn& callback)
+	void WindowsWindow::SetEventCallback(const EventCallbackFn &callback)
 	{
 		m_CallbackData.EventCallback = callback;
 		m_CallbackData.p_EngineWindow = this;
-		SetWindowLongPtr(m_NativeHandle, GWLP_USERDATA, (DWORD_PTR)&m_CallbackData);
+		SetWindowLongPtr(m_NativeHandle, GWLP_USERDATA, (DWORD_PTR) &m_CallbackData);
 	}
 
-	void DX11Window::SetWindowIcon(const HLString &path)
+	void WindowsWindow::SetWindowIcon(const HLString &path)
 	{
 		HANDLE hIcon = LoadImage(0, path.W_Str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		if (hIcon)
 		{
 			// Change both icons to the same icon handle.
-			SendMessage(m_NativeHandle, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-			SendMessage(m_NativeHandle, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-		
+			SendMessage(m_NativeHandle, WM_SETICON, ICON_SMALL, (LPARAM) hIcon);
+			SendMessage(m_NativeHandle, WM_SETICON, ICON_BIG, (LPARAM) hIcon);
+
 			// This will ensure that the application icon gets changed too.
-			SendMessage(GetWindow(m_NativeHandle, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-			SendMessage(GetWindow(m_NativeHandle, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+			SendMessage(GetWindow(m_NativeHandle, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM) hIcon);
+			SendMessage(GetWindow(m_NativeHandle, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM) hIcon);
 		}
 	}
 
-	std::pair<int32, int32> DX11Window::GetWindowDimensions()
+	std::pair<int32, int32> WindowsWindow::GetWindowDimensions()
 	{
 		HDC windowHDC = GetDC(m_NativeHandle);
 		int32 width = GetDeviceCaps(windowHDC, DESKTOPHORZRES);
@@ -133,21 +142,21 @@ namespace highlo
 		return { width, height };
 	}
 
-	std::pair<int32, int32> DX11Window::GetWindowPosition()
+	std::pair<int32, int32> WindowsWindow::GetWindowPosition()
 	{
 		RECT windowRect;
 		GetWindowRect(m_NativeHandle, &windowRect);
 		return { windowRect.left, windowRect.top };
 	}
 
-	void DX11Window::CloseWindow()
+	void WindowsWindow::CloseWindow()
 	{
 		WindowCloseEvent event;
 		m_Properties.m_EventCallback(event);
 		PostQuitMessage(0);
 	}
 
-	int32 DX11Window::ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType, WindowMessageIcon icon)
+	int32 WindowsWindow::ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType, WindowMessageIcon icon)
 	{
 		uint32 iconFlags;
 		uint32 buttonFlags;
@@ -219,25 +228,25 @@ namespace highlo
 		return MessageBoxW(m_NativeHandle, msg.W_Str(), title.W_Str(), iconFlags | buttonFlags);
 	}
 
-	void DX11Window::SetMenuBar(const Ref<MenuBar> &bar)
+	void WindowsWindow::SetMenuBar(const Ref<MenuBar> &bar)
 	{
 		m_MenuBar = bar;
-		SetMenu(m_NativeHandle, (HMENU)m_MenuBar->GetNativeMenuBar());
+		SetMenu(m_NativeHandle, (HMENU) m_MenuBar->GetNativeMenuBar());
 	}
 
-	void DX11Window::SetVSync(bool bEnabled)
+	void WindowsWindow::SetVSync(bool bEnabled)
 	{
 		m_Properties.m_VSync = bEnabled;
-		// TODO: Set VSync properly
+		m_Context->SetSwapInterval(bEnabled);
 	}
 
-	void DX11Window::SetVisible(bool bVisible)
+	void WindowsWindow::SetVisible(bool bVisible)
 	{
 		m_Properties.m_Visible = bVisible;
 		ShowWindow(m_NativeHandle, bVisible);
 	}
 
-	void DX11Window::SetFocus(bool bEnabled)
+	void WindowsWindow::SetFocus(bool bEnabled)
 	{
 		m_Properties.m_Focused = bEnabled;
 		if (bEnabled)
@@ -246,11 +255,11 @@ namespace highlo
 			::ShowWindow(m_NativeHandle, SW_MINIMIZE);
 	}
 
-	void DX11Window::SetFullscreen(bool bEnabled)
+	void WindowsWindow::SetFullscreen(bool bEnabled)
 	{
 		m_Properties.m_Fullscreen = bEnabled;
 		if (bEnabled)
-			{
+		{
 			auto [width, height] = GetWindowDimensions();
 
 			GetWindowPlacement(m_NativeHandle, &m_Placement.Placement);
@@ -263,39 +272,39 @@ namespace highlo
 
 			ShowWindow(m_NativeHandle, SW_MAXIMIZE);
 			UpdateWindow(m_NativeHandle);
-			}
+		}
 		else
-			{
+		{
 			SetWindowPlacement(m_NativeHandle, &m_Placement.Placement);
 			SetWindowLongPtrW(m_NativeHandle, GWL_EXSTYLE, WS_EX_OVERLAPPEDWINDOW);
 			SetWindowLongPtrW(m_NativeHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME);
 
 			ShowWindow(m_NativeHandle, true);
 			UpdateWindow(m_NativeHandle);
-			}
+		}
 	}
 
-	void DX11Window::ShowCursor()
+	void WindowsWindow::ShowCursor()
 	{
 		m_Properties.m_CursorVisible = true;
 		SetCursor(m_Cursor);
 		::ShowCursor(true);
 	}
 
-	void DX11Window::HideCursor()
+	void WindowsWindow::HideCursor()
 	{
 		m_Properties.m_CursorVisible = false;
 		SetCursor(NULL);
 		::ShowCursor(false);
 	}
 
-	void DX11Window::Maximize()
+	void WindowsWindow::Maximize()
 	{
 		m_Properties.m_Maximized = true;
 		ShowWindow(m_NativeHandle, SW_MAXIMIZE);
 	}
 
-	void DX11Window::CenterWindow()
+	void WindowsWindow::CenterWindow()
 	{
 		m_Properties.m_Centered = true;
 
@@ -307,19 +316,19 @@ namespace highlo
 		SetWindowPos(m_NativeHandle, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 	}
 
-	void DX11Window::SetTitle(const HLString &title)
+	void WindowsWindow::SetTitle(const HLString &title)
 	{
 		m_Properties.m_Title = title;
 		SetWindowTextW(m_NativeHandle, title.W_Str());
 	}
 
-	void DX11Window::OnResize(uint32 width, uint32 height)
+	void WindowsWindow::OnResize(uint32 width, uint32 height)
 	{
 		m_Properties.m_Width = width;
 		m_Properties.m_Height = height;
 	}
 
-	void DX11Window::Update()
+	void WindowsWindow::Update()
 	{
 		MSG msg;
 		ZeroMemory(&msg, sizeof(MSG));
@@ -345,184 +354,196 @@ namespace highlo
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 
-#ifdef IFR_VERDEV
+	#ifdef IFR_VERDEV
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
 			return true;
-#endif // IFR_VERDEV
+	#endif // IFR_VERDEV
 
 
 		switch (uMsg)
 		{
-		case WM_CLOSE:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+			case WM_CLOSE:
 			{
-				WindowCloseEvent event;
-				data->EventCallback(event);
-			}
-
-			DestroyWindow(hwnd);
-			break;
-		}
-		case WM_SIZE:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
-			{
-				WindowResizeEvent event((unsigned int)LOWORD(lParam), (unsigned int)HIWORD(lParam));
-				data->EventCallback(event);
-
-				// Updating window object's width and height properties
-				data->p_EngineWindow->OnResize((unsigned int)LOWORD(lParam), (unsigned int)HIWORD(lParam));
-			}
-			break;
-		}
-		case WM_MOUSEMOVE:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
-			{
-				float xPos = (float)GET_X_LPARAM(lParam);
-				float yPos = (float)GET_Y_LPARAM(lParam);
-
-				// if cursor is not hidden, simply process the event,
-				// otherwise process the logic for the event when cursor is locked
-				if (!data->p_EngineWindow->IsCursorHidden())
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
 				{
-					float deltaX = xPos - s_PreviousMousePos.x;
-					float deltaY = yPos - s_PreviousMousePos.y;
+					WindowCloseEvent event;
+					data->EventCallback(event);
+				}
 
-					MouseMovedEvent event(xPos, yPos, deltaX, deltaY);
+				DestroyWindow(hwnd);
+				break;
+			}
+
+			case WM_SIZE:
+			{
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					WindowResizeEvent event((unsigned int) LOWORD(lParam), (unsigned int) HIWORD(lParam));
 					data->EventCallback(event);
 
-					s_PreviousMousePos.x = xPos;
-					s_PreviousMousePos.y = yPos;
-
-					break;
+					// Updating window object's width and height properties
+					data->p_EngineWindow->OnResize((unsigned int) LOWORD(lParam), (unsigned int) HIWORD(lParam));
 				}
-
-				if (s_ShouldRegisterMouseMovedCallback)
+				break;
+			}
+				
+			case WM_MOUSEMOVE:
+			{
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
 				{
-					float deltaX = xPos - s_PreviousMousePos.x;
-					float deltaY = yPos - s_PreviousMousePos.y;
+					float xPos = (float) GET_X_LPARAM(lParam);
+					float yPos = (float) GET_Y_LPARAM(lParam);
 
-					MouseMovedEvent event(xPos, yPos, deltaX, deltaY);
+					// if cursor is not hidden, simply process the event,
+					// otherwise process the logic for the event when cursor is locked
+					if (!data->p_EngineWindow->IsCursorHidden())
+					{
+						float deltaX = xPos - s_PreviousMousePos.x;
+						float deltaY = yPos - s_PreviousMousePos.y;
+
+						MouseMovedEvent event(xPos, yPos, deltaX, deltaY);
+						data->EventCallback(event);
+
+						s_PreviousMousePos.x = xPos;
+						s_PreviousMousePos.y = yPos;
+
+						break;
+					}
+
+					if (s_ShouldRegisterMouseMovedCallback)
+					{
+						float deltaX = xPos - s_PreviousMousePos.x;
+						float deltaY = yPos - s_PreviousMousePos.y;
+
+						MouseMovedEvent event(xPos, yPos, deltaX, deltaY);
+						data->EventCallback(event);
+
+						s_PreviousMousePos.x = xPos;
+						s_PreviousMousePos.y = yPos;
+
+						s_ShouldRegisterMouseMovedCallback = false;
+
+						RECT wRect;
+						GetWindowRect((HWND) data->p_EngineWindow->GetNativeHandle(), &wRect);
+						SetCursorPos(wRect.left + data->p_EngineWindow->GetWidth() / 2, wRect.top + data->p_EngineWindow->GetHeight() / 2);
+					}
+					else
+					{
+						s_ShouldRegisterMouseMovedCallback = true;
+
+						s_PreviousMousePos.x = xPos;
+						s_PreviousMousePos.y = yPos;
+					}
+				}
+				break;
+			}
+
+			case WM_MOUSEWHEEL:
+			{
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					MouseScrolledEvent event(0, (float) ((short) HIWORD(wParam)) / (float) WHEEL_DELTA);
 					data->EventCallback(event);
-
-					s_PreviousMousePos.x = xPos;
-					s_PreviousMousePos.y = yPos;
-
-					s_ShouldRegisterMouseMovedCallback = false;
-
-					RECT wRect;
-					GetWindowRect((HWND)data->p_EngineWindow->GetNativeHandle(), &wRect);
-					SetCursorPos(wRect.left + data->p_EngineWindow->GetWidth() / 2, wRect.top + data->p_EngineWindow->GetHeight() / 2);
 				}
-				else
+				break;
+			}
+
+			case WM_LBUTTONDOWN:
+			{
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
 				{
-					s_ShouldRegisterMouseMovedCallback = true;
-
-					s_PreviousMousePos.x = xPos;
-					s_PreviousMousePos.y = yPos;
+					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_LEFT);
+					data->EventCallback(event);
 				}
+				break;
 			}
-			break;
-		}
-		case WM_MOUSEWHEEL:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+				
+			case WM_RBUTTONDOWN:
 			{
-				MouseScrolledEvent event(0, (float)((short)HIWORD(wParam)) / (float)WHEEL_DELTA);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_RIGHT);
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_LBUTTONDOWN:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+				
+			case WM_MBUTTONDOWN:
 			{
-				MouseButtonPressedEvent event((int32)HLMouseButtonCode::BUTTON_LEFT);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_MIDDLE);
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_RBUTTONDOWN:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+		
+			case WM_LBUTTONUP:
 			{
-				MouseButtonPressedEvent event((int32)HLMouseButtonCode::BUTTON_RIGHT);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_LEFT);
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_MBUTTONDOWN:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+				
+			case WM_RBUTTONUP:
 			{
-				MouseButtonPressedEvent event((int32)HLMouseButtonCode::BUTTON_MIDDLE);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_RIGHT);
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_LBUTTONUP:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+			
+			case WM_MBUTTONUP:
 			{
-				MouseButtonReleasedEvent event((int32)HLMouseButtonCode::BUTTON_LEFT);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_MIDDLE);
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_RBUTTONUP:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+				
+			case WM_KEYDOWN:
 			{
-				MouseButtonReleasedEvent event((int32)HLMouseButtonCode::BUTTON_RIGHT);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					int repeat = (int) (HIWORD(lParam) & KF_REPEAT) ? 1 : 0;
+					KeyPressedEvent event(utils::InputHelperWindowsKeyCodeToHL((int) wParam), repeat);
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_MBUTTONUP:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
+				
+			case WM_KEYUP:
 			{
-				MouseButtonReleasedEvent event((int32)HLMouseButtonCode::BUTTON_MIDDLE);
-				data->EventCallback(event);
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					KeyReleasedEvent event(utils::InputHelperWindowsKeyCodeToHL((int) wParam));
+					data->EventCallback(event);
+				}
+				break;
 			}
-			break;
-		}
-		case WM_KEYDOWN:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
-			{
-				int repeat = (int)(HIWORD(lParam) & KF_REPEAT) ? 1 : 0;
-				KeyPressedEvent event(utils::InputHelperWindowsKeyCodeToHL((int)wParam), repeat);
-				data->EventCallback(event);
-			}
-			break;
-		}
-		case WM_KEYUP:
-		{
-			WindowCallbackData* data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-			if (data)
-			{
-				KeyReleasedEvent event(utils::InputHelperWindowsKeyCodeToHL((int) wParam));
-				data->EventCallback(event);
-			}
-			break;
-		}
 		}
 
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 }
-#endif // HIGHLO_API_DX11
+
+#endif // HIGHLO_API_GLFW

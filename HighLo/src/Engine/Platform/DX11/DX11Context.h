@@ -4,8 +4,9 @@
 #include "Engine/Core/HLLog.h"
 
 #ifdef HIGHLO_API_DX11
+
 #include "Engine/Platform/DX11/DX11Resources.h"
-#include "Engine/Platform/DX11/Window/DX11Window.h"
+#include "Engine/Window/Window.h"
 
 namespace highlo
 {
@@ -13,10 +14,11 @@ namespace highlo
 	{
 	public:
 		DX11Context(WindowData& window_properties, HWND hwnd);
-		~DX11Context();
+		virtual ~DX11Context();
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
+		virtual void SetSwapInterval(bool bEnabled) override;
 
 	private:
 		void InitializeSwapChain();

@@ -2,10 +2,10 @@
 #include "VertexArray.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/Rendering/OpenGLVertexArray.h"
+#include "Engine/Platform/OpenGL/OpenGLVertexArray.h"
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-#include "Engine/Platform/DX11/Rendering/DX11VertexArray.h"
+#include "Engine/Platform/DX11/DX11VertexArray.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

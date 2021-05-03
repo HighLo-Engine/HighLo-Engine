@@ -2,10 +2,10 @@
 #include "IndexBuffer.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/Rendering/OpenGLIndexBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLIndexBuffer.h"
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-#include "Engine/Platform/DX11/Rendering/DX11IndexBuffer.h"
+#include "Engine/Platform/DX11/DX11IndexBuffer.h"
 #endif // HIGHLO_API_DX11
 
 namespace highlo

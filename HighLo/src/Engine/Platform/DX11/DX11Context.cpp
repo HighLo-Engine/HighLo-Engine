@@ -42,6 +42,11 @@ namespace highlo
 		// TODO: @FlareCoding
 	}
 
+	void DX11Context::MakeCurrent()
+	{
+		// TODO: @FlareCoding
+	}
+
 	void DX11Context::InitializeSwapChain()
 	{
 		std::vector<AdapterData> adapters = AdapterReader::GetAdapters();

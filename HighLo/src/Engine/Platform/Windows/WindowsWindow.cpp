@@ -104,10 +104,10 @@ namespace highlo
 		}
 
 	#ifdef HIGHLO_API_DX11
-		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, hwnd));
+		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, m_NativeHandle));
 		m_Context->Init();
 	#elif HIGHLO_API_OPENGL
-		m_Context = UniqueRef<RenderingContext>(new OpenGLContext(hwnd));
+		m_Context = UniqueRef<RenderingContext>(new OpenGLContext(m_NativeHandle));
 		m_Context->Init();
 	#endif // HIGHLO_API_DX11
 		}

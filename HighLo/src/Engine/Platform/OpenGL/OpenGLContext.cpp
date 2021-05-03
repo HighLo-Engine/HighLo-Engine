@@ -19,12 +19,15 @@ namespace highlo
 	{
 	}
 
+	void OpenGLContext::MakeCurrent()
+	{
+		glfwMakeContextCurrent((GLFWwindow*)m_OpenGLWindowHandle);
+	}
+
 	void OpenGLContext::Init()
 	{
 		glfwMakeContextCurrent((GLFWwindow*)m_OpenGLWindowHandle);
-
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-			HL_CORE_FATAL("Failed to initialize OpenGL context");
+		HL_ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to load OpenGL Context!");
 
 		std::stringstream ss;
 		ss << "\nOpenGL Info:\n";
@@ -88,8 +91,7 @@ namespace highlo
 			};
 
 		dc = GetDC((HWND)m_OpenGLWindowHandle);
-		int pf = ChoosePixelFormat(dc, &pfd);
-		SetPixelFormat(dc, pf, &pfd);
+		SetPixelFormat(dc, ChoosePixelFormat(dc, &pfd), &pfd);
 		rc = wglCreateContext(dc);
 
 		wglMakeCurrent(dc, rc);
@@ -101,6 +103,11 @@ namespace highlo
 		ss << "    Renderer  :  " << glGetString(GL_RENDERER) << "\n";
 		ss << "    Version   :  " << glGetString(GL_VERSION) << "\n";
 		HL_CORE_INFO(ss.str());
+	}
+
+	void OpenGLContext::MakeCurrent()
+	{
+		wglMakeCurrent(dc, rc);
 	}
 
 	void OpenGLContext::SwapBuffers()

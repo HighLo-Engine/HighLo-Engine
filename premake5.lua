@@ -29,6 +29,7 @@ workspace "HighLo"
 		include "HighLo/vendor/glm"
 		include "HighLo/vendor/assimp"
 		include "HighLo/vendor/imgui"
+		include "HighLo/vendor/spdlog"
 	group ""
 
 	group "Engine"

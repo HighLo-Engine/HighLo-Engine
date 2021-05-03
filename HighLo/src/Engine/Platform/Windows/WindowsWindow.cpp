@@ -119,7 +119,7 @@ namespace highlo
 		SetWindowLongPtr(m_NativeHandle, GWLP_USERDATA, (DWORD_PTR) &m_CallbackData);
 	}
 
-	void WindowsWindow::SetWindowIcon(const HLString &path)
+	void WindowsWindow::SetWindowIcon(const HLString &path, bool flip)
 	{
 		HANDLE hIcon = LoadImage(0, path.W_Str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 		if (hIcon)

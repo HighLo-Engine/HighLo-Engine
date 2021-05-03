@@ -3,6 +3,7 @@
 void Sandbox::OnInitialize()
 {
 	HL_TRACE("Sandbox Initialized");
+	HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.png");
 }
 
 void Sandbox::OnUpdate(Timestep timestep)

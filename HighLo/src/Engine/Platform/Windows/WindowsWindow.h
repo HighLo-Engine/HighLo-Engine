@@ -31,7 +31,7 @@ namespace highlo
 		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
 		virtual void *GetNativeHandle() override { return (void *) m_NativeHandle; }
 
-		virtual void SetWindowIcon(const HLString &path) override;
+		virtual void SetWindowIcon(const HLString &path, bool flip = false) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
 		virtual std::pair<int32, int32> GetWindowPosition() override;
 		virtual void CloseWindow() override;

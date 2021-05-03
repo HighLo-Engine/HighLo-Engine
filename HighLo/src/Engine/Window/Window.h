@@ -62,7 +62,7 @@ namespace highlo
 
 		virtual void Update() = 0;
 
-		virtual void SetWindowIcon(const HLString &path) = 0;
+		virtual void SetWindowIcon(const HLString &path, bool flip = false) = 0;
 		virtual std::pair<int32, int32> GetWindowDimensions() = 0;
 		virtual std::pair<int32, int32> GetWindowPosition() = 0;
 		virtual void CloseWindow() = 0;

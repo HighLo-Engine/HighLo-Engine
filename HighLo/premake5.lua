@@ -24,7 +24,8 @@ project "HighLo"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.GLAD}",
         "%{IncludeDir.assimp}",
-        "%{IncludeDir.imgui}"
+        "%{IncludeDir.imgui}",
+        "%{IncludeDir.stb_image}"
     }
 
     links
@@ -32,6 +33,7 @@ project "HighLo"
         "GLFW",
         "GLAD",
         "ImGui",
+        "stbimage",
         "%{LibDir.assimp}",
         "opengl32.lib"
     }

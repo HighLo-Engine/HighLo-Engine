@@ -11,6 +11,7 @@
 #include <GLFW/glfw3native.h>
 #endif // HIGHLO_API_OPENGL
 
+#include <stb_image.h>
 #include "Engine/Events/Events.h"
 
 namespace highlo
@@ -46,16 +47,14 @@ namespace highlo
 		m_Context->SwapBuffers();
 	}
 
-	void GLFWWindow::SetWindowIcon(const HLString &path)
+	void GLFWWindow::SetWindowIcon(const HLString &path, bool flip)
 	{
 		HL_CORE_INFO("Loading Window Icon: {0}", *path);
 
-		// TODO: Add stb_image
-		/*
 		int32 width, height;
-		stbi_set_flip_vertically_on_load(1);
-		stbi_uc *img = stbi_load(*path, &width, &height, 0, 4);
 
+		stbi_set_flip_vertically_on_load(flip);
+		stbi_uc *img = stbi_load(*path, &width, &height, 0, 4);
 		GLFWimage icons[1];
 		icons[0].width = width;
 		icons[0].height = height;
@@ -63,7 +62,6 @@ namespace highlo
 
 		glfwSetWindowIcon(m_NativeHandle, 1, icons);
 		stbi_image_free(icons[0].pixels);
-		*/
 	}
 
 	std::pair<int32, int32> GLFWWindow::GetWindowDimensions()

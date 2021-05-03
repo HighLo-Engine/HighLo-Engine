@@ -10,3 +10,6 @@
 [submodule "HighLo/vendor/imgui"]
 	path = HighLo/vendor/imgui
 	url = https://github.com/HighLo-Engine/imgui
+[submodule "HighLo/vendor/spdlog"]
+	path = HighLo/vendor/spdlog
+	url = https://github.com/HighLo-Engine/spdlog

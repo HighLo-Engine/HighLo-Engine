@@ -14,7 +14,7 @@ namespace highlo
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
-		virtual int32 GetCount() const override { return m_Count; }
+		virtual int32 GetCount() override { return m_Count; }
 
 	private:
 		uint32 m_ID;

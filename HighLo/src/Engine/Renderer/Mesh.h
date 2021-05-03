@@ -10,7 +10,7 @@ namespace highlo
 		std::vector<int>	m_Indices;
 	};
 
-	class Mesh
+	class Mesh : public IsSharedReference
 	{
 	public:
 		static Ref<Mesh> Create(const MeshData& data);

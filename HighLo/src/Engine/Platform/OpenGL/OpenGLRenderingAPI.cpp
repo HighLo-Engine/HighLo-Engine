@@ -17,17 +17,17 @@ namespace highlo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRenderingAPI::DrawIndexed(const Ref<VertexArray>& va)
+	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray>& va)
 	{
 		glDrawElements(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawInstanced(const Ref<VertexArray>& va, uint32 count)
+	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count)
 	{
 		glDrawElementsInstanced(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
 	}
 	
-	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(const Ref<VertexArray>& va)
+	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray>& va)
 	{
 		glDrawElements(GL_PATCHES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}

@@ -12,7 +12,7 @@ namespace highlo
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual int32 GetCount() const = 0;
+		virtual int32 GetCount() = 0;
 
 		static Ref<IndexBuffer> Create(std::vector<int32>& indices);
 	};

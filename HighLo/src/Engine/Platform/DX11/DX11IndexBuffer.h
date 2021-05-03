@@ -16,7 +16,7 @@ namespace highlo
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
-		virtual int32  GetCount() const override { return (int32)m_BufferSize; }
+		virtual int32 GetCount() override { return (int32)m_BufferSize; }
 
 	private:
 		ComPtr<ID3D11Buffer>	m_Buffer;

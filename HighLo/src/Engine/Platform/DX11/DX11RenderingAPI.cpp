@@ -21,19 +21,19 @@ namespace highlo
 		DX11Resources::s_DeviceContext->OMSetDepthStencilState(DX11Resources::s_DepthStencilState.Get(), 0);
 	}
 
-	void DX11RenderingAPI::DrawIndexed(const Ref<VertexArray>& va)
+	void DX11RenderingAPI::DrawIndexed(Ref<VertexArray>& va)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawInstanced(const Ref<VertexArray>& va, uint32 count)
+	void DX11RenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		DX11Resources::s_DeviceContext->DrawIndexedInstanced(va->GetIndexBuffer()->GetCount(), count, 0, 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawIndexedControlPointPatchList(const Ref<VertexArray>& va)
+	void DX11RenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray>& va)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);

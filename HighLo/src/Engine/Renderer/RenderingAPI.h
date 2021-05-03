@@ -13,9 +13,9 @@ namespace highlo
 		virtual void ClearScreenColor(const glm::vec4& color) = 0;
 		virtual void ClearScreenBuffers() = 0;
 
-		virtual void DrawIndexed(const Ref<VertexArray>& va) = 0;
-		virtual void DrawInstanced(const Ref<VertexArray>& va, uint32 count) = 0;
-		virtual void DrawIndexedControlPointPatchList(const Ref<VertexArray>& va) = 0;
+		virtual void DrawIndexed(Ref<VertexArray>& va) = 0;
+		virtual void DrawInstanced(Ref<VertexArray>& va, uint32 count) = 0;
+		virtual void DrawIndexedControlPointPatchList(Ref<VertexArray>& va) = 0;
 
 		virtual void SetWireframe(bool wf) = 0;
 

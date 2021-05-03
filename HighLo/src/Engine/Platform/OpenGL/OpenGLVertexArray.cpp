@@ -84,12 +84,12 @@ namespace highlo
 		m_IndexBuffer = index_buffer;
 	}
 
-	const std::vector<Ref<VertexBuffer>>& OpenGLVertexArray::GetVertexBuffers() const
+	std::vector<Ref<VertexBuffer>>& OpenGLVertexArray::GetVertexBuffers()
 	{
 		return m_VertexBuffers;
 	}
 
-	const Ref<IndexBuffer>& OpenGLVertexArray::GetIndexBuffer() const
+	Ref<IndexBuffer>& OpenGLVertexArray::GetIndexBuffer()
 	{
 		return m_IndexBuffer;
 	}

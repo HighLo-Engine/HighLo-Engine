@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Engine/Core/HLCore.h"
 #include "VertexData.h"
 #include "BufferLayout.h"

@@ -39,12 +39,12 @@ namespace highlo
 		m_IndexBuffer = index_buffer;
 	}
 
-	const std::vector<Ref<VertexBuffer>>& DX11VertexArray::GetVertexBuffers() const
+	std::vector<Ref<VertexBuffer>>& DX11VertexArray::GetVertexBuffers()
 	{
 		return m_VertexBuffers;
 	}
 
-	const Ref<IndexBuffer>& DX11VertexArray::GetIndexBuffer() const
+	Ref<IndexBuffer>& DX11VertexArray::GetIndexBuffer()
 	{
 		return m_IndexBuffer;
 	}

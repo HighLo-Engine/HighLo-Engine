@@ -43,7 +43,7 @@ namespace highlo
 		HLString DebugName;
 	};
 
-	class Framebuffer
+	class Framebuffer : public IsSharedReference
 	{
 	public:
 		virtual ~Framebuffer() = default;

@@ -53,7 +53,7 @@ namespace highlo
 			m_StartupSettings.Fullscreen,
 			m_StartupSettings.WindowWidth,
 			m_StartupSettings.WindowHeight,
-			m_StartupSettings.WindowTitle.c_str()))
+			m_StartupSettings.WindowTitle))
 		);
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
@@ -75,7 +75,6 @@ namespace highlo
 			return false;
 		}
 
-		// TODO: Resize Framebuffers and Viewports
 		auto &fbs = FramebufferPool::GetGlobal()->GetAll();
 		for (auto &fb : fbs)
 		{
@@ -86,7 +85,7 @@ namespace highlo
 		return true;
 	}
 
-	void HLApplication::InternalEventHandler(Event& event)
+	void HLApplication::InternalEventHandler(Event &event)
 	{
 		// Drop certain input events if the window is not in focus
 		if (!m_Window->IsFocused() && event.IsInCategory(EventCategory::EventCategoryInput))

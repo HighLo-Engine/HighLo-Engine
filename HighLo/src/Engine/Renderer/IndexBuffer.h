@@ -4,16 +4,16 @@
 
 namespace highlo
 {
-	class IndexBuffer
+	class IndexBuffer : public IsSharedReference
 	{
 	public:
 		virtual ~IndexBuffer() = default;
 
-		virtual void Bind() = 0;
-		virtual void Unbind() = 0;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-		virtual int GetCount() = 0;
+		virtual int32 GetCount() const = 0;
 
-		static Ref<IndexBuffer> Create(std::vector<int>& indices);
+		static Ref<IndexBuffer> Create(std::vector<int32>& indices);
 	};
 }

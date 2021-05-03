@@ -7,12 +7,12 @@
 
 namespace highlo
 {
-	OpenGLIndexBuffer::OpenGLIndexBuffer(std::vector<int>& indices)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(std::vector<int32>& indices)
 	{
 		m_Count = (uint32)indices.size();
 		glGenBuffers(1, &m_ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), &indices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int32), &indices[0], GL_STATIC_DRAW);
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -20,12 +20,12 @@ namespace highlo
 		glDeleteBuffers(1, &m_ID);
 	}
 
-	void OpenGLIndexBuffer::Bind()
+	void OpenGLIndexBuffer::Bind() const
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 	}
 
-	void OpenGLIndexBuffer::Unbind()
+	void OpenGLIndexBuffer::Unbind() const
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}

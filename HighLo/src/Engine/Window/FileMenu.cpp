@@ -10,7 +10,7 @@ namespace highlo
 	Ref<FileMenu> FileMenu::Create(const HLString &name)
 	{
 	#ifdef HL_PLATFORM_WINDOWS
-		return MakeRef<WindowsFileMenu>(name);
+		return Ref<WindowsFileMenu>::Create(name);
 	#else
 		return nullptr;
 	#endif

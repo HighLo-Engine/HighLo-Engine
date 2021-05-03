@@ -10,7 +10,7 @@ namespace highlo
 	Ref<MenuBar> MenuBar::Create()
 	{
 	#ifdef HL_PLATFORM_WINDOWS
-		return MakeRef<WindowsMenuBar>();
+		return Ref<WindowsMenuBar>::Create();
 	#else
 		return nullptr;
 	#endif

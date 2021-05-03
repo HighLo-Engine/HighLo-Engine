@@ -13,9 +13,9 @@ namespace highlo
 	Ref<Image2D> Image2D::Create(ImageFormat format, uint32 width, uint32 height, Allocator buffer)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return MakeRef<OpenGLImage2D>(format, width, height, buffer);
+		return Ref<OpenGLImage2D>::Create(format, width, height, buffer);
 	#elif HIGHLO_API_DX11
-		return MakeRef<DX11Image2D>(format, width, height, buffer);
+		return Ref<DX11Image2D>::Create(format, width, height, buffer);
 	#else
 		return nullptr;
 	#endif
@@ -24,9 +24,9 @@ namespace highlo
 	Ref<Image2D> Image2D::Create(ImageFormat format, uint32 width, uint32 height, const void *data)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return MakeRef<OpenGLImage2D>(format, width, height, data);
+		return Ref<OpenGLImage2D>::Create(format, width, height, data);
 	#elif HIGHLO_API_DX11
-		return MakeRef<DX11Image2D>(format, width, height, data);
+		return Ref<DX11Image2D>::Create(format, width, height, data);
 	#else
 		return nullptr;
 	#endif

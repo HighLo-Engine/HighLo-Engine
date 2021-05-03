@@ -6,13 +6,13 @@
 
 namespace highlo
 {
-	class VertexBuffer
+	class VertexBuffer : public IsSharedReference
 	{
 	public:
 		virtual ~VertexBuffer() = default;
 
-		virtual void Bind() = 0;
-		virtual void Unbind() = 0;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;

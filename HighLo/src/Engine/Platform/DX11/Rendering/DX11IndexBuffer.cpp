@@ -28,17 +28,12 @@ namespace highlo
 		DX11Resources::s_Device->CreateBuffer(&vbedsc, &vbdata, m_Buffer.GetAddressOf());
 	}
 
-	void DX11IndexBuffer::Bind()
+	void DX11IndexBuffer::Bind() const
 	{
 		DX11Resources::s_DeviceContext->IASetIndexBuffer(m_Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	}
 
-	void DX11IndexBuffer::Unbind() {}
-
-	int DX11IndexBuffer::GetCount()
-	{
-		return (int)m_BufferSize;
-	}
+	void DX11IndexBuffer::Unbind() const {}
 }
 
 #endif // HIGHLO_API_DX11

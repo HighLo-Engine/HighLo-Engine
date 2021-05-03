@@ -4,7 +4,7 @@
 
 namespace highlo
 {
-	class FileDialogue
+	class FileDialogue : public IsSharedReference
 	{
 	public:
 

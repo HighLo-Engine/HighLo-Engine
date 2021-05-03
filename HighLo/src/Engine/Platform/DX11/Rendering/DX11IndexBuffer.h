@@ -14,9 +14,9 @@ namespace highlo
 	public:
 		DX11IndexBuffer(std::vector<int>& indices);
 
-		virtual void Bind() override;
-		virtual void Unbind() override;
-		virtual int  GetCount() override;
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+		virtual int32  GetCount() const override { return (int32)m_BufferSize; }
 
 	private:
 		ComPtr<ID3D11Buffer>	m_Buffer;

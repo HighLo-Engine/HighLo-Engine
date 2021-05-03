@@ -10,7 +10,7 @@ namespace highlo
 	Ref<PopupMenu> PopupMenu::Create(const HLString &name)
 	{
 	#ifdef HL_PLATFORM_WINDOWS
-		return MakeRef<WindowsPopupMenu>(name);
+		return Ref<WindowsPopupMenu>::Create(name);
 	#else
 		return nullptr;
 	#endif

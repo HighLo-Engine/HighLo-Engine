@@ -12,11 +12,14 @@ namespace highlo
 		UINT offset = 0;
 		for (auto i = 0; i < m_VertexBuffers.size(); i++)
 		{
+			// TODO @FlareCoding: TEST - This should work
+			Ref<DX11VertexBuffer> dxVertexBuffer = m_VertexBuffers[i].As<DX11VertexBuffer>();
+
 			DX11Resources::s_DeviceContext->IASetVertexBuffers(
 				i,
 				1,
-				static_cast<DX11VertexBuffer*>(m_VertexBuffers.at(i).get())->GetAddressOf(),
-				static_cast<DX11VertexBuffer*>(m_VertexBuffers.at(i).get())->GetStridePtr(),
+				dxVertexBuffer->GetAddressOf(),
+				dxVertexBuffer->GetStridePtr(),
 				&offset
 			);
 		}

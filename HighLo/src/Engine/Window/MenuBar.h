@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-	class MenuBar
+	class MenuBar : public IsSharedReference
 	{
 	public:
 

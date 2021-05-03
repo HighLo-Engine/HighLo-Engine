@@ -6,6 +6,8 @@
 #include <glad/glad.h>
 #include "OpenGLImage.h"
 
+#include "Engine/Application/HLApplication.h"
+
 namespace highlo
 {
 	namespace utils
@@ -63,36 +65,38 @@ namespace highlo
 		static Ref<Image2D> CreateAndAttachColorAttachment(int samples, ImageFormat format, uint32 width, uint32 height, int32 index)
 		{
 			bool multisampled = samples > 1;
-			Ref<OpenGLImage2D> image;
+			Ref<Image2D> image;
 			if (multisampled)
 			{
 				//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
 			else
 			{
-				image = MakeRef<OpenGLImage2D>(format, width, height);
+				image = Image2D::Create(format, width, height);
 				image->Invalidate();
 			}
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), image->GetRendererID(), 0);
+			Ref<OpenGLImage2D> glImage = image.As<OpenGLImage2D>();
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), glImage->GetRendererID(), 0);
 			return image;
 		}
 
 		static Ref<Image2D> AttachDepthTexture(int samples, ImageFormat format, uint32 width, uint32 height)
 		{
 			bool multisampled = samples > 1;
-			Ref<OpenGLImage2D> image;
+			Ref<Image2D> image;
 			if (multisampled)
 			{
 				//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
 			else
 			{
-				image = MakeRef<OpenGLImage2D>(format, width, height);
+				image = Image2D::Create(format, width, height);
 				image->Invalidate();
 			}
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), image->GetRendererID(), 0);
+			Ref<OpenGLImage2D> glImage = image.As<OpenGLImage2D>();
+			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), glImage->GetRendererID(), 0);
 			return image;
 		}
 
@@ -136,7 +140,8 @@ namespace highlo
 		uint32 height = spec.Height;
 		if (0 == width)
 		{
-			// TODO: Get Application width and height
+			width = HLApplication::Get().GetWindow().GetWidth();
+			height = HLApplication::Get().GetWindow().GetHeight();
 		}
 
 		Resize(width, height, true);

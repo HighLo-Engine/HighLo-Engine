@@ -13,13 +13,13 @@ namespace highlo
 #ifdef HIGHLO_API_OPENGL
 	Ref<VertexArray> VertexArray::Create()
 	{
-		return Ref<VertexArray>(new OpenGLVertexArray());
+		return Ref<OpenGLVertexArray>::Create();
 	}
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
 	Ref<VertexArray> VertexArray::Create()
 	{
-		return Ref<VertexArray>(new DX11VertexArray());
+		return Ref<DX11VertexArray>::Create();
 	}
 #endif // HIGHLO_API_DX11
 }

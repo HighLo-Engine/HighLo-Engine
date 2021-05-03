@@ -3,8 +3,8 @@
 
 namespace highlo
 {
-	Ref<spdlog::logger> Logger::s_EngineLogger;
-	Ref<spdlog::logger> Logger::s_ClientLogger;
+	std::shared_ptr<spdlog::logger> Logger::s_EngineLogger;
+	std::shared_ptr<spdlog::logger> Logger::s_ClientLogger;
 
 	void Logger::Init()
 	{
@@ -17,12 +17,12 @@ namespace highlo
 		s_ClientLogger->set_level(spdlog::level::trace);
 	}
 
-	Ref<spdlog::logger> &Logger::GetCoreLogger()
+	std::shared_ptr<spdlog::logger> &Logger::GetCoreLogger()
 	{
 		return s_EngineLogger;
 	}
 
-	Ref<spdlog::logger> &Logger::GetClientLogger()
+	std::shared_ptr<spdlog::logger> &Logger::GetClientLogger()
 	{
 		return s_ClientLogger;
 	}

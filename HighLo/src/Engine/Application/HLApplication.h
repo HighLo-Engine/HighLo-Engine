@@ -13,7 +13,7 @@ namespace highlo
 		bool Fullscreen = false;
 		uint32 WindowWidth = 1270;
 		uint32 WindowHeight = 920;
-		std::string WindowTitle = "HighLo Engine";
+		HLString WindowTitle = "HighLo Engine";
 	};
 
 	class HLApplication
@@ -30,10 +30,10 @@ namespace highlo
 		HLAPI virtual void OnInitialize() {}
 		HLAPI virtual void OnUpdate(Timestep timestep) {}
 		HLAPI virtual void OnShutdown() {}
-		HLAPI virtual void OnEvent(Event& e) {}
+		HLAPI virtual void OnEvent(Event &e) {}
 
 		inline void Close() { m_Running = false; }
-		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings& settings) { m_StartupSettings = settings; }
+		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }
 
 	private:
 		static HLApplication* s_Instance;
@@ -48,6 +48,6 @@ namespace highlo
 		bool OnWindowReisze(WindowResizeEvent &event);
 
 	private:
-		void InternalEventHandler(Event& event);
+		void InternalEventHandler(Event &event);
 	};
 }

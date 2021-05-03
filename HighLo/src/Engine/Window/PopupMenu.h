@@ -4,7 +4,7 @@
 
 namespace highlo
 {
-	class PopupMenu
+	class PopupMenu : public IsSharedReference
 	{
 	public:
 

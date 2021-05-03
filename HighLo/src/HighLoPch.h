@@ -22,3 +22,7 @@
 /* Streams */
 #include <fstream>
 #include <sstream>
+
+#include "Engine/Core/HLCore.h"
+#include "Engine/Core/SharedReference.h"
+

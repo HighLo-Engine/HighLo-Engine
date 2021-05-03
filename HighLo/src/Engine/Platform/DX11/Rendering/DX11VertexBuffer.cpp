@@ -55,9 +55,9 @@ namespace highlo
 		DX11Resources::s_Device->CreateBuffer(&vbedsc, &vbdata, m_Buffer.GetAddressOf());
 	}
 
-	void DX11VertexBuffer::Bind() {}
+	void DX11VertexBuffer::Bind() const {}
 
-	void DX11VertexBuffer::Unbind() {}
+	void DX11VertexBuffer::Unbind() const {}
 
 	void DX11VertexBuffer::UpdateContents(std::vector<Vertex>& vertices)
 	{

@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-	class FileMenu
+	class FileMenu : public IsSharedReference
 	{
 	public:
 

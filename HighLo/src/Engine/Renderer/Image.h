@@ -6,7 +6,7 @@
 
 namespace highlo
 {
-	class Image
+	class Image : public IsSharedReference
 	{
 	public:
 

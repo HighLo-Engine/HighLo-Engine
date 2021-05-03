@@ -15,8 +15,8 @@ namespace highlo
 		DX11VertexBuffer(std::vector<Vertex>& vertices);
 		DX11VertexBuffer(void* data, size_t size, uint32 stride);
 
-		virtual void Bind() override;
-		virtual void Unbind() override;
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
 
 		inline ID3D11Buffer* Get() const { return m_Buffer.Get(); }
 		inline ID3D11Buffer* const* GetAddressOf() const { return m_Buffer.GetAddressOf(); }

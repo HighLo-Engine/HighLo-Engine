@@ -13,23 +13,23 @@ namespace highlo
 #ifdef HIGHLO_API_OPENGL
 	Ref<VertexBuffer> VertexBuffer::Create(std::vector<Vertex>& vertices)
 	{
-		return Ref<VertexBuffer>(new OpenGLVertexBuffer(vertices));
+		return Ref<OpenGLVertexBuffer>::Create(vertices);
 	}
 
 	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32 stride)
 	{
-		return Ref<VertexBuffer>(new OpenGLVertexBuffer(data, size, stride));
+		return Ref<OpenGLVertexBuffer>::Create(data, size, stride);
 	}
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
 	Ref<VertexBuffer> VertexBuffer::Create(std::vector<Vertex>& vertices)
 	{
-		return Ref<VertexBuffer>(new DX11VertexBuffer(vertices));
+		return Ref<DX11VertexBuffer>::Create(vertices);
 	}
 
 	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32 stride)
 	{
-		return Ref<VertexBuffer>(new DX11VertexBuffer(data, size, stride));
+		return Ref<DX11VertexBuffer>::Create(data, size, stride);
 	}
 #endif // HIGHLO_API_DX11
 }

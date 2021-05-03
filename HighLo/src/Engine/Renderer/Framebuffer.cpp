@@ -13,9 +13,9 @@ namespace highlo
 	Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification &spec)
 		{
 		#ifdef HIGHLO_API_OPENGL
-			return MakeRef<OpenGLFramebuffer>(spec);
+			return Ref<OpenGLFramebuffer>::Create(spec);
 		#elif HIGHLO_API_DX11
-			return MakeRef<DX11Framebuffer>(spec);
+			return Ref<DX11Framebuffer>::Create(spec);
 		#else
 			return nullptr;
 		#endif

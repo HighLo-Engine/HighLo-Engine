@@ -15,7 +15,7 @@ namespace highlo
 	Ref<FileDialogue> FileDialogue::Create()
 	{
 	#ifdef HL_PLATFORM_WINDOWS
-		return MakeRef<WindowsFileDialogue>();
+		return Ref<WindowsFileDialogue>::Create();
 	#else
 		return nullptr;
 	#endif

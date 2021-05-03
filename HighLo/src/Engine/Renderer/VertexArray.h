@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-	class VertexArray
+	class VertexArray : public IsSharedReference
 	{
 	public:
 		virtual ~VertexArray() {}

@@ -12,10 +12,10 @@ namespace highlo
 		bool Visible = true;
 		bool Seperator = false;
 
-		MenuItem() = default;
-		MenuItem(const MenuItem&) = default;
+		HLAPI MenuItem() = default;
+		HLAPI MenuItem(const MenuItem&) = default;
 
-		MenuItem(const HLString &name, int32 id, bool visible = true, bool seperator = false)
+		HLAPI MenuItem(const HLString &name, int32 id, bool visible = true, bool seperator = false)
 			: Name(name), ID(id), Visible(visible), Seperator(seperator) {}
 
 	};

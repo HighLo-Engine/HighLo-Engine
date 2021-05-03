@@ -53,44 +53,44 @@ namespace highlo
 	class Window
 	{
 	public:
-		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		HLAPI virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 
-		static Window& Get();
+		HLAPI static Window& Get();
 
-		static Window* Create(const WindowData& properties = WindowData());
-		virtual ~Window() = default;
+		HLAPI static Window* Create(const WindowData& properties = WindowData());
+		HLAPI virtual ~Window() = default;
 
-		virtual void Update() = 0;
+		HLAPI virtual void Update() = 0;
 
-		virtual void SetWindowIcon(const HLString &path, bool flip = false) = 0;
-		virtual std::pair<int32, int32> GetWindowDimensions() = 0;
-		virtual std::pair<int32, int32> GetWindowPosition() = 0;
-		virtual void CloseWindow() = 0;
+		HLAPI virtual void SetWindowIcon(const HLString &path, bool flip = false) = 0;
+		HLAPI virtual std::pair<int32, int32> GetWindowDimensions() = 0;
+		HLAPI virtual std::pair<int32, int32> GetWindowPosition() = 0;
+		HLAPI virtual void CloseWindow() = 0;
 
-		virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) = 0;
-		virtual void SetMenuBar(const Ref<MenuBar> &bar) = 0;
+		HLAPI virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) = 0;
+		HLAPI virtual void SetMenuBar(const Ref<MenuBar> &bar) = 0;
 
-		virtual void SetVSync(bool bEnabled) = 0;
-		virtual void SetVisible(bool bVisible) = 0;
-		virtual void SetFocus(bool bEnabled) = 0;
-		virtual void SetFullscreen(bool bEnabled) = 0;
-		virtual void ShowCursor() = 0;
-		virtual void HideCursor() = 0;
-		virtual void Maximize() = 0;
-		virtual void CenterWindow() = 0;
-		virtual void SetTitle(const HLString &title) = 0;
+		HLAPI virtual void SetVSync(bool bEnabled) = 0;
+		HLAPI virtual void SetVisible(bool bVisible) = 0;
+		HLAPI virtual void SetFocus(bool bEnabled) = 0;
+		HLAPI virtual void SetFullscreen(bool bEnabled) = 0;
+		HLAPI virtual void ShowCursor() = 0;
+		HLAPI virtual void HideCursor() = 0;
+		HLAPI virtual void Maximize() = 0;
+		HLAPI virtual void CenterWindow() = 0;
+		HLAPI virtual void SetTitle(const HLString &title) = 0;
 		
-		virtual bool IsVisible() = 0;
-		virtual bool IsCursorHidden() = 0;
-		virtual bool IsMaximized() = 0;
-		virtual bool IsFullscreen() = 0;
-		virtual bool IsCentered() = 0;
-		virtual bool IsFocused() = 0;
-		virtual const HLString &GetTitle() = 0;
+		HLAPI virtual bool IsVisible() = 0;
+		HLAPI virtual bool IsCursorHidden() = 0;
+		HLAPI virtual bool IsMaximized() = 0;
+		HLAPI virtual bool IsFullscreen() = 0;
+		HLAPI virtual bool IsCentered() = 0;
+		HLAPI virtual bool IsFocused() = 0;
+		HLAPI virtual const HLString &GetTitle() = 0;
 
-		virtual uint32 GetWidth() = 0;
-		virtual uint32 GetHeight() = 0;
-		virtual void* GetNativeHandle() = 0;
+		HLAPI virtual uint32 GetWidth() = 0;
+		HLAPI virtual uint32 GetHeight() = 0;
+		HLAPI virtual void* GetNativeHandle() = 0;
 
 	protected:
 

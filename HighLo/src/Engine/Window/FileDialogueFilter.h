@@ -8,9 +8,9 @@ namespace highlo
 	{
 	public:
 
-		void AddFilter(const HLString &name, const HLString &format);
-		bool HasFilters();
-		std::map<HLString, HLString> &GetFilters();
+		HLAPI void AddFilter(const HLString &name, const HLString &format);
+		HLAPI bool HasFilters();
+		HLAPI std::map<HLString, HLString> &GetFilters();
 
 	private:
 

@@ -9,14 +9,14 @@ namespace highlo
 	{
 	public:
 
-		virtual ~MenuBar() = default;
+		HLAPI virtual ~MenuBar() = default;
 
-		virtual void AddMenu(const Ref<FileMenu> &menu) = 0;
-		virtual void RemoveMenu(const Ref<FileMenu> &menu) = 0;
+		HLAPI virtual void AddMenu(const Ref<FileMenu> &menu) = 0;
+		HLAPI virtual void RemoveMenu(const Ref<FileMenu> &menu) = 0;
 
-		virtual void *GetNativeMenuBar() = 0;
-		virtual void *GetNativeMenuBar() const = 0;
+		HLAPI virtual void *GetNativeMenuBar() = 0;
+		HLAPI virtual void *GetNativeMenuBar() const = 0;
 
-		static Ref<MenuBar> Create();
+		HLAPI static Ref<MenuBar> Create();
 	};
 }

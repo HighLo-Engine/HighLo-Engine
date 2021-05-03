@@ -38,6 +38,10 @@ workspace "HighLo"
 		include "HighLo"
 	group ""
 
+	group "tests"
+		include "tests"
+	group ""
+
 	group "Games"
 		include "Sandbox"
 		include "LevelEditor"

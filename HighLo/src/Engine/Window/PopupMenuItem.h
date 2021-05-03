@@ -12,10 +12,10 @@ namespace highlo
 		bool Visible = true;
 		bool Seperator = false;
 
-		PopupMenuItem() = default;
-		PopupMenuItem(const PopupMenuItem&) = default;
+		HLAPI PopupMenuItem() = default;
+		HLAPI PopupMenuItem(const PopupMenuItem&) = default;
 
-		PopupMenuItem(const HLString &name, int32 id, int32 position, bool visible = true, bool seperator = false)
+		HLAPI PopupMenuItem(const HLString &name, int32 id, int32 position, bool visible = true, bool seperator = false)
 			: Name(name), ID(id), Position(position), Visible(visible), Seperator(seperator) {}
 	};
 }

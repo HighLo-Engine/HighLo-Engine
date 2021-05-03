@@ -8,14 +8,14 @@ namespace highlo
 	{
 	public:
 
-		virtual ~FileDialogue() = default;
+		HLAPI virtual ~FileDialogue() = default;
 
-		virtual HLString SelectDirectory() = 0;
-		virtual HLString SelectFile() = 0;
-		virtual HLString SaveFile() = 0;
+		HLAPI virtual HLString SelectDirectory() = 0;
+		HLAPI virtual HLString SelectFile() = 0;
+		HLAPI virtual HLString SaveFile() = 0;
 
-		void SetFilter(const FileDialogueFilter &filter);
-		static Ref<FileDialogue> Create();
+		HLAPI void SetFilter(const FileDialogueFilter &filter);
+		HLAPI static Ref<FileDialogue> Create();
 
 	protected:
 

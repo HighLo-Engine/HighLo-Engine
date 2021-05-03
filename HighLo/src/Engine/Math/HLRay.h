@@ -65,7 +65,7 @@ namespace highlo
             glm::vec3 E2 = C - A;
             glm::vec3 N = cross(E1, E2);
             float det = -glm::dot(Direction, N);
-            float invdet = 1.0 / det;
+            float invdet = 1.0f / det;
             glm::vec3 AO = Origin - A;
             glm::vec3 DAO = glm::cross(AO, Direction);
             float u = glm::dot(E2, DAO) * invdet;

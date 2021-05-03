@@ -38,12 +38,10 @@ namespace highlo
 		#endif
 
 			OnUpdate(Time::GetTimestep());
-
 			m_Window->Update();
 		}
 
 		OnShutdown();
-
 		VirtualFileSystem::Shutdown();
 	}
 

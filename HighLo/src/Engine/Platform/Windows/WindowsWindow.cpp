@@ -322,6 +322,11 @@ namespace highlo
 		SetWindowTextW(m_NativeHandle, title.W_Str());
 	}
 
+	bool WindowsWindow::IsFocused()
+	{
+		return (GetForegroundWindow() == m_NativeHandle);
+	}
+
 	void WindowsWindow::OnResize(uint32 width, uint32 height)
 	{
 		m_Properties.m_Width = width;
@@ -353,13 +358,6 @@ namespace highlo
 
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-
-	#ifdef IFR_VERDEV
-		if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
-			return true;
-	#endif // IFR_VERDEV
-
-
 		switch (uMsg)
 		{
 			case WM_CLOSE:

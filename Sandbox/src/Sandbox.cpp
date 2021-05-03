@@ -19,6 +19,5 @@ void Sandbox::OnShutdown()
 
 void Sandbox::OnEvent(Event& e)
 {
-//	if (e.IsInCategory(EventCategory::EventCategoryApplication))
-	HL_TRACE(*e.ToString());
+	HL_TRACE(e.ToString());
 }

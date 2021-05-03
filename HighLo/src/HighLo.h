@@ -8,14 +8,16 @@
 #include "Engine/Core/HLAllocator.h"
 #include "Engine/Core/DataTypes/HLDataTypes.h"
 #include "Engine/Core/HLLog.h"
-#include "Engine/Math/HLMath.h"
-#include "Engine/Window/Window.h"
 #include "Engine/Core/HLInput.h"
 #include "Engine/Core/HLTime.h"
 #include "Engine/Core/HLTimer.h"
 #include "Engine/Core/SharedReference.h"
 #include "Engine/Core/Profiler/HLProfiler.h"
 #include "Engine/Core/Profiler/HLProfilerTimer.h"
+
+#include "Engine/Math/HLMath.h"
+#include "Engine/Math/HLAABB.h"
+#include "Engine/Math/HLRay.h"
 
 #include "Engine/Renderer/BufferLayout.h"
 #include "Engine/Renderer/RenderingContext.h"

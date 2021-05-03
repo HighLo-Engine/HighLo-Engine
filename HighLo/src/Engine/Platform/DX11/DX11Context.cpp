@@ -34,17 +34,19 @@ namespace highlo
 
 	void DX11Context::SwapBuffers()
 	{
-		m_SwapChain->Present(0, NULL);
+		m_SwapChain->Present((int)m_VSyncEnabled, NULL);
 	}
 
 	void DX11Context::SetSwapInterval(bool bEnabled)
 	{
-		// TODO: @FlareCoding
+		m_VSyncEnabled = bEnabled;
 	}
 
 	void DX11Context::MakeCurrent()
 	{
-		// TODO: @FlareCoding
+		// *
+		// DX11 context doesn't require making itself current or not.
+		// *
 	}
 
 	void DX11Context::InitializeSwapChain()

@@ -41,6 +41,8 @@ namespace highlo
 		ComPtr<ID3D11Texture2D>			m_DepthStencilBuffer;
 		ComPtr<ID3D11BlendState>		m_BlendState;
 
+		bool							m_VSyncEnabled = false;
+
 	private:
 		std::string m_InitSuccessString = "";
 	};

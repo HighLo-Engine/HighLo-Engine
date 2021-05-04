@@ -47,7 +47,7 @@ namespace highlo
 		virtual bool IsFullscreen() override { return m_Properties.m_Fullscreen; }
 		virtual bool IsCentered() override { return m_Properties.m_Centered; }
 		virtual const HLString &GetTitle() override { return m_Properties.m_Title; }
-		bool IsFocused() override { return m_Properties.m_Focused; }
+		bool IsFocused() override;
 
 	private:
 

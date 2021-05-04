@@ -187,6 +187,11 @@ namespace highlo
 		glfwSetWindowTitle(m_NativeHandle, *title);
 	}
 
+	bool GLFWWindow::IsFocused()
+	{
+		return glfwGetWindowAttrib(m_NativeHandle, GLFW_FOCUSED);
+	}
+
 	void GLFWWindow::Init()
 		{
 		if (!s_GLFWInitialized)

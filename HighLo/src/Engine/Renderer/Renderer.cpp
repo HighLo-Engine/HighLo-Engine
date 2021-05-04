@@ -39,9 +39,11 @@ namespace highlo
 
 	void Renderer::Init(Window* window)
 	{
+		CoreRenderer::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
+		CoreRenderer::Shutdown();
 	}
 }

@@ -3,11 +3,6 @@
 
 namespace highlo
 {
-	float time_since_epoch() {
-		auto now = std::chrono::system_clock::now().time_since_epoch();
-		return (float)std::chrono::duration_cast<std::chrono::microseconds>(now).count();
-	}
-
 	float Time::s_ElapsedTime = 0;
 	float Time::s_TimeScale = 1;
 	float Time::s_TimeStep = 0;
@@ -39,12 +34,12 @@ namespace highlo
 	{
 		if (s_InitialTime == -1)
 		{
-			s_InitialTime = time_since_epoch();
+			s_InitialTime = (float)GetSystemTime();
 		}
 
-		float current_time = time_since_epoch();
+		double current_time = GetSystemTime();
 
-		s_ElapsedTime = (current_time - s_InitialTime) / 1000000.0f; // converting to seconds
+		s_ElapsedTime = (float)((current_time - (double)s_InitialTime) / 1000000.0); // converting to seconds
 
 		s_TimeStep = (s_ElapsedTime - s_LastTrackedTime) * 1000.0f; // converting to miliseconds
 		s_LastTrackedTime = s_ElapsedTime;
@@ -53,7 +48,7 @@ namespace highlo
 	double Time::GetSystemTime()
 	{
 		auto now = std::chrono::system_clock::now().time_since_epoch();
-		return (double) std::chrono::duration_cast<std::chrono::microseconds>(now).count();
+		return (double)std::chrono::duration_cast<std::chrono::microseconds>(now).count();
 	}
 
 	HLString Time::GetCurrentTimeStamp(HLDateFormat format, HLTimePrecision precision)

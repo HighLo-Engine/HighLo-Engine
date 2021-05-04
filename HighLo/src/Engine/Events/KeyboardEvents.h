@@ -46,7 +46,7 @@ namespace highlo
 
 		HLString ToString() const override
 		{
-			return HLString("KeyReleasedEvent") << m_KeyCode;
+			return HLString("KeyReleasedEvent: ") << m_KeyCode;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(KeyReleased)

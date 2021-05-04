@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RenderingAPI.h"
+#include "CoreRenderer.h"
 
 namespace highlo
 {
@@ -22,7 +23,6 @@ namespace highlo
 		static UniqueRef<RenderingAPI> s_RenderingAPI;
 
 	private:
-		/*friend class Renderer2D;
-		friend class Renderer3D;*/
+		friend class CoreRenderer;
 	};
 }

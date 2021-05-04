@@ -19,7 +19,7 @@ namespace highlo
 		void UpdateMeshData(std::vector<Vertex>& data);
 		void UpdateMeshData();
 
-		const Ref<VertexArray>& GetVertexArray() const { return m_VertexArray; }
+		Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 
 	private:
 		Mesh(const MeshData& data)

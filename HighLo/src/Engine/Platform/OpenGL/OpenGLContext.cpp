@@ -27,7 +27,7 @@ namespace highlo
 	void OpenGLContext::Init()
 	{
 		glfwMakeContextCurrent((GLFWwindow*)m_OpenGLWindowHandle);
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			HL_CORE_FATAL("Failed to load Context!");
 
 		std::stringstream ss;

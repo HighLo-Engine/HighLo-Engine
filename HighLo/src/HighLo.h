@@ -39,3 +39,4 @@
 #include "Engine/Window/PopupMenu.h"
 #include "Engine/Window/MenuBar.h"
 
+#include "Engine/Camera/FPSCamera.h"

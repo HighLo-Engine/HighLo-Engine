@@ -34,8 +34,8 @@ project "Renderer3DTest"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assimp-vc141-mtd.dll*")
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/Renderer3DTest/bin/" .. outputdir .. "/Renderer3DTest/HighLo.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/Renderer3DTest/bin/" .. outputdir .. "/Renderer3DTest/assimp-vc141-mtd.dll*")
 	}
 
     filter "system:windows"

@@ -25,7 +25,8 @@ project "HighLo"
         "%{IncludeDir.GLAD}",
         "%{IncludeDir.assimp}",
         "%{IncludeDir.imgui}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.SPIRV_Cross}"
     }
 
     links
@@ -33,6 +34,7 @@ project "HighLo"
         "GLFW",
         "GLAD",
         "ImGui",
+        "SPIRV-Cross",
         "stbimage",
         "%{LibDir.assimp}",
         "opengl32.lib"

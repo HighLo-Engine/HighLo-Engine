@@ -4,6 +4,8 @@
 
 namespace highlo
 {
+	using MenuItemCallback = std::function<void()>;
+
 	struct MenuItem
 	{
 		HLString Name = "Default Menu Item";
@@ -12,11 +14,13 @@ namespace highlo
 		bool Visible = true;
 		bool Seperator = false;
 
+		MenuItemCallback Callback = nullptr;
+
 		HLAPI MenuItem() = default;
 		HLAPI MenuItem(const MenuItem&) = default;
 
-		HLAPI MenuItem(const HLString &name, int32 id, bool visible = true, bool seperator = false)
-			: Name(name), ID(id), Visible(visible), Seperator(seperator) {}
+		HLAPI MenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible = true, bool seperator = false)
+			: Name(name), ID(id), Visible(visible), Seperator(seperator), Callback(callback) {}
 
 	};
 }

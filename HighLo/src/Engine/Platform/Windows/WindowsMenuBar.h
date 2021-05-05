@@ -20,9 +20,14 @@ namespace highlo
 		virtual void *GetNativeMenuBar() override { return (void*)m_NativeHandle; }
 		virtual void *GetNativeMenuBar() const override { return (void*)m_NativeHandle; }
 
+		virtual void OnEvent(Event &e) override;
+
 	private:
 
+		bool OnFileMenuClicked(FileMenuEvent &e);
+
 		HMENU m_NativeHandle;
+		std::vector<Ref<FileMenu>> Menus;
 	};
 }
 

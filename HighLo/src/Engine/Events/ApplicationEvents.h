@@ -40,4 +40,26 @@ namespace highlo
 	private:
 		uint32 m_Width, m_Height;
 	};
+
+	class HLAPI FileMenuEvent : public Event
+	{
+	public:
+
+		FileMenuEvent(int32 id)
+			: m_ID(id) {}
+
+		inline int32 GetID() const { return m_ID; }
+
+		HLString ToString() const override
+		{
+			return HLString("FileMenuEvent: ") << m_ID;
+		}
+
+		REGISTER_EVENT_CLASS_TYPE(FileMenu)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+
+		int32 m_ID;
+	};
 }

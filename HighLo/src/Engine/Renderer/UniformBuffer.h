@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Engine/Core/DataTypes/HLString.h"
 #include "UniformBufferSlotMappings.h"
 #include <vector>

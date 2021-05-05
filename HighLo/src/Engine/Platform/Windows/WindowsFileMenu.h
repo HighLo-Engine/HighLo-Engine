@@ -17,7 +17,7 @@ namespace highlo
 
 		virtual void AddMenuItem(const Ref<MenuItem> &item) override;
 		virtual void AddMenuItem(const MenuItem &item) override;
-		virtual void AddMenuItem(const HLString &name, int32 id, bool visible = true) override;
+		virtual void AddMenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible = true) override;
 
 		virtual void AddSubMenu(const Ref<FileMenu> &other) override;
 		virtual void AddMenuSeperator() override;
@@ -27,6 +27,8 @@ namespace highlo
 		virtual void *GetMenuHandle() override { return (void*)m_NativeHandle; }
 		virtual void *GetMenuHandle() const override { return (void*)m_NativeHandle; }
 
+		virtual const std::vector<MenuItem> &GetMenuItems() const override { return m_MenuItems; }
+
 		virtual HLString &GetName() override { return m_Name; }
 		virtual const HLString &GetName() const override { return m_Name; }
 		
@@ -34,7 +36,7 @@ namespace highlo
 
 		HLString m_Name = "DefaultMenuTitle";
 		HMENU m_NativeHandle;
-
+		std::vector<MenuItem> m_MenuItems;
 	};
 }
 

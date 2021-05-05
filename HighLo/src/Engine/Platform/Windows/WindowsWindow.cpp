@@ -362,7 +362,7 @@ namespace highlo
 		{
 			case WM_CLOSE:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					WindowCloseEvent event;
@@ -375,7 +375,7 @@ namespace highlo
 
 			case WM_SIZE:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					WindowResizeEvent event((unsigned int) LOWORD(lParam), (unsigned int) HIWORD(lParam));
@@ -389,7 +389,7 @@ namespace highlo
 				
 			case WM_MOUSEMOVE:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					float xPos = (float) GET_X_LPARAM(lParam);
@@ -441,7 +441,7 @@ namespace highlo
 
 			case WM_MOUSEWHEEL:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseScrolledEvent event(0, (float) ((short) HIWORD(wParam)) / (float) WHEEL_DELTA);
@@ -452,7 +452,7 @@ namespace highlo
 
 			case WM_LBUTTONDOWN:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_LEFT);
@@ -463,7 +463,7 @@ namespace highlo
 				
 			case WM_RBUTTONDOWN:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_RIGHT);
@@ -474,7 +474,7 @@ namespace highlo
 				
 			case WM_MBUTTONDOWN:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_MIDDLE);
@@ -485,7 +485,7 @@ namespace highlo
 		
 			case WM_LBUTTONUP:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_LEFT);
@@ -496,7 +496,7 @@ namespace highlo
 				
 			case WM_RBUTTONUP:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_RIGHT);
@@ -507,7 +507,7 @@ namespace highlo
 			
 			case WM_MBUTTONUP:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_MIDDLE);
@@ -518,7 +518,7 @@ namespace highlo
 				
 			case WM_KEYDOWN:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					int repeat = (int) (HIWORD(lParam) & KF_REPEAT) ? 1 : 0;
@@ -530,13 +530,24 @@ namespace highlo
 				
 			case WM_KEYUP:
 			{
-				WindowCallbackData *data = reinterpret_cast<WindowCallbackData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
 					KeyReleasedEvent event(utils::InputHelperWindowsKeyCodeToHL((int) wParam));
 					data->EventCallback(event);
 				}
 				break;
+			}
+
+			case WM_COMMAND:
+			{
+				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				if (data)
+				{
+					WORD eventID = LOWORD(wParam);
+					FileMenuEvent event(eventID);
+					data->EventCallback(event);
+				}
 			}
 		}
 

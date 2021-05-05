@@ -19,11 +19,37 @@ namespace highlo
 	{
 		HMENU menuItem = (HMENU)menu->GetMenuHandle();
 		AppendMenuW(m_NativeHandle, MF_POPUP, (UINT_PTR)menuItem, menu->GetName().W_Str());
+		Menus.push_back(menu);
 	}
 
 	void WindowsMenuBar::RemoveMenu(const Ref<FileMenu> &menu)
 	{
 		DestroyMenu((HMENU)menu->GetMenuHandle());
+	}
+
+	void WindowsMenuBar::OnEvent(Event &e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<FileMenuEvent>(HL_BIND_EVENT_FUNCTION(WindowsMenuBar::OnFileMenuClicked));
+	}
+
+	bool WindowsMenuBar::OnFileMenuClicked(FileMenuEvent &e)
+	{
+		int32 eventID = e.GetID();
+		for (int32 i = 0; i < Menus.size(); ++i)
+		{
+			std::vector<MenuItem> menuItems = Menus[i]->GetMenuItems();
+			for (int32 j = 0; j < menuItems.size(); ++j)
+			{
+				if (eventID == menuItems[j].ID)
+				{
+					menuItems[j].Callback();
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
 

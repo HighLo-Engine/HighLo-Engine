@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Shader.h"
 #include "Engine/Math/HLMath.h"
 
@@ -6,7 +7,7 @@ namespace highlo
 {
 	struct MaterialRenderProperties
 	{
-		glm::vec4 m_Color = glm::vec4(1, 1, 1, 1);
+		glm::vec4 m_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		float m_Roughness = 0.0f;
 	};
 

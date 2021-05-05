@@ -13,3 +13,6 @@
 [submodule "HighLo/vendor/spdlog"]
 	path = HighLo/vendor/spdlog
 	url = https://github.com/HighLo-Engine/spdlog
+[submodule "HighLo/vendor/SPIRV-Cross"]
+	path = HighLo/vendor/SPIRV-Cross
+	url = https://github.com/HighLo-Engine/SPIRV-Cross

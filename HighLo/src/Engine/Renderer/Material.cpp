@@ -82,4 +82,23 @@ namespace highlo
 		m_MaterialDataBuffer->SetBufferValue(&Properties.m_RenderProperties);
 		m_MaterialDataBuffer->UploadToShader();
 	}
+
+	void Material::AddTexture(const Ref<Texture>& texture)
+	{
+		m_Textures.push_back(texture);
+	}
+	
+	Ref<Texture> Material::GetTexture(uint64 idx)
+	{
+		return m_Textures.at(idx);
+	}
+
+	void Material::Bind(bool update_properties)
+	{
+		if (update_properties)
+			ApplyNewProperties();
+
+		for (uint32 i = 0; i < GetTextureCount(); i++)
+			m_Textures.at(i)->Bind(i);
+	}
 }

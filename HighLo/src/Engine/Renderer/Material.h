@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Shader.h"
+#include "Texture.h"
 #include "Engine/Math/HLMath.h"
+#include <vector>
 
 namespace highlo
 {
@@ -29,7 +31,7 @@ namespace highlo
 		Material(MaterialProperties props = MaterialProperties());
 
 	public:
-		static Ref<Material> Create(MaterialProperties props = MaterialProperties());
+		HLAPI static Ref<Material> Create(MaterialProperties props = MaterialProperties());
 
 		MaterialProperties Properties;
 
@@ -37,7 +39,16 @@ namespace highlo
 		/// Updates shaders with new data from m_Properties field.
 		/// Must be called every time a property is changed and needed to be udpated.
 		/// </summary>
-		void ApplyNewProperties();
+		HLAPI void ApplyNewProperties();
+
+		HLAPI void AddTexture(const Ref<Texture>& texture);
+		HLAPI Ref<Texture> GetTexture(uint64 idx);
+		HLAPI uint32 GetTextureCount() const { return (uint32)m_Textures.size(); }
+
+		HLAPI virtual void Bind(bool update_properties = false);
+
+	private:
+		std::vector<Ref<Texture>> m_Textures;
 
 	private:
 		void CreateShaders();

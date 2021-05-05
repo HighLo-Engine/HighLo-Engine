@@ -30,6 +30,8 @@ namespace highlo
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			HL_CORE_FATAL("Failed to load Context!");
 
+		glEnable(GL_DEPTH_TEST);
+
 		std::stringstream ss;
 		ss << "\nOpenGL Info:\n";
 		ss << "    Vendor    :  " << glGetString(GL_VENDOR) << "\n";
@@ -98,6 +100,8 @@ namespace highlo
 		wglMakeCurrent(dc, rc);
 		if (!gladLoadGL())
 			HL_CORE_FATAL("Failed to load Context!");
+
+		glEnable(GL_DEPTH_TEST);
 
 		std::stringstream ss;
 		ss << "\nOpenGL Info:\n";

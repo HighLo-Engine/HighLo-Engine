@@ -13,6 +13,8 @@ namespace highlo
 	void CoreRenderer::Init()
 	{
 		m_DefaultMaterial = Material::Create();
+		m_DefaultMaterial->AddTexture(Texture2D::CreateFromColor({ 255, 255, 255 }));
+
 		m_CubeMesh = Mesh::Create(Shapes::_3D::Cube);
 
 		HL_CORE_INFO("Core Renderer Initialized");
@@ -35,13 +37,32 @@ namespace highlo
 
 	void CoreRenderer::DrawCube(const glm::vec3& position, float size, const glm::vec3& color)
 	{
+		Ref<Shader> shader = m_DefaultMaterial->m_StaticShader;
+		shader->Bind();
+
 		m_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		m_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		m_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		m_DefaultMaterial->ApplyNewProperties();
+		m_DefaultMaterial->Bind(true);
 
+		glm::mat4 transform(1.0f);
+		transform = glm::translate(transform, position);
+		transform = glm::scale(transform, glm::vec3(size, size, size));
+
+		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
+		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->UploadToShader();
+
+		m_CubeMesh->GetVertexArray()->Bind();
+		Renderer::s_RenderingAPI->DrawIndexed(m_CubeMesh->GetVertexArray());
+	}
+
+	void CoreRenderer::DrawCube(const glm::vec3& position, float size, Ref<Material> material)
+	{
 		Ref<Shader> shader = m_DefaultMaterial->m_StaticShader;
 		shader->Bind();
+
+		material->Bind();
 
 		glm::mat4 transform(1.0f);
 		transform = glm::translate(transform, position);

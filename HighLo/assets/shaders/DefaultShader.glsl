@@ -1,7 +1,8 @@
 #shader vertex
 
 #version 450 core
-layout (location = 0) in vec3 POSITION;
+layout (location = 0) in vec3 in_Position;
+layout (location = 0) in vec2 in_UV;
 
 layout (std140, binding = 0) uniform VS_SceneBuffer
 {
@@ -16,11 +17,18 @@ layout (std140, binding = 1) uniform VS_ObjectBuffer
 	mat4 u_Transform;
 };
 
+out VS_TO_PS
+{
+	vec2 UV;
+} VS_Output;
+
 void main()
 {
-    vec4 WorldPosition = u_Transform * vec4(POSITION, 1.0);
+    vec4 WorldPosition = u_Transform * vec4(in_Position, 1.0);
 	vec4 ModelViewPosition = u_ViewMatrix * WorldPosition;
 	vec4 FinalPosition = u_ProjectionMatrix * ModelViewPosition;
+
+	VS_Output.UV = in_UV;
 
 	gl_Position = FinalPosition;
 }
@@ -29,7 +37,14 @@ void main()
 
 #version 450 core
 
+in VS_TO_PS
+{
+	vec2 UV;
+} PS_Input;
+
 out vec4 out_Color;
+
+layout(binding = 0) uniform sampler2D DiffuseTextureSampler;
 
 layout (std140, binding = 2) uniform MaterialDataBuffer
 {
@@ -37,7 +52,14 @@ layout (std140, binding = 2) uniform MaterialDataBuffer
 	float	u_Roughness;
 };
 
+vec4 CalculateTextureColor()
+{
+	return u_Color * texture(DiffuseTextureSampler, PS_Input.UV);
+}
+
 void main()
 {
-    out_Color = u_Color;
+	vec4 TextureColor = CalculateTextureColor();
+
+    out_Color = TextureColor;
 } 

@@ -24,7 +24,7 @@ namespace highlo
 		static ShaderSource GetDefaultEngineStaticShaderSource();
 		static ShaderSource GetDefaultEngineAnimatedShaderSource();
 
-		static Ref<Shader> Create(const ShaderSource& source);
+		static Ref<Shader> Create(const ShaderSource& source, const BufferLayout& layout);
 
 		virtual void Bind() const = 0;
 

@@ -11,15 +11,15 @@
 namespace highlo
 {
 #ifdef HIGHLO_API_OPENGL
-    Ref<Shader> Shader::Create(const ShaderSource& source)
+    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout& layout)
     {
         return Ref<OpenGLShader>::Create(source);
     }
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-    Ref<Shader> Shader::Create(const ShaderSource& source)
+    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout& layout)
     {
-        return Ref<DX11Shader>::Create(source);
+        return Ref<DX11Shader>::Create(source, layout);
     }
 #endif // HIGHLO_API_DX11
 
@@ -48,7 +48,12 @@ namespace highlo
 
 		if (first_time)
 		{
+#ifdef HIGHLO_API_OPENGL
 			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultShader.glsl");
+#endif
+#ifdef HIGHLO_API_DX11
+			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultShader.hlsl");
+#endif
 			first_time = false;
 		}
 
@@ -62,7 +67,12 @@ namespace highlo
 
 		if (first_time)
 		{
+#ifdef HIGHLO_API_OPENGL
 			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultAnimatedShader.glsl");
+#endif
+#ifdef HIGHLO_API_DX11
+			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultAnimatedShader.hlsl");
+#endif
 			first_time = false;
 		}
 

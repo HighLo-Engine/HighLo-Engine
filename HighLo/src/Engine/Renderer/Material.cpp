@@ -17,8 +17,24 @@ namespace highlo
 
 	void Material::CreateShaders()
 	{
-		m_StaticShader    = Shader::Create(Shader::GetDefaultEngineStaticShaderSource());
-		m_AnimatedShader  = Shader::Create(Shader::GetDefaultEngineAnimatedShaderSource());
+		BufferLayout static_layout = {
+			{ "POSITION", ShaderDataType::Float3 },
+			{ "UV"		, ShaderDataType::Float2 },
+			{ "NORMAL"	, ShaderDataType::Float3 }
+		};
+
+		BufferLayout animated_layout = {
+			{ "POSITION", ShaderDataType::Float3 },
+			{ "UV"		, ShaderDataType::Float2 },
+			{ "NORMAL"	, ShaderDataType::Float3 },
+			{ "TANGENT"	, ShaderDataType::Float3 },
+			{ "BINORMAL", ShaderDataType::Float3 },
+			{ "BONE_IDS", ShaderDataType::Int4 },
+			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
+		};
+
+		m_StaticShader    = Shader::Create(Shader::GetDefaultEngineStaticShaderSource(), static_layout);
+		m_AnimatedShader  = Shader::Create(Shader::GetDefaultEngineAnimatedShaderSource(), animated_layout);
 
 		auto VS_SceneBuffer = UniformBuffer::Create(
 			"VS_SceneBuffer",

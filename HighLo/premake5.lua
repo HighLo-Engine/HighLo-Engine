@@ -46,6 +46,7 @@ project "HighLo"
 		"HL_LIBRARY_EXPORT",
 		"HL_ENABLE_PROFILER",
 		"HIGHLO_API_OPENGL",
+		--"HIGHLO_API_DX11",
 		--"HIGHLO_API_GLFW"
 	}
 

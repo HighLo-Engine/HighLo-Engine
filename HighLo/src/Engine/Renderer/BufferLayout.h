@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Core/HLCore.h"
+#include "Engine/Core/DataTypes/HLString.h"
 
 namespace highlo
 {
@@ -37,7 +38,7 @@ namespace highlo
 
 	struct BufferElement
 	{
-		std::string Name;
+		HLString Name;
 		ShaderDataType Type = ShaderDataType::Float;
 		uint32 Size = 0;
 		uint32 Offset = 0;

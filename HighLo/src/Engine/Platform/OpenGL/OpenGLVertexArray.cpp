@@ -31,6 +31,7 @@ namespace highlo
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
 		glGenVertexArrays(1, &m_ID);
+		glBindVertexArray(m_ID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()

@@ -7,7 +7,6 @@ namespace highlo
 	{
 		Ref<Mesh> instance = Ref<Mesh>(new Mesh(data));
 		instance->m_VertexArray = VertexArray::Create();
-		instance->m_VertexArray->Bind();
 
 		static BufferLayout layout = {
 			{ "POSITION", ShaderDataType::Float3 },

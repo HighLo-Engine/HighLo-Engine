@@ -31,7 +31,13 @@ void main()
 
 out vec4 out_Color;
 
+layout (std140, binding = 2) uniform MaterialDataBuffer
+{
+	vec4	u_Color;
+	float	u_Roughness;
+};
+
 void main()
 {
-    out_Color = vec4(0.5, 0.2, 0.8, 1.0);
+    out_Color = u_Color;
 } 

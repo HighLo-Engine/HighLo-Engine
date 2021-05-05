@@ -35,6 +35,11 @@ namespace highlo
 
 	void CoreRenderer::DrawCube(const glm::vec3& position, float size, const glm::vec3& color)
 	{
+		m_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
+		m_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
+		m_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		m_DefaultMaterial->ApplyNewProperties();
+
 		Ref<Shader> shader = m_DefaultMaterial->m_StaticShader;
 		shader->Bind();
 

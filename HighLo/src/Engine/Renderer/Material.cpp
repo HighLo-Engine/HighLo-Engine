@@ -10,9 +10,10 @@ namespace highlo
 	}
 
 	Material::Material(MaterialProperties props)
-		: m_Properties(props)
+		: Properties(props)
 	{
 		CreateShaders();
+		ApplyNewProperties();
 	}
 
 	void Material::CreateShaders()
@@ -61,5 +62,24 @@ namespace highlo
 
 		m_StaticShader->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
 		m_AnimatedShader->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
+
+		m_MaterialDataBuffer = UniformBuffer::Create(
+			"MaterialDataBuffer",
+			{
+				UniformVariable("u_Color", sizeof(glm::vec4)),
+				UniformVariable("u_Roughness", sizeof(float)),
+			},
+			UniformBufferParentShader::PIXEL_SHADER,
+			(uint32)HL_UB_SLOT::MATERIAL_DATA_BUFFER
+		);
+
+		m_StaticShader->AddBuffer("MaterialDataBuffer", m_MaterialDataBuffer);
+		m_AnimatedShader->AddBuffer("MaterialDataBuffer", m_MaterialDataBuffer);
+	}
+
+	void Material::ApplyNewProperties()
+	{
+		m_MaterialDataBuffer->SetBufferValue(&Properties.m_RenderProperties);
+		m_MaterialDataBuffer->UploadToShader();
 	}
 }

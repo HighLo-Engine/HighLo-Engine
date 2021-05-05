@@ -1,10 +1,12 @@
 #pragma once
 #include "Shader.h"
+#include "Engine/Math/HLMath.h"
 
 namespace highlo
 {
 	struct MaterialRenderProperties
 	{
+		glm::vec4 m_Color = glm::vec4(1, 1, 1, 1);
 		float m_Roughness = 0.0f;
 	};
 
@@ -28,12 +30,21 @@ namespace highlo
 	public:
 		static Ref<Material> Create(MaterialProperties props = MaterialProperties());
 
-		MaterialProperties m_Properties;
+		MaterialProperties Properties;
+
+		/// <summary>
+		/// Updates shaders with new data from m_Properties field.
+		/// Must be called every time a property is changed and needed to be udpated.
+		/// </summary>
+		void ApplyNewProperties();
 
 	private:
 		void CreateShaders();
 
 		Ref<Shader> m_StaticShader;
 		Ref<Shader> m_AnimatedShader;
+
+	private:
+		Ref<UniformBuffer> m_MaterialDataBuffer = nullptr;
 	};
 }

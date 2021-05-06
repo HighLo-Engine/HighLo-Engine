@@ -37,7 +37,7 @@ project "Sandbox"
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assimp-vc141-mtd.dll*"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/")
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assets")
 	}
 
     filter "system:windows"

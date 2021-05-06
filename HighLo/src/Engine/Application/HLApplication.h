@@ -31,6 +31,7 @@ namespace highlo
 		HLAPI virtual void OnUpdate(Timestep timestep) {}
 		HLAPI virtual void OnShutdown() {}
 		HLAPI virtual void OnEvent(Event &e) {}
+		HLAPI virtual void OnImGuiRender() {}
 
 		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }

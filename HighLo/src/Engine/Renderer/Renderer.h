@@ -2,6 +2,7 @@
 
 #include "RenderingAPI.h"
 #include "CoreRenderer.h"
+#include "ImGuiRenderer.h"
 
 namespace highlo
 {

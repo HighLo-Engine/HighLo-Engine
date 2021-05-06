@@ -44,10 +44,12 @@ namespace highlo
 		Shapes::InitializeBasicShapes();
 
 		CoreRenderer::Init();
+		ImGuiRenderer::Init(window);
 	}
 
 	void Renderer::Shutdown()
 	{
+		ImGuiRenderer::Shutdown();
 		CoreRenderer::Shutdown();
 	}
 }

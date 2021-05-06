@@ -24,32 +24,30 @@ project "HighLo"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.GLAD}",
         "%{IncludeDir.assimp}",
-        "%{IncludeDir.imgui}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.SPIRV_Cross}",
-		"%{IncludeDir.shaderc}"
+        --"%{IncludeDir.SPIRV_Cross}",
+		--"%{IncludeDir.shaderc}"
     }
 
     links
     {
         "GLFW",
         "GLAD",
-        "ImGui",
-        "SPIRV-Cross",
+        --"SPIRV-Cross",
         "stbimage",
         "%{LibDir.assimp}",
         "opengl32.lib",
 		
-		"%{LibDir.shaderc}",
-		"%{LibDir.shaderc_util}",
-		"%{LibDir.glslang}",
-		"%{LibDir.glslang_MachineIndependent}",
-		"%{LibDir.glslang_SPIRV}",
-		"%{LibDir.glslang_OGLCompiler}",
-		"%{LibDir.glslang_OSDependent}",
-		"%{LibDir.glslang_GenericCodeGen}",
-		"%{LibDir.SPIRV_Tools}",
-		"%{LibDir.SPIRV_Tools_opt}"
+		--"%{LibDir.shaderc}",
+		--"%{LibDir.shaderc_util}",
+		-- "%{LibDir.glslang}",
+		-- "%{LibDir.glslang_MachineIndependent}",
+		-- "%{LibDir.glslang_SPIRV}",
+		-- "%{LibDir.glslang_OGLCompiler}",
+		-- "%{LibDir.glslang_OSDependent}",
+		-- "%{LibDir.glslang_GenericCodeGen}",
+		-- "%{LibDir.SPIRV_Tools}",
+		-- "%{LibDir.SPIRV_Tools_opt}"
     }
 
     defines

@@ -3,6 +3,8 @@
 
 #ifdef HIGHLO_API_DX11
 
+#include "Engine/Platform//DX11/DX11Resources.h"
+
 namespace highlo
 {
 	class DX11Texture2D : public Texture2D

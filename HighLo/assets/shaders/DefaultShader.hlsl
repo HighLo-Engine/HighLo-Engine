@@ -23,6 +23,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 out_Position : SV_POSITION;
+	float2 out_UV : UV;
 };
 
 VS_OUTPUT main(VS_INPUT input)
@@ -34,6 +35,7 @@ VS_OUTPUT main(VS_INPUT input)
 	float4 FinalPosition		= mul(u_ProjectionMatrix, ModelViewPosition);
 
 	output.out_Position = FinalPosition;
+	output.out_UV = input.in_UV;
 
 	return output;
 }
@@ -43,10 +45,27 @@ VS_OUTPUT main(VS_INPUT input)
 struct PS_INPUT
 {
 	float4 in_Position : SV_POSITION;
+	float2 in_UV : UV;
 };
+
+cbuffer MaterialDataBuffer : register(b2)
+{
+	float4	u_Color;
+	float	u_Roughness;
+};
+
+Texture2D DiffuseTexture : TEXTURE: register(t0);
+SamplerState DiffuseTextureSampler : SAMPLER: register(s0);
+
+float4 CalculateTextureColor(PS_INPUT input)
+{
+	return u_Color * DiffuseTexture.Sample(DiffuseTextureSampler, input.in_UV);
+}
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
-	float4 FinalColor = float4(0.5, 0.2, 0.8, 1.0);
+	float4 TextureColor = CalculateTextureColor(input);
+
+	float4 FinalColor = TextureColor;
 	return FinalColor;
 }

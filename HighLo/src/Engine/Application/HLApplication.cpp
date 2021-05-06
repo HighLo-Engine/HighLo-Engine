@@ -38,6 +38,11 @@ namespace highlo
 		#endif
 
 			OnUpdate(Time::GetTimestep());
+
+			ImGuiRenderer::BeginScene();
+			OnImGuiRender();
+			ImGuiRenderer::EndScene();
+
 			m_Window->Update();
 		}
 

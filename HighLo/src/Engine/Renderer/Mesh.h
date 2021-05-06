@@ -8,7 +8,7 @@ namespace highlo
 	struct MeshData
 	{
 		std::vector<Vertex> m_Vertices;
-		std::vector<int>	m_Indices;
+		std::vector<int32>	m_Indices;
 	};
 
 	class Mesh : public IsSharedReference

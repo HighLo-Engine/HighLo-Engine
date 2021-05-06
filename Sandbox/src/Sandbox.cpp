@@ -22,8 +22,9 @@ void Sandbox::OnUpdate(Timestep timestep)
 	Renderer::ClearScreenColor(glm::vec4(0.2f, 0.06f, 0.06f, 1.0f));
 
 	CoreRenderer::BeginScene(*m_Camera);
-	CoreRenderer::DrawCube({ -1, 0, 5 }, 2.0f, { 0.2f, 1.0f, 0.6f });
-	CoreRenderer::DrawSphere({ 6, 0, 6 }, 2.0f, { 0.2f, 1.0f, 0.6f });
+	CoreRenderer::DrawCube({ -1, 0, 5 }, 2.0f, 0.0f, { 0.2f, 1.0f, 0.6f });
+	CoreRenderer::DrawSphere({ 6, 0, 6 }, 2.0f, 0.0f, { 0.2f, 1.0f, 0.6f });
+	CoreRenderer::DrawCapsule({ 0, 0, 6 }, 1.0f, 45.0f, { 1.0f, 0.3f, 0.2f });
 	CoreRenderer::EndScene();
 }
 

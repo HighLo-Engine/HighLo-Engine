@@ -1,6 +1,7 @@
 #pragma once
+
 #include "Material.h"
-#include "Shapes.h"
+#include "Mesh.h"
 #include "Engine/Camera/ICamera.h"
 
 namespace highlo
@@ -14,11 +15,14 @@ namespace highlo
 		HLAPI static void BeginScene(const ICamera& camera);
 		HLAPI static void EndScene();
 
-		HLAPI static void DrawCube(const glm::vec3& position, float size, const glm::vec3& color);
-		HLAPI static void DrawCube(const glm::vec3& position, float size, Ref<Material> material);
+		HLAPI static void DrawCube(const glm::vec3& position, float size = 1.0f, float rotation = 0.0f, const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f));
+		HLAPI static void DrawCube(const glm::vec3& position, Ref<Material> material, float size = 1.0f, float rotation = 0.0f);
 
-		HLAPI static void DrawSphere(const glm::vec3& position, float size, const glm::vec3& color);
-		HLAPI static void DrawSphere(const glm::vec3& position, float size, Ref<Material> material);
+		HLAPI static void DrawSphere(const glm::vec3 &position, float size = 1.0f, float rotation = 0.0f, const glm::vec3 &color = glm::vec3(1.0f, 1.0f, 1.0f));
+		HLAPI static void DrawSphere(const glm::vec3 &position, Ref<Material> material, float size = 1.0f, float rotation = 0.0f);
+
+		HLAPI static void DrawCapsule(const glm::vec3& position, float size = 1.0f, float rotation = 0.0f, const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f));
+		HLAPI static void DrawCapsule(const glm::vec3& position, Ref<Material> material, float size = 1.0f, float rotation = 0.0f);
 
 	private:
 		struct SceneData
@@ -29,11 +33,12 @@ namespace highlo
 			float	  m_Padding01;
 		};
 
-		static SceneData m_SceneData;
+		static SceneData s_SceneData;
 
 	private:
-		static Ref<Material> m_DefaultMaterial;
-		static Ref<Mesh>	 m_CubeMesh;
-		static Ref<Mesh>	 m_SphereMesh;
+		static Ref<Material> s_DefaultMaterial;
+		static Ref<Mesh>	 s_CubeMesh;
+		static Ref<Mesh>	 s_SphereMesh;
+		static Ref<Mesh>	 s_CapsuleMesh;
 	};
 }

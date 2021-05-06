@@ -8,8 +8,6 @@
 #include "Engine/Platform/DX11/DX11RenderingAPI.h"
 #endif // HIGHLO_API_DX11
 
-#include "Shapes.h"
-
 namespace highlo
 {
 #ifdef HIGHLO_API_OPENGL
@@ -41,8 +39,6 @@ namespace highlo
 
 	void Renderer::Init(Window* window)
 	{
-		Shapes::InitializeBasicShapes();
-
 		CoreRenderer::Init();
 		ImGuiRenderer::Init(window);
 	}

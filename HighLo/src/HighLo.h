@@ -33,10 +33,11 @@
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/UniformBuffer.h"
 #include "Engine/Renderer/UniformBufferSlotMappings.h"
-#include "Engine/Renderer/Shapes.h"
 #include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/MeshFactory.h"
 #include "Engine/Renderer/Material.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/Renderer2D.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

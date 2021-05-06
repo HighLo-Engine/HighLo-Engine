@@ -20,8 +20,8 @@ namespace highlo
 		s_DefaultMaterial->AddTexture(Texture2D::CreateFromColor({ 255, 255, 255 }));
 
 		s_CubeMesh = MeshFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
-		s_SphereMesh = MeshFactory::CreateSphere(18.0f);
-		s_CapsuleMesh = MeshFactory::CreateCapsule(1.0f, 10.0f);
+		s_SphereMesh = MeshFactory::CreateSphere(1);
+		s_CapsuleMesh = MeshFactory::CreateCapsule(1.0f, 5.0f);
 
 		HL_CORE_INFO("Core Renderer Initialized");
 	}

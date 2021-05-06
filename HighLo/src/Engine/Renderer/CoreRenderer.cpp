@@ -3,7 +3,6 @@
 
 #include "Renderer.h"
 #include "MeshFactory.h"
-#include "Engine/Math/Transform.h"
 
 namespace highlo
 {
@@ -84,6 +83,14 @@ namespace highlo
 		Renderer::s_RenderingAPI->DrawIndexed(s_CubeMesh->GetVertexArray());
 	}
 
+	void CoreRenderer::DrawCube(const Transform &transform, const glm::vec3 &color)
+	{
+	}
+
+	void CoreRenderer::DrawCube(const Transform &transform, Ref<Material> material)
+	{
+	}
+
 	void CoreRenderer::DrawSphere(const glm::vec3& position, float size, float rotation, const glm::vec3& color)
 	{
 		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
@@ -127,6 +134,14 @@ namespace highlo
 		Renderer::s_RenderingAPI->DrawIndexed(s_SphereMesh->GetVertexArray());
 	}
 
+	void CoreRenderer::DrawSphere(const Transform &transform, const glm::vec3 &color)
+	{
+	}
+
+	void CoreRenderer::DrawSphere(const Transform &transform, Ref<Material> material)
+	{
+	}
+
 	void CoreRenderer::DrawCapsule(const glm::vec3 &position, float size, float rotation, const glm::vec3 &color)
 	{
 		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
@@ -168,5 +183,13 @@ namespace highlo
 
 		s_CapsuleMesh->GetVertexArray()->Bind();
 		Renderer::s_RenderingAPI->DrawIndexed(s_CapsuleMesh->GetVertexArray());
+	}
+	
+	void CoreRenderer::DrawCapsule(const Transform &transform, const glm::vec3 &color)
+	{
+	}
+
+	void CoreRenderer::DrawCapsule(const Transform &transform, Ref<Material> material)
+	{
 	}
 }

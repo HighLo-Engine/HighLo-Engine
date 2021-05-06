@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 #include "MeshFactory.h"
+#include "Engine/Math/Transform.h"
 
 namespace highlo
 {
@@ -50,12 +51,13 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
 		s_DefaultMaterial->Bind(true);
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1 })
-			* glm::scale(glm::mat4(1.0f), { size, size, size });
+		Transform transform;
+		transform.Scale({ size, size, size });
+		transform.Rotate(rotation, { 0, 0, 1 });
+		transform.Translate(position);
 
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
 
 		s_CubeMesh->GetVertexArray()->Bind();
@@ -69,12 +71,13 @@ namespace highlo
 
 		material->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1 })
-			* glm::scale(glm::mat4(1.0f), { size, size, size });
+		Transform transform;
+		transform.Scale({ size, size, size });
+		transform.Rotate(rotation, { 0, 0, 1 });
+		transform.Translate(position);
 
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
 
 		s_CubeMesh->GetVertexArray()->Bind();
@@ -91,12 +94,13 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
 		s_DefaultMaterial->Bind(true);
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1 })
-			* glm::scale(glm::mat4(1.0f), { size, size, size });
+		Transform transform;
+		transform.Scale({ size, size, size });
+		transform.Rotate(rotation, { 0, 0, 1 });
+		transform.Translate(position);
 
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
 
 		s_SphereMesh->GetVertexArray()->Bind();
@@ -110,12 +114,13 @@ namespace highlo
 
 		material->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1 })
-			* glm::scale(glm::mat4(1.0f), { size, size, size });
+		Transform transform;
+		transform.Scale({ size, size, size });
+		transform.Rotate(rotation, { 0, 0, 1 });
+		transform.Translate(position);
 
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
 
 		s_SphereMesh->GetVertexArray()->Bind();
@@ -132,12 +137,13 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
 		s_DefaultMaterial->Bind(true);
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1 })
-			* glm::scale(glm::mat4(1.0f), { size, size, size });
+		Transform transform;
+		transform.Scale({ size, size, size });
+		transform.Rotate(rotation, { 0, 0, 1 });
+		transform.Translate(position);
 
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
 
 		s_CapsuleMesh->GetVertexArray()->Bind();
@@ -151,12 +157,13 @@ namespace highlo
 
 		material->Bind();
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			                * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0, 0, 1 })
-			                * glm::scale(glm::mat4(1.0f), { size, size, size });
+		Transform transform;
+		transform.Scale({ size, size, size });
+		transform.Rotate(rotation, { 0, 0, 1 });
+		transform.Translate(position);
 
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", &transform);
+		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
 
 		s_CapsuleMesh->GetVertexArray()->Bind();

@@ -9,17 +9,17 @@ namespace highlo
 	class Transform
 	{
 	public:
-
 		HLAPI Transform() = default;
 
-		HLAPI void Translate(const glm::vec3 &translation);
-		HLAPI void Scale(const glm::vec3 &scale);
-		HLAPI void Rotate(float angle, const glm::vec3 &axis);
+		HLAPI Transform& Translate(const glm::vec3 &translation);
+		HLAPI Transform& Scale(const glm::vec3 &scale);
+		HLAPI Transform& Scale(float scale);
+		HLAPI Transform& Rotate(float angle, const glm::vec3 &axis);
 
-		HLAPI inline const glm::vec3 &GetPosition() {	return m_Position; }
-		HLAPI inline const glm::vec3 &GetScale() { return m_Scale; }
-		HLAPI inline const glm::quat &GetRotation() { return m_Rotation; }
-		HLAPI inline const glm::mat4 &GetTransform() { return m_Transform; }
+		HLAPI inline const glm::vec3 &GetPosition() const {	return m_Position; }
+		HLAPI inline const glm::vec3 &GetScale() const { return m_Scale; }
+		HLAPI inline const glm::quat &GetRotation() const { return m_Rotation; }
+		HLAPI inline const glm::mat4 &GetTransform() const { return m_Transform; }
 
 		HLAPI bool operator==(const Transform &other) const
 		{
@@ -31,6 +31,10 @@ namespace highlo
 		{
 			return !(*this == other);
 		}
+
+		HLAPI static Transform FromPosition(const glm::vec3& position);
+		HLAPI static Transform FromRotation(const glm::vec3& rotation);
+		HLAPI static Transform FromScale(const glm::vec3& scale);
 
 	private:
 

@@ -42,154 +42,149 @@ namespace highlo
 
 	void CoreRenderer::DrawCube(const glm::vec3& position, float size, float rotation, const glm::vec3& color)
 	{
-		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
-		shader->Bind();
-
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->Bind(true);
+		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
 		transform.Rotate(rotation, { 0, 0, 1 });
 		transform.Translate(position);
 
-		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
-		object_data_buffer->UploadToShader();
-
-		s_CubeMesh->GetVertexArray()->Bind();
-		Renderer::s_RenderingAPI->DrawIndexed(s_CubeMesh->GetVertexArray());
+		RenderMesh(s_CubeMesh, s_DefaultMaterial, transform);
 	}
 
 	void CoreRenderer::DrawCube(const glm::vec3& position, Ref<Material> material, float size, float rotation)
 	{
-		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
-		shader->Bind();
-
-		material->Bind();
-
 		Transform transform;
 		transform.Scale({ size, size, size });
 		transform.Rotate(rotation, { 0, 0, 1 });
 		transform.Translate(position);
 
-		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
-		object_data_buffer->UploadToShader();
-
-		s_CubeMesh->GetVertexArray()->Bind();
-		Renderer::s_RenderingAPI->DrawIndexed(s_CubeMesh->GetVertexArray());
+		RenderMesh(s_CubeMesh, material, transform);
 	}
 
 	void CoreRenderer::DrawCube(const Transform &transform, const glm::vec3 &color)
 	{
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->ApplyNewProperties();
+
+		RenderMesh(s_CubeMesh, s_DefaultMaterial, transform);
 	}
 
 	void CoreRenderer::DrawCube(const Transform &transform, Ref<Material> material)
 	{
+		RenderMesh(s_CubeMesh, material, transform);
 	}
 
 	void CoreRenderer::DrawSphere(const glm::vec3& position, float size, float rotation, const glm::vec3& color)
 	{
-		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
-		shader->Bind();
-
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->Bind(true);
+		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
 		transform.Rotate(rotation, { 0, 0, 1 });
 		transform.Translate(position);
 
-		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
-		object_data_buffer->UploadToShader();
-
-		s_SphereMesh->GetVertexArray()->Bind();
-		Renderer::s_RenderingAPI->DrawIndexed(s_SphereMesh->GetVertexArray());
+		RenderMesh(s_SphereMesh, s_DefaultMaterial, transform);
 	}
 	
 	void CoreRenderer::DrawSphere(const glm::vec3& position, Ref<Material> material, float size, float rotation)
 	{
-		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
-		shader->Bind();
-
-		material->Bind();
-
 		Transform transform;
 		transform.Scale({ size, size, size });
 		transform.Rotate(rotation, { 0, 0, 1 });
 		transform.Translate(position);
 
-		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
-		object_data_buffer->UploadToShader();
-
-		s_SphereMesh->GetVertexArray()->Bind();
-		Renderer::s_RenderingAPI->DrawIndexed(s_SphereMesh->GetVertexArray());
+		RenderMesh(s_SphereMesh, material, transform);
 	}
 
 	void CoreRenderer::DrawSphere(const Transform &transform, const glm::vec3 &color)
 	{
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->ApplyNewProperties();
+
+		RenderMesh(s_SphereMesh, s_DefaultMaterial, transform);
 	}
 
 	void CoreRenderer::DrawSphere(const Transform &transform, Ref<Material> material)
 	{
+		RenderMesh(s_SphereMesh, material, transform);
 	}
 
 	void CoreRenderer::DrawCapsule(const glm::vec3 &position, float size, float rotation, const glm::vec3 &color)
 	{
-		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
-		shader->Bind();
-
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->Bind(true);
+		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
 		transform.Rotate(rotation, { 0, 0, 1 });
 		transform.Translate(position);
 
-		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
-		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
-		object_data_buffer->UploadToShader();
-
-		s_CapsuleMesh->GetVertexArray()->Bind();
-		Renderer::s_RenderingAPI->DrawIndexed(s_CapsuleMesh->GetVertexArray());
+		RenderMesh(s_CapsuleMesh, s_DefaultMaterial, transform);
 	}
 
 	void CoreRenderer::DrawCapsule(const glm::vec3 &position, Ref<Material> material, float size, float rotation)
 	{
-		Ref<Shader> shader = s_DefaultMaterial->m_StaticShader;
-		shader->Bind();
-
-		material->Bind();
-
 		Transform transform;
 		transform.Scale({ size, size, size });
 		transform.Rotate(rotation, { 0, 0, 1 });
 		transform.Translate(position);
 
+		RenderMesh(s_CapsuleMesh, material, transform);
+	}
+
+	void CoreRenderer::DrawCapsule(const Transform& transform, const glm::vec3& color)
+	{
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->ApplyNewProperties();
+
+		RenderMesh(s_CapsuleMesh, s_DefaultMaterial, transform);
+	}
+
+	void CoreRenderer::DrawCapsule(const Transform& transform, Ref<Material> material)
+	{
+		RenderMesh(s_CapsuleMesh, material, transform);
+	}
+
+	void CoreRenderer::RenderVertexArray(Ref<VertexArray>& va)
+	{
+		va->Bind();
+		Renderer::s_RenderingAPI->DrawIndexed(va);
+	}
+
+	Ref<Shader> CoreRenderer::SelectMaterialShader(Ref<Material> material)
+	{
+		return material->m_StaticShader;
+	}
+
+	void CoreRenderer::SetObjectDataBuffer(Ref<Shader> shader, const Transform& transform)
+	{
 		auto object_data_buffer = shader->GetBuffer("VS_ObjectBuffer");
 		object_data_buffer->SetVariableValue("u_Transform", (void*)(&transform.GetTransform()[0]));
 		object_data_buffer->UploadToShader();
-
-		s_CapsuleMesh->GetVertexArray()->Bind();
-		Renderer::s_RenderingAPI->DrawIndexed(s_CapsuleMesh->GetVertexArray());
-	}
-	
-	void CoreRenderer::DrawCapsule(const Transform &transform, const glm::vec3 &color)
-	{
 	}
 
-	void CoreRenderer::DrawCapsule(const Transform &transform, Ref<Material> material)
+	void CoreRenderer::RenderMesh(Ref<Mesh> mesh, Ref<Material> material, const Transform& transform)
 	{
+		Ref<Shader> shader = SelectMaterialShader(material);
+		shader->Bind();
+		material->Bind();
+
+		SetObjectDataBuffer(shader, transform);
+		RenderVertexArray(mesh->GetVertexArray());
 	}
 }

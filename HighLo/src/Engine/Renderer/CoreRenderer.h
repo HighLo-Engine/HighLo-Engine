@@ -32,6 +32,13 @@ namespace highlo
 		HLAPI static void DrawCapsule(const Transform& transform, Ref<Material> material);
 
 	private:
+		// Internal helper functions
+		static void RenderVertexArray(Ref<VertexArray>& va);
+		static Ref<Shader> SelectMaterialShader(Ref<Material> material);
+		static void SetObjectDataBuffer(Ref<Shader> shader, const Transform& transform);
+		static void RenderMesh(Ref<Mesh> mesh, Ref<Material> material, const Transform& transform);
+
+	private:
 		struct SceneData
 		{
 			glm::mat4 m_ProjectionMatrix;

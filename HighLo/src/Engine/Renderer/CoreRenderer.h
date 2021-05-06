@@ -17,6 +17,9 @@ namespace highlo
 		HLAPI static void DrawCube(const glm::vec3& position, float size, const glm::vec3& color);
 		HLAPI static void DrawCube(const glm::vec3& position, float size, Ref<Material> material);
 
+		HLAPI static void DrawSphere(const glm::vec3& position, float size, const glm::vec3& color);
+		HLAPI static void DrawSphere(const glm::vec3& position, float size, Ref<Material> material);
+
 	private:
 		struct SceneData
 		{
@@ -31,5 +34,6 @@ namespace highlo
 	private:
 		static Ref<Material> m_DefaultMaterial;
 		static Ref<Mesh>	 m_CubeMesh;
+		static Ref<Mesh>	 m_SphereMesh;
 	};
 }

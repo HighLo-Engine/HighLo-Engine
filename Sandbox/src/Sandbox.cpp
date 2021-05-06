@@ -7,7 +7,7 @@ void Sandbox::OnInitialize()
 
 	m_Camera = Ref<FPSCamera>::Create();
 	m_Camera->SetYaw(90);
-
+	Renderer::SetWireframe(true);
 	HL_TRACE("Sandbox Initialized");
 }
 
@@ -20,6 +20,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 
 	CoreRenderer::BeginScene(*m_Camera);
 	CoreRenderer::DrawCube({ 0, 0, 5 }, 2.0f, { 0.2f, 1.0f, 0.6f });
+	CoreRenderer::DrawSphere({ 6, 0, 6 }, 2.0f, { 0.2f, 1.0f, 0.6f });
 	CoreRenderer::EndScene();
 }
 

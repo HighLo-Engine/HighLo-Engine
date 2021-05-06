@@ -10,6 +10,7 @@ namespace highlo
 		{
 			extern MeshData Cube;
 			extern MeshData Plane;
+			extern MeshData Sphere;
 		}
 
 		namespace _2D
@@ -17,5 +18,7 @@ namespace highlo
 			extern MeshData Quad;
 			extern MeshData Triangle;
 		}
+
+		void InitializeBasicShapes();
 	}
 }

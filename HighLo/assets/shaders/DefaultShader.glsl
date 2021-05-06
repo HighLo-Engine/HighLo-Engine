@@ -61,5 +61,5 @@ void main()
 {
 	vec4 TextureColor = CalculateTextureColor();
 
-    out_Color = TextureColor;
+    out_Color = u_Color;
 } 

@@ -102,6 +102,7 @@ namespace highlo
 			HL_CORE_FATAL("Failed to load Context!");
 
 		glEnable(GL_DEPTH_TEST);
+		SetSwapInterval(false);
 
 		std::stringstream ss;
 		ss << "\nOpenGL Info:\n";

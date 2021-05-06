@@ -24,7 +24,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 	CoreRenderer::BeginScene(*m_Camera);
 	CoreRenderer::DrawCube({ -1, 0, 5 }, 2.0f, 0.0f, { 0.2f, 1.0f, 0.6f });
 	CoreRenderer::DrawSphere({ 6, 0, 6 }, 2.0f, 0.0f, { 0.2f, 1.0f, 0.6f });
-	CoreRenderer::DrawCapsule({ 0, 0, 6 }, 1.0f, 45.0f, { 1.0f, 0.3f, 0.2f });
+	CoreRenderer::DrawCapsule({ 2, 0, 8 }, 1.0f, 30.0f, { 1.0f, 0.3f, 0.2f });
 	CoreRenderer::EndScene();
 }
 

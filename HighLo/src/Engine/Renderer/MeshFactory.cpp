@@ -86,52 +86,85 @@ namespace highlo
 
 	Ref<Mesh> MeshFactory::CreateSphere(float radius)
 	{
-		constexpr float latitudeBands = 30;
-		constexpr float longitudeBands = 30;
-
-		std::vector<Vertex> vertices;
-		std::vector<int32> indices;
-
-		// Generate vertices
-		for (float latitude = 0.0f; latitude <= latitudeBands; ++latitude)
-		{
-			float theta = latitude * (float)M_PI / latitudeBands;
-			float sinTheta = glm::sin(theta);
-			float cosTheta = glm::cos(theta);
-
-			for (float longitude = 0.0f; longitude <= longitudeBands; ++longitude)
-			{
-				float phi = longitude * 2.0f * (float)M_PI / longitudeBands;
-				float sinPhi = glm::sin(phi);
-				float cosPhi = glm::cos(phi);
-
-				Vertex vertex;
-				vertex.Normal = { cosPhi * sinTheta, cosTheta, sinPhi * sinTheta };
-				vertex.Position = { radius * vertex.Normal.x, radius * vertex.Normal.y, radius * vertex.Normal.z };
-				vertices.push_back(vertex);
-			}
-		}
-
-		// Generate indices
-		for (uint32 latitude = 0; latitude <= latitudeBands; ++latitude)
-		{
-			for (uint32 longitude = 0; longitude <= longitudeBands; ++longitude)
-			{
-				uint32 first = (uint32)((latitude * (longitudeBands + 1)) + longitude);
-				uint32 second = (uint32)(first + longitudeBands + 1);
-
-				indices.push_back(first);
-				indices.push_back(second);
-				indices.push_back(first + 1);
-				indices.push_back(second);
-				indices.push_back(second + 1);
-				indices.push_back(first + 1);
-			}
-		}
-
+		const float PI = 3.14159265359f;
+		float sectorCount = 36;
+		float stackCount = 18;
 		MeshData data;
-		data.m_Vertices = vertices;
-		data.m_Indices = indices;
+
+		float x, y, z, xy;                              // vertex position
+		float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
+		float s, t;                                     // vertex texCoord
+
+
+		float sectorStep = 2 * PI / sectorCount;
+		float stackStep = PI / stackCount;
+		float sectorAngle, stackAngle;
+
+		for (int i = 0; i <= stackCount; ++i)
+		{
+			stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
+			xy = radius * cosf(stackAngle);             // r * cos(u)
+			z = radius * sinf(stackAngle);              // r * sin(u)
+
+			// add (sectorCount+1) vertices per stack
+			// the first and last vertices have same position and normal, but different tex coords
+			for (int j = 0; j <= sectorCount; ++j)
+			{
+				Vertex vertex;
+
+				sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+
+				// vertex position (x, y, z)
+				x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+				y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+				vertex.Position.x = x;
+				vertex.Position.y = y;
+				vertex.Position.z = z;
+
+				// normalized vertex normal (nx, ny, nz)
+				nx = x * lengthInv;
+				ny = y * lengthInv;
+				nz = z * lengthInv;
+				vertex.Normal.x = nx;
+				vertex.Normal.y = ny;
+				vertex.Normal.z = nz;
+
+				// vertex tex coord (s, t) range between [0, 1]
+				s = (float)j / sectorCount;
+				t = (float)i / stackCount;
+				vertex.UV.x = s;
+				vertex.UV.y = t;
+
+				data.m_Vertices.push_back(vertex);
+			}
+		}
+
+		int k1, k2;
+		for (int i = 0; i < stackCount; ++i)
+		{
+			k1 = i * ((int)sectorCount + 1);     // beginning of current stack
+			k2 = k1 + (int)sectorCount + 1;      // beginning of next stack
+
+			for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
+			{
+				// 2 triangles per sector excluding first and last stacks
+				// k1 => k2 => k1+1
+				if (i != 0)
+				{
+					data.m_Indices.push_back(k1);
+					data.m_Indices.push_back(k2);
+					data.m_Indices.push_back(k1 + 1);
+				}
+
+				// k1+1 => k2 => k2+1
+				if (i != (stackCount - 1))
+				{
+					data.m_Indices.push_back(k1 + 1);
+					data.m_Indices.push_back(k2);
+					data.m_Indices.push_back(k2 + 1);
+				}
+			}
+		}
 
 		return Mesh::Create(data);
 	}

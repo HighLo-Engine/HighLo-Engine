@@ -5,3 +5,5 @@
 #include "HLQueue.h"
 #include "HLStack.h"
 #include "HLHashmap.h"
+#include "HLVector.h"
+

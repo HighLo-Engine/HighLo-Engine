@@ -4,6 +4,8 @@
 
 #ifdef HIGHLO_API_OPENGL
 
+#include <glad/glad.h>
+
 namespace highlo
 {
 	class OpenGLImage2D : public Image2D
@@ -41,6 +43,62 @@ namespace highlo
 		ImageFormat m_Format;
 		Allocator m_ImageData;
 	};
+
+	namespace utils
+	{
+		inline GLenum OpenGLImageFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::RGB:
+				case ImageFormat::SRGB:
+					return GL_RGB;
+
+				case ImageFormat::RGBA:
+				case ImageFormat::RGBA16F:
+				case ImageFormat::RGBA32F:
+					return GL_RGBA;
+			}
+
+			HL_ASSERT(false);
+			return 0;
+		}
+
+		inline GLenum OpenGLImageInternalFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::RGB:				return GL_RGB8;
+				case ImageFormat::SRGB:				return GL_SRGB8;
+				case ImageFormat::RGBA:				return GL_RGBA8;
+				case ImageFormat::RGBA16F:			return GL_RGBA16F;
+				case ImageFormat::RGBA32F:			return GL_RGBA32F;
+				case ImageFormat::DEPTH24STENCIL8:	return GL_DEPTH24_STENCIL8;
+				case ImageFormat::DEPTH32F:			return GL_DEPTH_COMPONENT32F;
+			}
+
+			HL_ASSERT(false);
+			return 0;
+		}
+
+		inline GLenum OpenGLFormatDataType(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::RGB:
+				case ImageFormat::RGBA:
+				case ImageFormat::SRGB:
+					return GL_UNSIGNED_BYTE;
+
+				case ImageFormat::RGBA16F:
+				case ImageFormat::RGBA32F:
+					return GL_FLOAT;
+			}
+
+			HL_ASSERT(false);
+			return 0;
+		}
+	}
 }
 
 #endif // HIGHLO_API_OPENGL

@@ -22,6 +22,11 @@ namespace highlo
 		glUseProgram(m_ID);
 	}
 
+	HLRendererID OpenGLShader::GetRendererID()
+	{
+		return m_ID;
+	}
+
 	uint32 OpenGLShader::CompileGLSLShader(const char* code, uint32 type)
 	{
 		uint32 shader_id = glCreateShader(type);

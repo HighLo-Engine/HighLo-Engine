@@ -5,6 +5,7 @@
 
 #include "stb_image.h"
 #include "Engine/Core/HLLog.h"
+#include "Engine/Utils/ImageUtils.h"
 
 namespace highlo
 {
@@ -262,6 +263,17 @@ namespace highlo
 		}
 
 		return rgba;
+	}
+
+	uint32 DX11Texture2D::GetMipLevelCount()
+	{
+		return utils::CalculateMipCount(m_Width, m_Height);
+	}
+
+	HLRendererID DX11Texture2D::GetRendererID()
+	{
+		// TODO
+		return 0;
 	}
 }
 

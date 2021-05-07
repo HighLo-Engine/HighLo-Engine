@@ -275,6 +275,12 @@ namespace highlo
 			DX11Resources::s_DeviceContext->DSSetSamplers(4, 1, DX11Resources::s_SamplerState.GetAddressOf());
 		}
 	}
+
+	HLRendererID DX11Shader::GetRendererID()
+	{
+		// TODO!
+		return 0;
+	}
 }
 
 #endif

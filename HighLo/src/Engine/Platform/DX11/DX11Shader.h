@@ -72,6 +72,7 @@ namespace highlo
 		inline DX11PixelShader* GetPixelShader() { return m_PixelShader.get(); }
 
 		virtual void Bind() const override;
+		virtual HLRendererID GetRendererID() override;
 
 	protected:
 		std::unique_ptr<DX11VertexShader>	m_VertexShader;

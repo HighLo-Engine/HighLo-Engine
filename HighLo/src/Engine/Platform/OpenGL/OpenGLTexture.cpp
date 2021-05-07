@@ -4,16 +4,18 @@
 #ifdef HIGHLO_API_OPENGL
 
 #include "Engine/Core/HLLog.h"
+#include "Engine/Utils/ImageUtils.h"
+#include "OpenGLImage.h"
 #include <stb_image.h>
 
 namespace highlo
 {
-	OpenGLTexture2D* OpenGLTexture2D::LoadFromFile(const HLString& filepath, TextureFormat format, bool flip_on_load)
+	OpenGLTexture2D* OpenGLTexture2D::LoadFromFile(const HLString& filepath, ImageFormat format, bool flip_on_load)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(flip_on_load);
 
-		stbi_uc* data = stbi_load(filepath.C_Str(), &width, &height, &channels, STBI_rgb_alpha);
+		stbi_uc* data = stbi_load(*filepath, &width, &height, &channels, STBI_rgb_alpha);
 		if (!data)
 		{
 			stbi_image_free(data);
@@ -27,11 +29,11 @@ namespace highlo
 		return instance;
 	}
 
-	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, TextureFormat format)
+	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, ImageFormat format)
 	{
 		OpenGLTexture2D* instance = nullptr;
 
-		if (format == TextureFormat::RGBA8)
+		if (format == ImageFormat::RGBA8)
 		{
 			unsigned char data[4] = { (unsigned char)rgb.x, (unsigned char)rgb.y, (unsigned char)rgb.z, (unsigned char)255 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
@@ -51,13 +53,13 @@ namespace highlo
 		return instance;
 	}
 	
-	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, TextureFormat format)
+	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, ImageFormat format)
 	{
 		OpenGLTexture2D* instance = nullptr;
 
 #pragma warning( push )
 #pragma warning( disable : 6386)
-		if (format == TextureFormat::RGBA8)
+		if (format == ImageFormat::RGBA8)
 		{
 			unsigned char* data = new unsigned char[(uint64)width * (uint64)height * (uint64)4];
 
@@ -108,17 +110,17 @@ namespace highlo
 		return instance;
 	}
 	
-	OpenGLTexture2D::OpenGLTexture2D(void* img_data, uint32 width, uint32 height, TextureFormat format)
+	OpenGLTexture2D::OpenGLTexture2D(void* img_data, uint32 width, uint32 height, ImageFormat format)
 		: m_ImageData(img_data), m_Width(width), m_Height(height)
 	{
 		switch (format)
 		{
-			case TextureFormat::RGBA8:
+			case ImageFormat::RGBA8:
 			{
 				m_InternalFormat = GL_RGBA8;
 				break;
 			}
-			case TextureFormat::RGBA16:
+			case ImageFormat::RGBA16:
 			{
 				m_InternalFormat = GL_RGBA16;
 				break;
@@ -172,7 +174,7 @@ namespace highlo
 
 		if (idx >= (uint64)m_Width * (uint64)m_Height * 4 || idx < 0) return;
 
-		if (Format == TextureFormat::RGBA8)
+		if (Format == ImageFormat::RGBA8)
 		{
 			((unsigned char*)m_ImageData)[idx] = (unsigned char)rgba.r;
 			((unsigned char*)m_ImageData)[idx + 1] = (unsigned char)rgba.g;
@@ -196,14 +198,14 @@ namespace highlo
 
 		glm::ivec4 rgba = { 0, 0, 0, 0 };
 
-		if (Format == TextureFormat::RGBA8)
+		if (Format == ImageFormat::RGBA8)
 		{
 			rgba.r = (uint32)(((unsigned char*)m_ImageData)[idx]);
 			rgba.g = (uint32)(((unsigned char*)m_ImageData)[idx + 1]);
 			rgba.b = (uint32)(((unsigned char*)m_ImageData)[idx + 2]);
 			rgba.a = (uint32)(((unsigned char*)m_ImageData)[idx + 3]);
 		}
-		else if (Format == TextureFormat::RGBA16)
+		else if (Format == ImageFormat::RGBA16)
 		{
 			rgba.r = (uint32)(((uint16*)m_ImageData)[idx]);
 			rgba.g = (uint32)(((uint16*)m_ImageData)[idx + 1]);
@@ -213,11 +215,114 @@ namespace highlo
 
 		return rgba;
 	}
+
+	uint32 OpenGLTexture2D::GetMipLevelCount()
+	{
+		return utils::CalculateMipCount(m_Width, m_Height);
+	}
+
+	HLRendererID OpenGLTexture2D::GetRendererID()
+	{
+		return m_ID;
+	}
 	
 	void OpenGLTexture2D::Bind(uint32 slot) const
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, m_ID);
+	}
+
+	// ====================================================================================================================
+	//												3D Texture
+	// ====================================================================================================================
+
+	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString> &filePaths)
+	{
+		// @TODO
+		HL_ASSERT(false);
+	}
+
+	OpenGLTexture3D::OpenGLTexture3D(ImageFormat format, uint32 width, uint32 height, const void *data)
+	{
+		m_Width = width;
+		m_Height = height;
+		m_Format = format;
+
+		if (data)
+		{
+			uint32 size = width * height * 4 * 6; // six layers
+			m_Buffer = Allocator::Copy(data, size);
+		}
+
+		uint32 levels = utils::CalculateMipCount(width, height);
+		
+		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_ID);
+		glTextureStorage2D(m_ID, levels, utils::OpenGLImageInternalFormat(m_Format), m_Width, m_Height);
+
+		if (m_Buffer.m_Data)
+			glTextureSubImage3D(m_ID, 0, 0, 0, 0, m_Width, m_Height, 6, utils::OpenGLImageFormat(m_Format), utils::OpenGLFormatDataType(m_Format), m_Buffer.m_Data);
+
+		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	}
+
+	OpenGLTexture3D::~OpenGLTexture3D()
+	{
+		glDeleteTextures(1, &m_ID);
+	}
+
+	uint32 OpenGLTexture3D::GetWidth() const
+	{
+		return m_Width;
+	}
+
+	uint32 OpenGLTexture3D::GetHeight() const
+	{
+		return m_Height;
+	}
+
+	void *OpenGLTexture3D::GetData() const
+	{
+		return m_Buffer.m_Data;
+	}
+
+	void OpenGLTexture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
+	{
+		// @TODO
+	}
+
+	glm::ivec4 OpenGLTexture3D::ReadPixel(uint32 row, uint32 column)
+	{
+		// @TODO
+		return {};
+	}
+
+	void OpenGLTexture3D::UpdateResourceData(void *data)
+	{
+		// @TODO
+	}
+
+	void OpenGLTexture3D::UpdateResourceData()
+	{
+		// @TODO
+	}
+
+	uint32 OpenGLTexture3D::GetMipLevelCount()
+	{
+		return utils::CalculateMipCount(m_Width, m_Height);
+	}
+
+	HLRendererID OpenGLTexture3D::GetRendererID()
+	{
+		return m_ID;
+	}
+
+	void OpenGLTexture3D::Bind(uint32 slot) const
+	{
+		glBindTextureUnit(slot, m_ID);
 	}
 }
 

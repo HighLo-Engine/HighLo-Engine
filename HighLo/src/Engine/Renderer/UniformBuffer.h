@@ -26,7 +26,8 @@ namespace highlo
 		HULL_SHADER,
 		DOMAIN_SHADER,
 		GEOMETRY_SHADER,
-		PIXEL_SHADER
+		PIXEL_SHADER,
+		COMPUTE_SHADER
 	};
 
 	class UniformBuffer : public IsSharedReference

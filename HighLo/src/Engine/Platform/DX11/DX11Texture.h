@@ -28,6 +28,8 @@ namespace highlo
 		virtual void UpdateResourceData(void* data) override;
 		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
+		virtual uint32 GetMipLevelCount() override;
+		virtual HLRendererID GetRendererID() override;
 
 		virtual void Bind(uint32 slot) const override;
 

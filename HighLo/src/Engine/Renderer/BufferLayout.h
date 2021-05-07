@@ -48,7 +48,7 @@ namespace highlo
 
 		BufferElement() {}
 
-		BufferElement(const std::string& name, ShaderDataType type, bool normalized = false, uint32 input_slot = 0, BufferElementInputClass classification = BufferElementInputClass::INPUT_PER_VERTEX_DATA)
+		BufferElement(const HLString& name, ShaderDataType type, bool normalized = false, uint32 input_slot = 0, BufferElementInputClass classification = BufferElementInputClass::INPUT_PER_VERTEX_DATA)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized), InputSlot(input_slot), ElementInputClass(classification)
 		{
 		}

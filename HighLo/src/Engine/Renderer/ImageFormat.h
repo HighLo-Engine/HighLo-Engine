@@ -7,6 +7,8 @@ namespace highlo
 		None = 0,
 		RGB,
 		RGBA,
+		RGBA8,
+		RGBA16,
 		RGBA16F,
 		RGBA32F,
 		RG32F,

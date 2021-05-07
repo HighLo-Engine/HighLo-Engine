@@ -85,7 +85,7 @@ namespace highlo
 
 		enum class ShaderType
 		{
-			NONE = -1, VERTEX_SHADER = 0, TESS_CONTROL_SHADER = 2, TESS_EVAL_SHADER = 3, GEOMETRY_SHADER = 4, PIXEL_SHADER = 5
+			NONE = -1, VERTEX_SHADER = 0, TESS_CONTROL_SHADER = 2, TESS_EVAL_SHADER = 3, GEOMETRY_SHADER = 4, PIXEL_SHADER = 5, COMPUTE_SHADER = 6
 		};
 
 		std::unordered_map<ShaderType, std::stringstream> shader_sources;
@@ -94,6 +94,7 @@ namespace highlo
 		shader_sources[ShaderType::TESS_EVAL_SHADER] = std::stringstream();
 		shader_sources[ShaderType::GEOMETRY_SHADER] = std::stringstream();
 		shader_sources[ShaderType::PIXEL_SHADER] = std::stringstream();
+		shader_sources[ShaderType::COMPUTE_SHADER] = std::stringstream();
 
 		std::ifstream file;
 		try
@@ -117,6 +118,8 @@ namespace highlo
 						type = ShaderType::GEOMETRY_SHADER;
 					else if (line.find("pixel") != std::string::npos)
 						type = ShaderType::PIXEL_SHADER;
+					else if (line.find("compute") != std::string::npos)
+						type = ShaderType::COMPUTE_SHADER;
 				}
 				else
 				{
@@ -135,6 +138,7 @@ namespace highlo
 		result.m_TessellationEvaluationShaderSrc	= HLString(shader_sources[ShaderType::TESS_EVAL_SHADER].str().c_str());
 		result.m_GeometryShaderSrc					= HLString(shader_sources[ShaderType::GEOMETRY_SHADER].str().c_str());
 		result.m_PixelShaderSrc						= HLString(shader_sources[ShaderType::PIXEL_SHADER].str().c_str());
+		result.m_ComputeShaderSrc					= HLString(shader_sources[ShaderType::COMPUTE_SHADER].str().c_str());
 
 		return result;
     }

@@ -39,7 +39,7 @@ void Sandbox::OnInitialize()
 			("assets/textures/skyboxes/SB2_front.jpg"),
 		}
 	));*/
-	m_Skybox->SetTexture(m_Environment->GetIrradianceMap());
+	m_Skybox->SetTexture(m_Environment->GetRadianceMap());
 	HL_TRACE("Sandbox Initialized");
 }
 

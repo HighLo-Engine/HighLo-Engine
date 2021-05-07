@@ -34,7 +34,7 @@ namespace highlo
         ImGui::CreateContext();
 
 #ifdef HIGHLO_API_GLFW
-        ImGui_ImplGlfw_InitForOpenGL(window->GetNativeHandle(), true);
+        ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->GetNativeHandle(), true);
 #else
         ImGui_ImplWin32_Init(window->GetNativeHandle());
 #endif // HIGHLO_API_DX11

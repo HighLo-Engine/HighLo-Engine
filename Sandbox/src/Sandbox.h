@@ -15,4 +15,9 @@ public:
 private:
 	Ref<FPSCamera> m_Camera;
 	Ref<Mesh> m_Mesh;
+
+	Ref<Material> m;
+	Ref<Texture> m_CabinTexture;
+	Model m_CabinModel;
+	Transform m_CabinTransform;
 };

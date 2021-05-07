@@ -31,10 +31,12 @@ namespace highlo
 		HLAPI static void DrawCapsule(const Transform& transform, const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f));
 		HLAPI static void DrawCapsule(const Transform& transform, Ref<Material> material);
 
+		HLAPI static void DrawMesh(const Ref<Mesh>& mesh, const Transform& transform);
+
 	private:
 		// Internal helper functions
 		static void RenderVertexArray(Ref<VertexArray>& va);
-		static Ref<Shader> SelectMaterialShader(Ref<Material> material);
+		static Ref<Shader> SelectMaterialShader(Ref<Material> material, bool animated);
 		static void SetObjectDataBuffer(Ref<Shader> shader, const Transform& transform);
 		static void RenderMesh(Ref<Mesh> mesh, Ref<Material> material, const Transform& transform);
 

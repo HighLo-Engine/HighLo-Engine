@@ -18,13 +18,13 @@ namespace highlo
 
 	void Material::CreateShaders()
 	{
-		BufferLayout static_layout = {
+		static BufferLayout static_layout = {
 			{ "POSITION", ShaderDataType::Float3 },
 			{ "UV"		, ShaderDataType::Float2 },
 			{ "NORMAL"	, ShaderDataType::Float3 }
 		};
 
-		BufferLayout animated_layout = {
+		static BufferLayout animated_layout = {
 			{ "POSITION", ShaderDataType::Float3 },
 			{ "UV"		, ShaderDataType::Float2 },
 			{ "NORMAL"	, ShaderDataType::Float3 },
@@ -37,7 +37,7 @@ namespace highlo
 		m_StaticShader    = Shader::Create(Shader::GetDefaultEngineStaticShaderSource(), static_layout);
 		m_AnimatedShader  = Shader::Create(Shader::GetDefaultEngineAnimatedShaderSource(), animated_layout);
 
-		auto VS_SceneBuffer = UniformBuffer::Create(
+		static auto VS_SceneBuffer = UniformBuffer::Create(
 			"VS_SceneBuffer",
 			{
 				UniformVariable("u_ProjectionMatrix", sizeof(glm::mat4)),
@@ -51,7 +51,7 @@ namespace highlo
 		m_StaticShader->AddBuffer("VS_SceneBuffer", VS_SceneBuffer);
 		m_AnimatedShader->AddBuffer("VS_SceneBuffer", VS_SceneBuffer);
 
-		auto VS_ObjectBuffer = UniformBuffer::Create(
+		static auto VS_ObjectBuffer = UniformBuffer::Create(
 			"VS_ObjectBuffer",
 			{
 				UniformVariable("u_Transform", sizeof(glm::mat4)),
@@ -63,7 +63,7 @@ namespace highlo
 		m_StaticShader->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
 		m_AnimatedShader->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
 
-		m_MaterialDataBuffer = UniformBuffer::Create(
+		static auto MaterialDataBuffer = UniformBuffer::Create(
 			"MaterialDataBuffer",
 			{
 				UniformVariable("u_Color", sizeof(glm::vec4)),
@@ -73,8 +73,10 @@ namespace highlo
 			(uint32)HL_UB_SLOT::MATERIAL_DATA_BUFFER
 		);
 
-		m_StaticShader->AddBuffer("MaterialDataBuffer", m_MaterialDataBuffer);
-		m_AnimatedShader->AddBuffer("MaterialDataBuffer", m_MaterialDataBuffer);
+		m_MaterialDataBuffer = MaterialDataBuffer;
+
+		m_StaticShader->AddBuffer("MaterialDataBuffer", MaterialDataBuffer);
+		m_AnimatedShader->AddBuffer("MaterialDataBuffer", MaterialDataBuffer);
 	}
 
 	void Material::ApplyNewProperties()

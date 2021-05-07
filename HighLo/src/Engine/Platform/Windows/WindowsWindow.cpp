@@ -16,6 +16,8 @@
 #include "Engine/Core/Defines/HLMouseButtonCodes.h"
 #include "Engine/Utils/InputUtils.h"
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace highlo
 {
 	static POINTFLOAT s_PreviousMousePos;
@@ -358,6 +360,9 @@ namespace highlo
 
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
+			return true;
+
 		switch (uMsg)
 		{
 			case WM_CLOSE:

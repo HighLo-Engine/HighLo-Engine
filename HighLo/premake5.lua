@@ -64,7 +64,7 @@ project "HighLo"
 
     filter "system:windows"
         systemversion "latest"
-        buildoptions "/MD"
+        staticruntime "off"
 
         disablewarnings { "5033" }
 

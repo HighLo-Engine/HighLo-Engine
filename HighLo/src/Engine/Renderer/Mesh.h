@@ -1,7 +1,8 @@
 #pragma once
-
 #include "Engine/Renderer/VertexData.h"
 #include "Engine/Renderer/VertexArray.h"
+#include "Material.h"
+#include "Animation.h"
 
 namespace highlo
 {
@@ -21,6 +22,9 @@ namespace highlo
 		void UpdateMeshData();
 
 		Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
+
+		Ref<Animation> animation = nullptr;
+		Ref<Material> material;
 
 	private:
 		Mesh(const MeshData& data)

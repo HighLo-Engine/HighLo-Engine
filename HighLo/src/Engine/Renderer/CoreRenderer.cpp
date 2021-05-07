@@ -45,7 +45,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -70,7 +69,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		RenderMesh(s_CubeMesh, s_DefaultMaterial, transform);
 	}
@@ -85,7 +83,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -110,7 +107,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		RenderMesh(s_SphereMesh, s_DefaultMaterial, transform);
 	}
@@ -125,7 +121,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -150,7 +145,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		RenderMesh(s_CapsuleMesh, s_DefaultMaterial, transform);
 	}
@@ -160,13 +154,18 @@ namespace highlo
 		RenderMesh(s_CapsuleMesh, material, transform);
 	}
 
+	void CoreRenderer::DrawMesh(const Ref<Mesh>& mesh, const Transform& transform)
+	{
+		RenderMesh(mesh, mesh->material, transform);
+	}
+
 	void CoreRenderer::RenderVertexArray(Ref<VertexArray>& va)
 	{
 		va->Bind();
 		Renderer::s_RenderingAPI->DrawIndexed(va);
 	}
 
-	Ref<Shader> CoreRenderer::SelectMaterialShader(Ref<Material> material)
+	Ref<Shader> CoreRenderer::SelectMaterialShader(Ref<Material> material, bool animated)
 	{
 		return material->m_StaticShader;
 	}
@@ -180,7 +179,7 @@ namespace highlo
 
 	void CoreRenderer::RenderMesh(Ref<Mesh> mesh, Ref<Material> material, const Transform& transform)
 	{
-		Ref<Shader> shader = SelectMaterialShader(material);
+		Ref<Shader> shader = SelectMaterialShader(material, (mesh->animation != nullptr));
 		shader->Bind();
 		material->Bind();
 

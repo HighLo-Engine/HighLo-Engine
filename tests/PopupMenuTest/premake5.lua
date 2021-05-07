@@ -42,7 +42,7 @@ project "PopupMenuTest"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
-        buildoptions "/MD"
+        staticruntime "off"
 
         disablewarnings { "5033" }
 

@@ -106,7 +106,6 @@ namespace highlo
 			return;
 		}
 
-
 		glDetachShader(m_ID, vs_id);
 		glDetachShader(m_ID, ps_id);
 

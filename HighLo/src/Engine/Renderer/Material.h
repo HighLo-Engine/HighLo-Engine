@@ -39,13 +39,12 @@ namespace highlo
 		/// Updates shaders with new data from m_Properties field.
 		/// Must be called every time a property is changed and needed to be udpated.
 		/// </summary>
-		HLAPI void ApplyNewProperties();
 
 		HLAPI void AddTexture(const Ref<Texture>& texture);
 		HLAPI Ref<Texture> GetTexture(uint64 idx);
 		HLAPI uint32 GetTextureCount() const { return (uint32)m_Textures.size(); }
 
-		HLAPI virtual void Bind(bool update_properties = false);
+		HLAPI virtual void Bind(bool update_properties = true);
 
 	private:
 		std::vector<Ref<Texture>> m_Textures;
@@ -55,6 +54,8 @@ namespace highlo
 
 		Ref<Shader> m_StaticShader;
 		Ref<Shader> m_AnimatedShader;
+
+		void ApplyNewProperties();
 
 	private:
 		Ref<UniformBuffer> m_MaterialDataBuffer = nullptr;

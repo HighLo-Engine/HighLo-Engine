@@ -16,6 +16,11 @@ namespace highlo
 		HLAPI Transform& Scale(float scale);
 		HLAPI Transform& Rotate(float angle, const glm::vec3 &axis);
 
+		HLAPI void SetPosition(const glm::vec3& position);
+		HLAPI void SetRotation(const glm::vec3& rotation);
+		HLAPI void SetScale(const glm::vec3& scale);
+		HLAPI void SetScale(float scale);
+
 		HLAPI inline const glm::vec3 &GetPosition() const {	return m_Position; }
 		HLAPI inline const glm::vec3 &GetScale() const { return m_Scale; }
 		HLAPI inline const glm::quat &GetRotation() const { return m_Rotation; }
@@ -35,6 +40,7 @@ namespace highlo
 		HLAPI static Transform FromPosition(const glm::vec3& position);
 		HLAPI static Transform FromRotation(const glm::vec3& rotation);
 		HLAPI static Transform FromScale(const glm::vec3& scale);
+		static Transform OriginTransform;
 
 	private:
 

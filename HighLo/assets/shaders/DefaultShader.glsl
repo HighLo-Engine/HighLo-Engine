@@ -59,8 +59,6 @@ const int LightCount = 1;
 // Constant normal incidence Fresnel factor for all dielectrics.
 const vec3 Fdielectric = vec3(0.04);
 
-const float ao = 1.0;
-
 struct Light {
 	vec3 Direction;
 	vec3 Radiance;
@@ -79,7 +77,11 @@ in VS_TO_PS
 
 out vec4 out_Color;
 
-layout(binding = 0) uniform sampler2D DiffuseTextureSampler;
+layout(binding = 0) uniform sampler2D AlbedoTextureSampler;
+layout(binding = 1) uniform sampler2D NormalTextureSampler;
+layout(binding = 2) uniform sampler2D MetallicTextureSampler;
+layout(binding = 3) uniform sampler2D RoughnessTextureSampler;
+layout(binding = 4) uniform sampler2D aoTextureSampler;
 
 layout (std140, binding = 2) uniform MaterialDataBuffer
 {
@@ -88,9 +90,26 @@ layout (std140, binding = 2) uniform MaterialDataBuffer
     float   u_Metallic;
 };
 
-vec4 CalculateTextureColor()
+vec3 getNormalFromMap()
 {
-	return u_Color * texture(DiffuseTextureSampler, PS_Input.UV);
+    vec3 tangentNormal = texture(NormalTextureSampler, PS_Input.UV).xyz * 2.0 - 1.0;
+
+    vec3 Q1  = dFdx(PS_Input.WorldPosition);
+    vec3 Q2  = dFdy(PS_Input.WorldPosition);
+    vec2 st1 = dFdx(PS_Input.UV);
+    vec2 st2 = dFdy(PS_Input.UV);
+
+    vec3 N   = normalize(PS_Input.Normal);
+    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
+    vec3 B  = -normalize(cross(N, T));
+    mat3 TBN = mat3(T, B, N);
+
+    return normalize(TBN * tangentNormal);
+}
+
+vec4 CalculateAlbedoTextureColor()
+{
+	return u_Color * texture(AlbedoTextureSampler, PS_Input.UV);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -135,12 +154,16 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
-    vec4 TextureColor = CalculateTextureColor();
+    vec4  AlbedoColor    = CalculateAlbedoTextureColor();
+    float MetallicValue  = texture(MetallicTextureSampler, PS_Input.UV).r;
+    float RoughnessValue = texture(RoughnessTextureSampler, PS_Input.UV).r;
+    float aoValue        = texture(aoTextureSampler, PS_Input.UV).r;
 
-	vec3 N = normalize(PS_Input.Normal);
+
+	vec3 N = getNormalFromMap();
     vec3 V = normalize(PS_Input.CameraPosition - PS_Input.WorldPosition);
 
-	vec3 F0 = mix(Fdielectric, vec3(TextureColor), u_Metallic);
+	vec3 F0 = mix(Fdielectric, vec3(AlbedoColor), MetallicValue);
 
     vec3 Lo = vec3(0.0);
 
@@ -152,8 +175,8 @@ void main()
     vec3 radiance = PS_Input.LightColor * attenuation;
 
 	// Cook-Torrance BRDF
-    float NDF = DistributionGGX(N, H, u_Roughness);   
-    float G   = GeometrySmith(N, V, L, u_Roughness);      
+    float NDF = DistributionGGX(N, H, RoughnessValue);   
+    float G   = GeometrySmith(N, V, L, RoughnessValue);      
     vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
            
     vec3 nominator    = NDF * G * F; 
@@ -169,15 +192,15 @@ void main()
     // multiply kD by the inverse metalness such that only non-metals 
     // have diffuse lighting, or a linear blend if partly metal (pure metals
     // have no diffuse light).
-    kD *= 1.0 - u_Metallic;
+    kD *= 1.0 - MetallicValue;
 
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
 
     // add to outgoing radiance Lo
-    Lo += (kD * vec3(TextureColor) / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    Lo += (kD * vec3(AlbedoColor) / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 
-    vec3 ambient = vec3(0.03) * vec3(TextureColor) * ao;
+    vec3 ambient = vec3(0.03) * vec3(AlbedoColor) * aoValue;
     vec3 color = ambient + Lo;
 
     // HDR tonemapping
@@ -185,5 +208,5 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2)); 
 
-    out_Color = vec4(color, TextureColor.a);
+    out_Color = vec4(color, AlbedoColor.a);
 } 

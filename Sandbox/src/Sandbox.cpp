@@ -13,17 +13,18 @@ void Sandbox::OnInitialize()
 	
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);
 
-	m_CabinTexture = Texture2D::LoadFromFile("assets/textures/WoodenCabin.jpg");
-	m_CabinModel = AssetLoader::LoadStaticModel("assets/models/WoodenCabin.obj", false);
-	m_CabinModel.AddTexture(m_CabinTexture);
+	auto albedo		= Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg");
+	auto normal		= Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg");
+	auto metallic	= Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg");
+	auto roughness	= Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Roughness.jpg");
+	auto ao			= Texture2D::CreateFromColor({ 255, 255, 255 });
 
-	m_CabinTransform.Rotate(180.0f, { 0, 1, 0 });
-	m_CabinTransform.Scale(0.3f);
-	m_CabinTransform.Translate({ 20, -5, 75 });
-
-	m_Sphere = MeshFactory::CreateSphere(1.0f);
-	m_Sphere->m_Material->Properties.m_RenderProperties.m_Color = { 1, 0, 0, 1 };
-	m_Sphere->m_Material->AddTexture(Texture2D::CreateFromColor({ 255, 255, 255 }));
+	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.dae").GetMesh(0);
+	m_PBR_Sphere->m_Material->AddTexture(albedo);
+	m_PBR_Sphere->m_Material->AddTexture(normal);
+	m_PBR_Sphere->m_Material->AddTexture(metallic);
+	m_PBR_Sphere->m_Material->AddTexture(roughness);
+	m_PBR_Sphere->m_Material->AddTexture(ao);
 
 	HL_TRACE("Sandbox Initialized");
 }
@@ -33,14 +34,15 @@ void Sandbox::OnUpdate(Timestep timestep)
 	m_Camera->Update();
 
 	Renderer::ClearScreenBuffers();
-	Renderer::ClearScreenColor(glm::vec4(0.02f, 0.02f, 0.02f, 1.0f));
+	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 
-	CoreRenderer::BeginScene(*m_Camera);
+	CoreRenderer::BeginScene(*m_Camera, m_Light);
 
-	CoreRenderer::DrawMesh(m_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f));
-		
-	for (uint64 i = 0; i < m_CabinModel.GetMeshCount(); i++)
-		CoreRenderer::DrawMesh(m_CabinModel.GetMesh(i), m_CabinTransform);
+	static float y_rot = 0.0f;
+	y_rot += 0.0004f * timestep;
+
+	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
+	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
 
 	CoreRenderer::EndScene();
 }
@@ -58,15 +60,6 @@ void Sandbox::OnEvent(Event& e)
 
 void Sandbox::OnImGuiRender()
 {
-	ImGuiRenderer::StartWindow("Material Editing");
-	ImGuiRenderer::BeginChild("Material Properties", 400, 400);
-
-	ImGuiRenderer::Property("Color", m_Sphere->m_Material->Properties.m_RenderProperties.m_Color, PropertyFlag::Color);
-	ImGuiRenderer::Property("Roughness", m_Sphere->m_Material->Properties.m_RenderProperties.m_Roughness, 0, 1);
-	ImGuiRenderer::Property("Metallic", m_Sphere->m_Material->Properties.m_RenderProperties.m_Metallic, 0, 1);
-
-	ImGuiRenderer::EndChild();
-	ImGuiRenderer::EndWindow();
 }
 
 void Sandbox::OnResize(uint32 width, uint32 height)

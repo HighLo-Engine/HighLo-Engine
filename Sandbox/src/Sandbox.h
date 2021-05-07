@@ -14,13 +14,8 @@ public:
 	void OnResize(uint32 width, uint32 height) override;
 
 private:
+	Light m_Light;
 	Ref<FPSCamera> m_Camera;
-	Ref<Mesh> m_Mesh;
-
-	Ref<Material> m;
-	Ref<Texture> m_CabinTexture;
-	Model m_CabinModel;
-	Transform m_CabinTransform;
-
-	Ref<Mesh> m_Sphere;
+	
+	Ref<Mesh> m_PBR_Sphere;
 };

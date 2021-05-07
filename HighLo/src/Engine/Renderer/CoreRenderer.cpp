@@ -47,7 +47,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -72,7 +71,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		RenderMesh(s_CubeMesh, s_DefaultMaterial, transform);
 	}
@@ -87,7 +85,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -112,7 +109,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		RenderMesh(s_SphereMesh, s_DefaultMaterial, transform);
 	}
@@ -127,7 +123,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -152,7 +147,6 @@ namespace highlo
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
 		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
-		s_DefaultMaterial->ApplyNewProperties();
 
 		RenderMesh(s_CapsuleMesh, s_DefaultMaterial, transform);
 	}

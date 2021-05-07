@@ -3,7 +3,7 @@
 void Sandbox::OnInitialize()
 {
 	// TO-DO: Fix for GLFW configuration.
-	HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.ico");
+	//HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.ico");
 
 	m_Camera = Ref<FPSCamera>::Create();
 	m_Camera->SetYaw(90);
@@ -19,8 +19,8 @@ void Sandbox::OnInitialize()
 	m_CabinTransform.Translate({ 20, -5, 75 });
 
 	m_Sphere = MeshFactory::CreateSphere(1.0f);
-	m_Sphere->material->Properties.m_RenderProperties.m_Color = { 1, 0, 0, 1 };
-	m_Sphere->material->AddTexture(Texture2D::CreateFromColor({ 255, 255, 255 }));
+	m_Sphere->m_Material->Properties.m_RenderProperties.m_Color = { 1, 0, 0, 1 };
+	m_Sphere->m_Material->AddTexture(Texture2D::CreateFromColor({ 255, 255, 255 }));
 
 	HL_TRACE("Sandbox Initialized");
 }
@@ -58,9 +58,9 @@ void Sandbox::OnImGuiRender()
 	ImGuiRenderer::StartWindow("Material Editing");
 	ImGuiRenderer::BeginChild("Material Properties", 400, 400);
 
-	ImGuiRenderer::ColorPicker("Color", m_Sphere->material->Properties.m_RenderProperties.m_Color);
-	ImGuiRenderer::SliderFloat("Roughness", m_Sphere->material->Properties.m_RenderProperties.m_Roughness, 0, 1);
-	ImGuiRenderer::SliderFloat("Metallic", m_Sphere->material->Properties.m_RenderProperties.m_Metallic, 0, 1);
+	ImGuiRenderer::ColorPicker("Color", m_Sphere->m_Material->Properties.m_RenderProperties.m_Color);
+	ImGuiRenderer::SliderFloat("Roughness", m_Sphere->m_Material->Properties.m_RenderProperties.m_Roughness, 0, 1);
+	ImGuiRenderer::SliderFloat("Metallic", m_Sphere->m_Material->Properties.m_RenderProperties.m_Metallic, 0, 1);
 
 	ImGuiRenderer::EndChild();
 	ImGuiRenderer::EndWindow();

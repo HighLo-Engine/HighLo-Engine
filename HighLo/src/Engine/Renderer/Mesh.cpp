@@ -28,7 +28,7 @@ namespace highlo
 
 		instance->m_VertexArray->Unbind();
 
-		instance->material = Material::Create();
+		instance->m_Material = Material::Create();
 
 		return instance;
 	}

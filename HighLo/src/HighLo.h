@@ -18,6 +18,7 @@
 #include "Engine/Math/HLMath.h"
 #include "Engine/Math/HLAABB.h"
 #include "Engine/Math/HLRay.h"
+#include "Engine/Math/Transform.h"
 
 #include "Engine/Renderer/BufferLayout.h"
 #include "Engine/Renderer/RenderingContext.h"
@@ -37,6 +38,7 @@
 #include "Engine/Renderer/MeshFactory.h"
 #include "Engine/Renderer/Material.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/ImGuiRenderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 
 #include "Engine/Window/Window.h"

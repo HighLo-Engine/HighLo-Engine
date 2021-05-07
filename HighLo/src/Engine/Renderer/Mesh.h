@@ -23,8 +23,8 @@ namespace highlo
 
 		Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 
-		Ref<Animation> animation = nullptr;
-		Ref<Material> material;
+		Ref<Animation> m_Animation = nullptr;
+		Ref<Material> m_Material;
 
 	private:
 		Mesh(const MeshData& data)

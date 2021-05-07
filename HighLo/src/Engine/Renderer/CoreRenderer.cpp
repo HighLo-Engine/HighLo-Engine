@@ -158,7 +158,7 @@ namespace highlo
 
 	void CoreRenderer::DrawMesh(const Ref<Mesh>& mesh, const Transform& transform)
 	{
-		RenderMesh(mesh, mesh->material, transform);
+		RenderMesh(mesh, mesh->m_Material, transform);
 	}
 
 	void CoreRenderer::RenderVertexArray(Ref<VertexArray>& va)
@@ -169,7 +169,10 @@ namespace highlo
 
 	Ref<Shader> CoreRenderer::SelectMaterialShader(Ref<Material> material, bool animated)
 	{
-		return material->m_StaticShader;
+		if (animated)
+			return material->m_AnimatedShader;
+		else
+			return material->m_StaticShader;
 	}
 
 	void CoreRenderer::SetObjectDataBuffer(Ref<Shader> shader, const Transform& transform)
@@ -181,7 +184,7 @@ namespace highlo
 
 	void CoreRenderer::RenderMesh(Ref<Mesh> mesh, Ref<Material> material, const Transform& transform)
 	{
-		Ref<Shader> shader = SelectMaterialShader(material, (mesh->animation != nullptr));
+		Ref<Shader> shader = SelectMaterialShader(material, (mesh->m_Animation != nullptr));
 		shader->Bind();
 		material->Bind();
 

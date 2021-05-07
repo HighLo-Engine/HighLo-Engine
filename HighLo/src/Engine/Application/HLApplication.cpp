@@ -18,8 +18,8 @@ namespace highlo
 
 	void HLApplication::Run()
 	{
-		Logger::Init();
 		m_Running = true;
+		Logger::Init();
 		VirtualFileSystem::Init();
 
 		InitializeWindow();

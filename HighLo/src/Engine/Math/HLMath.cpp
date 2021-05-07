@@ -55,4 +55,71 @@ namespace highlo
 
 		return glm::vec3(result.x, result.y, ClipSpacePos.z);
 	}
+
+	bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation)
+	{
+		glm::mat4 localMatrix(transform);
+
+		// normalize the matrix
+		if (glm::epsilonEqual(localMatrix[3][3], 0.0f, glm::epsilon<float>()))
+			return false;
+
+		// First isolate the perspective
+		if (glm::epsilonNotEqual(localMatrix[0][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[1][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[2][3], 0.0f, glm::epsilon<float>()))
+		{
+			localMatrix[0][3] = localMatrix[1][3] = 0.0f;
+			localMatrix[3][3] = 1.0f;
+		}
+
+		// Next take care of translation
+		translation = glm::vec3(localMatrix[3]);
+		localMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, localMatrix[3].w);
+
+		// Now get the scale and shear
+		glm::vec3 row[3];
+		glm::vec3 pdum3;
+
+		for (glm::length_t i = 0; i < 3; ++i)
+			for (glm::length_t j = 0; j < 3; ++j)
+				row[i][j] = localMatrix[i][j];
+
+		return true;
+	}
+
+	bool DecomposeTranslation(const glm::mat4 &transform, glm::vec3 &translation)
+	{
+		return false;
+	}
+
+	bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale)
+	{
+		return false;
+	}
+
+	bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation)
+	{
+		return false;
+	}
+	
+	void CreateCacheSin()
+	{
+	}
+
+	void CreateCacheCos()
+	{
+	}
+	
+	float Sin(float value)
+	{
+		// Temp - later the values of CreateCacheSin should be used
+		return ::sin(value);
+	}
+	
+	float Cos(float value)
+	{
+		// Temp - later the values of CreateCacheCos should be used
+		return ::cos(value);
+	}
 }

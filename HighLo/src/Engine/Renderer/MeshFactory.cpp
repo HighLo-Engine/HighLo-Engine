@@ -95,20 +95,19 @@ namespace highlo
 		float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 		float s, t;                                     // vertex texCoord
 
-
-		float sectorStep = 2 * PI / sectorCount;
+		float sectorStep = 2.0f * PI / sectorCount;
 		float stackStep = PI / stackCount;
 		float sectorAngle, stackAngle;
 
-		for (int i = 0; i <= stackCount; ++i)
+		for (int32 i = 0; i <= stackCount; ++i)
 		{
-			stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
+			stackAngle = PI / 2.0f - i * stackStep;     // starting from pi/2 to -pi/2
 			xy = radius * cosf(stackAngle);             // r * cos(u)
 			z = radius * sinf(stackAngle);              // r * sin(u)
 
 			// add (sectorCount+1) vertices per stack
 			// the first and last vertices have same position and normal, but different tex coords
-			for (int j = 0; j <= sectorCount; ++j)
+			for (int32 j = 0; j <= sectorCount; ++j)
 			{
 				Vertex vertex;
 
@@ -139,13 +138,13 @@ namespace highlo
 			}
 		}
 
-		int k1, k2;
-		for (int i = 0; i < stackCount; ++i)
+		int32 k1, k2;
+		for (int32 i = 0; i < stackCount; ++i)
 		{
-			k1 = i * ((int)sectorCount + 1);     // beginning of current stack
-			k2 = k1 + (int)sectorCount + 1;      // beginning of next stack
+			k1 = i * ((int32)sectorCount + 1);     // beginning of current stack
+			k2 = k1 + (int32)sectorCount + 1;      // beginning of next stack
 
-			for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
+			for (int32 j = 0; j < sectorCount; ++j, ++k1, ++k2)
 			{
 				// 2 triangles per sector excluding first and last stacks
 				// k1 => k2 => k1+1
@@ -185,7 +184,7 @@ namespace highlo
 		float calcH = 0.0f;
 		float calcV = 0.0f;
 
-		for (int i = 0; i < pointCount; i++)
+		for (int32 i = 0; i < pointCount; i++)
 		{
 			float calcHRadians = glm::radians(calcH);
 			float calcVRadians = glm::radians(calcV);

@@ -5,6 +5,7 @@
 
 // Implemented features:
 //  [X] Renderer: User texture binding. Use 'GLuint' OpenGL texture identifier as void*/ImTextureID. Read the FAQ about ImTextureID!
+//  [X] Renderer: Multi-viewport support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
 //  [x] Renderer: Desktop GL only: Support for large meshes (64k+ vertices) with 16-bit indices.
 
 // You can copy and use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
@@ -20,8 +21,6 @@
 //  The 'glsl_version' initialization parameter should be NULL (default) or a "#version XXX" string.
 //  On computer platform the GLSL version default to "#version 130". On OpenGL ES 3 platform it defaults to "#version 300 es"
 //  Only override if your GL version doesn't handle this GLSL version. See GLSL version table at the top of imgui_impl_opengl3.cpp.
-
-#ifdef HIGHLO_API_OPENGL
 
 #pragma once
 #include "imgui.h"      // IMGUI_IMPL_API
@@ -84,8 +83,6 @@ IMGUI_IMPL_API void     ImGui_ImplOpenGL3_DestroyDeviceObjects();
 #endif
 #else
     #define IMGUI_IMPL_OPENGL_LOADER_GL3W   // Default to GL3W embedded in our repository
-#endif
-
 #endif
 
 #endif

@@ -27,7 +27,7 @@ namespace highlo
 		bool OnFileMenuClicked(FileMenuEvent &e);
 
 		HMENU m_NativeHandle;
-		std::vector<Ref<FileMenu>> Menus;
+		std::vector<Ref<FileMenu>> m_Menus;
 	};
 }
 

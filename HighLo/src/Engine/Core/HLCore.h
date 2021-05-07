@@ -6,9 +6,9 @@
 #include "Engine/Core/Defines/HLBaseTypes.h"
 #include "Engine/Core/HLAssert.h"
 
-#ifdef HL_USE_DLL
+#ifdef HIGHLO_USE_DLL
 
-#ifdef HL_LIBRARY_EXPORT
+#ifdef HIGHLO_LIBRARY_EXPORT
 #define HLAPI HL_DLL_EXPORT
 #else
 #define HLAPI HL_DLL_IMPORT

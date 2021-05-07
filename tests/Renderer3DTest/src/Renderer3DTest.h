@@ -10,5 +10,10 @@ public:
 	void OnUpdate(Timestep timestep) override;
 	void OnShutdown() override;
 	void OnEvent(Event &e) override;
+
+private:
+
+	Ref<FPSCamera> m_Camera;
+	Ref<Mesh> m_Mesh;
 };
 

@@ -20,4 +20,15 @@ namespace highlo
 
 	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
 	glm::vec3 WorldToScreen(glm::vec3 point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
+
+	bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation);
+	bool DecomposeTranslation(const glm::mat4 &transform, glm::vec3 &translation);
+	bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale);
+	bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation);
+
+	void CreateCacheSin();
+	void CreateCacheCos();
+
+	float Sin(float value);
+	float Cos(float value);
 }

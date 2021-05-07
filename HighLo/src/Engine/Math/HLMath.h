@@ -1,8 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 #include "Engine/Core/HLCore.h"
 #include "Engine/Core/DataTypes/HLString.h"
@@ -10,8 +8,21 @@
 
 namespace highlo
 {
+	static std::unordered_map<float, float> s_CachedSin;
+	static std::unordered_map<float, float> s_CachedCos;
+
 #define WORLD_UP_DIR glm::vec3(0, 1, 0)
 #define CLAMP(x, minval, maxval) std::min(std::max(x, minval), maxval);
+
+#define HL_PI 3.1415926535897932f
+#define HL_TWO_PI 6.28318530718f
+#define HL_PI_INV 0.31830988618f
+#define HL_PI_OVER_2 1.57079632679f
+#define HL_PI_OVER_4 0.78539816339f
+#define HL_PI_HALF HL_PI_OVER_2
+
+// The value for which all absolute numbers smaller than are considered equal to zero.
+#define HL_ZERO_TOLERANCE 1e-6f
 
 	float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 
@@ -26,8 +37,8 @@ namespace highlo
 	bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale);
 	bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation);
 
-	void CreateCacheSin();
-	void CreateCacheCos();
+	void CreateCacheSin(float cacheSize = 100000.0f);
+	void CreateCacheCos(float cacheSize = 100000.0f);
 
 	float Sin(float value);
 	float Cos(float value);

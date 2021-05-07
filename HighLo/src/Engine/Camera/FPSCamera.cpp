@@ -1,6 +1,9 @@
 #include "HighLoPch.h"
 #include "FPSCamera.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Engine/Window/Window.h"
 #include "Engine/Core/HLInput.h"
 #include "Engine/Utils/InputUtils.h"
@@ -79,7 +82,7 @@ namespace highlo
 		m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
 
-	void FPSCamera::OnWindowResize(unsigned int width, unsigned int height)
+	void FPSCamera::OnWindowResize(uint32 width, uint32 height)
 	{
 		UpdateProjectionMatrix();
 	}

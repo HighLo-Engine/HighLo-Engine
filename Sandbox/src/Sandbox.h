@@ -11,6 +11,7 @@ public:
 	void OnShutdown() override;
 	void OnEvent(Event& e) override;
 	void OnImGuiRender() override;
+	void OnResize(uint32 width, uint32 height) override;
 
 private:
 	Ref<FPSCamera> m_Camera;

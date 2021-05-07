@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ICamera.h"
 
 namespace highlo
@@ -6,13 +7,15 @@ namespace highlo
 	class FPSCamera : public ICamera
 	{
 	public:
+
 		HLAPI FPSCamera(float zNear = 0.1f, float zFar = 2000.0f, float fov = 90.0f);
 
 		// Inherited via Camera
 		HLAPI virtual void Update() override;
-		HLAPI virtual void OnWindowResize(unsigned int width, unsigned int height) override;
+		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) override;
 
 	private:
+
 		float m_Speed = 0.01f;
 		float m_RotationSpeed = 0.48f;
 		float m_zNear, m_zFar, m_Fov;

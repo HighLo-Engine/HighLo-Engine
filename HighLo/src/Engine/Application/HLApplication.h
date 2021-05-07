@@ -32,6 +32,7 @@ namespace highlo
 		HLAPI virtual void OnShutdown() {}
 		HLAPI virtual void OnEvent(Event &e) {}
 		HLAPI virtual void OnImGuiRender() {}
+		HLAPI virtual void OnResize(uint32 width, uint32 height) {}
 
 		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }

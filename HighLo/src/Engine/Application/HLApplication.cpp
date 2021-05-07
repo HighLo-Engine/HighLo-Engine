@@ -4,6 +4,8 @@
 #include "Engine/Core/HLVirtualFileSystem.h"
 #include "Engine/Core/HLInput.h"
 #include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Math/HLMath.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace highlo
 {
@@ -21,6 +23,10 @@ namespace highlo
 		m_Running = true;
 		Logger::Init();
 		VirtualFileSystem::Init();
+
+		// Create cache for sin() and cos()
+		CreateCacheSin();
+		CreateCacheCos();
 
 		InitializeWindow();
 
@@ -76,6 +82,9 @@ namespace highlo
 			// Window is minimized
 			return false;
 		}
+
+		Renderer::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
+		OnResize(event.GetWidth(), event.GetHeight());
 
 		auto &fbs = FramebufferPool::GetGlobal()->GetAll();
 		for (auto &fb : fbs)

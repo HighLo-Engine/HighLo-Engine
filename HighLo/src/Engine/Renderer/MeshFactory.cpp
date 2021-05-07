@@ -1,9 +1,6 @@
 #include "HighLoPch.h"
 #include "MeshFactory.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace highlo
 {
 	Ref<Mesh> MeshFactory::CreateCube(const glm::vec3 &size)
@@ -86,7 +83,7 @@ namespace highlo
 
 	Ref<Mesh> MeshFactory::CreateSphere(float radius)
 	{
-		const float PI = 3.14159265359f;
+		const float PI = HL_PI;
 		float sectorCount = 36;
 		float stackCount = 18;
 		MeshData data;

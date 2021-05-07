@@ -1,6 +1,9 @@
 #include "HighLoPch.h"
 #include "Animation.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 namespace highlo
 {
 	glm::mat4 BoneTransform::GetLocalTransform()

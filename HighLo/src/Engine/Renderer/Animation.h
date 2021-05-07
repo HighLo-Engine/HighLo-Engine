@@ -1,4 +1,8 @@
 #pragma once
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 #include "Engine/Core/HLTime.h"
 #include "Engine/Math/HLMath.h"
 #include <vector>

@@ -1,16 +1,17 @@
 #pragma once
 
-#include "Engine/Core/DataTypes/HLString.h"
-#include "UniformBufferSlotMappings.h"
 #include <vector>
 #include <map>
+
+#include "Engine/Core/DataTypes/HLString.h"
+#include "UniformBufferSlotMappings.h"
 
 namespace highlo
 {
 	struct UniformVariable
 	{
 		UniformVariable() {}
-		UniformVariable(const std::string& name, uint32_t size)
+		UniformVariable(const HLString &name, uint32 size)
 			: Name(name), Size(size)
 		{
 		}

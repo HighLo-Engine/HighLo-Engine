@@ -9,12 +9,19 @@ namespace highlo
 	class Transform
 	{
 	public:
+
+		static Transform OriginTransform;
+
 		HLAPI Transform() = default;
 
 		HLAPI Transform& Translate(const glm::vec3 &translation);
 		HLAPI Transform& Scale(const glm::vec3 &scale);
 		HLAPI Transform& Scale(float scale);
 		HLAPI Transform& Rotate(float angle, const glm::vec3 &axis);
+
+		HLAPI static Transform FromPosition(const glm::vec3 &position);
+		HLAPI static Transform FromRotation(const glm::vec3 &rotation);
+		HLAPI static Transform FromScale(const glm::vec3 &scale);
 
 		HLAPI void SetPosition(const glm::vec3& position);
 		HLAPI void SetRotation(const glm::vec3& rotation);
@@ -36,11 +43,6 @@ namespace highlo
 		{
 			return !(*this == other);
 		}
-
-		HLAPI static Transform FromPosition(const glm::vec3& position);
-		HLAPI static Transform FromRotation(const glm::vec3& rotation);
-		HLAPI static Transform FromScale(const glm::vec3& scale);
-		static Transform OriginTransform;
 
 	private:
 

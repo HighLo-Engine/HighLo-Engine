@@ -1,6 +1,14 @@
 #include "HighLoPch.h"
 #include "HLMath.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/norm.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#include "Engine/Core/Profiler/HLProfilerTimer.h"
 #include "Engine/Window/Window.h"
 
 namespace highlo
@@ -79,47 +87,194 @@ namespace highlo
 
 		// Now get the scale and shear
 		glm::vec3 row[3];
-		glm::vec3 pdum3;
 
 		for (glm::length_t i = 0; i < 3; ++i)
 			for (glm::length_t j = 0; j < 3; ++j)
 				row[i][j] = localMatrix[i][j];
+
+		// Compute X scale factor and normalize first row
+		scale.x = glm::length(row[0]);
+		row[0] = glm::detail::scale(row[0], 1.0f);
+		
+		scale.y = glm::length(row[1]);
+		row[1] = glm::detail::scale(row[1], 1.0f);
+
+		scale.z = glm::length(row[2]);
+		row[2] = glm::detail::scale(row[2], 1.0f);
+
+		// Get the rotation
+		if (cos(rotation.y) != 0)
+		{
+			rotation.x = atan2(row[1][2], row[2][2]);
+			rotation.z = atan2(row[0][1], row[0][0]);
+		}
+		else
+		{
+			rotation.x = atan2(-row[2][0], row[1][1]);
+			rotation.z = 0.0f;
+		}
 
 		return true;
 	}
 
 	bool DecomposeTranslation(const glm::mat4 &transform, glm::vec3 &translation)
 	{
+		glm::mat4 localMatrix(transform);
+
+		// normalize the matrix
+		if (glm::epsilonEqual(localMatrix[3][3], 0.0f, glm::epsilon<float>()))
+			return false;
+
+		// First isolate the perspective
+		if (glm::epsilonNotEqual(localMatrix[0][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[1][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[2][3], 0.0f, glm::epsilon<float>()))
+		{
+			localMatrix[0][3] = localMatrix[1][3] = 0.0f;
+			localMatrix[3][3] = 1.0f;
+		}
+
+		// Next take care of translation
+		translation = glm::vec3(localMatrix[3]);
+		localMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, localMatrix[3].w);
+
 		return false;
 	}
 
 	bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale)
 	{
+		glm::mat4 localMatrix(transform);
+
+		// normalize the matrix
+		if (glm::epsilonEqual(localMatrix[3][3], 0.0f, glm::epsilon<float>()))
+			return false;
+
+		// First isolate the perspective
+		if (glm::epsilonNotEqual(localMatrix[0][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[1][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[2][3], 0.0f, glm::epsilon<float>()))
+		{
+			localMatrix[0][3] = localMatrix[1][3] = 0.0f;
+			localMatrix[3][3] = 1.0f;
+		}
+
+		// Next take care of translation - just unset it in the matrix because the user does not want to know about it
+		localMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, localMatrix[3].w);
+
+		// Now get the scale and shear
+		glm::vec3 row[3];
+
+		for (glm::length_t i = 0; i < 3; ++i)
+			for (glm::length_t j = 0; j < 3; ++j)
+				row[i][j] = localMatrix[i][j];
+
+		// Compute X scale factor and normalize first row
+		scale.x = glm::length(row[0]);
+		row[0] = glm::detail::scale(row[0], 1.0f);
+
+		scale.y = glm::length(row[1]);
+		row[1] = glm::detail::scale(row[1], 1.0f);
+
+		scale.z = glm::length(row[2]);
+		row[2] = glm::detail::scale(row[2], 1.0f);
+
 		return false;
 	}
 
 	bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation)
 	{
+		glm::mat4 localMatrix(transform);
+
+		// normalize the matrix
+		if (glm::epsilonEqual(localMatrix[3][3], 0.0f, glm::epsilon<float>()))
+			return false;
+
+		// First isolate the perspective
+		if (glm::epsilonNotEqual(localMatrix[0][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[1][3], 0.0f, glm::epsilon<float>()) ||
+			glm::epsilonNotEqual(localMatrix[2][3], 0.0f, glm::epsilon<float>()))
+		{
+			localMatrix[0][3] = localMatrix[1][3] = 0.0f;
+			localMatrix[3][3] = 1.0f;
+		}
+
+		// Next take care of translation - just unset it in the matrix because the user does not want to know about it
+		localMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, localMatrix[3].w);
+
+		// Now get the scale and shear
+		glm::vec3 row[3];
+
+		// Even though the transform is a 4x4 matrix, we don't really need the fourth dimension upon this point
+		for (glm::length_t i = 0; i < 3; ++i)
+			for (glm::length_t j = 0; j < 3; ++j)
+				row[i][j] = localMatrix[i][j];
+
+		// Compute X scale factor and normalize first row - just unset it in the matrix because the user does not want to know about it
+		row[0] = glm::detail::scale(row[0], 1.0f);
+		row[1] = glm::detail::scale(row[1], 1.0f);
+		row[2] = glm::detail::scale(row[2], 1.0f);
+
+		// Get the rotation
+		if (cos(rotation.y) != 0)
+		{
+			rotation.x = atan2(row[1][2], row[2][2]);
+			rotation.z = atan2(row[0][1], row[0][0]);
+		}
+		else
+		{
+			rotation.x = atan2(-row[2][0], row[1][1]);
+			rotation.z = 0.0f;
+		}
+
 		return false;
 	}
 	
-	void CreateCacheSin()
+	void CreateCacheSin(float cacheSize)
 	{
+		// The idea is to pre-run a wide variation of values with the Sin function and store the results in some sort of table that the engine can look up during runtime
+		// this would be much faster because sin() and cos() are expensive to calculate
+		HL_PROFILE_FUNCTION();
+
+		for (float i = 0.0f; i <= cacheSize; i += 0.5f)
+			s_CachedSin.insert({ i, ::sin(i) });
 	}
 
-	void CreateCacheCos()
+	void CreateCacheCos(float cacheSize)
 	{
+		// The idea is to pre-run a wide variation of values with the Sin function and store the results in some sort of table that the engine can look up during runtime
+		// this would be much faster because sin() and cos() are expensive to calculate
+
+		HL_PROFILE_FUNCTION();
+
+		for (float i = 0.0f; i <= cacheSize; i += 0.5f)
+			s_CachedCos.insert({ i, ::cos(i) });
 	}
 	
 	float Sin(float value)
 	{
-		// Temp - later the values of CreateCacheSin should be used
-		return ::sin(value);
+		HL_PROFILE_FUNCTION();
+
+		if (s_CachedSin.find(value) == s_CachedSin.end())
+		{
+			// Cache miss - value is not cached yet
+			HL_WARN("Cache miss at sinus cache - caching value {0}", value);
+			s_CachedSin.insert({ value, ::sin(value) });
+		}
+
+		return s_CachedSin[value];
 	}
 	
 	float Cos(float value)
 	{
-		// Temp - later the values of CreateCacheCos should be used
-		return ::cos(value);
+		HL_PROFILE_FUNCTION();
+
+		if (s_CachedCos.find(value) == s_CachedCos.end())
+		{
+			// cache miss - value is not cached yet
+			HL_WARN("Cache miss at cosinus cache - caching value {0}", value);
+			s_CachedCos.insert({ value, ::cos(value) });
+		}
+
+		return s_CachedCos[value];
 	}
 }

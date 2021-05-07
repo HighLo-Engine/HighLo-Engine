@@ -98,7 +98,8 @@ namespace highlo
 	
 	Ref<Texture> Material::GetTexture(uint64 idx)
 	{
-		return m_Textures.at(idx);
+		HL_ASSERT(idx < m_Textures.size());
+		return m_Textures[idx];
 	}
 
 	void Material::Bind(bool update_properties)
@@ -106,7 +107,7 @@ namespace highlo
 		if (update_properties)
 			ApplyNewProperties();
 
-		for (uint32 i = 0; i < GetTextureCount(); i++)
-			m_Textures.at(i)->Bind(i);
+		for (uint32 i = 0; i < GetTextureCount(); ++i)
+			m_Textures[i]->Bind(i);
 	}
 }

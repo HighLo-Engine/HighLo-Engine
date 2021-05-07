@@ -58,10 +58,15 @@ void Sandbox::OnImGuiRender()
 	ImGuiRenderer::StartWindow("Material Editing");
 	ImGuiRenderer::BeginChild("Material Properties", 400, 400);
 
-	ImGuiRenderer::ColorPicker("Color", m_Sphere->m_Material->Properties.m_RenderProperties.m_Color);
-	ImGuiRenderer::SliderFloat("Roughness", m_Sphere->m_Material->Properties.m_RenderProperties.m_Roughness, 0, 1);
-	ImGuiRenderer::SliderFloat("Metallic", m_Sphere->m_Material->Properties.m_RenderProperties.m_Metallic, 0, 1);
+	ImGuiRenderer::Property("Color", m_Sphere->m_Material->Properties.m_RenderProperties.m_Color, PropertyFlag::Color);
+	ImGuiRenderer::Property("Roughness", m_Sphere->m_Material->Properties.m_RenderProperties.m_Roughness, 0, 1);
+	ImGuiRenderer::Property("Metallic", m_Sphere->m_Material->Properties.m_RenderProperties.m_Metallic, 0, 1);
 
 	ImGuiRenderer::EndChild();
 	ImGuiRenderer::EndWindow();
+}
+
+void Sandbox::OnResize(uint32 width, uint32 height)
+{
+	m_Camera->OnWindowResize(width, height);
 }

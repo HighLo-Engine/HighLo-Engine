@@ -9,7 +9,7 @@ namespace highlo
 	{
 	public:
 		HLAPI virtual void Update() = 0;
-		HLAPI virtual void OnWindowResize(unsigned int width, unsigned int height) = 0;
+		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) = 0;
 		HLAPI virtual void OnEvent(Event& e) = 0;
 
 		HLAPI const glm::mat4& GetProjection() const { return m_ProjectionMatrix; }

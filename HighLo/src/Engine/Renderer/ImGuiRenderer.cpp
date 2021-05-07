@@ -286,7 +286,7 @@ namespace highlo
         if (flags == PropertyFlag::Slider)
             changed = ImGui::SliderFloat(*GenerateID(name), &value, min, max);
         else
-            changed = ImGui::DragFloat(*GenerateID(name), &value, 1.0f, min, max);
+            changed = ImGui::DragFloat(*GenerateID(name), &value, 0.1f, min, max);
 
         ImGui::PopItemWidth();
         ImGui::NextColumn();
@@ -311,7 +311,7 @@ namespace highlo
         if (flags == PropertyFlag::Slider)
             changed = ImGui::SliderFloat2(*GenerateID(name), &value[0], min, max);
         else
-            changed = ImGui::DragFloat2(*GenerateID(name), &value[0], 1.0f, min, max);
+            changed = ImGui::DragFloat2(*GenerateID(name), &value[0], 0.1f, min, max);
 
         ImGui::PopItemWidth();
         ImGui::NextColumn();
@@ -334,11 +334,11 @@ namespace highlo
 
         bool changed = false;
         if ((int32) flags & (int32) PropertyFlag::Color)
-            changed = ImGui::ColorEdit3(*GenerateID(name), &value[0], ImGuiColorEditFlags_NoInputs);
+            changed = ImGui::ColorPicker3(*GenerateID(name), &value[0], ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip);
         else if (flags == PropertyFlag::Slider)
             changed = ImGui::SliderFloat3(*GenerateID(name), &value[0], min, max);
         else
-            changed = ImGui::DragFloat3(*GenerateID(name), &value[0], 1.0f, min, max);
+            changed = ImGui::DragFloat3(*GenerateID(name), &value[0], 0.1f, min, max);
 
         ImGui::PopItemWidth();
         ImGui::NextColumn();
@@ -361,11 +361,11 @@ namespace highlo
 
         bool changed = false;
         if ((int32) flags & (int32) PropertyFlag::Color)
-            changed = ImGui::ColorEdit4(*GenerateID(name), &value[0], ImGuiColorEditFlags_NoInputs);
+            changed = ImGui::ColorPicker4(*GenerateID(name), &value[0], ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip);
         else if (flags == PropertyFlag::Slider)
             changed = ImGui::SliderFloat4(*GenerateID(name), &value[0], min, max);
         else
-            changed = ImGui::DragFloat4(*GenerateID(name), &value[0], 1.0f, min, max);
+            changed = ImGui::DragFloat4(*GenerateID(name), &value[0], 0.1f, min, max);
 
         ImGui::PopItemWidth();
         ImGui::NextColumn();

@@ -37,6 +37,29 @@ namespace highlo
 		return *this;
 	}
 
+	Transform Transform::FromPosition(const glm::vec3 &position)
+	{
+		Transform transform;
+		transform.Translate(position);
+		return transform;
+	}
+
+	Transform Transform::FromRotation(const glm::vec3 &rotation)
+	{
+		Transform transform;
+		transform.Rotate(rotation.x, { 1, 0, 0 });
+		transform.Rotate(rotation.y, { 0, 1, 0 });
+		transform.Rotate(rotation.z, { 0, 0, 1 });
+		return transform;
+	}
+
+	Transform Transform::FromScale(const glm::vec3 &scale)
+	{
+		Transform transform;
+		transform.Scale(scale);
+		return transform;
+	}
+
 	void Transform::SetPosition(const glm::vec3& position)
 	{
 		m_Position = position;
@@ -47,12 +70,17 @@ namespace highlo
 
 	void Transform::SetRotation(const glm::vec3& rotation)
 	{
-		float cy = cos(glm::radians(rotation.x) * 0.5f);
-		float sy = sin(glm::radians(rotation.x) * 0.5f);
-		float cp = cos(glm::radians(rotation.y) * 0.5f);
-		float sp = sin(glm::radians(rotation.y) * 0.5f);
-		float cr = cos(glm::radians(rotation.z) * 0.5f);
-		float sr = sin(glm::radians(rotation.z) * 0.5f);
+		const float xr = glm::radians(rotation.x);
+		const float yr = glm::radians(rotation.y);
+		const float zr = glm::radians(rotation.z);
+
+		const float cy = cos(xr * 0.5f);
+		const float sy = sin(xr * 0.5f);
+		const float cp = cos(yr * 0.5f);
+		const float sp = sin(yr * 0.5f);
+		const float cr = cos(zr * 0.5f);
+		const float sr = sin(zr * 0.5f);
+
 		m_Rotation.w = cy * cp * cr + sy * sp * sr;
 		m_Rotation.x = cy * cp * sr - sy * sp * cr;
 		m_Rotation.y = sy * cp * sr + cy * sp * cr;
@@ -65,6 +93,9 @@ namespace highlo
 	void Transform::SetScale(const glm::vec3& scale)
 	{
 		m_Scale = scale;
+
+		m_Transform = glm::translate(glm::mat4(1.0f), m_Position) *
+			glm::scale(glm::mat4(1.0f), m_Scale) * glm::mat4_cast(m_Rotation);
 	}
 
 	void Transform::SetScale(float scale)
@@ -73,28 +104,5 @@ namespace highlo
 
 		m_Transform = glm::translate(glm::mat4(1.0f), m_Position) *
 			glm::scale(glm::mat4(1.0f), m_Scale) * glm::mat4_cast(m_Rotation);
-	}
-	
-	Transform Transform::FromPosition(const glm::vec3& position)
-	{
-		Transform transform;
-		transform.Translate(position);
-		return transform;
-	}
-
-	Transform Transform::FromRotation(const glm::vec3& rotation)
-	{
-		Transform transform;
-		transform.Rotate(rotation.x, { 1, 0, 0 });
-		transform.Rotate(rotation.y, { 0, 1, 0 });
-		transform.Rotate(rotation.z, { 0, 0, 1 });
-		return transform;
-	}
-	
-	Transform Transform::FromScale(const glm::vec3& scale)
-	{
-		Transform transform;
-		transform.Scale(scale);
-		return transform;
 	}
 }

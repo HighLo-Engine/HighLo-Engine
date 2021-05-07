@@ -27,11 +27,13 @@ namespace highlo
 
 	void CoreRenderer::Shutdown() {}
 
-	void CoreRenderer::BeginScene(const ICamera& camera)
+	void CoreRenderer::BeginScene(const ICamera& camera, const Light& light)
 	{
 		s_SceneData.m_ProjectionMatrix	= camera.GetProjection();
 		s_SceneData.m_ViewMatrix		= camera.GetViewMatrix();
 		s_SceneData.m_CameraPosition	= camera.GetPosition();
+		s_SceneData.m_LightPosition		= light.Position;
+		s_SceneData.m_LightColor		= light.Color * light.Intensity;
 
 		auto scene_buffer = s_DefaultMaterial->m_StaticShader->GetBuffer("VS_SceneBuffer");
 		scene_buffer->SetBufferValue(&s_SceneData);

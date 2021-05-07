@@ -2,6 +2,7 @@
 
 #include "Material.h"
 #include "Mesh.h"
+#include "Light.h"
 #include "Engine/Camera/ICamera.h"
 #include "Engine/Math/Transform.h"
 
@@ -13,7 +14,7 @@ namespace highlo
 		HLAPI static void Init();
 		HLAPI static void Shutdown();
 
-		HLAPI static void BeginScene(const ICamera& camera);
+		HLAPI static void BeginScene(const ICamera& camera, const Light& light = Light());
 		HLAPI static void EndScene();
 
 		HLAPI static void DrawCube(const glm::vec3& position, float size = 1.0f, float rotation = 0.0f, const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f));
@@ -47,6 +48,10 @@ namespace highlo
 			glm::mat4 m_ViewMatrix;
 			glm::vec3 m_CameraPosition;
 			float	  m_Padding01;
+			glm::vec3 m_LightPosition;
+			float	  m_Padding02;
+			glm::vec3 m_LightColor;
+			float	  m_Padding03;
 		};
 
 		static SceneData s_SceneData;

@@ -11,6 +11,10 @@ layout (std140, binding = 0) uniform VS_SceneBuffer
 	mat4 u_ViewMatrix;
 	vec3 u_CameraPosition;
 	float u_Padding01;
+    vec3 u_LightPosition;
+    float u_Padding02;
+    vec3 u_LightColor;
+    float u_Padding03;
 };
 
 layout (std140, binding = 1) uniform VS_ObjectBuffer
@@ -24,6 +28,8 @@ out VS_TO_PS
 	vec3 Normal;
 	vec3 WorldPosition;
 	vec3 CameraPosition;
+    vec3 LightPosition;
+    vec3 LightColor;
 } VS_Output;
 
 void main()
@@ -36,6 +42,8 @@ void main()
 	VS_Output.Normal = mat3(u_Transform) * in_Normal;
 	VS_Output.WorldPosition = vec3(WorldPosition);
 	VS_Output.CameraPosition = u_CameraPosition;
+    VS_Output.LightPosition = u_LightPosition;
+    VS_Output.LightColor = u_LightColor;
 
 	gl_Position = FinalPosition;
 }
@@ -65,6 +73,8 @@ in VS_TO_PS
 	vec3 Normal;
 	vec3 WorldPosition;
 	vec3 CameraPosition;
+    vec3 LightPosition;
+    vec3 LightColor;
 } PS_Input;
 
 out vec4 out_Color;
@@ -123,9 +133,6 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 
-const vec3 LightPosition = vec3(0.0f,  8.0f, -10.0f);
-const vec3 LightColor = vec3(700.0f, 700.0f, 700.0f);
-
 void main()
 {
     vec4 TextureColor = CalculateTextureColor();
@@ -138,11 +145,11 @@ void main()
     vec3 Lo = vec3(0.0);
 
 	 // calculate light radiance
-	vec3 L = normalize(LightPosition - PS_Input.WorldPosition);
+	vec3 L = normalize(PS_Input.LightPosition - PS_Input.WorldPosition);
     vec3 H = normalize(V + L);
-    float distance = length(LightPosition - PS_Input.WorldPosition);
+    float distance = length(PS_Input.LightPosition - PS_Input.WorldPosition);
     float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = LightColor * attenuation;
+    vec3 radiance = PS_Input.LightColor * attenuation;
 
 	// Cook-Torrance BRDF
     float NDF = DistributionGGX(N, H, u_Roughness);   

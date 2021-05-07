@@ -42,7 +42,12 @@ namespace highlo
 			{
 				UniformVariable("u_ProjectionMatrix", sizeof(glm::mat4)),
 				UniformVariable("u_ViewMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_CameraPosition", sizeof(glm::vec3))
+				UniformVariable("u_CameraPosition", sizeof(glm::vec3)),
+				UniformVariable("u_Padding01", sizeof(float)),
+				UniformVariable("u_LightPosition", sizeof(glm::vec3)),
+				UniformVariable("u_Padding02", sizeof(float)),
+				UniformVariable("u_LightColor", sizeof(glm::vec3)),
+				UniformVariable("u_Padding03", sizeof(float))
 			},
 			UniformBufferParentShader::VERTEX_SHADER,
 			(uint32)HL_UB_SLOT::VS_SCENE_BUFFER

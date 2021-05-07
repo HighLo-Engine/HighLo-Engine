@@ -17,6 +17,15 @@ namespace highlo
 	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new DX11RenderingAPI());
 #endif // HIGHLO_API_DX11
 
+	struct RendererData
+	{
+		RendererConfig Config;
+		Ref<Texture3D> BlackCubeTexture;
+		Ref<Environment> EmptyEnvironment;
+	};
+
+	static RendererData *s_Data = nullptr;
+
 	void Renderer::ClearScreenColor(const glm::vec4& color)
 	{
 		s_RenderingAPI->ClearScreenColor(color);
@@ -39,6 +48,12 @@ namespace highlo
 
 	void Renderer::Init(Window* window)
 	{
+		s_Data = new RendererData();
+
+		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
+		s_Data->BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
+		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
+
 		CoreRenderer::Init();
 		ImGuiRenderer::Init(window);
 	}
@@ -47,5 +62,27 @@ namespace highlo
 	{
 		ImGuiRenderer::Shutdown();
 		CoreRenderer::Shutdown();
+
+		delete s_Data;
+	}
+
+	Ref<Texture3D> Renderer::GetBlackCubeTexture()
+	{
+		return s_Data->BlackCubeTexture;
+	}
+
+	Ref<Environment> Renderer::GetEmptyEnvironment()
+	{
+		return s_Data->EmptyEnvironment;
+	}
+
+	RendererConfig &Renderer::GetConfig()
+	{
+		return s_Data->Config;
+	}
+
+	Ref<Environment> Renderer::CreateEnvironment(const HLString &path)
+	{
+		return s_RenderingAPI->CreateEnvironment(path);
 	}
 }

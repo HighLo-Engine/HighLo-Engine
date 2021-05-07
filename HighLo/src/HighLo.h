@@ -33,6 +33,7 @@
 #include "Engine/Renderer/CoreRenderer.h"
 #include "Engine/Renderer/RenderingAPI.h"
 #include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Environment.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/UniformBuffer.h"
 #include "Engine/Renderer/UniformBufferSlotMappings.h"

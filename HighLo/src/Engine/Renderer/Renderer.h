@@ -3,22 +3,35 @@
 #include "RenderingAPI.h"
 #include "CoreRenderer.h"
 #include "ImGuiRenderer.h"
+#include "Texture.h"
+#include "Environment.h"
 
 namespace highlo
 {
 	class Window;
 
+	struct RendererConfig
+	{
+		bool ComputeEnvironmentMaps = true;
+	};
+
 	class Renderer
 	{
 	public:
-		static HLAPI void ClearScreenColor(const glm::vec4& color);
-		static HLAPI void ClearScreenBuffers();
+		HLAPI static void ClearScreenColor(const glm::vec4 &color);
+		HLAPI static void ClearScreenBuffers();
 
-		static HLAPI void SetWireframe(bool wf);
-		static HLAPI void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
+		HLAPI static void SetWireframe(bool wf);
+		HLAPI static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
 
-		static HLAPI void Init(Window* window);
-		static HLAPI void Shutdown();
+		HLAPI static void Init(Window *window);
+		HLAPI static void Shutdown();
+
+		HLAPI static Ref<Texture3D> GetBlackCubeTexture();
+		HLAPI static Ref<Environment> GetEmptyEnvironment();
+		HLAPI static RendererConfig &GetConfig();
+
+		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
 
 	private:
 		static UniqueRef<RenderingAPI> s_RenderingAPI;

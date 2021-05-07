@@ -12,7 +12,7 @@ namespace highlo
 {
 	OpenGLTexture2D* OpenGLTexture2D::LoadFromFile(const HLString& filepath, ImageFormat format, bool flip_on_load)
 	{
-		int width, height, channels;
+		int32 width, height, channels;
 		stbi_set_flip_vertically_on_load(flip_on_load);
 
 		stbi_uc* data = stbi_load(*filepath, &width, &height, &channels, STBI_rgb_alpha);
@@ -24,6 +24,7 @@ namespace highlo
 		}
 
 		OpenGLTexture2D* instance = new OpenGLTexture2D(data, width, height, format);
+		instance->Format = format;
 		HL_CORE_INFO("Texture2D>    [+] Loaded " + filepath + " [+]");
 
 		return instance;
@@ -78,6 +79,7 @@ namespace highlo
 			instance = new OpenGLTexture2D(data, width, height, format);
 
 			instance->m_ImageData = new unsigned char[(uint64)width * (uint64)height * (uint64)4];
+			instance->Format = format;
 			memcpy_s(instance->m_ImageData, ((uint64)width * (uint64)height * (uint64)4), data, ((uint64)width * (uint64)height * (uint64)4));
 
 			delete[] data;
@@ -101,6 +103,7 @@ namespace highlo
 			instance = new OpenGLTexture2D(data, width, height, format);
 
 			instance->m_ImageData = new uint16[(uint64)width * (uint64)height * (uint64)4];
+			instance->Format = format;
 			memcpy_s(instance->m_ImageData, ((uint64)width * (uint64)height * (uint64)8), data, ((uint64)width * (uint64)height * (uint64)8));
 
 			delete[] data;
@@ -132,6 +135,7 @@ namespace highlo
 			}
 		}
 
+		Format = format;
 		m_DataFormat = GL_RGBA;
 
 		glGenTextures(1, &m_ID);

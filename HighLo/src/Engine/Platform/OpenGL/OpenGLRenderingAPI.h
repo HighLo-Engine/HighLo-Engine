@@ -16,8 +16,11 @@ namespace highlo
 		virtual void DrawIndexed(Ref<VertexArray>& va) override;
 		virtual void DrawInstanced(Ref<VertexArray>& va, uint32 count) override;
 		virtual void DrawIndexedControlPointPatchList(Ref<VertexArray>& va) override;
+
 		virtual void SetWireframe(bool wf) override;
 		virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
+
+		virtual Ref<Environment> CreateEnvironment(const HLString &path) override;
 	};
 }
 

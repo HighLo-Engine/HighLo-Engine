@@ -69,6 +69,11 @@ namespace highlo
 
 		DX11Resources::s_DeviceContext->RSSetViewports(1, &viewport);
 	}
+
+	Ref<Environment> DX11RenderingAPI::CreateEnvironment(const HLString &path)
+	{
+		return Ref<Environment>();
+	}
 }
 
 #endif // HIGHLO_API_DX11

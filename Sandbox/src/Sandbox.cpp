@@ -11,6 +11,8 @@ void Sandbox::OnInitialize()
 	m_Camera = FPSCamera::Create();
 	m_Camera->SetYaw(90);
 	
+	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
+
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);
 
 	auto albedo		= Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg");

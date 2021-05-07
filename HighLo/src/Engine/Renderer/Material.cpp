@@ -14,6 +14,13 @@ namespace highlo
 	{
 		CreateShaders();
 		ApplyNewProperties();
+
+		// Setting default textures
+		SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_NORMAL, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_METALLIC, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, nullptr);
 	}
 
 	void Material::CreateShaders()
@@ -91,15 +98,28 @@ namespace highlo
 		m_MaterialDataBuffer->UploadToShader();
 	}
 
-	void Material::AddTexture(const Ref<Texture>& texture)
+	void Material::SetTexture(int32 type, Ref<Texture> texture)
 	{
-		m_Textures.push_back(texture);
-	}
-	
-	Ref<Texture> Material::GetTexture(uint64 idx)
-	{
-		HL_ASSERT(idx < m_Textures.size());
-		return m_Textures[idx];
+		static Ref<Texture> s_DefaultAlbedo    = Texture2D::CreateFromColor({ 255, 255, 255 });
+		static Ref<Texture> s_DefaultNormal    = Texture2D::CreateFromColor({ 0, 0, 255 });
+		static Ref<Texture> s_DefaultMetallic  = Texture2D::CreateFromColor({ 12.75f, 0, 255 });
+		static Ref<Texture> s_DefaultRoughness = Texture2D::CreateFromColor({ 219.3f, 219.3f, 219.3f });
+		static Ref<Texture> s_DefaultAO		   = Texture2D::CreateFromColor({ 255, 255, 255 });
+
+		if (!texture)
+		{
+			switch (type)
+			{
+			case HL_MATERIAL_TEXTURE_ALBEDO:				{ texture = s_DefaultAlbedo; break; }
+			case HL_MATERIAL_TEXTURE_NORMAL:				{ texture = s_DefaultNormal; break; }
+			case HL_MATERIAL_TEXTURE_METALLIC:				{ texture = s_DefaultMetallic; break; }
+			case HL_MATERIAL_TEXTURE_ROUGHNESS:				{ texture = s_DefaultRoughness; break; }
+			case HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION:		{ texture = s_DefaultAO; break; }
+			default: break;
+			}
+		}
+
+		m_Textures[type] = texture;
 	}
 
 	void Material::Bind(bool update_properties)
@@ -107,7 +127,7 @@ namespace highlo
 		if (update_properties)
 			ApplyNewProperties();
 
-		for (uint32 i = 0; i < GetTextureCount(); ++i)
-			m_Textures[i]->Bind(i);
+		for (auto const& [slot, texture] : m_Textures)
+			texture->Bind(slot);
 	}
 }

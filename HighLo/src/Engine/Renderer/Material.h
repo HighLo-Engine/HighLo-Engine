@@ -3,10 +3,16 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Engine/Math/HLMath.h"
-#include <vector>
+#include <map>
 
 namespace highlo
 {
+#define HL_MATERIAL_TEXTURE_ALBEDO				0
+#define HL_MATERIAL_TEXTURE_NORMAL				1
+#define HL_MATERIAL_TEXTURE_METALLIC			2
+#define HL_MATERIAL_TEXTURE_ROUGHNESS			3
+#define HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION   4
+
 	struct MaterialRenderProperties
 	{
 		glm::vec4 m_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -41,14 +47,13 @@ namespace highlo
 		/// Must be called every time a property is changed and needed to be udpated.
 		/// </summary>
 
-		HLAPI void AddTexture(const Ref<Texture>& texture);
-		HLAPI Ref<Texture> GetTexture(uint64 idx);
+		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
 		HLAPI uint32 GetTextureCount() const { return (uint32)m_Textures.size(); }
 
 		HLAPI virtual void Bind(bool update_properties = true);
 
 	private:
-		std::vector<Ref<Texture>> m_Textures;
+		std::map<int32, Ref<Texture>> m_Textures;
 
 	private:
 		void CreateShaders();

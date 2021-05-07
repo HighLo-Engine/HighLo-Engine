@@ -45,9 +45,8 @@ namespace highlo
 	class OpenGLTexture3D : public Texture3D
 	{
 	public:
-
 		OpenGLTexture3D(const std::vector<HLString> &filePaths);
-		OpenGLTexture3D(ImageFormat format, uint32 width, uint32 height, const void *data);
+		OpenGLTexture3D(ImageFormat format, uint32 width, uint32 height, const void* data);
 		virtual ~OpenGLTexture3D();
 
 		virtual uint32 GetWidth() const override;
@@ -64,7 +63,6 @@ namespace highlo
 		virtual void Bind(uint32 slot) const override;
 
 	private:
-
 		uint32 m_ID = 0;
 		uint32 m_Width = 0, m_Height = 0;
 		ImageFormat m_Format;

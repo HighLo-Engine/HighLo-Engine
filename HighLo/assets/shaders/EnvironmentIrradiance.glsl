@@ -43,7 +43,7 @@ vec3 sampleHemisphere(float u1, float u2)
 
 vec3 GetCubeMapTexCoord()
 {
-	vec2 st = gl_GlobalInvocationID.xy / vec2(imageSize(outputTexture[PARAM_LEVEL]));
+	vec2 st = gl_GlobalInvocationID.xy / vec2(imageSize(o_IrradianceMap));
 	vec2 uv = 2.0 * vec2(st.x, 1.0 - st.y) - vec2(1.0);
 	
 	vec3 result;
@@ -65,7 +65,7 @@ vec3 GetCubeMapTexCoord()
 	}
 	else if (gl_GlobalInvocationID.z == 4)
 	{
-		result = vec3(uv.x, ux.y, 1.0);
+		result = vec3(uv.x, uv.y, 1.0);
 	}
 	else if (gl_GlobalInvocationID.z == 5)
 	{

@@ -9,7 +9,7 @@ namespace highlo
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const ShaderSource& source);
+		OpenGLShader(const ShaderSource& source, bool isCompute = false);
 		~OpenGLShader();
 
 		// Inherited via Shader
@@ -21,6 +21,9 @@ namespace highlo
 		void CompileGLSLProgram(const ShaderSource& source);
 
 		uint32 m_ID = 0;
+
+	private:
+		void CompileComputeShader(const ShaderSource& source);
 	};
 }
 

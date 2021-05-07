@@ -8,19 +8,49 @@
 #include "Engine/Platform/DX11/DX11Shader.h"
 #endif // HIGHLO_API_DX11
 
+#include "Engine/Math/HLMath.h"
+
 namespace highlo
 {
+	Ref<UniformBuffer> Shader::m_VS_SceneBuffer;
+
 #ifdef HIGHLO_API_OPENGL
     Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout& layout)
     {
+		static bool first_time = true;
+		if (first_time)
+		{
+			CreateVSSceneBuffer();
+			first_time = false;
+		}
+
         return Ref<OpenGLShader>::Create(source);
     }
+	
+	Ref<Shader> Shader::CreateComputeShader(const ShaderSource& source)
+	{
+		return Ref<OpenGLShader>::Create(source, true);
+	}
+
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
     Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout& layout)
     {
+		static bool first_time = true;
+		if (first_time)
+		{
+			CreateVSSceneBuffer();
+			first_time = false;
+		}
+
         return Ref<DX11Shader>::Create(source, layout);
     }
+
+	Ref<Shader> Shader::CreateComputeShader(const ShaderSource& source)
+	{
+		return Ref<DX11Shader>::Create(source, layout, true);
+	}
+
 #endif // HIGHLO_API_DX11
 
 	Ref<UniformBuffer> Shader::GetBuffer(const HLString& name)
@@ -34,6 +64,25 @@ namespace highlo
 	void Shader::AddBuffer(const HLString& name, Ref<UniformBuffer> buffer)
 	{
 		m_BufferMap[name] = buffer;
+	}
+
+	void Shader::CreateVSSceneBuffer()
+	{
+		m_VS_SceneBuffer = UniformBuffer::Create(
+			"VS_SceneBuffer",
+			{
+				UniformVariable("u_ProjectionMatrix", sizeof(glm::mat4)),
+				UniformVariable("u_ViewMatrix", sizeof(glm::mat4)),
+				UniformVariable("u_CameraPosition", sizeof(glm::vec3)),
+				UniformVariable("u_Padding01", sizeof(float)),
+				UniformVariable("u_LightPosition", sizeof(glm::vec3)),
+				UniformVariable("u_Padding02", sizeof(float)),
+				UniformVariable("u_LightColor", sizeof(glm::vec3)),
+				UniformVariable("u_Padding03", sizeof(float))
+			},
+			UniformBufferParentShader::VERTEX_SHADER,
+			(uint32)HL_UB_SLOT::VS_SCENE_BUFFER
+		);
 	}
 
 	const HLString Shader::GetDefaultEngineShaderFolder()

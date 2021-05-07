@@ -7,9 +7,12 @@
 
 namespace highlo
 {
-	OpenGLShader::OpenGLShader(const ShaderSource& source)
+	OpenGLShader::OpenGLShader(const ShaderSource& source, bool isCompute)
 	{
-		CompileGLSLProgram(source);
+		if (!isCompute)
+			CompileGLSLProgram(source);
+		else
+			CompileComputeShader(source);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -47,7 +50,7 @@ namespace highlo
 			glDeleteShader(shader_id);
 
 			HL_CORE_ERROR(info_log.data());
-			HL_CORE_ERROR("Failed to compile vertex shader");
+			HL_CORE_ERROR("Failed to compile shader");
 			return 0;
 		}
 
@@ -117,6 +120,36 @@ namespace highlo
 		if (tcs_id) glDetachShader(m_ID, tcs_id);
 		if (tes_id) glDetachShader(m_ID, tes_id);
 		if (gs_id)  glDetachShader(m_ID, gs_id);
+	}
+
+	void OpenGLShader::CompileComputeShader(const ShaderSource& source)
+	{
+		m_ID = glCreateProgram();
+
+		auto cs_id = CompileGLSLShader(source.m_ComputeShaderSrc, GL_COMPUTE_SHADER);
+
+		glAttachShader(m_ID, cs_id);
+		glLinkProgram(m_ID);
+
+		int is_linked = 0;
+		glGetProgramiv(m_ID, GL_LINK_STATUS, (int*)&is_linked);
+		if (is_linked == GL_FALSE)
+		{
+			GLint maxLength = 0;
+			glGetProgramiv(m_ID, GL_INFO_LOG_LENGTH, &maxLength);
+
+			std::vector<GLchar> info_log(maxLength);
+			glGetProgramInfoLog(m_ID, maxLength, &maxLength, &info_log[0]);
+
+			glDeleteProgram(m_ID);
+			glDeleteShader(cs_id);
+
+			HL_CORE_ERROR(info_log.data());
+			HL_CORE_ERROR("Failed to link compute shader");
+			return;
+		}
+
+		glDetachShader(m_ID, cs_id);
 	}
 }
 

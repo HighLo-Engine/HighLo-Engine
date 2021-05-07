@@ -8,7 +8,7 @@ namespace highlo
 	{
 	public:
 
-		HLAPI FPSCamera(float zNear = 0.1f, float zFar = 2000.0f, float fov = 90.0f);
+		HLAPI FPSCamera(float zNear = 0.1f, float zFar = 10000.0f, float fov = 90.0f);
 
 		// Inherited via Camera
 		HLAPI virtual void Update() override;

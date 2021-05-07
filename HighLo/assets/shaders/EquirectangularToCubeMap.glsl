@@ -31,7 +31,7 @@ vec3 GetCubeMapTexCoord()
 	}
 	else if (gl_GlobalInvocationID.z == 4)
 	{
-		result = vec3(uv.x, ux.y, 1.0);
+		result = vec3(uv.x, uv.y, 1.0);
 	}
 	else if (gl_GlobalInvocationID.z == 5)
 	{

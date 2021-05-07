@@ -18,15 +18,14 @@ namespace highlo
 
 	class Shader : public IsSharedReference
 	{
-		static const HLString GetDefaultEngineShaderFolder();
-
 	public:
-
+		static const HLString GetDefaultEngineShaderFolder();
 		static ShaderSource LoadShaderSource(const HLString& filename);
 		static ShaderSource GetDefaultEngineStaticShaderSource();
 		static ShaderSource GetDefaultEngineAnimatedShaderSource();
 
 		static Ref<Shader> Create(const ShaderSource& source, const BufferLayout& layout);
+		static Ref<Shader> CreateComputeShader(const ShaderSource& source);
 
 		virtual void Bind() const = 0;
 		virtual HLRendererID GetRendererID() = 0;
@@ -34,7 +33,13 @@ namespace highlo
 		Ref<UniformBuffer> GetBuffer(const HLString& name);
 		void AddBuffer(const HLString& name, Ref<UniformBuffer> buffer);
 
+		static Ref<UniformBuffer>& GetVSSceneUniformBuffer() { return m_VS_SceneBuffer; }
+
 	private:
 		std::map<HLString, Ref<UniformBuffer>> m_BufferMap;
+
+	private:
+		static void CreateVSSceneBuffer();
+		static Ref<UniformBuffer> m_VS_SceneBuffer;
 	};
 }

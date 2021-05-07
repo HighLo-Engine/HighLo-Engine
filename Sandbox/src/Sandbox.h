@@ -17,6 +17,7 @@ private:
 	Light m_Light;
 	Ref<FPSCamera> m_Camera;
 	Ref<Environment> m_Environment;
+	Ref<Skybox> m_Skybox;
 	
 	Ref<Mesh> m_PBR_Sphere;
 };

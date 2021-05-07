@@ -155,6 +155,7 @@ namespace highlo
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		glDeleteTextures(1, &m_ID);
+		stbi_image_free(m_ImageData);
 	}
 	
 	void* OpenGLTexture2D::GetData() const
@@ -240,13 +241,75 @@ namespace highlo
 	//												3D Texture
 	// ====================================================================================================================
 
-	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString> &filePaths)
+	/*OpenGLTexture3D* OpenGLTexture3D::LoadFromFiles(const std::vector<HLString>& filePaths)
 	{
-		// @TODO
-		HL_ASSERT(false);
+		if (filePaths.size() != 6)
+		{
+			HL_CORE_ERROR("Texture3D>    [-] Failed to load cube map. {0} out of 6 texture paths were provided [-]", filePaths.size());
+			return nullptr;
+		}
+
+		std::vector<unsigned char*> texture_data;
+
+		int width = 0, height = 0, channels;
+		for (auto& path : filePaths)
+		{
+			stbi_set_flip_vertically_on_load(0);
+
+			stbi_uc* data = stbi_load(path.C_Str(), &width, &height, &channels, STBI_rgb_alpha);
+			texture_data.push_back(data);
+
+			if (!data)
+			{
+				for (auto& tex : texture_data)
+					stbi_image_free(tex);
+
+				HL_CORE_ERROR("[-] Failed to load one of the textures in texture3D: {0} [-]", path.C_Str());
+				return nullptr;
+			}
+		}
+
+		OpenGLTexture3D* instance = new OpenGLTexture3D(ImageFormat::RGBA, width, height, texture_data);
+
+		HL_CORE_INFO("Texture3D>    [+] Loaded 6 textures starting with {0} [+]", filePaths[0].C_Str());
+		return instance;
+	}*/
+
+	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString>& filePaths)
+	{
+		m_Format = ImageFormat::RGBA;
+
+		glGenTextures(1, &m_ID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
+
+		stbi_set_flip_vertically_on_load(1);
+
+		int32 width, height, nrComponents;
+		for (uint64 i = 0; i < filePaths.size(); i++)
+		{
+			unsigned char* data = stbi_load(filePaths[i].C_Str(), &width, &height, &nrComponents, 0);
+			if (data)
+			{
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (uint32)i, 0, GL_RGB, (GLsizei)width, (GLsizei)height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+				stbi_image_free(data);
+			}
+			else
+			{
+				HL_CORE_ERROR("[-] Failed to load one of the textures in texture3D: {0} [-]", filePaths[i].C_Str());
+				stbi_image_free(data);
+			}
+		}
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		HL_CORE_INFO("Texture3D>    [+] Loaded 6 textures starting with {0} [+]", filePaths[0].C_Str());
 	}
 
-	OpenGLTexture3D::OpenGLTexture3D(ImageFormat format, uint32 width, uint32 height, const void *data)
+	OpenGLTexture3D::OpenGLTexture3D(ImageFormat format, uint32 width, uint32 height, const void* data)
 	{
 		m_Width = width;
 		m_Height = height;

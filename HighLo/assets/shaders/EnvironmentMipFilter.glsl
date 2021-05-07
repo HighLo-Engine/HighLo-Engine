@@ -62,7 +62,7 @@ float ndfGGX(float cosLH, float roughness)
 	float alpha   = roughness * roughness;
 	float alphaSq = alpha * alpha;
 
-	float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
+	float denom = (cosLH * cosLH) * (alphaSq - 1.0) + 1.0;
 	return alphaSq / (PI * denom * denom);
 }
 
@@ -90,7 +90,7 @@ vec3 GetCubeMapTexCoord()
 	}
 	else if (gl_GlobalInvocationID.z == 4)
 	{
-		result = vec3(uv.x, ux.y, 1.0);
+		result = vec3(uv.x, uv.y, 1.0);
 	}
 	else if (gl_GlobalInvocationID.z == 5)
 	{

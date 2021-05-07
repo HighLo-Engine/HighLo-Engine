@@ -51,15 +51,16 @@ namespace highlo
 
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const HLString &path)
 	{
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
 			return Renderer::GetEmptyEnvironment();
 
 		const uint32 cubemapSize = 2048;
 		const uint32 irradianceMapSize = 32;
-		static BufferLayout emptyLayout({});
 
 		ShaderSource equirectangularConversionShaderSource = Shader::LoadShaderSource("assets/shaders/EquirectangularToCubeMap.glsl");
-		Ref<Shader> equirectangularConversionShader = Shader::Create(equirectangularConversionShaderSource, emptyLayout);
+		Ref<Shader> equirectangularConversionShader = Shader::CreateComputeShader(equirectangularConversionShaderSource);
 
 		static auto environmentBuffer = UniformBuffer::Create(
 			"EnvironmentBuffer",
@@ -68,10 +69,10 @@ namespace highlo
 			(uint32)HL_UB_SLOT::ENVIRONMENT_DATA_BUFFER);
 
 		ShaderSource envFilteringShaderSource = Shader::LoadShaderSource("assets/shaders/EnvironmentMipFilter.glsl");
-		Ref<Shader> envFilteringShader = Shader::Create(envFilteringShaderSource, emptyLayout);
+		Ref<Shader> envFilteringShader = Shader::CreateComputeShader(envFilteringShaderSource);
 
 		ShaderSource envIrradianceShaderSource = Shader::LoadShaderSource("assets/shaders/EnvironmentIrradiance.glsl");
-		Ref<Shader> envIrradianceShader = Shader::Create(envIrradianceShaderSource, emptyLayout);
+		Ref<Shader> envIrradianceShader = Shader::CreateComputeShader(envIrradianceShaderSource);
 		envFilteringShader->AddBuffer("EnvironmentBuffer", environmentBuffer);
 
 		Ref<Texture3D> envUnfiltered = Texture3D::Create(ImageFormat::RGBA32F, cubemapSize, cubemapSize);
@@ -99,7 +100,7 @@ namespace highlo
 		envUnfiltered->Bind(1);
 
 		const float deltaRoughness = 1.0f / glm::max((float)(envFiltered->GetMipLevelCount() - 1.0f), 1.0f);
-		for (int32 level = 1, size = cubemapSize / 2; level < envFiltered->GetMipLevelCount(); ++level, size /= 2)
+		for (int32 level = 1, size = cubemapSize / 2; level < (int32)envFiltered->GetMipLevelCount(); ++level, size /= 2)
 		{
 			glBindImageTexture(0, envFiltered->GetRendererID(), level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 

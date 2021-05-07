@@ -34,7 +34,7 @@ namespace highlo
 		s_SceneData.m_LightPosition		= light.Position;
 		s_SceneData.m_LightColor		= light.Color * light.Intensity;
 
-		auto scene_buffer = s_DefaultMaterial->m_StaticShader->GetBuffer("VS_SceneBuffer");
+		auto scene_buffer = s_DefaultMaterial->m_StaticShader->GetVSSceneUniformBuffer();
 		scene_buffer->SetBufferValue(&s_SceneData);
 		scene_buffer->UploadToShader();
 	}
@@ -158,6 +158,11 @@ namespace highlo
 	void CoreRenderer::DrawMesh(const Ref<Mesh>& mesh, const Transform& transform)
 	{
 		RenderMesh(mesh, mesh->m_Material, transform);
+	}
+
+	void CoreRenderer::DrawRawMeshData(Ref<Mesh>& mesh)
+	{
+		RenderVertexArray(mesh->GetVertexArray());
 	}
 
 	void CoreRenderer::RenderVertexArray(Ref<VertexArray>& va)

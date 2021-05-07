@@ -54,5 +54,6 @@
 #include "Engine/Window/MenuBar.h"
 
 #include "Engine/Camera/FPSCamera.h"
+#include "Engine/Renderer/Skybox.h"
 
 #include "Engine/Loaders/AssetLoader.h"

@@ -34,6 +34,8 @@ namespace highlo
 
 		HLAPI static void DrawMesh(const Ref<Mesh>& mesh, const Transform& transform);
 
+		HLAPI static void DrawRawMeshData(Ref<Mesh>& mesh);
+
 	private:
 		// Internal helper functions
 		static void RenderVertexArray(Ref<VertexArray>& va);

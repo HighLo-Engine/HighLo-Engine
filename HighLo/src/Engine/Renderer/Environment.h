@@ -7,7 +7,6 @@ namespace highlo
 	class Environment : public IsSharedReference
 	{
 	public:
-
 		HLAPI Environment() = default;
 		HLAPI Environment(const Ref<Texture3D> &radianceMap, const Ref<Texture3D> &irradianceMap);
 

@@ -3,7 +3,7 @@
 void Sandbox::OnInitialize()
 {
 	// TO-DO: Fix for GLFW configuration.
-	//HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.ico");
+	HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.png");
 
 	m_Camera = Ref<FPSCamera>::Create();
 	m_Camera->SetYaw(90);

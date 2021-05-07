@@ -59,7 +59,7 @@ project "HighLo"
 		"HL_ENABLE_PROFILER",
 		"HIGHLO_API_OPENGL",
 		--"HIGHLO_API_DX11",
-		--"HIGHLO_API_GLFW"
+		"HIGHLO_API_GLFW"
 	}
 
     filter "system:windows"

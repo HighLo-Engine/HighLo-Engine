@@ -51,17 +51,11 @@ namespace highlo
 	{
 		HL_CORE_INFO("Loading Window Icon: {0}", *path);
 
-		int32 width, height;
-
-		stbi_set_flip_vertically_on_load(flip);
-		stbi_uc *img = stbi_load(*path, &width, &height, 0, 4);
-		GLFWimage icons[1];
-		icons[0].width = width;
-		icons[0].height = height;
-		icons[0].pixels = img;
-
-		glfwSetWindowIcon(m_NativeHandle, 1, icons);
-		stbi_image_free(icons[0].pixels);
+		GLFWimage images[1];
+		stbi_set_flip_vertically_on_load(1);
+		images[0].pixels = stbi_load(path.C_Str(), &images[0].width, &images[0].height, 0, STBI_rgb_alpha);
+		glfwSetWindowIcon(m_NativeHandle, 1, images);
+		stbi_image_free(images[0].pixels);
 	}
 
 	std::pair<int32, int32> GLFWWindow::GetWindowDimensions()

@@ -66,6 +66,8 @@ namespace highlo
 		HLAPI static bool Property(const HLString &name, glm::vec3 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::Slider);
 		HLAPI static bool Property(const HLString &name, glm::vec4 &value, PropertyFlag flags);
 		HLAPI static bool Property(const HLString &name, glm::vec4 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::Slider);
+		
+		HLAPI static void OnWindowResize(uint32 width, uint32 height);
 
 	private:
 

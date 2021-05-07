@@ -14,6 +14,8 @@ namespace highlo
 		HLAPI virtual void Update() override;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) override;
 
+		HLAPI static Ref<FPSCamera> Create(float zNear = 0.1f, float zFar = 2000.0f, float fov = 90.0f);
+
 	private:
 
 		float m_Speed = 0.01f;

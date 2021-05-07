@@ -41,18 +41,18 @@ namespace highlo
 
 	public:
 
-		List()
+		HLAPI List()
 		{
 			m_Root = nullptr;
 			m_Length = 0;
 		}
 
-		~List()
+		HLAPI ~List()
 		{
 
 		}
 
-		void Append(T value)
+		HLAPI void Append(T value)
 		{
 			if (m_Root == nullptr)
 			{
@@ -65,7 +65,7 @@ namespace highlo
 			}
 		}
 
-		void Insert(T value)
+		HLAPI void Insert(T value)
 		{
 			Node *node = new Node(value);
 			m_Length++;
@@ -74,12 +74,12 @@ namespace highlo
 			m_Root = node;
 		}
 
-		T GetFirst()
+		HLAPI T GetFirst()
 		{
 			return m_Root->m_Value;
 		}
 
-		T GetLast()
+		HLAPI T GetLast()
 		{
 			Node *current = m_Root;
 			HL_ASSERT(current, "Root was nullptr!");
@@ -92,7 +92,7 @@ namespace highlo
 			return current->m_Value;
 		}
 
-		T Get(int32 index)
+		HLAPI T Get(int32 index)
 		{
 			if (index <= 0)
 			{
@@ -124,7 +124,7 @@ namespace highlo
 			return result;
 		}
 
-		void RemoveFirst()
+		HLAPI void RemoveFirst()
 		{
 			Node *tmp = m_Root;
 			HL_ASSERT(tmp, "Root was nullptr!");
@@ -135,7 +135,7 @@ namespace highlo
 			--m_Length;
 		}
 
-		void RemoveLast()
+		HLAPI void RemoveLast()
 		{
 			if (m_Length == 1)
 			{
@@ -162,7 +162,7 @@ namespace highlo
 			}
 		}
 
-		void Remove(uint32 index)
+		HLAPI void Remove(uint32 index)
 		{
 			if (0 == index)
 			{
@@ -198,23 +198,23 @@ namespace highlo
 			}
 		}
 
-		void RemoveAll()
+		HLAPI void RemoveAll()
 		{
 			Clear();
 			delete m_Root;
 		}
 
-		bool IsEmpty()
+		HLAPI bool IsEmpty()
 		{
 			return m_Length == 0;
 		}
 
-		uint32 Size()
+		HLAPI uint32 Size()
 		{
 			return m_Length;
 		}
 
-		void Clear()
+		HLAPI void Clear()
 		{
 			if (m_Length > 0)
 			{
@@ -233,7 +233,7 @@ namespace highlo
 			}
 		}
 
-		T *ToArray()
+		HLAPI T *ToArray()
 		{
 			T *arr = new T[m_Length];
 			Node *current = m_Root;
@@ -250,7 +250,7 @@ namespace highlo
 			return arr;
 		}
 
-		void Print()
+		HLAPI void Print()
 		{
 			if (m_Length == 0)
 			{
@@ -268,7 +268,7 @@ namespace highlo
 			}
 		}
 
-		friend std::ostream &operator<<(std::ostream &stream, List<T> &list)
+		HLAPI friend std::ostream &operator<<(std::ostream &stream, List<T> &list)
 		{
 			Node *current = list.m_Root;
 			HL_ASSERT(current, "Root was nullptr!");

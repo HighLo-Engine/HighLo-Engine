@@ -26,6 +26,7 @@ namespace highlo
 	class Time
 	{
 	public:
+
 		HLAPI static float	GetElapsedTime();
 
 		HLAPI static float	GetTimeScale();

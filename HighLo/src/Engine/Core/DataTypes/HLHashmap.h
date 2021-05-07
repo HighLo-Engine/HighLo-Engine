@@ -10,14 +10,14 @@ namespace highlo
 
 	public:
 
-		HLHashmap() {}
-		~HLHashmap()
+		HLAPI HLHashmap() {}
+		HLAPI ~HLHashmap()
 		{
 			m_Elements.clear();
 			m_Elements.shrink_to_fit();
 		}
 
-		bool ContainsKey(KeyType key)
+		HLAPI bool ContainsKey(KeyType key)
 		{
 			for (auto it = m_Elements.begin(); it != m_Elements.end(); ++it)
 			{
@@ -29,7 +29,7 @@ namespace highlo
 			return false;
 		}
 
-		bool ContainsValue(ValueType value)
+		HLAPI bool ContainsValue(ValueType value)
 		{
 			for (auto it = m_Elements.begin(); it != m_Elements.end(); ++it)
 			{
@@ -41,7 +41,7 @@ namespace highlo
 			return false;
 		}
 
-		bool Put(KeyType key, ValueType value)
+		HLAPI bool Put(KeyType key, ValueType value)
 		{
 			if (!ContainsKey(key) && !ContainsValue(value))
 			{
@@ -55,7 +55,7 @@ namespace highlo
 			return false;
 		}
 
-		bool Set(KeyType key, ValueType value)
+		HLAPI bool Set(KeyType key, ValueType value)
 		{
 			if (ContainsKey(key))
 			{
@@ -74,7 +74,7 @@ namespace highlo
 			return false;
 		}
 
-		bool Remove(KeyType key, ValueType value)
+		HLAPI bool Remove(KeyType key, ValueType value)
 		{
 			if (ContainsKey(key) && ContainsValue(value))
 			{
@@ -93,7 +93,7 @@ namespace highlo
 			return false;
 		}
 
-		bool Remove(KeyType key)
+		HLAPI bool Remove(KeyType key)
 		{
 			if (ContainsKey(key))
 			{
@@ -111,55 +111,55 @@ namespace highlo
 			return false;
 		}
 
-		void RemoveAll()
+		HLAPI void RemoveAll()
 		{
 			m_Elements.clear();
 			m_Elements.shrink_to_fit();
 		}
 
-		bool RemoveFirst()
+		HLAPI bool RemoveFirst()
 		{
 			m_Elements.erase(m_Elements.begin() + 0);
 			return true;
 		}
 
-		bool RemoveLast()
+		HLAPI bool RemoveLast()
 		{
 			m_Elements.erase(m_Elements.begin() + (m_Elements.size() - 1));
 			return true;
 		}
 
-		ValueType GetFirst()
+		HLAPI ValueType GetFirst()
 		{
 			return m_Elements.at(0).second;
 		}
 
-		ValueType GetLast()
+		HLAPI ValueType GetLast()
 		{
 			return m_Elements.at(m_Elements.size() - 1).second;
 		}
 
-		ValueType GetAt(int32 i)
+		HLAPI ValueType GetAt(int32 i)
 		{
 			return m_Elements.at(i).second;
 		}
 
-		KeyType GetKey(int32 i)
+		HLAPI KeyType GetKey(int32 i)
 		{
 			return m_Elements.at(i).first;
 		}
 
-		bool IsEmpty()
+		HLAPI bool IsEmpty()
 		{
 			return m_Elements.size() == 0;
 		}
 
-		uint32 Size()
+		HLAPI uint32 Size()
 		{
 			return (uint32)m_Elements.size();
 		}
 
-		void Print()
+		HLAPI void Print()
 		{
 			for (auto it = m_Elements.begin(); it != m_Elements.end(); it++)
 			{
@@ -168,7 +168,7 @@ namespace highlo
 			}
 		}
 
-		bool HasKey(const KeyType &key) const
+		HLAPI bool HasKey(const KeyType &key) const
 		{
 			for (uint32 i = 0; i < m_Elements.size(); ++i)
 			{
@@ -180,7 +180,7 @@ namespace highlo
 			return false;
 		}
 
-		ValueType &operator[](const KeyType &key)
+		HLAPI ValueType &operator[](const KeyType &key)
 		{
 			static ValueType value;
 
@@ -197,7 +197,7 @@ namespace highlo
 			return value;
 		}
 
-		const ValueType &operator[](const KeyType &key) const
+		HLAPI const ValueType &operator[](const KeyType &key) const
 		{
 			static ValueType value;
 
@@ -214,10 +214,10 @@ namespace highlo
 			return value;
 		}
 
-		ValueType &operator[](size_t i) { HL_ASSERT(i < m_Elements.size()); return m_Elements.at(i).second; }
-		const ValueType &operator[](size_t i) const { HL_ASSERT(i < m_Elements.size()); return m_Elements.at(i).second; }
+		HLAPI ValueType &operator[](size_t i) { HL_ASSERT(i < m_Elements.size()); return m_Elements.at(i).second; }
+		HLAPI const ValueType &operator[](size_t i) const { HL_ASSERT(i < m_Elements.size()); return m_Elements.at(i).second; }
 
-		friend std::ostream &operator<<(std::ostream &stream, HLHashmap<KeyType, ValueType> &hashmap)
+		HLAPI friend std::ostream &operator<<(std::ostream &stream, HLHashmap<KeyType, ValueType> &hashmap)
 		{
 			stream << "[" << std::endl;
 			uint32 i;

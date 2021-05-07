@@ -86,5 +86,10 @@ namespace highlo
 	{
 		UpdateProjectionMatrix();
 	}
+
+	Ref<FPSCamera> FPSCamera::Create(float zNear, float zFar, float fov)
+	{
+		return Ref<FPSCamera>::Create(zNear, zFar, fov);
+	}
 }
 

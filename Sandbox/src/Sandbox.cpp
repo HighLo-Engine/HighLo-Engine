@@ -5,7 +5,10 @@ void Sandbox::OnInitialize()
 	// TO-DO: Fix for GLFW configuration.
 	//HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.ico");
 
-	m_Camera = Ref<FPSCamera>::Create();
+	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
+	VirtualFileSystem::Get()->Mount("models", "assets/models/");
+
+	m_Camera = FPSCamera::Create();
 	m_Camera->SetYaw(90);
 	
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);

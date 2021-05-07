@@ -12,6 +12,8 @@
 #include "Engine/Core/HLTime.h"
 #include "Engine/Core/HLTimer.h"
 #include "Engine/Core/SharedReference.h"
+#include "Engine/Core/HLFileSystem.h"
+#include "Engine/Core/HLVirtualFileSystem.h"
 #include "Engine/Core/Profiler/HLProfiler.h"
 #include "Engine/Core/Profiler/HLProfilerTimer.h"
 

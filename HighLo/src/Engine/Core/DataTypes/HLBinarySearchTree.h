@@ -49,19 +49,19 @@ namespace highlo
 
 	public:
 
-		BinarySearchTree()
+		HLAPI BinarySearchTree()
 		{
 			Length = 0;
 			Root = nullptr;
 		}
 
-		~BinarySearchTree()
+		HLAPI ~BinarySearchTree()
 		{
 			RemoveAll();
 			Length = 0;
 		}
 
-		void Append(T value)
+		HLAPI void Append(T value)
 		{
 			Node *node = new Node(value);
 			Node *child, *parent = nullptr;
@@ -100,8 +100,8 @@ namespace highlo
 			}
 		}
 
-		void RemoveAll() { RemoveAll(Root); }
-		void RemoveAll(Node *node)
+		HLAPI void RemoveAll() { RemoveAll(Root); }
+		HLAPI void RemoveAll(Node *node)
 		{
 			if (node == nullptr)
 				return;
@@ -113,8 +113,8 @@ namespace highlo
 			node = nullptr;
 		}
 
-		Node *Remove(T value) { return Remove(Root, value); }
-		Node *Remove(Node *node, T value)
+		HLAPI Node *Remove(T value) { return Remove(Root, value); }
+		HLAPI Node *Remove(Node *node, T value)
 		{
 			if (!node || node == Root)
 				return nullptr;
@@ -154,8 +154,8 @@ namespace highlo
 			return node;
 		}
 
-		T FindMin() { return FindMin(Root); }
-		T FindMin(Node *node)
+		HLAPI T FindMin() { return FindMin(Root); }
+		HLAPI T FindMin(Node *node)
 		{
 			Node *current = node;
 			while (current->Left)
@@ -166,8 +166,8 @@ namespace highlo
 			return current->Value;
 		}
 
-		T FindMax() { return FindMax(Root); }
-		T FindMax(Node *node)
+		HLAPI T FindMax() { return FindMax(Root); }
+		HLAPI T FindMax(Node *node)
 		{
 			Node *current = node;
 			while (current->Right)
@@ -178,8 +178,8 @@ namespace highlo
 			return current->Value;
 		}
 
-		Node *FindMinNode() { return FindMinNode(Root); }
-		Node *FindMinNode(Node *node)
+		HLAPI Node *FindMinNode() { return FindMinNode(Root); }
+		HLAPI Node *FindMinNode(Node *node)
 		{
 			Node *current = node;
 			while (current->Left)
@@ -190,8 +190,8 @@ namespace highlo
 			return current;
 		}
 
-		Node *FindMaxNode() { return FindMaxNode(Root); }
-		Node *FindMaxNode(Node *node)
+		HLAPI Node *FindMaxNode() { return FindMaxNode(Root); }
+		HLAPI Node *FindMaxNode(Node *node)
 		{
 			Node *current = node;
 			while (current->Right)
@@ -202,8 +202,8 @@ namespace highlo
 			return current;
 		}
 
-		void Invert() { Invert(Root); }
-		void Invert(Node *node)
+		HLAPI void Invert() { Invert(Root); }
+		HLAPI void Invert(Node *node)
 		{
 			if (!node)
 				return;
@@ -213,8 +213,8 @@ namespace highlo
 			Invert(node->Right);
 		}
 
-		uint32 GetHeight() { return GetHeight(Root); }
-		uint32 GetHeight(Node *node)
+		HLAPI uint32 GetHeight() { return GetHeight(Root); }
+		HLAPI uint32 GetHeight(Node *node)
 		{
 			if (node == nullptr)
 				return 0;
@@ -222,18 +222,18 @@ namespace highlo
 			return node->CalcHeight();
 		}
 
-		bool IsEmpty()
+		HLAPI bool IsEmpty()
 		{
 			return Length == 0;
 		}
 
-		uint32 Size()
+		HLAPI uint32 Size()
 		{
 			return Length;
 		}
 
-		void LevelOrder() { LevelOrder(Root); }
-		void LevelOrder(Node *node)
+		HLAPI void LevelOrder() { LevelOrder(Root); }
+		HLAPI void LevelOrder(Node *node)
 		{
 			HLQueue<Node*> q;
 			q.Enqueue(node);
@@ -253,8 +253,8 @@ namespace highlo
 			}
 		}
 
-		void PreOrder() { PreOrder(Root); }
-		void PreOrder(Node *node)
+		HLAPI void PreOrder() { PreOrder(Root); }
+		HLAPI void PreOrder(Node *node)
 		{
 			if (node == nullptr)
 				return;
@@ -264,8 +264,8 @@ namespace highlo
 			PreOrder(node->Right);
 		}
 
-		void InOrder() { InOrder(Root); }
-		void InOrder(Node *node)
+		HLAPI void InOrder() { InOrder(Root); }
+		HLAPI void InOrder(Node *node)
 		{
 			if (node == nullptr)
 				return;
@@ -275,8 +275,8 @@ namespace highlo
 			InOrder(node->Right);
 		}
 
-		void PostOrder() { PostOrder(Root); }
-		void PostOrder(Node *node)
+		HLAPI void PostOrder() { PostOrder(Root); }
+		HLAPI void PostOrder(Node *node)
 		{
 			if (node == nullptr)
 				return;

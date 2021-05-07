@@ -12,8 +12,8 @@ namespace highlo
 
 	public:
 
-		HLQueue() {}
-		~HLQueue() {}
+		HLAPI HLQueue() {}
+		HLAPI ~HLQueue() {}
 
 		/**
 		 *
@@ -21,7 +21,7 @@ namespace highlo
 		 *
 		 * @param value The Value which should be added to the Queue.
 		 */
-		void Enqueue(const T &value)
+		HLAPI void Enqueue(const T &value)
 		{
 			m_List.Append(value);
 		}
@@ -31,7 +31,7 @@ namespace highlo
 		 * Removes the last element from the Queue.
 		 *
 		 */
-		void Dequeue()
+		HLAPI void Dequeue()
 		{
 			m_List.RemoveFirst();
 		}
@@ -42,7 +42,7 @@ namespace highlo
 		 *
 		 * @return Returns the current element from the Queue.
 		 */
-		T Front()
+		HLAPI T Front()
 		{
 			return m_List.GetFirst();
 		}
@@ -53,7 +53,7 @@ namespace highlo
 		 *
 		 * @return Returns true if the Queue is empty.
 		 */
-		bool IsEmpty()
+		HLAPI bool IsEmpty()
 		{
 			return m_List.IsEmpty();
 		}
@@ -64,7 +64,7 @@ namespace highlo
 		 *
 		 * @return Returns the size of the current Queue.
 		 */
-		uint32 Size()
+		HLAPI uint32 Size()
 		{
 			return m_List.Size();
 		}
@@ -74,7 +74,7 @@ namespace highlo
 		 * Clears the Queue.
 		 *
 		 */
-		void Clear()
+		HLAPI void Clear()
 		{
 			m_List.Clear();
 		}
@@ -84,7 +84,7 @@ namespace highlo
 		 * Prints the Queue to the console.
 		 *
 		 */
-		void Print()
+		HLAPI void Print()
 		{
 			m_List.Print();
 		}
@@ -97,7 +97,7 @@ namespace highlo
 		 * @param queue The Queue, which should be written to the stream.
 		 * @return Returns the stream, which was filled with the content of the Queue.
 		 */
-		friend std::ostream &operator<<(std::ostream &stream, HLQueue<T> &queue)
+		HLAPI friend std::ostream &operator<<(std::ostream &stream, HLQueue<T> &queue)
 		{
 			while (!queue.IsEmpty())
 			{

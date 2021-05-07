@@ -12,8 +12,8 @@ namespace highlo
 
 	public:
 
-		HLStack() {}
-		~HLStack() {}
+		HLAPI HLStack() {}
+		HLAPI ~HLStack() {}
 
 		/**
 		 *
@@ -21,7 +21,7 @@ namespace highlo
 		 *
 		 * @param value The value which should be added to the stack.
 		 */
-		void Push(T value)
+		HLAPI void Push(T value)
 		{
 			m_List.Append(value);
 		}
@@ -31,7 +31,7 @@ namespace highlo
 		 * Removes the current element from the stack.
 		 *
 		 */
-		void Pop()
+		HLAPI void Pop()
 		{
 			m_List.RemoveLast();
 		}
@@ -42,7 +42,7 @@ namespace highlo
 		 *
 		 * @return Returns the current element from the stack.
 		 */
-		T Top()
+		HLAPI T Top()
 		{
 			return m_List.GetLast();
 		}
@@ -53,7 +53,7 @@ namespace highlo
 		 *
 		 * @return Returns true if the stack is empty.
 		 */
-		bool IsEmpty()
+		HLAPI bool IsEmpty()
 		{
 			return m_List.IsEmpty();
 		}
@@ -64,7 +64,7 @@ namespace highlo
 		 *
 		 * @return Returns the size of the current stack.
 		 */
-		uint32 Size()
+		HLAPI uint32 Size()
 		{
 			return m_List.Size();
 		}
@@ -74,7 +74,7 @@ namespace highlo
 		 * Clears the Stack.
 		 *
 		 */
-		void Clear()
+		HLAPI void Clear()
 		{
 			m_List.Clear();
 		}
@@ -84,7 +84,7 @@ namespace highlo
 		 * Prints the Stack to the console.
 		 *
 		 */
-		void Print()
+		HLAPI void Print()
 		{
 			m_List.Print();
 		}
@@ -98,7 +98,7 @@ namespace highlo
 		 * @return Returns the stream, which was filled with the content of the Stack.
 		 *
 		 */
-		friend std::ostream &operator<<(std::ostream &stream, HLStack<T> &stack)
+		HLAPI friend std::ostream &operator<<(std::ostream &stream, HLStack<T> &stack)
 		{
 			while (!stack.IsEmpty())
 			{

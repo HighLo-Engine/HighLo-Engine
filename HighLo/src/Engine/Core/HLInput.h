@@ -9,16 +9,16 @@ namespace highlo
 	{
 	public:
 
-		static bool IsKeyPressed(HLKeyCode keyCode);
-		static bool IsMouseButtonPressed(HLMouseButtonCode mouseButtonCode);
+		HLAPI static bool IsKeyPressed(HLKeyCode keyCode);
+		HLAPI static bool IsMouseButtonPressed(HLMouseButtonCode mouseButtonCode);
 
-		static std::pair<double, double> GetMousePosition();
-		static std::pair<double, double> GetAbsoluteMousePosition();
+		HLAPI static std::pair<double, double> GetMousePosition();
+		HLAPI static std::pair<double, double> GetAbsoluteMousePosition();
 
-		static double GetMouseX();
-		static double GetAbsoluteMouseX();
+		HLAPI static double GetMouseX();
+		HLAPI static double GetAbsoluteMouseX();
 
-		static double GetMouseY();
-		static double GetAbsoluteMouseY();
+		HLAPI static double GetMouseY();
+		HLAPI static double GetAbsoluteMouseY();
 	};
 }

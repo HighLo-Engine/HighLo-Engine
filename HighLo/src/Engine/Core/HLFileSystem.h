@@ -15,7 +15,7 @@ namespace highlo
 		 * @param path The physical path to a file on the disk.
 		 * @return Returns true if the File exists on the disk.
 		 */
-		static bool FileExists(const HLString &path);
+		HLAPI static bool FileExists(const HLString &path);
 
 		/**
 		 *
@@ -24,7 +24,7 @@ namespace highlo
 		 * @param path The physical path to a folder on the disk.
 		 * @return Returns true if the Path exists on the disk.
 		 */
-		static bool PathExists(const HLString &path);
+		HLAPI static bool PathExists(const HLString &path);
 
 		/**
 		 *
@@ -33,7 +33,7 @@ namespace highlo
 		 * @param path The physical path to a file on the disk.
 		 * @return Returns true if the File has been removed from the disk.
 		 */
-		static bool RemoveFile(const HLString &path);
+		HLAPI static bool RemoveFile(const HLString &path);
 
 		/**
 		 *
@@ -42,7 +42,7 @@ namespace highlo
 		 * @param path The physical path to a file on the disk.
 		 * @return Returns the Size of the file on the disk.
 		 */
-		static int64 GetFileSize(const HLString &path);
+		HLAPI static int64 GetFileSize(const HLString &path);
 
 		/**
 		 *
@@ -51,7 +51,7 @@ namespace highlo
 		 * @param path The physical path to a folder on the disk.
 		 * @return Returns true if the folder has been created on the disk.
 		 */
-		static bool CreateFolder(const HLString &path);
+		HLAPI static bool CreateFolder(const HLString &path);
 
 		/**
 		 *
@@ -60,7 +60,7 @@ namespace highlo
 		 * @param path The physical path to a folder on the disk.
 		 * @return Returns true if the folder has been removed from the disk.
 		 */
-		static bool RemoveFolder(const HLString &path);
+		HLAPI static bool RemoveFolder(const HLString &path);
 
 		/**
 		 *
@@ -70,7 +70,7 @@ namespace highlo
 		 * @param outSize The Size of a file, that gets set inside this function.
 		 * @return Returns the Data read from the File or nullptr on failure.
 		 */
-		static Byte *ReadFile(const HLString &path, int64 *outSize);
+		HLAPI static Byte *ReadFile(const HLString &path, int64 *outSize);
 
 		/**
 		 *
@@ -79,7 +79,7 @@ namespace highlo
 		 * @param path The physical path to a file on the disk.
 		 * @return Returns the Data read from the File or an empty String on failure.
 		 */
-		static HLString ReadTextFile(const HLString &path);
+		HLAPI static HLString ReadTextFile(const HLString &path);
 
 		/**
 		 *
@@ -90,7 +90,7 @@ namespace highlo
 		 * @param size The Size of the data that should be stored.
 		 * @return Returns true if the Data has been written successfully to the disk.
 		 */
-		static bool WriteFile(const HLString &path, Byte *buffer, int64 size);
+		HLAPI static bool WriteFile(const HLString &path, Byte *buffer, int64 size);
 
 		/**
 		 *
@@ -100,7 +100,7 @@ namespace highlo
 		 * @param text The Text that should be stored in the file.
 		 * @return Returns true if the Data has been written successfully to the disk.
 		 */
-		static bool WriteTextFile(const HLString &path, const HLString &text);
+		HLAPI static bool WriteTextFile(const HLString &path, const HLString &text);
 
 		/**
 		 *
@@ -108,7 +108,7 @@ namespace highlo
 		 *
 		 * @param path The physical path to a file on the disk.
 		 */
-		static void OpenInExplorer(const HLString &path);
+		HLAPI static void OpenInExplorer(const HLString &path);
 
 		/**
 		 *
@@ -116,6 +116,6 @@ namespace highlo
 		 *
 		 * @param url The URL to a server that should be openend.
 		 */
-		static void OpenInBrowser(const HLString &url);
+		HLAPI static void OpenInBrowser(const HLString &url);
 	};
 }

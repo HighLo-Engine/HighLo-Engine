@@ -16,7 +16,7 @@ namespace highlo
 		 * This function is being called automatically by the Engine.
 		 *
 		 */
-		static void Init();
+		HLAPI static void Init();
 
 		/**
 		 *
@@ -24,7 +24,7 @@ namespace highlo
 		 * This function is being called automatically by the Engine.
 		 *
 		 */
-		static void Shutdown();
+		HLAPI static void Shutdown();
 
 		/**
 		 *
@@ -34,7 +34,7 @@ namespace highlo
 		 * @param virtualPath The fictional folderName that should be replaced by the actual folder structure.
 		 * @param physicalPath The actual folderStructure that should replace the fictional folder name when actually accessing files on the disk.
 		 */
-		void Mount(const HLString &virtualPath, const HLString &physicalPath);
+		HLAPI void Mount(const HLString &virtualPath, const HLString &physicalPath);
 
 		/**
 		 *
@@ -42,7 +42,7 @@ namespace highlo
 		 *
 		 * @param path The virtual path that should be removed.
 		 */
-		void Unmount(const HLString &path);
+		HLAPI void Unmount(const HLString &path);
 
 		/**
 		 *
@@ -53,7 +53,7 @@ namespace highlo
 		 * @param outPath The actual physical path that gets set inside this function if the path really exists on the disk.
 		 * @return Returns true if the virtual Path has been translated successfully into a physical path.
 		 */
-		bool ResolvePhysicalPath(HLString &path, HLString &outPath);
+		HLAPI bool ResolvePhysicalPath(HLString &path, HLString &outPath);
 
 		/**
 		 *
@@ -63,7 +63,7 @@ namespace highlo
 		 * @param outSize The Size of a file, that gets set inside this function.
 		 * @return Returns the Data read from the File or nullptr on failure.
 		 */
-		Byte *ReadFile(const HLString &path, int64 *outSize);
+		HLAPI Byte *ReadFile(const HLString &path, int64 *outSize);
 
 		/**
 		 *
@@ -72,7 +72,7 @@ namespace highlo
 		 * @param path The virtual path to a file on the disk.
 		 * @return Returns the Data read from the File or an empty String on failure.
 		 */
-		HLString ReadTextFile(const HLString &path);
+		HLAPI HLString ReadTextFile(const HLString &path);
 
 		/**
 		 *
@@ -81,7 +81,7 @@ namespace highlo
 		 * @param path The virtual path to a file on the disk.
 		 * @return Returns the file name of a path without the extension.
 		 */
-		HLString GetFileNameFromPath(const HLString &path);
+		HLAPI HLString GetFileNameFromPath(const HLString &path);
 
 		/**
 		 *
@@ -90,7 +90,7 @@ namespace highlo
 		 * @param path The virtual path to a file on the disk.
 		 * @return Returns the file extension of any file name.
 		 */
-		HLString GetFileExtension(const HLString &path);
+		HLAPI HLString GetFileExtension(const HLString &path);
 
 		/**
 		 *
@@ -101,7 +101,7 @@ namespace highlo
 		 * @param size The Size of the data that should be stored.
 		 * @return Returns true if the Data has been written successfully to the disk.
 		 */
-		bool WriteFile(const HLString &path, Byte *buffer, int64 size);
+		HLAPI bool WriteFile(const HLString &path, Byte *buffer, int64 size);
 
 		/**
 		 *
@@ -111,7 +111,7 @@ namespace highlo
 		 * @param text The Text that should be stored in the file.
 		 * @return Returns true if the Data has been written successfully to the disk.
 		 */
-		bool WriteTextFile(const HLString &path, const HLString &text);
+		HLAPI bool WriteTextFile(const HLString &path, const HLString &text);
 
 		/**
 		 *
@@ -120,7 +120,7 @@ namespace highlo
 		 * @param path The virtual path to a file on the disk.
 		 * @return Returns true if the File has been removed from the disk successfully.
 		 */
-		bool RemoveFile(const HLString &path);
+		HLAPI bool RemoveFile(const HLString &path);
 
 		/**
 		 *
@@ -129,7 +129,7 @@ namespace highlo
 		 * @param path The virtual path to a file on the disk.
 		 * @return Returns the Size in bytes of the file on the disk.
 		 */
-		int64 GetFileSize(const HLString &path);
+		HLAPI int64 GetFileSize(const HLString &path);
 
 		/**
 		 *
@@ -138,7 +138,7 @@ namespace highlo
 		 * @param path The virtual path to a file on the disk.
 		 * @return Returns true if the File exists on the disk.
 		 */
-		bool FileExists(const HLString &path);
+		HLAPI bool FileExists(const HLString &path);
 
 		/**
 		 *
@@ -147,7 +147,7 @@ namespace highlo
 		 * @param path The virtual path to a folder on the disk.
 		 * @return Returns true if the Path exists on the disk.
 		 */
-		bool PathExists(const HLString &path);
+		HLAPI bool PathExists(const HLString &path);
 
 		/**
 		 *
@@ -156,7 +156,7 @@ namespace highlo
 		 * @param path The virtual path to a folder on the disk.
 		 * @return Returns true if the folder has been created on the disk.
 		 */
-		bool CreateFolder(const HLString &path);
+		HLAPI bool CreateFolder(const HLString &path);
 
 		/**
 		 *
@@ -165,7 +165,7 @@ namespace highlo
 		 * @param path The virtual path to a folder on the disk.
 		 * @return Returns true if the folder has been removed from the disk.
 		 */
-		bool RemoveFolder(const HLString &path);
+		HLAPI bool RemoveFolder(const HLString &path);
 
 		/**
 		 *
@@ -173,7 +173,7 @@ namespace highlo
 		 *
 		 * @param path The virtual path to a file on the disk.
 		 */
-		void OpenInExplorer(const HLString &path);
+		HLAPI void OpenInExplorer(const HLString &path);
 
 		/**
 		 *
@@ -181,7 +181,7 @@ namespace highlo
 		 *
 		 * @param url The URL to a server that should be openend.
 		 */
-		void OpenInBrowser(const HLString &url);
+		HLAPI void OpenInBrowser(const HLString &url);
 
 		/**
 		 *
@@ -190,7 +190,7 @@ namespace highlo
 		 * @param path The virtual path from which the physical path should be calculated.
 		 * @return Returns the physical path of a given virtual path.
 		 */
-		HLString GetAbsoluteFilePath(const HLString &path);
+		HLAPI HLString GetAbsoluteFilePath(const HLString &path);
 
 		/**
 		 *
@@ -198,7 +198,7 @@ namespace highlo
 		 *
 		 * @return Returns a Instance of the Virtual filesystem.
 		 */
-		static VirtualFileSystem *Get();
+		HLAPI static VirtualFileSystem *Get();
 
 	private:
 

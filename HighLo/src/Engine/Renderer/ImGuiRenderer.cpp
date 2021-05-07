@@ -36,19 +36,29 @@ namespace highlo
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard controls
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepage controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;     // Enable Multi-Viewport / Platform Windows
+        io.ConfigViewportsNoAutoMerge = true;
+        io.ConfigViewportsNoTaskBarIcon = true;
 
         ImFont *font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 18.0f);
         io.FontDefault = io.Fonts->Fonts.back();
 
+        // Internal method used to override ImGui's theme colors with our own
         if (windowStyle == ImGuiWindowStyle::Dark)
+        {
             ImGui::StyleColorsDark();
+            SetDarkThemeColors();
+        }
         else
+        {
             ImGui::StyleColorsClassic();
+            SetLightThemeColors();
+        }
 
         ImGuiStyle &style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -56,12 +66,10 @@ namespace highlo
             style.WindowRounding = 0.0f;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
-
-        // Internal method used to override ImGui's theme colors with our own
-        if (windowStyle == ImGuiWindowStyle::Dark)
-            SetDarkThemeColors();
         else
-            SetLightThemeColors();
+        {
+            style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, style.Colors[ImGuiCol_WindowBg].w);
+        }
 
 #ifdef HIGHLO_API_GLFW
         ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->GetNativeHandle(), true);
@@ -373,6 +381,11 @@ namespace highlo
         return changed;
     }
 
+    void ImGuiRenderer::OnWindowResize(uint32 width, uint32 height)
+    {
+        
+    }
+
     void ImGuiRenderer::DisplayDebugInformation()
     {
         static std::vector<float> frames;
@@ -391,7 +404,7 @@ namespace highlo
         }
 
         ImGui::SetNextWindowPos(ImVec2(10, 10));
-        ImGui::Begin("FPS Graph", 0, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+        ImGui::Begin("FPS Graph", 0, ImGuiWindowFlags_NoBackground);
 
         char fps_text[60];
         sprintf_s(fps_text, 60, "Frames: %f", fps);

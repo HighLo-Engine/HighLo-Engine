@@ -30,6 +30,7 @@ namespace highlo
 		template<typename T>
 		HLAPI FORCEINLINE T &Read(uint32 offset = 0)
 		{
+			HL_ASSERT(offset < m_Size);
 			return *(T*)(m_Data + offset);
 		}
 

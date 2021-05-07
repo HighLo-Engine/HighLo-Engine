@@ -43,17 +43,17 @@ namespace highlo
 
             // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
             if (tmax < 0)
-                {
+            {
                 t = tmax;
                 return false;
-                }
+            }
 
             // if tmin > tmax, ray doesn't intersect AABB
             if (tmin > tmax)
-                {
+            {
                 t = tmax;
                 return false;
-                }
+            }
 
             t = tmin;
             return true;

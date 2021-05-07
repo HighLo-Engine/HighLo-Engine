@@ -68,6 +68,7 @@ namespace highlo
 			{
 				UniformVariable("u_Color", sizeof(glm::vec4)),
 				UniformVariable("u_Roughness", sizeof(float)),
+				UniformVariable("u_Metallic", sizeof(float)),
 			},
 			UniformBufferParentShader::PIXEL_SHADER,
 			(uint32)HL_UB_SLOT::MATERIAL_DATA_BUFFER

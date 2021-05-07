@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Math/HLMath.h"
 
 struct ImGuiTextBuffer;
 
@@ -36,6 +37,8 @@ namespace highlo
 		HLAPI static bool Combobox(const HLString& text, std::vector<HLString>& items, int& selected_index);
 		HLAPI static bool Checkbox(const HLString& text, bool& checked);
 		HLAPI static void InputText(const HLString& label, char* text, size_t buffersize);
+		HLAPI static void ColorPicker(const HLString& label, glm::vec3& color);
+		HLAPI static void ColorPicker(const HLString& label, glm::vec4& color);
 
 		HLAPI static void AddToTextBuffer(const HLString& text);
 

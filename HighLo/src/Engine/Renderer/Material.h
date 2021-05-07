@@ -10,7 +10,8 @@ namespace highlo
 	struct MaterialRenderProperties
 	{
 		glm::vec4 m_Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		float m_Roughness = 0.0f;
+		float m_Roughness = 0.86f;
+		float m_Metallic = 0.05f;
 	};
 
 	struct MaterialPhysicalProperties

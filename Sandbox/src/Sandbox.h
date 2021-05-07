@@ -20,4 +20,6 @@ private:
 	Ref<Texture> m_CabinTexture;
 	Model m_CabinModel;
 	Transform m_CabinTransform;
+
+	Ref<Mesh> m_Sphere;
 };

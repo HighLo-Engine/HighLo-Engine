@@ -187,6 +187,16 @@ namespace highlo
         ImGui::InputText(label.C_Str(), &text[0], buffersize);
     }
 
+    void ImGuiRenderer::ColorPicker(const HLString& label, glm::vec3& color)
+    {
+        ImGui::ColorPicker3(label.C_Str(), &color[0], ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip);
+    }
+
+    void ImGuiRenderer::ColorPicker(const HLString& label, glm::vec4& color)
+    {
+        ImGui::ColorPicker3(label.C_Str(), &color[0], ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip);
+    }
+
     void ImGuiRenderer::AddToTextBuffer(const HLString& text)
     {
         if (s_ShouldDisplayDebugInformation)

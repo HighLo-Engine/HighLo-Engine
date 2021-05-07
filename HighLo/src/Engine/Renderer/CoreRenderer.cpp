@@ -16,7 +16,6 @@ namespace highlo
 	void CoreRenderer::Init()
 	{
 		s_DefaultMaterial = Material::Create();
-		s_DefaultMaterial->AddTexture(Texture2D::CreateFromColor({ 255, 255, 255 }));
 
 		s_CubeMesh = MeshFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
 		s_SphereMesh = MeshFactory::CreateSphere(1.0f);

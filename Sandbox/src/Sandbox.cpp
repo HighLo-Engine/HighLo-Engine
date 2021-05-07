@@ -20,11 +20,11 @@ void Sandbox::OnInitialize()
 	auto ao			= Texture2D::CreateFromColor({ 255, 255, 255 });
 
 	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.dae").GetMesh(0);
-	m_PBR_Sphere->m_Material->AddTexture(albedo);
-	m_PBR_Sphere->m_Material->AddTexture(normal);
-	m_PBR_Sphere->m_Material->AddTexture(metallic);
-	m_PBR_Sphere->m_Material->AddTexture(roughness);
-	m_PBR_Sphere->m_Material->AddTexture(ao);
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, albedo);
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, normal);
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, metallic);
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, roughness);
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, ao);
 
 	HL_TRACE("Sandbox Initialized");
 }
@@ -43,6 +43,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
+	CoreRenderer::DrawSphere(Transform::FromPosition({ -6, -2, 9 }).Scale(3.0f).Rotate(-y_rot, { 0, 1, 0 }), { 0, 0.7f, 0 });
 
 	CoreRenderer::EndScene();
 }

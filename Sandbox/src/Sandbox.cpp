@@ -42,6 +42,8 @@ void Sandbox::OnUpdate(Timestep timestep)
 	for (uint64 i = 0; i < m_TestSpheres.size(); i++)
 		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
 
+	CoreRenderer::DrawMesh(m_Pistol, Transform::FromPosition({ 30, -3, 0 }).Scale(0.5f));
+
 	CoreRenderer::EndScene();
 }
 
@@ -128,4 +130,7 @@ void Sandbox::CreatePBRObjects()
 
 		m_TestSpheres.push_back(newSphere);
 	}
+
+	m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/Pistol.fbx");
+	m_Pistol->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
 }

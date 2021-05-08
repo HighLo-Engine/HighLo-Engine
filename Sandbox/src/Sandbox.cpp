@@ -12,7 +12,6 @@ void Sandbox::OnInitialize()
 	m_Camera->SetYaw(90);
 	
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
-	m_Environment2 = Environment::Create("assets/textures/PBR_Scene_Arena.hdr");
 
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);
 
@@ -30,6 +29,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 	Renderer::ClearScreenBuffers();
 	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 
+	m_Skybox->Render(*m_Camera);
 	CoreRenderer::BeginScene(*m_Camera, m_Light);
 
 	static float y_rot = 0.0f;
@@ -38,7 +38,9 @@ void Sandbox::OnUpdate(Timestep timestep)
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
 	CoreRenderer::DrawMesh(m_PBR_Gun, Transform::FromPosition({ 18, -6, 26 }).Scale(0.24f).Rotate(y_rot, { 0, 1, 0 }));
-	m_Skybox->Render(*m_Camera);
+
+	for (uint64 i = 0; i < m_TestSpheres.size(); i++)
+		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
 
 	CoreRenderer::EndScene();
 }
@@ -56,35 +58,6 @@ void Sandbox::OnEvent(Event& e)
 
 void Sandbox::OnImGuiRender()
 {
-	ImGuiRenderer::BeginChild("Environment");
-
-	static bool switchEnv = false;
-	ImGuiRenderer::Checkbox("Switch Environment", switchEnv);
-
-	if (switchEnv)
-	{
-		if (m_Skybox->GetTexture() != m_Environment2->GetSkyboxTexture())
-		{
-			m_Skybox->SetTexture(m_Environment2->GetSkyboxTexture());
-			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment2->GetIrradianceMap());
-			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment2->GetRadianceMap());
-			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment2->GetIrradianceMap());
-			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment2->GetRadianceMap());
-		}
-	}
-	else
-	{
-		if (m_Skybox->GetTexture() != m_Environment->GetSkyboxTexture())
-		{
-			m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
-			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-		}
-	}
-
-	ImGuiRenderer::EndChild();
 }
 
 void Sandbox::OnResize(uint32 width, uint32 height)
@@ -105,6 +78,8 @@ void Sandbox::CreatePBRObjects()
 	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
 	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
 	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_PBR_Sphere->m_Material->Properties.m_RenderProperties.m_Metallic = 1;
+	m_PBR_Sphere->m_Material->Properties.m_RenderProperties.m_Roughness = 1;
 
 	auto m_PBR_Gun_Model = AssetLoader::LoadStaticModel("assets/models/PBR_AK47.obj");
 	m_PBR_Gun = m_PBR_Gun_Model.GetMesh(0);
@@ -117,4 +92,41 @@ void Sandbox::CreatePBRObjects()
 	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
 	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
 	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_PBR_Gun->m_Material->Properties.m_RenderProperties.m_Metallic = 1;
+	m_PBR_Gun->m_Material->Properties.m_RenderProperties.m_Roughness = 1;
+
+	for (int i = 0; i < 10; i++)
+	{
+		auto newSphere = MeshFactory::CreateSphere(1.0f);
+		newSphere->m_Material->Properties.m_RenderProperties.m_Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
+		newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0.1f * i;
+		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+
+		if (i == 0)
+		{
+			newSphere->m_Material->Properties.m_RenderProperties.m_Color = glm::vec4(0.0f);
+			newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0;
+		}
+		if (i == 1)
+		{
+			newSphere->m_Material->Properties.m_RenderProperties.m_Color = glm::vec4(1.0f);
+			newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0;
+		}
+
+		m_TestSpheres.push_back(newSphere);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		auto newSphere = MeshFactory::CreateSphere(1.0f);
+		newSphere->m_Material->Properties.m_RenderProperties.m_Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
+		newSphere->m_Material->Properties.m_RenderProperties.m_Metallic = 0.1f * i;
+		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+
+		m_TestSpheres.push_back(newSphere);
+	}
 }

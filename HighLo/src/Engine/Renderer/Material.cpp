@@ -85,10 +85,13 @@ namespace highlo
 	void Material::SetTexture(int32 type, Ref<Texture> texture)
 	{
 		static Ref<Texture> s_DefaultAlbedo    = Texture2D::CreateFromColor({ 255, 255, 255 });
-		static Ref<Texture> s_DefaultNormal    = Texture2D::CreateFromColor({ 0, 0, 255 });
-		static Ref<Texture> s_DefaultMetallic  = Texture2D::CreateFromColor({ 12.75f, 0, 255 });
-		static Ref<Texture> s_DefaultRoughness = Texture2D::CreateFromColor({ 219.3f, 219.3f, 219.3f });
+		static Ref<Texture> s_DefaultNormal    = Texture2D::CreateFromColor({ 128, 128, 255 });
+		static Ref<Texture> s_DefaultMetallic  = Texture2D::CreateFromColor({ 255, 255, 255 });
+		static Ref<Texture> s_DefaultRoughness = Texture2D::CreateFromColor({ 255, 255, 255 });
 		static Ref<Texture> s_DefaultAO		   = Texture2D::CreateFromColor({ 255, 255, 255 });
+
+		static uint32 s_BlackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
+		static Ref<Texture> s_BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &s_BlackTextureData).As<Texture3D>();
 
 		if (!texture)
 		{
@@ -99,6 +102,9 @@ namespace highlo
 			case HL_MATERIAL_TEXTURE_METALLIC:				{ texture = s_DefaultMetallic; break; }
 			case HL_MATERIAL_TEXTURE_ROUGHNESS:				{ texture = s_DefaultRoughness; break; }
 			case HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION:		{ texture = s_DefaultAO; break; }
+			case HL_MATERIAL_TEXTURE_IRRADIANCE_MAP:		{ texture = s_BlackCubeTexture; break; }
+			case HL_MATERIAL_TEXTURE_PREFILTER_MAP:			{ texture = s_BlackCubeTexture; break; }
+			case HL_MATERIAL_TEXTURE_BRDF_MAP:				{ texture = s_BlackCubeTexture; break; }
 			default: break;
 			}
 		}

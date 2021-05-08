@@ -20,8 +20,6 @@ namespace highlo
 		HLAPI uint64 GetMeshCount()			const { return m_Meshes.size(); }
 		HLAPI Ref<Mesh> GetMesh(uint64 idx)	const { return m_Meshes.at(idx); }
 
-		HLAPI void SetTexture(int type, const Ref<Texture>& texture);
-
 		HLString Name = "";
 		glm::vec4 Color = glm::vec4(1, 1, 1, 1);
 

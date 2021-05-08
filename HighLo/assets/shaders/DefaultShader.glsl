@@ -110,11 +110,6 @@ vec3 getNormalFromMap()
     return normalize(TBN * tangentNormal);
 }
 
-vec4 CalculateAlbedoTextureColor()
-{
-	return u_Color * texture(AlbedoTextureSampler, PS_Input.UV);
-}
-
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -160,12 +155,32 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 } 
 
+vec4 CalculateAlbedoColor()
+{
+	return u_Color * texture(AlbedoTextureSampler, PS_Input.UV);
+}
+
+float CalculateMetallicValue()
+{
+	return u_Metallic * max(texture(MetallicTextureSampler, PS_Input.UV).r, 0.05);
+}
+
+float CalculateRoughnessValue()
+{
+	return u_Roughness * texture(RoughnessTextureSampler, PS_Input.UV).r;
+}
+
+float CalculateAmbientOcclusionValue()
+{
+	return texture(aoTextureSampler, PS_Input.UV).r;
+}
+
 void main()
 {
-    vec4  AlbedoColor    = CalculateAlbedoTextureColor();
-    float MetallicValue  = texture(MetallicTextureSampler, PS_Input.UV).r;
-    float RoughnessValue = max(texture(RoughnessTextureSampler, PS_Input.UV).r, 0.05);
-    float aoValue        = texture(aoTextureSampler, PS_Input.UV).r;
+    vec4  AlbedoColor    = CalculateAlbedoColor();
+    float MetallicValue  = CalculateMetallicValue();
+    float RoughnessValue = CalculateRoughnessValue();
+    float aoValue        = CalculateAmbientOcclusionValue();
 
 	vec3 N = getNormalFromMap();
     vec3 V = normalize(PS_Input.CameraPosition - PS_Input.WorldPosition);

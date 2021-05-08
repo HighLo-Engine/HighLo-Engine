@@ -3,9 +3,4 @@
 
 namespace highlo
 {
-	void Model::SetTexture(int type, const Ref<Texture>& texture)
-	{
-		for (auto& mesh : m_Meshes)
-			mesh->m_Material->SetTexture(type, texture);
-	}
 }

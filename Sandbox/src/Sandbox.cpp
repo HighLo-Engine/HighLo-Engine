@@ -131,6 +131,6 @@ void Sandbox::CreatePBRObjects()
 		m_TestSpheres.push_back(newSphere);
 	}
 
-	m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/Pistol.fbx");
+	m_Pistol = AssetLoader::LoadStaticModel("assets/models/Pistol.fbx").GetMesh(0);
 	m_Pistol->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
 }

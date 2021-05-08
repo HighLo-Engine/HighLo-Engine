@@ -10,14 +10,20 @@ namespace highlo
 	{
 	public:
 		OpenGLIndexBuffer(std::vector<int32>& indices);
+		OpenGLIndexBuffer(void *data, uint32 size);
+		OpenGLIndexBuffer(uint32 size);
 		~OpenGLIndexBuffer();
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
-		virtual int32 GetCount() override { return m_Count; }
+		virtual void UpdateContents(void *data, uint32 size) override;
+		virtual void UpdateContents(std::vector<int32> &indices) override;
+
+		inline virtual uint32 GetCount() override { return m_Count; }
+		inline virtual HLRendererID GetRendererID() override { return m_ID; }
 
 	private:
-		uint32 m_ID;
+		uint32 m_ID = 0;
 		uint32 m_Count = 0;
 	};
 }

@@ -28,6 +28,7 @@ namespace highlo
 		HLAPI static void Shutdown();
 
 		HLAPI static Ref<Texture3D> GetBlackCubeTexture();
+		HLAPI static Ref<Texture2D> GetWhiteTexture();
 		HLAPI static Ref<Environment> GetEmptyEnvironment();
 		HLAPI static RendererConfig &GetConfig();
 
@@ -38,5 +39,6 @@ namespace highlo
 
 	private:
 		friend class CoreRenderer;
+		friend class Renderer2D;
 	};
 }

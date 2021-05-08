@@ -189,6 +189,7 @@ namespace highlo
 		result.m_PixelShaderSrc						= HLString(shader_sources[ShaderType::PIXEL_SHADER].str().c_str());
 		result.m_ComputeShaderSrc					= HLString(shader_sources[ShaderType::COMPUTE_SHADER].str().c_str());
 
+		HL_CORE_INFO("Shader>    [+] Loaded " + filename + " [+]");
 		return result;
     }
 }

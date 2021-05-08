@@ -33,7 +33,6 @@ namespace highlo
 		HLAPI static void DrawCapsule(const Transform& transform, Ref<Material> material);
 
 		HLAPI static void DrawMesh(const Ref<Mesh>& mesh, const Transform& transform);
-
 		HLAPI static void DrawRawMeshData(Ref<Mesh>& mesh);
 
 	private:

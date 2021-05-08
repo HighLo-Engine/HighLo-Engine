@@ -15,6 +15,16 @@ namespace highlo
 	{
 		return Ref<OpenGLIndexBuffer>::Create(indices);
 	}
+
+	Ref<IndexBuffer> IndexBuffer::Create(void *data, uint32 size)
+	{
+		return Ref<OpenGLIndexBuffer>::Create(data, size);
+	}
+	
+	Ref<IndexBuffer> IndexBuffer::Create(uint32 size)
+	{
+		return Ref<OpenGLIndexBuffer>::Create(size);
+	}
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
 	Ref<IndexBuffer> IndexBuffer::Create(std::vector<int32>& indices)

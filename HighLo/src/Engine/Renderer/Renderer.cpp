@@ -1,6 +1,8 @@
 #include "HighLoPch.h"
 #include "Renderer.h"
 
+#include "Renderer2D.h"
+
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLRenderingAPI.h"
 #endif // HIGHLO_API_OPENGL
@@ -21,6 +23,7 @@ namespace highlo
 	{
 		RendererConfig Config;
 		Ref<Texture3D> BlackCubeTexture;
+		Ref<Texture2D> WhiteTexture;
 		Ref<Environment> EmptyEnvironment;
 	};
 
@@ -52,14 +55,17 @@ namespace highlo
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
+		s_Data->WhiteTexture = Texture2D::CreateFromColor({ 1.0f, 1.0f, 1.0f }).As<Texture2D>();
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 
 		CoreRenderer::Init();
 		ImGuiRenderer::Init(window);
+		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
+		Renderer2D::Shutdown();
 		ImGuiRenderer::Shutdown();
 		CoreRenderer::Shutdown();
 
@@ -69,6 +75,11 @@ namespace highlo
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()
 	{
 		return s_Data->BlackCubeTexture;
+	}
+
+	Ref<Texture2D> Renderer::GetWhiteTexture()
+	{
+		return s_Data->WhiteTexture;
 	}
 
 	Ref<Environment> Renderer::GetEmptyEnvironment()

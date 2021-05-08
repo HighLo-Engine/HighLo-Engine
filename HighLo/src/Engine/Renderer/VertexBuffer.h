@@ -5,6 +5,13 @@
 
 namespace highlo
 {
+	enum class VertexBufferUsage
+	{
+		None = 0,
+		Static = 1,
+		Dynamic = 2
+	};
+
 	class VertexBuffer : public IsSharedReference
 	{
 	public:
@@ -19,7 +26,11 @@ namespace highlo
 		virtual void UpdateContents(std::vector<Vertex>& vertices) = 0;
 		virtual void UpdateContents(void* data, size_t size) = 0;
 
-		static Ref<VertexBuffer> Create(std::vector<Vertex>& vertices);
-		static Ref<VertexBuffer> Create(void* data, size_t size, uint32 stride);
+		virtual HLRendererID GetRendererID() = 0;
+		virtual VertexBufferUsage GetUsage() = 0;
+
+		static Ref<VertexBuffer> Create(std::vector<Vertex>& vertices, VertexBufferUsage usage = VertexBufferUsage::Static);
+		static Ref<VertexBuffer> Create(void* data, size_t size, uint32 stride, VertexBufferUsage usage = VertexBufferUsage::Static);
+		static Ref<VertexBuffer> Create(size_t size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 	};
 }

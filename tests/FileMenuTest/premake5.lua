@@ -35,7 +35,8 @@ project "FileMenuTest"
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assimp-vc141-mtd.dll*")
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assimp-vc141-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assets")
 	}
 
     filter "system:windows"

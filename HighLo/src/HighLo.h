@@ -43,6 +43,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/ImGuiRenderer.h"
 #include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Camera/OrthographicCamera.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

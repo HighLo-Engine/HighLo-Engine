@@ -35,7 +35,8 @@ project "Renderer2DTest"
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/Renderer2DTest/bin/" .. outputdir .. "/Renderer2DTest/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/Renderer2DTest/bin/" .. outputdir .. "/Renderer2DTest/assimp-vc141-mtd.dll*")
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/Renderer2DTest/bin/" .. outputdir .. "/Renderer2DTest/assimp-vc141-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/Renderer2DTest/bin/" .. outputdir .. "/Renderer2DTest/assets")
 	}
 
     filter "system:windows"

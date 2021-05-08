@@ -14,6 +14,28 @@
 
 namespace highlo
 {
+	namespace utils
+	{
+		static GLenum ConvertToOpenGLPrimitiveType(PrimitiveType type)
+		{
+			switch (type)
+			{
+				case PrimitiveType::None:
+				case PrimitiveType::Triangles:
+					return GL_TRIANGLES;
+
+				case PrimitiveType::Lines:
+					return GL_LINES;
+
+				case PrimitiveType::Patch:
+					return GL_PATCHES;
+			}
+
+			HL_ASSERT(false);
+			return 0;
+		}
+	}
+
 	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
@@ -24,19 +46,19 @@ namespace highlo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray>& va)
+	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray>& va, PrimitiveType type)
 	{
-		glDrawElements(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count)
+	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count, PrimitiveType type)
 	{
-		glDrawElementsInstanced(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
+		glDrawElementsInstanced(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
 	}
 	
-	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray>& va)
+	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray>& va, PrimitiveType type)
 	{
-		glDrawElements(GL_PATCHES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 	
 	void OpenGLRenderingAPI::SetWireframe(bool wf)

@@ -129,6 +129,22 @@ namespace highlo
 			return true;
 		}
 
+		HLAPI ValueType Find(KeyType key)
+		{
+			static ValueType result;
+
+			for (uint32 i = 0; i < m_Elements.size(); ++i)
+			{
+				if (key == m_Elements[i].first)
+				{
+					result = m_Elements[i].second;
+					break;
+				}
+			}
+
+			return result;
+		}
+
 		HLAPI ValueType GetFirst()
 		{
 			return m_Elements.at(0).second;

@@ -52,7 +52,7 @@ namespace highlo
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
-		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
+		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 
 		CoreRenderer::Init();
 		ImGuiRenderer::Init(window);

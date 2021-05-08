@@ -5,8 +5,8 @@
 
 namespace highlo
 {
-	Environment::Environment(const Ref<Texture3D> &radianceMap, const Ref<Texture3D> &irradianceMap)
-		: m_RadianceMap(radianceMap), m_IrradianceMap(irradianceMap) {}
+	Environment::Environment(const Ref<Texture3D>& skyboxTexture, const Ref<Texture3D> &radianceMap, const Ref<Texture3D> &irradianceMap, const Ref<Texture2D>& brdfMap)
+		: m_SkyboxTexture(skyboxTexture), m_RadianceMap(radianceMap), m_IrradianceMap(irradianceMap), m_BRDFMap(brdfMap) {}
 
 	Ref<Environment> Environment::Create(const HLString &path)
 	{

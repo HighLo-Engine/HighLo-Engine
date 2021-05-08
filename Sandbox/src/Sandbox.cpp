@@ -12,34 +12,14 @@ void Sandbox::OnInitialize()
 	m_Camera->SetYaw(90);
 	
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
+	m_Environment2 = Environment::Create("assets/textures/PBR_Scene_Arena.hdr");
 
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);
 
-	auto albedo = Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg");
-	auto normal = Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg");
-	auto metallic = Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg");
-	auto roughness = Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Roughness.jpg");
-	auto ao = Texture2D::CreateFromColor({ 255, 255, 255 });
-
-	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.dae").GetMesh(0);
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, albedo);
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, normal);
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, metallic);
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, roughness);
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, ao);
+	CreatePBRObjects();
 
 	m_Skybox = Skybox::Create();
-	/*m_Skybox->SetTexture(Texture3D::LoadFromFiles(
-		{
-			("assets/textures/skyboxes/SB2_right.jpg"),
-			("assets/textures/skyboxes/SB2_left.jpg"),
-			("assets/textures/skyboxes/SB2_bottom.jpg"),
-			("assets/textures/skyboxes/SB2_top.jpg"),
-			("assets/textures/skyboxes/SB2_back.jpg"),
-			("assets/textures/skyboxes/SB2_front.jpg"),
-		}
-	));*/
-	m_Skybox->SetTexture(m_Environment->GetRadianceMap());
+	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
 	HL_TRACE("Sandbox Initialized");
 }
 
@@ -57,7 +37,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
-	CoreRenderer::DrawSphere(Transform::FromPosition({ -6, -2, 9 }).Scale(3.0f).Rotate(-y_rot, { 0, 1, 0 }), { 0, 0.7f, 0 });
+	CoreRenderer::DrawMesh(m_PBR_Gun, Transform::FromPosition({ 18, -6, 26 }).Scale(0.24f).Rotate(y_rot, { 0, 1, 0 }));
 	m_Skybox->Render(*m_Camera);
 
 	CoreRenderer::EndScene();
@@ -76,9 +56,65 @@ void Sandbox::OnEvent(Event& e)
 
 void Sandbox::OnImGuiRender()
 {
+	ImGuiRenderer::BeginChild("Environment");
+
+	static bool switchEnv = false;
+	ImGuiRenderer::Checkbox("Switch Environment", switchEnv);
+
+	if (switchEnv)
+	{
+		if (m_Skybox->GetTexture() != m_Environment2->GetSkyboxTexture())
+		{
+			m_Skybox->SetTexture(m_Environment2->GetSkyboxTexture());
+			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment2->GetIrradianceMap());
+			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment2->GetRadianceMap());
+			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment2->GetIrradianceMap());
+			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment2->GetRadianceMap());
+		}
+	}
+	else
+	{
+		if (m_Skybox->GetTexture() != m_Environment->GetSkyboxTexture())
+		{
+			m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
+			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+			m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+			m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+		}
+	}
+
+	ImGuiRenderer::EndChild();
 }
 
 void Sandbox::OnResize(uint32 width, uint32 height)
 {
 	m_Camera->OnWindowResize(width, height);
+}
+
+void Sandbox::CreatePBRObjects()
+{
+	auto sampleBRDF = Texture2D::LoadFromFile("assets/textures/brdfMap.png");
+
+	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.dae").GetMesh(0);
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg"));
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg"));
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Roughness.jpg"));
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::CreateFromColor({ 255, 255, 255 }));
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+
+	auto m_PBR_Gun_Model = AssetLoader::LoadStaticModel("assets/models/PBR_AK47.obj");
+	m_PBR_Gun = m_PBR_Gun_Model.GetMesh(0);
+
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/AK47/AK47_albedo.tga"));
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/AK47/AK47_normal.tga"));
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/AK47/AK47_metalness.tga"));
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/AK47/AK47_roughness.tga"));
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::LoadFromFile("assets/textures/AK47/AK47_ao.tga"));
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
 }

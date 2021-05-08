@@ -123,7 +123,7 @@ namespace highlo
 		glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		glGenerateTextureMipmap(irradianceMap->GetRendererID());
 
-		return Ref<Environment>::Create(envFiltered, irradianceMap);
+		return Ref<Environment>::Create(envUnfiltered, envFiltered, irradianceMap, nullptr);
 	}
 }
 

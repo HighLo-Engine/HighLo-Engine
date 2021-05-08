@@ -17,7 +17,11 @@ private:
 	Light m_Light;
 	Ref<FPSCamera> m_Camera;
 	Ref<Environment> m_Environment;
+	Ref<Environment> m_Environment2;
 	Ref<Skybox> m_Skybox;
 	
 	Ref<Mesh> m_PBR_Sphere;
+	Ref<Mesh> m_PBR_Gun;
+
+	void CreatePBRObjects();
 };

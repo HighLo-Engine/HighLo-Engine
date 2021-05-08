@@ -21,6 +21,9 @@ namespace highlo
 		SetTexture(HL_MATERIAL_TEXTURE_METALLIC, nullptr);
 		SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, nullptr);
 		SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, nullptr);
+		SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, nullptr);
 	}
 
 	void Material::CreateShaders()

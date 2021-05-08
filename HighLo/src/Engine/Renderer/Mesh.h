@@ -15,16 +15,20 @@ namespace highlo
 	class Mesh : public IsSharedReference
 	{
 	public:
-		static Ref<Mesh> Create(const MeshData& data);
+		HLAPI static Ref<Mesh> Create(const MeshData& data);
 
-		MeshData& GetMeshData() { return m_MeshData; }
-		void UpdateMeshData(std::vector<Vertex>& data);
-		void UpdateMeshData();
+		HLAPI MeshData& GetMeshData() { return m_MeshData; }
+		HLAPI void UpdateMeshData(std::vector<Vertex>& data);
+		HLAPI void UpdateMeshData();
 
-		Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
+		HLAPI Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 
 		Ref<Animation> m_Animation = nullptr;
 		Ref<Material> m_Material;
+
+		HLAPI static void Copy(const Ref<Mesh>& src, Ref<Mesh>& dest);
+		HLAPI static Ref<Mesh> Copy(const Ref<Mesh>& src);
+		HLAPI Ref<Mesh> Copy() const;
 
 	private:
 		Mesh(const MeshData& data)

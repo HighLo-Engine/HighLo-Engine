@@ -45,11 +45,7 @@ namespace highlo
 
 		MaterialProperties Properties;
 
-		/// <summary>
-		/// Updates shaders with new data from m_Properties field.
-		/// Must be called every time a property is changed and needed to be udpated.
-		/// </summary>
-
+		HLAPI Ref<Texture> GetTexture(int32 type) const { return m_Textures.at(type); }
 		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
 		HLAPI uint32 GetTextureCount() const { return (uint32)m_Textures.size(); }
 

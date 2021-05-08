@@ -42,4 +42,28 @@ namespace highlo
 	{
 		m_VertexArray->GetVertexBuffers()[0]->UpdateContents(m_MeshData.m_Vertices);
 	}
+
+	Ref<Mesh> Mesh::Copy() const
+	{
+		Ref<Mesh> clone = Ref<Mesh>(new Mesh(m_MeshData));
+
+		clone->m_VertexArray = this->m_VertexArray;
+		clone->m_Animation = this->m_Animation;
+		clone->m_Material = Material::Create();
+
+		for (uint32 i = 0; i < m_Material->GetTextureCount(); ++i)
+			clone->m_Material->SetTexture(i, m_Material->GetTexture(i));
+
+		return clone;
+	}
+
+	Ref<Mesh> Mesh::Copy(const Ref<Mesh>& src)
+	{
+		return src->Copy();
+	}
+
+	void Mesh::Copy(const Ref<Mesh>& src, Ref<Mesh>& dest)
+	{
+		dest = src->Copy();
+	}
 }

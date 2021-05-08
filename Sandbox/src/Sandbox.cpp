@@ -95,14 +95,16 @@ void Sandbox::CreatePBRObjects()
 	m_PBR_Gun->m_Material->Properties.m_RenderProperties.m_Metallic = 1;
 	m_PBR_Gun->m_Material->Properties.m_RenderProperties.m_Roughness = 1;
 
+	auto SphereBlueprint = MeshFactory::CreateSphere(1.0f);
+	SphereBlueprint->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	SphereBlueprint->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	SphereBlueprint->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+
 	for (int i = 0; i < 10; i++)
 	{
-		auto newSphere = MeshFactory::CreateSphere(1.0f);
+		auto newSphere = SphereBlueprint->Copy();
 		newSphere->m_Material->Properties.m_RenderProperties.m_Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
 		newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0.1f * i;
-		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
 
 		if (i == 0)
 		{
@@ -120,12 +122,9 @@ void Sandbox::CreatePBRObjects()
 
 	for (int i = 0; i < 10; i++)
 	{
-		auto newSphere = MeshFactory::CreateSphere(1.0f);
+		auto newSphere = SphereBlueprint->Copy();
 		newSphere->m_Material->Properties.m_RenderProperties.m_Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
 		newSphere->m_Material->Properties.m_RenderProperties.m_Metallic = 0.1f * i;
-		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-		newSphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
 
 		m_TestSpheres.push_back(newSphere);
 	}

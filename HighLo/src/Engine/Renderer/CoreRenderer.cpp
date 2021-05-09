@@ -43,9 +43,9 @@ namespace highlo
 
 	void CoreRenderer::DrawCube(const glm::vec3& position, float size, float rotation, const glm::vec3& color)
 	{
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.z = color.z;
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -67,9 +67,9 @@ namespace highlo
 
 	void CoreRenderer::DrawCube(const Transform &transform, const glm::vec3 &color)
 	{
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.z = color.z;
 
 		RenderMesh(s_CubeMesh, s_DefaultMaterial, transform);
 	}
@@ -81,9 +81,9 @@ namespace highlo
 
 	void CoreRenderer::DrawSphere(const glm::vec3& position, float size, float rotation, const glm::vec3& color)
 	{
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.z = color.z;
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -105,9 +105,9 @@ namespace highlo
 
 	void CoreRenderer::DrawSphere(const Transform &transform, const glm::vec3 &color)
 	{
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.z = color.z;
 
 		RenderMesh(s_SphereMesh, s_DefaultMaterial, transform);
 	}
@@ -119,9 +119,9 @@ namespace highlo
 
 	void CoreRenderer::DrawCapsule(const glm::vec3 &position, float size, float rotation, const glm::vec3 &color)
 	{
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.z = color.z;
 
 		Transform transform;
 		transform.Scale({ size, size, size });
@@ -143,9 +143,9 @@ namespace highlo
 
 	void CoreRenderer::DrawCapsule(const Transform& transform, const glm::vec3& color)
 	{
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.x = color.x;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.y = color.y;
-		s_DefaultMaterial->Properties.m_RenderProperties.m_Color.z = color.z;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.x = color.x;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.y = color.y;
+		s_DefaultMaterial->Properties.m_RenderProperties.Color.z = color.z;
 
 		RenderMesh(s_CapsuleMesh, s_DefaultMaterial, transform);
 	}

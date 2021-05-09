@@ -2,10 +2,11 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <vector>
 
 #include "Engine/Core/HLTime.h"
 #include "Engine/Math/HLMath.h"
-#include <vector>
+#include "Engine/Math/Transform.h"
 
 namespace highlo
 {
@@ -15,7 +16,7 @@ namespace highlo
 		glm::vec3 Translation;
 		glm::quat Rotation;
 
-		HLAPI glm::mat4 GetLocalTransform();
+		HLAPI Transform GetLocalTransform();
 
 		HLAPI static BoneTransform Interpolate(BoneTransform first, BoneTransform second, float progression);
 
@@ -29,9 +30,8 @@ namespace highlo
 		BoneTransform Transform;
 	};
 
-	class Bone
+	struct Bone
 	{
-	public:
 		HLString Name;
 		uint32 ID = -1;
 
@@ -97,6 +97,6 @@ namespace highlo
 
 		std::pair<uint64, uint64> GetPreviousAndNextFrames(Bone& bone, float animation_time);
 		float CalculateProgression(Bone& bone, uint64 previous_frame_index, uint64 next_frame_index, float animation_time);
-		glm::mat4 InterpolatePoses(BoneTransform previous_pose, BoneTransform next_pose, float progression);
+		Transform InterpolatePoses(BoneTransform previous_pose, BoneTransform next_pose, float progression);
 	};
 }

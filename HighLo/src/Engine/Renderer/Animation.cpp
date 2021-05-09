@@ -6,14 +6,11 @@
 
 namespace highlo
 {
-	glm::mat4 BoneTransform::GetLocalTransform()
+	Transform BoneTransform::GetLocalTransform()
 	{
-		glm::mat4 mat = glm::mat4(1.0f);
-
-		mat = glm::translate(mat, Translation);
-		mat = mat * glm::toMat4(Rotation);
-
-		return mat;
+		Transform localTransform;
+		localTransform = localTransform.FromPosition(Translation).Rotate(Rotation);
+		return localTransform;
 	}
 
 	BoneTransform BoneTransform::Interpolate(BoneTransform first, BoneTransform second, float progression)
@@ -78,9 +75,8 @@ namespace highlo
 		if (frames.second > bone.Keyframes.size() - 1)
 			frames.second = 0;
 
-		glm::mat4 current_pose = InterpolatePoses(bone.Keyframes[frames.first].Transform, bone.Keyframes[frames.second].Transform, progression);
-
-		glm::mat4 transform = parent_transform * current_pose;
+		Transform current_pose = InterpolatePoses(bone.Keyframes[frames.first].Transform, bone.Keyframes[frames.second].Transform, progression);
+		glm::mat4 transform = parent_transform * current_pose.GetTransform();
 
 		bone.FinalTransform = m_InverseTransform * transform * bone.OffsetMatrix;
 
@@ -134,35 +130,35 @@ namespace highlo
 
 	std::pair<uint64, uint64> Animation::GetPreviousAndNextFrames(Bone& bone, float animation_time)
 	{
-		float PreviousFrame = bone.Keyframes[0].Timestamp;
-		float NextFrame = bone.Keyframes[0].Timestamp;
+		float previousFrame = bone.Keyframes[0].Timestamp;
+		float nextFrame = bone.Keyframes[0].Timestamp;
 
-		uint64 PreviousFrameIndex = 0;
-		uint64 NextFrameIndex = 0;
+		uint64 previousFrameIndex = 0;
+		uint64 nextFrameIndex = 0;
 
 		for (uint64 i = 1; i < bone.Keyframes.size(); i++)
 		{
-			NextFrame = bone.Keyframes[i].Timestamp;
-			NextFrameIndex = i;
+			nextFrame = bone.Keyframes[i].Timestamp;
+			nextFrameIndex = i;
 
-			if (NextFrame > animation_time)
+			if (nextFrame > animation_time)
 				break;
 
-			PreviousFrame = bone.Keyframes[i].Timestamp;
-			PreviousFrameIndex = i;
+			previousFrame = bone.Keyframes[i].Timestamp;
+			previousFrameIndex = i;
 		}
 
-		return { PreviousFrameIndex, NextFrameIndex };
+		return { previousFrameIndex, nextFrameIndex };
 	}
 
 	float Animation::CalculateProgression(Bone& bone, uint64 previous_frame_index, uint64 next_frame_index, float animation_time)
 	{
-		float TotalTime = bone.Keyframes[next_frame_index].Timestamp - bone.Keyframes[previous_frame_index].Timestamp;
-		float CurrentTime = animation_time - bone.Keyframes[previous_frame_index].Timestamp;
-		return CurrentTime / TotalTime;
+		float totalTime = bone.Keyframes[next_frame_index].Timestamp - bone.Keyframes[previous_frame_index].Timestamp;
+		float currentTime = animation_time - bone.Keyframes[previous_frame_index].Timestamp;
+		return currentTime / totalTime;
 	}
 
-	glm::mat4 Animation::InterpolatePoses(BoneTransform previous_pose, BoneTransform next_pose, float progression)
+	Transform Animation::InterpolatePoses(BoneTransform previous_pose, BoneTransform next_pose, float progression)
 	{
 		return BoneTransform::Interpolate(previous_pose, next_pose, progression).GetLocalTransform();
 	}
@@ -200,6 +196,6 @@ namespace highlo
 			}
 		}
 
-		CurrentAnimationTime += ((float)ts * AnimationSpeed) / AnimationSpeedDenominator;
+		CurrentAnimationTime += (ts * AnimationSpeed) / AnimationSpeedDenominator;
 	}
 }

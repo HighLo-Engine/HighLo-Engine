@@ -111,15 +111,15 @@ namespace highlo
 		{
 			switch (type)
 			{
-			case HL_MATERIAL_TEXTURE_ALBEDO:				{ texture = s_DefaultAlbedo; break; }
-			case HL_MATERIAL_TEXTURE_NORMAL:				{ texture = s_DefaultNormal; break; }
-			case HL_MATERIAL_TEXTURE_METALLIC:				{ texture = s_DefaultMetallic; break; }
-			case HL_MATERIAL_TEXTURE_ROUGHNESS:				{ texture = s_DefaultRoughness; break; }
-			case HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION:		{ texture = s_DefaultAO; break; }
-			case HL_MATERIAL_TEXTURE_IRRADIANCE_MAP:		{ texture = s_BlackCubeTexture; break; }
-			case HL_MATERIAL_TEXTURE_PREFILTER_MAP:			{ texture = s_BlackCubeTexture; break; }
-			case HL_MATERIAL_TEXTURE_BRDF_MAP:				{ texture = s_BlackCubeTexture; break; }
-			default: break;
+				case HL_MATERIAL_TEXTURE_ALBEDO:				{ texture = s_DefaultAlbedo; break; }
+				case HL_MATERIAL_TEXTURE_NORMAL:				{ texture = s_DefaultNormal; break; }
+				case HL_MATERIAL_TEXTURE_METALLIC:				{ texture = s_DefaultMetallic; break; }
+				case HL_MATERIAL_TEXTURE_ROUGHNESS:				{ texture = s_DefaultRoughness; break; }
+				case HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION:		{ texture = s_DefaultAO; break; }
+				case HL_MATERIAL_TEXTURE_IRRADIANCE_MAP:		{ texture = s_BlackCubeTexture; break; }
+				case HL_MATERIAL_TEXTURE_PREFILTER_MAP:			{ texture = s_BlackCubeTexture; break; }
+				case HL_MATERIAL_TEXTURE_BRDF_MAP:				{ texture = s_BlackCubeTexture; break; }
+				default: break;
 			}
 		}
 

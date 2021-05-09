@@ -24,7 +24,8 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(Timestep timestep)
 {
-	m_Pistol->m_Animation->Update(timestep);
+	m_Pistol->Update(timestep);
+	m_Human->Update(timestep);
 
 	m_Camera->Update();
 
@@ -45,6 +46,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
 
 	CoreRenderer::DrawMesh(m_Pistol, Transform::FromPosition({ 30, -3, 0 }).Scale(0.5f));
+	CoreRenderer::DrawMesh(m_Human, Transform::FromPosition({ 20, -5, 0 }).Scale(0.5f));
 
 	CoreRenderer::EndScene();
 }
@@ -74,51 +76,51 @@ void Sandbox::CreatePBRObjects()
 	auto sampleBRDF = Texture2D::LoadFromFile("assets/textures/brdfMap.png");
 
 	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj").GetMesh(0);
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg"));
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg"));
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Roughness.jpg"));
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::CreateFromColor({ 255, 255, 255 }));
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
-	m_PBR_Sphere->m_Material->Properties.m_RenderProperties.m_Metallic = 1;
-	m_PBR_Sphere->m_Material->Properties.m_RenderProperties.m_Roughness = 1;
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg"));
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg"));
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Roughness.jpg"));
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::CreateFromColor({ 255, 255, 255 }));
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_PBR_Sphere->GetMaterialProperties().Metallic = 1;
+	m_PBR_Sphere->GetMaterialProperties().Roughness = 1;
 
 	auto m_PBR_Gun_Model = AssetLoader::LoadStaticModel("assets/models/PBR_AK47.obj");
 	m_PBR_Gun = m_PBR_Gun_Model.GetMesh(0);
 
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/AK47/AK47_albedo.tga"));
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/AK47/AK47_normal.tga"));
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/AK47/AK47_metalness.tga"));
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/AK47/AK47_roughness.tga"));
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::LoadFromFile("assets/textures/AK47/AK47_ao.tga"));
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	m_PBR_Gun->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
-	m_PBR_Gun->m_Material->Properties.m_RenderProperties.m_Metallic = 1;
-	m_PBR_Gun->m_Material->Properties.m_RenderProperties.m_Roughness = 1;
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/AK47/AK47_albedo.tga"));
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/AK47/AK47_normal.tga"));
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/AK47/AK47_metalness.tga"));
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/AK47/AK47_roughness.tga"));
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::LoadFromFile("assets/textures/AK47/AK47_ao.tga"));
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_PBR_Gun->GetMaterialProperties().Metallic = 1;
+	m_PBR_Gun->GetMaterialProperties().Roughness = 1;
 
 	auto SphereBlueprint = MeshFactory::CreateSphere(1.0f);
-	SphereBlueprint->m_Material->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
-	SphereBlueprint->m_Material->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	SphereBlueprint->m_Material->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
 
 	for (int i = 0; i < 10; i++)
 	{
 		auto newSphere = SphereBlueprint->Copy();
-		newSphere->m_Material->Properties.m_RenderProperties.m_Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
-		newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0.1f * i;
+		newSphere->GetMaterialProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
+		newSphere->GetMaterialProperties().Roughness = 0.1f * i;
 
 		if (i == 0)
 		{
-			newSphere->m_Material->Properties.m_RenderProperties.m_Color = glm::vec4(0.0f);
-			newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0;
+			newSphere->GetMaterialProperties().Color = glm::vec4(0.0f);
+			newSphere->GetMaterialProperties().Roughness = 0;
 		}
 		if (i == 1)
 		{
-			newSphere->m_Material->Properties.m_RenderProperties.m_Color = glm::vec4(1.0f);
-			newSphere->m_Material->Properties.m_RenderProperties.m_Roughness = 0;
+			newSphere->GetMaterialProperties().Color = glm::vec4(1.0f);
+			newSphere->GetMaterialProperties().Roughness = 0;
 		}
 
 		m_TestSpheres.push_back(newSphere);
@@ -127,16 +129,18 @@ void Sandbox::CreatePBRObjects()
 	for (int i = 0; i < 10; i++)
 	{
 		auto newSphere = SphereBlueprint->Copy();
-		newSphere->m_Material->Properties.m_RenderProperties.m_Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
-		newSphere->m_Material->Properties.m_RenderProperties.m_Metallic = 0.1f * i;
+		newSphere->GetMaterialProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
+		newSphere->GetMaterialProperties().Metallic = 0.1f * i;
 
 		m_TestSpheres.push_back(newSphere);
 	}
 
 	m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/Pistol.fbx");
-	m_Pistol->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
-	/*m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/RunningPerson.dae");
-	m_Pistol->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/RunningPerson.png"));*/
+	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
+	
+	m_Human = AssetLoader::LoadAnimatedModel("assets/models/RunningPerson.dae");
+	m_Human->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/RunningPerson.png"));
 
 	m_Pistol->m_Animation->Play();
+	m_Human->m_Animation->Play();
 }

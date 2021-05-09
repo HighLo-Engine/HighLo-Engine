@@ -1,6 +1,8 @@
 #include "HighLoPch.h"
 #include "Transform.h"
 
+#include <glm/gtx/quaternion.hpp>
+
 namespace highlo
 {
 	Transform Transform::OriginTransform = Transform::FromPosition({ 0, 0, 0 });
@@ -34,6 +36,14 @@ namespace highlo
 		m_Transform = glm::translate(glm::mat4(1.0f), m_Position) *
 			glm::scale(glm::mat4(1.0f), m_Scale) * glm::mat4_cast(m_Rotation);
 
+		return *this;
+	}
+
+	Transform &Transform::Rotate(const glm::quat &rotation)
+	{
+		m_Rotation = rotation;
+		m_Transform = glm::translate(glm::mat4(1.0f), m_Position)
+			* glm::scale(glm::mat4(1.0f), m_Scale) * glm::mat4_cast(rotation);
 		return *this;
 	}
 

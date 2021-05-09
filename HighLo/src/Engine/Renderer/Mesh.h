@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Renderer/VertexData.h"
 #include "Engine/Renderer/VertexArray.h"
+#include "Engine/Core/HLTime.h"
 #include "Material.h"
 #include "Animation.h"
 
@@ -18,8 +19,13 @@ namespace highlo
 		HLAPI static Ref<Mesh> Create(const MeshData& data);
 
 		HLAPI MeshData& GetMeshData() { return m_MeshData; }
+		HLAPI void Update(Timestep timestep);
 		HLAPI void UpdateMeshData(std::vector<Vertex>& data);
 		HLAPI void UpdateMeshData();
+
+		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
+		HLAPI MaterialRenderProperties &GetMaterialProperties();
+		HLAPI MaterialPhysicalProperties &GetPhysicsProperties();
 
 		HLAPI Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 

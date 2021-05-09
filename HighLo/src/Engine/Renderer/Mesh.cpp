@@ -33,6 +33,14 @@ namespace highlo
 		return instance;
 	}
 
+	void Mesh::Update(Timestep timestep)
+	{
+		if (m_Animation != nullptr)
+		{
+			m_Animation->Update(timestep);
+		}
+	}
+
 	void Mesh::UpdateMeshData(std::vector<Vertex>& data)
 	{
 		m_VertexArray->GetVertexBuffers()[0]->UpdateContents(data);
@@ -41,6 +49,21 @@ namespace highlo
 	void Mesh::UpdateMeshData()
 	{
 		m_VertexArray->GetVertexBuffers()[0]->UpdateContents(m_MeshData.m_Vertices);
+	}
+
+	void Mesh::SetTexture(int32 type, Ref<Texture> texture)
+	{
+		m_Material->SetTexture(type, texture);
+	}
+
+	MaterialRenderProperties &Mesh::GetMaterialProperties()
+	{
+		return m_Material->Properties.m_RenderProperties;
+	}
+
+	MaterialPhysicalProperties &Mesh::GetPhysicsProperties()
+	{
+		return m_Material->Properties.m_PhysicalProperties;
 	}
 
 	Ref<Mesh> Mesh::Copy() const

@@ -150,7 +150,6 @@ void Sandbox::CreatePBRObjects()
 	m_Stormtrooper = AssetLoader::LoadAnimatedModel("assets/models/Stormtrooper.fbx");
 	m_Stormtrooper->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Stormtrooper.png"));
 
-	m_Pistol->m_Animation->AnimationSpeed = 2;
 	m_Pistol->m_Animation->Play();
 	m_Cowboy->m_Animation->Play();
 	m_Stormtrooper->m_Animation->Play();

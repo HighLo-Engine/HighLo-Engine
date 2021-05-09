@@ -25,8 +25,8 @@ namespace highlo
 		VirtualFileSystem::Init();
 
 		// Create cache for sin() and cos()
-		CreateCacheSin();
-		CreateCacheCos();
+	//	CreateCacheSin();
+	//	CreateCacheCos();
 
 		InitializeWindow();
 

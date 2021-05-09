@@ -45,7 +45,7 @@ namespace highlo
         io.ConfigViewportsNoAutoMerge = true;
         io.ConfigViewportsNoTaskBarIcon = true;
 
-        ImFont *font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 18.0f);
+        ImFont *font = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
         io.FontDefault = io.Fonts->Fonts.back();
 
         // Internal method used to override ImGui's theme colors with our own
@@ -99,13 +99,13 @@ namespace highlo
         IMGUI_WINDOW_IMPL_FN_NAME(NewFrame)();
         ImGui::NewFrame();
 
+        s_CanDraw = true;
+
         if (s_ShouldDisplayDebugInformation)
             DisplayDebugInformation();
 
         if (s_ShouldUseCustomConsole)
             DisplayCustomConsole();
-
-        s_CanDraw = true;
     }
 
     void ImGuiRenderer::EndScene()
@@ -132,6 +132,8 @@ namespace highlo
             wglMakeCurrent(wglGetCurrentDC(), backupContext);
         #endif // HIGHLO_API_GLFW
         }
+
+        ImGui::EndFrame();
     }
 
     void ImGuiRenderer::ShowDemoWindow()
@@ -388,6 +390,7 @@ namespace highlo
 
     void ImGuiRenderer::DisplayDebugInformation()
     {
+        HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
         static std::vector<float> frames;
 
         auto fps = ImGui::GetIO().Framerate;
@@ -403,7 +406,6 @@ namespace highlo
             frames.push_back(fps);
         }
 
-        ImGui::SetNextWindowPos(ImVec2(10, 10));
         ImGui::Begin("FPS Graph", 0, ImGuiWindowFlags_NoBackground);
 
         char fps_text[60];

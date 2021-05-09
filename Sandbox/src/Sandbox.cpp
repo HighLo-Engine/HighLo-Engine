@@ -71,7 +71,7 @@ void Sandbox::CreatePBRObjects()
 {
 	auto sampleBRDF = Texture2D::LoadFromFile("assets/textures/brdfMap.png");
 
-	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.dae").GetMesh(0);
+	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj").GetMesh(0);
 	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
 	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg"));
 	m_PBR_Sphere->m_Material->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg"));

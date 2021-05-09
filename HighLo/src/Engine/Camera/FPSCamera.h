@@ -19,7 +19,7 @@ namespace highlo
 	private:
 
 		float m_Speed = 0.01f;
-		float m_RotationSpeed = 0.48f;
+		float m_RotationSpeed = 0.18f;
 		float m_zNear, m_zFar, m_Fov;
 
 		glm::vec3 m_Front;

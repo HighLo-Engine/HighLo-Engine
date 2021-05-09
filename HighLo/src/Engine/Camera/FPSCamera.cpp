@@ -29,7 +29,7 @@ namespace highlo
 		auto timestep = Time::GetTimestep();
 
 		float frame_velocity = m_Speed * timestep;
-		float frame_rotation_velocity = m_RotationSpeed;
+		float frame_rotation_velocity = m_RotationSpeed * timestep;
 
 		if (Input::IsKeyPressed(HL_KEY_LEFT))
 			Rotate(glm::vec3(-frame_rotation_velocity, 0, 0));

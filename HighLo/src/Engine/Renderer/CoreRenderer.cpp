@@ -192,6 +192,18 @@ namespace highlo
 		shader->Bind();
 		material->Bind();
 
+		if (mesh->m_Animation)
+		{
+			static glm::mat4 transforms[150];
+			for (uint64 i = 0; i < mesh->m_Animation->GetCurrentPoseTransforms().size(); i++)
+				transforms[i] = mesh->m_Animation->GetCurrentPoseTransforms()[i];
+				//transforms[i] = glm::mat4(1.0f);
+
+			auto btb = shader->GetBuffer("BoneTransformsBuffer");
+			btb->SetBufferValue(&transforms[0]);
+			btb->UploadToShader();
+		}
+
 		SetObjectDataBuffer(shader, transform);
 		RenderVertexArray(mesh->GetVertexArray());
 	}

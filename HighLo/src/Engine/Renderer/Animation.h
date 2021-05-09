@@ -15,9 +15,9 @@ namespace highlo
 		glm::vec3 Translation;
 		glm::quat Rotation;
 
-		glm::mat4 GetLocalTransform();
+		HLAPI glm::mat4 GetLocalTransform();
 
-		static BoneTransform Interpolate(BoneTransform first, BoneTransform second, float progression);
+		HLAPI static BoneTransform Interpolate(BoneTransform first, BoneTransform second, float progression);
 
 	private:
 		static glm::quat Interpolate(glm::quat a, glm::quat b, float blend);
@@ -49,8 +49,8 @@ namespace highlo
 	class Animation : public IsSharedReference
 	{
 	public:
-		Animation() = default;
-		Animation(const HLString& name, float duration, float ticks_per_second, glm::mat4 inverse_transform, int bone_count, Bone root_bone, glm::mat4 correction_matrix);
+		HLAPI Animation() = default;
+		HLAPI Animation(const HLString& name, float duration, float ticks_per_second, glm::mat4 inverse_transform, int bone_count, Bone root_bone, glm::mat4 correction_matrix);
 
 		HLString Name;
 
@@ -63,21 +63,21 @@ namespace highlo
 
 		bool ShouldLoopAnimation = true;
 
-		bool IsPlaying() const { return m_IsPlaying; }
+		HLAPI bool IsPlaying() const { return m_IsPlaying; }
 
-		void Play();
-		void Pause();
-		void Stop();
-		void Update(Timestep ts);
+		HLAPI void Play();
+		HLAPI void Pause();
+		HLAPI void Stop();
+		HLAPI void Update(Timestep ts);
 
-		std::vector<glm::mat4>& GetCurrentPoseTransforms();
+		HLAPI std::vector<glm::mat4>& GetCurrentPoseTransforms();
 
-		glm::mat4 GetCorrectionMatrix() const { return m_CorrectionMatrix; }
+		HLAPI glm::mat4 GetCorrectionMatrix() const { return m_CorrectionMatrix; }
 
-		Bone* FindBone(const HLString& name);
-		void ForEachBone(Bone& bone, std::function<void(Bone&)> lambda);
+		HLAPI Bone* FindBone(const HLString& name);
+		HLAPI void ForEachBone(Bone& bone, std::function<void(Bone&)> lambda);
 
-		Bone& GetRootBone() { return m_RootBone; }
+		HLAPI Bone& GetRootBone() { return m_RootBone; }
 
 	private:
 		bool m_IsPlaying = false;

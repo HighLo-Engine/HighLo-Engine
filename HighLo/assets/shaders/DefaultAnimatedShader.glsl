@@ -5,7 +5,7 @@ layout (location = 0) in vec3 in_Position;
 layout (location = 1) in vec2 in_UV;
 layout (location = 2) in vec3 in_Normal;
 layout (location = 3) in vec3 in_Tangent;
-layout (location = 4) in vec4 in_Binormal;
+layout (location = 4) in vec3 in_Binormal;
 layout (location = 5) in ivec4 in_BoneIDs;
 layout (location = 6) in vec4 in_BoneWeights;
 
@@ -26,7 +26,7 @@ layout (std140, binding = 1) uniform VS_ObjectBuffer
 	mat4 u_Transform;
 };
 
-layout (std140, binding = 4) uniform VS_BoneTransformsBuffer
+layout (std140, binding = 4) uniform BoneTransformsBuffer
 {
 	mat4 u_BoneTransforms[150];
 };
@@ -43,12 +43,19 @@ out VS_TO_PS
 
 void main()
 {
-    vec4 WorldPosition = u_Transform * vec4(in_Position, 1.0);
+	mat4 BoneTransform = u_BoneTransforms[in_BoneIDs[0]] * in_BoneWeights[0];
+    BoneTransform += u_BoneTransforms[in_BoneIDs[1]] * in_BoneWeights[1];
+    BoneTransform += u_BoneTransforms[in_BoneIDs[2]] * in_BoneWeights[2];
+    BoneTransform += u_BoneTransforms[in_BoneIDs[3]] * in_BoneWeights[3];
+
+	vec4 LocalVertexPosition = BoneTransform * vec4(in_Position, 1.0);
+
+    vec4 WorldPosition = u_Transform * LocalVertexPosition;
 	vec4 ModelViewPosition = u_ViewMatrix * WorldPosition;
 	vec4 FinalPosition = u_ProjectionMatrix * ModelViewPosition;
 
 	VS_Output.UV = in_UV;
-	VS_Output.Normal = mat3(u_Transform) * in_Normal;
+	VS_Output.Normal = mat3(u_Transform) * mat3(BoneTransform) * in_Normal;
 	VS_Output.WorldPosition = vec3(WorldPosition);
 	VS_Output.CameraPosition = u_CameraPosition;
     VS_Output.LightPosition = u_LightPosition;

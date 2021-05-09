@@ -24,6 +24,8 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(Timestep timestep)
 {
+	m_Pistol->m_Animation->Update(timestep);
+
 	m_Camera->Update();
 
 	Renderer::ClearScreenBuffers();
@@ -37,7 +39,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
-	CoreRenderer::DrawMesh(m_PBR_Gun, Transform::FromPosition({ 18, -6, 26 }).Scale(0.24f).Rotate(y_rot, { 0, 1, 0 }));
+	CoreRenderer::DrawMesh(m_PBR_Gun, Transform::FromPosition({ 26, -6, 26 }).Scale(0.24f).Rotate(y_rot, { 0, 1, 0 }));
 
 	for (uint64 i = 0; i < m_TestSpheres.size(); i++)
 		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
@@ -133,4 +135,8 @@ void Sandbox::CreatePBRObjects()
 
 	m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/Pistol.fbx");
 	m_Pistol->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
+	/*m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/RunningPerson.dae");
+	m_Pistol->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/RunningPerson.png"));*/
+
+	m_Pistol->m_Animation->Play();
 }

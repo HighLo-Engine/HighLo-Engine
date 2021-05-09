@@ -185,12 +185,12 @@ namespace highlo
 		std::vector<BoneTransform> KeyframeTransforms;
 	};
 
-	std::map<std::string, uint32_t> BoneMapping;
+	std::map<HLString, uint32_t> BoneMapping;
 	std::vector<BoneInfo> BoneInfoList;
 
-	static std::string CalculateBoneTransforms(Bone& RootBone, const aiScene* scene, uint32_t animation_index, glm::mat4 GlobalInverseTransform, float& TicksPerSecond, float& AnimationDuration);
+	static HLString CalculateBoneTransforms(Bone& RootBone, const aiScene* scene, uint32_t animation_index, glm::mat4 GlobalInverseTransform, float& TicksPerSecond, float& AnimationDuration);
 	static Bone ReadNodeHierarchy(aiAnimation* animation, aiNode* node);
-	static const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const std::string& NodeName);
+	static const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const HLString& NodeName);
 
 	static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from)
 	{
@@ -301,7 +301,7 @@ namespace highlo
 		for (size_t i = 0; i < mesh->mNumBones; i++)
 		{
 			aiBone* bone = mesh->mBones[i];
-			std::string BoneName(bone->mName.data);
+			HLString BoneName(bone->mName.data);
 			uint32_t BoneIndex = 0;
 
 			if (BoneMapping.find(BoneName) == BoneMapping.end())
@@ -341,7 +341,7 @@ namespace highlo
 		for (uint32_t i = 0; i < scene->mNumAnimations; i++)
 		{
 			Bone RootBone;
-			std::string animation_name = CalculateBoneTransforms(RootBone, scene, i, InverseTransform, TicksPerSecond, AnimationDuration);
+			HLString animation_name = CalculateBoneTransforms(RootBone, scene, i, InverseTransform, TicksPerSecond, AnimationDuration);
 
 			auto animation = Ref<Animation>::Create(animation_name, AnimationDuration, TicksPerSecond, InverseTransform, BoneCount, RootBone, animation_correction_matrix);
 			animations.push_back(animation);
@@ -363,7 +363,7 @@ namespace highlo
 		return EngineMesh;
 	}
 
-	std::string CalculateBoneTransforms(Bone& RootBone, const aiScene* scene, uint32_t animation_index, glm::mat4 GlobalInverseTransform, float& TicksPerSecond, float& AnimationDuration)
+	HLString CalculateBoneTransforms(Bone& RootBone, const aiScene* scene, uint32_t animation_index, glm::mat4 GlobalInverseTransform, float& TicksPerSecond, float& AnimationDuration)
 	{
 		TicksPerSecond = (float)scene->mAnimations[animation_index]->mTicksPerSecond;
 		AnimationDuration = (float)scene->mAnimations[animation_index]->mDuration;
@@ -374,7 +374,7 @@ namespace highlo
 
 	Bone ReadNodeHierarchy(aiAnimation* animation, aiNode* node)
 	{
-		std::string name(node->mName.data);
+		HLString name(node->mName.data);
 		const aiNodeAnim* NodeAnim = FindNodeAnim(animation, name);
 		float keyframe_time = 0;
 
@@ -426,12 +426,12 @@ namespace highlo
 		return bone;
 	}
 
-	const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const std::string& NodeName)
+	const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const HLString& NodeName)
 	{
 		for (uint32_t i = 0; i < animation->mNumChannels; i++)
 		{
 			const aiNodeAnim* nodeAnim = animation->mChannels[i];
-			if (std::string(nodeAnim->mNodeName.data) == NodeName)
+			if (HLString(nodeAnim->mNodeName.data) == NodeName)
 				return nodeAnim;
 		}
 		return nullptr;

@@ -44,11 +44,22 @@ namespace highlo
 			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
 		};
 
+		constexpr uint32 MAX_BONES = 150;
+		static auto BoneTransformsBuffer = UniformBuffer::Create(
+			"BoneTransformsBuffer",
+			{
+				UniformVariable("u_BoneTransforms", sizeof(glm::mat4) * MAX_BONES)
+			},
+			UniformBufferParentShader::VERTEX_SHADER,
+			(uint32)HL_UB_SLOT::BONE_TRANSFORMS_BUFFER
+		);
+
 		m_StaticShader    = Shader::Create(Shader::GetDefaultEngineStaticShaderSource(), static_layout);
 		m_AnimatedShader  = Shader::Create(Shader::GetDefaultEngineAnimatedShaderSource(), animated_layout);
 
 		m_StaticShader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 		m_AnimatedShader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
+		m_AnimatedShader->AddBuffer("BoneTransformsBuffer", BoneTransformsBuffer);
 
 		static auto VS_ObjectBuffer = UniformBuffer::Create(
 			"VS_ObjectBuffer",

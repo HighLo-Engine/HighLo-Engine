@@ -57,8 +57,8 @@ namespace highlo
 		: Name(name), Duration(duration), TicksPerSecond(ticks_per_second), m_InverseTransform(inverse_transform), m_RootBone(root_bone),
 		m_BoneCount((uint32)bone_count), m_CorrectionMatrix(correction_matrix)
 	{
-		for (uint64 i = 0; i < bone_count; i++)
-			m_BoneFrameTransforms.push_back(glm::mat4(1.0f));
+		for (uint64 i = 0; i < HL_MAX_SKELETAL_BONES; i++)
+			m_BoneFrameTransforms[i] = glm::mat4(1.0f);
 	}
 
 	void Animation::CalculateFinalBoneTransforms(Bone& bone, glm::mat4 parent_transform, float animation_time)
@@ -84,13 +84,16 @@ namespace highlo
 
 	void Animation::AddBoneTransform(Bone& bone)
 	{
-		m_BoneFrameTransforms[bone.ID] = bone.UserTransformation * m_CorrectionMatrix * bone.FinalTransform;
+		glm::mat4 boneFrameTransform = bone.UserTransformation * m_CorrectionMatrix * bone.FinalTransform;
+
+		if (!isnan(boneFrameTransform[0][0]))
+			m_BoneFrameTransforms[bone.ID] = boneFrameTransform;
 
 		for (auto& child : bone.Children)
 			AddBoneTransform(child);
 	}
 
-	std::vector<glm::mat4>& Animation::GetCurrentPoseTransforms()
+	glm::mat4* Animation::GetCurrentPoseTransforms()
 	{
 		if (m_IsPlaying)
 		{
@@ -193,6 +196,9 @@ namespace highlo
 				return;
 			}
 		}
+
+		if (CurrentAnimationTime < 0)
+			CurrentAnimationTime = 0;
 
 		CurrentAnimationTime += (ts * AnimationSpeed) / AnimationSpeedDenominator;
 	}

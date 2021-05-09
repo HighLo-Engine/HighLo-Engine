@@ -14,7 +14,7 @@ namespace highlo
 			{ "NORMAL"	, ShaderDataType::Float3 },
 			{ "TANGENT"	, ShaderDataType::Float3 },
 			{ "BINORMAL", ShaderDataType::Float3 },
-			{ "BONE_IDS", ShaderDataType::Int4	 },
+			{ "BONE_IDS", ShaderDataType::Int4	},
 			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
 		};
 

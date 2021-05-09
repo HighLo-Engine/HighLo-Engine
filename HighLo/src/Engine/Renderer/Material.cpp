@@ -4,6 +4,8 @@
 #include "Engine/Math/HLMath.h"
 #include "Engine/Renderer/Renderer.h"
 
+#include "Animation.h"
+
 namespace highlo
 {
 	Ref<Material> Material::Create(MaterialProperties props)
@@ -30,11 +32,10 @@ namespace highlo
 
 	void Material::CreateShaders()
 	{
-		constexpr uint32 MAX_BONES = 150;
 		static auto BoneTransformsBuffer = UniformBuffer::Create(
 			"BoneTransformsBuffer",
 			{
-				UniformVariable("u_BoneTransforms", sizeof(glm::mat4) * MAX_BONES)
+				UniformVariable("u_BoneTransforms", sizeof(glm::mat4) * HL_MAX_SKELETAL_BONES)
 			},
 			UniformBufferParentShader::VERTEX_SHADER,
 			(uint32)HL_UB_SLOT::BONE_TRANSFORMS_BUFFER

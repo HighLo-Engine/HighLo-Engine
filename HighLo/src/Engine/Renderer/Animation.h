@@ -10,6 +10,8 @@
 
 namespace highlo
 {
+#define HL_MAX_SKELETAL_BONES 150
+
 	class BoneTransform
 	{
 	public:
@@ -70,7 +72,7 @@ namespace highlo
 		HLAPI void Stop();
 		HLAPI void Update(Timestep ts);
 
-		HLAPI std::vector<glm::mat4>& GetCurrentPoseTransforms();
+		HLAPI glm::mat4* GetCurrentPoseTransforms();
 
 		HLAPI glm::mat4 GetCorrectionMatrix() const { return m_CorrectionMatrix; }
 
@@ -89,7 +91,7 @@ namespace highlo
 		glm::mat4 m_CorrectionMatrix = glm::mat4(1.0f);
 
 	private:
-		std::vector<glm::mat4> m_BoneFrameTransforms;
+		glm::mat4 m_BoneFrameTransforms[HL_MAX_SKELETAL_BONES];
 
 	private:
 		void CalculateFinalBoneTransforms(Bone& bone, glm::mat4 parent_transform, float animation_time);

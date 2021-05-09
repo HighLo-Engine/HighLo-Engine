@@ -25,7 +25,7 @@ void Sandbox::OnInitialize()
 void Sandbox::OnUpdate(Timestep timestep)
 {
 	m_Pistol->Update(timestep);
-	m_Human->Update(timestep);
+	m_Cowboy->Update(timestep);
 
 	m_Camera->Update();
 
@@ -46,7 +46,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
 
 	CoreRenderer::DrawMesh(m_Pistol, Transform::FromPosition({ 30, -3, 0 }).Scale(0.5f));
-	CoreRenderer::DrawMesh(m_Human, Transform::FromPosition({ 20, -5, 0 }).Scale(0.5f));
+	CoreRenderer::DrawMesh(m_Cowboy, Transform::FromPosition({ 26, -5, -12 }).Scale(0.8f));
 
 	CoreRenderer::EndScene();
 }
@@ -137,10 +137,12 @@ void Sandbox::CreatePBRObjects()
 
 	m_Pistol = AssetLoader::LoadAnimatedModel("assets/models/Pistol.fbx");
 	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
-	
-	m_Human = AssetLoader::LoadAnimatedModel("assets/models/RunningPerson.dae");
-	m_Human->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/RunningPerson.png"));
 
+	m_Cowboy = AssetLoader::LoadAnimatedModel("assets/models/Cowboy.fbx", true);
+	m_Cowboy->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Cowboy.png"));
+
+	m_Pistol->m_Animation->AnimationSpeed = 2;
 	m_Pistol->m_Animation->Play();
-	m_Human->m_Animation->Play();
+
+	m_Cowboy->m_Animation->Play();
 }

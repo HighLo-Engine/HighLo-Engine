@@ -56,12 +56,12 @@ namespace highlo
 		m_Material->SetTexture(type, texture);
 	}
 
-	MaterialRenderProperties &Mesh::GetMaterialProperties()
+	MaterialRenderProperties &Mesh::GetMaterialRenderProperties()
 	{
 		return m_Material->Properties.m_RenderProperties;
 	}
 
-	MaterialPhysicalProperties &Mesh::GetPhysicsProperties()
+	MaterialPhysicalProperties &Mesh::GetMaterialPhysicsProperties()
 	{
 		return m_Material->Properties.m_PhysicalProperties;
 	}

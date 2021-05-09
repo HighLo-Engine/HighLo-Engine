@@ -23,6 +23,7 @@ private:
 	Ref<Mesh> m_PBR_Gun;
 	Ref<Mesh> m_Pistol;
 	Ref<Mesh> m_Cowboy;
+	Ref<Mesh> m_Stormtrooper;
 
 	std::vector<Ref<Mesh>> m_TestSpheres;
 

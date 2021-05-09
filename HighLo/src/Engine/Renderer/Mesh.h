@@ -24,8 +24,8 @@ namespace highlo
 		HLAPI void UpdateMeshData();
 
 		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
-		HLAPI MaterialRenderProperties &GetMaterialProperties();
-		HLAPI MaterialPhysicalProperties &GetPhysicsProperties();
+		HLAPI MaterialRenderProperties &GetMaterialRenderProperties();
+		HLAPI MaterialPhysicalProperties &GetMaterialPhysicsProperties();
 
 		HLAPI Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 

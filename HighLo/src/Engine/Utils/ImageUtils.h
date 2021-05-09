@@ -7,27 +7,27 @@
 #include "Engine/Core/HLCore.h"
 #include "Engine/Core/HLLog.h"
 #include "Engine/Core/HLAssert.h"
-#include "Engine/Renderer/ImageFormat.h"
+#include "Engine/Renderer/TextureFormat.h"
 
 namespace highlo
 {
 	namespace utils
 	{
-		inline uint32 GetImageFormatBPP(ImageFormat format)
+		inline uint32 GetImageFormatBPP(TextureFormat format)
 		{
 			switch (format)
 			{
-				case ImageFormat::RGB:
-				case ImageFormat::SRGB:
+				case TextureFormat::RGB:
+				case TextureFormat::SRGB:
 					return 3;
 
-				case ImageFormat::RGBA:
+				case TextureFormat::RGBA:
 					return 4;
 
-				case ImageFormat::RGBA16F:
+				case TextureFormat::RGBA16F:
 					return 2 * 4;
 
-				case ImageFormat::RGBA32F:
+				case TextureFormat::RGBA32F:
 					return 4 * 4;
 			}
 
@@ -40,7 +40,7 @@ namespace highlo
 			return (int32)(std::floor(std::log2(glm::min(width, height))) + 1);
 		}
 
-		inline uint32 GetImageMemorySize(ImageFormat format, uint32 width, uint32 height)
+		inline uint32 GetImageMemorySize(TextureFormat format, uint32 width, uint32 height)
 		{
 			return width * height * GetImageFormatBPP(format);
 		}

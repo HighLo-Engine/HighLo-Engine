@@ -4,9 +4,9 @@
 #ifdef HIGHLO_API_OPENGL
 
 #include <glad/glad.h>
-#include "OpenGLImage.h"
 
 #include "Engine/Application/HLApplication.h"
+#include "OpenGLTexture.h"
 
 namespace highlo
 {
@@ -48,75 +48,75 @@ namespace highlo
 			return 0;
 		}
 
-		static GLenum DepthAttachmentType(ImageFormat format)
+		static GLenum DepthAttachmentType(TextureFormat format)
 		{
 			switch (format)
 			{
-				case ImageFormat::DEPTH32F:
+				case TextureFormat::DEPTH32F:
 					return GL_DEPTH_ATTACHMENT;
 
-				case ImageFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH24STENCIL8:
 					return GL_DEPTH_STENCIL_ATTACHMENT;
 			}
 			HL_ASSERT(false, "Unknown format");
 			return 0;
 		}
 
-		static Ref<Image2D> CreateAndAttachColorAttachment(int samples, ImageFormat format, uint32 width, uint32 height, int32 index)
+		static Ref<Texture> CreateAndAttachColorAttachment(int samples, TextureFormat format, uint32 width, uint32 height, int32 index)
 		{
 			bool multisampled = samples > 1;
-			Ref<Image2D> image;
+			Ref<Texture> image;
 			if (multisampled)
 			{
 				//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
 			else
 			{
-				image = Image2D::Create(format, width, height);
+				image = Texture2D::Create(format, width, height);
 				image->Invalidate();
 			}
 
-			Ref<OpenGLImage2D> glImage = image.As<OpenGLImage2D>();
+			Ref<OpenGLTexture2D> glImage = image.As<OpenGLTexture2D>();
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), glImage->GetRendererID(), 0);
 			return image;
 		}
 
-		static Ref<Image2D> AttachDepthTexture(int samples, ImageFormat format, uint32 width, uint32 height)
+		static Ref<Texture> AttachDepthTexture(int samples, TextureFormat format, uint32 width, uint32 height)
 		{
 			bool multisampled = samples > 1;
-			Ref<Image2D> image;
+			Ref<Texture> image;
 			if (multisampled)
 			{
 				//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
 			else
 			{
-				image = Image2D::Create(format, width, height);
+				image = Texture2D::Create(format, width, height);
 				image->Invalidate();
 			}
 
-			Ref<OpenGLImage2D> glImage = image.As<OpenGLImage2D>();
+			Ref<OpenGLTexture2D> glImage = image.As<OpenGLTexture2D>();
 			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), glImage->GetRendererID(), 0);
 			return image;
 		}
 
-		static bool IsDepthFormat(ImageFormat format)
+		static bool IsDepthFormat(TextureFormat format)
 		{
 			switch (format)
 			{
-				case ImageFormat::DEPTH24STENCIL8:
-				case ImageFormat::DEPTH32F:
+				case TextureFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH32F:
 					return true;
 			}
 			return false;
 		}
 
-		static GLenum HihloFBTextureFormatToGL(ImageFormat format)
+		static GLenum HihloFBTextureFormatToGL(TextureFormat format)
 		{
 			switch (format)
 			{
-				case ImageFormat::RGBA:       return GL_RGBA8;
-				case ImageFormat::RED_INTEGER: return GL_RED_INTEGER;
+				case TextureFormat::RGBA:       return GL_RGBA8;
+				case TextureFormat::RED_INTEGER: return GL_RED_INTEGER;
 			}
 
 			HL_ASSERT(false);
@@ -178,7 +178,7 @@ namespace highlo
 				m_ColorAttachments[i] = utils::CreateAndAttachColorAttachment(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Width, m_Height, i);
 		}
 
-		if (m_DepthAttachmentFormat != ImageFormat::None)
+		if (m_DepthAttachmentFormat != TextureFormat::None)
 		{
 			m_DepthAttachment = utils::AttachDepthTexture(m_Specification.Samples, m_DepthAttachmentFormat, m_Width, m_Height);
 		}

@@ -3,14 +3,15 @@
 
 #ifdef HIGHLO_API_OPENGL
 
+#include <stb_image.h>
+
 #include "Engine/Core/HLLog.h"
 #include "Engine/Utils/ImageUtils.h"
-#include "OpenGLImage.h"
-#include <stb_image.h>
+#include "OpenGLUtils.h"
 
 namespace highlo
 {
-	OpenGLTexture2D* OpenGLTexture2D::LoadFromFile(const HLString& filepath, ImageFormat format, bool flip_on_load)
+	OpenGLTexture2D* OpenGLTexture2D::LoadFromFile(const HLString& filepath, TextureFormat format, bool flip_on_load)
 	{
 		int32 width, height, channels;
 		stbi_set_flip_vertically_on_load(flip_on_load);
@@ -30,11 +31,11 @@ namespace highlo
 		return instance;
 	}
 
-	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, ImageFormat format)
+	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, TextureFormat format)
 	{
 		OpenGLTexture2D* instance = nullptr;
 
-		if (format == ImageFormat::RGBA8)
+		if (format == TextureFormat::RGBA8)
 		{
 			unsigned char data[4] = { (unsigned char)rgb.x, (unsigned char)rgb.y, (unsigned char)rgb.z, (unsigned char)255 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
@@ -54,13 +55,13 @@ namespace highlo
 		return instance;
 	}
 	
-	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, ImageFormat format)
+	OpenGLTexture2D* OpenGLTexture2D::CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, TextureFormat format)
 	{
 		OpenGLTexture2D* instance = nullptr;
 
 #pragma warning( push )
 #pragma warning( disable : 6386)
-		if (format == ImageFormat::RGBA8)
+		if (format == TextureFormat::RGBA8)
 		{
 			unsigned char* data = new unsigned char[(uint64)width * (uint64)height * (uint64)4];
 
@@ -113,21 +114,23 @@ namespace highlo
 		return instance;
 	}
 	
-	OpenGLTexture2D::OpenGLTexture2D(void* img_data, uint32 width, uint32 height, ImageFormat format)
+	OpenGLTexture2D::OpenGLTexture2D(void* img_data, uint32 width, uint32 height, TextureFormat format)
 		: m_ImageData(img_data), m_Width(width), m_Height(height)
 	{
 		switch (format)
 		{
-			case ImageFormat::RGBA8:
+			case TextureFormat::RGBA8:
 			{
 				m_InternalFormat = GL_RGBA8;
 				break;
 			}
-			case ImageFormat::RGBA16:
+
+			case TextureFormat::RGBA16:
 			{
 				m_InternalFormat = GL_RGBA16;
 				break;
 			}
+
 			default:
 			{
 				m_InternalFormat = GL_RGBA8;
@@ -151,16 +154,88 @@ namespace highlo
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+
+	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height)
+	{
+		switch (format)
+		{
+			case TextureFormat::RGBA8:
+			{
+				m_InternalFormat = GL_RGBA8;
+				break;
+			}
+
+			case TextureFormat::RGBA16:
+			{
+				m_InternalFormat = GL_RGBA16;
+				break;
+			}
+
+			default:
+			{
+				m_InternalFormat = GL_RGBA8;
+				break;
+			}
+		}
+
+		Format = format;
+		m_Width = width;
+		m_Height = height;
+		m_DataFormat = GL_RGBA;
+
+		glGenTextures(1, &m_ID);
+		glBindTexture(GL_TEXTURE_2D, m_ID);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 	
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		glDeleteTextures(1, &m_ID);
-		stbi_image_free(m_ImageData);
+		if (m_ImageData)
+			stbi_image_free(m_ImageData);
 	}
 	
 	void* OpenGLTexture2D::GetData() const
 	{
 		return m_ImageData;
+	}
+
+	void OpenGLTexture2D::Release()
+	{
+		if (m_ID)
+		{
+			glDeleteTextures(1, &m_ID);
+			m_ID = 0;
+		}
+
+		if (m_ImageData)
+			stbi_image_free(m_ImageData);
+	}
+
+	void OpenGLTexture2D::Invalidate()
+	{
+		if (m_ID)
+			Release();
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
+		GLenum glInternalFormat = utils::OpenGLImageInternalFormat(Format);
+		uint32 mipCount = utils::CalculateMipCount(m_Width, m_Height);
+		glTextureStorage2D(m_ID, mipCount, glInternalFormat, m_Width, m_Height);
+
+		if (m_ImageData)
+		{
+			GLenum glFormat = utils::OpenGLImageFormat(Format);
+			GLenum glDataType = utils::OpenGLFormatDataType(Format);
+			glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, glFormat, glDataType, m_ImageData);
+			glGenerateTextureMipmap(m_ID);
+		}
 	}
 	
 	void OpenGLTexture2D::UpdateResourceData()
@@ -179,16 +254,16 @@ namespace highlo
 
 		if (idx >= (uint64)m_Width * (uint64)m_Height * 4 || idx < 0) return;
 
-		if (Format == ImageFormat::RGBA8)
+		if (Format == TextureFormat::RGBA8)
 		{
-			((unsigned char*)m_ImageData)[idx] = (unsigned char)rgba.r;
-			((unsigned char*)m_ImageData)[idx + 1] = (unsigned char)rgba.g;
-			((unsigned char*)m_ImageData)[idx + 2] = (unsigned char)rgba.b;
-			((unsigned char*)m_ImageData)[idx + 3] = (unsigned char)rgba.a;
+			((Byte*)m_ImageData)[idx]	  = (Byte)rgba.r;
+			((Byte*)m_ImageData)[idx + 1] = (Byte)rgba.g;
+			((Byte*)m_ImageData)[idx + 2] = (Byte)rgba.b;
+			((Byte*)m_ImageData)[idx + 3] = (Byte)rgba.a;
 		}
 		else
 		{
-			((uint16*)m_ImageData)[idx] = (uint16)rgba.r;
+			((uint16*)m_ImageData)[idx]		= (uint16)rgba.r;
 			((uint16*)m_ImageData)[idx + 1] = (uint16)rgba.g;
 			((uint16*)m_ImageData)[idx + 2] = (uint16)rgba.b;
 			((uint16*)m_ImageData)[idx + 3] = (uint16)rgba.a;
@@ -203,14 +278,14 @@ namespace highlo
 
 		glm::ivec4 rgba = { 0, 0, 0, 0 };
 
-		if (Format == ImageFormat::RGBA8)
+		if (Format == TextureFormat::RGBA8)
 		{
-			rgba.r = (uint32)(((unsigned char*)m_ImageData)[idx]);
-			rgba.g = (uint32)(((unsigned char*)m_ImageData)[idx + 1]);
-			rgba.b = (uint32)(((unsigned char*)m_ImageData)[idx + 2]);
-			rgba.a = (uint32)(((unsigned char*)m_ImageData)[idx + 3]);
+			rgba.r = (uint32)(((Byte*)m_ImageData)[idx]);
+			rgba.g = (uint32)(((Byte*)m_ImageData)[idx + 1]);
+			rgba.b = (uint32)(((Byte*)m_ImageData)[idx + 2]);
+			rgba.a = (uint32)(((Byte*)m_ImageData)[idx + 3]);
 		}
-		else if (Format == ImageFormat::RGBA16)
+		else if (Format == TextureFormat::RGBA16)
 		{
 			rgba.r = (uint32)(((uint16*)m_ImageData)[idx]);
 			rgba.g = (uint32)(((uint16*)m_ImageData)[idx + 1]);
@@ -226,7 +301,7 @@ namespace highlo
 		return utils::CalculateMipCount(m_Width, m_Height);
 	}
 
-	HLRendererID OpenGLTexture2D::GetRendererID()
+	HLRendererID OpenGLTexture2D::GetRendererID() const
 	{
 		return m_ID;
 	}
@@ -277,7 +352,7 @@ namespace highlo
 
 	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString>& filePaths)
 	{
-		m_Format = ImageFormat::RGBA;
+		m_Format = TextureFormat::RGBA;
 
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
@@ -309,7 +384,7 @@ namespace highlo
 		HL_CORE_INFO("Texture3D>    [+] Loaded 6 textures starting with {0} [+]", filePaths[0].C_Str());
 	}
 
-	OpenGLTexture3D::OpenGLTexture3D(ImageFormat format, uint32 width, uint32 height, const void* data)
+	OpenGLTexture3D::OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void* data)
 	{
 		m_Width = width;
 		m_Height = height;
@@ -356,25 +431,61 @@ namespace highlo
 		return m_Buffer.m_Data;
 	}
 
+	void OpenGLTexture3D::Release()
+	{
+		if (m_ID)
+		{
+			glDeleteTextures(1, &m_ID);
+			m_ID = 0;
+		}
+
+		if (m_Buffer)
+			m_Buffer.Release();
+	}
+
+	void OpenGLTexture3D::Invalidate()
+	{
+		if (m_ID)
+			Release();
+
+		uint32 levels = utils::CalculateMipCount(m_Width, m_Height);
+
+		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_ID);
+		glTextureStorage2D(m_ID, levels, utils::OpenGLImageInternalFormat(m_Format), m_Width, m_Height);
+
+		if (m_Buffer.m_Data)
+			glTextureSubImage3D(m_ID, 0, 0, 0, 0, m_Width, m_Height, 6, utils::OpenGLImageFormat(m_Format), utils::OpenGLFormatDataType(m_Format), m_Buffer.m_Data);
+
+		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	}
+
 	void OpenGLTexture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
 		// @TODO
+		HL_ASSERT(false, "Not implemented yet");
 	}
 
 	glm::ivec4 OpenGLTexture3D::ReadPixel(uint32 row, uint32 column)
 	{
 		// @TODO
+		HL_ASSERT(false, "Not implemented yet");
 		return {};
 	}
 
 	void OpenGLTexture3D::UpdateResourceData(void *data)
 	{
 		// @TODO
+		HL_ASSERT(false, "Not implemented yet");
 	}
 
 	void OpenGLTexture3D::UpdateResourceData()
 	{
 		// @TODO
+		HL_ASSERT(false, "Not implemented yet");
 	}
 
 	uint32 OpenGLTexture3D::GetMipLevelCount()
@@ -382,7 +493,7 @@ namespace highlo
 		return utils::CalculateMipCount(m_Width, m_Height);
 	}
 
-	HLRendererID OpenGLTexture3D::GetRendererID()
+	HLRendererID OpenGLTexture3D::GetRendererID() const
 	{
 		return m_ID;
 	}

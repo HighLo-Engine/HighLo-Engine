@@ -56,7 +56,7 @@ namespace highlo
 		s_Data->ShaderLib = Ref<ShaderLibrary>::Create();
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		s_Data->BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
+		s_Data->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
 		s_Data->WhiteTexture = Texture2D::CreateFromColor({ 1.0f, 1.0f, 1.0f }).As<Texture2D>();
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 

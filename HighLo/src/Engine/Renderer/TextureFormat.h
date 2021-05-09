@@ -2,7 +2,7 @@
 
 namespace highlo
 {
-	enum class ImageFormat
+	enum class TextureFormat
 	{
 		None = 0,
 		RGB,

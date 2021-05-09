@@ -21,8 +21,8 @@ namespace highlo
 
 		virtual void BindTexture(uint32 attachmentIndex = 0, uint32 slot = 0) const override;
 
-		inline virtual Ref<Image2D> GetImage(uint32 attachmentIndex = 0) const override { return m_ColorAttachments[attachmentIndex]; }
-		inline virtual Ref<Image2D> GetDepthImage() const override { return m_DepthAttachment; }
+		inline virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { return m_ColorAttachments[attachmentIndex]; }
+		inline virtual Ref<Texture> GetDepthImage() const override { return m_DepthAttachment; }
 
 		inline virtual uint32 GetWidth() const override { return m_Width; }
 		inline virtual uint32 GetHeight() const override { return m_Height; }
@@ -39,11 +39,11 @@ namespace highlo
 		FramebufferSpecification m_Specification;
 		HLRendererID m_RendererID = 0;
 
-		std::vector<Ref<Image2D>> m_ColorAttachments;
-		Ref<Image2D> m_DepthAttachment;
+		std::vector<Ref<Texture>> m_ColorAttachments;
+		Ref<Texture> m_DepthAttachment;
 
-		std::vector<ImageFormat> m_ColorAttachmentFormats;
-		ImageFormat m_DepthAttachmentFormat = ImageFormat::None;
+		std::vector<TextureFormat> m_ColorAttachmentFormats;
+		TextureFormat m_DepthAttachmentFormat = TextureFormat::None;
 
 		uint32 m_Width = 0;
 		uint32 m_Height = 0;

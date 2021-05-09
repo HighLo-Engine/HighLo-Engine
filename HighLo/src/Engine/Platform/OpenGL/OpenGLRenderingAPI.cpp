@@ -8,7 +8,6 @@
 #include <glad/glad.h>
 
 #include "Engine/Renderer/Renderer.h"
-#include "OpenGLImage.h"
 #include "OpenGLShader.h"
 #include "OpenGLTexture.h"
 
@@ -93,12 +92,12 @@ namespace highlo
 
 		envFilteringShader->AddBuffer("EnvironmentBuffer", environmentBuffer);
 
-		Ref<Texture3D> envUnfiltered = Texture3D::Create(ImageFormat::RGBA32F, cubemapSize, cubemapSize);
-		Ref<Texture3D> envFiltered = Texture3D::Create(ImageFormat::RGBA32F, cubemapSize, cubemapSize);
-		Ref<Texture3D> irradianceMap = Texture3D::Create(ImageFormat::RGBA32F, irradianceMapSize, irradianceMapSize);
+		Ref<Texture3D> envUnfiltered = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
+		Ref<Texture3D> envFiltered = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
+		Ref<Texture3D> irradianceMap = Texture3D::Create(TextureFormat::RGBA32F, irradianceMapSize, irradianceMapSize);
 
-		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(path, ImageFormat::RGBA32F);
-		HL_ASSERT(envEquirect->GetFormat() == ImageFormat::RGBA32F, "Texture is not a HDR Texture!");
+		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(path, TextureFormat::RGBA32F);
+		HL_ASSERT(envEquirect->GetFormat() == TextureFormat::RGBA32F, "Texture is not a HDR Texture!");
 
 		equirectangularConversionShader->Bind();
 		envEquirect->Bind(1);

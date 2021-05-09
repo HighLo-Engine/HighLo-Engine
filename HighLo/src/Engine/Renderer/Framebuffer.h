@@ -5,17 +5,18 @@
 #include "Engine/Core/HLCore.h"
 #include "Engine/Core/HLLog.h"
 #include "Engine/Core/DataTypes/HLString.h"
-#include "Engine/Renderer/Image.h"
+#include "Engine/Renderer/TextureFormat.h"
+#include "Engine/Renderer/Texture.h"
 
 namespace highlo
 {
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
-		FramebufferTextureSpecification(ImageFormat format)
+		FramebufferTextureSpecification(TextureFormat format)
 			: m_Format(format) {}
 
-		ImageFormat m_Format;
+		TextureFormat m_Format;
 	};
 
 	struct FramebufferAttachmentSpecification
@@ -63,8 +64,8 @@ namespace highlo
 
 		virtual HLRendererID GetRendererID() const = 0;
 
-		virtual Ref<Image2D> GetImage(uint32 attachmentIndex = 0) const = 0;
-		virtual Ref<Image2D> GetDepthImage() const = 0;
+		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const = 0;
+		virtual Ref<Texture> GetDepthImage() const = 0;
 
 		virtual const FramebufferSpecification &GetSpecification() const = 0;
 

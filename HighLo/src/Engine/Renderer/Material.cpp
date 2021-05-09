@@ -92,7 +92,7 @@ namespace highlo
 		static Ref<Texture> s_DefaultAO		   = Texture2D::CreateFromColor({ 255, 255, 255 });
 
 		static uint32 s_BlackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		static Ref<Texture> s_BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &s_BlackTextureData).As<Texture3D>();
+		static Ref<Texture> s_BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &s_BlackTextureData).As<Texture3D>();
 
 		if (!texture)
 		{

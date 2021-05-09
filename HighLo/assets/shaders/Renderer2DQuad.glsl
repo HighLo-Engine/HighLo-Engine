@@ -51,6 +51,6 @@ layout(binding = 0) uniform sampler2D u_Textures[32];
 
 void main()
 {
-	Color = texture(u_Texture[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * Input.Color;
+	Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * Input.Color;
 }
 

@@ -87,7 +87,6 @@ namespace highlo
 		s_2DData->WhiteTexture = Renderer::GetWhiteTexture();
 
 		// Create Shaders
-		ShaderSource textureShaderSource = Shader::LoadShaderSource("assets/shaders/Renderer2DQuad.glsl");
 		BufferLayout textureLayout = {
 			{ "in_Position", ShaderDataType::Float3 },
 			{ "in_Color", ShaderDataType::Float4 },
@@ -95,23 +94,21 @@ namespace highlo
 			{ "in_TexIndex", ShaderDataType::Float },
 			{ "in_TilingFactor", ShaderDataType::Float },
 		};
-		s_2DData->TextureShader = Shader::Create(textureShaderSource, textureLayout);
-
-		ShaderSource lineShaderSource = Shader::LoadShaderSource("assets/shaders/Renderer2DLine.glsl");
 		BufferLayout lineLayout = {
 			{ "in_Position", ShaderDataType::Float3 },
 			{ "in_Color", ShaderDataType::Float4 }
 		};
-		s_2DData->LineShader = Shader::Create(lineShaderSource, lineLayout);
 
-		ShaderSource circleShaderSource = Shader::LoadShaderSource("assets/shaders/Renderer2DCircle.glsl");
 		BufferLayout circleLayout = {
 			{ "in_WorldPosition", ShaderDataType::Float3 },
 			{ "in_Thickness", ShaderDataType::Float },
 			{ "in_LocalPosition", ShaderDataType::Float2 },
 			{ "in_Color", ShaderDataType::Float4 },
 		};
-		s_2DData->CircleShader = Shader::Create(circleShaderSource, circleLayout);
+
+		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
+		s_2DData->LineShader = Renderer::GetShaderLibrary()->Get("Renderer2DLine");
+		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
 
 		static auto cameraBuffer = UniformBuffer::Create(
 			"Camera",

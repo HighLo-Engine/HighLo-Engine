@@ -5,6 +5,7 @@
 #include "ImGuiRenderer.h"
 #include "Texture.h"
 #include "Environment.h"
+#include "ShaderLibrary.h"
 
 namespace highlo
 {
@@ -31,6 +32,7 @@ namespace highlo
 		HLAPI static Ref<Texture2D> GetWhiteTexture();
 		HLAPI static Ref<Environment> GetEmptyEnvironment();
 		HLAPI static RendererConfig &GetConfig();
+		HLAPI static Ref<ShaderLibrary> GetShaderLibrary();
 
 		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
 

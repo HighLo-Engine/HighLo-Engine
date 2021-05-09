@@ -35,6 +35,7 @@
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/Environment.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/ShaderLibrary.h"
 #include "Engine/Renderer/UniformBuffer.h"
 #include "Engine/Renderer/UniformBufferSlotMappings.h"
 #include "Engine/Renderer/Mesh.h"

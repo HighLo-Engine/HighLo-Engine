@@ -15,6 +15,7 @@ namespace highlo
 		// Inherited via Shader
 		virtual void Bind() const override;
 		virtual HLRendererID GetRendererID() override;
+		virtual const HLString &GetName() const override { return m_Name; }
 
 	private:
 		uint32 CompileGLSLShader(const char* code, uint32 type);
@@ -24,6 +25,9 @@ namespace highlo
 
 	private:
 		void CompileComputeShader(const ShaderSource& source);
+
+		HLString m_FileName;
+		HLString m_Name;
 	};
 }
 

@@ -1,11 +1,13 @@
 #include "HighLoPch.h"
 #include "Skybox.h"
+
 #include "Engine/Renderer/MeshFactory.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CoreRenderer.h"
 
 namespace highlo
 {
-	static constexpr uint32_t SKYBOX_SIZE = 2000;
+	static constexpr uint32 SKYBOX_SIZE = 2000;
 
 	Ref<Skybox> Skybox::Create()
 	{
@@ -45,13 +47,7 @@ namespace highlo
 
 	void Skybox::CreateShader()
 	{
-		static BufferLayout layout = {
-			{ "POSITION", ShaderDataType::Float3 },
-		};
-
-		auto shaderPath = Shader::GetDefaultEngineShaderFolder() + "SkyboxShader.glsl";
-		m_Shader = Shader::Create(Shader::LoadShaderSource(shaderPath), layout);
-
+		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
 		m_Shader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 	}
 }

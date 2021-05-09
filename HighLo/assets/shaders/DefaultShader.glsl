@@ -1,4 +1,5 @@
 #shader vertex
+
 #version 450 core
 
 layout (location = 0) in vec3 in_Position;
@@ -49,6 +50,7 @@ void main()
 }
 
 #shader pixel
+
 #version 450 core
 
 const float PI = 3.141592;

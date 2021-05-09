@@ -77,6 +77,9 @@ namespace highlo
 	class BufferLayout
 	{
 	public:
+
+		static BufferLayout Empty;
+
 		BufferLayout() {}
 
 		BufferLayout(const std::initializer_list<BufferElement>& elements)

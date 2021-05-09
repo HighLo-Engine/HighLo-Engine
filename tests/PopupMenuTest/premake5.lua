@@ -35,7 +35,7 @@ project "PopupMenuTest"
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/PopupMenuTest/bin/" .. outputdir .. "/PopupMenuTest/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.dll %{wks.location}tests/PopupMenuTest/bin/" .. outputdir .. "/PopupMenuTest/assimp-vc141-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/PopupMenuTest/bin/" .. outputdir .. "/PopupMenuTest/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/PopupMenuTest/bin/" .. outputdir .. "/PopupMenuTest/assets")
 	}
 

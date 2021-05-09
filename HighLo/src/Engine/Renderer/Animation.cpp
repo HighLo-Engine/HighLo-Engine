@@ -8,9 +8,7 @@ namespace highlo
 {
 	Transform BoneTransform::GetLocalTransform()
 	{
-		Transform localTransform;
-		localTransform = localTransform.FromPosition(Translation).Rotate(Rotation);
-		return localTransform;
+		return Transform::FromPosition(Translation).Rotate(Rotation);
 	}
 
 	BoneTransform BoneTransform::Interpolate(BoneTransform first, BoneTransform second, float progression)
@@ -36,7 +34,7 @@ namespace highlo
 		float dot = a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
 		float blendI = 1.0f - blend;
 
-		if (dot < 0)
+		if (dot < 0.0f)
 		{
 			result.w = blendI * a.w + blend * -b.w;
 			result.x = blendI * a.x + blend * -b.x;

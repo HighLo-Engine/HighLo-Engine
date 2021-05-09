@@ -3,6 +3,8 @@
 
 namespace highlo
 {
+	BufferLayout BufferLayout::Empty = std::initializer_list<BufferElement>();
+
 	void BufferLayout::CalculateOffsetsAndStride()
 	{
 		uint32 offset = 0;

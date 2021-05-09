@@ -85,49 +85,6 @@ namespace highlo
 		);
 	}
 
-	const HLString Shader::GetDefaultEngineShaderFolder()
-	{
-		return "assets/shaders/";
-	}
-
-	ShaderSource Shader::GetDefaultEngineStaticShaderSource()
-	{
-		static ShaderSource source;
-		static bool first_time = true;
-
-		if (first_time)
-		{
-#ifdef HIGHLO_API_OPENGL
-			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultShader.glsl");
-#endif
-#ifdef HIGHLO_API_DX11
-			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultShader.hlsl");
-#endif
-			first_time = false;
-		}
-
-		return source;
-	}
-
-	ShaderSource Shader::GetDefaultEngineAnimatedShaderSource()
-	{
-		static ShaderSource source;
-		static bool first_time = true;
-
-		if (first_time)
-		{
-#ifdef HIGHLO_API_OPENGL
-			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultAnimatedShader.glsl");
-#endif
-#ifdef HIGHLO_API_DX11
-			source = LoadShaderSource(GetDefaultEngineShaderFolder() + "DefaultAnimatedShader.hlsl");
-#endif
-			first_time = false;
-		}
-
-		return source;
-	}
-
     ShaderSource Shader::LoadShaderSource(const HLString& filename)
     {
 		ShaderSource result;
@@ -188,6 +145,7 @@ namespace highlo
 		result.m_GeometryShaderSrc					= HLString(shader_sources[ShaderType::GEOMETRY_SHADER].str().c_str());
 		result.m_PixelShaderSrc						= HLString(shader_sources[ShaderType::PIXEL_SHADER].str().c_str());
 		result.m_ComputeShaderSrc					= HLString(shader_sources[ShaderType::COMPUTE_SHADER].str().c_str());
+		result.m_FileName							= filename;
 
 		HL_CORE_INFO("Shader>    [+] Loaded " + filename + " [+]");
 		return result;

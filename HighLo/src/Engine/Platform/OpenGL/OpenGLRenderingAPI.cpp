@@ -81,8 +81,9 @@ namespace highlo
 		const uint32 cubemapSize = 2048;
 		const uint32 irradianceMapSize = 32;
 
-		ShaderSource equirectangularConversionShaderSource = Shader::LoadShaderSource("assets/shaders/EquirectangularToCubeMap.glsl");
-		Ref<Shader> equirectangularConversionShader = Shader::CreateComputeShader(equirectangularConversionShaderSource);
+		Ref<Shader> equirectangularConversionShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCubeMap");
+		Ref<Shader> envFilteringShader = Renderer::GetShaderLibrary()->Get("EnvironmentMipFilter");
+		Ref<Shader> envIrradianceShader = Renderer::GetShaderLibrary()->Get("EnvironmentIrradiance");
 
 		static auto environmentBuffer = UniformBuffer::Create(
 			"EnvironmentBuffer",
@@ -90,11 +91,6 @@ namespace highlo
 			UniformBufferParentShader::COMPUTE_SHADER,
 			(uint32)HL_UB_SLOT::ENVIRONMENT_DATA_BUFFER);
 
-		ShaderSource envFilteringShaderSource = Shader::LoadShaderSource("assets/shaders/EnvironmentMipFilter.glsl");
-		Ref<Shader> envFilteringShader = Shader::CreateComputeShader(envFilteringShaderSource);
-
-		ShaderSource envIrradianceShaderSource = Shader::LoadShaderSource("assets/shaders/EnvironmentIrradiance.glsl");
-		Ref<Shader> envIrradianceShader = Shader::CreateComputeShader(envIrradianceShaderSource);
 		envFilteringShader->AddBuffer("EnvironmentBuffer", environmentBuffer);
 
 		Ref<Texture3D> envUnfiltered = Texture3D::Create(ImageFormat::RGBA32F, cubemapSize, cubemapSize);

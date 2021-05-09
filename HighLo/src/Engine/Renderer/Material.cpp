@@ -1,6 +1,8 @@
 #include "HighLoPch.h"
 #include "Material.h"
+
 #include "Engine/Math/HLMath.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace highlo
 {
@@ -28,22 +30,6 @@ namespace highlo
 
 	void Material::CreateShaders()
 	{
-		static BufferLayout static_layout = {
-			{ "POSITION", ShaderDataType::Float3 },
-			{ "UV"		, ShaderDataType::Float2 },
-			{ "NORMAL"	, ShaderDataType::Float3 }
-		};
-
-		static BufferLayout animated_layout = {
-			{ "POSITION", ShaderDataType::Float3 },
-			{ "UV"		, ShaderDataType::Float2 },
-			{ "NORMAL"	, ShaderDataType::Float3 },
-			{ "TANGENT"	, ShaderDataType::Float3 },
-			{ "BINORMAL", ShaderDataType::Float3 },
-			{ "BONE_IDS", ShaderDataType::Int4 },
-			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
-		};
-
 		constexpr uint32 MAX_BONES = 150;
 		static auto BoneTransformsBuffer = UniformBuffer::Create(
 			"BoneTransformsBuffer",
@@ -54,8 +40,8 @@ namespace highlo
 			(uint32)HL_UB_SLOT::BONE_TRANSFORMS_BUFFER
 		);
 
-		m_StaticShader    = Shader::Create(Shader::GetDefaultEngineStaticShaderSource(), static_layout);
-		m_AnimatedShader  = Shader::Create(Shader::GetDefaultEngineAnimatedShaderSource(), animated_layout);
+		m_StaticShader   = Renderer::GetShaderLibrary()->Get("DefaultShader");
+		m_AnimatedShader = Renderer::GetShaderLibrary()->Get("DefaultAnimatedShader");
 
 		m_StaticShader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 		m_AnimatedShader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());

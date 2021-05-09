@@ -8,6 +8,7 @@ namespace highlo
 {
 	struct ShaderSource
 	{
+		HLString m_FileName;
 		HLString m_VertexShaderSrc;
 		HLString m_TessellationControlShaderSrc;
 		HLString m_TessellationEvaluationShaderSrc;
@@ -19,16 +20,14 @@ namespace highlo
 	class Shader : public IsSharedReference
 	{
 	public:
-		static const HLString GetDefaultEngineShaderFolder();
 		static ShaderSource LoadShaderSource(const HLString& filename);
-		static ShaderSource GetDefaultEngineStaticShaderSource();
-		static ShaderSource GetDefaultEngineAnimatedShaderSource();
 
 		static Ref<Shader> Create(const ShaderSource& source, const BufferLayout& layout);
 		static Ref<Shader> CreateComputeShader(const ShaderSource& source);
 
 		virtual void Bind() const = 0;
 		virtual HLRendererID GetRendererID() = 0;
+		virtual const HLString &GetName() const = 0;
 
 		Ref<UniformBuffer> GetBuffer(const HLString& name);
 		void AddBuffer(const HLString& name, Ref<UniformBuffer> buffer);

@@ -25,6 +25,7 @@ namespace highlo
 		Ref<Texture3D> BlackCubeTexture;
 		Ref<Texture2D> WhiteTexture;
 		Ref<Environment> EmptyEnvironment;
+		Ref<ShaderLibrary> ShaderLib;
 	};
 
 	static RendererData *s_Data = nullptr;
@@ -52,11 +53,63 @@ namespace highlo
 	void Renderer::Init(Window* window)
 	{
 		s_Data = new RendererData();
+		s_Data->ShaderLib = Ref<ShaderLibrary>::Create();
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->BlackCubeTexture = Texture3D::Create(ImageFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
 		s_Data->WhiteTexture = Texture2D::CreateFromColor({ 1.0f, 1.0f, 1.0f }).As<Texture2D>();
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
+
+		// Define Shader layouts
+		BufferLayout textureLayout2D = {
+			{ "in_Position", ShaderDataType::Float3 },
+			{ "in_Color", ShaderDataType::Float4 },
+			{ "in_TexCoord", ShaderDataType::Float2 },
+			{ "in_TexIndex", ShaderDataType::Float },
+			{ "in_TilingFactor", ShaderDataType::Float },
+		};
+		BufferLayout lineLayout2D = {
+			{ "in_Position", ShaderDataType::Float3 },
+			{ "in_Color", ShaderDataType::Float4 }
+		};
+		BufferLayout circleLayout2D = {
+			{ "in_WorldPosition", ShaderDataType::Float3 },
+			{ "in_Thickness", ShaderDataType::Float },
+			{ "in_LocalPosition", ShaderDataType::Float2 },
+			{ "in_Color", ShaderDataType::Float4 },
+		};
+		BufferLayout staticPBRLayout = {
+			{ "POSITION", ShaderDataType::Float3 },
+			{ "UV"		, ShaderDataType::Float2 },
+			{ "NORMAL"	, ShaderDataType::Float3 }
+		};
+		BufferLayout animatedPBRLayout = {
+			{ "POSITION", ShaderDataType::Float3 },
+			{ "UV"		, ShaderDataType::Float2 },
+			{ "NORMAL"	, ShaderDataType::Float3 },
+			{ "TANGENT"	, ShaderDataType::Float3 },
+			{ "BINORMAL", ShaderDataType::Float3 },
+			{ "BONE_IDS", ShaderDataType::Int4 },
+			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
+		};
+		BufferLayout skyboxLayout = {
+			{ "POSITION", ShaderDataType::Float3 },
+		};
+
+		// Load PBR Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticPBRLayout);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedPBRLayout);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", skyboxLayout);
+
+		// Load 2D Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", textureLayout2D);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", lineLayout2D);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", circleLayout2D);
+
+		// Load Compute Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl", BufferLayout::Empty, true);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty, true);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty, true);
 
 		CoreRenderer::Init();
 		ImGuiRenderer::Init(window);
@@ -90,6 +143,11 @@ namespace highlo
 	RendererConfig &Renderer::GetConfig()
 	{
 		return s_Data->Config;
+	}
+
+	Ref<ShaderLibrary> Renderer::GetShaderLibrary()
+	{
+		return s_Data->ShaderLib;
 	}
 
 	Ref<Environment> Renderer::CreateEnvironment(const HLString &path)

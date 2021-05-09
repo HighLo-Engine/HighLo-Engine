@@ -5,14 +5,19 @@
 
 #include <glad/glad.h>
 
+#include "Engine/Core/HLVirtualFileSystem.h"
+
 namespace highlo
 {
 	OpenGLShader::OpenGLShader(const ShaderSource& source, bool isCompute)
+		: m_FileName(source.m_FileName)
 	{
 		if (!isCompute)
 			CompileGLSLProgram(source);
 		else
 			CompileComputeShader(source);
+
+		m_Name = VirtualFileSystem::Get()->GetFileNameFromPath(source.m_FileName);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -50,7 +55,7 @@ namespace highlo
 			glDeleteShader(shader_id);
 
 			HL_CORE_ERROR(info_log.data());
-			HL_CORE_ERROR("Failed to compile shader");
+			HL_CORE_ERROR("Failed to compile shader {0}", *m_FileName);
 			return 0;
 		}
 
@@ -110,7 +115,7 @@ namespace highlo
 			if (gs_id)  glDeleteShader(gs_id);
 
 			HL_CORE_ERROR(info_log.data());
-			HL_CORE_ERROR("Failed to link shader");
+			HL_CORE_ERROR("Failed to link shader {0}", *m_FileName);
 			return;
 		}
 

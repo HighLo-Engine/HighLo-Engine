@@ -12,7 +12,7 @@ IncludeDir["stb_image"]    = "%{wks.location}/HighLo/vendor/stb_image"
 IncludeDir["SPIRV_Cross"]  = "%{wks.location}/HighLo/vendor/SPIRV-Cross"
 
 LibDir = {}
-LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc141-mtd.lib"
+LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"
 LibDir["shaderc"]                    = "%{wks.location}/HighLovendor/shaderc/lib/%{cfg.buildcfg}/shaderc.lib"
 LibDir["shaderc_util"]               = "%{wks.location}/HighLovendor/shaderc/lib/%{cfg.buildcfg}/shaderc_util.lib"
 LibDir["glslang"]                    = "%{wks.location}/HighLovendor/glslang/lib/%{cfg.buildcfg}/glslang.lib"

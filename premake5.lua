@@ -46,7 +46,7 @@ workspace "HighLo"
 		include "HighLo/vendor/assimp"
 		include "HighLo/vendor/spdlog"
 		include "HighLo/vendor/stb_image"
-		--include "HighLo/vendor/SPIRV-Cross"
+		include "HighLo/vendor/SPIRV-Cross"
 	group ""
 
 	group "Engine"

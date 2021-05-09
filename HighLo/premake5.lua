@@ -33,7 +33,7 @@ project "HighLo"
     {
         "GLFW",
         "GLAD",
-        --"SPIRV-Cross",
+        "SPIRV-Cross",
         "stbimage",
         "%{LibDir.assimp}",
         "opengl32.lib",

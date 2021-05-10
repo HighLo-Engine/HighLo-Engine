@@ -1,4 +1,4 @@
-project "LevelEditor"
+project "HighLoEdit"
     kind "ConsoleApp"
     language "C++"
 	cppdialect "C++17"

@@ -205,8 +205,7 @@ namespace highlo
 			// Update camera projection
 			s_2DData->TextureShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->TextureShader->GetBuffer("CameraBuffer");
-			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection); // ???
-			//buffer->SetBufferValue(&s_2DData->CameraProjection);
+			buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
 			// Bind textures
@@ -226,8 +225,7 @@ namespace highlo
 			// Update camera projection
 			s_2DData->LineShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->LineShader->GetBuffer("CameraBuffer");
-			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection); // ???
-			//buffer->SetBufferValue(&s_2DData->CameraProjection);
+			buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
 			s_2DData->LineVertexArray->Bind();
@@ -243,8 +241,7 @@ namespace highlo
 			// Update camera projection
 			s_2DData->CircleShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->CircleShader->GetBuffer("CameraBuffer");
-			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection);
-			//buffer->SetBufferValue(&s_2DData->CameraProjection);
+			buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
 			s_2DData->CircleVertexArray->Bind();

@@ -59,6 +59,6 @@ workspace "HighLo"
 
 	group "Games"
 		include "Sandbox"
-		include "LevelEditor"
+		include "HighLoEdit"
 	group ""
 

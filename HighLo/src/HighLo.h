@@ -45,7 +45,11 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/ImGuiRenderer.h"
 #include "Engine/Renderer/Renderer2D.h"
-#include "Engine/Camera/OrthographicCamera.h"
+#include "Engine/Renderer/Skybox.h"
+
+#include "Engine/Camera/Camera.h"
+#include "Engine/Camera/FPSCamera.h"
+#include "Engine/Camera/FreeFlyCamera.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"
@@ -55,8 +59,5 @@
 #include "Engine/Window/FileMenu.h"
 #include "Engine/Window/PopupMenu.h"
 #include "Engine/Window/MenuBar.h"
-
-#include "Engine/Camera/FPSCamera.h"
-#include "Engine/Renderer/Skybox.h"
 
 #include "Engine/Loaders/AssetLoader.h"

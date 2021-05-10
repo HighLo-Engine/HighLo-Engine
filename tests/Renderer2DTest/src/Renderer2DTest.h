@@ -13,6 +13,6 @@ public:
 
 private:
 
-	Ref<OrthographicCamera> m_Camera;
+	Ref<Camera> m_Camera;
 };
 

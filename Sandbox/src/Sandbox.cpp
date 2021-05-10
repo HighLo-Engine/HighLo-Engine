@@ -2,15 +2,13 @@
 
 void Sandbox::OnInitialize()
 {
-	// TO-DO: Fix for GLFW configuration.
+	// TODO: Fix for GLFW configuration.
 	//HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.ico");
 
 	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
 
-	m_Camera = FPSCamera::Create();
-	m_Camera->SetYaw(90);
-
+	m_Camera = Ref<FPSCamera>::Create();
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
 
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);
@@ -60,6 +58,8 @@ void Sandbox::OnEvent(Event& e)
 {
 	if (e.IsInCategory(EventCategory::EventCategoryApplication))
 		HL_TRACE(e.ToString());
+
+	m_Camera->OnEvent(e);
 }
 
 void Sandbox::OnImGuiRender()

@@ -8,6 +8,10 @@ namespace highlo
 	class ICamera : public IsSharedReference
 	{
 	public:
+
+		HLAPI ICamera() = default;
+		HLAPI virtual ~ICamera() = default;
+
 		HLAPI virtual void Update() = 0;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) = 0;
 		HLAPI virtual void OnEvent(Event& e) = 0;
@@ -26,26 +30,24 @@ namespace highlo
 		HLAPI void SetPosition(const glm::vec3& position);
 		HLAPI void SetYawPitchRoll(const glm::vec3& orientation);
 
-		HLAPI void Translate(const glm::vec3& translation);
-		HLAPI void Rotate(const glm::vec3& rotation);
-
 		HLAPI void SetYaw(float yaw);
 		HLAPI void SetPitch(float pitch);
 		HLAPI void SetRoll(float roll);
 
 		HLAPI void InvertPitch();
 
-	protected:
-		glm::mat4 m_ProjectionMatrix;
-		glm::mat4 m_ViewMatrix;
+		HLAPI float GetExposure() const { return m_Exposure; }
+		HLAPI float &GetExposure() { return m_Exposure; }
 
-		virtual void UpdateProjectionMatrix() = 0;
-		virtual void UpdateViewMatrix() = 0;
+	protected:
+		glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+		glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
 
 	protected:
 		glm::vec3 m_Position = glm::vec3(0, 0, 0);
 		float m_Yaw = 0.0f;
 		float m_Pitch = 0.0f;
 		float m_Roll = 0.0f;
+		float m_Exposure = 0.0f;
 	};
 }

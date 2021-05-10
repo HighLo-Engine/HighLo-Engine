@@ -1,18 +1,16 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-
 #include "Camera.h"
 
 namespace highlo
 {
-	class FPSCamera : public Camera
+	class FreeFlyCamera : public Camera
 	{
 	public:
 
-		HLAPI FPSCamera();
-		HLAPI FPSCamera(const glm::mat4 &projectionMatrix);
+		HLAPI FreeFlyCamera();
+		HLAPI FreeFlyCamera(const glm::mat4 &projectionMatrix);
+		HLAPI virtual ~FreeFlyCamera();
 
 		HLAPI void Update() override;
 		HLAPI void OnEvent(Event &e) override {}

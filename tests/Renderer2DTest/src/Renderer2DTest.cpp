@@ -2,7 +2,8 @@
 
 void Renderer2DTest::OnInitialize()
 {
-	m_Camera = OrthographicCamera::Create(1270.0f, 940.0f);
+	m_Camera = Ref<Camera>::Create();
+	m_Camera->SetOrthographic();
 }
 
 void Renderer2DTest::OnUpdate(Timestep timestep)

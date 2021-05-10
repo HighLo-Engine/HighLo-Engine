@@ -5,7 +5,7 @@ void PBRSceneDemo::OnInitialize()
 	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
 
-	m_Camera = FPSCamera::Create();
+	m_Camera = Ref<Camera>::Create();
 	m_Camera->SetYaw(90);
 
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");

@@ -13,7 +13,7 @@ public:
 
 private:
 
-	Ref<FPSCamera> m_Camera;
+	Ref<Camera> m_Camera;
 	Ref<Mesh> m_Mesh;
 };
 

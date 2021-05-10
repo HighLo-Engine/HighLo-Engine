@@ -10,7 +10,7 @@ void Sandbox::OnInitialize()
 
 	m_Camera = FPSCamera::Create();
 	m_Camera->SetYaw(90);
-	
+
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
 
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);
@@ -26,7 +26,6 @@ void Sandbox::OnUpdate(Timestep timestep)
 {
 	m_Pistol->Update(timestep);
 	m_Cowboy->Update(timestep);
-	//m_Stormtrooper->Update(timestep);
 
 	m_Camera->Update();
 
@@ -47,8 +46,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
 
 	CoreRenderer::DrawMesh(m_Pistol,		Transform::FromPosition({ 30, -3, 0 }).Scale(0.5f));
-	CoreRenderer::DrawMesh(m_Cowboy,		Transform::FromPosition({ 26, -5, -12 }).Scale(0.8f));
-	//CoreRenderer::DrawMesh(m_Stormtrooper,	Transform::FromPosition({ 26, -3, -20 }).Scale(1.6f));
+	CoreRenderer::DrawMesh(m_Cowboy,		Transform::FromPosition({ 26, -5, -12 }).Scale(0.8f).Rotate(-45.0f, {0, 1, 0}));
 
 	CoreRenderer::EndScene();
 }
@@ -146,11 +144,8 @@ void Sandbox::CreatePBRObjects()
 
 	m_Cowboy = AssetLoader::LoadAnimatedModel("assets/models/Cowboy.fbx", true);
 	m_Cowboy->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Cowboy.png"));
-
-	m_Stormtrooper = AssetLoader::LoadAnimatedModel("assets/models/Stormtrooper.fbx");
-	m_Stormtrooper->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Stormtrooper.png"));
+	m_Cowboy->m_Material->IsUsingPBR = false;
 
 	m_Pistol->m_Animation->Play();
 	m_Cowboy->m_Animation->Play();
-	m_Stormtrooper->m_Animation->Play();
 }

@@ -67,20 +67,6 @@ void main()
 #shader pixel
 #version 450 core
 
-const float PI = 3.141592;
-const float Epsilon = 0.00001;
-
-const int LightCount = 1;
-
-// Constant normal incidence Fresnel factor for all dielectrics.
-const vec3 Fdielectric = vec3(0.04);
-
-struct Light {
-	vec3 Direction;
-	vec3 Radiance;
-	float Multiplier;
-};
-
 in VS_TO_PS
 {
 	vec2 UV;
@@ -93,20 +79,18 @@ in VS_TO_PS
 
 out vec4 out_Color;
 
-layout(binding = 0) uniform sampler2D AlbedoTextureSampler;
+layout(binding = 0) uniform sampler2D DiffuseTextureSampler;
 layout(binding = 1) uniform sampler2D NormalTextureSampler;
-layout(binding = 2) uniform sampler2D MetallicTextureSampler;
-layout(binding = 3) uniform sampler2D RoughnessTextureSampler;
-layout(binding = 4) uniform sampler2D aoTextureSampler;
-layout(binding = 5) uniform samplerCube IrradianceTextureSampler;
-layout(binding = 6) uniform samplerCube PreFilterTextureSampler;
-layout(binding = 7) uniform sampler2D BRDFTextureSampler;
 
 layout (std140, binding = 2) uniform MaterialDataBuffer
 {
 	vec4	u_Color;
 	float	u_Roughness;
     float   u_Metallic;
+    float   u_UnkPadding0;
+    float   u_UnkPadding1;
+	vec3    u_SpecularHighlight;
+	float   u_Shininess;
 };
 
 vec3 getNormalFromMap()
@@ -126,138 +110,31 @@ vec3 getNormalFromMap()
     return normalize(TBN * tangentNormal);
 }
 
-float DistributionGGX(vec3 N, vec3 H, float roughness)
+vec4 CalculateDiffuseColor()
 {
-    float a = roughness*roughness;
-    float a2 = a*a;
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH*NdotH;
-
-    float nom   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-
-    return nom / max(denom, 0.0000001); // prevent divide by zero for roughness=0.0 and NdotH=1.0
-}
-// ----------------------------------------------------------------------------
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float nom   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-// ----------------------------------------------------------------------------
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-
-    return ggx1 * ggx2;
-}
-// ----------------------------------------------------------------------------
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-}
-// ----------------------------------------------------------------------------
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-} 
-// ----------------------------------------------------------------------------
-vec4 CalculateAlbedoColor()
-{
-	return u_Color * texture(AlbedoTextureSampler, PS_Input.UV);
-}
-
-float CalculateMetallicValue()
-{
-	return u_Metallic * max(texture(MetallicTextureSampler, PS_Input.UV).r, 0.05);
-}
-
-float CalculateRoughnessValue()
-{
-	return u_Roughness * texture(RoughnessTextureSampler, PS_Input.UV).r;
-}
-
-float CalculateAmbientOcclusionValue()
-{
-	return texture(aoTextureSampler, PS_Input.UV).r;
+	return u_Color * texture(DiffuseTextureSampler, PS_Input.UV);
 }
 
 void main()
 {
-    vec4  AlbedoColor    = CalculateAlbedoColor();
-    float MetallicValue  = CalculateMetallicValue();
-    float RoughnessValue = CalculateRoughnessValue();
-    float aoValue        = CalculateAmbientOcclusionValue();
+    vec4 diffuseColor = CalculateDiffuseColor();
+	vec3 normal = normalize(getNormalFromMap());
 
-	vec3 N = getNormalFromMap();
-    vec3 V = normalize(PS_Input.CameraPosition - PS_Input.WorldPosition);
-    vec3 R = reflect(-V, N); 
+	// Ambient
+    vec3 ambient = normalize(PS_Input.LightColor) * vec3(diffuseColor) * u_Shininess;
+  	
+    // Diffuse
+    vec3 lightDir = normalize(PS_Input.LightPosition - PS_Input.WorldPosition);
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = normalize(PS_Input.LightColor) * (diff * vec3(diffuseColor));
+    
+    // Specular
+    vec3 viewDir = normalize(PS_Input.CameraPosition - PS_Input.WorldPosition);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Shininess);
+    vec3 specular = normalize(PS_Input.LightColor) * (spec * u_SpecularHighlight) * u_Shininess;  
+        
+    vec3 result = ambient + diffuse + specular;
 
-	vec3 F0 = mix(Fdielectric, vec3(AlbedoColor), MetallicValue);
-
-    vec3 Lo = vec3(0.0);
-
-	for (int i = 0; i < 1; i++)
-    {
-        // calculate light radiance
-	    vec3 L = normalize(PS_Input.LightPosition - PS_Input.WorldPosition);
-        vec3 H = normalize(V + L);
-        float distance = length(PS_Input.LightPosition - PS_Input.WorldPosition);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = PS_Input.LightColor * attenuation;
-
-	    // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, RoughnessValue);   
-        float G   = GeometrySmith(N, V, L, RoughnessValue);      
-        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
-           
-        vec3 nominator    = NDF * G * F; 
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + Epsilon;
-        vec3 specular = nominator / denominator;
-
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-
-        kD *= 1.0 - MetallicValue;
-
-        // scale light by NdotL
-        float NdotL = max(dot(N, L), 0.0);
-
-        // add to outgoing radiance Lo
-        Lo += (kD * vec3(AlbedoColor) / PI + specular) * radiance * NdotL;
-    }
-
-    // ambient lighting (we now use IBL as the ambient term)
-    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, RoughnessValue);
-
-    vec3 kS = F;
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - MetallicValue;
-
-    vec3 irradiance   = texture(IrradianceTextureSampler, -N).rgb;
-    vec3 diffuse      = irradiance * vec3(AlbedoColor);
-
-    const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(PreFilterTextureSampler, -R, RoughnessValue * MAX_REFLECTION_LOD).rgb;    
-    vec2 brdf  = texture(BRDFTextureSampler, vec2(max(dot(N, V), 0.0), RoughnessValue)).rg;
-    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-
-    vec3 ambient = (kD * diffuse + specular) * aoValue;
-    vec3 color = ambient + Lo;
-
-    // HDR tonemapping
-    color = color / (color + vec3(1.0));
-    // gamma correct
-    color = pow(color, vec3(1.0 / 2.2)); 
-
-    out_Color = vec4(color, AlbedoColor.a);
+    out_Color = vec4(result, diffuseColor.a);
 } 

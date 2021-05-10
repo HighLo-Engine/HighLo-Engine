@@ -43,10 +43,16 @@ namespace highlo
 
 		m_StaticShader   = Renderer::GetShaderLibrary()->Get("DefaultShader");
 		m_AnimatedShader = Renderer::GetShaderLibrary()->Get("DefaultAnimatedShader");
+		m_StaticShaderPBR = Renderer::GetShaderLibrary()->Get("DefaultShaderPBR");
+		m_AnimatedShaderPBR = Renderer::GetShaderLibrary()->Get("DefaultAnimatedShaderPBR");
 
 		m_StaticShader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
+		m_StaticShaderPBR->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
+
 		m_AnimatedShader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 		m_AnimatedShader->AddBuffer("BoneTransformsBuffer", BoneTransformsBuffer);
+		m_AnimatedShaderPBR->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
+		m_AnimatedShaderPBR->AddBuffer("BoneTransformsBuffer", BoneTransformsBuffer);
 
 		static auto VS_ObjectBuffer = UniformBuffer::Create(
 			"VS_ObjectBuffer",
@@ -58,7 +64,9 @@ namespace highlo
 		);
 
 		m_StaticShader->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
+		m_StaticShaderPBR->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
 		m_AnimatedShader->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
+		m_AnimatedShaderPBR->AddBuffer("VS_ObjectBuffer", VS_ObjectBuffer);
 
 		static auto MaterialDataBuffer = UniformBuffer::Create(
 			"MaterialDataBuffer",
@@ -66,6 +74,10 @@ namespace highlo
 				UniformVariable("u_Color", sizeof(glm::vec4)),
 				UniformVariable("u_Roughness", sizeof(float)),
 				UniformVariable("u_Metallic", sizeof(float)),
+				UniformVariable("u_Padding001", sizeof(float)),
+				UniformVariable("u_Padding002", sizeof(float)),
+				UniformVariable("u_SpecularHighlight", sizeof(glm::vec3)),
+				UniformVariable("u_Shininess", sizeof(float))
 			},
 			UniformBufferParentShader::PIXEL_SHADER,
 			(uint32)HL_UB_SLOT::MATERIAL_DATA_BUFFER
@@ -74,7 +86,9 @@ namespace highlo
 		m_MaterialDataBuffer = MaterialDataBuffer;
 
 		m_StaticShader->AddBuffer("MaterialDataBuffer", MaterialDataBuffer);
+		m_StaticShaderPBR->AddBuffer("MaterialDataBuffer", MaterialDataBuffer);
 		m_AnimatedShader->AddBuffer("MaterialDataBuffer", MaterialDataBuffer);
+		m_AnimatedShaderPBR->AddBuffer("MaterialDataBuffer", MaterialDataBuffer);
 	}
 
 	void Material::ApplyNewProperties()

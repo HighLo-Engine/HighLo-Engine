@@ -78,12 +78,12 @@ namespace highlo
 			{ "in_LocalPosition", ShaderDataType::Float2 },
 			{ "in_Color", ShaderDataType::Float4 },
 		};
-		BufferLayout staticPBRLayout = {
+		BufferLayout staticShaderLayout = {
 			{ "POSITION", ShaderDataType::Float3 },
 			{ "UV"		, ShaderDataType::Float2 },
 			{ "NORMAL"	, ShaderDataType::Float3 }
 		};
-		BufferLayout animatedPBRLayout = {
+		BufferLayout animatedShaderLayout = {
 			{ "POSITION", ShaderDataType::Float3 },
 			{ "UV"		, ShaderDataType::Float2 },
 			{ "NORMAL"	, ShaderDataType::Float3 },
@@ -96,9 +96,11 @@ namespace highlo
 			{ "POSITION", ShaderDataType::Float3 },
 		};
 
-		// Load PBR Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticPBRLayout);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedPBRLayout);
+		// Load 3D Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedShaderLayout);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl", staticShaderLayout);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl", animatedShaderLayout);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", skyboxLayout);
 
 		// Load 2D Shaders

@@ -16,6 +16,7 @@ namespace highlo
 	void CoreRenderer::Init()
 	{
 		s_DefaultMaterial = Material::Create();
+		s_DefaultMaterial->IsUsingPBR = false;
 
 		s_CubeMesh = MeshFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
 		s_SphereMesh = MeshFactory::CreateSphere(1.0f);
@@ -173,10 +174,20 @@ namespace highlo
 
 	Ref<Shader> CoreRenderer::SelectMaterialShader(Ref<Material> material, bool animated)
 	{
-		if (animated)
-			return material->m_AnimatedShader;
+		if (material->IsUsingPBR)
+		{
+			if (animated)
+				return material->m_AnimatedShaderPBR;
+			else
+				return material->m_StaticShaderPBR;
+		}
 		else
-			return material->m_StaticShader;
+		{
+			if (animated)
+				return material->m_AnimatedShader;
+			else
+				return material->m_StaticShader;
+		}
 	}
 
 	void CoreRenderer::SetObjectDataBuffer(Ref<Shader> shader, const Transform& transform)

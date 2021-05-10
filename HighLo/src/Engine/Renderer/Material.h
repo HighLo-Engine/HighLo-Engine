@@ -22,6 +22,10 @@ namespace highlo
 		glm::vec4 Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		float Roughness = 0.86f;
 		float Metallic = 0.05f;
+		float UnkPadding0;
+		float UnkPadding1;
+		glm::vec3 SpecularHighlight = glm::vec3(1.0f, 1.0f, 1.0f);
+		float Shininess = 0.25f;
 	};
 
 	struct MaterialPhysicalProperties
@@ -45,6 +49,7 @@ namespace highlo
 		HLAPI static Ref<Material> Create(MaterialProperties props = MaterialProperties());
 
 		MaterialProperties Properties;
+		bool IsUsingPBR = true;
 
 		HLAPI Ref<Texture> GetTexture(int32 type) const { return m_Textures.at(type); }
 		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
@@ -60,6 +65,8 @@ namespace highlo
 
 		Ref<Shader> m_StaticShader;
 		Ref<Shader> m_AnimatedShader;
+		Ref<Shader> m_StaticShaderPBR;
+		Ref<Shader> m_AnimatedShaderPBR;
 
 		void ApplyNewProperties();
 

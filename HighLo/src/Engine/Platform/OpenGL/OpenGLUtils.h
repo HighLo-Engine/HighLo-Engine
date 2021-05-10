@@ -67,4 +67,4 @@ namespace highlo
 	}
 }
 
-#endif
+#endif // HIGHLO_API_OPENGL

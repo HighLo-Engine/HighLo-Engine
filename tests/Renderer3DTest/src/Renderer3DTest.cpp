@@ -14,7 +14,7 @@ void Renderer3DTest::OnUpdate(Timestep timestep)
 	m_Camera->Update();
 
 	Renderer::ClearScreenBuffers();
-	Renderer::ClearScreenColor(glm::vec4(0.2f, 0.06f, 0.06f, 1.0f));
+	Renderer::ClearScreenColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	CoreRenderer::BeginScene(*m_Camera);
 	CoreRenderer::DrawCube({ -1, 0, 5 }, 2.0f, 0.0f, { 0.2f, 1.0f, 0.6f });

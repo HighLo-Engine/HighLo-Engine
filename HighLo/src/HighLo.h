@@ -29,6 +29,7 @@
 #include "Engine/Renderer/VertexData.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Renderer/RenderPass.h"
 #include "Engine/Renderer/CoreRenderer.h"
 #include "Engine/Renderer/RenderingAPI.h"
 #include "Engine/Renderer/Texture.h"

@@ -1,12 +1,15 @@
 #pragma once
 
 #include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Events/ApplicationEvents.h"
 
 namespace highlo
 {
 	class FileSystem
 	{
 	public:
+
+		using FileSystemChangedCallbackFn = std::function<void(FileSystemChangedEvent)>;
 
 		/**
 		 *
@@ -34,6 +37,20 @@ namespace highlo
 		 * @return Returns true if the File has been removed from the disk.
 		 */
 		HLAPI static bool RemoveFile(const HLString &path);
+
+		/** 
+		 * 
+		 * .
+		 * 
+		 */
+		HLAPI static HLString Rename(const HLString &path, const HLString &newName);
+
+		/** 
+		 * 
+		 * .
+		 * 
+		 */
+		HLAPI static bool Move(const HLString &filePath, const HLString &dest);
 
 		/**
 		 *
@@ -117,5 +134,21 @@ namespace highlo
 		 * @param url The URL to a server that should be openend.
 		 */
 		HLAPI static void OpenInBrowser(const HLString &url);
+
+		HLAPI static void SetChangeCallback(const FileSystemChangedCallbackFn &callback);
+
+		HLAPI static void StartWatching();
+		HLAPI static void StopWatching();
+
+	private:
+
+		/**
+		 * 
+		 * .
+		 * 
+		 */
+		static unsigned long Watch(void *param);
+
+		static FileSystemChangedCallbackFn s_Callback;
 	};
 }

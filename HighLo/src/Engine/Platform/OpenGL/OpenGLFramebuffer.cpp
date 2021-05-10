@@ -127,13 +127,13 @@ namespace highlo
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification &spec)
 		: m_Specification(spec), m_Width(spec.Width), m_Height(spec.Height)
 	{
-		HL_ASSERT(spec.Attachments.m_Attachments.size());
-		for (auto format : m_Specification.Attachments.m_Attachments)
+		HL_ASSERT(spec.Attachments.Attachments.size());
+		for (auto format : m_Specification.Attachments.Attachments)
 		{
-			if (!utils::IsDepthFormat(format.m_Format))
-				m_ColorAttachmentFormats.emplace_back(format.m_Format);
+			if (!utils::IsDepthFormat(format.Format))
+				m_ColorAttachmentFormats.emplace_back(format.Format);
 			else
-				m_DepthAttachmentFormat = format.m_Format;
+				m_DepthAttachmentFormat = format.Format;
 		}
 
 		uint32 width = spec.Width;

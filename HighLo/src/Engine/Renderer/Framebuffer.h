@@ -14,18 +14,18 @@ namespace highlo
 	{
 		FramebufferTextureSpecification() = default;
 		FramebufferTextureSpecification(TextureFormat format)
-			: m_Format(format) {}
+			: Format(format) {}
 
-		TextureFormat m_Format;
+		TextureFormat Format;
 	};
 
 	struct FramebufferAttachmentSpecification
 	{
 		FramebufferAttachmentSpecification() = default;
 		FramebufferAttachmentSpecification(std::initializer_list<FramebufferTextureSpecification> &attachments)
-			: m_Attachments(attachments) {}
+			: Attachments(attachments) {}
 
-		std::vector<FramebufferTextureSpecification> m_Attachments;
+		std::vector<FramebufferTextureSpecification> Attachments;
 	};
 
 	struct FramebufferSpecification

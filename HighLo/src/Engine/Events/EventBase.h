@@ -17,7 +17,7 @@ namespace highlo
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoves, FileMenu,
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoves, FileMenu, FileSystemChanged,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
@@ -30,6 +30,12 @@ namespace highlo
 		EventCategoryKeyboard = HL_BIT(2),
 		EventCategoryMouse = HL_BIT(3),
 		EventCategoryMouseButton = HL_BIT(4),
+	};
+
+	enum class FileSystemAction
+	{
+		None = 0,
+		Added, Renamed, Modified, Deleted
 	};
 
 	template<typename T>

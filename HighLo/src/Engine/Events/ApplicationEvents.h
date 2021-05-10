@@ -62,4 +62,82 @@ namespace highlo
 
 		int32 m_ID;
 	};
+
+	class HLAPI FileSystemChangedEvent : public Event
+	{
+	public:
+
+		FileSystemChangedEvent() = default;
+
+		FileSystemChangedEvent(const HLString &oldName, const HLString &newName, const HLString &path, FileSystemAction action, bool isDirectory)
+			: m_OldName(oldName), m_NewName(newName), m_FilePath(path), m_Action(action), m_IsDirectory(isDirectory)
+		{
+		}
+
+		const HLString &GetOldName() const
+		{
+			return m_OldName;
+		}
+
+		const HLString &GetNewName() const
+		{
+			return m_NewName;
+		}
+
+		const HLString &GetPath() const
+		{
+			return m_FilePath;
+		}
+
+		FileSystemAction GetAction()
+		{
+			return m_Action;
+		}
+
+		bool IsDirectory() const
+		{
+			return m_IsDirectory;
+		}
+
+		void SetAction(FileSystemAction action)
+		{
+			m_Action = action;
+		}
+
+		void SetIsDirectory(bool isDirectory)
+		{
+			m_IsDirectory = isDirectory;
+		}
+
+		void SetFilePath(const HLString &path)
+		{
+			m_FilePath = path;
+		}
+
+		void SetOldName(const HLString &oldName)
+		{
+			m_OldName = oldName;
+		}
+
+		void SetNewName(const HLString &newName)
+		{
+			m_NewName = newName;
+		}
+
+		HLString ToString() const override
+		{
+			return HLString("FileSystemChangedEvent: ") << m_OldName << " -> " << m_NewName;
+		}
+
+		REGISTER_EVENT_CLASS_TYPE(FileSystemChanged)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+
+		FileSystemAction m_Action = FileSystemAction::Added;
+		HLString m_FilePath = "";
+		HLString m_OldName = "";
+		HLString m_NewName = "";
+		bool m_IsDirectory = false;
+	};
 }

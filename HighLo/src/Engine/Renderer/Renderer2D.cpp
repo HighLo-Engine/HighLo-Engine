@@ -243,7 +243,7 @@ namespace highlo
 			// Update camera projection
 			s_2DData->CircleShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->CircleShader->GetBuffer("CameraBuffer");
-			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection); // ???
+			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection);
 			//buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 

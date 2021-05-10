@@ -74,7 +74,7 @@ namespace highlo
 	
 	void OrthographicCamera::OnWindowResize(uint32 width, uint32 height)
 	{
-		float aspectRatio = width / height;
+		float aspectRatio = (float)width / (float)height;
 		m_ProjectionMatrix = glm::ortho(-aspectRatio * m_ZoomLevel, aspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel, -1.0f, 1.0f);
 	}
 	

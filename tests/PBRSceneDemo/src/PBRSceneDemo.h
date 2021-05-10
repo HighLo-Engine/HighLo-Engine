@@ -14,7 +14,7 @@ public:
 
 private:
 	Light m_Light;
-	Ref<Camera> m_Camera;
+	Ref<FreeFlyCamera> m_Camera;
 	Ref<Environment> m_Environment;
 	Ref<Skybox> m_Skybox;
 

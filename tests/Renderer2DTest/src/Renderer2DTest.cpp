@@ -9,10 +9,8 @@ void Renderer2DTest::OnUpdate(Timestep timestep)
 {
 	m_Camera->Update();
 
-	Transform transform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
-
-	Renderer2D::BeginScene(m_Camera->GetProjection() * m_Camera->GetViewMatrix(), true);
-	Renderer2D::DrawQuad(transform.GetTransform(), { 0.8f, 0.2f, 0.3f, 1.0f });
+	Renderer2D::BeginScene(m_Camera->GetViewProjectionMatrix());
+	Renderer2D::DrawLine({ 0.0f, 0.0f, 0.0f }, { 50.0f, 50.0f, 50.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 	Renderer2D::EndScene();
 
 }

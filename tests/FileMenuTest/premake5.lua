@@ -36,7 +36,8 @@ project "FileMenuTest"
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assimp-vc142-mtd.dll*"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assets")
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/FileMenuTest/bin/" .. outputdir .. "/FileMenuTest/assets"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/FileMenuTest/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}
 
     filter "system:windows"

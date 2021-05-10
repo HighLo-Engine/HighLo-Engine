@@ -34,7 +34,6 @@ namespace highlo
 		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;
-		virtual HLRendererID GetRendererID() const override;
 
 		virtual void Bind(uint32 slot) const override;
 
@@ -42,7 +41,6 @@ namespace highlo
 
 		void* m_ImageData = nullptr;
 		uint32 m_Width = 0, m_Height = 0;
-		uint32 m_ID = 0;
 		GLenum m_InternalFormat, m_DataFormat;
 	};
 
@@ -65,12 +63,10 @@ namespace highlo
 		virtual void UpdateResourceData(void *data) override;
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
-		virtual HLRendererID GetRendererID() const override;
 
 		virtual void Bind(uint32 slot) const override;
 
 	private:
-		uint32 m_ID = 0;
 		uint32 m_Width = 0, m_Height = 0;
 		TextureFormat m_Format;
 		Allocator m_Buffer;

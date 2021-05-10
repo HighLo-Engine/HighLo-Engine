@@ -75,7 +75,7 @@ namespace highlo
 		glm::vec4 QuadVertexPositions[4];
 
 		bool DepthTest = true;
-		glm::mat4 CameraProjection;
+		glm::mat4 CameraProjection = glm::mat4(1.0f);
 		Renderer2D::Statistics Stats;
 	};
 
@@ -98,7 +98,6 @@ namespace highlo
 			{ "in_Position", ShaderDataType::Float3 },
 			{ "in_Color", ShaderDataType::Float4 }
 		};
-
 		BufferLayout circleLayout = {
 			{ "in_WorldPosition", ShaderDataType::Float3 },
 			{ "in_Thickness", ShaderDataType::Float },
@@ -156,7 +155,7 @@ namespace highlo
 		Ref<VertexBuffer> lineVertexbuffer = VertexBuffer::Create(s_2DData->MaxLineVertices * sizeof(LineVertex));
 		lineVertexbuffer->SetLayout(lineLayout);
 		s_2DData->LineVertexArray->AddVertexBuffer(lineVertexbuffer);
-		s_2DData->LineVertexArray->SetIndexBuffer(IndexBuffer::Create(&lineIndices[0], lineIndices.size() * sizeof(int32)));
+		s_2DData->LineVertexArray->SetIndexBuffer(IndexBuffer::Create(&lineIndices[0], (uint32)(lineIndices.size() * sizeof(int32))));
 
 		s_2DData->CircleVertexArray = VertexArray::Create();
 		Ref<VertexBuffer> circleVertexbuffer = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
@@ -206,7 +205,8 @@ namespace highlo
 			// Update camera projection
 			s_2DData->TextureShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->TextureShader->GetBuffer("CameraBuffer");
-			buffer->SetBufferValue(&s_2DData->CameraProjection);
+			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection); // ???
+			//buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
 			// Bind textures
@@ -226,7 +226,8 @@ namespace highlo
 			// Update camera projection
 			s_2DData->LineShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->LineShader->GetBuffer("CameraBuffer");
-			buffer->SetBufferValue(&s_2DData->CameraProjection);
+			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection); // ???
+			//buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
 			s_2DData->LineVertexArray->Bind();
@@ -242,7 +243,8 @@ namespace highlo
 			// Update camera projection
 			s_2DData->CircleShader->Bind();
 			Ref<UniformBuffer> buffer = s_2DData->CircleShader->GetBuffer("CameraBuffer");
-			buffer->SetBufferValue(&s_2DData->CameraProjection);
+			buffer->SetVariableValue("u_ViewProjection", &s_2DData->CameraProjection); // ???
+			//buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
 			s_2DData->CircleVertexArray->Bind();
@@ -282,46 +284,125 @@ namespace highlo
 	void Renderer2D::DrawQuad(const glm::mat4 &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 	{
 		constexpr uint32 quadVertexCount = 4;
-		const float textureIndex = 0.0f;
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+		if (s_2DData->QuadIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
 
+		float textureIndex = 0.0f;
+		for (uint32 i = 1; i < s_2DData->TextureSlotIndex; ++i)
+		{
+			if (*s_2DData->TextureSlots[i].Get() == *texture.Get())
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			if (s_2DData->TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+				FlushAndReset();
+
+			textureIndex = (float)s_2DData->TextureSlotIndex;
+			s_2DData->TextureSlots[s_2DData->TextureSlotIndex] = texture;
+			s_2DData->TextureSlotIndex++;
+		}
+
+		for (uint32 i = 0; i < quadVertexCount; ++i)
+		{
+			s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[i];
+			s_2DData->QuadVertexBufferPtr->Color = color;
+			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			s_2DData->QuadVertexBufferPtr++;
+		}
+
+		s_2DData->QuadIndexCount += 6;
+		s_2DData->Stats.QuadCount++;
 	}
 
 	void Renderer2D::DrawQuad(const Transform &transform, const glm::vec4 &color)
 	{
+		DrawQuad(transform.GetTransform(), color);
 	}
 
 	void Renderer2D::DrawQuad(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 	{
+		DrawQuad(transform.GetTransform(), texture, tilingFactor, tintColor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color)
 	{
+		Transform transform = Transform::FromPosition({ position.x, position.y, 0.0f }).Scale({ size.x, size.y, 1.0f });
+		DrawQuad(transform.GetTransform(), color);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color)
 	{
+		Transform transform = Transform::FromPosition({ position.x, position.y, position.z }).Scale({ size.x, size.y, 1.0f });
+		DrawQuad(transform.GetTransform(), color);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 	{
+		Transform transform = Transform::FromPosition({ position.x, position.y, 0.0f }).Scale({ size.x, size.y, 1.0f });
+		DrawQuad(transform.GetTransform(), texture, tilingFactor, tintColor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 	{
+		Transform transform = Transform::FromPosition({ position.x, position.y, position.z }).Scale({ size.x, size.y, 1.0f });
+		DrawQuad(transform.GetTransform(), texture, tilingFactor, tintColor);
 	}
 
 	void Renderer2D::DrawCircle(const glm::vec2 &p0, float radius, const glm::vec4 &color, float thickness)
 	{
+		DrawCircle({ p0.x, p0.y, 0.0f }, radius, color, thickness);
 	}
 	
 	void Renderer2D::DrawCircle(const glm::vec3 &p0, float radius, const glm::vec4 &color, float thickness)
 	{
+		if (s_2DData->CircleIndexCount >= Renderer2DData::MaxIndices)
+			FlushAndReset();
+
+		Transform transform = Transform::FromPosition({ p0.x, p0.y, p0.z }).Scale({ radius * 2.0f, radius * 2.0f, 1.0f });
+
+		for (int32 i = 0; i < 4; ++i)
+		{
+			s_2DData->CircleVertexBufferPtr->WorldPosition = transform.GetTransform() * s_2DData->QuadVertexPositions[i];
+			s_2DData->CircleVertexBufferPtr->Thickness = thickness;
+			s_2DData->CircleVertexBufferPtr->LocalPosition = s_2DData->QuadVertexPositions[i] * 2.0f;
+			s_2DData->CircleVertexBufferPtr->Color = color;
+			s_2DData->CircleVertexBufferPtr++;
+		}
+
+		s_2DData->CircleIndexCount += 6;
+		s_2DData->Stats.CircleCount++;
+	}
+
+	void Renderer2D::DrawLine(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color)
+	{
+		DrawLine(glm::vec3{ p0.x, p0.y, 0.0f }, glm::vec3{ p1.x, p1.y, 0.0f }, color);
 	}
 	
 	void Renderer2D::DrawLine(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec4 &color)
 	{
+		if (s_2DData->LineIndexCount >= Renderer2DData::MaxLineIndices)
+			FlushAndResetLines();
+
+		s_2DData->LineVertexBufferPtr->Position = p0;
+		s_2DData->LineVertexBufferPtr->Color = color;
+		s_2DData->LineVertexBufferPtr++;
+
+		s_2DData->LineVertexBufferPtr->Position = p1;
+		s_2DData->LineVertexBufferPtr->Color = color;
+		s_2DData->LineVertexBufferPtr++;
+
+		s_2DData->LineIndexCount += 2;
+		s_2DData->Stats.LineCount++;
 	}
 
 	void Renderer2D::ResetStatistics()

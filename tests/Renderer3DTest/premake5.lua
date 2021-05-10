@@ -37,7 +37,7 @@ project "Renderer3DTest"
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/Renderer3DTest/bin/" .. outputdir .. "/Renderer3DTest/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/Renderer3DTest/bin/" .. outputdir .. "/Renderer3DTest/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/Renderer3DTest/bin/" .. outputdir .. "/Renderer3DTest/assets"),
-		("{COPY} %{wks.location}tests/Renderer3DTest/assets %{wks.location}tests/Renderer3DTest/bin/" .. outputdir .. "/Renderer3DTest/assets"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/Renderer3DTest/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}
 
     filter "system:windows"

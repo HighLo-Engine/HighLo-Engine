@@ -22,6 +22,7 @@ namespace highlo
 	public:
 		HLString Name = "";
 		TextureShaderLocation ShaderLocation = TextureShaderLocation::PIXEL_SHADER;
+		uint32 RendererID = 0;
 
 		TextureFormat Format = TextureFormat::RGBA8;
 
@@ -31,6 +32,7 @@ namespace highlo
 		HLAPI virtual uint32 GetHeight() const = 0;
 		HLAPI virtual void* GetData() const = 0;
 
+		HLAPI virtual void Bind(uint32 slot) const = 0;
 		HLAPI virtual void Release() = 0;
 		HLAPI virtual void Invalidate() = 0;
 
@@ -39,10 +41,12 @@ namespace highlo
 		HLAPI virtual void UpdateResourceData(void* data) = 0;
 		HLAPI virtual void UpdateResourceData() = 0;
 		HLAPI virtual uint32 GetMipLevelCount() = 0;
-		HLAPI virtual HLRendererID GetRendererID() const = 0;
 
-		HLAPI virtual void Bind(uint32 slot) const = 0;
 		HLAPI inline TextureFormat GetFormat() { return Format; }
+		HLAPI inline HLRendererID GetRendererID() const { return RendererID; }
+
+		HLAPI inline bool operator==(const Texture& other) const { return RendererID == other.RendererID; }
+		HLAPI inline bool operator!=(const Texture& other) const { return !(*this == other); }
 	};
 
 	class Texture2D : public Texture

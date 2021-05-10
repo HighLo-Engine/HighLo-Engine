@@ -31,6 +31,7 @@ namespace highlo
 		HLAPI static void DrawCircle(const glm::vec2 &p0, float radius, const glm::vec4 &color, float thickness = 0.05f);
 		HLAPI static void DrawCircle(const glm::vec3 &p0, float radius, const glm::vec4 &color, float thickness = 0.05f);
 
+		HLAPI static void DrawLine(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
 		HLAPI static void DrawLine(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		struct Statistics
@@ -38,8 +39,9 @@ namespace highlo
 			uint32 DrawCalls = 0;
 			uint32 QuadCount = 0;
 			uint32 LineCount = 0;
+			uint32 CircleCount = 0;
 
-			uint32 GetTotalVertexCount() { return QuadCount * 4 + LineCount * 2; }
+			uint32 GetTotalVertexCount() { return QuadCount * 4 + LineCount * 2 + CircleCount; }
 			uint32 GetTotalIndexCount() { return QuadCount * 6 + LineCount * 2; }
 		};
 

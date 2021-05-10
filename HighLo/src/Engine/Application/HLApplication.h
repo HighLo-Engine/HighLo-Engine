@@ -5,6 +5,8 @@
 #include "Engine/Window/Window.h"
 #include "Engine/Events/Events.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/ECS/ECS_Registry.h"
+#include "Engine/ECS/ECS_SystemManager.h"
 
 namespace highlo
 {
@@ -48,6 +50,11 @@ namespace highlo
 
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
+
+		ECS_Registry m_ECS_Registry;
+
+		ECS_SystemManager m_ECS_SystemManager;
+		void Create_ECS_Systems();
 
 	private:
 		void InternalEventHandler(Event &event);

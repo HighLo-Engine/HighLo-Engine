@@ -5,7 +5,8 @@
 #include "Engine/Core/HLInput.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Math/HLMath.h"
-#include "Engine/Renderer/Renderer.h"
+
+#include "Engine/ECS/RenderSystem.h"
 
 namespace highlo
 {
@@ -30,6 +31,8 @@ namespace highlo
 
 		InitializeWindow();
 
+		Create_ECS_Systems();
+
 		HL_CORE_INFO("Engine Initialized");
 		OnInitialize();
 
@@ -44,6 +47,7 @@ namespace highlo
 		#endif
 
 			OnUpdate(Time::GetTimestep());
+			m_ECS_SystemManager.Update();
 
 			ImGuiRenderer::BeginScene();
 			OnImGuiRender();
@@ -53,6 +57,7 @@ namespace highlo
 		}
 
 		OnShutdown();
+		m_ECS_SystemManager.Shutdown();
 		VirtualFileSystem::Shutdown();
 	}
 
@@ -94,6 +99,11 @@ namespace highlo
 		}
 
 		return true;
+	}
+
+	void HLApplication::Create_ECS_Systems()
+	{
+		m_ECS_SystemManager.RegisterSystem<RenderSystem>();
 	}
 
 	void HLApplication::InternalEventHandler(Event &event)

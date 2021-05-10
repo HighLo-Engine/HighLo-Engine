@@ -60,4 +60,6 @@
 #include "Engine/Window/PopupMenu.h"
 #include "Engine/Window/MenuBar.h"
 
+#include "Engine/ECS/Entity.h"
+
 #include "Engine/Loaders/AssetLoader.h"

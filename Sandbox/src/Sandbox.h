@@ -18,13 +18,6 @@ private:
 	Ref<FPSCamera> m_Camera;
 	Ref<Environment> m_Environment;
 	Ref<Skybox> m_Skybox;
-	
-	Ref<Mesh> m_PBR_Sphere;
-	Ref<Mesh> m_PBR_Gun;
-	Ref<Mesh> m_Pistol;
-	Ref<Mesh> m_Cowboy;
 
-	std::vector<Ref<Mesh>> m_TestSpheres;
-
-	void CreatePBRObjects();
+	Entity m_Entity;
 };

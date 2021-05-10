@@ -30,7 +30,7 @@ namespace highlo
 
 	Transform& Transform::Rotate(float angle, const glm::vec3 &axis)
 	{
-		glm::vec3 rotation_axis_value = axis * angle;
+		glm::vec3 rotation_axis_value = axis * glm::radians(angle);
 		m_Rotation = glm::normalize(m_Rotation * glm::quat(rotation_axis_value));
 
 		m_Transform = glm::translate(glm::mat4(1.0f), m_Position) *

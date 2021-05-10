@@ -3,13 +3,12 @@
 #include <HighLo.h>
 using namespace highlo;
 
-
-class LevelEditor : public HLApplication
+class HighLoEditor : public HLApplication
 {
 public:
 
-	LevelEditor();
-	virtual ~LevelEditor();
+	HighLoEditor();
+	virtual ~HighLoEditor();
 
 	void OnInitialize() override;
 	void OnUpdate(Timestep timestep) override;
@@ -35,8 +34,8 @@ private:
 		Mesh = 2
 	};
 
-	bool OnKeyPressedEvent(KeyPressedEvent &e);
-	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent &e);
+	bool OnKeyPressedEvent(const KeyPressedEvent &e);
+	bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e);
 
 private:
 

@@ -16,8 +16,9 @@ namespace highlo
 	
 	Skybox::Skybox()
 	{
-		CreateMesh();
-		CreateShader();
+		m_Mesh = MeshFactory::CreateCube({ (float) SKYBOX_SIZE, (float) SKYBOX_SIZE, (float) SKYBOX_SIZE });
+		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
+		m_Shader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 	}
 
 	void Skybox::Render(ICamera& camera)
@@ -38,16 +39,5 @@ namespace highlo
 		m_Shader->GetVSSceneUniformBuffer()->UploadToShader();
 
 		CoreRenderer::DrawRawMeshData(m_Mesh);
-	}
-
-	void Skybox::CreateMesh()
-	{
-		m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
-	}
-
-	void Skybox::CreateShader()
-	{
-		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
-		m_Shader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 	}
 }

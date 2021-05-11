@@ -197,7 +197,7 @@ namespace highlo
 
 	void Renderer2D::EndScene()
 	{
-		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase);
+		uint32 dataSize = (uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase;
 		if (dataSize)
 		{
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
@@ -212,12 +212,14 @@ namespace highlo
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 				s_2DData->TextureSlots[i]->Bind(i);
 
+			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->QuadVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->QuadVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadVertexArray);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Stats.DrawCalls++;
 		}
 
-		dataSize = (uint32)((uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase);
+		dataSize = (uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase;
 		if (dataSize)
 		{
 			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
@@ -228,12 +230,15 @@ namespace highlo
 			buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
+			s_2DData->LineVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->LineVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->LineVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineVertexArray, PrimitiveType::Lines);
+			Renderer::s_RenderingAPI->SetLineThickness(2.0f);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, s_2DData->DepthTest);
 			s_2DData->Stats.DrawCalls++;
 		}
 
-		dataSize = (uint32)((uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase);
+		dataSize = (uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase;
 		if (dataSize)
 		{
 			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
@@ -244,8 +249,9 @@ namespace highlo
 			buffer->SetBufferValue(&s_2DData->CameraProjection);
 			buffer->UploadToShader();
 
+			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->Bind();
 			s_2DData->CircleVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleVertexArray);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Stats.DrawCalls++;
 		}
 	}

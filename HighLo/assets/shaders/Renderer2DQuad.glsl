@@ -1,5 +1,4 @@
 #shader vertex
-
 #version 450 core
 
 layout(location = 0) in vec3 in_Position;
@@ -33,7 +32,6 @@ void main()
 }
 
 #shader pixel
-
 #version 450 core
 
 layout(location = 0) out vec4 Color;
@@ -52,6 +50,6 @@ layout(binding = 0) uniform sampler2D u_Textures[32];
 void main()
 {
 	//Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * Input.Color;
-	Color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	Color = vec4(1.0f, 0.2f, 0.3f, 1.0f);
 }
 

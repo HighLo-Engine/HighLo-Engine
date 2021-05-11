@@ -13,8 +13,10 @@ void Renderer2DTest::OnUpdate(Timestep timestep)
 	Renderer::ClearScreenBuffers();
 	Renderer::ClearScreenColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
-	Renderer2D::BeginScene(m_Camera->GetViewProjectionMatrix());
-	Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	Renderer2D::BeginScene(glm::mat4(1.0f), false);
+	//Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	//Renderer2D::DrawLine({ 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 5.0f }, { 1.0f, 0.3f, 0.2f, 1.0f });
+	Renderer2D::DrawCircle({ 0.0f, 0.0f, 0.0f }, 10.0f, { 1.0f, 0.3f, 0.2f, 1.0f }, 1.0f);
 	Renderer2D::EndScene();
 
 }

@@ -5,6 +5,7 @@ void PBRSceneDemo::OnInitialize()
 	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
 
+	Renderer::SetBlendMode(false);
 	m_Camera = Ref<FreeFlyCamera>::Create();
 
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
@@ -63,8 +64,6 @@ void PBRSceneDemo::OnResize(uint32 width, uint32 height)
 
 void PBRSceneDemo::CreatePBRObjects()
 {
-	auto sampleBRDF = Texture2D::LoadFromFile("assets/textures/brdfMap.png");
-
 	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj").GetMesh(0);
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg"));
@@ -72,7 +71,7 @@ void PBRSceneDemo::CreatePBRObjects()
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ROUGHNESS, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Roughness.jpg"));
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 	m_PBR_Sphere->GetMaterialRenderProperties().Metallic = 1;
 	m_PBR_Sphere->GetMaterialRenderProperties().Roughness = 1;
 
@@ -86,14 +85,14 @@ void PBRSceneDemo::CreatePBRObjects()
 	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION, Texture2D::LoadFromFile("assets/textures/AK47/AK47_ao.tga"));
 	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
 	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 	m_PBR_Gun->GetMaterialRenderProperties().Metallic = 1;
 	m_PBR_Gun->GetMaterialRenderProperties().Roughness = 1;
 
 	auto SphereBlueprint = MeshFactory::CreateSphere(1.0f);
 	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
 	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -128,7 +127,7 @@ void PBRSceneDemo::CreatePBRObjects()
 	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Pistol.png"));
 	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
 	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
-	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, sampleBRDF);
+	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 	m_Pistol->GetMaterialRenderProperties().Roughness = 0.4f;
 	m_Pistol->GetMaterialRenderProperties().Metallic = 0.68f;
 

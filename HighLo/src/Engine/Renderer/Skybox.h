@@ -22,9 +22,6 @@ namespace highlo
 		Ref<Shader> m_Shader;
 		Ref<Mesh> m_Mesh;
 
-		void CreateMesh();
-		void CreateShader();
-
 	private:
 		struct VS_SceneData
 		{

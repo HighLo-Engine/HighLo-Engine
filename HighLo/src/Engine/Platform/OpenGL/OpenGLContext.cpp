@@ -29,15 +29,6 @@ namespace highlo
 		glfwMakeContextCurrent((GLFWwindow*)m_OpenGLWindowHandle);
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 			HL_CORE_FATAL("Failed to load Context!");
-
-		glEnable(GL_DEPTH_TEST);
-
-		std::stringstream ss;
-		ss << "\nOpenGL Info:\n";
-		ss << "    Vendor    :  " << glGetString(GL_VENDOR) << "\n";
-		ss << "    Renderer  :  " << glGetString(GL_RENDERER) << "\n";
-		ss << "    Version   :  " << glGetString(GL_VERSION) << "\n";
-		HL_CORE_INFO(ss.str());
 	}
 
 	void OpenGLContext::SwapBuffers()

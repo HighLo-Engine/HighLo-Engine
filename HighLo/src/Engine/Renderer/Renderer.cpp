@@ -22,8 +22,10 @@ namespace highlo
 	struct RendererData
 	{
 		RendererConfig Config;
+		RendererCapabilities Capabilities;
 		Ref<Texture3D> BlackCubeTexture;
 		Ref<Texture2D> WhiteTexture;
+		Ref<Texture2D> BRDFLut;
 		Ref<Environment> EmptyEnvironment;
 		Ref<ShaderLibrary> ShaderLib;
 	};
@@ -50,6 +52,21 @@ namespace highlo
 		s_RenderingAPI->SetViewport(x, y, width, height);
 	}
 
+	void Renderer::SetBlendMode(bool bEnabled)
+	{
+		s_RenderingAPI->SetBlendMode(bEnabled);
+	}
+
+	void Renderer::SetMultiSample(bool bEnabled)
+	{
+		s_RenderingAPI->SetMultiSample(bEnabled);
+	}
+
+	void Renderer::SetDepthTest(bool bEnabled)
+	{
+		s_RenderingAPI->SetDepthTest(bEnabled);
+	}
+
 	void Renderer::Init(Window* window)
 	{
 		s_Data = new RendererData();
@@ -58,6 +75,7 @@ namespace highlo
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
 		s_Data->WhiteTexture = Texture2D::CreateFromColor({ 1.0f, 1.0f, 1.0f }).As<Texture2D>();
+		s_Data->BRDFLut = Texture2D::LoadFromFile("assets/textures/brdfMap.png").As<Texture2D>();
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 
 		// Define Shader layouts
@@ -113,6 +131,7 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty, true);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty, true);
 
+		s_RenderingAPI->Init();
 		CoreRenderer::Init();
 		ImGuiRenderer::Init(window);
 		Renderer2D::Init();
@@ -123,6 +142,7 @@ namespace highlo
 		Renderer2D::Shutdown();
 		ImGuiRenderer::Shutdown();
 		CoreRenderer::Shutdown();
+		s_RenderingAPI->Shutdown();
 
 		delete s_Data;
 	}
@@ -150,6 +170,16 @@ namespace highlo
 	Ref<ShaderLibrary> Renderer::GetShaderLibrary()
 	{
 		return s_Data->ShaderLib;
+	}
+
+	RendererCapabilities &Renderer::GetCapabilities()
+	{
+		return s_Data->Capabilities;
+	}
+
+	Ref<Texture2D> &Renderer::GetBRDFLutTexture()
+	{
+		return s_Data->BRDFLut;
 	}
 
 	Ref<Environment> Renderer::CreateEnvironment(const HLString &path)

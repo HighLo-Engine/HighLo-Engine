@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "Environment.h"
 #include "ShaderLibrary.h"
+#include "RendererCapabilities.h"
 
 namespace highlo
 {
@@ -24,6 +25,9 @@ namespace highlo
 
 		HLAPI static void SetWireframe(bool wf);
 		HLAPI static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
+		HLAPI static void SetBlendMode(bool bEnabled);
+		HLAPI static void SetMultiSample(bool bEnabled);
+		HLAPI static void SetDepthTest(bool bEnabled);
 
 		HLAPI static void Init(Window *window);
 		HLAPI static void Shutdown();
@@ -33,6 +37,8 @@ namespace highlo
 		HLAPI static Ref<Environment> GetEmptyEnvironment();
 		HLAPI static RendererConfig &GetConfig();
 		HLAPI static Ref<ShaderLibrary> GetShaderLibrary();
+		HLAPI static RendererCapabilities &GetCapabilities();
+		HLAPI static Ref<Texture2D> &GetBRDFLutTexture();
 
 		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
 

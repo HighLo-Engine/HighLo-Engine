@@ -33,6 +33,78 @@ namespace highlo
 			HL_ASSERT(false);
 			return 0;
 		}
+
+		static void OpenGLLogMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+		{
+			switch (severity)
+			{
+				case GL_DEBUG_SEVERITY_HIGH:
+				{
+					HL_CORE_ERROR("[OpenGL Debug HIGH] {0}", message);
+					break;
+				}
+
+				case GL_DEBUG_SEVERITY_MEDIUM:
+				{
+					HL_CORE_WARN("[OpenGL Debug MEDIUM] {0}", message);
+					break;
+				}
+
+				case GL_DEBUG_SEVERITY_LOW:
+					{
+					HL_CORE_INFO("[OpenGL Debug LOW] {0}", message);
+					break;
+					}
+
+				case GL_DEBUG_SEVERITY_NOTIFICATION:
+					{
+			//		HL_CORE_TRACE("[OpenGL Debug NOTIFICATION] {0}", message);
+					break;
+					}
+			}
+		}
+	}
+
+	void OpenGLRenderingAPI::Init()
+	{
+		glDebugMessageCallback(utils::OpenGLLogMessage, nullptr);
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+		// Load Renderer Caps
+		auto &caps = Renderer::GetCapabilities();
+		caps.Vendor = (const char*)glGetString(GL_VENDOR);
+		caps.Device = (const char*)glGetString(GL_RENDERER);
+		caps.Version = (const char*)glGetString(GL_VERSION);
+		glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
+
+		HLString output = "\nOpenGL Info:\n";
+		output += "    Vendor    :  " + caps.Vendor + "\n";
+		output += "    Renderer  :  " + caps.Device + "\n";
+		output += "    Version   :  " + caps.Version + "\n";
+		HL_CORE_INFO(*output);
+
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // for seamless cube maps
+		glFrontFace(GL_CCW);
+
+		SetDepthTest(true);
+		SetBlendMode(true);
+		SetMultiSample(true);
+
+		glEnable(GL_STENCIL_TEST);
+
+		GLenum error = glGetError();
+		while (error != GL_NO_ERROR)
+		{
+			HL_CORE_ERROR("OpenGL Error: {0}", error);
+			error = glGetError();
+		}
+	}
+
+	void OpenGLRenderingAPI::Shutdown()
+	{
 	}
 
 	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4& color)
@@ -48,6 +120,17 @@ namespace highlo
 	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray>& va, PrimitiveType type)
 	{
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void OpenGLRenderingAPI::DrawIndexed(uint32 indexCount, PrimitiveType type, bool depthTest)
+	{
+		if (!depthTest)
+			SetDepthTest(false);
+
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
+
+		if (!depthTest)
+			SetDepthTest(true);
 	}
 
 	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count, PrimitiveType type)
@@ -70,10 +153,42 @@ namespace highlo
 		glViewport(x, y, width, height);
 	}
 
+	void OpenGLRenderingAPI::SetBlendMode(bool bEnabled)
+	{
+		if (bEnabled)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+		}
+	}
+
+	void OpenGLRenderingAPI::SetMultiSample(bool bEnabled)
+	{
+		if (bEnabled)
+			glEnable(GL_MULTISAMPLE);
+		else
+			glDisable(GL_MULTISAMPLE);
+	}
+
+	void OpenGLRenderingAPI::SetDepthTest(bool bEnabled)
+	{
+		if (bEnabled)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+	}
+
+	void OpenGLRenderingAPI::SetLineThickness(float thickness)
+	{
+		glLineWidth(thickness);
+	}
+
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const HLString &path)
 	{
-		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
 			return Renderer::GetEmptyEnvironment();
 

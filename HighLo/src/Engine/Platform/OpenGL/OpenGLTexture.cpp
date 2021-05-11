@@ -37,7 +37,7 @@ namespace highlo
 
 		if (format == TextureFormat::RGBA8)
 		{
-			unsigned char data[4] = { (unsigned char)rgb.x, (unsigned char)rgb.y, (unsigned char)rgb.z, (unsigned char)255 };
+			Byte data[4] = { (Byte)rgb.x, (Byte)rgb.y, (Byte)rgb.z, (Byte)255 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
 
 			instance->m_ImageData = malloc(4);
@@ -63,23 +63,23 @@ namespace highlo
 #pragma warning( disable : 6386)
 		if (format == TextureFormat::RGBA8)
 		{
-			unsigned char* data = new unsigned char[(uint64)width * (uint64)height * (uint64)4];
+			Byte *data = new Byte[(uint64)width * (uint64)height * (uint64)4];
 
 			for (uint64 r = 0; r < (uint64)width * 4; r++)
 			{
 				for (uint64 c = 0; c < (uint64)height; c += 4)
 				{
 					uint64 idx = r * width + c;
-					data[idx] = (unsigned char)(unsigned int)rgb.r;
-					data[idx + 1] = (unsigned char)(unsigned int)rgb.g;
-					data[idx + 2] = (unsigned char)(unsigned int)rgb.b;
-					data[idx + 3] = (unsigned char)255;
+					data[idx] = (Byte)(uint32)rgb.r;
+					data[idx + 1] = (Byte)(uint32)rgb.g;
+					data[idx + 2] = (Byte)(uint32)rgb.b;
+					data[idx + 3] = (Byte)255;
 				}
 			}
 
 			instance = new OpenGLTexture2D(data, width, height, format);
 
-			instance->m_ImageData = new unsigned char[(uint64)width * (uint64)height * (uint64)4];
+			instance->m_ImageData = new Byte[(uint64)width * (uint64)height * (uint64)4];
 			instance->Format = format;
 			memcpy_s(instance->m_ImageData, ((uint64)width * (uint64)height * (uint64)4), data, ((uint64)width * (uint64)height * (uint64)4));
 
@@ -94,9 +94,9 @@ namespace highlo
 				for (uint64 c = 0; c < (uint64)height; c += 4)
 				{
 					uint64 idx = r * width + c;
-					data[idx] = (uint16)(unsigned int)rgb.r;
-					data[idx + 1] = (uint16)(unsigned int)rgb.g;
-					data[idx + 2] = (uint16)(unsigned int)rgb.b;
+					data[idx] = (uint16)(uint32)rgb.r;
+					data[idx + 1] = (uint16)(uint32)rgb.g;
+					data[idx + 2] = (uint16)(uint32)rgb.b;
 					data[idx + 3] = (uint16)65535;
 				}
 			}
@@ -148,8 +148,8 @@ namespace highlo
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -188,8 +188,8 @@ namespace highlo
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
 
 		glBindTexture(GL_TEXTURE_2D, 0);

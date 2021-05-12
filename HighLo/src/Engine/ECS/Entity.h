@@ -15,6 +15,7 @@ namespace highlo
 
 		HLString Tag;
 		const EntityID ID;
+		TransformComponent* _TransformComponent;
 
 		template <typename T>
 		T* AddComponent()

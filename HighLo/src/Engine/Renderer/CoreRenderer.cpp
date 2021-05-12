@@ -39,8 +39,6 @@ namespace highlo
 		scene_buffer->SetBufferValue(&s_SceneData);
 		scene_buffer->UploadToShader();
 	}
-	
-	void CoreRenderer::EndScene() {}
 
 	void CoreRenderer::DrawCube(const glm::vec3& position, float size, float rotation, const glm::vec3& color)
 	{

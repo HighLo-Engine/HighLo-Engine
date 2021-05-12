@@ -13,61 +13,61 @@ namespace highlo
 	{
 		glm::vec3 Min, Max;
 
-		AABB()
+		HLAPI AABB()
 			: Min(0.0f), Max(0.0f) {}
 
-		AABB(const glm::vec3 &min, const glm::vec3 &max)
+		HLAPI AABB(const glm::vec3 &min, const glm::vec3 &max)
 			: Min(min), Max(max)
 		{
 		}
 
-		float Width() const
+		HLAPI float Width() const
 		{
 			return Max.x - Min.x;
 		}
 
-		float Height() const
+		HLAPI float Height() const
 		{
 			return Max.y - Min.y;
 		}
 
-		float Depth() const
+		HLAPI float Depth() const
 		{
 			return Max.z - Min.z;
 		}
 
-		float X() const
+		HLAPI float X() const
 		{
 			return (Max.x + Min.x) / 2;
 		}
 
-		float Y() const
+		HLAPI float Y() const
 		{
 			return (Max.y + Min.y) / 2;
 		}
 
-		float Z() const
+		HLAPI float Z() const
 		{
 			return (Max.z + Min.z) / 2;
 		}
 
-		bool IsEmpty() const
+		HLAPI bool IsEmpty() const
 		{
 			return Min.x >= Max.x || Min.y >= Max.y || Min.z >= Max.z;
 		}
 
-		void Clear()
+		HLAPI void Clear()
 		{
 			Min = { MAX_FLOAT, MAX_FLOAT, MAX_FLOAT };
 			Max = { MAX_FLOAT, MAX_FLOAT, MAX_FLOAT };
 		}
 
-		void Add(const glm::vec3 &coordinate)
+		HLAPI void Add(const glm::vec3 &coordinate)
 		{
 			Add(coordinate.x, coordinate.y, coordinate.z);
 		}
 
-		void Add(float x, float y, float z)
+		HLAPI void Add(float x, float y, float z)
 		{
 			HL_ASSERT(!isinf(x) && !isnan(x));
 			HL_ASSERT(!isinf(y) && !isnan(y));
@@ -82,7 +82,7 @@ namespace highlo
 			Max.z = HL_MAX(Max.z, std::ceil(z));
 		}
 
-		void Add(const AABB &other)
+		HLAPI void Add(const AABB &other)
 		{
 			Min.x = HL_MIN(Min.x, other.Min.x);
 			Min.y = HL_MIN(Min.y, other.Min.y);
@@ -93,7 +93,7 @@ namespace highlo
 			Max.z = HL_MAX(Max.z, other.Max.z);
 		}
 
-		void Set(const AABB &other)
+		HLAPI void Set(const AABB &other)
 		{
 			Min.x = other.Min.x;
 			Min.y = other.Min.y;
@@ -104,7 +104,7 @@ namespace highlo
 			Max.z = other.Max.z;
 		}
 
-		void Translate(float x, float y, float z)
+		HLAPI void Translate(float x, float y, float z)
 		{
 			Min.x += x;
 			Min.y += y;
@@ -115,7 +115,7 @@ namespace highlo
 			Max.z += z;
 		}
 
-		void Translate(const glm::vec3 &translation)
+		HLAPI void Translate(const glm::vec3 &translation)
 		{
 			Min.x = std::floor(Min.x + translation.x);
 			Min.y = std::floor(Min.y + translation.y);
@@ -126,13 +126,25 @@ namespace highlo
 			Max.z = std::ceil(Max.z + translation.z);
 		}
 
-		AABB Translated(const glm::vec3 &translation) const
+		HLAPI AABB Translated(const glm::vec3 &translation) const
 		{
 			return AABB({ Min.x + translation.x, Min.y + translation.y, Min.z + translation.z },
 						{ Max.x + translation.x, Max.y + translation.y,	Max.z + translation.z });
 		}
 
-		void Set(const AABB &other, const glm::vec3 &translation)
+		HLAPI AABB Scaled(const glm::vec3& scale) const
+		{
+			return AABB({ Min.x * scale.x, Min.y * scale.y, Min.z * scale.z },
+				{ Max.x * scale.x, Max.y * scale.y,	Max.z * scale.z });
+		}
+
+		HLAPI AABB Transformed(const glm::vec3& translation, const glm::vec3& scale)
+		{
+			return AABB({ (Min.x + translation.x) * scale.x, (Min.y + translation.y) * scale.y, (Min.z + translation.z) * scale.z },
+				{ (Max.x + translation.x) * scale.x, (Max.y + translation.y) * scale.y,	(Max.z + translation.z) * scale.z });
+		}
+
+		HLAPI void Set(const AABB &other, const glm::vec3 &translation)
 		{
 			Min.x = std::floor(other.Min.x + translation.x);
 			Min.y = std::floor(other.Min.y + translation.y);
@@ -143,14 +155,39 @@ namespace highlo
 			Max.z = std::ceil(other.Max.z + translation.z);
 		}
 
-		bool IsOutside(const AABB &other) const
+		HLAPI void UpdateDimensions(const glm::vec3& min, const glm::vec3& max)
+		{
+			Min = min;
+			Max = max;
+		}
+
+		HLAPI std::vector<glm::vec3> GetCorners()
+		{
+			return {
+				Min,
+				glm::vec3(Min.x, Min.y, Max.z),
+				glm::vec3(Min.x, Max.y, Min.z),
+				glm::vec3(Min.x, Max.y, Max.z),
+				glm::vec3(Max.x, Min.y, Min.z),
+				glm::vec3(Max.x, Min.y, Max.z),
+				glm::vec3(Max.x, Max.y, Min.z),
+				Max
+			};
+		}
+
+		HLAPI float GetRadius() const
+		{
+			return glm::length((Max - Min) / 2.0f);
+		}
+
+		HLAPI bool IsOutside(const AABB &other) const
 		{
 			return Max.x - other.Min.x < 0 || Min.x - other.Max.x > 0 ||
 				   Max.y - other.Min.y < 0 || Min.y - other.Max.y > 0 ||
 				   Max.z - other.Min.z < 0 || Min.z - other.Max.z > 0;
 		}
 
-		static bool IsOutside(const AABB &left, const AABB &right)
+		HLAPI static bool IsOutside(const AABB &left, const AABB &right)
 		{
 			return left.Max.x - right.Min.x < 0 || left.Min.x - right.Max.x > 0 ||
 				   left.Max.y - right.Min.y < 0 || left.Min.y - right.Max.y > 0 ||

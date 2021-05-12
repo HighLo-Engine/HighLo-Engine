@@ -39,6 +39,8 @@ namespace highlo
 		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }
 
+		HLAPI ECS_SystemManager& GetECSSystemManager() { return m_ECS_SystemManager; }
+
 	private:
 		static HLApplication* s_Instance;
 		ApplicationStartupSettings m_StartupSettings;

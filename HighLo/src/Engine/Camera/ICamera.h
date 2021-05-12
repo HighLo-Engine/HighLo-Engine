@@ -8,7 +8,6 @@ namespace highlo
 	class ICamera : public IsSharedReference
 	{
 	public:
-
 		HLAPI ICamera() = default;
 		HLAPI virtual ~ICamera() = default;
 
@@ -19,6 +18,7 @@ namespace highlo
 		HLAPI const glm::mat4& GetProjection() const { return m_ProjectionMatrix; }
 		HLAPI const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 		HLAPI glm::mat4 GetViewProjectionMatrix() { return m_ProjectionMatrix * m_ViewMatrix; }
+		HLAPI void GetViewProjectionMatrix(glm::mat4& out) { MatrixMulSSE(m_ProjectionMatrix, m_ViewMatrix, out); }
 
 		HLAPI const glm::vec3& GetPosition()	 const { return m_Position; }
 		HLAPI const glm::vec3 GetYawPitchRoll()  const { return glm::vec3(m_Yaw, m_Pitch, m_Roll); }

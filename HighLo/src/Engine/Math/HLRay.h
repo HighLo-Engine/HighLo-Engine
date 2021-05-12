@@ -15,12 +15,12 @@ namespace highlo
 			Direction = direction;
 		}
 
-		static Ray Zero()
+        HLAPI static Ray Zero()
 		{
 			return { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 		}
 
-		bool IntersectsAABB(const AABB &aabb, float &t) const
+        HLAPI bool IntersectsAABB(const AABB &aabb, float &t) const
 		{
             glm::vec3 dirfrac;
             // r.dir is unit direction vector of ray
@@ -59,7 +59,7 @@ namespace highlo
             return true;
 		}
 
-		bool IntersectsTriangle(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C, float &t)
+        HLAPI bool IntersectsTriangle(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C, float &t)
 		{
             glm::vec3 E1 = B - A;
             glm::vec3 E2 = C - A;

@@ -1,15 +1,16 @@
 #pragma once
-
+#include "Engine/Core/HLCore.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace highlo
 {
+	//class OBB;
+
 	class Transform
 	{
 	public:
-
 		static Transform OriginTransform;
 
 		HLAPI Transform() = default;
@@ -34,6 +35,9 @@ namespace highlo
 		HLAPI inline const glm::quat &GetRotation() const { return m_Rotation; }
 		HLAPI inline const glm::mat4 &GetTransform() const { return m_Transform; }
 
+		//HLAPI void SetOBB(const Ref<OBB>& obb) { m_BoundingBox = obb; }
+		//HLAPI inline const Ref<OBB>& GetOBB() const { return m_BoundingBox; }
+
 		HLAPI bool operator==(const Transform &other) const
 		{
 			// this is faster than just comparing the transform because a transform has 16 comparisons and this has just 10
@@ -46,12 +50,11 @@ namespace highlo
 		}
 
 	private:
-
 		glm::vec3 m_Position  = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_Scale     = { 1.0f, 1.0f, 1.0f };
 		glm::quat m_Rotation  = { 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::mat4 m_Transform = glm::mat4(1.0f);
-
+		//Ref<OBB>  m_BoundingBox = nullptr;
 	};
 }
 

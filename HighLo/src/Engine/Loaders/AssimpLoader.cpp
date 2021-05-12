@@ -145,6 +145,7 @@ namespace highlo
 		ProcessNode(scene->mRootNode, scene, parser_meshes);
 
 		float xMin, xMax, yMin, yMax, zMin, zMax;
+
 		xMin = parser_meshes.at(0).xMin;
 		xMax = parser_meshes.at(0).xMax;
 		yMin = parser_meshes.at(0).yMin;
@@ -167,7 +168,7 @@ namespace highlo
 		}
 
 		auto model = Model(engine_meshes);
-		//model.DefaultBoundingBoxData = BoundingBoxData{ xMax, xMin, yMax, yMin, zMax, zMin };
+		model.BoundingBox = AABB({ xMax, xMin, yMax }, { yMin, zMax, zMin });
 
 		HL_CORE_INFO("AssimpLoader> [+] Loaded {0} [+]", filepath.C_Str());
 		return model;

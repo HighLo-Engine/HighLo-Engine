@@ -15,7 +15,6 @@ namespace highlo
 		HLAPI static void Shutdown();
 
 		HLAPI static void BeginScene(const ICamera& camera, const Light& light = Light());
-		HLAPI static void EndScene();
 
 		HLAPI static void DrawCube(const glm::vec3& position, float size = 1.0f, float rotation = 0.0f, const glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f));
 		HLAPI static void DrawCube(const glm::vec3& position, Ref<Material> material, float size = 1.0f, float rotation = 0.0f);

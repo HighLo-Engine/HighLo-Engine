@@ -103,7 +103,7 @@ namespace highlo
 
 	void HLApplication::Create_ECS_Systems()
 	{
-		m_ECS_SystemManager.RegisterSystem<RenderSystem>();
+		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 	}
 
 	void HLApplication::InternalEventHandler(Event &event)

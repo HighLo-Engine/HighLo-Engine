@@ -3,6 +3,8 @@
 #include <HighLo.h>
 using namespace highlo;
 
+#include <Engine/ECS/RenderSystem.h>
+
 class Sandbox : public HLApplication
 {
 public:
@@ -14,10 +16,7 @@ public:
 	void OnResize(uint32 width, uint32 height) override;
 
 private:
-	Light m_Light;
-	Ref<FPSCamera> m_Camera;
-	Ref<Environment> m_Environment;
-	Ref<Skybox> m_Skybox;
+	Ref<RenderSystem> m_RenderSystemRef;
 
-	Entity m_Entity;
+	Ref<Scene> m_Scene;
 };

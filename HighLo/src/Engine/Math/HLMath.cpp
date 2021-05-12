@@ -11,6 +11,24 @@
 #include "Engine/Core/Profiler/HLProfilerTimer.h"
 #include "Engine/Window/Window.h"
 
+#define SHUFFLE_PARAM(x, y, z, w) \
+    (z<<6) | (y<<4) | (x<<2) | w//((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
+
+#define _mm_madd_ps(a, b, c) \
+    _mm_add_ps(_mm_mul_ps((a), (b)), (c))
+
+#define _mm_replicate_x_ps(v) \
+    _mm_shuffle_ps((v), (v), SHUFFLE_PARAM(0, 0, 0, 0))
+
+#define _mm_replicate_y_ps(v) \
+    _mm_shuffle_ps((v), (v), SHUFFLE_PARAM(1, 1, 1, 1))
+
+#define _mm_replicate_z_ps(v) \
+    _mm_shuffle_ps((v), (v), SHUFFLE_PARAM(2, 2, 2, 2))
+
+#define _mm_replicate_w_ps(v) \
+    _mm_shuffle_ps((v), (v), SHUFFLE_PARAM(3, 3, 3, 3))
+
 namespace highlo
 {
 	float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)
@@ -25,6 +43,19 @@ namespace highlo
 	std::ostream& operator<<(std::ostream& os, const glm::vec3& vec)
 	{
 		os << vec.x << ", " << vec.y << ", " << vec.z;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const glm::mat4& mat)
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				os << mat[i][j] << " ";
+			}
+			os << "\n";
+		}
 		return os;
 	}
 
@@ -276,5 +307,48 @@ namespace highlo
 		}
 
 		return s_CachedCos[value];
+	}
+	
+	void MatrixMulSSE(const glm::mat4& A, const glm::mat4& B, glm::mat4& dest)
+	{
+		__m128 m2_row_0 = _mm_setr_ps(A[0][0], A[0][1], A[0][2], A[0][3]);
+		__m128 m2_row_1 = _mm_setr_ps(A[1][0], A[1][1], A[1][2], A[1][3]);
+		__m128 m2_row_2 = _mm_setr_ps(A[2][0], A[2][1], A[2][2], A[2][3]);
+		__m128 m2_row_3 = _mm_setr_ps(A[3][0], A[3][1], A[3][2], A[3][3]);
+
+		__m128 m1_row_0 = _mm_setr_ps(B[0][0], B[0][1], B[0][2], B[0][3]);
+		__m128 m1_row_1 = _mm_setr_ps(B[1][0], B[1][1], B[1][2], B[1][3]);
+		__m128 m1_row_2 = _mm_setr_ps(B[2][0], B[2][1], B[2][2], B[2][3]);
+		__m128 m1_row_3 = _mm_setr_ps(B[3][0], B[3][1], B[3][2], B[3][3]);
+
+		__m128 out0;
+		__m128 out1;
+		__m128 out2;
+		__m128 out3;
+
+		out0 = _mm_mul_ps(m2_row_0, _mm_replicate_x_ps(m1_row_0));
+		out1 = _mm_mul_ps(m2_row_0, _mm_replicate_x_ps(m1_row_1));
+		out2 = _mm_mul_ps(m2_row_0, _mm_replicate_x_ps(m1_row_2));
+		out3 = _mm_mul_ps(m2_row_0, _mm_replicate_x_ps(m1_row_3));
+
+		out0 = _mm_madd_ps(m2_row_1, _mm_replicate_y_ps(m1_row_0), out0);
+		out1 = _mm_madd_ps(m2_row_1, _mm_replicate_y_ps(m1_row_1), out1);
+		out2 = _mm_madd_ps(m2_row_1, _mm_replicate_y_ps(m1_row_2), out2);
+		out3 = _mm_madd_ps(m2_row_1, _mm_replicate_y_ps(m1_row_3), out3);
+
+		out0 = _mm_madd_ps(m2_row_2, _mm_replicate_z_ps(m1_row_0), out0);
+		out1 = _mm_madd_ps(m2_row_2, _mm_replicate_z_ps(m1_row_1), out1);
+		out2 = _mm_madd_ps(m2_row_2, _mm_replicate_z_ps(m1_row_2), out2);
+		out3 = _mm_madd_ps(m2_row_2, _mm_replicate_z_ps(m1_row_3), out3);
+
+		out0 = _mm_madd_ps(m2_row_3, _mm_replicate_w_ps(m1_row_0), out0);
+		out1 = _mm_madd_ps(m2_row_3, _mm_replicate_w_ps(m1_row_1), out1);
+		out2 = _mm_madd_ps(m2_row_3, _mm_replicate_w_ps(m1_row_2), out2);
+		out3 = _mm_madd_ps(m2_row_3, _mm_replicate_w_ps(m1_row_3), out3);
+
+		_mm_store_ps(&dest[0][0], out0);
+		_mm_store_ps(&dest[1][0], out1);
+		_mm_store_ps(&dest[2][0], out2);
+		_mm_store_ps(&dest[3][0], out3);
 	}
 }

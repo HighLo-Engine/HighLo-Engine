@@ -44,8 +44,6 @@ void PBRSceneDemo::OnUpdate(Timestep timestep)
 
 	CoreRenderer::DrawMesh(m_Pistol, Transform::FromPosition({ 30, -3, 0 }).Scale(0.5f));
 	CoreRenderer::DrawMesh(m_Cowboy, Transform::FromPosition({ 26, -5, -12 }).Scale(0.8f).Rotate(-45.0f, { 0, 1, 0 }));
-
-	CoreRenderer::EndScene();
 }
 
 void PBRSceneDemo::OnShutdown()

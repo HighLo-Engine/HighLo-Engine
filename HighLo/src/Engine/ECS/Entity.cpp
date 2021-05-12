@@ -7,16 +7,17 @@ namespace highlo
 	Entity::Entity(const HLString& tag) 
 		: ID(ECS_Registry::Get().GenerateEntityID()), Tag(tag)
 	{
-		ECS_Registry::Get().AddComponent<TransformComponent>(ID);
+		_TransformComponent = ECS_Registry::Get().AddComponent<TransformComponent>(ID);
 	}
 
 	Entity::Entity(EntityID id) 
 		: ID(id), Tag("Entity")
 	{
+		_TransformComponent = ECS_Registry::Get().GetComponent<TransformComponent>(ID);
 	}
 	
 	Entity::Entity(const Entity& entity) 
-		: ID(entity.ID), Tag(entity.Tag)
+		: ID(entity.ID), Tag(entity.Tag), _TransformComponent(entity._TransformComponent)
 	{
 	}
 	

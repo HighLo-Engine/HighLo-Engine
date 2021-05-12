@@ -170,7 +170,7 @@ namespace highlo
 	
 	float FreeFlyCamera::RotationSpeed() const
 	{
-		return 0.08f;
+		return 0.16f;
 	}
 	
 	float FreeFlyCamera::RunningSpeed() const

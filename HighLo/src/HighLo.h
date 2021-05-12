@@ -62,4 +62,6 @@
 
 #include "Engine/ECS/Entity.h"
 
+#include "Engine/Scene/Scene.h"
+
 #include "Engine/Loaders/AssetLoader.h"

@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Math/HLAABB.h"
 #include <vector>
 #include <initializer_list>
 
@@ -22,6 +23,7 @@ namespace highlo
 
 		HLString Name = "";
 		glm::vec4 Color = glm::vec4(1, 1, 1, 1);
+		AABB BoundingBox;
 
 	private:
 		std::vector<Ref<Mesh>> m_Meshes;

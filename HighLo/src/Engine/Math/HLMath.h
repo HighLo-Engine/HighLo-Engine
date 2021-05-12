@@ -24,22 +24,29 @@ namespace highlo
 // The value for which all absolute numbers smaller than are considered equal to zero.
 #define HL_ZERO_TOLERANCE 1e-6f
 
-	float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
+#define HL_INTERSECTING 0
+#define HL_INSIDE		1
+#define HL_OUTSIDE		2
 
-	std::ostream& operator<<(std::ostream& os, const glm::vec3& vec);
-	HLString vec3ToString(const glm::vec3& v);
+	HLAPI float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 
-	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
-	glm::vec3 WorldToScreen(glm::vec3 point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
+	HLAPI std::ostream& operator<<(std::ostream& os, const glm::vec3& vec);
+	HLAPI std::ostream& operator<<(std::ostream& os, const glm::mat4& mat);
+	HLAPI HLString vec3ToString(const glm::vec3& v);
 
-	bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation);
-	bool DecomposeTranslation(const glm::mat4 &transform, glm::vec3 &translation);
-	bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale);
-	bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation);
+	HLAPI glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
+	HLAPI glm::vec3 WorldToScreen(glm::vec3 point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
 
-	void CreateCacheSin(float cacheSize = 100000.0f);
-	void CreateCacheCos(float cacheSize = 100000.0f);
+	HLAPI bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation);
+	HLAPI bool DecomposeTranslation(const glm::mat4 &transform, glm::vec3 &translation);
+	HLAPI bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale);
+	HLAPI bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation);
 
-	float Sin(float value);
-	float Cos(float value);
+	HLAPI void CreateCacheSin(float cacheSize = 100000.0f);
+	HLAPI void CreateCacheCos(float cacheSize = 100000.0f);
+
+	HLAPI float Sin(float value);
+	HLAPI float Cos(float value);
+
+	HLAPI void MatrixMulSSE(const glm::mat4& A, const glm::mat4& B, glm::mat4& dest);
 }

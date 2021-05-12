@@ -7,5 +7,9 @@ namespace highlo
 	{
 	public:
 		void OnUpdate(Timestep ts, ECS_Registry& registry) override;
+
+		uint64 FrameEntitiesRendered;
+		uint64 FrameMeshesRendered;
+		uint64 FrameTrianglesRendered;
 	};
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Renderer//Model.h"
+#include "Engine/Renderer/Model.h"
 
 namespace highlo
 {
@@ -11,5 +11,7 @@ namespace highlo
 	struct RenderComponent
 	{
 		Model Model;
+		bool Enabled = true;
+		bool Wireframe = false;
 	};
 }

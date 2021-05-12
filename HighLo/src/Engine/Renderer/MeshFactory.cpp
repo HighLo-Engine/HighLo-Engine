@@ -81,6 +81,13 @@ namespace highlo
 		return Mesh::Create(data);
 	}
 
+	Model MeshFactory::CreateCubeModel(const glm::vec3& size)
+	{
+		Model model = Model({ CreateCube(size) });
+		model.BoundingBox = AABB(glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), glm::vec3(size.x / 2, size.y / 2, size.z / 2));
+		return model;
+	}
+
 	Ref<Mesh> MeshFactory::CreateSphere(float radius)
 	{
 		const float PI = HL_PI;

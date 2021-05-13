@@ -10,8 +10,13 @@ namespace highlo
 
 	struct RenderComponent
 	{
-		Model Model;
+		Model MainModel;
+		Model ModelLOD1;
+		Model ModelLOD2;
+		bool UseLOD = false;
+		int LodLevel = 0;
 		bool Enabled = true;
 		bool Wireframe = false;
+		bool ResetForNextFrame = false;
 	};
 }

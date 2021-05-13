@@ -36,6 +36,8 @@ namespace highlo
 		HLAPI inline float GetOrthographicNearPlane() const { return m_OrthographicNear; }
 		HLAPI inline float GetOrthographicFarPlane() const { return m_OrthographicFar; }
 
+		HLAPI virtual void GetDirectionVectors(glm::vec3& front, glm::vec3& up, glm::vec3& left);
+
 		HLAPI virtual void Update() override {}
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) override;
 		HLAPI virtual void OnEvent(Event &e) override {}

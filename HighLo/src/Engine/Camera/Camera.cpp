@@ -32,6 +32,38 @@ namespace highlo
 		SetProjectionInternal(width, height);
 	}
 
+	void Camera::GetDirectionVectors(glm::vec3& front, glm::vec3& up, glm::vec3& left)
+	{
+		float sx, sy, sz, cx, cy, cz, theta;
+
+		// rotation angle about X-axis (pitch)
+		theta = glm::radians(m_Pitch);
+		sx = Sin(theta);
+		cx = Cos(theta);
+
+		// rotation angle about Y-axis (yaw)
+		theta = glm::radians(m_Yaw);
+		sy = Sin(theta);
+		cy = Cos(theta);
+
+		// rotation angle about Z-axis (roll)
+		theta = glm::radians(m_Roll);
+		sz = Sin(theta);
+		cz = Cos(theta);
+
+		left.x = cy * cz;
+		left.y = sx * sy * cz + cx * sz;
+		left.z = -cx * sy * cz + sx * sz;
+
+		up.x = -cy * sz;
+		up.y = -sx * sy * sz + cx * cz;
+		up.z = cx * sy * sz + sx * cz;
+
+		front.x = sy;
+		front.y = -sx * cy;
+		front.z = cx * cy;
+	}
+
 	void Camera::OnWindowResize(uint32 width, uint32 height)
 	{
 		SetProjectionInternal(width, height);

@@ -15,23 +15,33 @@ namespace highlo
 			if (!component.Enabled)
 				return;
 
-			for (uint64 i = 0; i < component.Model.GetMeshCount(); i++)
+			Model& model = component.MainModel;
+			if (component.UseLOD)
+			{
+				switch (component.LodLevel)
+				{
+				case 1: model = component.ModelLOD1; break;
+				case 2: model = component.ModelLOD2; break;
+				default: break;
+				}
+			}
+
+			for (uint64 i = 0; i < model.GetMeshCount(); i++)
 			{
 				if (component.Wireframe)
 					Renderer::SetWireframe(true);
 
-				CoreRenderer::DrawMesh(component.Model.GetMesh(i), transform.Transform);
+				CoreRenderer::DrawMesh(model.GetMesh(i), transform.Transform);
 
 				if (component.Wireframe)
 					Renderer::SetWireframe(false);
 				
 				FrameMeshesRendered++;
-				FrameTrianglesRendered += component.Model.GetMesh(i)->GetMeshData().m_Indices.size() / 3;
+				FrameTrianglesRendered += model.GetMesh(i)->GetMeshData().m_Indices.size() / 3;
 			}
 
-			Renderer::SetWireframe(true);
-			//CoreRenderer::DrawMesh(transform.Transform.GetOBB(), transform.Transform);
-			Renderer::SetWireframe(false);
+			if (component.ResetForNextFrame)
+				component.Enabled = false;
 
 			FrameEntitiesRendered++;
 		});

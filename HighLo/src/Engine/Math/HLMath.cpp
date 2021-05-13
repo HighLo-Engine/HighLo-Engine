@@ -31,6 +31,15 @@
 
 namespace highlo
 {
+	float hsum_ps_sse3(__m128 v)
+	{
+		__m128 shuf = _mm_movehdup_ps(v);
+		__m128 sums = _mm_add_ps(v, shuf);
+		shuf = _mm_movehl_ps(shuf, sums);
+		sums = _mm_add_ss(sums, shuf);
+		return _mm_cvtss_f32(sums);
+	}
+
 	float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)
 	{
 		float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
@@ -83,7 +92,7 @@ namespace highlo
 		return glm::normalize(glm::vec3(world_coords.x, world_coords.y, world_coords.z));
 	}
 
-	glm::vec3 WorldToScreen(glm::vec3 point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset)
+	glm::vec3 WorldToScreen(const glm::vec3& point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset)
 	{
 		glm::vec4 WorldPosition = glm::vec4(point, 1.0f);
 		glm::vec4 ClipSpacePos = projection * (view_matrix * WorldPosition);
@@ -266,7 +275,7 @@ namespace highlo
 		// this would be much faster because sin() and cos() are expensive to calculate
 		HL_PROFILE_FUNCTION();
 
-		for (float i = 0.0f; i <= cacheSize; i += 0.5f)
+		for (float i = 0.0f; i <= cacheSize; i += 0.01f)
 			s_CachedSin.insert({ i, ::sin(i) });
 	}
 
@@ -277,7 +286,7 @@ namespace highlo
 
 		HL_PROFILE_FUNCTION();
 
-		for (float i = 0.0f; i <= cacheSize; i += 0.5f)
+		for (float i = 0.0f; i <= cacheSize; i += 0.01f)
 			s_CachedCos.insert({ i, ::cos(i) });
 	}
 	
@@ -350,5 +359,31 @@ namespace highlo
 		_mm_store_ps(&dest[1][0], out1);
 		_mm_store_ps(&dest[2][0], out2);
 		_mm_store_ps(&dest[3][0], out3);
+	}
+	
+	float DistanceSquaredSSE(const glm::vec3& A, const glm::vec3& B)
+	{
+		__m128 a4 = _mm_set_ps(A.x, A.y, A.z, 0.0f);
+		__m128 b4 = _mm_set_ps(B.x, B.y, B.z, 0.0f);
+		
+		__m128 diff = _mm_sub_ps(b4, a4);
+		__m128 sqr = _mm_mul_ps(diff, diff);
+
+		return hsum_ps_sse3(sqr);
+	}
+	
+	bool CompareVectorsSSE(const glm::vec3& A, const glm::vec3& B)
+	{
+		__m128i v1 = _mm_load_si128((__m128i*)&A);
+		__m128i v2 = _mm_load_si128((__m128i*)&B);
+		__m128i vcmp = _mm_cmpeq_epi32(v1, v2);
+		uint16_t mask = _mm_movemask_epi8(vcmp);
+		return (mask == 0xffff);
+	}
+	
+	float DotProductSSE(const glm::vec3& A, const glm::vec3& B)
+	{
+		// TO-DO
+		return 0;
 	}
 }

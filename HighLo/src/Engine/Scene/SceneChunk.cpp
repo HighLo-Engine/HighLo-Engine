@@ -167,7 +167,7 @@ namespace highlo
 				continue;
 
 			chunk->Update(ts, camera, cameraFrustum, processedEntityCount);
-			//chunk->RenderDebugMesh();
+			chunk->RenderDebugMesh();
 		}
 	}
 

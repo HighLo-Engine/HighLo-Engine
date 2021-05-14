@@ -275,19 +275,24 @@ namespace highlo
 		// this would be much faster because sin() and cos() are expensive to calculate
 		HL_PROFILE_FUNCTION();
 
-		for (float i = 0.0f; i <= cacheSize; i += 0.01f)
-			s_CachedSin.insert({ i, ::sin(i) });
+		for (int32 i = 0; i < cacheSize; ++i)
+			{
+			float cachedValue = std::sin((float)(HL_PI * i / 1000.0f));
+			s_CachedSin.insert({ (float)(HL_PI * i / 1000.0f), cachedValue });
+			}
 	}
 
 	void CreateCacheCos(float cacheSize)
 	{
 		// The idea is to pre-run a wide variation of values with the Sin function and store the results in some sort of table that the engine can look up during runtime
 		// this would be much faster because sin() and cos() are expensive to calculate
-
 		HL_PROFILE_FUNCTION();
 
-		for (float i = 0.0f; i <= cacheSize; i += 0.01f)
-			s_CachedCos.insert({ i, ::cos(i) });
+		for (int32 i = 0; i < cacheSize; ++i)
+		{
+			float cachedValue = std::cos((float)(HL_PI * i / 1000.0f));
+			s_CachedCos.insert({ (float)(HL_PI * i / 1000.0f), cachedValue });
+		}
 	}
 	
 	float Sin(float value)
@@ -383,7 +388,7 @@ namespace highlo
 	
 	float DotProductSSE(const glm::vec3& A, const glm::vec3& B)
 	{
-		// TO-DO
+		// TODO
 		return 0;
 	}
 }

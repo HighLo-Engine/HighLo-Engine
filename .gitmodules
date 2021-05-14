@@ -13,3 +13,6 @@
 [submodule "HighLo/vendor/SPIRV-Cross"]
 	path = HighLo/vendor/SPIRV-Cross
 	url = https://github.com/HighLo-Engine/SPIRV-Cross
+[submodule "HighLo/vendor/glslang"]
+	path = HighLo/vendor/glslang
+	url = https://github.com/HighLo-Engine/glslang

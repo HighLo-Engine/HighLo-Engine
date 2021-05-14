@@ -16,3 +16,6 @@
 [submodule "HighLo/vendor/glslang"]
 	path = HighLo/vendor/glslang
 	url = https://github.com/HighLo-Engine/glslang
+[submodule "HighLo/vendor/shaderc"]
+	path = HighLo/vendor/shaderc
+	url = https://github.com/HighLo-Engine/shaderc

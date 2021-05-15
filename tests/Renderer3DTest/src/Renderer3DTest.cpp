@@ -2,8 +2,7 @@
 
 void Renderer3DTest::OnInitialize()
 {
-	m_Camera = Ref<Camera>::Create();
-	m_Camera->SetYaw(90);
+	m_Camera = Ref<FPSCamera>::Create();
 
 	Renderer::SetWireframe(true);
 	ImGuiRenderer::ShouldDisplayDebugInformation(true);

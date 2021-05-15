@@ -24,6 +24,7 @@ namespace highlo
 		virtual uint32 GetWidth() const override { return m_Width; };
 		virtual uint32 GetHeight() const override { return m_Height; };
 		virtual void* GetData() const override;
+		virtual Allocator GetWriteableBuffer() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
@@ -39,7 +40,7 @@ namespace highlo
 
 	private:
 
-		void* m_ImageData = nullptr;
+		Allocator m_Buffer;
 		uint32 m_Width = 0, m_Height = 0;
 		GLenum m_InternalFormat, m_DataFormat;
 	};
@@ -54,6 +55,7 @@ namespace highlo
 		virtual uint32 GetWidth() const override;
 		virtual uint32 GetHeight() const override;
 		virtual void *GetData() const override;
+		virtual Allocator GetWriteableBuffer() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;

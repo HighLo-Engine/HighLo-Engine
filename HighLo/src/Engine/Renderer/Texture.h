@@ -4,6 +4,7 @@
 
 #include "Engine/Core/DataTypes/HLString.h"
 #include "Engine/Math/HLMath.h"
+#include "Engine/Core/HLAllocator.h"
 #include "TextureFormat.h"
 
 namespace highlo
@@ -31,6 +32,7 @@ namespace highlo
 		HLAPI virtual uint32 GetWidth() const = 0;
 		HLAPI virtual uint32 GetHeight() const = 0;
 		HLAPI virtual void* GetData() const = 0;
+		HLAPI virtual Allocator GetWriteableBuffer() = 0;
 
 		HLAPI virtual void Bind(uint32 slot) const = 0;
 		HLAPI virtual void Release() = 0;

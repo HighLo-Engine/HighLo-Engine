@@ -40,16 +40,18 @@ namespace highlo
 			Byte data[4] = { (Byte)rgb.x, (Byte)rgb.y, (Byte)rgb.z, (Byte)255 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
 
-			instance->m_ImageData = malloc(4);
-			memcpy_s(instance->m_ImageData, 4, data, 4);
+			void *dataToStore = malloc(4);
+			memcpy_s(dataToStore, 4, data, 4);
+			instance->m_Buffer = Allocator::Copy(dataToStore, 4);
 		}
 		else
 		{
 			uint16 data[4] = { (uint16)rgb.x, (uint16)rgb.y, (uint16)rgb.z, (uint16)65535 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
 
-			instance->m_ImageData = malloc(8);
-			memcpy_s(instance->m_ImageData, 8, data, 8);
+			void *dataToStore = malloc(8);
+			memcpy_s(dataToStore, 8, data, 8);
+			instance->m_Buffer = Allocator::Copy(dataToStore, 8);
 		}
 
 		return instance;
@@ -79,9 +81,10 @@ namespace highlo
 
 			instance = new OpenGLTexture2D(data, width, height, format);
 
-			instance->m_ImageData = new Byte[(uint64)width * (uint64)height * (uint64)4];
+			Byte *dataToStore = new Byte[(uint64)width * (uint64)height * (uint64)4];
 			instance->Format = format;
-			memcpy_s(instance->m_ImageData, ((uint64)width * (uint64)height * (uint64)4), data, ((uint64)width * (uint64)height * (uint64)4));
+			memcpy_s(dataToStore, ((uint64)width * (uint64)height * (uint64)4), data, ((uint64)width * (uint64)height * (uint64)4));
+			instance->m_Buffer = Allocator::Copy(dataToStore, (uint64)width * (uint64)height * (uint64)4);
 
 			delete[] data;
 		}
@@ -103,9 +106,10 @@ namespace highlo
 
 			instance = new OpenGLTexture2D(data, width, height, format);
 
-			instance->m_ImageData = new uint16[(uint64)width * (uint64)height * (uint64)4];
+			uint16 *dataToStore = new uint16[(uint64)width * (uint64)height * (uint64)4];
 			instance->Format = format;
-			memcpy_s(instance->m_ImageData, ((uint64)width * (uint64)height * (uint64)8), data, ((uint64)width * (uint64)height * (uint64)8));
+			memcpy_s(dataToStore, ((uint64)width * (uint64)height * (uint64)8), data, ((uint64)width * (uint64)height * (uint64)8));
+			instance->m_Buffer = Allocator::Copy(dataToStore, (uint64)width * (uint64)height * (uint64)4);
 
 			delete[] data;
 		}
@@ -115,8 +119,10 @@ namespace highlo
 	}
 	
 	OpenGLTexture2D::OpenGLTexture2D(void* img_data, uint32 width, uint32 height, TextureFormat format)
-		: m_ImageData(img_data), m_Width(width), m_Height(height)
+		: m_Width(width), m_Height(height)
 	{
+		m_Buffer = Allocator::Copy(img_data, (uint64)width * (uint64)height * (uint64)4);
+
 		switch (format)
 		{
 			case TextureFormat::RGBA8:
@@ -178,6 +184,7 @@ namespace highlo
 			}
 		}
 
+		m_Buffer.Allocate(width * height * 4);
 		Format = format;
 		m_Width = width;
 		m_Height = height;
@@ -198,13 +205,18 @@ namespace highlo
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		glDeleteTextures(1, &RendererID);
-		if (m_ImageData)
-			stbi_image_free(m_ImageData);
+		if (m_Buffer)
+			stbi_image_free(m_Buffer.m_Data);
 	}
 	
 	void* OpenGLTexture2D::GetData() const
 	{
-		return m_ImageData;
+		return m_Buffer.m_Data;
+	}
+
+	Allocator OpenGLTexture2D::GetWriteableBuffer()
+	{
+		return m_Buffer;
 	}
 
 	void OpenGLTexture2D::Release()
@@ -215,8 +227,8 @@ namespace highlo
 			RendererID = 0;
 		}
 
-		if (m_ImageData)
-			stbi_image_free(m_ImageData);
+		if (m_Buffer)
+			stbi_image_free(m_Buffer.m_Data);
 	}
 
 	void OpenGLTexture2D::Invalidate()
@@ -229,18 +241,18 @@ namespace highlo
 		uint32 mipCount = utils::CalculateMipCount(m_Width, m_Height);
 		glTextureStorage2D(RendererID, mipCount, glInternalFormat, m_Width, m_Height);
 
-		if (m_ImageData)
+		if (m_Buffer)
 		{
 			GLenum glFormat = utils::OpenGLImageFormat(Format);
 			GLenum glDataType = utils::OpenGLFormatDataType(Format);
-			glTextureSubImage2D(RendererID, 0, 0, 0, m_Width, m_Height, glFormat, glDataType, m_ImageData);
+			glTextureSubImage2D(RendererID, 0, 0, 0, m_Width, m_Height, glFormat, glDataType, m_Buffer.m_Data);
 			glGenerateTextureMipmap(RendererID);
 		}
 	}
 	
 	void OpenGLTexture2D::UpdateResourceData()
 	{
-		UpdateResourceData(m_ImageData);
+		UpdateResourceData(m_Buffer.m_Data);
 	}
 	
 	void OpenGLTexture2D::UpdateResourceData(void* data)
@@ -256,17 +268,17 @@ namespace highlo
 
 		if (Format == TextureFormat::RGBA8)
 		{
-			((Byte*)m_ImageData)[idx]	  = (Byte)rgba.r;
-			((Byte*)m_ImageData)[idx + 1] = (Byte)rgba.g;
-			((Byte*)m_ImageData)[idx + 2] = (Byte)rgba.b;
-			((Byte*)m_ImageData)[idx + 3] = (Byte)rgba.a;
+			((Byte*)m_Buffer.m_Data)[idx]	  = (Byte)rgba.r;
+			((Byte*)m_Buffer.m_Data)[idx + 1] = (Byte)rgba.g;
+			((Byte*)m_Buffer.m_Data)[idx + 2] = (Byte)rgba.b;
+			((Byte*)m_Buffer.m_Data)[idx + 3] = (Byte)rgba.a;
 		}
 		else
 		{
-			((uint16*)m_ImageData)[idx]		= (uint16)rgba.r;
-			((uint16*)m_ImageData)[idx + 1] = (uint16)rgba.g;
-			((uint16*)m_ImageData)[idx + 2] = (uint16)rgba.b;
-			((uint16*)m_ImageData)[idx + 3] = (uint16)rgba.a;
+			((uint16*)m_Buffer.m_Data)[idx]		= (uint16)rgba.r;
+			((uint16*)m_Buffer.m_Data)[idx + 1] = (uint16)rgba.g;
+			((uint16*)m_Buffer.m_Data)[idx + 2] = (uint16)rgba.b;
+			((uint16*)m_Buffer.m_Data)[idx + 3] = (uint16)rgba.a;
 		}
 	}
 	
@@ -280,17 +292,17 @@ namespace highlo
 
 		if (Format == TextureFormat::RGBA8)
 		{
-			rgba.r = (uint32)(((Byte*)m_ImageData)[idx]);
-			rgba.g = (uint32)(((Byte*)m_ImageData)[idx + 1]);
-			rgba.b = (uint32)(((Byte*)m_ImageData)[idx + 2]);
-			rgba.a = (uint32)(((Byte*)m_ImageData)[idx + 3]);
+			rgba.r = (uint32)(((Byte*)m_Buffer.m_Data)[idx]);
+			rgba.g = (uint32)(((Byte*)m_Buffer.m_Data)[idx + 1]);
+			rgba.b = (uint32)(((Byte*)m_Buffer.m_Data)[idx + 2]);
+			rgba.a = (uint32)(((Byte*)m_Buffer.m_Data)[idx + 3]);
 		}
 		else if (Format == TextureFormat::RGBA16)
 		{
-			rgba.r = (uint32)(((uint16*)m_ImageData)[idx]);
-			rgba.g = (uint32)(((uint16*)m_ImageData)[idx + 1]);
-			rgba.b = (uint32)(((uint16*)m_ImageData)[idx + 2]);
-			rgba.a = (uint32)(((uint16*)m_ImageData)[idx + 3]);
+			rgba.r = (uint32)(((uint16*)m_Buffer.m_Data)[idx]);
+			rgba.g = (uint32)(((uint16*)m_Buffer.m_Data)[idx + 1]);
+			rgba.b = (uint32)(((uint16*)m_Buffer.m_Data)[idx + 2]);
+			rgba.a = (uint32)(((uint16*)m_Buffer.m_Data)[idx + 3]);
 		}
 
 		return rgba;
@@ -424,6 +436,11 @@ namespace highlo
 	void *OpenGLTexture3D::GetData() const
 	{
 		return m_Buffer.m_Data;
+	}
+
+	Allocator OpenGLTexture3D::GetWriteableBuffer()
+	{
+		return m_Buffer;
 	}
 
 	void OpenGLTexture3D::Release()

@@ -1,6 +1,6 @@
-#include "PBRSceneDemo.h"
+#include "PBRSceneTest.h"
 
-void PBRSceneDemo::OnInitialize()
+void PBRSceneTest::OnInitialize()
 {
 	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
@@ -19,7 +19,7 @@ void PBRSceneDemo::OnInitialize()
 	HL_TRACE("PBR Demo Initialized");
 }
 
-void PBRSceneDemo::OnUpdate(Timestep timestep)
+void PBRSceneTest::OnUpdate(Timestep timestep)
 {
 	m_Pistol->Update(timestep);
 	m_Cowboy->Update(timestep);
@@ -46,21 +46,21 @@ void PBRSceneDemo::OnUpdate(Timestep timestep)
 	CoreRenderer::DrawMesh(m_Cowboy, Transform::FromPosition({ 26, -5, -12 }).Scale(0.8f).Rotate(-45.0f, { 0, 1, 0 }));
 }
 
-void PBRSceneDemo::OnShutdown()
+void PBRSceneTest::OnShutdown()
 {
 	HL_TRACE("PBR Demo Shutdown");
 }
 
-void PBRSceneDemo::OnEvent(Event &e)
+void PBRSceneTest::OnEvent(Event &e)
 {
 }
 
-void PBRSceneDemo::OnResize(uint32 width, uint32 height)
+void PBRSceneTest::OnResize(uint32 width, uint32 height)
 {
 	m_Camera->OnWindowResize(width, height);
 }
 
-void PBRSceneDemo::CreatePBRObjects()
+void PBRSceneTest::CreatePBRObjects()
 {
 	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj").GetMesh(0);
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));

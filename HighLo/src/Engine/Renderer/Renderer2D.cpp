@@ -380,10 +380,10 @@ namespace highlo
 			s_2DData->CircleVertexBufferPtr->LocalPosition = s_2DData->QuadVertexPositions[i] * 2.0f;
 			s_2DData->CircleVertexBufferPtr->Color = color;
 			s_2DData->CircleVertexBufferPtr++;
-		}
 
-		s_2DData->CircleIndexCount += 6;
-		s_2DData->Stats.CircleCount++;
+			s_2DData->CircleIndexCount += 6;
+			s_2DData->Stats.CircleCount++;
+		}
 	}
 
 	void Renderer2D::DrawLine(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color)

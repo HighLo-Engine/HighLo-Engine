@@ -3,7 +3,7 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class PBRSceneDemo : public HLApplication
+class PBRSceneTest : public HLApplication
 {
 public:
 	void OnInitialize() override;

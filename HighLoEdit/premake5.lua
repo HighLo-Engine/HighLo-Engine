@@ -35,8 +35,10 @@ project "HighLoEdit"
 	
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}LevelEditor/bin/" .. outputdir .. "/LevelEditor/assimp-vc142-mtd.dll*")
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/HighLo.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets"),
+		("{COPY} %{wks.location}HighLoEdit/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets")
 	}
 
     filter "system:windows"

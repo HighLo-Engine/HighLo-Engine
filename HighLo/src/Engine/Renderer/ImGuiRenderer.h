@@ -39,7 +39,7 @@ namespace highlo
 		HLAPI static void ShouldDisplayDebugInformation(bool show);
 		HLAPI static void ShouldUseCustomConsole(bool use);
 
-		HLAPI static void StartWindow(const HLString &title, uint32 width = 0, uint32 height = 0);
+		HLAPI static void StartWindow(const HLString &title);
 		HLAPI static void EndWindow();
 
 		HLAPI static void BeginChild(const HLString &id, uint32 width = 0, uint32 height = 0);

@@ -68,7 +68,7 @@ void Sandbox::OnEvent(Event& e)
 
 void Sandbox::OnImGuiRender()
 {
-	ImGuiRenderer::StartWindow("Scene Debug Information", 400, 200);
+	ImGuiRenderer::StartWindow("Scene Debug Information");
 
 	HLString entities_total		= "         Total Entities   : " + HLString::ToString(m_Scene->GetEntityCount());
 	HLString entities_processed	= "Processed Entities  : " + HLString::ToString(m_Scene->GetFrameEntitiesProcessed());

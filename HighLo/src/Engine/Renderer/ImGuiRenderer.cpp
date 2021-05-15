@@ -170,11 +170,8 @@ namespace highlo
         // TODO: Modify spdlog stdout channel to redirect to the ImGui console buffer.
     }
 
-    void ImGuiRenderer::StartWindow(const HLString &title, uint32 width, uint32 height)
+    void ImGuiRenderer::StartWindow(const HLString &title)
     {
-        if (width != 0 && height != 0)
-            ImGui::SetNextWindowSize(ImVec2((float)width, (float)height));
-
         ImGui::Begin(*title);
     }
 

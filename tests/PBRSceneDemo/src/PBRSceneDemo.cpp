@@ -33,7 +33,7 @@ void PBRSceneDemo::OnUpdate(Timestep timestep)
 	CoreRenderer::BeginScene(*m_Camera, m_Light);
 
 	static float y_rot = 0.0f;
-	y_rot += 0.0004f * timestep;
+	y_rot += 0.04f * timestep;
 
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));

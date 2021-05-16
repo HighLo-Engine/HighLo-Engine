@@ -7,6 +7,8 @@
 
 namespace highlo
 {
+	static int32 s_LastPosition = 0;
+
 	WindowsPopupMenu::WindowsPopupMenu(const HLString &name)
 		: m_Name(name)
 	{
@@ -17,45 +19,65 @@ namespace highlo
 
 	void WindowsPopupMenu::AddMenuItem(const Ref<PopupMenuItem> &item)
 	{
-		m_LastPosition += item->Position;
+		++s_LastPosition;
+		m_MenuItems.push_back(*item);
+
 		if (item->Visible)
-			InsertMenuW(m_NativeHandle, item->Position, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS, item->ID, item->Name.W_Str());
+			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS, item->ID, item->Name.W_Str());
 		else
-			InsertMenuW(m_NativeHandle, item->Position, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, item->ID, item->Name.W_Str());
+			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, item->ID, item->Name.W_Str());
 	}
 
 	void WindowsPopupMenu::AddMenuItem(const PopupMenuItem &item)
 	{
-		m_LastPosition += item.Position;
+		++s_LastPosition;
+		m_MenuItems.push_back(item);
+
 		if (item.Visible)
-			InsertMenuW(m_NativeHandle, item.Position, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS, item.ID, item.Name.W_Str());
+			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS, item.ID, item.Name.W_Str());
 		else
-			InsertMenuW(m_NativeHandle, item.Position, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, item.ID, item.Name.W_Str());
+			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, item.ID, item.Name.W_Str());
 	}
 
-	void WindowsPopupMenu::AddMenuItem(const HLString &name, int32 id, int32 position, bool visible)
+	void WindowsPopupMenu::AddMenuItem(const HLString &name, int32 id, PopupItemCallback callback, bool visible)
 	{
-		m_LastPosition += position;
+		++s_LastPosition;
+		PopupMenuItem item;
+		item.Name = name;
+		item.ID = id;
+		item.Callback = callback;
+		item.Visible = visible;
+		item.Seperator = false;
+		m_MenuItems.push_back(item);
+
 		if (visible)
-			InsertMenuW(m_NativeHandle, position, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS, id, name.W_Str());
+			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS, id, name.W_Str());
 		else
-			InsertMenuW(m_NativeHandle, position, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, id, name.W_Str());
+			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, id, name.W_Str());
 	}
 	
 	void WindowsPopupMenu::AddSeperator()
 	{
-		InsertMenuW(m_NativeHandle, m_LastPosition + 1, MF_SEPARATOR, 0, NULL);
+		++s_LastPosition;
+		InsertMenuW(m_NativeHandle, s_LastPosition, MF_SEPARATOR, 0, NULL);
 	}
 	
 	void WindowsPopupMenu::AddSubMenu(const Ref<PopupMenu> &menu)
 	{
 		HMENU item = (HMENU)menu->GetPopupMenuHandle();
-		InsertMenuW(m_NativeHandle, m_LastPosition + 1, MF_STRING | MF_POPUP | MNS_NOTIFYBYPOS, (UINT_PTR) item, menu->GetName().W_Str());
+		++s_LastPosition;
+		
+		// Copy Menu Items of other menu
+		std::vector<PopupMenuItem> items = menu->GetMenuItems();
+		for (PopupMenuItem item : items)
+			m_MenuItems.push_back(item);
+
+		InsertMenuW(m_NativeHandle, s_LastPosition, MF_STRING | MF_POPUP | MNS_NOTIFYBYPOS, (UINT_PTR) item, menu->GetName().W_Str());
 	}
 	
-	void WindowsPopupMenu::Show()
+	void WindowsPopupMenu::Update()
 	{
-		if (Input::IsMouseButtonPressed(HLMouseButtonCode::BUTTON_RIGHT))
+		if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_RIGHT))
 		{
 			HWND window = GetActiveWindow();
 			SetForegroundWindow(window);
@@ -63,8 +85,28 @@ namespace highlo
 			POINT p;
 			GetCursorPos(&p);
 
-			TrackPopupMenuEx(m_NativeHandle, TPM_RIGHTBUTTON | TPM_RECURSE, p.x, p.y, window, NULL);
+			TrackPopupMenuEx(m_NativeHandle, TPM_LEFTBUTTON | TPM_RECURSE, p.x, p.y, window, NULL);
 		}
+	}
+
+	void WindowsPopupMenu::OnEvent(Event &e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<FileMenuEvent>(HL_BIND_EVENT_FUNCTION(WindowsPopupMenu::OnFileMenuClickedEvent));
+	}
+
+	bool WindowsPopupMenu::OnFileMenuClickedEvent(const FileMenuEvent &e)
+	{
+		for (PopupMenuItem item : m_MenuItems)
+		{
+			if (item.ID == e.GetID())
+			{
+				item.Callback();
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
 

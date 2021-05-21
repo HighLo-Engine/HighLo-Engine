@@ -14,20 +14,20 @@ void Sandbox::OnInitialize()
 	auto house_tex = Texture2D::LoadFromFile("assets/textures/WoodenCabin.jpg");
 
 	Model house = AssetLoader::LoadStaticModel("assets/models/WoodenCabin.obj");
-	house.GetMesh(0)->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
-	house.GetMesh(1)->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
+	house.GetMesh(0)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
+	house.GetMesh(1)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
 
 	Model houseLod1 = AssetLoader::LoadStaticModel("assets/models/WoodenCabinLOD1.obj");
-	houseLod1.GetMesh(0)->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
-	houseLod1.GetMesh(1)->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
+	houseLod1.GetMesh(0)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
+	houseLod1.GetMesh(1)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
 
 	Model houseLod2 = AssetLoader::LoadStaticModel("assets/models/WoodenCabinLOD2.obj");
-	houseLod2.GetMesh(0)->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
-	houseLod2.GetMesh(1)->m_Material->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
+	houseLod2.GetMesh(0)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
+	houseLod2.GetMesh(1)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
 
-	for (int i = -20; i < 20; i++)
+	for (int32 i = -20; i < 20; i++)
 	{
-		for (int j = -20; j < 20; j++)
+		for (int32 j = -20; j < 20; j++)
 		{
 			Entity entity = Entity();
 			auto rc = entity.AddComponent<RenderComponent>();

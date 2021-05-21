@@ -30,7 +30,7 @@ void PopupMenuTest::OnEvent(Event &e)
 	m_PopupMenu->OnEvent(e);
 }
 
-void PopupMenuTest::OnImGuiRender()
+void PopupMenuTest::OnUIRender(Timestep timestep)
 {
 }
 

@@ -12,7 +12,7 @@ public:
 	void OnUpdate(Timestep timestep) override;
 	void OnShutdown() override;
 	void OnEvent(Event& e) override;
-	void OnImGuiRender() override;
+	void OnUIRender(Timestep timestep) override;
 	void OnResize(uint32 width, uint32 height) override;
 
 private:

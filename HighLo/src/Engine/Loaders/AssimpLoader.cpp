@@ -125,7 +125,7 @@ namespace highlo
 			ProcessNode(node->mChildren[i], scene, mesh_list);
 	}
 
-	Model AssimpLoader::LoadStatic(const HLString& filepath, bool bShouldApplyCorrectionMatrix)
+	Ref<Model> AssimpLoader::LoadStatic(const HLString& filepath, bool bShouldApplyCorrectionMatrix)
 	{
 		s_ShouldApplyCorrectionMatrix = bShouldApplyCorrectionMatrix;
 
@@ -136,7 +136,7 @@ namespace highlo
 		{
 			HL_CORE_ERROR("AssimpLoader> Failed to load " + filepath);
 			HL_CORE_ERROR(importer.GetErrorString());
-			return Model();
+			return Model::Create();
 		}
 
 		std::vector<ParserMesh> parser_meshes;
@@ -167,10 +167,10 @@ namespace highlo
 			engine_meshes.push_back(mesh.EngineMesh);
 		}
 
-		auto model = Model(engine_meshes);
-		model.BoundingBox = AABB({ xMax, xMin, yMax }, { yMin, zMax, zMin });
+		auto model = Model::Create(engine_meshes);
+		model->BoundingBox = AABB({ xMax, xMin, yMax }, { yMin, zMax, zMin });
 
-		HL_CORE_INFO("AssimpLoader> [+] Loaded {0} [+]", filepath.C_Str());
+		HL_CORE_INFO("AssimpLoader> [+] Loaded {0} [+]", *filepath);
 		return model;
 	}
 

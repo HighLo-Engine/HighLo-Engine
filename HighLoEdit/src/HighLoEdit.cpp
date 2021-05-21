@@ -34,7 +34,7 @@ void HighLoEditor::OnEvent(Event &e)
 	dispatcher.Dispatch<MouseButtonPressedEvent>(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnMouseButtonPressedEvent));
 }
 
-void HighLoEditor::OnImGuiRender()
+void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	ImGuiRenderer::StartWindow("Viewport");
 	ImGuiRenderer::EndWindow();

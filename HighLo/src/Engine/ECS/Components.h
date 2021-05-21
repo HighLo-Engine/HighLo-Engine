@@ -10,9 +10,9 @@ namespace highlo
 
 	struct RenderComponent
 	{
-		Model MainModel;
-		Model ModelLOD1;
-		Model ModelLOD2;
+		Ref<Model> MainModel;
+		Ref<Model> ModelLOD1;
+		Ref<Model> ModelLOD2;
 		bool UseLOD = false;
 		int LodLevel = 0;
 		bool Enabled = true;

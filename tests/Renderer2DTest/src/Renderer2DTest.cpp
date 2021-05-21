@@ -30,3 +30,11 @@ void Renderer2DTest::OnEvent(Event &e)
 	m_Camera->OnEvent(e);
 }
 
+void Renderer2DTest::OnUIRender(Timestep timestep)
+{
+}
+
+void Renderer2DTest::OnResize(uint32 width, uint32 height)
+{
+}
+

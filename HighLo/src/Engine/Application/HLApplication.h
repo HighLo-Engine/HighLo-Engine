@@ -33,7 +33,7 @@ namespace highlo
 		HLAPI virtual void OnUpdate(Timestep timestep) {}
 		HLAPI virtual void OnShutdown() {}
 		HLAPI virtual void OnEvent(Event &e) {}
-		HLAPI virtual void OnImGuiRender() {}
+		HLAPI virtual void OnUIRender(Timestep timestep) {}
 		HLAPI virtual void OnResize(uint32 width, uint32 height) {}
 
 		inline void Close() { m_Running = false; }

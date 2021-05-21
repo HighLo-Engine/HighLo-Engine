@@ -60,9 +60,13 @@ void PBRSceneTest::OnResize(uint32 width, uint32 height)
 	m_Camera->OnWindowResize(width, height);
 }
 
+void PBRSceneTest::OnUIRender(Timestep timestep)
+{
+}
+
 void PBRSceneTest::CreatePBRObjects()
 {
-	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj").GetMesh(0);
+	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj")->GetMesh(0);
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Normal.jpg"));
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_METALLIC, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Metallic.jpg"));
@@ -74,7 +78,7 @@ void PBRSceneTest::CreatePBRObjects()
 	m_PBR_Sphere->GetMaterialRenderProperties().Roughness = 1;
 
 	auto m_PBR_Gun_Model = AssetLoader::LoadStaticModel("assets/models/PBR_AK47.obj");
-	m_PBR_Gun = m_PBR_Gun_Model.GetMesh(0);
+	m_PBR_Gun = m_PBR_Gun_Model->GetMesh(0);
 
 	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/AK47/AK47_albedo.tga"));
 	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_NORMAL, Texture2D::LoadFromFile("assets/textures/AK47/AK47_normal.tga"));
@@ -92,7 +96,7 @@ void PBRSceneTest::CreatePBRObjects()
 	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
 	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 
-	for (int i = 0; i < 10; i++)
+	for (int32 i = 0; i < 10; i++)
 	{
 		auto newSphere = SphereBlueprint->Copy();
 		newSphere->GetMaterialRenderProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
@@ -112,7 +116,7 @@ void PBRSceneTest::CreatePBRObjects()
 		m_TestSpheres.push_back(newSphere);
 	}
 
-	for (int i = 0; i < 10; i++)
+	for (int32 i = 0; i < 10; i++)
 	{
 		auto newSphere = SphereBlueprint->Copy();
 		newSphere->GetMaterialRenderProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };

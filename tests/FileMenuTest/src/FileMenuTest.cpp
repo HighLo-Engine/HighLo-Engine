@@ -35,3 +35,11 @@ void FileMenuTest::OnEvent(Event &e)
 	m_Menubar->OnEvent(e);
 }
 
+void FileMenuTest::OnUIRender(Timestep timestep)
+{
+}
+
+void FileMenuTest::OnResize(uint32 width, uint32 height)
+{
+}
+

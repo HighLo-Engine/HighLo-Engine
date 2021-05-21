@@ -6,10 +6,12 @@ using namespace highlo;
 class FileMenuTest : public HLApplication
 {
 public:
-	void OnInitialize() override;
-	void OnUpdate(Timestep timestep) override;
-	void OnShutdown() override;
-	void OnEvent(Event &e) override;
+	virtual void OnInitialize() override;
+	virtual void OnUpdate(Timestep timestep) override;
+	virtual void OnShutdown() override;
+	virtual void OnEvent(Event &e) override;
+	virtual void OnUIRender(Timestep timestep) override;
+	virtual void OnResize(uint32 width, uint32 height) override;
 
 private:
 

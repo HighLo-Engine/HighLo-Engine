@@ -50,7 +50,7 @@ namespace highlo
 			m_ECS_SystemManager.Update();
 
 			ImGuiRenderer::BeginScene();
-			OnImGuiRender();
+			OnUIRender(Time::GetTimestep());
 			ImGuiRenderer::EndScene();
 
 			m_Window->Update();

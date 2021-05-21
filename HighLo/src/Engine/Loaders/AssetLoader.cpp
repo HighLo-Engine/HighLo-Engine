@@ -4,7 +4,7 @@
 
 namespace highlo
 {
-	Model AssetLoader::LoadStaticModel(const HLString& filepath, bool bShouldApplyCorrectionMatrix)
+	Ref<Model> AssetLoader::LoadStaticModel(const HLString& filepath, bool bShouldApplyCorrectionMatrix)
 	{
 		return AssimpLoader::LoadStatic(filepath, bShouldApplyCorrectionMatrix);
 	}

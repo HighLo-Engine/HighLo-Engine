@@ -112,7 +112,7 @@ namespace highlo
 			else
 				rc->LodLevel = 0;
 
-			auto WorldAABB = rc->MainModel.BoundingBox.Transformed(
+			auto WorldAABB = rc->MainModel->BoundingBox.Transformed(
 				entity._TransformComponent->Transform.GetPosition(),
 				entity._TransformComponent->Transform.GetScale()
 			);

@@ -30,3 +30,12 @@ void Renderer3DTest::OnEvent(Event &e)
 	if (e.IsInCategory(EventCategory::EventCategoryApplication))
 		HL_TRACE(e.ToString());
 }
+
+void Renderer3DTest::OnUIRender(Timestep timestep)
+{
+}
+
+void Renderer3DTest::OnResize(uint32 width, uint32 height)
+{
+}
+

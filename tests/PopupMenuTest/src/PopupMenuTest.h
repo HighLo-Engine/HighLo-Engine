@@ -10,7 +10,7 @@ public:
 	virtual void OnUpdate(Timestep timestep) override;
 	virtual void OnShutdown() override;
 	virtual void OnEvent(Event &e) override;
-	virtual void OnImGuiRender() override;
+	virtual void OnUIRender(Timestep timestep) override;
 	virtual void OnResize(uint32 width, uint32 height) override;
 
 private:

@@ -45,7 +45,7 @@ private:
 
 private:
 
-	ViewportPanel m_Viewport;
+	UniqueRef<ViewportPanel> m_Viewport;
 
 	HLString m_LastSceneFilePath;
 

@@ -21,7 +21,11 @@ namespace highlo
 		if (!m_NativeHandle)
 			return;
 
-		HLString name = item->Name + "\t" + item->Shortcut;
+		HLString name = "";
+		if (!item->Shortcut.IsEmpty())
+			name = item->Name + "\t" + item->Shortcut;
+		else
+			name = item->Name;
 
 		if (item->Visible)
 			AppendMenuW(m_NativeHandle, MF_STRING, item->ID, name.W_Str());
@@ -36,7 +40,11 @@ namespace highlo
 		if (!m_NativeHandle)
 			return;
 
-		HLString name = item.Name + "\t" + item.Shortcut;
+		HLString name = "";
+		if (!item.Shortcut.IsEmpty())
+			name = item.Name + "\t" + item.Shortcut;
+		else
+			name = item.Name;
 
 		if (item.Visible)
 			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, name.W_Str());
@@ -60,7 +68,11 @@ namespace highlo
 		item.Callback = callback;
 		m_MenuItems.push_back(item);
 
-		HLString realName = name + "\t" + shortcut;
+		HLString realName = "";
+		if (!shortcut.IsEmpty())
+			realName = name + "\t" + shortcut;
+		else
+			realName = name;
 
 		if (item.Visible)
 			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, realName.W_Str());

@@ -30,17 +30,17 @@ void EditorCamera::Focus(const glm::vec3 &focusPoint)
 
 void EditorCamera::Update()
 {
-	if (highlo::Input::IsKeyPressed(HL_KEY_LEFT_ALT))
+	if (Input::IsKeyPressed(HL_KEY_LEFT_ALT))
 	{
-		const glm::vec2 &mouse = { highlo::Input::GetMouseX(), highlo::Input::GetMouseY() };
+		const glm::vec2 &mouse = { Input::GetMouseX(), Input::GetMouseY() };
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 		m_InitialMousePosition = mouse;
 
-		if (highlo::Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_LEFT))
+		if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_LEFT))
 			MouseRotate(delta);
-		else if (highlo::Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_RIGHT))
+		else if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_RIGHT))
 			MouseZoom(delta.y);
-		else if (highlo::Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_MIDDLE))
+		else if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_MIDDLE))
 			MousePan(delta);
 	}
 
@@ -53,10 +53,10 @@ void EditorCamera::OnWindowResize(uint32 width, uint32 height)
 	m_ViewportHeight = height;
 }
 
-void EditorCamera::OnEvent(highlo::Event &e)
+void EditorCamera::OnEvent(Event &e)
 {
-	highlo::EventDispatcher dispatcher(e);
-	dispatcher.Dispatch<highlo::MouseScrolledEvent>(HL_BIND_EVENT_FUNCTION(EditorCamera::OnMouseScrolled));
+	EventDispatcher dispatcher(e);
+	dispatcher.Dispatch<MouseScrolledEvent>(HL_BIND_EVENT_FUNCTION(EditorCamera::OnMouseScrolled));
 }
 
 void EditorCamera::SetProjection(const glm::mat4 &projection)
@@ -93,7 +93,7 @@ void EditorCamera::UpdateCameraView()
 	m_ViewMatrix = glm::inverse(m_ViewMatrix);
 }
 
-bool EditorCamera::OnMouseScrolled(highlo::MouseScrolledEvent &e)
+bool EditorCamera::OnMouseScrolled(MouseScrolledEvent &e)
 {
 	float delta = e.GetYOffset() * 0.1f;
 	MouseZoom(delta);

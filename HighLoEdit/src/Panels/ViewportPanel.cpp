@@ -4,7 +4,7 @@ void ViewportPanel::Initialize(uint32 width, uint32 height)
 {
 	m_ViewportWidth = width;
 	m_ViewportHeight = height;
-	m_Camera = EditorCamera(glm::perspectiveFov(glm::radians(90.0f), (float)width, (float)height, 0.1f, 1000.0f));
+	m_Camera = Ref<EditorCamera>::Create(glm::perspectiveFov(glm::radians(90.0f), (float)width, (float)height, 0.1f, 1000.0f));
 
 	FramebufferSpecification spec;
 	spec.Width = 1280;
@@ -18,6 +18,12 @@ void ViewportPanel::Initialize(uint32 width, uint32 height)
 	CreatePBRObjects();
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
+
+	Renderer::SetBlendMode(false);
+}
+
+void ViewportPanel::Destroy()
+{
 }
 
 void ViewportPanel::Render(Timestep ts)
@@ -28,11 +34,11 @@ void ViewportPanel::Render(Timestep ts)
 	Renderer::ClearScreenBuffers();
 	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 
-	m_Camera.Update();
+	m_Camera->Update();
 	m_Pistol->Update(ts);
 	m_Cowboy->Update(ts);
-	m_Skybox->Render(m_Camera);
-	CoreRenderer::BeginScene(m_Camera, m_Light);
+	m_Skybox->Render(*m_Camera);
+	CoreRenderer::BeginScene(*m_Camera, m_Light);
 
 	static float y_rot = 0.0f;
 	y_rot += 0.04f * ts;
@@ -59,8 +65,11 @@ void ViewportPanel::RenderUI(Timestep ts)
 
 	auto viewportOffset = ImGuiRenderer::GetCursorPosition(); // Includes tab bar
 	auto viewportSize = ImGuiRenderer::GetContentRegion();
-	m_Camera.SetProjection(glm::perspectiveFov(glm::radians(90.0f), (float)viewportSize.x, (float)viewportSize.y, 0.1f, 1000.0f));
-	m_Camera.SetViewportSize((uint32) viewportSize.x, (uint32) viewportSize.y);
+	if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
+	{
+		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), viewportSize.x, viewportSize.y, 0.1f, 1000.0f));
+		m_Camera->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+	}
 
 	// Render viewport image
 	ImGuiRenderer::DrawFramebuffer(m_ViewportContent, viewportSize, { 0, 1 }, { 1, 0 });
@@ -86,7 +95,9 @@ void ViewportPanel::OnResize(uint32 width, uint32 height)
 {
 	m_ViewportWidth = width;
 	m_ViewportHeight = height;
-	m_Camera.SetProjection(glm::perspectiveFov(glm::radians(90.0f), (float)m_ViewportWidth, (float)m_ViewportHeight, 0.1f, 1000.0f));
+
+	if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
+		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), (float)m_ViewportWidth, (float)m_ViewportHeight, 0.1f, 1000.0f));
 }
 
 std::pair<float, float> ViewportPanel::GetMouseViewportSpace()
@@ -105,10 +116,10 @@ std::pair<float, float> ViewportPanel::GetMouseViewportSpace()
 std::pair<glm::vec3, glm::vec3> ViewportPanel::CastRay(float mx, float my)
 {
 	glm::vec4 mouseClipPos = { mx, my, -1.0f, 1.0f };
-	auto inverseProj = glm::inverse(m_Camera.GetProjection());
-	auto inverseView = glm::inverse(glm::mat3(m_Camera.GetViewMatrix()));
+	auto inverseProj = glm::inverse(m_Camera->GetProjection());
+	auto inverseView = glm::inverse(glm::mat3(m_Camera->GetViewMatrix()));
 
-	glm::vec3 rayPos = m_Camera.GetPosition();
+	glm::vec3 rayPos = m_Camera->GetPosition();
 
 	glm::vec4 ray = inverseProj * mouseClipPos;
 	glm::vec3 rayDir = inverseView * glm::vec3(ray);

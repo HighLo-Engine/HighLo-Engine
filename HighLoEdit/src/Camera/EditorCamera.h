@@ -1,8 +1,9 @@
 #pragma once
 
 #include <HighLo.h>
+using namespace highlo;
 
-class EditorCamera : public highlo::Camera
+class EditorCamera : public Camera
 {
 public:
 
@@ -12,7 +13,7 @@ public:
 	void Focus(const glm::vec3 &focusPoint);
 	virtual void Update() override;
 	virtual void OnWindowResize(uint32 width, uint32 height) override;
-	virtual void OnEvent(highlo::Event &e) override;
+	virtual void OnEvent(Event &e) override;
 
 	inline float GetDistance() const { return m_Distance; }
 	inline void SetDistance(float distance) { m_Distance = distance; }
@@ -26,7 +27,7 @@ public:
 private:
 
 	void UpdateCameraView();
-	bool OnMouseScrolled(highlo::MouseScrolledEvent &e);
+	bool OnMouseScrolled(MouseScrolledEvent &e);
 
 	void MousePan(const glm::vec2 &delta);
 	void MouseRotate(const glm::vec2 &delta);

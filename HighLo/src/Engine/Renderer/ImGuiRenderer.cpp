@@ -501,6 +501,19 @@ namespace highlo
         }
     }
 
+    void ImGuiRenderer::DrawHelpMarker(const HLString &description)
+    {
+        ImGui::TextDisabled("(?)");
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+            ImGui::TextUnformatted(*description);
+            ImGui::PopTextWrapPos();
+            ImGui::EndTooltip();
+        }
+    }
+
     bool ImGuiRenderer::IsWindowHovered()
     {
         return ImGui::IsWindowHovered();

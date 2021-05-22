@@ -8,6 +8,7 @@ class ViewportPanel : public Panel
 public:
 
 	virtual void Initialize(uint32 width, uint32 height) override;
+	virtual void Destroy() override;
 	virtual void Render(Timestep ts) override;
 	virtual void RenderUI(Timestep ts) override;
 	virtual void OnEvent(Event &e) override;
@@ -27,7 +28,7 @@ public:
 
 private:
 
-	EditorCamera m_Camera;
+	Ref<EditorCamera> m_Camera;
 	Ref<Framebuffer> m_ViewportContent;
 	uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 	glm::vec2 m_ViewportBounds[2];

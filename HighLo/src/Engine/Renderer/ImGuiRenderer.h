@@ -83,6 +83,7 @@ namespace highlo
 		
 		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), const glm::vec4 &borderColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 		HLAPI static void DrawMenu(const Ref<MenuBar> &menubar);
+		HLAPI static void DrawHelpMarker(const HLString &description);
 
 		HLAPI static bool IsWindowHovered();
 		HLAPI static bool IsWindowFocused();

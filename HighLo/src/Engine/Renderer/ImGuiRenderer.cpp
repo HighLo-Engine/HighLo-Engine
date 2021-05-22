@@ -462,15 +462,21 @@ namespace highlo
         return changed;
     }
 
+    void ImGuiRenderer::DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1)
+    {
+        HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
+        ImGui::Image((ImTextureID)framebuffer->GetImage()->GetRendererID(), ImVec2(size.x, size.y), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y));
+    }
+
     void ImGuiRenderer::DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor, const glm::vec4 &borderColor)
     {
-        HL_ASSERT(s_CanDraw, "");
+        HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
         ImGui::Image((ImTextureID)framebuffer->GetImage()->GetRendererID(), ImVec2(size.x, size.y), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y), ImVec4(tintColor.x, tintColor.y, tintColor.z, tintColor.w), ImVec4(borderColor.x, borderColor.y, borderColor.z, borderColor.w));
     }
 
     void ImGuiRenderer::DrawMenu(const Ref<MenuBar> &menubar)
     {
-        HL_ASSERT(s_CanDraw, "");
+        HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
         std::vector<Ref<FileMenu>> fileMenus = menubar->GetMenus();
         if (ImGui::BeginMenuBar())
         {

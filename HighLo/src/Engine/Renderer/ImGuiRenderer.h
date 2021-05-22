@@ -81,7 +81,8 @@ namespace highlo
 		HLAPI static bool Property(const HLString &name, glm::vec4 &value, PropertyFlag flags = PropertyFlag::Slider);
 		HLAPI static bool Property(const HLString &name, glm::vec4 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::Slider);
 		
-		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), const glm::vec4 &borderColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1);
+		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor, const glm::vec4 &borderColor);
 		HLAPI static void DrawMenu(const Ref<MenuBar> &menubar);
 		HLAPI static void DrawHelpMarker(const HLString &description);
 

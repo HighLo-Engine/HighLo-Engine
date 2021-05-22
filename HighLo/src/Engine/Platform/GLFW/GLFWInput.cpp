@@ -8,17 +8,17 @@
 
 namespace highlo
 {
-	bool Input::IsKeyPressed(HLKeyCode keyCode)
+	bool Input::IsKeyPressed(int32 keyCode)
 	{
 		GLFWwindow *window = static_cast<GLFWwindow*>(HLApplication::Get().GetWindow().GetNativeHandle());
-		int32 state = glfwGetKey(window, static_cast<int32>(keyCode));
+		int32 state = glfwGetKey(window, keyCode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool Input::IsMouseButtonPressed(HLMouseButtonCode mouseButtonCode)
+	bool Input::IsMouseButtonPressed(int32 mouseButtonCode)
 	{
 		GLFWwindow *window = static_cast<GLFWwindow*>(HLApplication::Get().GetWindow().GetNativeHandle());
-		int32 state = glfwGetMouseButton(window, static_cast<int32>(mouseButtonCode));
+		int32 state = glfwGetMouseButton(window, mouseButtonCode);
 		return state == GLFW_PRESS;
 	}
 

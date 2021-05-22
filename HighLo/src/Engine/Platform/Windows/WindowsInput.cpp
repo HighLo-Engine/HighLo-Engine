@@ -9,16 +9,16 @@
 
 namespace highlo
 {
-	bool Input::IsKeyPressed(HLKeyCode keyCode)
+	bool Input::IsKeyPressed(int32 keyCode)
 	{
 		return (GetKeyState(utils::InputHelperHLKeyCodeToWindows(keyCode)) & 0x8000);
 	}
 
-	bool Input::IsMouseButtonPressed(HLMouseButtonCode mouseButtonCode)
+	bool Input::IsMouseButtonPressed(int32 mouseButtonCode)
 	{
-		if (mouseButtonCode == HLMouseButtonCode::BUTTON_LEFT) return (GetKeyState(VK_LBUTTON) & 0x8000);
-		else if (mouseButtonCode == HLMouseButtonCode::BUTTON_RIGHT) return (GetKeyState(VK_RBUTTON) & 0x8000);
-		else if (mouseButtonCode == HLMouseButtonCode::BUTTON_MIDDLE) return (GetKeyState(VK_MBUTTON) & 0x8000);
+		if (mouseButtonCode == HL_MOUSE_BUTTON_LEFT) return (GetKeyState(VK_LBUTTON) & 0x8000);
+		else if (mouseButtonCode == HL_MOUSE_BUTTON_RIGHT) return (GetKeyState(VK_RBUTTON) & 0x8000);
+		else if (mouseButtonCode == HL_MOUSE_BUTTON_MIDDLE) return (GetKeyState(VK_MBUTTON) & 0x8000);
 
 		return false;
 	}

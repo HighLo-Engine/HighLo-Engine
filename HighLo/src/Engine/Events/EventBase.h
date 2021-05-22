@@ -47,11 +47,12 @@ namespace highlo
 
 	#define REGISTER_EVENT_CLASS_CATEGORY(type) virtual int GetCategoryFlags() const override { return type; }
 
-	class HLAPI Event
+	class Event
 	{
 	friend class EventDispatcher;
 
 	public:
+
 		bool m_Handled = false; /**< Indicates whether the Event has been handled or not. */
 
 		/**
@@ -60,7 +61,7 @@ namespace highlo
 		 *
 		 * @return Returns the correct EventType after it gets implemented by the subclass.
 		 */
-		virtual EventType GetEventType() const = 0;
+		HLAPI virtual EventType GetEventType() const = 0;
 
 		/**
 		 *
@@ -68,7 +69,7 @@ namespace highlo
 		 *
 		 * @return Returns the Name of the Event after it gets implemented by the subclass.
 		 */
-		virtual const char *GetName() const = 0;
+		HLAPI virtual const char *GetName() const = 0;
 
 		/**
 		 *
@@ -76,7 +77,7 @@ namespace highlo
 		 *
 		 * @return Returns the CategoryFlags of the Event after it gets implemented by the subclass.
 		 */
-		virtual int GetCategoryFlags() const = 0;
+		HLAPI virtual int GetCategoryFlags() const = 0;
 
 		/**
 		 *
@@ -84,7 +85,7 @@ namespace highlo
 		 *
 		 * @return New FakeString with the Name of the correct EventName.
 		 */
-		virtual HLString ToString() const
+		HLAPI virtual HLString ToString() const
 		{
 			return GetName();
 		}
@@ -98,22 +99,22 @@ namespace highlo
 		 */
 #pragma warning(push)
 #pragma warning(disable: 26812)
-		bool IsInCategory(EventCategory c)
+		HLAPI bool IsInCategory(EventCategory c)
 		{
 			return GetCategoryFlags() & c;
 		}
 #pragma warning(pop)
 	};
 
-	class HLAPI EventDispatcher
+	class EventDispatcher
 	{
 	public:
 
-		EventDispatcher(Event &e)
+		HLAPI EventDispatcher(Event &e)
 			: m_Event(e) {}
 
 		template<typename EventType, typename FunctionType>
-		bool Dispatch(const FunctionType &func)
+		HLAPI bool Dispatch(const FunctionType &func)
 		{
 			if (m_Event.GetEventType() == EventType::GetStaticType())
 			{
@@ -125,6 +126,7 @@ namespace highlo
 		}
 
 	private:
+
 		Event &m_Event;
 	};
 

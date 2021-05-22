@@ -20,7 +20,7 @@ public:
 	void NewScene();
 	void OpenScene();
 	void OpenScene(const HLString &path);
-	void SaveScene();
+	void SaveScene(const HLString &path);
 	void SaveSceneAs();
 
 private:
@@ -40,6 +40,14 @@ private:
 		Mesh = 2
 	};
 
+	enum class GizmoType
+	{
+		None = 0,
+		Translate,
+		Rotate,
+		Scale
+	};
+
 	bool OnKeyPressedEvent(const KeyPressedEvent &e);
 	bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e);
 
@@ -48,6 +56,7 @@ private:
 	UniqueRef<ViewportPanel> m_Viewport;
 
 	HLString m_LastSceneFilePath;
+	GizmoType m_GizmoType = GizmoType::None;
 
 	float m_EnvironmentMapRotation = 0.0f;
 	float m_SnapValue = 0.5f;

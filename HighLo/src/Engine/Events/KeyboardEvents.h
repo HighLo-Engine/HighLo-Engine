@@ -4,30 +4,31 @@
 
 namespace highlo
 {
-	class HLAPI KeyEvent : public Event
+	class KeyEvent : public Event
 	{
 	public:
 
-		inline int32_t GetKeyCode() const { return m_KeyCode; }
+		HLAPI inline int32 GetKeyCode() const { return m_KeyCode; }
 
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
 	protected:
-		KeyEvent(int32_t keyCode)
+		HLAPI KeyEvent(int32_t keyCode)
 			: m_KeyCode(keyCode) {}
 
-		int32_t m_KeyCode;
+		int32 m_KeyCode;
 	};
 
-	class HLAPI KeyPressedEvent : public KeyEvent
+	class KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int32_t keyCode, int32_t repeatCount)
+
+		HLAPI KeyPressedEvent(int32 keyCode, int32 repeatCount)
 			: KeyEvent(keyCode), m_RepeatCount(repeatCount) {}
 
-		inline int32_t GetRepeatCount() { return m_RepeatCount; }
+		HLAPI inline int32 GetRepeatCount() { return m_RepeatCount; }
 
-		HLString ToString() const override
+		HLAPI HLString ToString() const override
 		{
 			return HLString("KeyPressedEvent: ") << m_KeyCode << " (" << m_RepeatCount << " repeats)";
 		}
@@ -35,16 +36,17 @@ namespace highlo
 		REGISTER_EVENT_CLASS_TYPE(KeyPressed)
 
 	private:
-		int32_t m_RepeatCount;
+		int32 m_RepeatCount;
 	};
 
-	class HLAPI KeyReleasedEvent : public KeyEvent
+	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int32_t keyCode)
+		
+		HLAPI KeyReleasedEvent(int32 keyCode)
 			: KeyEvent(keyCode) {}
 
-		HLString ToString() const override
+		HLAPI HLString ToString() const override
 		{
 			return HLString("KeyReleasedEvent: ") << m_KeyCode;
 		}

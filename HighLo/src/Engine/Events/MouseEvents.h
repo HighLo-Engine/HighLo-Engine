@@ -4,19 +4,19 @@
 
 namespace highlo
 {
-	class HLAPI MouseMovedEvent : public Event
+	class MouseMovedEvent : public Event
 	{
 	public:
 
-		MouseMovedEvent(float xPos, float yPos, float dxPos, float dyPos)
+		HLAPI MouseMovedEvent(float xPos, float yPos, float dxPos, float dyPos)
 			: m_MouseX(xPos), m_MouseY(yPos), m_MouseDX(dxPos), m_MouseDY(dyPos) {}
 
-		inline float GetMouseX() const { return m_MouseX; }
-		inline float GetMouseY() const { return m_MouseY; }
-		inline float GetMouseDX() const { return m_MouseDX; }
-		inline float GetMouseDY() const { return m_MouseDY; }
+		HLAPI inline float GetMouseX() const { return m_MouseX; }
+		HLAPI inline float GetMouseY() const { return m_MouseY; }
+		HLAPI inline float GetMouseDX() const { return m_MouseDX; }
+		HLAPI inline float GetMouseDY() const { return m_MouseDY; }
 
-		HLString ToString() const override
+		HLAPI HLString ToString() const override
 		{
 			return HLString("MouseMovedEvent: ") << m_MouseDX << ", " << m_MouseDY;
 		}
@@ -25,21 +25,22 @@ namespace highlo
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 	private:
+
 		float m_MouseX, m_MouseY;
 		float m_MouseDX, m_MouseDY;
 	};
 
-	class HLAPI MouseScrolledEvent : public Event
+	class MouseScrolledEvent : public Event
 	{
 	public:
 
-		MouseScrolledEvent(float xOffset, float yOffset)
+		HLAPI MouseScrolledEvent(float xOffset, float yOffset)
 			: m_XOffset(xOffset), m_YOffset(yOffset) {}
 
-		inline float GetXOffset() const { return m_XOffset; }
-		inline float GetYOffset() const { return m_YOffset; }
+		HLAPI inline float GetXOffset() const { return m_XOffset; }
+		HLAPI inline float GetYOffset() const { return m_YOffset; }
 
-		HLString ToString() const override
+		HLAPI HLString ToString() const override
 		{
 			return HLString("MouseScrolledEvent: ") << m_XOffset << ", " << m_YOffset;
 		}
@@ -48,33 +49,34 @@ namespace highlo
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 	private:
+
 		float m_XOffset, m_YOffset;
 	};
 
-	class HLAPI MouseButton : public Event
+	class MouseButton : public Event
 	{
 	public:
 		
-		inline int32_t GetMouseButton() const { return m_MouseButton; }
+		HLAPI inline int32 GetMouseButton() const { return m_MouseButton; }
 
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput)
 
 	protected:
 
-		MouseButton(int32_t mouseButton)
+		HLAPI MouseButton(int32 mouseButton)
 			: m_MouseButton(mouseButton) {}
 
-		int32_t m_MouseButton;
+		int32 m_MouseButton;
 	};
 
-	class HLAPI MouseButtonPressedEvent : public MouseButton
+	class MouseButtonPressedEvent : public MouseButton
 	{
 	public:
 		
-		MouseButtonPressedEvent(int32 mouseButton)
+		HLAPI MouseButtonPressedEvent(int32 mouseButton)
 			: MouseButton(mouseButton) {}
 
-		HLString ToString() const override
+		HLAPI HLString ToString() const override
 		{
 			return HLString("MouseButtonPressedEvent: ") << m_MouseButton;
 		}
@@ -82,14 +84,14 @@ namespace highlo
 		REGISTER_EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class HLAPI MouseButtonReleasedEvent : public MouseButton
+	class MouseButtonReleasedEvent : public MouseButton
 	{
 	public:
 
-		MouseButtonReleasedEvent(int32_t mouseButton)
+		HLAPI MouseButtonReleasedEvent(int32 mouseButton)
 			: MouseButton(mouseButton) {}
 
-		HLString ToString() const override
+		HLAPI HLString ToString() const override
 		{
 			return HLString("MouseButtonReleasedEvent") << m_MouseButton;
 		}

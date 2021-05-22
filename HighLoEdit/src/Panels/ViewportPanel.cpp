@@ -18,6 +18,7 @@ void ViewportPanel::Initialize(uint32 width, uint32 height)
 	CreatePBRObjects();
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
+	m_Light.Color = { 1.0f, 0.2f, 0.3f };
 
 	Renderer::SetBlendMode(false);
 }
@@ -89,6 +90,7 @@ void ViewportPanel::RenderUI(Timestep ts)
 
 void ViewportPanel::OnEvent(Event &e)
 {
+	m_Camera->OnEvent(e);
 }
 
 void ViewportPanel::OnResize(uint32 width, uint32 height)

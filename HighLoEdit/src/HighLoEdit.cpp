@@ -17,7 +17,7 @@ void HighLoEditor::OnInitialize()
 	fileMenu->AddMenuItem("New Scene", "Strg+N", 1, [=]() { NewScene(); });
 	fileMenu->AddMenuItem("Open Scene...", "Strg+O", 2, [=]() { OpenScene(); });
 	fileMenu->AddMenuSeperator();
-	fileMenu->AddMenuItem("Save Scene", "Strg+S", 3, [=]() { SaveScene(); });
+	fileMenu->AddMenuItem("Save Scene", "Strg+S", 3, [=]() { SaveScene(m_LastSceneFilePath); });
 	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", 4, [=]() { SaveSceneAs(); });
 	fileMenu->AddMenuSeperator();
 
@@ -59,16 +59,24 @@ void HighLoEditor::OnEvent(Event &e)
 	{
 		// TODO: call RuntimeScene onEvent
 	}
-
 }
 
 void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	static bool pOpen = true;
 	ImGuiRenderer::StartWindow("RootWindow", pOpen, true);
+	ImGuiRenderer::DrawMenu(m_MenuBar);
 	
 	m_Viewport->RenderUI(timestep);
-	ImGuiRenderer::DrawMenu(m_MenuBar);
+
+	ImGuiRenderer::StartViewport("Scene Hierarchy");
+	ImGuiRenderer::EndViewport();
+
+	ImGuiRenderer::StartViewport("Assets");
+	ImGuiRenderer::EndViewport();
+
+	ImGuiRenderer::StartViewport("Object Details");
+	ImGuiRenderer::EndViewport();
 
 	ImGuiRenderer::EndWindow();
 }
@@ -87,6 +95,7 @@ void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 void HighLoEditor::NewScene()
 {
 	HL_TRACE("NewScene");
+	UpdateWindowTitle("Untitled scene");
 }
 
 void HighLoEditor::OpenScene()
@@ -115,18 +124,90 @@ void HighLoEditor::OpenScene(const HLString &path)
 	HL_TRACE("Open scene {0}", *path);
 }
 
-void HighLoEditor::SaveScene()
+void HighLoEditor::SaveScene(const HLString &path)
 {
-	HL_TRACE("SaveScene");
+	HL_TRACE("SaveScene {0}", *path);
 }
 
 void HighLoEditor::SaveSceneAs()
 {
 	HL_TRACE("SaveSceneAs");
+	Ref<FileDialogue> fd = FileDialogue::Create();
+	FileDialogueFilter filter;
+	filter.AddFilter("High-Lo Scene file", "*.hl");
+	fd->SetFilter(filter);
+	HLString result = fd->SaveFile();
+
+	if (!result.IsEmpty())
+	{
+		SaveScene(result);
+	}
 }
 
 bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 {
+	if (Input::IsKeyPressed(HL_KEY_LEFT_CONTROL))
+	{
+		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT))
+		{
+			switch (e.GetKeyCode())
+			{
+				case HL_KEY_S:
+				{
+					SaveSceneAs();
+					break;
+				}
+			}
+
+			return false;
+		}
+
+		switch (e.GetKeyCode())
+		{
+			case HL_KEY_N:
+			{
+				NewScene();
+				break;
+			}
+
+			case HL_KEY_O:
+			{
+				OpenScene();
+				break;
+			}
+
+			case HL_KEY_S:
+			{
+				SaveScene(m_LastSceneFilePath);
+				break;
+			}
+
+			case HL_KEY_Q:
+			{
+				m_GizmoType = GizmoType::None;
+				break;
+			}
+
+			case HL_KEY_W:
+			{
+				m_GizmoType = GizmoType::Translate;
+				break;
+			}
+
+			case HL_KEY_E:
+			{
+				m_GizmoType = GizmoType::Rotate;
+				break;
+			}
+
+			case HL_KEY_R:
+			{
+				m_GizmoType = GizmoType::Scale;
+				break;
+			}
+		}
+	}
+
 	return false;
 }
 

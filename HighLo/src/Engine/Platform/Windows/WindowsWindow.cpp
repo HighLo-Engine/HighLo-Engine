@@ -17,6 +17,7 @@
 #include "Engine/Utils/InputUtils.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+static bool s_IsMenubarSet = false;
 
 namespace highlo
 {
@@ -232,6 +233,10 @@ namespace highlo
 
 	void WindowsWindow::SetMenuBar(const Ref<MenuBar> &bar)
 	{
+		if (s_IsMenubarSet)
+			return;
+
+		s_IsMenubarSet = true;
 		m_MenuBar = bar;
 		SetMenu(m_NativeHandle, (HMENU) m_MenuBar->GetNativeMenuBar());
 	}

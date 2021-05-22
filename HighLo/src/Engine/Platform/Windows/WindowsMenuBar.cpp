@@ -30,6 +30,10 @@ namespace highlo
 
 	void WindowsMenuBar::OnEvent(Event &e)
 	{
+	#ifdef HIGHLO_API_GLFW
+		return; // skip events if GLFW is enabled
+	#endif // HIGHLO_API_GLFW
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<FileMenuEvent>(HL_BIND_EVENT_FUNCTION(WindowsMenuBar::OnFileMenuClicked));
 	}

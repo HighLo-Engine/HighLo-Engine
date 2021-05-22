@@ -13,6 +13,7 @@
 
 #include <stb_image.h>
 #include "Engine/Events/Events.h"
+#include "Engine/Renderer/ImGuiRenderer.h"
 
 namespace highlo
 {
@@ -87,7 +88,8 @@ namespace highlo
 
 	void GLFWWindow::SetMenuBar(const Ref<MenuBar> &bar)
 	{
-		HL_ASSERT(false, "Not supported with this platform!");
+		if (ImGuiRenderer::CanDraw())
+			ImGuiRenderer::DrawMenu(bar);
 	}
 
 	void GLFWWindow::SetVSync(bool bEnabled)

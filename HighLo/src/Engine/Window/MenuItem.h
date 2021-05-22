@@ -9,6 +9,7 @@ namespace highlo
 	struct MenuItem
 	{
 		HLString Name = "Default Menu Item";
+		HLString Shortcut = "";
 		
 		int32 ID = 0;
 		bool Visible = true;

@@ -32,6 +32,8 @@ namespace highlo
     bool ImGuiRenderer::s_CanDraw = false;
     std::shared_ptr<ImGuiTextBuffer> ImGuiRenderer::s_ImGuiTextBuffer = std::make_shared<ImGuiTextBuffer>();
 
+    static int32 s_CheckboxCount = 0;
+
     void ImGuiRenderer::Init(Window* window, ImGuiWindowStyle windowStyle)
     {
         IMGUI_CHECKVERSION();
@@ -93,7 +95,7 @@ namespace highlo
         ImGui::DestroyContext();
     }
 
-    void ImGuiRenderer::BeginScene()
+    void ImGuiRenderer::StartScene()
     {
         IMGUI_RENDER_API_IMPL_FN_NAME(NewFrame)();
         IMGUI_WINDOW_IMPL_FN_NAME(NewFrame)();
@@ -170,9 +172,43 @@ namespace highlo
         // TODO: Modify spdlog stdout channel to redirect to the ImGui console buffer.
     }
 
-    void ImGuiRenderer::StartWindow(const HLString &title)
+    void ImGuiRenderer::StartWindow(const HLString &title, bool pOpen, bool fullscreen)
     {
-        ImGui::Begin(*title);
+        static ImGuiDockNodeFlags optFlags = ImGuiDockNodeFlags_None;
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+
+        if (fullscreen)
+        {
+            ImGuiViewport *viewport = ImGui::GetMainViewport();
+            ImGui::SetNextWindowPos(viewport->Pos);
+            ImGui::SetNextWindowSize(viewport->Size);
+            ImGui::SetNextWindowViewport(viewport->ID);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        }
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin(*title, &pOpen, windowFlags);
+        ImGui::PopStyleVar();
+
+        if (fullscreen)
+            ImGui::PopStyleVar(2);
+
+        // Dockspace
+        ImGuiIO &io = ImGui::GetIO();
+        ImGuiStyle &style = ImGui::GetStyle();
+
+        float minWinSizeX = style.WindowMinSize.x;
+        style.WindowMinSize.x = 370.0f;
+        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+        {
+            ImGuiID dockspaceID = ImGui::GetID("DockSpace");
+            ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), optFlags);
+        }
+
+        style.WindowMinSize.x = minWinSizeX;
     }
 
     void ImGuiRenderer::EndWindow()
@@ -180,7 +216,17 @@ namespace highlo
         ImGui::End();
     }
 
-    void ImGuiRenderer::BeginChild(const HLString &id, uint32 width, uint32 height)
+    void ImGuiRenderer::StartViewport(const HLString &title)
+    {
+        ImGui::Begin(*title);
+    }
+
+    void ImGuiRenderer::EndViewport()
+    {
+        ImGui::End();
+    }
+
+    void ImGuiRenderer::StartChild(const HLString &id, uint32 width, uint32 height)
     {
         ImGui::BeginChild(*id, ImVec2((float)width, (float)height));
     }
@@ -188,6 +234,42 @@ namespace highlo
     void ImGuiRenderer::EndChild()
     {
         ImGui::EndChild();
+    }
+
+    bool ImGuiRenderer::StartTreeNode(const HLString &name, bool defaultOpen)
+    {
+        ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
+        if (defaultOpen)
+            treeNodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+        return ImGui::TreeNodeEx(*name, treeNodeFlags);
+    }
+
+    void ImGuiRenderer::EndTreeNode()
+    {
+        ImGui::TreePop();
+    }
+
+    void ImGuiRenderer::StartCheckboxGroup(const HLString &label)
+    {
+        ImGui::Text(*label);
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+    }
+
+    void ImGuiRenderer::EndCheckboxGroup()
+    {
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+        s_CheckboxCount = 0;
+    }
+
+    void ImGuiRenderer::StartPopupModal(const HLString &text)
+    {
+    }
+
+    void ImGuiRenderer::EndPopupModal()
+    {
     }
 
     void ImGuiRenderer::NewLine()
@@ -378,6 +460,95 @@ namespace highlo
         ImGui::NextColumn();
 
         return changed;
+    }
+
+    void ImGuiRenderer::DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor, const glm::vec4 &borderColor)
+    {
+        HL_ASSERT(s_CanDraw, "");
+        ImGui::Image((ImTextureID)framebuffer->GetImage()->GetRendererID(), ImVec2(size.x, size.y), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y), ImVec4(tintColor.x, tintColor.y, tintColor.z, tintColor.w), ImVec4(borderColor.x, borderColor.y, borderColor.z, borderColor.w));
+    }
+
+    void ImGuiRenderer::DrawMenu(const Ref<MenuBar> &menubar)
+    {
+        HL_ASSERT(s_CanDraw, "");
+        std::vector<Ref<FileMenu>> fileMenus = menubar->GetMenus();
+        if (ImGui::BeginMenuBar())
+        {
+            for (int32 i = 0; i < fileMenus.size(); ++i)
+            {
+                Ref<FileMenu> menu = fileMenus[i];
+                std::vector<MenuItem> menuItems = menu->GetMenuItems();
+                if (ImGui::BeginMenu(*menu->GetName()))
+                {
+                    for (int32 j = 0; j < menuItems.size(); ++j)
+                    {
+                        MenuItem currentItem = menuItems[j];
+                        if (currentItem.Seperator)
+                        {
+                            ImGui::Separator();
+                            continue;
+                        }
+
+                        if (ImGui::MenuItem(*currentItem.Name, *currentItem.Shortcut))
+                            currentItem.Callback();
+                    }
+
+                    ImGui::EndMenu();
+                }
+            }
+
+            ImGui::EndMenuBar();
+        }
+    }
+
+    bool ImGuiRenderer::IsWindowHovered()
+    {
+        return ImGui::IsWindowHovered();
+    }
+
+    bool ImGuiRenderer::IsWindowFocused()
+    {
+        return ImGui::IsWindowFocused();
+    }
+
+    bool ImGuiRenderer::CanDraw()
+    {
+        return s_CanDraw;
+    }
+
+    glm::vec2 ImGuiRenderer::GetCursorPosition()
+    {
+        ImVec2 cursorPos = ImGui::GetCursorPos();
+        return { cursorPos.x, cursorPos.y };
+    }
+
+    glm::vec2 ImGuiRenderer::GetMousePosition()
+    {
+        ImVec2 pos = ImGui::GetMousePos();
+        return { pos.x, pos.y };
+    }
+
+    glm::vec2 ImGuiRenderer::GetContentRegion()
+    {
+        ImVec2 region = ImGui::GetContentRegionAvail();
+        return { region.x, region.y };
+    }
+
+    glm::vec2 ImGuiRenderer::GetWindowSize()
+    {
+        ImVec2 size = ImGui::GetWindowSize();
+        return { size.x, size.y };
+    }
+
+    glm::vec2 ImGuiRenderer::GetWindowPos()
+    {
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        return { windowPos.x, windowPos.y };
+    }
+
+    bool ImGuiRenderer::IsMouseHoveringRect(const glm::vec2 &min, const glm::vec2 &max)
+    {
+        return ImGui::IsMouseHoveringRect({ min.x, min.y }, { max.x, max.y });
     }
 
     void ImGuiRenderer::OnWindowResize(uint32 width, uint32 height)

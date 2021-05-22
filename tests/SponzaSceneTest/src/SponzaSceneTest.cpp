@@ -16,8 +16,8 @@ void SponzaSceneTest::OnInitialize()
 void SponzaSceneTest::OnUpdate(Timestep timestep)
 {
 	m_Camera->Update();
-
 	m_Skybox->Render(*m_Camera);
+
 	for (int32 i = 0; i < m_SponzaMesh->GetMeshCount(); ++i)
 	{
 		m_SponzaMesh->GetMesh(i)->Update(timestep);

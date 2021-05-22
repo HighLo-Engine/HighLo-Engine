@@ -59,6 +59,11 @@ void EditorCamera::OnEvent(highlo::Event &e)
 	dispatcher.Dispatch<highlo::MouseScrolledEvent>(HL_BIND_EVENT_FUNCTION(EditorCamera::OnMouseScrolled));
 }
 
+void EditorCamera::SetProjection(const glm::mat4 &projection)
+{
+	m_ProjectionMatrix = projection;
+}
+
 glm::vec3 EditorCamera::GetUpDirection()
 {
 	return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));

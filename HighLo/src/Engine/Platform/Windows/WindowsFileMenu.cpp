@@ -21,10 +21,12 @@ namespace highlo
 		if (!m_NativeHandle)
 			return;
 
+		HLString name = item->Name + "\t" + item->Shortcut;
+
 		if (item->Visible)
-			AppendMenuW(m_NativeHandle, MF_STRING, item->ID, item->Name.W_Str());
+			AppendMenuW(m_NativeHandle, MF_STRING, item->ID, name.W_Str());
 		else
-			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item->ID, item->Name.W_Str());
+			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item->ID, name.W_Str());
 
 		m_MenuItems.push_back(*item);
 	}
@@ -34,31 +36,36 @@ namespace highlo
 		if (!m_NativeHandle)
 			return;
 
+		HLString name = item.Name + "\t" + item.Shortcut;
+
 		if (item.Visible)
-			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, item.Name.W_Str());
+			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, name.W_Str());
 		else
-			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, item.Name.W_Str());
+			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, name.W_Str());
 
 		m_MenuItems.push_back(item);
 	}
 	
-	void WindowsFileMenu::AddMenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible)
+	void WindowsFileMenu::AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, MenuItemCallback callback, bool visible)
 	{
 		if (!m_NativeHandle)
 			return;
 
 		MenuItem item;
 		item.Name = name;
+		item.Shortcut = shortcut;
 		item.ID = id;
 		item.Visible = visible;
 		item.Seperator = false;
 		item.Callback = callback;
 		m_MenuItems.push_back(item);
 
+		HLString realName = name + "\t" + shortcut;
+
 		if (item.Visible)
-			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, item.Name.W_Str());
+			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, realName.W_Str());
 		else
-			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, item.Name.W_Str());
+			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, realName.W_Str());
 	}
 	
 	void WindowsFileMenu::AddSubMenu(const Ref<FileMenu> &other)
@@ -76,6 +83,15 @@ namespace highlo
 	void WindowsFileMenu::AddMenuSeperator()
 	{
 		AppendMenuW(m_NativeHandle, MF_SEPARATOR, 0, NULL);
+
+		MenuItem item;
+		item.Name = "";
+		item.Shortcut = "";
+		item.ID = -1;
+		item.Visible = true;
+		item.Seperator = true;
+		item.Callback = nullptr;
+		m_MenuItems.push_back(item);
 	}
 
 	bool WindowsFileMenu::EnableMenuItem(int32 id, bool bEnabled)

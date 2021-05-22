@@ -17,6 +17,9 @@ namespace highlo
 		virtual void AddMenu(const Ref<FileMenu> &menu) override;
 		virtual void RemoveMenu(const Ref<FileMenu> &menu) override;
 
+		inline virtual std::vector<Ref<FileMenu>> &GetMenus() override { return m_Menus; }
+		inline virtual const std::vector<Ref<FileMenu>> &GetMenus() const override { return m_Menus; }
+
 		virtual void *GetNativeMenuBar() override { return (void*)m_NativeHandle; }
 		virtual void *GetNativeMenuBar() const override { return (void*)m_NativeHandle; }
 

@@ -16,6 +16,7 @@ public:
 
 	inline float GetDistance() const { return m_Distance; }
 	inline void SetDistance(float distance) { m_Distance = distance; }
+	void SetProjection(const glm::mat4 &projection);
 
 	glm::vec3 GetUpDirection();
 	glm::vec3 GetRightDirection();

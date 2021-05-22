@@ -3,12 +3,11 @@
 #include <HighLo.h>
 using namespace highlo;
 
+#include "Panels/ViewportPanel.h"
+
 class HighLoEditor : public HLApplication
 {
 public:
-
-	HighLoEditor();
-	virtual ~HighLoEditor();
 
 	virtual void OnInitialize() override;
 	virtual void OnUpdate(Timestep timestep) override;
@@ -18,6 +17,11 @@ public:
 	virtual void OnResize(uint32 width, uint32 height);
 
 	void UpdateWindowTitle(const HLString &sceneName);
+	void NewScene();
+	void OpenScene();
+	void OpenScene(const HLString &path);
+	void SaveScene();
+	void SaveSceneAs();
 
 private:
 
@@ -41,8 +45,9 @@ private:
 
 private:
 
-	HLString m_SceneFilePath;
-	glm::vec2 m_ViewportBounds[2];
+	ViewportPanel m_Viewport;
+
+	HLString m_LastSceneFilePath;
 
 	float m_EnvironmentMapRotation = 0.0f;
 	float m_SnapValue = 0.5f;
@@ -53,11 +58,9 @@ private:
 	bool m_UIShowBoundingBoxes = false;
 	bool m_UIShowBoundingBoxesOnTop = false;
 
-	bool m_ViewportPanelMouseOver = false;
-	bool m_ViewportPanelFocused = false;
-
 	Ref<Texture> m_CheckerboardTex;
 	Ref<Texture> m_PlayButtonTex, m_StopButtonTex, m_PauseButtonTex;
+	Ref<MenuBar> m_MenuBar;
 
 	SceneState m_SceneSate = SceneState::Edit;
 	SelectionMode m_SelectionMode = SelectionMode::Model;

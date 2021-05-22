@@ -39,6 +39,7 @@ namespace highlo
 		HLAPI static Ref<ShaderLibrary> GetShaderLibrary();
 		HLAPI static RendererCapabilities &GetCapabilities();
 		HLAPI static Ref<Texture2D> &GetBRDFLutTexture();
+		HLAPI static HLString GetCurrentRenderingAPI();
 
 		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
 

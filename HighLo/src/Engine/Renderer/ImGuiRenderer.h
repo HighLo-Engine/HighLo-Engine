@@ -4,6 +4,8 @@
 
 #include "Engine/Core/DataTypes/HLString.h"
 #include "Engine/Math/HLMath.h"
+#include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Window/MenuBar.h"
 
 struct ImGuiTextBuffer;
 
@@ -32,18 +34,30 @@ namespace highlo
 		HLAPI static void Init(Window* window, ImGuiWindowStyle windowStyle = ImGuiWindowStyle::Dark);
 		HLAPI static void Shutdown();
 
-		HLAPI static void BeginScene();
+		HLAPI static void StartScene();
 		HLAPI static void EndScene();
 
 		HLAPI static void ShowDemoWindow();
 		HLAPI static void ShouldDisplayDebugInformation(bool show);
 		HLAPI static void ShouldUseCustomConsole(bool use);
 
-		HLAPI static void StartWindow(const HLString &title);
+		HLAPI static void StartWindow(const HLString &title, bool pOpen = false, bool fullscreen = false);
 		HLAPI static void EndWindow();
 
-		HLAPI static void BeginChild(const HLString &id, uint32 width = 0, uint32 height = 0);
+		HLAPI static void StartViewport(const HLString &title);
+		HLAPI static void EndViewport();
+
+		HLAPI static void StartChild(const HLString &id, uint32 width = 0, uint32 height = 0);
 		HLAPI static void EndChild();
+
+		HLAPI static bool StartTreeNode(const HLString &name, bool defaultOpen = true);
+		HLAPI static void EndTreeNode();
+
+		HLAPI static void StartCheckboxGroup(const HLString &label);
+		HLAPI static void EndCheckboxGroup();
+
+		HLAPI static void StartPopupModal(const HLString &text);
+		HLAPI static void EndPopupModal();
 
 		HLAPI static void NewLine();
 		HLAPI static void Separator();
@@ -67,6 +81,20 @@ namespace highlo
 		HLAPI static bool Property(const HLString &name, glm::vec4 &value, PropertyFlag flags = PropertyFlag::Slider);
 		HLAPI static bool Property(const HLString &name, glm::vec4 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::Slider);
 		
+		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), const glm::vec4 &borderColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		HLAPI static void DrawMenu(const Ref<MenuBar> &menubar);
+
+		HLAPI static bool IsWindowHovered();
+		HLAPI static bool IsWindowFocused();
+		HLAPI static bool CanDraw();
+
+		HLAPI static glm::vec2 GetCursorPosition();
+		HLAPI static glm::vec2 GetMousePosition();
+		HLAPI static glm::vec2 GetContentRegion();
+		HLAPI static glm::vec2 GetWindowSize();
+		HLAPI static glm::vec2 GetWindowPos();
+		HLAPI static bool IsMouseHoveringRect(const glm::vec2 &min, const glm::vec2 &max);
+
 		HLAPI static void OnWindowResize(uint32 width, uint32 height);
 
 	private:

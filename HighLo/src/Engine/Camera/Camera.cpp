@@ -2,13 +2,13 @@
 #include "Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include "Engine/Window/Window.h"
+#include "Engine/Application/HLApplication.h"
 
 namespace highlo
 {
 	Camera::Camera()
 	{
-		SetProjectionInternal(Window::Get().GetWidth(), Window::Get().GetHeight());
+		SetProjectionInternal(1280, 720);
 	}
 
 	void Camera::SetPerspective(float verticalFOV, float nearClip, float farClip)

@@ -15,6 +15,9 @@ namespace highlo
 		HLAPI virtual void AddMenu(const Ref<FileMenu> &menu) = 0;
 		HLAPI virtual void RemoveMenu(const Ref<FileMenu> &menu) = 0;
 
+		HLAPI virtual std::vector<Ref<FileMenu>> &GetMenus() = 0;
+		HLAPI virtual const std::vector<Ref<FileMenu>> &GetMenus() const = 0;
+
 		HLAPI virtual void *GetNativeMenuBar() = 0;
 		HLAPI virtual void *GetNativeMenuBar() const = 0;
 

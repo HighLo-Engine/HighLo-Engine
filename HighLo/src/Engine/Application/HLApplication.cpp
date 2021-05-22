@@ -17,11 +17,7 @@ namespace highlo
 	HLApplication::HLApplication()
 	{
 		s_Instance = this;
-	}
 
-	void HLApplication::Run()
-	{
-		m_Running = true;
 		Logger::Init();
 		VirtualFileSystem::Init();
 
@@ -30,10 +26,22 @@ namespace highlo
 		CreateCacheCos();
 
 		InitializeWindow();
-
+		Renderer::Init(m_Window.get());
 		Create_ECS_Systems();
 
 		HL_CORE_INFO("Engine Initialized");
+	}
+
+	HLApplication::~HLApplication()
+	{
+		m_ECS_SystemManager.Shutdown();
+		Renderer::Shutdown();
+		VirtualFileSystem::Shutdown();
+	}
+
+	void HLApplication::Run()
+	{
+		m_Running = true;
 		OnInitialize();
 
 		// Main Rendering Thread
@@ -49,7 +57,7 @@ namespace highlo
 			OnUpdate(Time::GetTimestep());
 			m_ECS_SystemManager.Update();
 
-			ImGuiRenderer::BeginScene();
+			ImGuiRenderer::StartScene();
 			OnUIRender(Time::GetTimestep());
 			ImGuiRenderer::EndScene();
 
@@ -57,8 +65,6 @@ namespace highlo
 		}
 
 		OnShutdown();
-		m_ECS_SystemManager.Shutdown();
-		VirtualFileSystem::Shutdown();
 	}
 
 	void HLApplication::InitializeWindow()
@@ -71,7 +77,6 @@ namespace highlo
 		);
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
-		Renderer::Init(m_Window.get());
 	}
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &event)

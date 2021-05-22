@@ -25,7 +25,7 @@ namespace highlo
 		HLAPI Window &GetWindow() { return *m_Window; }
 
 		HLAPI HLApplication();
-		HLAPI ~HLApplication() = default;
+		HLAPI ~HLApplication();
 
 		HLAPI void Run();
 

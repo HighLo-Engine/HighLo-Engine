@@ -226,9 +226,6 @@ namespace highlo
 			glDeleteTextures(1, &RendererID);
 			RendererID = 0;
 		}
-
-		if (m_Buffer)
-			stbi_image_free(m_Buffer.m_Data);
 	}
 
 	void OpenGLTexture2D::Invalidate()

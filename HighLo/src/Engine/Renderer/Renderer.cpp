@@ -137,14 +137,14 @@ namespace highlo
 
 		s_RenderingAPI->Init();
 		CoreRenderer::Init();
-		ImGuiRenderer::Init(window);
 		Renderer2D::Init();
+		ImGuiRenderer::Init(window);
 	}
 
 	void Renderer::Shutdown()
 	{
-		Renderer2D::Shutdown();
 		ImGuiRenderer::Shutdown();
+		Renderer2D::Shutdown();
 		CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();
 
@@ -184,6 +184,23 @@ namespace highlo
 	Ref<Texture2D> &Renderer::GetBRDFLutTexture()
 	{
 		return s_Data->BRDFLut;
+	}
+
+	HLString Renderer::GetCurrentRenderingAPI()
+	{
+	#ifdef HIGHLO_API_OPENGL
+		return "OpenGL";
+	#elif HIGHLO_API_DX11
+		return "DirectX11";
+	#elif HIGHLO_API_DX12
+		return "DirectX12";
+	#elif HIGHLO_API_VULKAN
+		return "Vulkan";
+	#elif HIGHLO_API_METAL
+		return "Metal";
+	#else
+		return "Unknown";
+	#endif // HIGHLO_API_OPENGL
 	}
 
 	Ref<Environment> Renderer::CreateEnvironment(const HLString &path)

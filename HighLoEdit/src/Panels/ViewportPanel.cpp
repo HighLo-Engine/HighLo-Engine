@@ -29,8 +29,6 @@ void ViewportPanel::Destroy()
 
 void ViewportPanel::Update(Timestep ts)
 {
-	m_ViewportContent->Resize(m_ViewportWidth, m_ViewportHeight);
-
 	// Render Framebuffer
 	m_ViewportContent->Bind();
 

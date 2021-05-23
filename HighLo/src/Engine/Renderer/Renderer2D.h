@@ -31,7 +31,6 @@ namespace highlo
 		HLAPI static void DrawCircle(const glm::vec2 &p0, float radius, const glm::vec4 &color, float thickness = 0.05f);
 		HLAPI static void DrawCircle(const glm::vec3 &p0, float radius, const glm::vec4 &color, float thickness = 0.05f);
 
-		HLAPI static void DrawLine(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
 		HLAPI static void DrawLine(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		struct Statistics

@@ -6,6 +6,7 @@
 
 #include "Engine/Window/Window.h"
 #include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Window/MenuBar.h"
 
 namespace highlo
 {
@@ -22,6 +23,7 @@ namespace highlo
 		virtual uint32 GetWidth() override { return m_Properties.m_Width; }
 		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
 		virtual void *GetNativeHandle() override { return (void*)m_NativeHandle; }
+		virtual void *GetNativeContext() override { return (void*) m_Context->GetNativeContext(); }
 
 		virtual void SetWindowIcon(const HLString &path, bool flip = false) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
@@ -47,6 +49,8 @@ namespace highlo
 		virtual bool IsFullscreen() override { return m_Properties.m_Fullscreen; }
 		virtual bool IsCentered() override { return m_Properties.m_Centered; }
 		virtual const HLString &GetTitle() override { return m_Properties.m_Title; }
+		virtual bool HasMenuBar() override { return m_MenuBar != nullptr; }
+		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
 
 	private:
@@ -60,7 +64,7 @@ namespace highlo
 		WindowData m_Properties;
 		WNDPlacement m_Placement;
 
-
+		Ref<MenuBar> m_MenuBar = nullptr;
 		UniqueRef<RenderingContext> m_Context;
 
 		GLFWwindow *m_NativeHandle = nullptr;

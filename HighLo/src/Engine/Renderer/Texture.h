@@ -21,9 +21,10 @@ namespace highlo
 	class Texture : public IsSharedReference
 	{
 	public:
+
 		HLString Name = "";
 		TextureShaderLocation ShaderLocation = TextureShaderLocation::PIXEL_SHADER;
-		uint32 RendererID = 0;
+		HLRendererID RendererID = 0;
 
 		TextureFormat Format = TextureFormat::RGBA8;
 
@@ -46,6 +47,7 @@ namespace highlo
 
 		HLAPI inline TextureFormat GetFormat() { return Format; }
 		HLAPI inline HLRendererID GetRendererID() const { return RendererID; }
+		HLAPI inline uint64 GetHash() const { return (uint64)RendererID; }
 
 		HLAPI inline bool operator==(const Texture& other) const { return RendererID == other.RendererID; }
 		HLAPI inline bool operator!=(const Texture& other) const { return !(*this == other); }
@@ -54,17 +56,27 @@ namespace highlo
 	class Texture2D : public Texture
 	{
 	public:
+
 		HLAPI virtual uint32 GetDimensions() const override { return 2; };
 
 		HLAPI static Ref<Texture> LoadFromFile(const HLString& filepath, TextureFormat format = TextureFormat::RGBA8, bool flip_on_load = true);
 		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3& rgb, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height);
+
+		HLAPI virtual HLRendererID GetSamplerRendererID() const = 0;
+
+		HLAPI virtual void CreatePerLayerImageViews() = 0;
+		HLAPI virtual void CreateSampler(TextureProperties properties) = 0;
+
+		HLAPI virtual TextureSpecification &GetSpecification() = 0;
+		HLAPI virtual const TextureSpecification &GetSpecification() const = 0;
 	};
 
 	class Texture3D : public Texture
 	{
 	public:
+
 		HLAPI virtual uint32 GetDimensions() const override { return 3; };
 
 		HLAPI static Ref<Texture> LoadFromFiles(const std::vector<HLString>& filepaths);

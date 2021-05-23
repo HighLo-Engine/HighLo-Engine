@@ -16,6 +16,7 @@ namespace highlo
 	class Mesh : public IsSharedReference
 	{
 	public:
+
 		HLAPI static Ref<Mesh> Create(const MeshData& data);
 
 		HLAPI MeshData& GetMeshData() { return m_MeshData; }

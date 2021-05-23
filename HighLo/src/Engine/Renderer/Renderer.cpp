@@ -28,6 +28,7 @@ namespace highlo
 		Ref<Texture2D> BRDFLut;
 		Ref<Environment> EmptyEnvironment;
 		Ref<ShaderLibrary> ShaderLib;
+		Ref<RenderPass> ActiveRenderPass;
 	};
 
 	static RendererData *s_Data = nullptr;
@@ -149,6 +150,70 @@ namespace highlo
 		s_RenderingAPI->Shutdown();
 
 		delete s_Data;
+	}
+
+	void Renderer::BeginFrame()
+	{
+		s_RenderingAPI->BeginFrame();
+	}
+
+	void Renderer::EndFrame()
+	{
+		s_RenderingAPI->EndFrame();
+	}
+
+	void Renderer::BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear)
+	{
+		HL_ASSERT(renderPass, "Renderpass can not be null!");
+		s_Data->ActiveRenderPass = renderPass;
+
+		renderPass->GetSpcification().Framebuffer->Bind();
+		if (clear)
+		{
+			const glm::vec4 &clearColor = renderPass->GetSpcification().Framebuffer->GetSpecification().ClearColor;
+			s_RenderingAPI->ClearScreenBuffers();
+			s_RenderingAPI->ClearScreenColor(clearColor);
+		}
+	}
+
+	void Renderer::EndRenderPass()
+	{
+		HL_ASSERT(s_Data->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
+		s_Data->ActiveRenderPass->GetSpcification().Framebuffer->Unbind();
+		s_Data->ActiveRenderPass = nullptr;
+	}
+
+	void Renderer::DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color)
+	{
+		DrawAABB(model->BoundingBox, transform, color);
+	}
+
+	void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
+	{
+		glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
+		glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
+
+		glm::vec4 corners[8] =
+		{
+			transform * glm::vec4{ aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
+			transform * glm::vec4{ aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
+			transform * glm::vec4{ aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
+			transform * glm::vec4{ aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
+
+			transform * glm::vec4{ aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
+			transform * glm::vec4{ aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
+			transform * glm::vec4{ aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
+			transform * glm::vec4{ aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
+		};
+
+		for (uint32 i = 0; i < 4; ++i)
+			Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
+
+		for (uint32 i = 0; i < 4; ++i)
+			Renderer2D::DrawLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
+
+		for (uint32 i = 0; i < 4; ++i)
+			Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 	}
 
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()

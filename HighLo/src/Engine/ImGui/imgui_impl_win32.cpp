@@ -73,6 +73,8 @@ static ImGuiMouseCursor     g_LastMouseCursor = ImGuiMouseCursor_COUNT;
 static bool                 g_HasGamepad = false;
 static bool                 g_WantUpdateHasGamepad = true;
 static bool                 g_WantUpdateMonitors = true;
+static HWND                 g_focused_hWnd = 0;
+static HGLRC                g_context = 0;
 
 // Forward Declarations
 static void ImGui_ImplWin32_InitPlatformInterface();
@@ -87,7 +89,7 @@ static PFN_XInputGetState           g_XInputGetState = NULL;
 #endif
 
 // Functions
-bool    ImGui_ImplWin32_Init(void* hwnd)
+bool    ImGui_ImplWin32_Init(void* hwnd, void* context)
 {
     if (!::QueryPerformanceFrequency((LARGE_INTEGER*)&g_TicksPerSecond))
         return false;
@@ -106,8 +108,18 @@ bool    ImGui_ImplWin32_Init(void* hwnd)
     g_hWnd = (HWND)hwnd;
     ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = (void*)g_hWnd;
+    g_context = (HGLRC) context;
+    g_focused_hWnd = g_hWnd;
+
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
         ImGui_ImplWin32_InitPlatformInterface();
+    }
+    else
+    {
+        ImGuiViewport *main_viewport = ImGui::GetMainViewport();
+        main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = (void*)g_hWnd;
+    }
 
     // Keyboard mapping. Dear ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
     io.KeyMap[ImGuiKey_Tab] = VK_TAB;
@@ -159,6 +171,7 @@ bool    ImGui_ImplWin32_Init(void* hwnd)
 void    ImGui_ImplWin32_Shutdown()
 {
     ImGui_ImplWin32_ShutdownPlatformInterface();
+    g_hWnd = (HWND)0;
 
     // Unload XInput library
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
@@ -317,33 +330,6 @@ static void ImGui_ImplWin32_UpdateGamepads()
         #undef MAP_ANALOG
     }
 #endif // #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
-}
-
-static BOOL CALLBACK ImGui_ImplWin32_UpdateMonitors_EnumFunc(HMONITOR monitor, HDC, LPRECT, LPARAM)
-{
-    MONITORINFO info = {};
-    info.cbSize = sizeof(MONITORINFO);
-    if (!::GetMonitorInfo(monitor, &info))
-        return TRUE;
-    ImGuiPlatformMonitor imgui_monitor;
-    imgui_monitor.MainPos = ImVec2((float)info.rcMonitor.left, (float)info.rcMonitor.top);
-    imgui_monitor.MainSize = ImVec2((float)(info.rcMonitor.right - info.rcMonitor.left), (float)(info.rcMonitor.bottom - info.rcMonitor.top));
-    imgui_monitor.WorkPos = ImVec2((float)info.rcWork.left, (float)info.rcWork.top);
-    imgui_monitor.WorkSize = ImVec2((float)(info.rcWork.right - info.rcWork.left), (float)(info.rcWork.bottom - info.rcWork.top));
-    imgui_monitor.DpiScale = ImGui_ImplWin32_GetDpiScaleForMonitor(monitor);
-    ImGuiPlatformIO& io = ImGui::GetPlatformIO();
-    if (info.dwFlags & MONITORINFOF_PRIMARY)
-        io.Monitors.push_front(imgui_monitor);
-    else
-        io.Monitors.push_back(imgui_monitor);
-    return TRUE;
-}
-
-static void ImGui_ImplWin32_UpdateMonitors()
-{
-    ImGui::GetPlatformIO().Monitors.resize(0);
-    ::EnumDisplayMonitors(NULL, NULL, ImGui_ImplWin32_UpdateMonitors_EnumFunc, 0);
-    g_WantUpdateMonitors = false;
 }
 
 void    ImGui_ImplWin32_NewFrame()
@@ -633,10 +619,56 @@ struct ImGuiViewportDataWin32
     bool    HwndOwned;
     DWORD   DwStyle;
     DWORD   DwExStyle;
+    HDC     Hdc;
+    HGLRC   HgLrc;
 
-    ImGuiViewportDataWin32() { Hwnd = NULL; HwndOwned = false;  DwStyle = DwExStyle = 0; }
+    ImGuiViewportDataWin32() { Hwnd = NULL; HwndOwned = false;  DwStyle = DwExStyle = 0; Hdc = NULL; HgLrc = NULL; }
     ~ImGuiViewportDataWin32() { IM_ASSERT(Hwnd == NULL); }
 };
+
+static void ImGui_ImplWin32_RenderWindow(ImGuiViewport* viewport, void*)
+{
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    if (data->Hdc == NULL)
+    {
+        data->Hdc = GetDC(data->Hwnd);
+        PIXELFORMATDESCRIPTOR pfd =
+            {
+                sizeof(PIXELFORMATDESCRIPTOR),
+                1,
+                PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
+                PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+                32,                   // Colordepth of the framebuffer.
+                0, 0, 0, 0, 0, 0,
+                0,
+                0,
+                0,
+                0, 0, 0, 0,
+                24,                   // Number of bits for the depthbuffer
+                8,                    // Number of bits for the stencilbuffer
+                0,                    // Number of Aux buffers in the framebuffer.
+                PFD_MAIN_PLANE,
+                0,
+                0, 0, 0
+            };
+        int iPixelFormat = ChoosePixelFormat(data->Hdc, &pfd);
+        SetPixelFormat(data->Hdc, iPixelFormat, &pfd);
+    }
+    
+    if (data->HgLrc == NULL)
+        data->HgLrc = wglCreateContext(data->Hdc);
+
+    ImDrawList *list = ImGui::GetBackgroundDrawList(viewport);
+
+    bool isMadeCurrent = wglMakeCurrent(data->Hdc, data->HgLrc);
+}
+
+static void ImGui_ImplWin32_SwapBuffers(ImGuiViewport* viewport, void*)
+{
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    wglMakeCurrent(data->Hdc, data->HgLrc);
+    SwapBuffers(data->Hdc);
+}
 
 static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)
 {
@@ -653,6 +685,9 @@ static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags fl
     if (flags & ImGuiViewportFlags_TopMost)
         *out_ex_style |= WS_EX_TOPMOST;
 }
+
+static void ImGui_ImplWin32_SetWindowFocus(ImGuiViewport *viewport);
+static void ImGui_ImplWin32_ShowWindow(ImGuiViewport *viewport);
 
 static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
 {
@@ -676,6 +711,41 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
     data->HwndOwned = true;
     viewport->PlatformRequestResize = false;
     viewport->PlatformHandle = viewport->PlatformHandleRaw = data->Hwnd;
+
+    //Set this window to the current context.
+    data->Hdc = GetDC(data->Hwnd);
+
+    PIXELFORMATDESCRIPTOR pfd =
+    {
+        sizeof(PIXELFORMATDESCRIPTOR),
+        1,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
+        PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+        32,                   // Colordepth of the framebuffer.
+        0, 0, 0, 0, 0, 0,
+        0,
+        0,
+        0,
+        0, 0, 0, 0,
+        24,                   // Number of bits for the depthbuffer
+        8,                    // Number of bits for the stencilbuffer
+        0,                    // Number of Aux buffers in the framebuffer.
+        PFD_MAIN_PLANE,
+        0,
+        0, 0, 0
+    };
+
+    int pixelFormat = ChoosePixelFormat(data->Hdc, &pfd);
+    SetPixelFormat(data->Hdc, pixelFormat, &pfd);
+    data->HgLrc = wglCreateContext(data->Hdc);
+    wglMakeCurrent(data->Hdc, data->HgLrc);
+    SwapBuffers(data->Hdc);
+    wglShareLists(g_context, data->HgLrc);
+ //   ImGui_ImplWin32_SetWindowFocus(viewport);
+ //   ImGui_ImplWin32_ShowWindow(viewport);
+
+    //Set it as our focused window.
+    g_focused_hWnd = data->Hwnd;
 }
 
 static void ImGui_ImplWin32_DestroyWindow(ImGuiViewport* viewport)
@@ -689,7 +759,12 @@ static void ImGui_ImplWin32_DestroyWindow(ImGuiViewport* viewport)
             ::SetCapture(g_hWnd);
         }
         if (data->Hwnd && data->HwndOwned)
+        {
             ::DestroyWindow(data->Hwnd);
+
+            //Set the focused window back to the owner
+            g_focused_hWnd = g_hWnd;
+        }
         data->Hwnd = NULL;
         IM_DELETE(data);
     }
@@ -773,6 +848,12 @@ static void ImGui_ImplWin32_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     ::SetWindowPos(data->Hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
+static bool ImGui_ImplWin32_ViewportHasOwner(ImGuiViewport* viewport)
+{
+    ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
+    return data->HwndOwned;
+}
+
 static void ImGui_ImplWin32_SetWindowFocus(ImGuiViewport* viewport)
 {
     ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
@@ -780,12 +861,17 @@ static void ImGui_ImplWin32_SetWindowFocus(ImGuiViewport* viewport)
     ::BringWindowToTop(data->Hwnd);
     ::SetForegroundWindow(data->Hwnd);
     ::SetFocus(data->Hwnd);
+
+    //Set the focused window field since windows and debugging does not like grabbing actual windows.
+    g_focused_hWnd = data->Hwnd;
 }
 
 static bool ImGui_ImplWin32_GetWindowFocus(ImGuiViewport* viewport)
 {
     ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
     IM_ASSERT(data->Hwnd != 0);
+    ImDrawList* list = ImGui::GetBackgroundDrawList(viewport);
+    //return g_focused_hWnd == data->Hwnd;
     return ::GetForegroundWindow() == data->Hwnd;
 }
 
@@ -858,6 +944,8 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
     {
         switch (msg)
         {
+        case WM_ERASEBKGND:
+            return 0;
         case WM_CLOSE:
             viewport->PlatformRequestClose = true;
             return 0;
@@ -883,6 +971,33 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
     }
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+static BOOL CALLBACK ImGui_ImplWin32_UpdateMonitors_EnumFunc(HMONITOR monitor, HDC, LPRECT, LPARAM)
+{
+    MONITORINFO info = { 0 };
+    info.cbSize = sizeof(MONITORINFO);
+    if (!::GetMonitorInfo(monitor, &info))
+        return TRUE;
+    ImGuiPlatformMonitor imgui_monitor;
+    imgui_monitor.MainPos = ImVec2((float)info.rcMonitor.left, (float)info.rcMonitor.top);
+    imgui_monitor.MainSize = ImVec2((float)(info.rcMonitor.right - info.rcMonitor.left), (float)(info.rcMonitor.bottom - info.rcMonitor.top));
+    imgui_monitor.WorkPos = ImVec2((float)info.rcWork.left, (float)info.rcWork.top);
+    imgui_monitor.WorkSize = ImVec2((float)(info.rcWork.right - info.rcWork.left), (float)(info.rcWork.bottom - info.rcWork.top));
+    imgui_monitor.DpiScale = ImGui_ImplWin32_GetDpiScaleForMonitor(monitor);
+    ImGuiPlatformIO& io = ImGui::GetPlatformIO();
+    if (info.dwFlags & MONITORINFOF_PRIMARY)
+        io.Monitors.push_front(imgui_monitor);
+    else
+        io.Monitors.push_back(imgui_monitor);
+    return TRUE;
+}
+
+static void ImGui_ImplWin32_UpdateMonitors()
+{
+    ImGui::GetPlatformIO().Monitors.resize(0);
+    ::EnumDisplayMonitors(NULL, NULL, ImGui_ImplWin32_UpdateMonitors_EnumFunc, NULL);
+    g_WantUpdateMonitors = false;
 }
 
 static void ImGui_ImplWin32_InitPlatformInterface()
@@ -921,6 +1036,9 @@ static void ImGui_ImplWin32_InitPlatformInterface()
     platform_io.Platform_UpdateWindow = ImGui_ImplWin32_UpdateWindow;
     platform_io.Platform_GetWindowDpiScale = ImGui_ImplWin32_GetWindowDpiScale; // FIXME-DPI
     platform_io.Platform_OnChangedViewport = ImGui_ImplWin32_OnChangedViewport; // FIXME-DPI
+    platform_io.Platform_RenderWindow = ImGui_ImplWin32_RenderWindow;
+    platform_io.Platform_SwapBuffers = ImGui_ImplWin32_SwapBuffers;
+    //platform_io.Platform_HasOwner = ImGui_ImplWin32_ViewportHasOwner;
 #if HAS_WIN32_IME
     platform_io.Platform_SetImeInputPos = ImGui_ImplWin32_SetImeInputPos;
 #endif

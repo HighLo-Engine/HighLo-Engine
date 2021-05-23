@@ -29,7 +29,8 @@ namespace highlo
 
 		virtual uint32 GetWidth() override { return m_Properties.m_Width; }
 		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
-		virtual void *GetNativeHandle() override { return (void *) m_NativeHandle; }
+		virtual void *GetNativeHandle() override { return (void*) m_NativeHandle; }
+		virtual void *GetNativeContext() override { return (void*) m_Context->GetCurrentContext(); }
 
 		virtual void SetWindowIcon(const HLString &path, bool flip = false) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
@@ -54,7 +55,9 @@ namespace highlo
 		virtual bool IsMaximized() override { return m_Properties.m_Maximized; }
 		virtual bool IsFullscreen() override { return m_Properties.m_Fullscreen; }
 		virtual bool IsCentered() override { return m_Properties.m_Centered; }
+		virtual bool HasMenuBar() override;
 		virtual const HLString &GetTitle() override { return m_Properties.m_Title; }
+		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
 
 		// Specific to DX11Window
@@ -78,7 +81,7 @@ namespace highlo
 		HWND m_NativeHandle = nullptr;
 		HICON m_WindowIcon = NULL;
 		HCURSOR m_Cursor = NULL;
-		Ref<MenuBar> m_MenuBar;
+		Ref<MenuBar> m_MenuBar = nullptr;
 		bool m_CursorLocked = false;
 
 		WindowCallbackData m_CallbackData;

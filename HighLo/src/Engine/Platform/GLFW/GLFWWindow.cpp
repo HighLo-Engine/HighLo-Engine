@@ -88,8 +88,7 @@ namespace highlo
 
 	void GLFWWindow::SetMenuBar(const Ref<MenuBar> &bar)
 	{
-		if (ImGuiRenderer::CanDraw())
-			ImGuiRenderer::DrawMenu(bar);
+		m_MenuBar = bar;
 	}
 
 	void GLFWWindow::SetVSync(bool bEnabled)

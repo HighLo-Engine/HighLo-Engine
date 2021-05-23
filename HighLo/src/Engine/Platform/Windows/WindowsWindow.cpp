@@ -329,6 +329,11 @@ namespace highlo
 		SetWindowTextW(m_NativeHandle, title.W_Str());
 	}
 
+	bool WindowsWindow::HasMenuBar()
+	{
+		return m_MenuBar != nullptr;
+	}
+
 	bool WindowsWindow::IsFocused()
 	{
 		return (GetForegroundWindow() == m_NativeHandle);
@@ -465,7 +470,7 @@ namespace highlo
 				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
-					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_LEFT);
+					MouseButtonPressedEvent event(HL_MOUSE_BUTTON_LEFT);
 					data->EventCallback(event);
 				}
 				break;
@@ -476,7 +481,7 @@ namespace highlo
 				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
-					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_RIGHT);
+					MouseButtonPressedEvent event(HL_MOUSE_BUTTON_RIGHT);
 					data->EventCallback(event);
 				}
 				break;
@@ -487,7 +492,7 @@ namespace highlo
 				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
-					MouseButtonPressedEvent event((int32) HLMouseButtonCode::BUTTON_MIDDLE);
+					MouseButtonPressedEvent event(HL_MOUSE_BUTTON_MIDDLE);
 					data->EventCallback(event);
 				}
 				break;
@@ -498,7 +503,7 @@ namespace highlo
 				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
-					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_LEFT);
+					MouseButtonReleasedEvent event(HL_MOUSE_BUTTON_LEFT);
 					data->EventCallback(event);
 				}
 				break;
@@ -509,7 +514,7 @@ namespace highlo
 				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
-					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_RIGHT);
+					MouseButtonReleasedEvent event(HL_MOUSE_BUTTON_RIGHT);
 					data->EventCallback(event);
 				}
 				break;
@@ -520,7 +525,7 @@ namespace highlo
 				WindowCallbackData *data = reinterpret_cast<WindowCallbackData*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				if (data)
 				{
-					MouseButtonReleasedEvent event((int32) HLMouseButtonCode::BUTTON_MIDDLE);
+					MouseButtonReleasedEvent event(HL_MOUSE_BUTTON_MIDDLE);
 					data->EventCallback(event);
 				}
 				break;

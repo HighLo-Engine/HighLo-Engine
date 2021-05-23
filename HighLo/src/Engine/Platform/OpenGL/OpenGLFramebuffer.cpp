@@ -7,6 +7,7 @@
 
 #include "Engine/Application/HLApplication.h"
 #include "OpenGLTexture.h"
+#include "OpenGLUtils.h"
 
 namespace highlo
 {
@@ -19,7 +20,7 @@ namespace highlo
 
 		static void CreateTextures(bool multisampled, HLRendererID *outID, uint32 count)
 		{
-			glCreateTextures(TextureTarget(multisampled), 1, outID);
+			glCreateTextures(TextureTarget(multisampled), count, outID);
 		}
 
 		static void BindTexture(bool multisampled, HLRendererID id)
@@ -68,7 +69,7 @@ namespace highlo
 			Ref<Texture> image;
 			if (multisampled)
 			{
-				//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLImageInternalFormat(format), width, height, GL_FALSE);
 			}
 			else
 			{
@@ -77,6 +78,7 @@ namespace highlo
 			}
 
 			Ref<OpenGLTexture2D> glImage = image.As<OpenGLTexture2D>();
+			glImage->CreateSampler(TextureProperties());
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), glImage->GetRendererID(), 0);
 			return image;
 		}
@@ -87,7 +89,7 @@ namespace highlo
 			Ref<Texture> image;
 			if (multisampled)
 			{
-				//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLImageInternalFormat(format), width, height, GL_FALSE);
 			}
 			else
 			{
@@ -96,6 +98,7 @@ namespace highlo
 			}
 
 			Ref<OpenGLTexture2D> glImage = image.As<OpenGLTexture2D>();
+			glImage->CreateSampler(TextureProperties());
 			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), glImage->GetRendererID(), 0);
 			return image;
 		}

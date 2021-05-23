@@ -86,11 +86,14 @@ namespace highlo
 		HLAPI virtual bool IsFullscreen() = 0;
 		HLAPI virtual bool IsCentered() = 0;
 		HLAPI virtual bool IsFocused() = 0;
+		HLAPI virtual bool HasMenuBar() = 0;
 		HLAPI virtual const HLString &GetTitle() = 0;
+		HLAPI virtual const Ref<MenuBar> &GetMenuBar() const = 0;
 
 		HLAPI virtual uint32 GetWidth() = 0;
 		HLAPI virtual uint32 GetHeight() = 0;
 		HLAPI virtual void* GetNativeHandle() = 0;
+		HLAPI virtual void *GetNativeContext() = 0;
 
 	protected:
 

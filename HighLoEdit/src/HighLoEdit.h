@@ -6,9 +6,10 @@ using namespace highlo;
 #include "Panels/ViewportPanel.h"
 #include "Panels/AssetsPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ObjectPropertiesPanel.h"
 #include "Panels/ModelViewerPanel.h"
 #include "Panels/MaterialViewerPanel.h"
-#include "Panels/ObjectPropertiesPanel.h"
+#include "Panels/SettingsViewerPanel.h"
 
 class HighLoEditor : public HLApplication
 {
@@ -83,6 +84,10 @@ private:
 	UniqueRef<AssetsPanel> m_Assets;
 	UniqueRef<SceneHierarchyPanel> m_SceneHierarchy;
 	UniqueRef<ObjectPropertiesPanel> m_ObjectProperties;
+
+	UniqueRef<SettingsViewerPanel> m_SettingsViewer;
+	UniqueRef<ModelViewerPanel> m_ModelViewer;
+	UniqueRef<MaterialViewerPanel> m_MaterialViewer;
 
 	HLString m_LastSceneFilePath;
 	GizmoType m_GizmoType = GizmoType::None;

@@ -59,9 +59,9 @@ namespace highlo
 
 			ImGuiRenderer::StartScene();
 			OnUIRender(Time::GetTimestep());
-			ImGuiRenderer::EndScene();
-
 			m_Window->Update();
+
+			ImGuiRenderer::EndScene();
 		}
 
 		OnShutdown();

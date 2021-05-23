@@ -16,14 +16,11 @@ namespace highlo
 		{
 			switch (format)
 			{
-				case TextureFormat::RGB:
-				case TextureFormat::SRGB:
-					return GL_RGB;
-
-				case TextureFormat::RGBA:
-				case TextureFormat::RGBA16F:
-				case TextureFormat::RGBA32F:
-					return GL_RGBA;
+				case TextureFormat::RGB:		return GL_RGB;
+				case TextureFormat::SRGB:		return GL_RGB;
+				case TextureFormat::RGBA:		return GL_RGBA;
+				case TextureFormat::RGBA16F:	return GL_RGBA;
+				case TextureFormat::RGBA32F:	return GL_RGBA;
 			}
 
 		HL_ASSERT(false);
@@ -51,14 +48,35 @@ namespace highlo
 		{
 			switch (format)
 			{
-				case TextureFormat::RGB:
-				case TextureFormat::RGBA:
-				case TextureFormat::SRGB:
-					return GL_UNSIGNED_BYTE;
+				case TextureFormat::RGB:		return GL_UNSIGNED_BYTE;
+				case TextureFormat::RGBA:		return GL_UNSIGNED_BYTE;
+				case TextureFormat::SRGB:		return GL_UNSIGNED_BYTE;
+				case TextureFormat::RGBA16F:	return GL_FLOAT;
+				case TextureFormat::RGBA32F:	return GL_FLOAT;
+			}
 
-				case TextureFormat::RGBA16F:
-				case TextureFormat::RGBA32F:
-					return GL_FLOAT;
+			HL_ASSERT(false);
+			return 0;
+		}
+
+		inline GLenum OpenGLSamplerWrap(TextureWrap wrap)
+		{
+			switch (wrap)
+			{
+				case TextureWrap::Clamp:	return GL_CLAMP_TO_EDGE;
+				case TextureWrap::Repeat:	return GL_REPEAT;
+			}
+
+			HL_ASSERT(false);
+			return 0;
+		}
+
+		inline GLenum OpenGLSamplerFilter(TextureFilter filter, bool mipmap)
+		{
+			switch (filter)
+			{
+				case TextureFilter::Linear:		return mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+				case TextureFilter::Nearest:	return mipmap ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
 			}
 
 			HL_ASSERT(false);

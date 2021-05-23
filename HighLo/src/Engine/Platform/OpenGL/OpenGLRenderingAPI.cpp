@@ -142,6 +142,14 @@ namespace highlo
 	{
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
+
+	void OpenGLRenderingAPI::BeginFrame()
+	{
+	}
+
+	void OpenGLRenderingAPI::EndFrame()
+	{
+	}
 	
 	void OpenGLRenderingAPI::SetWireframe(bool wf)
 	{

@@ -40,6 +40,11 @@ namespace highlo
 	{
 		glfwSwapInterval(bEnabled);
 	}
+
+	void *OpenGLContext::GetCurrentContext()
+	{
+		return (void*)glfwGetCurrentContext();
+	}
 }
 
 #else
@@ -116,6 +121,11 @@ namespace highlo
 	void OpenGLContext::SetSwapInterval(bool bEnabled)
 	{
 		((BOOL(WINAPI*)(int32))wglGetProcAddress("wglSwapIntervalEXT"))(bEnabled);
+	}
+
+	void *OpenGLContext::GetCurrentContext()
+	{
+		return (void*)rc;
 	}
 }
 

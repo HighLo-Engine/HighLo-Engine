@@ -35,6 +35,7 @@ namespace highlo
     std::shared_ptr<ImGuiTextBuffer> ImGuiRenderer::s_ImGuiTextBuffer = std::make_shared<ImGuiTextBuffer>();
 
     static int32 s_CheckboxCount = 0;
+    static bool s_WindowIsActive = false;
 
     void ImGuiRenderer::Init(Window* window, ImGuiWindowStyle windowStyle)
     {
@@ -42,6 +43,7 @@ namespace highlo
         ImGui::CreateContext();
 
         ImGuiIO &io = ImGui::GetIO();
+        io.IniFilename = "editorconfig.ini"; // rename imgui.ini to editorconfig to hide the usage from imgui
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard controls
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepage controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable docking
@@ -49,8 +51,9 @@ namespace highlo
         io.ConfigViewportsNoAutoMerge = true;
         io.ConfigViewportsNoTaskBarIcon = true;
 
-        ImFont *font = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
-        io.FontDefault = io.Fonts->Fonts.back();
+        ImFont *font = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f);
+        ImFont *boldFont = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
+        io.FontDefault = io.Fonts->Fonts[0];
 
         // Internal method used to override ImGui's theme colors with our own
         if (windowStyle == ImGuiWindowStyle::Dark)
@@ -78,7 +81,7 @@ namespace highlo
 #ifdef HIGHLO_API_GLFW
         ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->GetNativeHandle(), true);
 #else
-        ImGui_ImplWin32_Init(window->GetNativeHandle());
+        ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
 #endif // HIGHLO_API_DX11
 
 #ifdef HIGHLO_API_OPENGL
@@ -178,7 +181,12 @@ namespace highlo
     void ImGuiRenderer::StartWindow(const HLString &title, bool pOpen, bool fullscreen)
     {
         static ImGuiDockNodeFlags optFlags = ImGuiDockNodeFlags_None;
-        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
+    #ifdef HIGHLO_API_GLFW
+        windowFlags |= ImGuiWindowFlags_MenuBar;
+    #endif // HIGHLO_API_GLFW
+
+        s_WindowIsActive = true;
 
         if (fullscreen)
         {
@@ -212,11 +220,17 @@ namespace highlo
         }
 
         style.WindowMinSize.x = minWinSizeX;
+
+    #ifdef HIGHLO_API_GLFW
+        if (HLApplication::Get().GetWindow().HasMenuBar())
+            DrawMenu(HLApplication::Get().GetWindow().GetMenuBar());
+    #endif // HIGHLO_API_GLFW
     }
 
     void ImGuiRenderer::EndWindow()
     {
         ImGui::End();
+        s_WindowIsActive = false;
     }
 
     void ImGuiRenderer::StartViewport(const HLString &title)
@@ -701,6 +715,11 @@ namespace highlo
         return ImGui::IsMouseHoveringRect({ min.x, min.y }, { max.x, max.y });
     }
 
+    bool ImGuiRenderer::HasCurrentWindow()
+    {
+        return s_WindowIsActive;
+    }
+
     bool ImGuiRenderer::IsMouseOverGizmo()
     {
         return ImGuizmo::IsOver();
@@ -962,6 +981,18 @@ namespace highlo
         colors[ImGuiCol_NavHighlight]           = nav;
         colors[ImGuiCol_NavWindowingHighlight]  = nav;
 
+    }
+
+    void ImGuiRenderer::UseDefaultFont()
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        ImGui::SetCurrentFont(io.Fonts->Fonts[0]);
+    }
+
+    void ImGuiRenderer::UseBoldFont()
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        ImGui::SetCurrentFont(io.Fonts->Fonts[1]);
     }
     
     void ImGuiRenderer::DrawFileMenuInternal(const HLString &menuName, const std::vector<MenuItem> &items)

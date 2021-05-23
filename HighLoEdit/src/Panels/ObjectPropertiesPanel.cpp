@@ -17,7 +17,6 @@ void ObjectPropertiesPanel::Render(Timestep ts)
 	ImGuiRenderer::StartViewport("Object Properties");
 
 
-
 	ImGuiRenderer::EndViewport();
 }
 

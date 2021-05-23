@@ -386,11 +386,6 @@ namespace highlo
 		}
 	}
 
-	void Renderer2D::DrawLine(const glm::vec2 &p0, const glm::vec2 &p1, const glm::vec4 &color)
-	{
-		DrawLine(glm::vec3{ p0.x, p0.y, 0.0f }, glm::vec3{ p1.x, p1.y, 0.0f }, color);
-	}
-	
 	void Renderer2D::DrawLine(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec4 &color)
 	{
 		if (s_2DData->LineIndexCount >= Renderer2DData::MaxLineIndices)

@@ -96,6 +96,7 @@ namespace highlo
 		HLAPI static bool IsWindowHovered();
 		HLAPI static bool IsWindowFocused();
 		HLAPI static bool CanDraw();
+		HLAPI static bool HasCurrentWindow();
 
 		HLAPI static glm::vec2 GetCursorPosition();
 		HLAPI static glm::vec2 GetMousePosition();
@@ -107,6 +108,12 @@ namespace highlo
 		HLAPI static bool IsMouseOverGizmo();
 		HLAPI static bool IsUsingGizmo();
 
+		HLAPI static void SetDarkThemeColors();
+		HLAPI static void SetLightThemeColors();
+
+		HLAPI static void UseDefaultFont();
+		HLAPI static void UseBoldFont();
+
 	private:
 
 		static bool s_ShouldDisplayDebugInformation;
@@ -117,9 +124,6 @@ namespace highlo
 		static void DisplayDebugInformation();
 		static void DisplayCustomConsole();
 		static HLString GenerateID(const HLString &name);
-
-		static void SetDarkThemeColors();
-		static void SetLightThemeColors();
 
 		static void DrawFileMenuInternal(const HLString &menuName, const std::vector<MenuItem> &items);
 		static void DrawPopupMenuInternal(const HLString &menuName, const std::vector<PopupMenuItem> &items);

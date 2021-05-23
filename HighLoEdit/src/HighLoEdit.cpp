@@ -30,15 +30,23 @@ void HighLoEditor::OnInitialize()
 
 	m_SceneHierarchy = MakeUniqueRef<SceneHierarchyPanel>(m_EditorScene);
 	m_SceneHierarchy->Initialize(width, height);
-	m_SceneHierarchy->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
-	m_SceneHierarchy->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
-
+	m_SceneHierarchy->SetSelectionChangedCallback(HL_BIND_EVENT_FUNCTION(HighLoEditor::SelectEntity));
+	m_SceneHierarchy->SetEntityDeletedCallback(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnEntityDeleted));
 
 	m_ObjectProperties = MakeUniqueRef<ObjectPropertiesPanel>();
 	m_ObjectProperties->Initialize(width, height);
 
+	m_SettingsViewer = MakeUniqueRef<SettingsViewerPanel>();
+	m_SettingsViewer->Initialize(width, height);
+
+	m_ModelViewer = MakeUniqueRef<ModelViewerPanel>();
+	m_ModelViewer->Initialize(width, height);
+
+	m_MaterialViewer = MakeUniqueRef<MaterialViewerPanel>();
+	m_MaterialViewer->Initialize(width, height);
+
 	GetWindow().Maximize();
-	GetWindow().SetWindowIcon("assets/textures/HighLoEngine.png");
+	GetWindow().SetWindowIcon("assets/textures/HighLoEngine.png", true);
 	UpdateWindowTitle("Untitled Scene");
 
 	FileSystem::StartWatching();
@@ -81,12 +89,17 @@ void HighLoEditor::OnInitialize()
 	editMenu->AddMenuItem("Redo", "Strg+Y", 8, [=]() { HL_TRACE("Redo..."); });
 	editMenu->AddSeparator();
 
+	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
+	windowMenu->AddMenuItem("Set Dark Theme", "", 9, [=]() { ImGuiRenderer::SetDarkThemeColors(); });
+	windowMenu->AddMenuItem("Set Light Theme", "", 10, [=]() { ImGuiRenderer::SetLightThemeColors(); });
+
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
-	helpMenu->AddMenuItem("About HighLo", "", 9, [=]() { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
-	helpMenu->AddMenuItem("Documentation", "", 10, [=]() { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
+	helpMenu->AddMenuItem("About HighLo", "", 11, [=]() { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
+	helpMenu->AddMenuItem("Documentation", "", 12, [=]() { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
 
 	m_MenuBar->AddMenu(fileMenu);
 	m_MenuBar->AddMenu(editMenu);
+	m_MenuBar->AddMenu(windowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
 }
@@ -97,6 +110,10 @@ void HighLoEditor::OnUpdate(Timestep timestep)
 	m_Assets->Update(timestep);
 	m_SceneHierarchy->Update(timestep);
 	m_ObjectProperties->Update(timestep);
+
+	m_ModelViewer->Update(timestep);
+	m_MaterialViewer->Update(timestep);
+	m_SettingsViewer->Update(timestep);
 
 	auto [x, y] = m_Viewport->GetMouseViewportSpace();
 	switch (m_SceneState)
@@ -127,6 +144,9 @@ void HighLoEditor::OnShutdown()
 {
 	FileSystem::StopWatching();
 
+	m_MaterialViewer->Destroy();
+	m_ModelViewer->Destroy();
+	m_SettingsViewer->Destroy();
 	m_ObjectProperties->Destroy();
 	m_SceneHierarchy->Destroy();
 	m_Assets->Destroy();
@@ -146,6 +166,10 @@ void HighLoEditor::OnEvent(Event &e)
 	m_Assets->OnEvent(e);
 	m_ObjectProperties->OnEvent(e);
 
+	m_ModelViewer->OnEvent(e);
+	m_MaterialViewer->OnEvent(e);
+	m_SettingsViewer->OnEvent(e);
+
 	if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 	{
 		if (m_Viewport->IsMouseOver())
@@ -160,12 +184,14 @@ void HighLoEditor::OnEvent(Event &e)
 void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	ImGuiRenderer::StartWindow("RootWindow", true, true);
-	ImGuiRenderer::DrawMenu(m_MenuBar);
 	
 	m_Viewport->Render(timestep);
 	m_Assets->Render(timestep);
 	m_SceneHierarchy->Render(timestep);
 	m_ObjectProperties->Render(timestep);
+	m_ModelViewer->Render(timestep);
+	m_MaterialViewer->Render(timestep);
+	m_SettingsViewer->Render(timestep);
 
 	ImGuiRenderer::EndWindow();
 }
@@ -176,6 +202,9 @@ void HighLoEditor::OnResize(uint32 width, uint32 height)
 	m_Assets->OnResize(width, height);
 	m_SceneHierarchy->OnResize(width, height);
 	m_ObjectProperties->OnResize(width, height);
+	m_ModelViewer->OnResize(width, height);
+	m_MaterialViewer->OnResize(width, height);
+	m_SettingsViewer->OnResize(width, height);
 }
 
 void HighLoEditor::SelectEntity(Entity entity)

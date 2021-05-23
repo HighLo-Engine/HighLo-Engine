@@ -7,6 +7,9 @@
 #include "Environment.h"
 #include "ShaderLibrary.h"
 #include "RendererCapabilities.h"
+#include "RenderPass.h"
+#include "Model.h"
+#include "Engine/Math/HLAABB.h"
 
 namespace highlo
 {
@@ -20,6 +23,7 @@ namespace highlo
 	class Renderer
 	{
 	public:
+
 		HLAPI static void ClearScreenColor(const glm::vec4 &color);
 		HLAPI static void ClearScreenBuffers();
 
@@ -31,6 +35,15 @@ namespace highlo
 
 		HLAPI static void Init(Window *window);
 		HLAPI static void Shutdown();
+
+		HLAPI static void BeginFrame();
+		HLAPI static void EndFrame();
+
+		HLAPI static void BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear = true);
+		HLAPI static void EndRenderPass();
+
+		HLAPI static void DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+		HLAPI static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 
 		HLAPI static Ref<Texture3D> GetBlackCubeTexture();
 		HLAPI static Ref<Texture2D> GetWhiteTexture();

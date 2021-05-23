@@ -19,6 +19,8 @@ namespace highlo
 		virtual void MakeCurrent() override;
 		virtual void SetSwapInterval(bool bEnabled) override;
 
+		virtual void *GetCurrentContext() override;
+
 	private:
 		void* m_OpenGLWindowHandle;
 	};

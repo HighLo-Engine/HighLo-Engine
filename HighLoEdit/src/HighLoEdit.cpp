@@ -1,5 +1,21 @@
 #include "HighLoEdit.h"
 
+namespace editorutils
+{
+	static int32 ConvertToImGuizmoType(HighLoEditor::GizmoType type)
+	{
+		switch (type)
+		{
+			case HighLoEditor::GizmoType::None:			return -1;
+			case HighLoEditor::GizmoType::Translate:	return 0;
+			case HighLoEditor::GizmoType::Rotate:		return 1;
+			case HighLoEditor::GizmoType::Scale:		return 2;
+		}
+
+		return -1;
+	}
+}
+
 void HighLoEditor::OnInitialize()
 {
 	uint32 width = GetWindow().GetWidth();
@@ -12,13 +28,17 @@ void HighLoEditor::OnInitialize()
 	m_Assets = MakeUniqueRef<AssetsPanel>();
 	m_Assets->Initialize(width, height);
 
-	m_SceneHierarchy = MakeUniqueRef<SceneHierarchyPanel>();
+	m_SceneHierarchy = MakeUniqueRef<SceneHierarchyPanel>(m_EditorScene);
 	m_SceneHierarchy->Initialize(width, height);
+	m_SceneHierarchy->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
+	m_SceneHierarchy->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
+
 
 	m_ObjectProperties = MakeUniqueRef<ObjectPropertiesPanel>();
 	m_ObjectProperties->Initialize(width, height);
 
 	GetWindow().Maximize();
+	GetWindow().SetWindowIcon("assets/textures/HighLoEngine.png");
 	UpdateWindowTitle("Untitled Scene");
 
 	FileSystem::StartWatching();
@@ -56,7 +76,6 @@ void HighLoEditor::OnInitialize()
 	fileMenu->AddSeparator();
 	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", 6, [=]() { Close(); });
 	
-
 	Ref<FileMenu> editMenu = FileMenu::Create("Edit");
 	editMenu->AddMenuItem("Undo", "Strg+Z", 7, [=]() { HL_TRACE("Undo..."); });
 	editMenu->AddMenuItem("Redo", "Strg+Y", 8, [=]() { HL_TRACE("Redo..."); });
@@ -159,6 +178,38 @@ void HighLoEditor::OnResize(uint32 width, uint32 height)
 	m_ObjectProperties->OnResize(width, height);
 }
 
+void HighLoEditor::SelectEntity(Entity entity)
+{
+	if (!entity.ID)
+		return;
+
+	SelectedMesh selection;
+	//if (entity.HasComponent<MeshComponent>())
+	//{
+	//	auto &meshComp = entity.GetComponent<MeshComponent>();
+	//	if (meshComp.Mesh && meshComp.Mesh->Type == AssetType::Mesh)
+	//	{
+	//		selection.m_Mesh = &meshComp.Mesh->GetSubmeshes()[0];
+	//	}
+	//}
+
+	selection.m_Entity = entity;
+	m_SelectionContext.clear();
+	m_SelectionContext.push_back(selection);
+
+	if (m_SceneState == SceneState::Edit)
+	{
+	//	m_EditorScene->SetSelectedEntity(entity);
+		m_CurrentScene = m_EditorScene;
+	}
+	else if (m_SceneState == SceneState::Simulate)
+	{
+	//	m_EditorScene->SetSelectedEntity(entity);
+		m_CurrentScene = m_SimulationScene;
+	}
+
+}
+
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 {
 	HLString title = sceneName + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI();
@@ -222,6 +273,46 @@ void HighLoEditor::SaveSceneAs()
 
 bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 {
+	if (m_Viewport->IsMouseOver())
+	{
+		switch (e.GetKeyCode())
+		{
+			case HL_KEY_F:
+			{
+				if (m_SelectionContext.size() == 0)
+					break;
+
+				Entity selectedEntity = m_SelectionContext[0].m_Entity;
+				m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
+				break;
+			}
+
+			case HL_KEY_Q:
+			{
+				m_GizmoType = GizmoType::None;
+				break;
+			}
+
+			case HL_KEY_W:
+			{
+				m_GizmoType = GizmoType::Translate;
+				break;
+			}
+
+			case HL_KEY_E:
+			{
+				m_GizmoType = GizmoType::Rotate;
+				break;
+			}
+
+			case HL_KEY_R:
+			{
+				m_GizmoType = GizmoType::Scale;
+				break;
+			}
+		}
+	}
+
 	if (Input::IsKeyPressed(HL_KEY_LEFT_CONTROL))
 	{
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT))
@@ -264,30 +355,6 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 				break;
 			}
 
-			case HL_KEY_Q:
-			{
-				m_GizmoType = GizmoType::None;
-				break;
-			}
-
-			case HL_KEY_W:
-			{
-				m_GizmoType = GizmoType::Translate;
-				break;
-			}
-
-			case HL_KEY_E:
-			{
-				m_GizmoType = GizmoType::Rotate;
-				break;
-			}
-
-			case HL_KEY_R:
-			{
-				m_GizmoType = GizmoType::Scale;
-				break;
-			}
-
 			case HL_KEY_Z:
 			{
 				HL_TRACE("Undo...");
@@ -299,6 +366,31 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 				HL_TRACE("Redo...");
 				break;
 			}
+
+			case HL_KEY_D:
+			{
+				// duplicate selected entity
+				if (m_SelectionContext.size() == 0)
+					break;
+
+				Entity selectedEntity = m_SelectionContext[0].m_Entity;
+				break;
+			}
+		}
+	}
+
+	switch (e.GetKeyCode())
+	{
+		case HL_KEY_ESCAPE:
+		{
+			// Clear selection
+			break;
+		}
+
+		case HL_KEY_DELETE:
+		{
+			// Delete selected entity
+			break;
 		}
 	}
 
@@ -307,15 +399,40 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 
 bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 {
+	auto [mx, my] = Input::GetMousePosition();
+	if (e.GetMouseButton() == HL_MOUSE_BUTTON_LEFT
+		&& m_Viewport->IsMouseOver()
+		&& !Input::IsKeyPressed(HL_KEY_LEFT_ALT)
+		&& !ImGuiRenderer::IsMouseOverGizmo()
+		&& m_SceneState != SceneState::Play)
+	{
+		auto [mouseX, mouseY] = m_Viewport->GetMouseViewportSpace();
+		if (mouseX > -1.0f && mouseX < 1.0f && mouseY > -1.0f && mouseY < 1.0f)
+		{
+			auto [origin, direction] = m_Viewport->CastRay(mouseX, mouseY);
+			m_SelectionContext.clear();
+		//	m_CurrentScene->SetSelectedEntity({});
+
+		//	auto meshEntities = m_CurrentScene->GetAllEntitiesWith<MeshComponent>();
+		// TODO
+		}
+	}
 	return false;
 }
 
 void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 {
+	//m_SceneHierarchy->SetSelected(selectionContext.m_Entity);
+	//m_CurrentScene->SetSelectedEntity(selectionContext.m_Entity);
 }
 
 void HighLoEditor::OnEntityDeleted(Entity e)
 {
+	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].m_Entity == e)
+	{
+		m_SelectionContext.clear();
+	//	m_EditorScene->SetSelectedEntity({});
+	}
 }
 
 void HighLoEditor::OnScenePlay()
@@ -344,7 +461,6 @@ void HighLoEditor::OnSceneStop()
 	m_SelectionContext.clear();
 	//m_SceneHierarchy->SetContext(m_EditorScene);
 	m_CurrentScene = m_EditorScene;
-
 }
 
 void HighLoEditor::OnSceneStartSimulation()
@@ -359,7 +475,6 @@ void HighLoEditor::OnSceneStartSimulation()
 	//m_SimulationScene->OnSimulationStart();
 	//m_SceneHierarchy->SetContext(m_SimulationScene);
 	m_CurrentScene = m_SimulationScene;
-
 }
 
 void HighLoEditor::OnSceneEndSimulation()
@@ -372,23 +487,21 @@ void HighLoEditor::OnSceneEndSimulation()
 	m_SelectionContext.clear();
 	//m_SceneHierarchy->SetContext(m_EditorScene);
 	m_CurrentScene = m_EditorScene;
-
 }
 
 float HighLoEditor::GetSnapValue()
 {
 	switch (m_GizmoType)
 	{
-		/*
-		case  ImGuizmo::OPERATION::TRANSLATE: return 0.5f;
-		case  ImGuizmo::OPERATION::ROTATE: return 45.0f;
-		case  ImGuizmo::OPERATION::SCALE: return 0.5f;
-		*/
+		case GizmoType::Translate:	return 0.5f;
+		case GizmoType::Rotate:		return 45.0f;
+		case GizmoType::Scale:		return 0.5f;
 	}
 	return 0.0f;
 }
 
 void HighLoEditor::DeleteEntity(Entity entity)
 {
+
 }
 

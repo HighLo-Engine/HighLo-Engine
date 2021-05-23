@@ -17,6 +17,8 @@ public:
 	virtual bool IsMouseOver() const override { return m_ViewportPanelMouseOver; }
 	virtual bool IsSelected() const override { return m_ViewportPanelFocused; }
 
+	void Focus(const glm::vec3 &translation);
+
 	const glm::vec2 &GetViewportMinBounds() const { return m_ViewportBounds[0]; }
 	const glm::vec2 &GetViewportMaxBounds() const { return m_ViewportBounds[1]; }
 	uint32 GetViewportWidth() const { return m_ViewportWidth; }

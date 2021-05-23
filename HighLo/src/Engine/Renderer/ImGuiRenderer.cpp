@@ -540,6 +540,131 @@ namespace highlo
         return { cursorPos.x, cursorPos.y };
     }
 
+    bool ImGuiRenderer::DrawVec2(const HLString &label, glm::vec2 &values, float resetValue, float columnWidth)
+    {
+        bool modified = false;
+
+        ImGui::PushID(*label);
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, columnWidth);
+        ImGui::Text(*label);
+        ImGui::NextColumn();
+
+        ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+        float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+        if (ImGui::Button("X", buttonSize))
+        {
+            values.x = resetValue;
+            modified = true;
+        }
+
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine();
+        modified |= ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+        if (ImGui::Button("Y", buttonSize))
+        {
+            values.y = resetValue;
+            modified = true;
+        }
+
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine();
+        modified |= ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        ImGui::PopStyleVar();
+        ImGui::Columns(1);
+        ImGui::PopID();
+
+        return modified;
+    }
+
+    bool ImGuiRenderer::DrawVec3(const HLString &label, glm::vec3 &values, float resetValue, float columnWidth)
+    {
+        bool modified = false;
+
+        ImGui::PushID(*label);
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, columnWidth);
+        ImGui::Text(*label);
+        ImGui::NextColumn();
+
+        ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+        float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+        if (ImGui::Button("X", buttonSize))
+        {
+            values.x = resetValue;
+            modified = true;
+        }
+
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine();
+        modified |= ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+        if (ImGui::Button("Y", buttonSize))
+        {
+            values.y = resetValue;
+            modified = true;
+        }
+
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine();
+        modified |= ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+        if (ImGui::Button("Z", buttonSize))
+        {
+            values.z = resetValue;
+            modified = true;
+        }
+
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine();
+        modified |= ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+
+        ImGui::PopStyleVar();
+        ImGui::Columns(1);
+        ImGui::PopID();
+
+        return modified;
+    }
+
     glm::vec2 ImGuiRenderer::GetMousePosition()
     {
         ImVec2 pos = ImGui::GetMousePos();
@@ -564,14 +689,26 @@ namespace highlo
         return { windowPos.x, windowPos.y };
     }
 
+    std::pair<glm::vec2, glm::vec2> ImGuiRenderer::GetWindowRect()
+    {
+        ImVec2 min = ImGui::GetWindowContentRegionMin();
+        ImVec2 max = ImGui::GetWindowContentRegionMax();
+        return { { min.x, min.y }, { max.x, max.y } };
+    }
+
     bool ImGuiRenderer::IsMouseHoveringRect(const glm::vec2 &min, const glm::vec2 &max)
     {
         return ImGui::IsMouseHoveringRect({ min.x, min.y }, { max.x, max.y });
     }
 
-    void ImGuiRenderer::OnWindowResize(uint32 width, uint32 height)
+    bool ImGuiRenderer::IsMouseOverGizmo()
     {
-        
+        return ImGuizmo::IsOver();
+    }
+
+    bool ImGuiRenderer::IsUsingGizmo()
+    {
+        return ImGuizmo::IsUsing();
     }
 
     void ImGuiRenderer::DisplayDebugInformation()
@@ -856,17 +993,15 @@ namespace highlo
         if (ImGui::GetIO().MouseClicked[1])
         {
             HL_CORE_TRACE("TEST POPUP");
+            ImGui::OpenPopup("Welcome");
 
-            ImGuiContext &g = *GImGui;
-            if (g.OpenPopupStack.size() > 0)
-                g.OpenPopupStack.pop_back();
-
-            if (ImGui::BeginPopupContextWindow())
+            if (ImGui::BeginPopupModal("Welcome", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                if (ImGui::MenuItem("New camera"))
-                {
-                    HL_CORE_TRACE("TEST CAMERA");
-                }
+                ImGui::Text("Welcome to HighLo!");
+                ImGui::Separator();
+
+                if (ImGui::Button("OK"))
+                    ImGui::CloseCurrentPopup();
 
                 ImGui::EndPopup();
             }

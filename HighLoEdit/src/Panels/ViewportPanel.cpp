@@ -18,7 +18,6 @@ void ViewportPanel::Initialize(uint32 width, uint32 height)
 	CreatePBRObjects();
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
-	m_Light.Color = { 1.0f, 0.2f, 0.3f };
 
 	Renderer::SetBlendMode(false);
 }
@@ -102,6 +101,11 @@ void ViewportPanel::OnResize(uint32 width, uint32 height)
 
 	if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
 		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), (float)m_ViewportWidth, (float)m_ViewportHeight, 0.1f, 1000.0f));
+}
+
+void ViewportPanel::Focus(const glm::vec3 &translation)
+{
+	m_Camera->Focus(translation);
 }
 
 std::pair<float, float> ViewportPanel::GetMouseViewportSpace()

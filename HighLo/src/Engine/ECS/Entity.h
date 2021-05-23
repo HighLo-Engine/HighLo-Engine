@@ -29,6 +29,16 @@ namespace highlo
 		{
 			return ECS_Registry::Get().GetComponent<T>(ID);
 		}
+
+		HLAPI bool operator==(const Entity& other) const
+		{
+			return ID == other.ID;
+		}
+
+		HLAPI bool operator!=(const Entity& other) const
+		{
+			return !(*this == other);
+		}
 	};
 }
 

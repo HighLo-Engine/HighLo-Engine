@@ -90,6 +90,8 @@ namespace highlo
 		HLAPI static void DrawMenu(const Ref<MenuBar> &menubar);
 		HLAPI static void DrawPopupMenu(const Ref<PopupMenu> &menu);
 		HLAPI static void DrawHelpMarker(const HLString &description);
+		HLAPI static bool DrawVec2(const HLString &label, glm::vec2 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
+		HLAPI static bool DrawVec3(const HLString &label, glm::vec3 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
 
 		HLAPI static bool IsWindowHovered();
 		HLAPI static bool IsWindowFocused();
@@ -100,9 +102,10 @@ namespace highlo
 		HLAPI static glm::vec2 GetContentRegion();
 		HLAPI static glm::vec2 GetWindowSize();
 		HLAPI static glm::vec2 GetWindowPos();
+		HLAPI static std::pair<glm::vec2, glm::vec2> GetWindowRect();
 		HLAPI static bool IsMouseHoveringRect(const glm::vec2 &min, const glm::vec2 &max);
-
-		HLAPI static void OnWindowResize(uint32 width, uint32 height);
+		HLAPI static bool IsMouseOverGizmo();
+		HLAPI static bool IsUsingGizmo();
 
 	private:
 

@@ -21,12 +21,22 @@ public:
 	virtual void OnUIRender(Timestep timestep) override;
 	virtual void OnResize(uint32 width, uint32 height);
 
+	void SelectEntity(Entity entity);
+
 	void UpdateWindowTitle(const HLString &sceneName);
 	void NewScene();
 	void OpenScene();
 	void OpenScene(const HLString &path);
 	void SaveScene();
 	void SaveSceneAs();
+
+	enum class GizmoType
+	{
+		None = 0,
+		Translate = 1,
+		Rotate = 2,
+		Scale = 3
+	};
 
 private:
 
@@ -50,14 +60,6 @@ private:
 		None		= 0,
 		Model		= 1,
 		Mesh		= 2
-	};
-
-	enum class GizmoType
-	{
-		None		= 0,
-		Translate	= 1,
-		Rotate		= 2,
-		Scale		= 3
 	};
 
 	bool OnKeyPressedEvent(const KeyPressedEvent &e);

@@ -8,7 +8,7 @@ void FileMenuTest::OnInitialize()
 	fileMenu->AddMenuItem("New Scene", "", 1, [=]() { HL_WARN("Clicked New Scene"); });
 	fileMenu->AddMenuItem("Open Scene", "", 2, [=]() { HL_WARN("Clicked Open Scene"); });
 
-	fileMenu->AddMenuSeperator();
+	fileMenu->AddSeparator();
 
 	Ref<FileMenu> zoomMenu = FileMenu::Create("Zoom");
 	zoomMenu->AddMenuItem("200%", "", 3, [=]() { HL_WARN("Clicked 200%"); });

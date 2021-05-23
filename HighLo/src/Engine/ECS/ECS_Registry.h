@@ -1,4 +1,5 @@
 #pragma once
+
 #include <any>
 #include <vector>
 #include <unordered_map>
@@ -20,7 +21,7 @@ namespace highlo
 		HLAPI EntityID GenerateEntityID();
 
 		template <typename T>
-		const std::vector<T>& GetComponents()
+		HLAPI const std::vector<T>& GetComponents()
 		{
 			static std::vector<T> s_empty;
 
@@ -32,7 +33,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		T* AddComponent(EntityID entityID)
+		HLAPI T* AddComponent(EntityID entityID)
 		{
 			auto comp = std::make_any<T>();
 			auto& type = std::type_index(typeid(T));
@@ -57,7 +58,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		T* GetComponent(EntityID entityID)
+		HLAPI T* GetComponent(EntityID entityID)
 		{
 			auto& type = std::type_index(typeid(T));
 
@@ -72,7 +73,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		void ForEach(const std::function<void(EntityID, T&, TransformComponent&)>& callback)
+		HLAPI void ForEach(const std::function<void(EntityID, T&, TransformComponent&)>& callback)
 		{
 			auto& type = std::type_index(typeid(T));
 			if (m_Components.find(type) != m_Components.end())
@@ -81,6 +82,7 @@ namespace highlo
 		}
 
 	private:
+
 		std::unordered_map<std::type_index, std::vector<std::pair<EntityID, std::any>>> m_Components;
 		std::unordered_map<EntityID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;
 		std::unordered_map<EntityID, void*> m_TransformComponents;

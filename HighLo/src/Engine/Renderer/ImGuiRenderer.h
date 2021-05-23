@@ -6,6 +6,7 @@
 #include "Engine/Math/HLMath.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Window/MenuBar.h"
+#include "Engine/Window/PopupMenu.h"
 
 struct ImGuiTextBuffer;
 
@@ -59,6 +60,9 @@ namespace highlo
 		HLAPI static void StartPopupModal(const HLString &text);
 		HLAPI static void EndPopupModal();
 
+		HLAPI static void StartGroup();
+		HLAPI static void EndGroup();
+
 		HLAPI static void NewLine();
 		HLAPI static void Separator();
 		HLAPI static void SameLine();
@@ -84,6 +88,7 @@ namespace highlo
 		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1);
 		HLAPI static void DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor, const glm::vec4 &borderColor);
 		HLAPI static void DrawMenu(const Ref<MenuBar> &menubar);
+		HLAPI static void DrawPopupMenu(const Ref<PopupMenu> &menu);
 		HLAPI static void DrawHelpMarker(const HLString &description);
 
 		HLAPI static bool IsWindowHovered();
@@ -112,5 +117,8 @@ namespace highlo
 
 		static void SetDarkThemeColors();
 		static void SetLightThemeColors();
+
+		static void DrawFileMenuInternal(const HLString &menuName, const std::vector<MenuItem> &items);
+		static void DrawPopupMenuInternal(const HLString &menuName, const std::vector<PopupMenuItem> &items);
 	};
 }

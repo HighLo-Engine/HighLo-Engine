@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ISystemBase.h"
 
 namespace highlo
@@ -6,7 +7,8 @@ namespace highlo
 	class RenderSystem : public ISystemBase
 	{
 	public:
-		void OnUpdate(Timestep ts, ECS_Registry& registry) override;
+
+		HLAPI void OnUpdate(Timestep ts, ECS_Registry& registry) override;
 
 		uint64 FrameEntitiesRendered;
 		uint64 FrameMeshesRendered;

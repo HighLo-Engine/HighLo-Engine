@@ -13,15 +13,18 @@ namespace highlo
 		
 		int32 ID = 0;
 		bool Visible = true;
-		bool Seperator = false;
+		bool Separator = false;
+		bool IsSubmenu = false;
 
 		MenuItemCallback Callback = nullptr;
+
+		std::vector<MenuItem> SubmenuItems;
 
 		HLAPI MenuItem() = default;
 		HLAPI MenuItem(const MenuItem&) = default;
 
-		HLAPI MenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible = true, bool seperator = false)
-			: Name(name), ID(id), Visible(visible), Seperator(seperator), Callback(callback) {}
+		HLAPI MenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible = true, bool separator = false)
+			: Name(name), ID(id), Visible(visible), Separator(separator), Callback(callback) {}
 
 	};
 }

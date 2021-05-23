@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Engine/Core/HLCore.h"
 #include "Engine/Core/DataTypes/HLString.h"
 #include "ECS_Registry.h"
@@ -18,15 +19,16 @@ namespace highlo
 		TransformComponent* _TransformComponent;
 
 		template <typename T>
-		T* AddComponent()
+		HLAPI T* AddComponent()
 		{
 			return ECS_Registry::Get().AddComponent<T>(ID);
 		}
 
 		template <typename T>
-		T* GetComponent()
+		HLAPI T* GetComponent()
 		{
 			return ECS_Registry::Get().GetComponent<T>(ID);
 		}
 	};
 }
+

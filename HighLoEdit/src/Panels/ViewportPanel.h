@@ -9,18 +9,19 @@ public:
 
 	virtual void Initialize(uint32 width, uint32 height) override;
 	virtual void Destroy() override;
+	virtual void Update(Timestep ts) override;
 	virtual void Render(Timestep ts) override;
-	virtual void RenderUI(Timestep ts) override;
 	virtual void OnEvent(Event &e) override;
 	virtual void OnResize(uint32 width, uint32 height) override;
+
+	virtual bool IsMouseOver() const override { return m_ViewportPanelMouseOver; }
+	virtual bool IsSelected() const override { return m_ViewportPanelFocused; }
 
 	const glm::vec2 &GetViewportMinBounds() const { return m_ViewportBounds[0]; }
 	const glm::vec2 &GetViewportMaxBounds() const { return m_ViewportBounds[1]; }
 	uint32 GetViewportWidth() const { return m_ViewportWidth; }
 	uint32 GetViewportHeight() const { return m_ViewportHeight; }
 	bool AreCameraEventsAllowed() const { return m_AllowViewportCameraEvents; }
-	bool IsMouseOverViewport() const { return m_ViewportPanelMouseOver; }
-	bool IsViewportFocused() const { return m_ViewportPanelFocused; }
 
 	std::pair<float, float> GetMouseViewportSpace();
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my);

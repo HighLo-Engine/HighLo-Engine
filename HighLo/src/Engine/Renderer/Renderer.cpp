@@ -138,7 +138,7 @@ namespace highlo
 		s_RenderingAPI->Init();
 		CoreRenderer::Init();
 		Renderer2D::Init();
-		ImGuiRenderer::Init(window);
+		ImGuiRenderer::Init(window, ImGuiWindowStyle::Dark);
 	}
 
 	void Renderer::Shutdown()

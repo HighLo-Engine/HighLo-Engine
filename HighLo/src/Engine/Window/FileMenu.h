@@ -17,7 +17,7 @@ namespace highlo
 		HLAPI virtual void AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, MenuItemCallback callback, bool visible = true) = 0;
 		
 		HLAPI virtual void AddSubMenu(const Ref<FileMenu> &other) = 0;
-		HLAPI virtual void AddMenuSeperator() = 0;
+		HLAPI virtual void AddSeparator() = 0;
 
 		HLAPI virtual void *GetMenuHandle() = 0;
 		HLAPI virtual void *GetMenuHandle() const = 0;

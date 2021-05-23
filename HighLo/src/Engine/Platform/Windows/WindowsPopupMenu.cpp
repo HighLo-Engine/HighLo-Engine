@@ -47,7 +47,8 @@ namespace highlo
 		item.ID = id;
 		item.Callback = callback;
 		item.Visible = visible;
-		item.Seperator = false;
+		item.Separator = false;
+		item.IsSubmenu = false;
 		m_MenuItems.push_back(item);
 
 		if (visible)
@@ -56,23 +57,36 @@ namespace highlo
 			InsertMenuW(m_NativeHandle, s_LastPosition, MF_BYPOSITION | MF_STRING | MNS_NOTIFYBYPOS | MF_GRAYED, id, name.W_Str());
 	}
 	
-	void WindowsPopupMenu::AddSeperator()
+	void WindowsPopupMenu::AddSeparator()
 	{
 		++s_LastPosition;
 		InsertMenuW(m_NativeHandle, s_LastPosition, MF_SEPARATOR, 0, NULL);
+
+		PopupMenuItem item;
+		item.Name = "";
+		item.ID = -1;
+		item.Callback = nullptr;
+		item.Visible = true;
+		item.Separator = true;
+		item.IsSubmenu = false;
+		m_MenuItems.push_back(item);
 	}
 	
 	void WindowsPopupMenu::AddSubMenu(const Ref<PopupMenu> &menu)
 	{
-		HMENU item = (HMENU)menu->GetPopupMenuHandle();
+		HMENU popupitem = (HMENU)menu->GetPopupMenuHandle();
 		++s_LastPosition;
-		
-		// Copy Menu Items of other menu
-		std::vector<PopupMenuItem> items = menu->GetMenuItems();
-		for (PopupMenuItem item : items)
-			m_MenuItems.push_back(item);
+		InsertMenuW(m_NativeHandle, s_LastPosition, MF_STRING | MF_POPUP | MNS_NOTIFYBYPOS, (UINT_PTR)popupitem, menu->GetName().W_Str());
 
-		InsertMenuW(m_NativeHandle, s_LastPosition, MF_STRING | MF_POPUP | MNS_NOTIFYBYPOS, (UINT_PTR) item, menu->GetName().W_Str());
+		PopupMenuItem item;
+		item.Name = menu->GetName();
+		item.ID = -1;
+		item.Callback = nullptr;
+		item.Visible = true;
+		item.Separator = false;
+		item.IsSubmenu = true;
+		item.SubMenuItems = menu->GetMenuItems();
+		m_MenuItems.push_back(item);
 	}
 	
 	void WindowsPopupMenu::Update()

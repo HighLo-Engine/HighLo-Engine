@@ -11,13 +11,16 @@ namespace highlo
 		HLString Name = "DefaultPopupMenuItem";
 		int32 ID = 0;
 		bool Visible = true;
-		bool Seperator = false;
+		bool Separator = false;
+		bool IsSubmenu = false;
 		PopupItemCallback Callback = nullptr;
+
+		std::vector<PopupMenuItem> SubMenuItems;
 
 		HLAPI PopupMenuItem() = default;
 		HLAPI PopupMenuItem(const PopupMenuItem&) = default;
 
-		HLAPI PopupMenuItem(const HLString &name, int32 id, PopupItemCallback callback, bool visible = true, bool seperator = false)
-			: Name(name), ID(id), Callback(callback), Visible(visible), Seperator(seperator) {}
+		HLAPI PopupMenuItem(const HLString &name, int32 id, PopupItemCallback callback, bool visible = true, bool separator = false)
+			: Name(name), ID(id), Callback(callback), Visible(visible), Separator(separator) {}
 	};
 }

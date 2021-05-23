@@ -64,8 +64,9 @@ namespace highlo
 		item.Shortcut = shortcut;
 		item.ID = id;
 		item.Visible = visible;
-		item.Seperator = false;
+		item.Separator = false;
 		item.Callback = callback;
+		item.IsSubmenu = false;
 		m_MenuItems.push_back(item);
 
 		HLString realName = "";
@@ -82,17 +83,22 @@ namespace highlo
 	
 	void WindowsFileMenu::AddSubMenu(const Ref<FileMenu> &other)
 	{
-		HMENU menuItem = (HMENU) other->GetMenuHandle();
-		AppendMenuW(m_NativeHandle, MF_POPUP, (UINT_PTR) menuItem, other->GetName().W_Str());
+		HMENU menuItem = (HMENU)other->GetMenuHandle();
+		AppendMenuW(m_NativeHandle, MF_POPUP, (UINT_PTR)menuItem, other->GetName().W_Str());
 
-		std::vector<MenuItem> otherMenuItems = other->GetMenuItems();
-		for (int32 i = 0; i < otherMenuItems.size(); ++i)
-		{
-			m_MenuItems.push_back(otherMenuItems[i]);
-		}
+		MenuItem item;
+		item.Name = other->GetName();
+		item.Shortcut = "";
+		item.ID = -1;
+		item.Visible = true;
+		item.Separator = true;
+		item.Callback = nullptr;
+		item.IsSubmenu = true;
+		item.SubmenuItems = other->GetMenuItems();
+		m_MenuItems.push_back(item);
 	}
 	
-	void WindowsFileMenu::AddMenuSeperator()
+	void WindowsFileMenu::AddSeparator()
 	{
 		AppendMenuW(m_NativeHandle, MF_SEPARATOR, 0, NULL);
 
@@ -101,8 +107,9 @@ namespace highlo
 		item.Shortcut = "";
 		item.ID = -1;
 		item.Visible = true;
-		item.Seperator = true;
+		item.Separator = true;
 		item.Callback = nullptr;
+		item.IsSubmenu = false;
 		m_MenuItems.push_back(item);
 	}
 

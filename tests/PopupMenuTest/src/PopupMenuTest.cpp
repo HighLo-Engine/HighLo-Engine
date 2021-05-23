@@ -7,7 +7,7 @@ void PopupMenuTest::OnInitialize()
 	m_PopupMenu = PopupMenu::Create("Testing");
 	m_PopupMenu->AddMenuItem("Test menu item", 1, [=]() { HL_WARN("Clicked first popup menu Item"); });
 	m_PopupMenu->AddMenuItem("Test menu item 2", 2, [=]() { HL_WARN("Clicked second popup menu Item"); });
-	m_PopupMenu->AddSeperator();
+	m_PopupMenu->AddSeparator();
 	m_PopupMenu->AddMenuItem("Test menu item 3", 3, [=]() { HL_WARN("Clicked third popup menu Item"); });
 
 	Ref<PopupMenu> menu = PopupMenu::Create("Testing 2");

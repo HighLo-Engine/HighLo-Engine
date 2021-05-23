@@ -27,7 +27,7 @@ void ViewportPanel::Destroy()
 {
 }
 
-void ViewportPanel::Render(Timestep ts)
+void ViewportPanel::Update(Timestep ts)
 {
 	// Render Framebuffer
 	m_ViewportContent->Bind();
@@ -35,7 +35,9 @@ void ViewportPanel::Render(Timestep ts)
 	Renderer::ClearScreenBuffers();
 	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 
-	m_Camera->Update();
+	if (m_ViewportPanelMouseOver)
+		m_Camera->Update();
+
 	m_Pistol->Update(ts);
 	m_Cowboy->Update(ts);
 	m_Skybox->Render(*m_Camera);
@@ -57,7 +59,7 @@ void ViewportPanel::Render(Timestep ts)
 	m_ViewportContent->Unbind();
 }
 
-void ViewportPanel::RenderUI(Timestep ts)
+void ViewportPanel::Render(Timestep ts)
 {
 	ImGuiRenderer::StartViewport("Viewport");
 

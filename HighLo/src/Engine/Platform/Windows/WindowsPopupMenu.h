@@ -17,7 +17,7 @@ namespace highlo
 		virtual void AddMenuItem(const Ref<PopupMenuItem> &item) override;
 		virtual void AddMenuItem(const PopupMenuItem &item) override;
 		virtual void AddMenuItem(const HLString &name, int32 id, PopupItemCallback callback, bool visible = true) override;
-		virtual void AddSeperator() override;
+		virtual void AddSeparator() override;
 		virtual void AddSubMenu(const Ref<PopupMenu> &menu) override;
 
 		virtual void Update() override;

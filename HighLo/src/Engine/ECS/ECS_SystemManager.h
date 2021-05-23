@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ISystemBase.h"
 
 namespace highlo
@@ -6,8 +7,9 @@ namespace highlo
 	class ECS_SystemManager
 	{
 	public:
+
 		template <typename T>
-		void RegisterSystem(const HLString& name = "")
+		HLAPI void RegisterSystem(const HLString& name = "")
 		{
 			auto instance = Ref<T>::Create();
 			instance->OnCreate(ECS_Registry::Get());
@@ -26,11 +28,13 @@ namespace highlo
 				return nullptr;
 		}
 
-		void Update();
-		void Shutdown();
+		HLAPI void Update();
+		HLAPI void Shutdown();
 
 	private:
+
 		std::map<HLString, Ref<ISystemBase>> m_SystemMappings;
 		std::vector<Ref<ISystemBase>> m_Systems;
 	};
 }
+

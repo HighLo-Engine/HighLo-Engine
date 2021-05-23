@@ -16,6 +16,7 @@ void ViewportPanel::Initialize(uint32 width, uint32 height)
 	// TEMP
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
 	CreatePBRObjects();
+
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
 
@@ -28,17 +29,19 @@ void ViewportPanel::Destroy()
 
 void ViewportPanel::Update(Timestep ts)
 {
+	m_ViewportContent->Resize(m_ViewportWidth, m_ViewportHeight);
+
 	// Render Framebuffer
 	m_ViewportContent->Bind();
+
+	m_Pistol->Update(ts);
+	m_Cowboy->Update(ts);
+
+	m_Camera->Update();
 
 	Renderer::ClearScreenBuffers();
 	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 
-	if (m_ViewportPanelMouseOver)
-		m_Camera->Update();
-
-	m_Pistol->Update(ts);
-	m_Cowboy->Update(ts);
 	m_Skybox->Render(*m_Camera);
 	CoreRenderer::BeginScene(*m_Camera, m_Light);
 
@@ -67,6 +70,8 @@ void ViewportPanel::Render(Timestep ts)
 
 	auto viewportOffset = ImGuiRenderer::GetCursorPosition(); // Includes tab bar
 	auto viewportSize = ImGuiRenderer::GetContentRegion();
+	m_ViewportWidth = (uint32)viewportSize.x;
+	m_ViewportHeight = (uint32)viewportSize.y;
 	if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
 	{
 		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), viewportSize.x, viewportSize.y, 0.1f, 1000.0f));

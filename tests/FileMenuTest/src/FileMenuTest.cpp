@@ -20,6 +20,7 @@ void FileMenuTest::OnInitialize()
 	m_Menubar = MenuBar::Create();
 	m_Menubar->AddMenu(fileMenu);
 	GetWindow().SetMenuBar(m_Menubar);
+	GetWindow().Maximize();
 }
 
 void FileMenuTest::OnUpdate(Timestep timestep)
@@ -37,6 +38,9 @@ void FileMenuTest::OnEvent(Event &e)
 
 void FileMenuTest::OnUIRender(Timestep timestep)
 {
+	ImGuiRenderer::StartWindow("RootWindow", true, true);
+	ImGuiRenderer::DrawMenu(m_Menubar);
+	ImGuiRenderer::EndWindow();
 }
 
 void FileMenuTest::OnResize(uint32 width, uint32 height)

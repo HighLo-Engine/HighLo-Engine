@@ -67,6 +67,7 @@ namespace highlo
 		HLAPI virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const = 0;
 		HLAPI virtual Ref<Texture> GetDepthImage() const = 0;
 
+		HLAPI virtual FramebufferSpecification &GetSpecification() = 0;
 		HLAPI virtual const FramebufferSpecification &GetSpecification() const = 0;
 
 		HLAPI static Ref<Framebuffer> Create(const FramebufferSpecification &spec);

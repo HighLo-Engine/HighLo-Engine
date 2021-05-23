@@ -32,6 +32,7 @@ namespace highlo
 
 		inline virtual HLRendererID GetRendererID() const override { return m_RendererID; }
 
+		inline virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
 		inline virtual const FramebufferSpecification &GetSpecification() const override { return m_Specification; }
 
 	private:

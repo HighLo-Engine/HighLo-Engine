@@ -2,9 +2,6 @@
 
 void PBRSceneTest::OnInitialize()
 {
-	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
-	VirtualFileSystem::Get()->Mount("models", "assets/models/");
-
 	Renderer::SetBlendMode(false);
 	m_Camera = Ref<FreeFlyCamera>::Create();
 
@@ -16,6 +13,8 @@ void PBRSceneTest::OnInitialize()
 
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
+	
+	GetWindow().Maximize();
 	HL_TRACE("PBR Demo Initialized");
 }
 

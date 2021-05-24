@@ -31,6 +31,9 @@ public:
 	void SaveScene();
 	void SaveSceneAs();
 
+	void EnableDarkMode(FileMenu *menu, MenuItem *item);
+	void EnableLightMode(FileMenu *menu, MenuItem *item);
+
 	enum class GizmoType
 	{
 		None = 0,

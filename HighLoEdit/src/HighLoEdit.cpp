@@ -55,47 +55,50 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar = MenuBar::Create();
 
 	Ref<FileMenu> importMenu = FileMenu::Create("Import");
-	importMenu->AddMenuItem("Import .obj", "", 42, [=]() { HL_TRACE("Importing obj"); });
-	importMenu->AddMenuItem("Import .fbx", "", 43, [=]() { HL_TRACE("Importing fbx"); });
-	importMenu->AddMenuItem("Import .stl", "", 44, [=]() { HL_TRACE("Importing stl"); });
-	importMenu->AddMenuItem("Import .3ds", "", 45, [=]() { HL_TRACE("Importing 3ds"); });
-	importMenu->AddMenuItem("Import .c4d", "", 46, [=]() { HL_TRACE("Importing c4d"); });
-	importMenu->AddMenuItem("Import .mb", "", 47, [=]() { HL_TRACE("Importing mb"); });
+	importMenu->AddMenuItem("Import .obj", "", 42, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing obj"); });
+	importMenu->AddMenuItem("Import .fbx", "", 43, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing fbx"); });
+	importMenu->AddMenuItem("Import .stl", "", 44, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing stl"); });
+	importMenu->AddMenuItem("Import .3ds", "", 45, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing 3ds"); });
+	importMenu->AddMenuItem("Import .c4d", "", 46, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing c4d"); });
+	importMenu->AddMenuItem("Import .mb", "", 47, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing mb"); });
 	Ref<FileMenu> exportMenu = FileMenu::Create("Export");
-	exportMenu->AddMenuItem("Export .obj", "", 48, [=]() { HL_TRACE("Exporting obj"); });
-	exportMenu->AddMenuItem("Export .fbx", "", 49, [=]() { HL_TRACE("Exporting fbx"); });
-	exportMenu->AddMenuItem("Export .stl", "", 50, [=]() { HL_TRACE("Exporting stl"); });
+	exportMenu->AddMenuItem("Export .obj", "", 48, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting obj"); });
+	exportMenu->AddMenuItem("Export .fbx", "", 49, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting fbx"); });
+	exportMenu->AddMenuItem("Export .stl", "", 50, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting stl"); });
 	exportMenu->AddSeparator();
-	exportMenu->AddMenuItem("Export .mp4", "", 51, [=]() { HL_TRACE("Exporting mp4"); });
-	exportMenu->AddMenuItem("Export .avi", "", 52, [=]() { HL_TRACE("Exporting avi"); });
-	exportMenu->AddMenuItem("Export .mov", "", 53, [=]() { HL_TRACE("Exporting mov"); });
+	exportMenu->AddMenuItem("Export .mp4", "", 51, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mp4"); });
+	exportMenu->AddMenuItem("Export .avi", "", 52, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting avi"); });
+	exportMenu->AddMenuItem("Export .mov", "", 53, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mov"); });
 
 	Ref<FileMenu> fileMenu = FileMenu::Create("File");
-	fileMenu->AddMenuItem("New Scene", "Strg+N", 1, [=]() { NewScene(); });
-	fileMenu->AddMenuItem("Open Scene...", "Strg+O", 2, [=]() { OpenScene(); });
+	fileMenu->AddMenuItem("New Scene", "Strg+N", 1, [=](FileMenu *menu, MenuItem *item) { NewScene(); });
+	fileMenu->AddMenuItem("Open Scene...", "Strg+O", 2, [=](FileMenu *menu, MenuItem *item) { OpenScene(); });
 	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Save Scene", "Strg+S", 3, [=]() { SaveScene(); }, false);
-	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", 4, [=]() { SaveSceneAs(); });
+	fileMenu->AddMenuItem("Save Scene", "Strg+S", 3, [=](FileMenu *menu, MenuItem *item) { SaveScene(); }, false);
+	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", 4, [=](FileMenu *menu, MenuItem *item) { SaveSceneAs(); });
 	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Settings", "", 5, [=]() { HL_TRACE("Settings..."); });
+	fileMenu->AddMenuItem("Settings", "", 5, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Settings..."); });
 	fileMenu->AddSeparator();
 	fileMenu->AddSubMenu(importMenu);
 	fileMenu->AddSubMenu(exportMenu);
 	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", 6, [=]() { Close(); });
+	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", 6, [=](FileMenu *menu, MenuItem *item) { Close(); });
 	
 	Ref<FileMenu> editMenu = FileMenu::Create("Edit");
-	editMenu->AddMenuItem("Undo", "Strg+Z", 7, [=]() { HL_TRACE("Undo..."); });
-	editMenu->AddMenuItem("Redo", "Strg+Y", 8, [=]() { HL_TRACE("Redo..."); });
+	editMenu->AddMenuItem("Undo", "Strg+Z", 7, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Undo..."); });
+	editMenu->AddMenuItem("Redo", "Strg+Y", 8, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Redo..."); });
 	editMenu->AddSeparator();
 
 	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
-	windowMenu->AddMenuItem("Set Dark Theme", "", 9, [=]() { ImGuiRenderer::SetDarkThemeColors(); });
-	windowMenu->AddMenuItem("Set Light Theme", "", 10, [=]() { ImGuiRenderer::SetLightThemeColors(); });
+	bool darkThemeActive = ImGuiRenderer::GetCurrentWindowStyle() == ImGuiWindowStyle::Dark;
+	bool lightThemeActive = ImGuiRenderer::GetCurrentWindowStyle() == ImGuiWindowStyle::Light;
+
+	windowMenu->AddMenuItem("Set Dark Theme", "", 9, [=](FileMenu *menu, MenuItem *item) { EnableDarkMode(menu, item); }, !darkThemeActive);
+	windowMenu->AddMenuItem("Set Light Theme", "", 10, [=](FileMenu *menu, MenuItem *item) { EnableLightMode(menu, item); }, !lightThemeActive);
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
-	helpMenu->AddMenuItem("About HighLo", "", 11, [=]() { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
-	helpMenu->AddMenuItem("Documentation", "", 12, [=]() { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
+	helpMenu->AddMenuItem("About HighLo", "", 11, [=](FileMenu *menu, MenuItem *item) { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
+	helpMenu->AddMenuItem("Documentation", "", 12, [=](FileMenu *menu, MenuItem *item) { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
 
 	m_MenuBar->AddMenu(fileMenu);
 	m_MenuBar->AddMenu(editMenu);
@@ -298,6 +301,20 @@ void HighLoEditor::SaveSceneAs()
 	{
 		// Serialize scene
 	}
+}
+
+void HighLoEditor::EnableDarkMode(FileMenu *menu, MenuItem *item)
+{
+	ImGuiRenderer::SetDarkThemeColors();
+	menu->EnableMenuItem(item->ID, false);
+	menu->EnableMenuItem(item->ID + 1, true);
+}
+
+void HighLoEditor::EnableLightMode(FileMenu *menu, MenuItem *item)
+{
+	ImGuiRenderer::SetLightThemeColors();
+	menu->EnableMenuItem(item->ID, false);
+	menu->EnableMenuItem(item->ID - 1, true);
 }
 
 bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)

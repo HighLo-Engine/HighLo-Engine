@@ -4,7 +4,10 @@
 
 namespace highlo
 {
-	using MenuItemCallback = std::function<void()>;
+	struct MenuItem;
+	class FileMenu;
+
+	using MenuItemCallback = std::function<void(FileMenu*, MenuItem*)>;
 
 	struct MenuItem
 	{

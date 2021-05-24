@@ -36,11 +36,13 @@ namespace highlo
 
     static int32 s_CheckboxCount = 0;
     static bool s_WindowIsActive = false;
+    static ImGuiWindowStyle s_ImGuiWindowStyle = ImGuiWindowStyle::None;
 
     void ImGuiRenderer::Init(Window* window, ImGuiWindowStyle windowStyle)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        s_ImGuiWindowStyle = windowStyle;
 
         ImGuiIO &io = ImGui::GetIO();
         io.IniFilename = "editorconfig.ini"; // rename imgui.ini to editorconfig to hide the usage from imgui
@@ -508,7 +510,7 @@ namespace highlo
         if (ImGui::BeginMenuBar())
         {
             for (int32 i = 0; i < fileMenus.size(); ++i)
-                DrawFileMenuInternal(fileMenus[i]->GetName(), fileMenus[i]->GetMenuItems());
+                DrawFileMenuInternal(fileMenus[i]);
 
             ImGui::EndMenuBar();
         }
@@ -786,6 +788,7 @@ namespace highlo
     {
         auto &colors = ImGui::GetStyle().Colors;
         ImGuiStyle *style = &ImGui::GetStyle();
+        s_ImGuiWindowStyle = ImGuiWindowStyle::Dark;
 
         float hspacing = 8.0f;
         float vspacing = 6.0f;
@@ -878,6 +881,7 @@ namespace highlo
     {
         auto &colors = ImGui::GetStyle().Colors;
         ImGuiStyle *style = &ImGui::GetStyle();
+        s_ImGuiWindowStyle = ImGuiWindowStyle::Light;
 
         float hspacing = 8.0f;
         float vspacing = 6.0f;
@@ -983,6 +987,11 @@ namespace highlo
 
     }
 
+    ImGuiWindowStyle ImGuiRenderer::GetCurrentWindowStyle()
+    {
+        return s_ImGuiWindowStyle;
+    }
+
     void ImGuiRenderer::UseDefaultFont()
     {
         ImGuiIO &io = ImGui::GetIO();
@@ -995,15 +1004,16 @@ namespace highlo
         ImGui::SetCurrentFont(io.Fonts->Fonts[1]);
     }
     
-    void ImGuiRenderer::DrawFileMenuInternal(const HLString &menuName, const std::vector<MenuItem> &items)
+    void ImGuiRenderer::DrawFileMenuInternal(Ref<FileMenu> &menu)
     {
-        if (ImGui::BeginMenu(*menuName))
+        if (ImGui::BeginMenu(*menu->GetName()))
         {
+            const std::vector<MenuItem> items = menu->GetMenuItems();
             for (int32 i = 0; i < items.size(); ++i)
             {
                 MenuItem currentItem = items[i];
                 if (currentItem.IsSubmenu)
-                    DrawFileMenuInternal(currentItem.Name, currentItem.SubmenuItems);
+                    DrawFileSubMenuInternal(menu, currentItem.Name, currentItem.SubmenuItems);
 
                 if (currentItem.Separator)
                 {
@@ -1012,13 +1022,38 @@ namespace highlo
                 }
 
                 if (ImGui::MenuItem(*currentItem.Name, *currentItem.Shortcut, false, currentItem.Visible))
-                    currentItem.Callback();
+                    currentItem.Callback(menu.Get(), &currentItem);
+
             }
 
             ImGui::EndMenu();
         }
     }
     
+    void ImGuiRenderer::DrawFileSubMenuInternal(Ref<FileMenu> &parentMenu, const HLString &menuName, const std::vector<MenuItem> &items)
+    {
+        if (ImGui::BeginMenu(*menuName))
+        {
+            for (int32 i = 0; i < items.size(); ++i)
+            {
+                MenuItem currentItem = items[i];
+                if (currentItem.IsSubmenu)
+                    DrawFileSubMenuInternal(parentMenu, currentItem.Name, currentItem.SubmenuItems);
+
+                if (currentItem.Separator)
+                {
+                    ImGui::Separator();
+                    continue;
+                }
+
+                if (ImGui::MenuItem(*currentItem.Name, *currentItem.Shortcut, false, currentItem.Visible))
+                    currentItem.Callback(parentMenu.Get(), &currentItem);
+            }
+
+            ImGui::EndMenu();
+        }
+    }
+
     void ImGuiRenderer::DrawPopupMenuInternal(const HLString &menuName, const std::vector<PopupMenuItem> &items)
     {
         if (ImGui::GetIO().MouseClicked[1])

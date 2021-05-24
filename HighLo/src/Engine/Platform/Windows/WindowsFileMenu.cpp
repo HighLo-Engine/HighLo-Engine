@@ -115,6 +115,12 @@ namespace highlo
 
 	bool WindowsFileMenu::EnableMenuItem(int32 id, bool bEnabled)
 	{
+		for (int32 i = 0; i < m_MenuItems.size(); ++i)
+		{
+			if (id == m_MenuItems[i].ID)
+				m_MenuItems[i].Visible = bEnabled;
+		}
+
 		if (bEnabled)
 			return ::EnableMenuItem(m_NativeHandle, id, MF_ENABLED);
 		else

@@ -110,6 +110,7 @@ namespace highlo
 
 		HLAPI static void SetDarkThemeColors();
 		HLAPI static void SetLightThemeColors();
+		HLAPI static ImGuiWindowStyle GetCurrentWindowStyle();
 
 		HLAPI static void UseDefaultFont();
 		HLAPI static void UseBoldFont();
@@ -125,7 +126,8 @@ namespace highlo
 		static void DisplayCustomConsole();
 		static HLString GenerateID(const HLString &name);
 
-		static void DrawFileMenuInternal(const HLString &menuName, const std::vector<MenuItem> &items);
+		static void DrawFileMenuInternal(Ref<FileMenu> &menu);
+		static void DrawFileSubMenuInternal(Ref<FileMenu> &parentMenu, const HLString &menuName, const std::vector<MenuItem> &items);
 		static void DrawPopupMenuInternal(const HLString &menuName, const std::vector<PopupMenuItem> &items);
 	};
 }

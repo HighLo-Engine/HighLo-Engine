@@ -48,7 +48,7 @@ namespace highlo
 			{
 				if (eventID == menuItems[j].ID)
 				{
-					menuItems[j].Callback();
+					menuItems[j].Callback(m_Menus[i].Get(), &menuItems[j]);
 					return true;
 				}
 			}

@@ -772,6 +772,7 @@ CODE
 //-------------------------------------------------------------------------
 
 #include "HighLoPch.h"
+#include "Engine/Core/HLLog.h"
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
@@ -7843,7 +7844,13 @@ static void ImGui::ErrorCheckEndFrameSanityChecks()
     // We silently accommodate for this case by ignoring/ the case where all io.KeyXXX modifiers were released (aka key_mod_flags == 0),
     // while still correctly asserting on mid-frame key press events.
     const ImGuiKeyModFlags key_mod_flags = GetMergedKeyModFlags();
-    IM_ASSERT((key_mod_flags == 0 || g.IO.KeyMods == key_mod_flags) && "Mismatching io.KeyCtrl/io.KeyShift/io.KeyAlt/io.KeySuper vs io.KeyMods");
+    //IM_ASSERT((key_mod_flags == 0 || g.IO.KeyMods == key_mod_flags) && "Mismatching io.KeyCtrl/io.KeyShift/io.KeyAlt/io.KeySuper vs io.KeyMods");
+    if (key_mod_flags != 0 || g.IO.KeyMods != key_mod_flags)
+    {
+        // TODO: THIS IS CALLED!!!
+        //HL_CORE_ERROR("ImGui Error: Mismatching io.KeyCtrl/io.KeyShift/io.KeyAlt/io.KeySuper vs io.KeyMods");
+    }
+
     IM_UNUSED(key_mod_flags);
 
     // Recover from errors

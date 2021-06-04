@@ -112,14 +112,7 @@ bool    ImGui_ImplWin32_Init(void* hwnd, void* context)
     g_focused_hWnd = g_hWnd;
 
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
         ImGui_ImplWin32_InitPlatformInterface();
-    }
-    else
-    {
-        ImGuiViewport *main_viewport = ImGui::GetMainViewport();
-        main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = (void*)g_hWnd;
-    }
 
     // Keyboard mapping. Dear ImGui will use those indices to peek into the io.KeysDown[] array that we will update during the application lifetime.
     io.KeyMap[ImGuiKey_Tab] = VK_TAB;
@@ -171,7 +164,6 @@ bool    ImGui_ImplWin32_Init(void* hwnd, void* context)
 void    ImGui_ImplWin32_Shutdown()
 {
     ImGui_ImplWin32_ShutdownPlatformInterface();
-    g_hWnd = (HWND)0;
 
     // Unload XInput library
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
@@ -633,24 +625,24 @@ static void ImGui_ImplWin32_RenderWindow(ImGuiViewport* viewport, void*)
     {
         data->Hdc = GetDC(data->Hwnd);
         PIXELFORMATDESCRIPTOR pfd =
-            {
-                sizeof(PIXELFORMATDESCRIPTOR),
-                1,
-                PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
-                PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
-                32,                   // Colordepth of the framebuffer.
-                0, 0, 0, 0, 0, 0,
-                0,
-                0,
-                0,
-                0, 0, 0, 0,
-                24,                   // Number of bits for the depthbuffer
-                8,                    // Number of bits for the stencilbuffer
-                0,                    // Number of Aux buffers in the framebuffer.
-                PFD_MAIN_PLANE,
-                0,
-                0, 0, 0
-            };
+        {
+            sizeof(PIXELFORMATDESCRIPTOR),
+            1,
+            PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
+            PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+            32,                   // Colordepth of the framebuffer.
+            0, 0, 0, 0, 0, 0,
+            0,
+            0,
+            0,
+            0, 0, 0, 0,
+            24,                   // Number of bits for the depthbuffer
+            8,                    // Number of bits for the stencilbuffer
+            0,                    // Number of Aux buffers in the framebuffer.
+            PFD_MAIN_PLANE,
+            0,
+            0, 0, 0
+        };
         int iPixelFormat = ChoosePixelFormat(data->Hdc, &pfd);
         SetPixelFormat(data->Hdc, iPixelFormat, &pfd);
     }
@@ -741,8 +733,8 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
     wglMakeCurrent(data->Hdc, data->HgLrc);
     SwapBuffers(data->Hdc);
     wglShareLists(g_context, data->HgLrc);
- //   ImGui_ImplWin32_SetWindowFocus(viewport);
- //   ImGui_ImplWin32_ShowWindow(viewport);
+    ImGui_ImplWin32_SetWindowFocus(viewport);
+    ImGui_ImplWin32_ShowWindow(viewport);
 
     //Set it as our focused window.
     g_focused_hWnd = data->Hwnd;
@@ -870,8 +862,6 @@ static bool ImGui_ImplWin32_GetWindowFocus(ImGuiViewport* viewport)
 {
     ImGuiViewportDataWin32* data = (ImGuiViewportDataWin32*)viewport->PlatformUserData;
     IM_ASSERT(data->Hwnd != 0);
-    ImDrawList* list = ImGui::GetBackgroundDrawList(viewport);
-    //return g_focused_hWnd == data->Hwnd;
     return ::GetForegroundWindow() == data->Hwnd;
 }
 
@@ -980,12 +970,12 @@ static BOOL CALLBACK ImGui_ImplWin32_UpdateMonitors_EnumFunc(HMONITOR monitor, H
     if (!::GetMonitorInfo(monitor, &info))
         return TRUE;
     ImGuiPlatformMonitor imgui_monitor;
-    imgui_monitor.MainPos = ImVec2((float)info.rcMonitor.left, (float)info.rcMonitor.top);
-    imgui_monitor.MainSize = ImVec2((float)(info.rcMonitor.right - info.rcMonitor.left), (float)(info.rcMonitor.bottom - info.rcMonitor.top));
-    imgui_monitor.WorkPos = ImVec2((float)info.rcWork.left, (float)info.rcWork.top);
-    imgui_monitor.WorkSize = ImVec2((float)(info.rcWork.right - info.rcWork.left), (float)(info.rcWork.bottom - info.rcWork.top));
+    imgui_monitor.MainPos = ImVec2((float) info.rcMonitor.left, (float) info.rcMonitor.top);
+    imgui_monitor.MainSize = ImVec2((float) (info.rcMonitor.right - info.rcMonitor.left), (float) (info.rcMonitor.bottom - info.rcMonitor.top));
+    imgui_monitor.WorkPos = ImVec2((float) info.rcWork.left, (float) info.rcWork.top);
+    imgui_monitor.WorkSize = ImVec2((float) (info.rcWork.right - info.rcWork.left), (float) (info.rcWork.bottom - info.rcWork.top));
     imgui_monitor.DpiScale = ImGui_ImplWin32_GetDpiScaleForMonitor(monitor);
-    ImGuiPlatformIO& io = ImGui::GetPlatformIO();
+    ImGuiPlatformIO &io = ImGui::GetPlatformIO();
     if (info.dwFlags & MONITORINFOF_PRIMARY)
         io.Monitors.push_front(imgui_monitor);
     else
@@ -1038,7 +1028,6 @@ static void ImGui_ImplWin32_InitPlatformInterface()
     platform_io.Platform_OnChangedViewport = ImGui_ImplWin32_OnChangedViewport; // FIXME-DPI
     platform_io.Platform_RenderWindow = ImGui_ImplWin32_RenderWindow;
     platform_io.Platform_SwapBuffers = ImGui_ImplWin32_SwapBuffers;
-    //platform_io.Platform_HasOwner = ImGui_ImplWin32_ViewportHasOwner;
 #if HAS_WIN32_IME
     platform_io.Platform_SetImeInputPos = ImGui_ImplWin32_SetImeInputPos;
 #endif

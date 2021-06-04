@@ -32,7 +32,7 @@ namespace highlo
 	class ImGuiRenderer
 	{
 	public:
-		HLAPI static void Init(Window* window, ImGuiWindowStyle windowStyle = ImGuiWindowStyle::Dark);
+		HLAPI static void Init(Window *window, ImGuiWindowStyle windowStyle = ImGuiWindowStyle::Dark);
 		HLAPI static void Shutdown();
 
 		HLAPI static void StartScene();
@@ -66,15 +66,15 @@ namespace highlo
 		HLAPI static void NewLine();
 		HLAPI static void Separator();
 		HLAPI static void SameLine();
-		HLAPI static void Text(const HLString& text);
-		HLAPI static void SliderInt(const HLString& text, int32 &val, int32 min, int32 max);
-		HLAPI static void SliderFloat(const HLString& text, float& val, float min, float max);
-		HLAPI static bool Button(const HLString& text, float width = 0, float height = 0);
-		HLAPI static bool Combobox(const HLString& text, std::vector<HLString> &items, int32 &selected_index);
-		HLAPI static bool Checkbox(const HLString& text, bool &checked);
-		HLAPI static void InputText(const HLString& label, const HLString &text);
-		HLAPI static void ColorPicker(const HLString& label, glm::vec3 &color);
-		HLAPI static void ColorPicker(const HLString& label, glm::vec4 &color);
+		HLAPI static void Text(const HLString &text);
+		HLAPI static void SliderInt(const HLString &text, int32 &val, int32 min, int32 max);
+		HLAPI static void SliderFloat(const HLString &text, float &val, float min, float max);
+		HLAPI static bool Button(const HLString &text, float width = 0, float height = 0);
+		HLAPI static bool Combobox(const HLString &text, std::vector<HLString> &items, int32 &selected_index);
+		HLAPI static bool Checkbox(const HLString &text, bool &checked);
+		HLAPI static void InputText(const HLString &label, const HLString &text);
+		HLAPI static void ColorPicker(const HLString &label, glm::vec3 &color);
+		HLAPI static void ColorPicker(const HLString &label, glm::vec4 &color);
 
 		HLAPI static bool Property(const HLString &name, bool &value);
 		HLAPI static bool Property(const HLString &name, float &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::Slider);
@@ -107,6 +107,7 @@ namespace highlo
 		HLAPI static bool IsMouseHoveringRect(const glm::vec2 &min, const glm::vec2 &max);
 		HLAPI static bool IsMouseOverGizmo();
 		HLAPI static bool IsUsingGizmo();
+		HLAPI static bool IsItemHovered();
 
 		HLAPI static void SetDarkThemeColors();
 		HLAPI static void SetLightThemeColors();

@@ -16,8 +16,8 @@ namespace highlo
 		ECS_Registry();
 
 	public:
-		HLAPI static ECS_Registry& Get();
 
+		HLAPI static ECS_Registry& Get();
 		HLAPI EntityID GenerateEntityID();
 
 		template <typename T>
@@ -70,6 +70,32 @@ namespace highlo
 					return std::any_cast<T>(&m_Components[type][comp_info.second].second);
 
 			return nullptr;
+		}
+
+		template <typename T>
+		HLAPI bool HasComponent(EntityID entityID)
+		{
+			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
+				return false;
+
+			return true;
+		}
+
+		template <typename T>
+		HLAPI void RemoveComponent(EntityID entityID)
+		{
+			auto &type = std::type_index(typeid(T));
+			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
+				return; // No component with this entityID
+
+			for (auto &comp_info : m_EntityComponents[entityID])
+			{
+				if (comp_info.first == type)
+				{
+					// We found the component to delete
+					// TODO @FlareCoding
+				}
+			}
 		}
 
 		template <typename T>

@@ -180,7 +180,7 @@ void HighLoEditor::OnEvent(Event &e)
 	}
 	else if (m_SceneState == SceneState::Play)
 	{
-		// TODO: call RuntimeScene onEvent
+		m_RuntimeScene->OnEvent(e);
 	}
 }
 
@@ -420,6 +420,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 					break;
 
 				Entity selectedEntity = m_SelectionContext[0].m_Entity;
+				// TODO
 				break;
 			}
 		}
@@ -489,8 +490,8 @@ void HighLoEditor::OnScenePlay()
 
 	m_RuntimeScene = Ref<Scene>::Create();
 	
-	//m_EditorScene->CopyTo(m_RuntimeScene);
-	//m_RuntimeScene->OnRuntimeStart();
+	m_EditorScene->CopyTo(m_RuntimeScene);
+	m_RuntimeScene->OnRuntimeStart();
 	//m_SceneHierarchy->SetContext(m_RuntimeScene);
 	
 	m_CurrentScene = m_RuntimeScene;
@@ -498,7 +499,7 @@ void HighLoEditor::OnScenePlay()
 
 void HighLoEditor::OnSceneStop()
 {
-	//m_RuntimeScene->OnRuntimeStop();
+	m_RuntimeScene->OnRuntimeStop();
 	m_SceneState = SceneState::Edit;
 
 	// Unload runtime scene
@@ -516,16 +517,16 @@ void HighLoEditor::OnSceneStartSimulation()
 	m_SceneState = SceneState::Simulate;
 
 	m_SimulationScene = Ref<Scene>::Create();
-	//m_EditorScene->CopyTo(m_SimulationScene);
+	m_EditorScene->CopyTo(m_SimulationScene);
 
-	//m_SimulationScene->OnSimulationStart();
+	m_SimulationScene->OnSimulationStart();
 	//m_SceneHierarchy->SetContext(m_SimulationScene);
 	m_CurrentScene = m_SimulationScene;
 }
 
 void HighLoEditor::OnSceneEndSimulation()
 {
-	//m_SimulationScene->OnSimulationEnd();
+	m_SimulationScene->OnSimulationEnd();
 	m_SceneState = SceneState::Edit;
 
 	m_SimulationScene = nullptr;

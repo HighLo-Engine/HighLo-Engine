@@ -58,8 +58,8 @@ namespace highlo
 		HLAPI HLString &Reverse();
 		HLAPI HLString Substr(uint32 beginIndex, uint32 endIndex = 0) const;
 
-		HLAPI const HLString &ToLower() const;
-		HLAPI const HLString &ToUpper() const;
+		HLAPI const HLString &ToLowerCase() const;
+		HLAPI const HLString &ToUpperCase() const;
 
 		HLAPI void Print() const;
 

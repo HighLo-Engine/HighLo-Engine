@@ -38,7 +38,7 @@ namespace highlo
     static bool s_WindowIsActive = false;
     static ImGuiWindowStyle s_ImGuiWindowStyle = ImGuiWindowStyle::None;
 
-    void ImGuiRenderer::Init(Window* window, ImGuiWindowStyle windowStyle)
+    void ImGuiRenderer::Init(Window *window, ImGuiWindowStyle windowStyle)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -366,12 +366,12 @@ namespace highlo
         ImGui::InputText(*label, (char*)&(*text)[0], text.Length());
     }
 
-    void ImGuiRenderer::ColorPicker(const HLString& label, glm::vec3& color)
+    void ImGuiRenderer::ColorPicker(const HLString &label, glm::vec3 &color)
     {
         ImGui::ColorPicker3(label.C_Str(), &color[0], ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip);
     }
 
-    void ImGuiRenderer::ColorPicker(const HLString& label, glm::vec4& color)
+    void ImGuiRenderer::ColorPicker(const HLString &label, glm::vec4 &color)
     {
         ImGui::ColorPicker3(label.C_Str(), &color[0], ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip);
     }
@@ -494,13 +494,23 @@ namespace highlo
     void ImGuiRenderer::DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1)
     {
         HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
+
+        // disable conversion warning (HLRendererID -> ImTextureID)
+    #pragma warning(push)
+    #pragma warning(disable: 4312)
         ImGui::Image((ImTextureID)framebuffer->GetImage()->GetRendererID(), ImVec2(size.x, size.y), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y));
+    #pragma warning(pop)
     }
 
     void ImGuiRenderer::DrawFramebuffer(const Ref<Framebuffer> &framebuffer, const glm::vec2 &size, const glm::vec2 &uv0, const glm::vec2 &uv1, const glm::vec4 &tintColor, const glm::vec4 &borderColor)
     {
         HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
+
+        // disable conversion warning (HLRendererID -> ImTextureID)
+    #pragma warning(push)
+    #pragma warning(disable: 4312)
         ImGui::Image((ImTextureID)framebuffer->GetImage()->GetRendererID(), ImVec2(size.x, size.y), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y), ImVec4(tintColor.x, tintColor.y, tintColor.z, tintColor.w), ImVec4(borderColor.x, borderColor.y, borderColor.z, borderColor.w));
+    #pragma warning(pop)
     }
 
     void ImGuiRenderer::DrawMenu(const Ref<MenuBar> &menubar)
@@ -730,6 +740,11 @@ namespace highlo
     bool ImGuiRenderer::IsUsingGizmo()
     {
         return ImGuizmo::IsUsing();
+    }
+
+    bool ImGuiRenderer::IsItemHovered()
+    {
+        return ImGui::IsItemHovered();
     }
 
     void ImGuiRenderer::DisplayDebugInformation()

@@ -225,7 +225,7 @@ namespace highlo
             DWORD status = ReadDirectoryChangesW(
                 handle,
                 &buffer[0],
-                buffer.size(),
+                (DWORD)buffer.size(),
                 TRUE,
                 FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME,
                 &bytesReturned,

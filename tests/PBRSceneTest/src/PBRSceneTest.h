@@ -26,6 +26,7 @@ private:
 	Ref<Mesh> m_Pistol;
 	Ref<Mesh> m_Cowboy;
 
+	uint32 m_VertexCount = 0;
 	std::vector<Ref<Mesh>> m_TestSpheres;
 
 	void CreatePBRObjects();

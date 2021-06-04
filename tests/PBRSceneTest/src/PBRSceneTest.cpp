@@ -34,6 +34,8 @@ void PBRSceneTest::OnUpdate(Timestep timestep)
 	static float y_rot = 0.0f;
 	y_rot += 0.04f * timestep;
 
+	
+
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
 	CoreRenderer::DrawMesh(m_PBR_Gun, Transform::FromPosition({ 26, -6, 26 }).Scale(0.24f).Rotate(y_rot, { 0, 1, 0 }));
@@ -61,6 +63,12 @@ void PBRSceneTest::OnResize(uint32 width, uint32 height)
 
 void PBRSceneTest::OnUIRender(Timestep timestep)
 {
+	HLString text = "Vertices: ";
+	text += HLString::ToString(m_VertexCount);
+
+	ImGuiRenderer::StartViewport("Vertices");
+	ImGuiRenderer::Text(text);
+	ImGuiRenderer::EndViewport();
 }
 
 void PBRSceneTest::CreatePBRObjects()
@@ -75,6 +83,7 @@ void PBRSceneTest::CreatePBRObjects()
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 	m_PBR_Sphere->GetMaterialRenderProperties().Metallic = 1;
 	m_PBR_Sphere->GetMaterialRenderProperties().Roughness = 1;
+	m_VertexCount += m_PBR_Sphere->GetMeshData().m_Vertices.size();
 
 	auto m_PBR_Gun_Model = AssetLoader::LoadStaticModel("assets/models/PBR_AK47.obj");
 	m_PBR_Gun = m_PBR_Gun_Model->GetMesh(0);
@@ -89,6 +98,8 @@ void PBRSceneTest::CreatePBRObjects()
 	m_PBR_Gun->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 	m_PBR_Gun->GetMaterialRenderProperties().Metallic = 1;
 	m_PBR_Gun->GetMaterialRenderProperties().Roughness = 1;
+	m_VertexCount += m_PBR_Gun->GetMeshData().m_Vertices.size();
+
 
 	auto SphereBlueprint = MeshFactory::CreateSphere(1.0f);
 	SphereBlueprint->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
@@ -100,6 +111,7 @@ void PBRSceneTest::CreatePBRObjects()
 		auto newSphere = SphereBlueprint->Copy();
 		newSphere->GetMaterialRenderProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
 		newSphere->GetMaterialRenderProperties().Roughness = 0.1f * i;
+		m_VertexCount += newSphere->GetMeshData().m_Vertices.size();
 
 		if (i == 0)
 		{
@@ -120,6 +132,7 @@ void PBRSceneTest::CreatePBRObjects()
 		auto newSphere = SphereBlueprint->Copy();
 		newSphere->GetMaterialRenderProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
 		newSphere->GetMaterialRenderProperties().Metallic = 0.1f * i;
+		m_VertexCount += newSphere->GetMeshData().m_Vertices.size();
 
 		m_TestSpheres.push_back(newSphere);
 	}
@@ -131,10 +144,12 @@ void PBRSceneTest::CreatePBRObjects()
 	m_Pistol->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
 	m_Pistol->GetMaterialRenderProperties().Roughness = 0.4f;
 	m_Pistol->GetMaterialRenderProperties().Metallic = 0.68f;
+	m_VertexCount += m_Pistol->GetMeshData().m_Vertices.size();
 
 	m_Cowboy = AssetLoader::LoadAnimatedModel("assets/models/Cowboy.fbx", true);
 	m_Cowboy->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Cowboy.png"));
 	m_Cowboy->m_Material->IsUsingPBR = false;
+	m_VertexCount += m_Cowboy->GetMeshData().m_Vertices.size();
 
 	m_Pistol->m_Animation->Play();
 	m_Cowboy->m_Animation->Play();

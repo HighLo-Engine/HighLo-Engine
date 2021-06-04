@@ -15,9 +15,16 @@ namespace highlo
 		Ref<Model> ModelLOD1;
 		Ref<Model> ModelLOD2;
 		bool UseLOD = false;
-		int LodLevel = 0;
+		int32 LodLevel = 0;
 		bool Enabled = true;
 		bool Wireframe = false;
 		bool ResetForNextFrame = false;
 	};
+
+	struct SceneComponent
+	{
+		uint64 SceneID;
+	};
+
+
 }

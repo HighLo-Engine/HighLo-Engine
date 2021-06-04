@@ -136,18 +136,18 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty, true);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty, true);
 
+		ImGuiRenderer::Init(window);
 		s_RenderingAPI->Init();
 		CoreRenderer::Init();
 		Renderer2D::Init();
-		ImGuiRenderer::Init(window, ImGuiWindowStyle::Dark);
 	}
 
 	void Renderer::Shutdown()
 	{
-		ImGuiRenderer::Shutdown();
 		Renderer2D::Shutdown();
 		CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();
+		ImGuiRenderer::Shutdown();
 
 		delete s_Data;
 	}

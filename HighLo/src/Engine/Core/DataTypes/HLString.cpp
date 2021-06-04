@@ -192,7 +192,7 @@ namespace highlo
 		{
 			memcpy(new_data, m_Data, m_Size);
 			delete[] m_Data;
-			}
+		}
 
 		m_Data = new_data;
 		++m_Size;
@@ -584,7 +584,7 @@ namespace highlo
 		return HLString(*this, beginIndex, endIndex);
 	}
 
-	const HLString &HLString::ToLower() const
+	const HLString &HLString::ToLowerCase() const
 	{
 		for (uint32 i = 0; i < m_Size; ++i)
 		{
@@ -595,7 +595,7 @@ namespace highlo
 		return *this;
 	}
 
-	const HLString &HLString::ToUpper() const
+	const HLString &HLString::ToUpperCase() const
 	{
 		for (uint32 i = 0; i < m_Size; ++i)
 		{

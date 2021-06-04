@@ -9,7 +9,7 @@ void Sandbox::OnInitialize()
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
 
 	m_Scene = Ref<Scene>::Create();
-	m_Scene->Camera = Ref<FreeFlyCamera>::Create();
+	m_Scene->m_Camera = Ref<FreeFlyCamera>::Create();
 
 	auto house_tex = Texture2D::LoadFromFile("assets/textures/WoodenCabin.jpg");
 
@@ -88,5 +88,5 @@ void Sandbox::OnUIRender(Timestep timestep)
 
 void Sandbox::OnResize(uint32 width, uint32 height)
 {
-	m_Scene->Camera->OnWindowResize(width, height);
+	m_Scene->m_Camera->OnWindowResize(width, height);
 }

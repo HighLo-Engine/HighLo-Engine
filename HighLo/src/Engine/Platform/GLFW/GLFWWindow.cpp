@@ -53,7 +53,7 @@ namespace highlo
 		HL_CORE_INFO("Loading Window Icon: {0}", *path);
 
 		GLFWimage images[1];
-		stbi_set_flip_vertically_on_load(1);
+		stbi_set_flip_vertically_on_load(flip);
 		images[0].pixels = stbi_load(path.C_Str(), &images[0].width, &images[0].height, 0, STBI_rgb_alpha);
 		glfwSetWindowIcon(m_NativeHandle, 1, images);
 		stbi_image_free(images[0].pixels);

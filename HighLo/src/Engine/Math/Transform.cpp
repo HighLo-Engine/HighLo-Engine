@@ -7,7 +7,7 @@ namespace highlo
 {
 	Transform Transform::OriginTransform = Transform::FromPosition({ 0, 0, 0 });
 
-	Transform& Transform::Translate(const glm::vec3 &translation)
+	Transform &Transform::Translate(const glm::vec3 &translation)
 	{
 		m_Position += translation;
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);
@@ -16,7 +16,7 @@ namespace highlo
 		return *this;
 	}
 
-	Transform& Transform::Scale(const glm::vec3 &scale)
+	Transform &Transform::Scale(const glm::vec3 &scale)
 	{
 		m_Scale *= scale;
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);
@@ -24,7 +24,7 @@ namespace highlo
 		return *this;
 	}
 
-	Transform& Transform::Scale(float scale)
+	Transform &Transform::Scale(float scale)
 	{
 		m_Scale *= glm::vec3(scale, scale, scale);
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);
@@ -32,15 +32,16 @@ namespace highlo
 		return *this;
 	}
 
-	Transform& Transform::Rotate(float angle, const glm::vec3 &axis)
+	Transform &Transform::Rotate(float angle, const glm::vec3 &axis)
 	{
 		glm::vec3 rotation_axis_value = axis * glm::radians(angle);
-		m_Rotation = glm::normalize(m_Rotation * glm::quat(rotation_axis_value));
+		glm::quat rotation = glm::normalize(glm::quat(m_Rotation) * glm::quat(rotation_axis_value));
+		m_Rotation = glm::eulerAngles(rotation);
 
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);
 
 		m_Transform = glm::translate(glm::mat4(1.0f), m_Position) *
-			glm::scale(glm::mat4(1.0f), m_Scale) * glm::toMat4(glm::quat(m_Rotation));
+			glm::scale(glm::mat4(1.0f), m_Scale) * glm::mat4_cast(rotation);
 
 		return *this;
 	}
@@ -84,7 +85,7 @@ namespace highlo
 		return transform;
 	}
 
-	void Transform::SetPosition(const glm::vec3& position)
+	void Transform::SetPosition(const glm::vec3 &position)
 	{
 		m_Position = position;
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);
@@ -93,7 +94,7 @@ namespace highlo
 			glm::scale(glm::mat4(1.0f), m_Scale) * glm::toMat4(glm::quat(m_Rotation));
 	}
 
-	void Transform::SetRotation(const glm::vec3& rotation)
+	void Transform::SetRotation(const glm::vec3 &rotation)
 	{
 		m_Rotation = rotation;
 
@@ -101,7 +102,7 @@ namespace highlo
 			glm::scale(glm::mat4(1.0f), m_Scale) * glm::toMat4(glm::quat(m_Rotation));
 	}
 
-	void Transform::SetScale(const glm::vec3& scale)
+	void Transform::SetScale(const glm::vec3 &scale)
 	{
 		m_Scale = scale;
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);

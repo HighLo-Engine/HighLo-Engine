@@ -12,6 +12,7 @@ namespace highlo
 	class Transform
 	{
 	public:
+
 		static Transform OriginTransform;
 
 		HLAPI Transform() = default;
@@ -26,9 +27,9 @@ namespace highlo
 		HLAPI static Transform FromRotation(const glm::vec3 &rotation);
 		HLAPI static Transform FromScale(const glm::vec3 &scale);
 
-		HLAPI void SetPosition(const glm::vec3& position);
-		HLAPI void SetRotation(const glm::vec3& rotation);
-		HLAPI void SetScale(const glm::vec3& scale);
+		HLAPI void SetPosition(const glm::vec3 &position);
+		HLAPI void SetRotation(const glm::vec3 &rotation);
+		HLAPI void SetScale(const glm::vec3 &scale);
 		HLAPI void SetScale(float scale);
 
 		HLAPI static void Decompose(const glm::mat4 &transform, Transform &outTransform);
@@ -36,7 +37,7 @@ namespace highlo
 		HLAPI inline const glm::vec3 &GetPosition() const {	return m_Position; }
 		HLAPI inline const glm::vec3 &GetScale() const { return m_Scale; }
 		HLAPI inline const glm::vec3 &GetRotation() const { return m_Rotation; }
-		HLAPI inline const glm::quat GetRotationAsQuat() const { return glm::toMat4(glm::quat(m_Rotation)); }
+		HLAPI inline const glm::quat GetRotationAsQuat() const { return glm::quat(m_Rotation); }
 		HLAPI inline const glm::mat4 &GetTransform() const { return m_Transform; }
 
 		HLAPI bool operator==(const Transform &other) const

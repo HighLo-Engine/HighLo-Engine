@@ -27,8 +27,11 @@ private:
 	Ref<Mesh> m_Cowboy;
 
 	uint32 m_VertexCount = 0;
+	uint32 m_IndexCount = 0;
 	std::vector<Ref<Mesh>> m_TestSpheres;
 
 	void CreatePBRObjects();
+	uint32 GetVertexCountFromModel(const Ref<Model> &model);
+	uint32 GetVertexCountFromMesh(Ref<Mesh> &mesh);
 };
 

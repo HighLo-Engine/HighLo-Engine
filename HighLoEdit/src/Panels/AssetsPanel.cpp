@@ -3,9 +3,9 @@
 void AssetsPanel::Initialize(uint32 width, uint32 height)
 {
 	m_Popup = PopupMenu::Create("MainPopup");
-	m_Popup->AddMenuItem("Create Folder", 1, [=]() { HL_TRACE("Creating folder"); });
+	m_Popup->AddMenuItem("Create Folder", 1, [=](PopupMenuItem item) { HL_TRACE("Creating folder"); });
 	m_Popup->AddSeparator();
-	m_Popup->AddMenuItem("Test", 2, [=]() { HL_TRACE("TEST"); });
+	m_Popup->AddMenuItem("Test", 2, [=](PopupMenuItem item) { HL_TRACE("TEST"); });
 }
 
 void AssetsPanel::Destroy()

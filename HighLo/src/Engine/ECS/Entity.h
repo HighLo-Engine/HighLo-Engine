@@ -20,13 +20,13 @@ namespace highlo
 		TransformComponent *_TransformComponent;
 
 		template <typename T>
-		HLAPI T* AddComponent()
+		HLAPI T *AddComponent()
 		{
 			return ECS_Registry::Get().AddComponent<T>(ID);
 		}
 
 		template <typename T>
-		HLAPI T* GetComponent()
+		HLAPI T *GetComponent()
 		{
 			return ECS_Registry::Get().GetComponent<T>(ID);
 		}
@@ -38,7 +38,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI T* FindComponentByTag(const HLString &tag)
+		HLAPI T *FindComponentByTag(const HLString &tag)
 		{
 			std::vector<T*> &components = ECS_Registry::Get().GetComponents();
 			for (T *component : components)

@@ -4,6 +4,7 @@
 #include "Engine/Application/HLApplication.h"
 #include "Engine/Window/Window.h"
 #include "Engine/Core/HLTime.h"
+#include "Engine/Core/HLInput.h"
 #include "Engine/ImGui/imgui.h"
 #include "Engine/ImGui/ImGuizmo.h"
 #include "Engine/ImGui/imgui_internal.h"
@@ -36,6 +37,7 @@ namespace highlo
 
     static int32 s_CheckboxCount = 0;
     static bool s_WindowIsActive = false;
+    static bool s_UseMenuBar = false;
     static ImGuiWindowStyle s_ImGuiWindowStyle = ImGuiWindowStyle::None;
 
     void ImGuiRenderer::Init(Window *window, ImGuiWindowStyle windowStyle)
@@ -185,7 +187,8 @@ namespace highlo
         static ImGuiDockNodeFlags optFlags = ImGuiDockNodeFlags_None;
         ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
     #ifdef HIGHLO_API_GLFW
-        windowFlags |= ImGuiWindowFlags_MenuBar;
+        if (s_UseMenuBar)
+            windowFlags |= ImGuiWindowFlags_MenuBar;
     #endif // HIGHLO_API_GLFW
 
         s_WindowIsActive = true;
@@ -235,9 +238,22 @@ namespace highlo
         s_WindowIsActive = false;
     }
 
-    void ImGuiRenderer::StartViewport(const HLString &title)
+    void ImGuiRenderer::StartViewport(const HLString &title, const Ref<PopupMenu> &popupMenu)
     {
         ImGui::Begin(*title);
+
+        // Check if the mouse is in the area of the viewport
+        if (popupMenu)
+        {
+            if (ImGui::IsWindowHovered())
+            {
+            #ifdef HIGHLO_API_GLFW
+                DrawPopupMenu(popupMenu);
+            #else
+                popupMenu->Update();
+            #endif // HIGHLO_API_GLFW
+            }
+        }
     }
 
     void ImGuiRenderer::EndViewport()
@@ -517,12 +533,12 @@ namespace highlo
     {
         HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
         std::vector<Ref<FileMenu>> fileMenus = menubar->GetMenus();
-        if (ImGui::BeginMenuBar())
+        if (ImGui::BeginMainMenuBar())
         {
             for (int32 i = 0; i < fileMenus.size(); ++i)
                 DrawFileMenuInternal(fileMenus[i]);
 
-            ImGui::EndMenuBar();
+            ImGui::EndMainMenuBar();
         }
     }
 
@@ -767,12 +783,12 @@ namespace highlo
 
         ImGui::Begin("FPS Graph", 0, ImGuiWindowFlags_NoBackground);
 
-        char fps_text[60];
-        sprintf_s(fps_text, 60, "Frames: %f", fps);
+        char fps_text[64];
+        sprintf_s(fps_text, 64, "Frames: %f", fps);
         ImGui::Text(fps_text);
 
-        char timestep_text[36];
-        sprintf_s(timestep_text, 36, "Timestep: %f ms", Time::GetTimestep());
+        char timestep_text[64];
+        sprintf_s(timestep_text, 64, "Timestep: %f ms", Time::GetTimestep());
         ImGui::Text(timestep_text);
 
         ImGui::PlotHistogram("Framerate", &frames[0], (int32)frames.size(), 0, NULL, 0.0f, 600, ImVec2(300, 100));
@@ -783,8 +799,8 @@ namespace highlo
     {
         HL_ASSERT(s_CanDraw, "Unable to draw into a ImGui Window, maybe you forgot to call ImGuiRenderer::BeginScene() ?");
 
-        ImGui::SetNextWindowPos(ImVec2(10, (float)Window::Get().GetHeight() - 362));
-        ImGui::SetNextWindowSize(ImVec2((float)Window::Get().GetWidth() * (2 / 5), 360));
+    //  ImGui::SetNextWindowPos(ImVec2(10, (float)Window::Get().GetHeight() - 362));
+    //  ImGui::SetNextWindowSize(ImVec2((float)Window::Get().GetWidth() * (2 / 5), 360));
         ImGui::Begin("Console");
 
         ImGui::TextUnformatted(s_ImGuiTextBuffer->Buf.begin());
@@ -1018,6 +1034,16 @@ namespace highlo
         ImGuiIO &io = ImGui::GetIO();
         ImGui::SetCurrentFont(io.Fonts->Fonts[1]);
     }
+
+    void ImGuiRenderer::EnableMenuBar()
+    {
+        s_UseMenuBar = true;
+    }
+
+    void ImGuiRenderer::DisableMenuBar()
+    {
+        s_UseMenuBar = false;
+    }
     
     void ImGuiRenderer::DrawFileMenuInternal(Ref<FileMenu> &menu)
     {
@@ -1038,7 +1064,6 @@ namespace highlo
 
                 if (ImGui::MenuItem(*currentItem.Name, *currentItem.Shortcut, false, currentItem.Visible))
                     currentItem.Callback(menu.Get(), &currentItem);
-
             }
 
             ImGui::EndMenu();
@@ -1049,9 +1074,8 @@ namespace highlo
     {
         if (ImGui::BeginMenu(*menuName))
         {
-            for (int32 i = 0; i < items.size(); ++i)
+            for (MenuItem currentItem : items)
             {
-                MenuItem currentItem = items[i];
                 if (currentItem.IsSubmenu)
                     DrawFileSubMenuInternal(parentMenu, currentItem.Name, currentItem.SubmenuItems);
 
@@ -1071,23 +1095,27 @@ namespace highlo
 
     void ImGuiRenderer::DrawPopupMenuInternal(const HLString &menuName, const std::vector<PopupMenuItem> &items)
     {
-        if (ImGui::GetIO().MouseClicked[1])
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
         {
             HL_CORE_TRACE("TEST POPUP");
-            ImGui::OpenPopup("Welcome");
-
-            if (ImGui::BeginPopupModal("Welcome", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                ImGui::Text("Welcome to HighLo!");
-                ImGui::Separator();
-
-                if (ImGui::Button("OK"))
-                    ImGui::CloseCurrentPopup();
-
-                ImGui::EndPopup();
-            }
+            ImGui::OpenPopup("mytest");
         }
 
-       
+        bool open = true;
+        if (ImGui::BeginPopupModal("mytest", &open, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            if (ImGui::BeginMenu("Test"))
+            {
+                if (ImGui::MenuItem("test item", "", false, true))
+                {
+                    HL_CORE_TRACE("test item clicked");
+                }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndPopup();
+        }
     }
 }
+

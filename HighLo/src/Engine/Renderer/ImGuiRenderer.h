@@ -45,7 +45,7 @@ namespace highlo
 		HLAPI static void StartWindow(const HLString &title, bool pOpen = false, bool fullscreen = false);
 		HLAPI static void EndWindow();
 
-		HLAPI static void StartViewport(const HLString &title);
+		HLAPI static void StartViewport(const HLString &title, const Ref<PopupMenu> &popupMenu = nullptr);
 		HLAPI static void EndViewport();
 
 		HLAPI static void StartChild(const HLString &id, uint32 width = 0, uint32 height = 0);
@@ -111,6 +111,8 @@ namespace highlo
 
 		HLAPI static void SetDarkThemeColors();
 		HLAPI static void SetLightThemeColors();
+		HLAPI static void EnableMenuBar();
+		HLAPI static void DisableMenuBar();
 		HLAPI static ImGuiWindowStyle GetCurrentWindowStyle();
 
 		HLAPI static void UseDefaultFont();

@@ -4,7 +4,8 @@
 
 namespace highlo
 {
-	using PopupItemCallback = std::function<void()>;
+	struct PopupMenuItem;
+	using PopupItemCallback = std::function<void(PopupMenuItem)>;
 
 	struct PopupMenuItem
 	{

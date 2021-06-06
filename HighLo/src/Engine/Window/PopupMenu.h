@@ -17,7 +17,7 @@ namespace highlo
 		HLAPI virtual void AddSeparator() = 0;
 		HLAPI virtual void AddSubMenu(const Ref<PopupMenu> &menu) = 0;
 
-		HLAPI virtual void Update() = 0;
+		HLAPI virtual void Update() const = 0;
 		HLAPI virtual void OnEvent(Event &e) = 0;
 
 		HLAPI virtual std::vector<PopupMenuItem> &GetMenuItems() = 0;

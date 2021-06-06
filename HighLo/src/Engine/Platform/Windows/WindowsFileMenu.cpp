@@ -8,16 +8,21 @@ namespace highlo
 	WindowsFileMenu::WindowsFileMenu(const HLString &name)
 		: m_Name(name)
 	{
+	#ifndef HIGHLO_API_GLFW
 		m_NativeHandle = CreatePopupMenu();
+	#endif // HIGHLO_API_GLFW
 	}
 	
 	WindowsFileMenu::~WindowsFileMenu()
 	{
+	#ifndef HIGHLO_API_GLFW
 		DestroyMenu(m_NativeHandle);
+	#endif // HIGHLO_API_GLFW
 	}
 
 	void WindowsFileMenu::AddMenuItem(const Ref<MenuItem> &item)
 	{
+	#ifndef HIGHLO_API_GLFW
 		if (!m_NativeHandle)
 			return;
 
@@ -32,11 +37,14 @@ namespace highlo
 		else
 			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item->ID, name.W_Str());
 
+	#endif // HIGHLO_API_GLFW
+
 		m_MenuItems.push_back(*item);
 	}
 
 	void WindowsFileMenu::AddMenuItem(const MenuItem &item)
 	{
+	#ifndef HIGHLO_API_GLFW
 		if (!m_NativeHandle)
 			return;
 
@@ -51,13 +59,29 @@ namespace highlo
 		else
 			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, name.W_Str());
 
+	#endif // HIGHLO_API_GLFW
+
 		m_MenuItems.push_back(item);
 	}
 	
 	void WindowsFileMenu::AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, MenuItemCallback callback, bool visible)
 	{
+	#ifndef HIGHLO_API_GLFW
 		if (!m_NativeHandle)
 			return;
+
+		HLString realName = "";
+		if (!shortcut.IsEmpty())
+			realName = name + "\t" + shortcut;
+		else
+			realName = name;
+
+		if (visible)
+			AppendMenuW(m_NativeHandle, MF_STRING, id, realName.W_Str());
+		else
+			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, id, realName.W_Str());
+
+	#endif // HIGHLO_API_GLFW
 
 		MenuItem item;
 		item.Name = name;
@@ -68,23 +92,14 @@ namespace highlo
 		item.Callback = callback;
 		item.IsSubmenu = false;
 		m_MenuItems.push_back(item);
-
-		HLString realName = "";
-		if (!shortcut.IsEmpty())
-			realName = name + "\t" + shortcut;
-		else
-			realName = name;
-
-		if (item.Visible)
-			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, realName.W_Str());
-		else
-			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, realName.W_Str());
 	}
 	
 	void WindowsFileMenu::AddSubMenu(const Ref<FileMenu> &other)
 	{
+	#ifndef HIGHLO_API_GLFW
 		HMENU menuItem = (HMENU)other->GetMenuHandle();
 		AppendMenuW(m_NativeHandle, MF_POPUP, (UINT_PTR)menuItem, other->GetName().W_Str());
+	#endif // HIGHLO_API_GLFW
 
 		MenuItem item;
 		item.Name = other->GetName();
@@ -100,7 +115,9 @@ namespace highlo
 	
 	void WindowsFileMenu::AddSeparator()
 	{
+	#ifndef HIGHLO_API_GLFW
 		AppendMenuW(m_NativeHandle, MF_SEPARATOR, 0, NULL);
+	#endif // HIGHLO_API_GLFW
 
 		MenuItem item;
 		item.Name = "";
@@ -121,10 +138,12 @@ namespace highlo
 				m_MenuItems[i].Visible = bEnabled;
 		}
 
+	#ifndef HIGHLO_API_GLFW
 		if (bEnabled)
 			return ::EnableMenuItem(m_NativeHandle, id, MF_ENABLED);
 		else
 			return ::EnableMenuItem(m_NativeHandle, id, MF_GRAYED);
+	#endif // HIGHLO_API_GLFW
 	}
 }
 

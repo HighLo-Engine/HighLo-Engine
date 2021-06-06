@@ -71,11 +71,11 @@ void HighLoEditor::OnInitialize()
 	exportMenu->AddMenuItem("Export .mov", "", 53, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mov"); });
 
 	Ref<FileMenu> fileMenu = FileMenu::Create("File");
-	fileMenu->AddMenuItem("New Scene", "Strg+N", 1, [=](FileMenu *menu, MenuItem *item) { NewScene(); });
-	fileMenu->AddMenuItem("Open Scene...", "Strg+O", 2, [=](FileMenu *menu, MenuItem *item) { OpenScene(); });
+	fileMenu->AddMenuItem("New Scene", "Strg+N", 1, [=](FileMenu *menu, MenuItem *item) { NewScene(menu, item); });
+	fileMenu->AddMenuItem("Open Scene...", "Strg+O", 2, [=](FileMenu *menu, MenuItem *item) { OpenScene(menu, item); });
 	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Save Scene", "Strg+S", 3, [=](FileMenu *menu, MenuItem *item) { SaveScene(); }, false);
-	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", 4, [=](FileMenu *menu, MenuItem *item) { SaveSceneAs(); });
+	fileMenu->AddMenuItem("Save Scene", "Strg+S", 3, [=](FileMenu *menu, MenuItem *item) { SaveScene(menu, item); }, false);
+	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", 4, [=](FileMenu *menu, MenuItem *item) { SaveSceneAs(menu, item); });
 	fileMenu->AddSeparator();
 	fileMenu->AddMenuItem("Settings", "", 5, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Settings..."); });
 	fileMenu->AddSeparator();
@@ -248,14 +248,15 @@ void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 	GetWindow().SetTitle(title);
 }
 
-void HighLoEditor::NewScene()
+void HighLoEditor::NewScene(FileMenu *menu, MenuItem *item)
 {
 	HL_TRACE("NewScene");
-	UpdateWindowTitle("Untitled scene");
+	UpdateWindowTitle("Untitled Scene");
 }
 
-void HighLoEditor::OpenScene()
+void HighLoEditor::OpenScene(FileMenu *menu, MenuItem *item)
 {
+	HL_TRACE("TEST OPEN");
 	Ref<FileDialogue> fd = FileDialogue::Create();
 	FileDialogueFilter filter;
 	filter.AddFilter("High-Lo Scene file", "*.hl");
@@ -264,6 +265,7 @@ void HighLoEditor::OpenScene()
 
 	if (!result.IsEmpty())
 	{
+		HL_TRACE("TEST NOT EMPTY");
 		OpenScene(m_LastSceneFilePath);
 	}
 }
@@ -276,7 +278,7 @@ void HighLoEditor::OpenScene(const HLString &path)
 	// Deserialize scene
 }
 
-void HighLoEditor::SaveScene()
+void HighLoEditor::SaveScene(FileMenu *menu, MenuItem *item)
 {
 	if (!m_LastSceneFilePath.IsEmpty())
 	{
@@ -284,11 +286,11 @@ void HighLoEditor::SaveScene()
 	}
 	else
 	{
-		SaveSceneAs();
+		SaveSceneAs(menu, item);
 	}
 }
 
-void HighLoEditor::SaveSceneAs()
+void HighLoEditor::SaveSceneAs(FileMenu *menu, MenuItem *item)
 {
 	HL_TRACE("SaveSceneAs");
 	Ref<FileDialogue> fd = FileDialogue::Create();
@@ -367,7 +369,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 			{
 				case HL_KEY_S:
 				{
-					SaveSceneAs();
+					SaveSceneAs(nullptr, nullptr);
 					break;
 				}
 
@@ -385,19 +387,19 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 		{
 			case HL_KEY_N:
 			{
-				NewScene();
+				NewScene(nullptr, nullptr);
 				break;
 			}
 
 			case HL_KEY_O:
 			{
-				OpenScene();
+				OpenScene(nullptr, nullptr);
 				break;
 			}
 
 			case HL_KEY_S:
 			{
-				SaveScene();
+				SaveScene(nullptr, nullptr);
 				break;
 			}
 

@@ -25,11 +25,11 @@ public:
 	void SelectEntity(Entity entity);
 
 	void UpdateWindowTitle(const HLString &sceneName);
-	void NewScene();
-	void OpenScene();
+	void NewScene(FileMenu *menu, MenuItem *item);
+	void OpenScene(FileMenu *menu, MenuItem *item);
 	void OpenScene(const HLString &path);
-	void SaveScene();
-	void SaveSceneAs();
+	void SaveScene(FileMenu *menu, MenuItem *item);
+	void SaveSceneAs(FileMenu *menu, MenuItem *item);
 
 	void EnableDarkMode(FileMenu *menu, MenuItem *item);
 	void EnableLightMode(FileMenu *menu, MenuItem *item);

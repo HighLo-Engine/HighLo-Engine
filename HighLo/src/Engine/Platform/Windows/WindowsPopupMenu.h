@@ -20,7 +20,7 @@ namespace highlo
 		virtual void AddSeparator() override;
 		virtual void AddSubMenu(const Ref<PopupMenu> &menu) override;
 
-		virtual void Update() override;
+		virtual void Update() const override;
 		virtual void OnEvent(Event &e) override;
 
 		virtual std::vector<PopupMenuItem> &GetMenuItems() override { return m_MenuItems; }

@@ -89,8 +89,12 @@ namespace highlo
 		m_MenuItems.push_back(item);
 	}
 	
-	void WindowsPopupMenu::Update()
+	void WindowsPopupMenu::Update() const
 	{
+	#ifdef HIGHLO_API_GLFW
+		return; // skip events if GLFW is enabled
+	#endif // HIGHLO_API_GLFW
+
 		if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_RIGHT))
 		{
 			HWND window = GetActiveWindow();
@@ -99,23 +103,29 @@ namespace highlo
 			POINT p;
 			GetCursorPos(&p);
 
+			HL_CORE_TRACE("popupMenu clicked");
 			TrackPopupMenuEx(m_NativeHandle, TPM_LEFTBUTTON | TPM_RECURSE, p.x, p.y, window, NULL);
 		}
 	}
 
 	void WindowsPopupMenu::OnEvent(Event &e)
 	{
+	#ifdef HIGHLO_API_GLFW
+		return; // skip events if GLFW is enabled
+	#endif // HIGHLO_API_GLFW
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<FileMenuEvent>(HL_BIND_EVENT_FUNCTION(WindowsPopupMenu::OnFileMenuClickedEvent));
 	}
 
 	bool WindowsPopupMenu::OnFileMenuClickedEvent(const FileMenuEvent &e)
 	{
-		for (PopupMenuItem item : m_MenuItems)
+		for (int32 i = 0; i < m_MenuItems.size(); ++i)
 		{
+			PopupMenuItem item = m_MenuItems[i];
 			if (item.ID == e.GetID())
 			{
-				item.Callback();
+				item.Callback(item);
 				return true;
 			}
 		}

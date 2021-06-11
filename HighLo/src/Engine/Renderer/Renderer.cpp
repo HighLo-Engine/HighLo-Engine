@@ -140,10 +140,12 @@ namespace highlo
 		s_RenderingAPI->Init();
 		CoreRenderer::Init();
 		Renderer2D::Init();
+		SceneRenderer::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
+		SceneRenderer::Shutdown();
 		Renderer2D::Shutdown();
 		CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();

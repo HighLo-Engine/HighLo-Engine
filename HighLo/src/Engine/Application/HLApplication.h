@@ -39,26 +39,25 @@ namespace highlo
 		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }
 
-		HLAPI ECS_SystemManager& GetECSSystemManager() { return m_ECS_SystemManager; }
+		HLAPI ECS_SystemManager &GetECSSystemManager() { return m_ECS_SystemManager; }
 
 	private:
 		static HLApplication* s_Instance;
 		ApplicationStartupSettings m_StartupSettings;
 
 		bool m_Running = false;
-
 		UniqueRef<Window> m_Window;
+
+		ECS_Registry m_ECS_Registry;
+		ECS_SystemManager m_ECS_SystemManager;
+
 		void InitializeWindow();
 
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
 
-		ECS_Registry m_ECS_Registry;
-
-		ECS_SystemManager m_ECS_SystemManager;
-		void Create_ECS_Systems();
-
 	private:
+
 		void InternalEventHandler(Event &event);
 	};
 }

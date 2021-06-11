@@ -27,7 +27,7 @@ namespace highlo
 
 		InitializeWindow();
 		Renderer::Init(m_Window.get());
-		Create_ECS_Systems();
+		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
 		HL_CORE_INFO("Engine Initialized");
 	}
@@ -104,11 +104,6 @@ namespace highlo
 		}
 
 		return true;
-	}
-
-	void HLApplication::Create_ECS_Systems()
-	{
-		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 	}
 
 	void HLApplication::InternalEventHandler(Event &event)

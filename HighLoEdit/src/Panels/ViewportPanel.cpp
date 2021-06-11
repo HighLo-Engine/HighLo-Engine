@@ -7,8 +7,8 @@ void ViewportPanel::Initialize(uint32 width, uint32 height)
 	m_Camera = Ref<EditorCamera>::Create(glm::perspectiveFov(glm::radians(90.0f), (float)width, (float)height, 0.1f, 1000.0f));
 
 	FramebufferSpecification spec;
-	spec.Width = 1280;
-	spec.Height = 720;
+	spec.Width = m_ViewportWidth;
+	spec.Height = m_ViewportHeight;
 	spec.Attachments = { TextureFormat::RGBA };
 	spec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
 	m_ViewportContent = Framebuffer::Create(spec);

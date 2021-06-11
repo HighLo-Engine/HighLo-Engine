@@ -3,6 +3,7 @@
 #include "RenderingAPI.h"
 #include "CoreRenderer.h"
 #include "ImGuiRenderer.h"
+#include "SceneRenderer.h"
 #include "Texture.h"
 #include "Environment.h"
 #include "ShaderLibrary.h"

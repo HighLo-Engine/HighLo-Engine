@@ -23,7 +23,7 @@ public:
 	const glm::vec2 &GetViewportMaxBounds() const { return m_ViewportBounds[1]; }
 	uint32 GetViewportWidth() const { return m_ViewportWidth; }
 	uint32 GetViewportHeight() const { return m_ViewportHeight; }
-	bool AreCameraEventsAllowed() const { return m_AllowViewportCameraEvents; }
+	bool SkipCameraEvents() const { return !m_AllowViewportCameraEvents; }
 
 	std::pair<float, float> GetMouseViewportSpace();
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my);

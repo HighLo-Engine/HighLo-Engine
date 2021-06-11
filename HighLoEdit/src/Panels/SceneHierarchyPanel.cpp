@@ -81,3 +81,12 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 {
 }
 
+template<typename T, typename UIFunc>
+static void DrawComponent(const HLString &name, Entity entity, UIFunc func, bool canBeRemoved = false)
+{
+	if (entity.HasComponent<T>())
+	{
+		auto &component = entity.GetComponent<T>();
+		
+	}
+}

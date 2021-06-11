@@ -132,10 +132,14 @@ namespace highlo
 
 	bool WindowsFileMenu::EnableMenuItem(int32 id, bool bEnabled)
 	{
+		bool itemFound = false;
 		for (int32 i = 0; i < m_MenuItems.size(); ++i)
 		{
 			if (id == m_MenuItems[i].ID)
+			{
 				m_MenuItems[i].Visible = bEnabled;
+				itemFound = true;
+			}
 		}
 
 	#ifndef HIGHLO_API_GLFW
@@ -143,6 +147,8 @@ namespace highlo
 			return ::EnableMenuItem(m_NativeHandle, id, MF_ENABLED);
 		else
 			return ::EnableMenuItem(m_NativeHandle, id, MF_GRAYED);
+	#else
+		return itemFound;
 	#endif // HIGHLO_API_GLFW
 	}
 }

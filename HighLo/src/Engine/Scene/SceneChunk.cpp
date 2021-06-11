@@ -39,6 +39,9 @@ namespace highlo
 		if (m_Layer == m_DeepestLayer)
 		{
 			RenderComponent* rc = entity.GetComponent<RenderComponent>();
+			if (!rc)
+				return;
+
 			rc->ResetForNextFrame = true;
 			m_RenderComponentMap[entity.ID] = rc;
 			return;
@@ -104,6 +107,8 @@ namespace highlo
 				continue;
 
 			RenderComponent* rc = m_RenderComponentMap[entity.ID];
+			if (!rc)
+				continue;
 
 			if (distanceToEntity > m_LOD2DistanceSquared)
 				rc->LodLevel = 2;
@@ -167,7 +172,7 @@ namespace highlo
 				continue;
 
 			chunk->Update(ts, camera, cameraFrustum, processedEntityCount);
-			chunk->RenderDebugMesh();
+			//chunk->RenderDebugMesh();
 		}
 	}
 

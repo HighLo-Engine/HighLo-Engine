@@ -88,12 +88,15 @@ namespace highlo
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return; // No component with this entityID
 
-			for (auto &comp_info : m_EntityComponents[entityID])
+			// Find and remove actual component pointer.
+			auto& component_infos = m_EntityComponents[entityID];
+			for (auto& it = component_infos.begin(); it != component_infos.end(); it++)
 			{
-				if (comp_info.first == type)
+				if (it->first == type)
 				{
-					// We found the component to delete
-					// TODO @FlareCoding
+					m_Components[type].erase(m_Components[type].begin() + it->second);
+					m_EntityComponents[entityID].erase(it);
+					break;
 				}
 			}
 		}
@@ -108,7 +111,6 @@ namespace highlo
 		}
 
 	private:
-
 		std::unordered_map<std::type_index, std::vector<std::pair<EntityID, std::any>>> m_Components;
 		std::unordered_map<EntityID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;
 		std::unordered_map<EntityID, void*> m_TransformComponents;

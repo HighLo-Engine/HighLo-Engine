@@ -51,8 +51,6 @@ namespace highlo
 		ECS_Registry m_ECS_Registry;
 		ECS_SystemManager m_ECS_SystemManager;
 
-		void InitializeWindow();
-
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
 

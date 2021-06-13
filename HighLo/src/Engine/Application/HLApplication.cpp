@@ -25,7 +25,17 @@ namespace highlo
 		CreateCacheSin();
 		CreateCacheCos();
 
-		InitializeWindow();
+		// Init Window
+		m_Window = UniqueRef<Window>(Window::Create(WindowData(
+			m_StartupSettings.Fullscreen,
+			m_StartupSettings.WindowWidth,
+			m_StartupSettings.WindowHeight,
+			m_StartupSettings.WindowTitle))
+			);
+
+		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+
+		// Init Renderer
 		Renderer::Init(m_Window.get());
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
@@ -65,18 +75,6 @@ namespace highlo
 		}
 
 		OnShutdown();
-	}
-
-	void HLApplication::InitializeWindow()
-	{
-		m_Window = UniqueRef<Window>(Window::Create(WindowData(
-			m_StartupSettings.Fullscreen,
-			m_StartupSettings.WindowWidth,
-			m_StartupSettings.WindowHeight,
-			m_StartupSettings.WindowTitle))
-		);
-
-		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 	}
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &event)

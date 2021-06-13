@@ -1,6 +1,8 @@
 #include "HighLoPch.h"
 #include "HLTime.h"
 
+#include <iomanip>
+
 namespace highlo
 {
 	float Time::s_ElapsedTime = 0;
@@ -66,17 +68,20 @@ namespace highlo
 				{
 					case HLTimePrecision::Milliseconds:
 					{
+						result = HLString::ToString(std::put_time(&now, "%m/%d/%Y - %H:%M:%S"));
 						break;
 					}
 
 					case HLTimePrecision::Seconds:
 					{
+						result = HLString::ToString(std::put_time(&now, "%m/%d/%Y - %H:%M"));
 						break;
 					}
 
 					case HLTimePrecision::None:
 					default:
 					{
+						result = HLString::ToString(std::put_time(&now, "%m/%d/%Y - %H:%M:%S"));
 						break;
 					}
 				}
@@ -89,17 +94,20 @@ namespace highlo
 				{
 					case HLTimePrecision::Milliseconds:
 					{
+						result = HLString::ToString(std::put_time(&now, "%d/%m/%Y - %H:%M:%S"));
 						break;
 					}
 
 					case HLTimePrecision::Seconds:
 					{
+						result = HLString::ToString(std::put_time(&now, "%d/%m/%Y - %H:%M"));
 						break;
 					}
 
 					case HLTimePrecision::None:
 					default:
 					{
+						result = HLString::ToString(std::put_time(&now, "%d/%m/%Y - %H:%M:%S"));
 						break;
 					}
 				}
@@ -112,17 +120,46 @@ namespace highlo
 				{
 					case HLTimePrecision::Milliseconds:
 					{
+						result = HLString::ToString(std::put_time(&now, "%d.%m.%Y - %H:%M:%S"));
 						break;
 					}
 
 					case HLTimePrecision::Seconds:
 					{
+						result = HLString::ToString(std::put_time(&now, "%d.%m.%Y - %H:%M"));
 						break;
 					}
 
 					case HLTimePrecision::None:
 					default:
 					{
+						result = HLString::ToString(std::put_time(&now, "%d.%m.%Y - %H:%M:%S"));
+						break;
+					}
+				}
+				break;
+			}
+
+			default:
+			{
+				switch (precision)
+				{
+					case HLTimePrecision::Milliseconds:
+					{
+						result = HLString::ToString(std::put_time(&now, "%m/%d/%Y - %H:%M:%S"));
+						break;
+					}
+
+					case HLTimePrecision::Seconds:
+					{
+						result = HLString::ToString(std::put_time(&now, "%m/%d/%Y - %H:%M"));
+						break;
+					}
+
+					case HLTimePrecision::None:
+					default:
+					{
+						result = HLString::ToString(std::put_time(&now, "%m/%d/%Y - %H:%M:%S"));
 						break;
 					}
 				}

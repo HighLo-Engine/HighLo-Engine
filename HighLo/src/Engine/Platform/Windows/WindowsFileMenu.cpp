@@ -139,6 +139,7 @@ namespace highlo
 			{
 				m_MenuItems[i].Visible = bEnabled;
 				itemFound = true;
+				break;
 			}
 		}
 

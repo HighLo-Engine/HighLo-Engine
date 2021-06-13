@@ -135,4 +135,27 @@ namespace highlo
 		for (auto const& [slot, texture] : m_Textures)
 			texture->Bind(slot);
 	}
+
+	uint32 Material::GetFlags() const
+	{
+		return m_MaterialFlags;
+	}
+	
+	bool Material::GetFlag(MaterialFlag flag) const
+	{
+		return (uint32)flag & m_MaterialFlags;
+	}
+	
+	void Material::SetFlag(MaterialFlag flag, bool value)
+	{
+		if (value)
+		{
+			m_MaterialFlags |= (uint32)flag;
+		}
+		else
+		{
+			m_MaterialFlags &= ~(uint32)flag;
+		}
+	}
 }
+

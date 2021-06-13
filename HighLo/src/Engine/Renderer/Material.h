@@ -17,6 +17,14 @@ namespace highlo
 #define HL_MATERIAL_TEXTURE_PREFILTER_MAP		6
 #define HL_MATERIAL_TEXTURE_BRDF_MAP			7
 
+	enum class MaterialFlag
+	{
+		None		= HL_BIT(0),
+		DepthTest	= HL_BIT(1),
+		Blend		= HL_BIT(2),
+		TwoSided	= HL_BIT(3),
+	};
+
 	struct MaterialRenderProperties
 	{
 		glm::vec4 Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -57,6 +65,10 @@ namespace highlo
 
 		HLAPI virtual void Bind(bool update_properties = true);
 
+		HLAPI uint32 GetFlags() const;
+		HLAPI bool GetFlag(MaterialFlag flag) const;
+		HLAPI void SetFlag(MaterialFlag flag, bool value = true);
+
 	private:
 		std::map<int32, Ref<Texture>> m_Textures;
 
@@ -71,6 +83,8 @@ namespace highlo
 		void ApplyNewProperties();
 
 	private:
+
 		Ref<UniformBuffer> m_MaterialDataBuffer = nullptr;
+		uint32 m_MaterialFlags = 0;
 	};
 }

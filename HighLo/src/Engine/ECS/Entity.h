@@ -38,36 +38,6 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI T *FindComponentByTag(const HLString &tag)
-		{
-			std::vector<T*> &components = ECS_Registry::Get().GetComponents();
-			for (T *component : components)
-			{
-				if (component->Tag == tag)
-				{
-					return component;
-				}
-			}
-
-			return nullptr;
-		}
-
-		template <typename T>
-		HLAPI T *FindComponentByID(EntityID id)
-		{
-			std::vector<T*> &components = ECS_Registry::Get().GetComponents();
-			for (T *component : components)
-			{
-				if (component->ID == id)
-				{
-					return component;
-				}
-			}
-
-			return nullptr;
-		}
-
-		template <typename T>
 		HLAPI void RemoveComponent()
 		{
 			ECS_Registry::Get().RemoveComponent<T>(ID);

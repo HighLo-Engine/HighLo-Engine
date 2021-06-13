@@ -1,12 +1,28 @@
 #pragma once
 
 #include "Engine/Renderer/Model.h"
+#include "Engine/Camera/Camera.h"
 
 namespace highlo
 {
+	struct IDComponent
+	{
+		uint64 ID = 0;
+	};
+
+	struct SceneComponent
+	{
+		uint64 SceneID = 0;
+	};
+
 	struct TransformComponent
 	{
 		Transform Transform;
+	};
+
+	struct TagComponent
+	{
+		HLString Tag;
 	};
 
 	struct RenderComponent
@@ -21,9 +37,23 @@ namespace highlo
 		bool ResetForNextFrame = false;
 	};
 
-	struct SceneComponent
+	struct CameraComponent
 	{
-		uint64 SceneID;
+		Ref<Camera> Camera;
+		bool Primary = true;
+	};
+
+	struct SpriteComponent
+	{
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float TilingFactor = 1.0f;
+		Ref<Texture2D> Texture;
+	};
+
+	struct ModelComponent
+	{
+		Ref<Model> Model;
+		bool IsFractured = false;
 	};
 
 

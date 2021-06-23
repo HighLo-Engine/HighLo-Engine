@@ -9,6 +9,8 @@ namespace highlo
 {
 	class OpenGLRenderingAPI : public RenderingAPI
 	{
+	friend class Renderer2D;
+
 	public:
 		virtual void Init() override;
 		virtual void Shutdown() override;
@@ -31,7 +33,7 @@ namespace highlo
 		virtual void SetDepthTest(bool bEnabled) override;
 		virtual void SetLineThickness(float thickness) override;
 
-		virtual Ref<Environment> CreateEnvironment(const HLString &path) override;
+		virtual Ref<Environment> CreateEnvironment(const HLString &path, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
 	};
 }
 

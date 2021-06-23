@@ -200,6 +200,7 @@ namespace highlo
 		uint32 dataSize = (uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase;
 		if (dataSize)
 		{
+			HL_CORE_TRACE("Rendering Quads");
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
 
 			// Update camera projection
@@ -222,6 +223,7 @@ namespace highlo
 		dataSize = (uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase;
 		if (dataSize)
 		{
+			HL_CORE_TRACE("Rendering Lines");
 			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
 
 			// Update camera projection
@@ -241,6 +243,7 @@ namespace highlo
 		dataSize = (uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase;
 		if (dataSize)
 		{
+			HL_CORE_TRACE("Rendering Circles");
 			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
 
 			// Update camera projection

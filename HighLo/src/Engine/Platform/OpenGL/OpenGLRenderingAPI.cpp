@@ -195,13 +195,10 @@ namespace highlo
 		glLineWidth(thickness);
 	}
 
-	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const HLString &path)
+	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const HLString &path, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
 			return Renderer::GetEmptyEnvironment();
-
-		const uint32 cubemapSize = 2048;
-		const uint32 irradianceMapSize = 32;
 
 		Ref<Shader> equirectangularConversionShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCubeMap");
 		Ref<Shader> envFilteringShader = Renderer::GetShaderLibrary()->Get("EnvironmentMipFilter");

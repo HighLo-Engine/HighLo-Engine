@@ -74,13 +74,13 @@ void PBRSceneTest::OnUIRender(Timestep timestep)
 	versionText += Renderer::GetCapabilities().Version;
 
 	HLString maxTextureUnitsText = "MaxTextureUnits: ";
-	maxTextureUnitsText += Renderer::GetCapabilities().MaxTextureUnits;
+	maxTextureUnitsText += HLString::ToString(Renderer::GetCapabilities().MaxTextureUnits);
 
 	HLString maxSamplesText = "MaxSamples: ";
-	maxSamplesText += Renderer::GetCapabilities().MaxSamples;
+	maxSamplesText += HLString::ToString(Renderer::GetCapabilities().MaxSamples);
 
 	HLString maxAnisotropyText = "MaxAnisotropy: ";
-	maxAnisotropyText += Renderer::GetCapabilities().MaxAnisotropy;
+	maxAnisotropyText += HLString::ToString(Renderer::GetCapabilities().MaxAnisotropy);
 
 	HLString verticesText = "Vertices: ";
 	verticesText += "";	verticesText += HLString::ToString(m_VertexCount);

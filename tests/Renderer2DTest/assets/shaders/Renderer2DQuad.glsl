@@ -45,11 +45,11 @@ struct VertexOutput
 };
 
 layout(location = 0) in VertexOutput Input;
-layout(binding = 0) uniform sampler2D u_Textures[32];
+layout(binding = 1) uniform sampler2D u_Textures[32];
 
 void main()
 {
-	Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * Input.Color;
+	Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * vec4(1.0f, 0.2f, 0.3f, 1.0f);
 	//Color = vec4(1.0f, 0.2f, 0.3f, 1.0f);
 }
 

@@ -17,9 +17,10 @@ layout (std140, binding = 0) uniform VS_SceneBuffer
 
 out vec3 pass_TextureCoords;
 
-void main() {
-	gl_Position = u_ProjectionMatrix * u_ViewMatrix * vec4(in_Position, 1.0);
+void main()
+{
 	pass_TextureCoords = in_Position;
+	gl_Position = u_ProjectionMatrix * u_ViewMatrix * vec4(in_Position, 1.0);
 } 
 
 #shader pixel
@@ -27,11 +28,10 @@ void main() {
 
 in vec3 pass_TextureCoords;
 
+out vec4 Color;
 layout(binding = 0) uniform samplerCube SkyTextureSampler;
-
-out vec4 o_Color;
 
 void main()
 {
-	o_Color = texture(SkyTextureSampler, -pass_TextureCoords);
+	Color = texture(SkyTextureSampler, -pass_TextureCoords);
 }

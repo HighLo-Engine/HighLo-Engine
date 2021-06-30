@@ -78,7 +78,7 @@ namespace highlo
 		
 		uint32 whiteTextureData = 0xffffffff;
 		s_Data->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1).As<Texture2D>();
-		s_Data->WhiteTexture->GetWriteableBuffer().Write(&whiteTextureData, sizeof(uint32));
+		s_Data->WhiteTexture->GetData().Write(&whiteTextureData, sizeof(uint32));
 
 		s_Data->BRDFLut = Texture2D::LoadFromFile("assets/textures/brdfMap.png").As<Texture2D>();
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
@@ -208,6 +208,7 @@ namespace highlo
 			transform * glm::vec4{ aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
 		};
 
+		/*
 		for (uint32 i = 0; i < 4; ++i)
 			Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
 
@@ -216,6 +217,7 @@ namespace highlo
 
 		for (uint32 i = 0; i < 4; ++i)
 			Renderer2D::DrawLine(corners[i], corners[i + 4], color);
+		*/
 	}
 
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()

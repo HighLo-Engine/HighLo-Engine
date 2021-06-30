@@ -66,41 +66,41 @@ namespace highlo
 		static Ref<Texture> CreateAndAttachColorAttachment(int samples, TextureFormat format, uint32 width, uint32 height, int32 index)
 		{
 			bool multisampled = samples > 1;
-			Ref<Texture> image;
+			Ref<Texture> texture;
 			if (multisampled)
 			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLImageInternalFormat(format), width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLTextureInternalFormat(format), width, height, GL_FALSE);
 			}
 			else
 			{
-				image = Texture2D::Create(format, width, height);
-				image->Invalidate();
+				texture = Texture2D::Create(format, width, height);
+				texture->Invalidate();
 			}
 
-			Ref<OpenGLTexture2D> glImage = image.As<OpenGLTexture2D>();
-			glImage->CreateSampler(TextureProperties());
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), glImage->GetRendererID(), 0);
-			return image;
+			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
+			glTexture->CreateSampler(TextureProperties());
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), glTexture->GetRendererID(), 0);
+			return texture;
 		}
 
 		static Ref<Texture> AttachDepthTexture(int samples, TextureFormat format, uint32 width, uint32 height)
 		{
 			bool multisampled = samples > 1;
-			Ref<Texture> image;
+			Ref<Texture> texture;
 			if (multisampled)
 			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLImageInternalFormat(format), width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLTextureInternalFormat(format), width, height, GL_FALSE);
 			}
 			else
 			{
-				image = Texture2D::Create(format, width, height);
-				image->Invalidate();
+				texture = Texture2D::Create(format, width, height);
+				texture->Invalidate();
 			}
 
-			Ref<OpenGLTexture2D> glImage = image.As<OpenGLTexture2D>();
-			glImage->CreateSampler(TextureProperties());
-			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), glImage->GetRendererID(), 0);
-			return image;
+			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
+			glTexture->CreateSampler(TextureProperties());
+			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), glTexture->GetRendererID(), 0);
+			return texture;
 		}
 
 		static bool IsDepthFormat(TextureFormat format)

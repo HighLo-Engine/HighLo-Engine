@@ -24,8 +24,7 @@ namespace highlo
 			return nullptr;
 		}
 
-		OpenGLTexture2D* instance = new OpenGLTexture2D(data, width, height, format);
-		instance->Format = format;
+		OpenGLTexture2D *instance = new OpenGLTexture2D(data, width, height, format);
 		HL_CORE_INFO("Texture2D>    [+] Loaded " + filepath + " [+]");
 
 		return instance;
@@ -39,19 +38,11 @@ namespace highlo
 		{
 			Byte data[4] = { (Byte)rgb.x, (Byte)rgb.y, (Byte)rgb.z, (Byte)255 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
-
-			void *dataToStore = malloc(4);
-			memcpy_s(dataToStore, 4, data, 4);
-			instance->m_Buffer = Allocator::Copy(dataToStore, 4);
 		}
 		else
 		{
 			uint16 data[4] = { (uint16)rgb.x, (uint16)rgb.y, (uint16)rgb.z, (uint16)65535 };
 			instance = new OpenGLTexture2D(data, 1, 1, format);
-
-			void *dataToStore = malloc(8);
-			memcpy_s(dataToStore, 8, data, 8);
-			instance->m_Buffer = Allocator::Copy(dataToStore, 8);
 		}
 
 		return instance;
@@ -80,12 +71,6 @@ namespace highlo
 			}
 
 			instance = new OpenGLTexture2D(data, width, height, format);
-
-			Byte *dataToStore = new Byte[(uint64)width * (uint64)height * (uint64)4];
-			instance->Format = format;
-			memcpy_s(dataToStore, ((uint64)width * (uint64)height * (uint64)4), data, ((uint64)width * (uint64)height * (uint64)4));
-			instance->m_Buffer = Allocator::Copy(dataToStore, (uint64)width * (uint64)height * (uint64)4);
-
 			delete[] data;
 		}
 		else
@@ -105,12 +90,6 @@ namespace highlo
 			}
 
 			instance = new OpenGLTexture2D(data, width, height, format);
-
-			uint16 *dataToStore = new uint16[(uint64)width * (uint64)height * (uint64)4];
-			instance->Format = format;
-			memcpy_s(dataToStore, ((uint64)width * (uint64)height * (uint64)8), data, ((uint64)width * (uint64)height * (uint64)8));
-			instance->m_Buffer = Allocator::Copy(dataToStore, (uint64)width * (uint64)height * (uint64)4);
-
 			delete[] data;
 		}
 #pragma warning( pop )
@@ -122,28 +101,7 @@ namespace highlo
 		: m_Width(width), m_Height(height)
 	{
 		m_Buffer = Allocator::Copy(img_data, (uint64)width * (uint64)height * (uint64)4);
-
-		switch (format)
-		{
-			case TextureFormat::RGBA8:
-			{
-				m_InternalFormat = GL_RGBA8;
-				break;
-			}
-
-			case TextureFormat::RGBA16:
-			{
-				m_InternalFormat = GL_RGBA16;
-				break;
-			}
-
-			default:
-			{
-				m_InternalFormat = GL_RGBA8;
-				break;
-			}
-		}
-
+		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
 		Format = format;
 		m_DataFormat = GL_RGBA;
 
@@ -156,34 +114,13 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height)
 	{
-		switch (format)
-		{
-			case TextureFormat::RGBA8:
-			{
-				m_InternalFormat = GL_RGBA8;
-				break;
-			}
-
-			case TextureFormat::RGBA16:
-			{
-				m_InternalFormat = GL_RGBA16;
-				break;
-			}
-
-			default:
-			{
-				m_InternalFormat = GL_RGBA8;
-				break;
-			}
-		}
-
+		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
 		m_Buffer.Allocate(width * height * 4);
 		Format = format;
 		m_Width = width;
@@ -197,7 +134,6 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -208,13 +144,8 @@ namespace highlo
 		if (m_Buffer)
 			stbi_image_free(m_Buffer.m_Data);
 	}
-	
-	void* OpenGLTexture2D::GetData() const
-	{
-		return m_Buffer.m_Data;
-	}
 
-	Allocator OpenGLTexture2D::GetWriteableBuffer()
+	Allocator OpenGLTexture2D::GetData()
 	{
 		return m_Buffer;
 	}
@@ -234,13 +165,13 @@ namespace highlo
 			Release();
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
-		GLenum glInternalFormat = utils::OpenGLImageInternalFormat(Format);
+		GLenum glInternalFormat = utils::OpenGLTextureInternalFormat(Format);
 		uint32 mipCount = utils::CalculateMipCount(m_Width, m_Height);
 		glTextureStorage2D(RendererID, mipCount, glInternalFormat, m_Width, m_Height);
 
 		if (m_Buffer)
 		{
-			GLenum glFormat = utils::OpenGLImageFormat(Format);
+			GLenum glFormat = utils::OpenGLTextureFormat(Format);
 			GLenum glDataType = utils::OpenGLFormatDataType(Format);
 			glTextureSubImage2D(RendererID, 0, 0, 0, m_Width, m_Height, glFormat, glDataType, m_Buffer.m_Data);
 			glGenerateTextureMipmap(RendererID);
@@ -274,7 +205,6 @@ namespace highlo
 	void OpenGLTexture2D::WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba)
 	{
 		uint64 idx = (((uint64)row * (uint64)m_Width) + (uint64)column) * 4;
-
 		if (idx >= (uint64)m_Width * (uint64)m_Height * 4 || idx < 0) return;
 
 		if (Format == TextureFormat::RGBA8)
@@ -296,7 +226,6 @@ namespace highlo
 	glm::ivec4 OpenGLTexture2D::ReadPixel(uint32 row, uint32 column)
 	{
 		uint64 idx = (((uint64)row * (uint64)m_Width) + (uint64)column) * 4;
-
 		if (idx >= (uint64)m_Width * (uint64)m_Height * 4 || idx < 0) return { 0, 0, 0, 0 };
 
 		glm::ivec4 rgba = { 0, 0, 0, 0 };
@@ -383,10 +312,10 @@ namespace highlo
 		uint32 levels = utils::CalculateMipCount(width, height);
 		
 		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &RendererID);
-		glTextureStorage2D(RendererID, levels, utils::OpenGLImageInternalFormat(m_Format), m_Width, m_Height);
+		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Format), m_Width, m_Height);
 
 		if (m_Buffer.m_Data)
-			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Width, m_Height, 6, utils::OpenGLImageFormat(m_Format), utils::OpenGLFormatDataType(m_Format), m_Buffer.m_Data);
+			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Width, m_Height, 6, utils::OpenGLTextureFormat(m_Format), utils::OpenGLFormatDataType(m_Format), m_Buffer.m_Data);
 
 		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 		glTextureParameteri(RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -410,12 +339,7 @@ namespace highlo
 		return m_Height;
 	}
 
-	void *OpenGLTexture3D::GetData() const
-	{
-		return m_Buffer.m_Data;
-	}
-
-	Allocator OpenGLTexture3D::GetWriteableBuffer()
+	Allocator OpenGLTexture3D::GetData()
 	{
 		return m_Buffer;
 	}
@@ -437,10 +361,10 @@ namespace highlo
 		uint32 levels = utils::CalculateMipCount(m_Width, m_Height);
 
 		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &RendererID);
-		glTextureStorage2D(RendererID, levels, utils::OpenGLImageInternalFormat(m_Format), m_Width, m_Height);
+		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Format), m_Width, m_Height);
 
 		if (m_Buffer.m_Data)
-			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Width, m_Height, 6, utils::OpenGLImageFormat(m_Format), utils::OpenGLFormatDataType(m_Format), m_Buffer.m_Data);
+			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Width, m_Height, 6, utils::OpenGLTextureFormat(m_Format), utils::OpenGLFormatDataType(m_Format), m_Buffer.m_Data);
 
 		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 		glTextureParameteri(RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -451,26 +375,26 @@ namespace highlo
 
 	void OpenGLTexture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
-		// @TODO
+		// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 	}
 
 	glm::ivec4 OpenGLTexture3D::ReadPixel(uint32 row, uint32 column)
 	{
-		// @TODO
+		// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 		return {};
 	}
 
 	void OpenGLTexture3D::UpdateResourceData(void *data)
 	{
-		// @TODO
+		// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 	}
 
 	void OpenGLTexture3D::UpdateResourceData()
 	{
-		// @TODO
+		// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 	}
 

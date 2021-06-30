@@ -32,8 +32,7 @@ namespace highlo
 		HLAPI virtual uint32 GetDimensions() const = 0;
 		HLAPI virtual uint32 GetWidth() const = 0;
 		HLAPI virtual uint32 GetHeight() const = 0;
-		HLAPI virtual void* GetData() const = 0;
-		HLAPI virtual Allocator GetWriteableBuffer() = 0;
+		HLAPI virtual Allocator GetData() = 0;
 
 		HLAPI virtual void Bind(uint32 slot) const = 0;
 		HLAPI virtual void Release() = 0;

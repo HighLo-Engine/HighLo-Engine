@@ -45,7 +45,7 @@ struct VertexOutput
 };
 
 layout(location = 0) in VertexOutput Input;
-layout(binding = 0) uniform sampler2D u_Textures[32];
+layout(binding = 1) uniform sampler2D u_Textures[32];
 
 void main()
 {

@@ -22,6 +22,7 @@ void PBRSceneTest::OnUpdate(Timestep timestep)
 {
 	m_Pistol->Update(timestep);
 	m_Cowboy->Update(timestep);
+	m_DancingStormTrooper->Update(timestep);
 
 	m_Camera->Update();
 
@@ -37,6 +38,7 @@ void PBRSceneTest::OnUpdate(Timestep timestep)
 	CoreRenderer::DrawCube(Transform::FromPosition(m_Light.Position));
 	CoreRenderer::DrawMesh(m_PBR_Sphere, Transform::FromPosition({ 6, -2, 6 }).Scale(3.0f).Rotate(y_rot, { 0, 1, 0 }));
 	CoreRenderer::DrawMesh(m_PBR_Gun, Transform::FromPosition({ 26, -6, 26 }).Scale(0.24f).Rotate(y_rot, { 0, 1, 0 }));
+	CoreRenderer::DrawMesh(m_DancingStormTrooper, Transform::FromPosition({ 26, -10, 30 }).Scale(2.0f));
 
 	for (uint64 i = 0; i < m_TestSpheres.size(); i++)
 		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
@@ -116,6 +118,17 @@ void PBRSceneTest::CreatePBRObjects()
 	m_VertexCount += GetVertexCountFromMesh(m_PBR_Sphere);
 	m_IndexCount += m_PBR_Sphere->GetVertexArray()->GetIndexBuffer()->GetCount();
 
+	m_DancingStormTrooper = AssetLoader::LoadAnimatedModel("assets/models/Stormtrooper.fbx");
+	m_DancingStormTrooper->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Stormtrooper.png"));
+
+	m_DancingStormTrooper->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+	m_DancingStormTrooper->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+	m_DancingStormTrooper->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
+	m_DancingStormTrooper->GetMaterialRenderProperties().Metallic = 1.0f;
+	m_DancingStormTrooper->GetMaterialRenderProperties().Roughness = 0.0f;
+	m_VertexCount += GetVertexCountFromMesh(m_DancingStormTrooper);
+	m_IndexCount += m_DancingStormTrooper->GetVertexArray()->GetIndexBuffer()->GetCount();
+
 	auto m_PBR_Gun_Model = AssetLoader::LoadStaticModel("assets/models/PBR_AK47.obj");
 	m_PBR_Gun = m_PBR_Gun_Model->GetMesh(0);
 
@@ -188,6 +201,7 @@ void PBRSceneTest::CreatePBRObjects()
 
 	m_Pistol->m_Animation->Play();
 	m_Cowboy->m_Animation->Play();
+	m_DancingStormTrooper->m_Animation->Play();
 }
 
 uint32 PBRSceneTest::GetVertexCountFromModel(const Ref<Model> &model)

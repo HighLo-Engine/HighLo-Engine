@@ -17,6 +17,7 @@ namespace highlo
 		m_PerspectiveFOV = glm::radians(verticalFOV);
 		m_PerspectiveNear = nearClip;
 		m_PerspecticeFar = farClip;
+		SetProjectionInternal(HLApplication::Get().GetWindow().GetWidth(), HLApplication::Get().GetWindow().GetHeight());
 	}
 
 	void Camera::SetOrthographic(float size, float nearClip, float farClip)
@@ -25,6 +26,7 @@ namespace highlo
 		m_OrthographicSize = size;
 		m_OrthographicNear = nearClip;
 		m_OrthographicFar = farClip;
+		SetProjectionInternal(HLApplication::Get().GetWindow().GetWidth(), HLApplication::Get().GetWindow().GetHeight());
 	}
 
 	void Camera::SetViewportSize(uint32 width, uint32 height)
@@ -32,7 +34,7 @@ namespace highlo
 		SetProjectionInternal(width, height);
 	}
 
-	void Camera::GetDirectionVectors(glm::vec3& front, glm::vec3& up, glm::vec3& left)
+	void Camera::GetDirectionVectors(glm::vec3 &front, glm::vec3 &up, glm::vec3 &left)
 	{
 		float sx, sy, sz, cx, cy, cz, theta;
 

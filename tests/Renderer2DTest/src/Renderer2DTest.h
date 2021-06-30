@@ -18,5 +18,6 @@ public:
 private:
 
 	Ref<Camera> m_Camera;
+	Ref<Texture2D> m_Texture;
 };
 

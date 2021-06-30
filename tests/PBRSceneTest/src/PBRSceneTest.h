@@ -25,6 +25,7 @@ private:
 	Ref<Mesh> m_PBR_Gun;
 	Ref<Mesh> m_Pistol;
 	Ref<Mesh> m_Cowboy;
+	Ref<Mesh> m_DancingStormTrooper;
 
 	uint32 m_VertexCount = 0;
 	uint32 m_IndexCount = 0;

@@ -191,7 +191,7 @@ namespace highlo
 
     unsigned long FileSystem::Watch(void *param)
     {
-        LPCWSTR	filepath = L"assets";
+        LPCWSTR	filepath = L"assets"; // TODO: make this a parameter to be able to watch different folders as well
         std::vector<BYTE> buffer;
         buffer.resize(10 * 1024);
         OVERLAPPED overlapped = { 0 };

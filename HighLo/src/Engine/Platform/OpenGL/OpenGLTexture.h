@@ -23,8 +23,7 @@ namespace highlo
 
 		virtual uint32 GetWidth() const override { return m_Width; };
 		virtual uint32 GetHeight() const override { return m_Height; };
-		virtual void* GetData() const override;
-		virtual Allocator GetWriteableBuffer() override;
+		virtual Allocator GetData() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
@@ -63,8 +62,7 @@ namespace highlo
 
 		virtual uint32 GetWidth() const override;
 		virtual uint32 GetHeight() const override;
-		virtual void *GetData() const override;
-		virtual Allocator GetWriteableBuffer() override;
+		virtual Allocator GetData() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;

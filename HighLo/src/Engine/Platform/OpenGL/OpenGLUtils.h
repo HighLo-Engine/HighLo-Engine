@@ -12,7 +12,7 @@ namespace highlo
 {
 	namespace utils
 	{
-		inline GLenum OpenGLImageFormat(TextureFormat format)
+		inline GLenum OpenGLTextureFormat(TextureFormat format)
 		{
 			switch (format)
 			{
@@ -27,11 +27,12 @@ namespace highlo
 		return 0;
 		}
 
-		inline GLenum OpenGLImageInternalFormat(TextureFormat format)
+		inline GLenum OpenGLTextureInternalFormat(TextureFormat format)
 		{
 			switch (format)
 			{
 				case TextureFormat::RGB:				return GL_RGB8;
+				case TextureFormat::RGBA8:				return GL_RGBA8;
 				case TextureFormat::SRGB:				return GL_SRGB8;
 				case TextureFormat::RGBA:				return GL_RGBA8;
 				case TextureFormat::RGBA16F:			return GL_RGBA16F;

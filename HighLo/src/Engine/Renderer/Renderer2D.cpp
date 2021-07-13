@@ -248,11 +248,11 @@ namespace highlo
 			Flush();
 
 		float textureIndex = 0.0f;
-		for (uint32_t i = 1; i < s_2DData->TextureSlotIndex; i++)
+		for (uint32 i = 1; i < s_2DData->TextureSlotIndex; i++)
 		{
 			if (*s_2DData->TextureSlots[i].Get() == *texture.Get())
 			{
-				textureIndex = (float) i;
+				textureIndex = (float)i;
 				break;
 			}
 		}

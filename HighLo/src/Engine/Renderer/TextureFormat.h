@@ -9,6 +9,7 @@ namespace highlo
 		RGBA,
 		RGBA8,
 		RGBA16,
+		RGBA32,
 		RGBA16F,
 		RGBA32F,
 		RG32F,

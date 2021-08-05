@@ -1,7 +1,7 @@
 #include <HighLo.h>
 using namespace highlo;
 
-int32 test_append_to_string()
+bool test_append_to_string()
 {
 	highloUnit::Timer timer("test_append_to_string");
 
@@ -14,7 +14,7 @@ int32 test_append_to_string()
 	return test.AssertEqual(timer, *expected, *result);
 }
 
-int32 test_remove_from_string()
+bool test_remove_from_string()
 {
 	highloUnit::Timer timer("test_remove_from_string");
 	
@@ -26,7 +26,7 @@ int32 test_remove_from_string()
 	return test.AssertEqual(timer, *expected, *str);
 }
 
-int32 test_empty_string()
+bool test_empty_string()
 {
 	highloUnit::Timer timer("test_empty_string");
 	

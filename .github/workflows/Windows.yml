@@ -1,4 +1,4 @@
-name: Windows
+name: MSBuild
 
 on:
   push:

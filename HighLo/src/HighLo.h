@@ -67,6 +67,9 @@
 
 #include "Engine/Loaders/AssetLoader.h"
 
+#include "Engine/Encryption/Base64.h"
+#include "Engine/Encryption/Encryptor.h"
+
 #include "Engine/Serialization/Serializable.h"
 #include "Engine/Serialization/Serializer.h"
 

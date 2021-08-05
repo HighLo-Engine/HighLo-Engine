@@ -19,3 +19,6 @@
 [submodule "HighLo/vendor/shaderc"]
 	path = HighLo/vendor/shaderc
 	url = https://github.com/HighLo-Engine/shaderc
+[submodule "HighLo/vendor/openssl"]
+	path = HighLo/vendor/openssl
+	url = https://github.com/HighLo-Engine/openssl

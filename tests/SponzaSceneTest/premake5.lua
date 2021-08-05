@@ -36,6 +36,8 @@ project "SponzaSceneTest"
 	{
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/SponzaSceneTest/bin/" .. outputdir .. "/SponzaSceneTest/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/SponzaSceneTest/bin/" .. outputdir .. "/SponzaSceneTest/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/SponzaSceneTest/bin/" .. outputdir .. "/SponzaSceneTest/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/SponzaSceneTest/bin/" .. outputdir .. "/SponzaSceneTest/libssl-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/SponzaSceneTest/bin/" .. outputdir .. "/SponzaSceneTest/assets"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/SponzaSceneTest/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}

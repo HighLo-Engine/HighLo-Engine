@@ -32,31 +32,35 @@ namespace highlo
 
 	OpenGLTexture2D *OpenGLTexture2D::CreateFromColor(const glm::vec3 &rgb, TextureFormat format)
 	{
-		Byte data[4];
-
 		if (format == TextureFormat::RGBA8)
 		{
+			Byte data[4];
 			data[0] = (Byte)rgb.x;
 			data[1] = (Byte)rgb.y;
 			data[2] = (Byte)rgb.z;
 			data[3] = (Byte)255; // 2^8
+			return new OpenGLTexture2D(data, 1, 1, format);
 		}
 		else if (format == TextureFormat::RGBA16)
 		{
+			uint16 data[4];
 			data[0] = (uint16)rgb.x;
 			data[1] = (uint16)rgb.y;
 			data[2] = (uint16)rgb.z;
 			data[3] = (uint16)65535; // 2^16
+			return new OpenGLTexture2D(data, 1, 1, format);
 		}
 		else if (format == TextureFormat::RGBA32)
 		{
+			uint32 data[4];
 			data[0] = (uint32)rgb.x;
 			data[1] = (uint32)rgb.y;
 			data[2] = (uint32)rgb.z;
 			data[3] = (uint32)4294967295; // 2^32
+			return new OpenGLTexture2D(data, 1, 1, format);
 		}
 
-		return new OpenGLTexture2D(data, 1, 1, format);
+		return nullptr;
 	}
 	
 	OpenGLTexture2D *OpenGLTexture2D::CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format)

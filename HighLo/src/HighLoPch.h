@@ -25,4 +25,5 @@
 
 #include "Engine/Core/HLCore.h"
 #include "Engine/Core/SharedReference.h"
+#include "Engine/Core/DataTypes/HLString.h"
 

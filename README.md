@@ -1,5 +1,3 @@
-![Windows](https://github.com/HighLo-Engine/HighLo-Engine/actions/workflows/Windows.yml/badge.svg?branch=master)
-
 # HighLo-Engine
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.
@@ -12,6 +10,14 @@ cd HighLo-Engine
 git submodule update --init --recursive
 .\GenerateProjects.bat # or simply double click this file
 ```
+
+# Build Status
+
+| Linux | Windows | MacOS | Android | IOS |
+|:--------:| :-: | :-: | :-: | :-: |
+| X    | ✓ | X | X | X |
+
+![Windows](https://github.com/HighLo-Engine/HighLo-Engine/actions/workflows/Windows.yml/badge.svg?branch=master)
 
 # Contributing
 

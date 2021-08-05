@@ -65,6 +65,10 @@ workspace "HighLo"
 		include "HighLo"
 	group ""
 
+	group "demos"
+		include "demos"
+	group ""
+
 	group "tests"
 		include "tests"
 	group ""

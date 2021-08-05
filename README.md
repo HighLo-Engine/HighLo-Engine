@@ -1,3 +1,5 @@
+![Windows](https://github.com/HighLo-Engine/HighLo-Engine/actions/workflows/Windows.yml/badge.svg?branch=master)
+
 # HighLo-Engine
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.

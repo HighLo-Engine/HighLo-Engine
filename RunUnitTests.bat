@@ -13,6 +13,8 @@ echo done preparation.
 echo Running String Unit Tests...
 call tests\StringTest\bin\StringTest.exe
 
+echo ErrorLevel: %ERRORLEVEL%
+
 if %ERRORLEVEL% equ 0 (
 	echo All Unit Tests have passed successfully!
 	EXIT 0

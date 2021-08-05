@@ -84,7 +84,7 @@ namespace highlo
 	{
 		HLString cipher;
 		uint32 cipherLength = 0;
-		unsigned char *cipherRaw;
+		unsigned char cipherRaw[256];
 		unsigned char *plainTextRaw = (unsigned char*)*plainText;
 		uint32 plainTextLength = (uint32)plainText.Length();
 
@@ -98,7 +98,7 @@ namespace highlo
 	{
 		HLString plainText;
 		uint32 plainTextLength = 0;
-		unsigned char *plainTextRaw;
+		unsigned char plainTextRaw[256];
 		unsigned char *cipherRaw = (unsigned char*)*cipherText;
 		uint32 cipherLength = (uint32)cipherText.Length();
 

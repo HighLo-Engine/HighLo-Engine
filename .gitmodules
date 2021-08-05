@@ -30,3 +30,7 @@
 	path = HighLo/vendor/openssl
 	url = https://github.com/HighLo-Engine/openssl
 	ignore = dirty
+[submodule "HighLo/vendor/HighLo-Unit"]
+	path = HighLo/vendor/HighLo-Unit
+	url = https://github.com/HighLo-Engine/HighLo-Unit
+	ignore = dirty

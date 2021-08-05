@@ -19,7 +19,8 @@ project "SponzaSceneDemo"
 		"src",
 		"%{wks.location}/HighLo/src",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.HighLo_Unit}"
     }
 
     links
@@ -38,6 +39,7 @@ project "SponzaSceneDemo"
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/libssl-3-x64.dll*"),
+				("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/HighLo-Unit.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/assets"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/SponzaSceneDemo/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}

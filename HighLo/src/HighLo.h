@@ -73,3 +73,6 @@
 #include "Engine/Serialization/Serializable.h"
 #include "Engine/Serialization/Serializer.h"
 
+// TODO: include this only if flag is active
+#include "HighLo-Unit.h"
+

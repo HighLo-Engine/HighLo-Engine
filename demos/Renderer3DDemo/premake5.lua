@@ -19,7 +19,8 @@ project "Renderer3DDemo"
 		"src",
 		"%{wks.location}/HighLo/src",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.HighLo_Unit}"
     }
 
     links
@@ -38,6 +39,7 @@ project "Renderer3DDemo"
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/Renderer3DDemo/bin/" .. outputdir .. "/Renderer3DDemo/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/Renderer3DDemo/bin/" .. outputdir .. "/Renderer3DDemo/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/Renderer3DDemo/bin/" .. outputdir .. "/Renderer3DDemo/libssl-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}demos/Renderer3DDemo/bin/" .. outputdir .. "/Renderer3DDemo/HighLo-Unit.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/Renderer3DDemo/bin/" .. outputdir .. "/Renderer3DDemo/assets"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/Renderer3DDemo/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}

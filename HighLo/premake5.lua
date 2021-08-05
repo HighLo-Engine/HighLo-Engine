@@ -27,7 +27,8 @@ project "HighLo"
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.SPIRV_Cross}",
 		"%{IncludeDir.shaderc}",
-		"%{IncludeDir.openssl}"
+		"%{IncludeDir.openssl}",
+		"%{IncludeDir.HighLo_Unit}"
     }
 
     links
@@ -57,7 +58,8 @@ project "HighLo"
 		"%{LibDir.SPIRV_Tools}",
 		"%{LibDir.SPIRV_Tools_opt}",
 		"%{LibDir.openssl_libssl}",
-		"%{LibDir.openssl_libcrypto}"
+		"%{LibDir.openssl_libcrypto}",
+		"%{LibDir.HighLo_Unit}"
     }
 
     defines

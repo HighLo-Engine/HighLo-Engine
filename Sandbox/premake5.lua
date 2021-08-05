@@ -20,7 +20,8 @@ project "Sandbox"
 		"src",
 		"../HighLo/src",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.HighLo_Unit}"
     }
 
     links
@@ -38,6 +39,7 @@ project "Sandbox"
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/HighLo-Unit.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libssl-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assets")
 	}

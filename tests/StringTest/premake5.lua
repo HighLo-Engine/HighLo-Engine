@@ -5,8 +5,8 @@ project "StringTest"
 	staticruntime "on"
 	entrypoint "mainCRTStartup"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+    targetdir ("bin")
+    objdir ("bin-obj")
 
     files
     { 
@@ -19,25 +19,29 @@ project "StringTest"
 		"src",
 		"%{wks.location}/HighLo/src",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.HighLo_Unit}"
     }
 
     links
     {
-        "HighLo"
+        "HighLo",
+		"%{LibDir.HighLo_Unit}"
     }
 
 	defines
 	{
-		"HL_USE_DLL"
+		"HL_USE_DLL",
+		"HIGHLO_UNIT_USE_DLL"
 	}
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/assimp-vc142-mtd.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/libcrypto-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/libssl-3-x64.dll*")
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/%{prj.name}/bin/HighLo.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/%{prj.name}/bin/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libssl-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}tests/%{prj.name}/bin/HighLo-Unit.dll*")
 	}
 
     filter "system:windows"

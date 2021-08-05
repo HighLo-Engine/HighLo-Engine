@@ -19,7 +19,8 @@ project "PBRSceneDemo"
 		"src",
 		"%{wks.location}/HighLo/src",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.HighLo_Unit}"
     }
 
     links
@@ -38,6 +39,7 @@ project "PBRSceneDemo"
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/PBRSceneDemo/bin/" .. outputdir .. "/PBRSceneDemo/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/PBRSceneDemo/bin/" .. outputdir .. "/PBRSceneDemo/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/PBRSceneDemo/bin/" .. outputdir .. "/PBRSceneDemo/libssl-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}demos/PBRSceneDemo/bin/" .. outputdir .. "/PBRSceneDemo/HighLo-Unit.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/PBRSceneDemo/bin/" .. outputdir .. "/PBRSceneDemo/assets"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/PBRSceneDemo/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}

@@ -10,6 +10,7 @@ ROBOCOPY HighLo\vendor\assimp\lib\Release\ tests\StringTest\bin\Release-windows-
 echo done preperation.
 
 echo Running String Unit Tests...
-call tests\StringTest\bin\Release-windows-x86_64\StringTest\StringTest.exe
+call tests\StringTest\bin\Release-windows-x86_64\StringTest\StringTest.exe || echo Some Unit tests have failed.
 
-PAUSE
+EXIT %ERRORLEVEL%
+

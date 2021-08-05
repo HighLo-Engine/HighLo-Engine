@@ -9,15 +9,15 @@ jobs:
     runs-on: windows-latest
     steps:
         - name: Checkout latest code
-        - uses: actions/checkout@v2
-            with:
-                lfs: true
-                submodules: true
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+          submodules: true
       
         - name: Build Windows 64 Bit
-        - uses: ilammy/msvc-dev-cmd@v1
-            with:
-                arch: win64
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: win64
         - run: build
     
         - name: Run Unit Tests

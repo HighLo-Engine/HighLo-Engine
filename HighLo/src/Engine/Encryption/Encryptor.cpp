@@ -14,7 +14,7 @@ namespace highlo
 	{
 		EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 		int32 len;
-		int32 ciphertext_len;
+		uint32 ciphertext_len;
 
 		if (!ctx)
 		{
@@ -49,7 +49,7 @@ namespace highlo
 	{
 		EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 		int32 len;
-		int32 plaintext_len;
+		uint32 plaintext_len;
 
 		if (!ctx)
 		{

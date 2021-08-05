@@ -1,0 +1,29 @@
+name: Windows Build
+on: [pull_request, push]
+
+jobs:
+    strategy:
+        matrix:
+            os:
+            - windows-latest
+            - windows-2016
+            platform:
+            - arch: win64
+            config: VC-WIN64
+        runs-on: ${{matrix.os}}
+        steps:
+        - name: Checkout latest code
+        - uses: actions/checkout@v2
+          with:
+            lfs: true
+            submodules: true
+          
+        - name: Build Windows 64 Bit
+        - uses: ilammy/msvc-dev-cmd@v1
+          with:
+            arch: ${{ matrix.platform.arch }}
+        - run: build
+        
+        - name: Run Unit Tests
+        
+        

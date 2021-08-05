@@ -11,7 +11,7 @@ ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\StringTest\bin\ HighLo-Unit.dll /m
 echo done preparation.
 
 echo Running String Unit Tests...
-call tests\StringTest\bin\Release-windows-x86_64\StringTest\StringTest.exe || echo Some Unit tests have failed.
+call tests\StringTest\bin\StringTest.exe || echo Some Unit tests have failed.
 
 EXIT %ERRORLEVEL%
 

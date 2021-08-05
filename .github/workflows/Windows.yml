@@ -38,11 +38,11 @@ jobs:
           working-directory: ${{env.GITHUB_WORKSPACE}}
           # Add additional options to the MSBuild command line here (like platform or verbosity level).
           # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEvent= ${{env.SOLUTION_FILE_PATH}}
+          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.SOLUTION_FILE_PATH}}
           
         - name: Build Unit Tests
           working-directory: ${{env.GITHUB_WORKSPACE}}
-          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEvent= ${{env.STRING_UNIT_TEST_FILE_PATH}}
+          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.STRING_UNIT_TEST_FILE_PATH}}
           
         - name: Run Unit Tests
           run: .\RunUnitTests.bat

@@ -6,6 +6,7 @@ Release-windows-x86_64/
 Dist-windows-x86_64/
 bin/
 bin-int/
+bin-obj/
 build/
 builds/
 !vendor/bin/

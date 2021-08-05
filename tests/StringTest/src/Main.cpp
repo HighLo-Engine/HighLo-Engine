@@ -1,5 +1,4 @@
 #include <HighLo.h>
-#include <HighLo-Unit.h>
 using namespace highlo;
 
 int32 test_append_to_string()

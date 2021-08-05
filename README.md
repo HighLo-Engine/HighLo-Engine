@@ -8,6 +8,7 @@ The HighLo Engine is a free open source game engine made only by two very passio
 git clone https://github.com/HighLo-Engine/HighLo-Engine.git
 cd HighLo-Engine
 git submodule update --init --recursive
+.\GenerateProjects.bat # or simply double click this file
 ```
 
 # Contributing

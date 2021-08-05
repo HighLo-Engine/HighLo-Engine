@@ -13,14 +13,8 @@ echo done preparation.
 echo Running String Unit Tests...
 call tests\StringTest\bin\StringTest.exe
 
-echo ErrorLevel: %ERRORLEVEL%
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 
-if %ERRORLEVEL% equ 0 (
-	echo All Unit Tests have passed successfully!
-	EXIT 0
-) else (
-	echo Error: Some unit tests failed
-	EXIT 1
-)
-
+echo All Unit Tests have passed successfully
+pause
 

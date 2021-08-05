@@ -37,9 +37,7 @@ project "StringTest"
 		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/libcrypto-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/libssl-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/assets"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}tests/StringTest/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/StringTest/bin/" .. outputdir .. "/StringTest/libssl-3-x64.dll*")
 	}
 
     filter "system:windows"

@@ -12,7 +12,7 @@ bool test_append_to_string()
 
 	highloUnit::UnitTest test;
 	bool unitTestResult = test.AssertEqual(timer, *expected, *result);
-	if (unitTestResult)
+	if (!unitTestResult)
 	{
 		std::cout << "Test test_append_to_string succeeded!" << std::endl;
 	}
@@ -34,7 +34,7 @@ bool test_remove_from_string()
 
 	highloUnit::UnitTest test;
 	bool unitTestResult = test.AssertEqual(timer, *expected, *str);
-	if (unitTestResult)
+	if (!unitTestResult)
 	{
 		std::cout << "Test test_remove_from_string succeeded!" << std::endl;
 	}
@@ -54,7 +54,7 @@ bool test_empty_string()
 
 	highloUnit::UnitTest test;
 	bool unitTestResult = test.AssertEqual<uint32>(timer, emptyStr.Length(), 0);
-	if (unitTestResult)
+	if (!unitTestResult)
 	{
 		std::cout << "Test test_empty_string succeeded!" << std::endl;
 	}

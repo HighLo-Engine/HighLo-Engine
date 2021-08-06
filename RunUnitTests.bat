@@ -13,9 +13,8 @@ ECHO done preparation.
 ECHO Running String Unit Tests...
 
 cd.>nul
-call tests\StringTest\bin\StringTest.exe
+CALL tests\StringTest\bin\StringTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 
-ECHO All Unit Tests have passed successfully
 EXIT /B 0
 

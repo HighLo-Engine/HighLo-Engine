@@ -4,78 +4,108 @@
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 
-// Temp
-#define KEY ""
-#define IV ""
-
 namespace highlo
 {
+	static EVP_CIPHER_CTX *CipherContext = nullptr;
+	
+	namespace utils
+	{
+		static const EVP_CIPHER *ConvertAlgorithmFromType(EncryptionAlgorithm algorithm)
+		{
+			switch (algorithm)
+			{
+				case EncryptionAlgorithm::AES_128_CBC:
+					return EVP_aes_128_cbc();
+
+				case EncryptionAlgorithm::AES_256_CBC:
+					return EVP_aes_256_cbc();
+
+				case EncryptionAlgorithm::AES_192_CBC:
+					return EVP_aes_192_cbc();
+
+				case EncryptionAlgorithm::AES_128_CCM:
+					return EVP_aes_128_ccm();
+
+				case EncryptionAlgorithm::AES_256_CCM:
+					return EVP_aes_256_ccm();
+
+				case EncryptionAlgorithm::AES_192_CCM:
+					return EVP_aes_192_ccm();
+
+				case EncryptionAlgorithm::AES_128_CFB:
+					return EVP_aes_128_cfb128();
+
+				case EncryptionAlgorithm::AES_256_CFB:
+					return EVP_aes_256_cfb128();
+
+				case EncryptionAlgorithm::AES_192_CFB:
+					return EVP_aes_192_cfb128();
+
+
+
+				case EncryptionAlgorithm::None:
+				default:
+					HL_ASSERT(false, "Unknown algorithm!");
+					return nullptr;
+			}
+		}
+	}
+
+	Encryptor::Encryptor(const HLString &key, const HLString &iv, EncryptionAlgorithm algorithm)
+		: Key(key), IV(iv), Algorithm(algorithm)
+	{
+		if (!CipherContext)
+		{
+			CipherContext = EVP_CIPHER_CTX_new();
+			if (!CipherContext)
+				HL_CORE_ERROR("Error: Cipher context could not be created!");
+		}
+	}
+
+	Encryptor::~Encryptor()
+	{
+		if (CipherContext)
+			EVP_CIPHER_CTX_free(CipherContext);
+	}
+
 	uint32 Encryptor::Encrypt(unsigned char *plainText, uint32 plainTextLength, unsigned char *cipherText)
 	{
-		EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 		int32 len;
 		uint32 ciphertext_len;
 
-		if (!ctx)
-		{
+		if (!EVP_EncryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char*)*Key, (unsigned char*)*IV))
+			HL_CORE_ERROR("Error: Could not initialize the Encryptor");
 
-		}
-
-		if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (unsigned char*)KEY, (unsigned char*)IV))
-		{
-
-		}
-
-		if (1 != EVP_EncryptUpdate(ctx, cipherText, &len, plainText, plainTextLength))
-		{
-
-		}
+		if (!EVP_EncryptUpdate(CipherContext, cipherText, &len, plainText, plainTextLength))
+			HL_CORE_ERROR("Error: ");
 
 		ciphertext_len = len;
 
-		if (1 != EVP_EncryptFinal_ex(ctx, cipherText + len, &len))
-		{
-
-		}
+		if (!EVP_EncryptFinal_ex(CipherContext, cipherText + len, &len))
+			HL_CORE_ERROR("Error: ");
 
 		ciphertext_len += len;
-
-		EVP_CIPHER_CTX_free(ctx);
 		cipherText[ciphertext_len] = '\0';
 		return ciphertext_len;
 	}
 
 	uint32 Encryptor::Decrypt(unsigned char *cipherText, uint32 cipherTextLength, unsigned char *plainText)
 	{
-		EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 		int32 len;
 		uint32 plaintext_len;
 
-		if (!ctx)
-		{
+		if (!EVP_DecryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char *)*Key, (unsigned char *)*IV))
+			HL_CORE_ERROR("Error: ");
 
-		}
-
-		if (!EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (unsigned char *) KEY, (unsigned char *) IV))
-		{
-
-		}
-
-		if (!EVP_DecryptUpdate(ctx, plainText, &len, cipherText, cipherTextLength))
-		{
-
-		}
+		if (!EVP_DecryptUpdate(CipherContext, plainText, &len, cipherText, cipherTextLength))
+			HL_CORE_ERROR("Error: ");
 
 		plaintext_len = len;
 
-		if (!EVP_DecryptFinal_ex(ctx, plainText + len, &len))
-		{
-
-		}
+		if (!EVP_DecryptFinal_ex(CipherContext, plainText + len, &len))
+			HL_CORE_ERROR("Error: ");
 
 		plaintext_len += len;
-
-		EVP_CIPHER_CTX_free(ctx);
 		plainText[plaintext_len] = '\0';
 		return plaintext_len;
 	}

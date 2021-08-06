@@ -47,6 +47,9 @@ int main(int argc, char *argv[])
 
 	highloUnit::UnitTest unitTest;
 	unitTest.AppendAllTests(funcs);
-	return unitTest.ExecuteTests();
+	
+	int exitCode = unitTest.ExecuteTests();
+	std::cout << "Exit Code: " << exitCode << std::endl;
+	return exitCode;
 }
 

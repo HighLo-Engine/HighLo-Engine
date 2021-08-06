@@ -4,9 +4,6 @@ using namespace highlo;
 bool test_append_to_string()
 {
 	highloUnit::Timer timer("test_append_to_string");
-	highloUnit::Ref<highloUnit::Console> console = highloUnit::Console::Create();
-	highloUnit::ConsoleForeground foreground = highloUnit::ConsoleForeground::GREEN;
-	highloUnit::ConsoleBackground background = highloUnit::ConsoleBackground::BLACK;
 
 	HLString str = "Hello";
 	HLString str2 = " World!";
@@ -17,12 +14,11 @@ bool test_append_to_string()
 	bool unitTestResult = test.AssertEqual(timer, *expected, *result);
 	if (unitTestResult)
 	{
-		console->WriteLine("Test test_append_to_string succeeded!", foreground, background);
+		std::cout << "Test test_append_to_string succeeded!" << std::endl;
 	}
 	else
 	{
-		foreground = highloUnit::ConsoleForeground::RED;
-		console->WriteLine("Test test_append_to_string failed!", foreground, background);
+		std::cout << "Test test_append_to_string failed!" << std::endl;
 	}
 
 	return unitTestResult;
@@ -31,9 +27,6 @@ bool test_append_to_string()
 bool test_remove_from_string()
 {
 	highloUnit::Timer timer("test_remove_from_string");
-	highloUnit::Ref<highloUnit::Console> console = highloUnit::Console::Create();
-	highloUnit::ConsoleForeground foreground = highloUnit::ConsoleForeground::GREEN;
-	highloUnit::ConsoleBackground background = highloUnit::ConsoleBackground::BLACK;
 	
 	HLString str = "Hello World!";
 	str -= " World!";
@@ -43,12 +36,11 @@ bool test_remove_from_string()
 	bool unitTestResult = test.AssertEqual(timer, *expected, *str);
 	if (unitTestResult)
 	{
-		console->WriteLine("Test test_remove_from_string succeeded!", foreground, background);
+		std::cout << "Test test_remove_from_string succeeded!" << std::endl;
 	}
 	else
 	{
-		foreground = highloUnit::ConsoleForeground::RED;
-		console->WriteLine("Test test_remove_from_string failed!", foreground, background);
+		std::cout << "Test test_remove_from_string failed!" << std::endl;
 	}
 
 	return unitTestResult;
@@ -57,9 +49,6 @@ bool test_remove_from_string()
 bool test_empty_string()
 {
 	highloUnit::Timer timer("test_empty_string");
-	highloUnit::Ref<highloUnit::Console> console = highloUnit::Console::Create();
-	highloUnit::ConsoleForeground foreground = highloUnit::ConsoleForeground::GREEN;
-	highloUnit::ConsoleBackground background = highloUnit::ConsoleBackground::BLACK;
 
 	HLString emptyStr = "";
 
@@ -67,12 +56,11 @@ bool test_empty_string()
 	bool unitTestResult = test.AssertEqual<uint32>(timer, emptyStr.Length(), 0);
 	if (unitTestResult)
 	{
-		console->WriteLine("Test test_empty_string succeeded!", foreground, background);
+		std::cout << "Test test_empty_string succeeded!" << std::endl;
 	}
 	else
 	{
-		foreground = highloUnit::ConsoleForeground::RED;
-		console->WriteLine("Test test_empty_string failed!", foreground, background);
+		std::cout << "Test test_empty_string failed!" << std::endl;
 	}
 
 	return unitTestResult;

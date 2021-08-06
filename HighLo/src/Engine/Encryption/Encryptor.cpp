@@ -70,8 +70,8 @@ namespace highlo
 
 	uint32 Encryptor::Encrypt(unsigned char *plainText, uint32 plainTextLength, unsigned char *cipherText)
 	{
-		int32 len;
-		uint32 ciphertext_len;
+		int32 len = 0;
+		uint32 ciphertext_len = 0;
 
 		if (!EVP_EncryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char*)*Key, (unsigned char*)*IV))
 			HL_CORE_ERROR("Error: Could not initialize the Encryptor");
@@ -91,8 +91,8 @@ namespace highlo
 
 	uint32 Encryptor::Decrypt(unsigned char *cipherText, uint32 cipherTextLength, unsigned char *plainText)
 	{
-		int32 len;
-		uint32 plaintext_len;
+		int32 len = 0;
+		uint32 plaintext_len = 0;
 
 		if (!EVP_DecryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char *)*Key, (unsigned char *)*IV))
 			HL_CORE_ERROR("Error: ");
@@ -112,30 +112,24 @@ namespace highlo
 	
 	HLString Encryptor::Encrypt(const HLString &plainText)
 	{
-		HLString cipher;
-		uint32 cipherLength = 0;
 		unsigned char cipherRaw[256];
 		unsigned char *plainTextRaw = (unsigned char*)*plainText;
 		uint32 plainTextLength = (uint32)plainText.Length();
+		uint32 cipherLength = 0;
 
 		cipherLength = Encrypt(plainTextRaw, plainTextLength, cipherRaw);
-		cipher = HLString((const char*)cipherRaw, cipherLength);
-
-		return cipher;
+		return HLString((const char*)cipherRaw, cipherLength);
 	}
 	
 	HLString Encryptor::Decrypt(const HLString &cipherText)
 	{
-		HLString plainText;
-		uint32 plainTextLength = 0;
 		unsigned char plainTextRaw[256];
 		unsigned char *cipherRaw = (unsigned char*)*cipherText;
 		uint32 cipherLength = (uint32)cipherText.Length();
+		uint32 plainTextLength = 0;
 
 		plainTextLength = Decrypt(cipherRaw, cipherLength, plainTextRaw);
-		plainText = HLString((const char*) plainTextRaw, plainTextLength);
-
-		return plainText;
+		return HLString((const char*) plainTextRaw, plainTextLength);
 	}
 	
 	HLString Encryptor::EncryptBase64(const HLString &plainText)

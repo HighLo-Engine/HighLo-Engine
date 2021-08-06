@@ -6,10 +6,10 @@ namespace highlo
 	{
 	public:
 
-		static bool IsBase64(Byte c);
-		static HLString Encode(const Byte *buffer, uint32 bufferLength);
-		static std::vector<Byte> Decode(const HLString &encodedString);
-		static HLString DecodeToString(const HLString &encodedString);
+		HLAPI static bool IsBase64(Byte c);
+		HLAPI static HLString Encode(const Byte *buffer, uint32 bufferLength);
+		HLAPI static std::vector<Byte> Decode(const HLString &encodedString);
+		HLAPI static HLString DecodeToString(const HLString &encodedString);
 	};
 }
 

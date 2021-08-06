@@ -33,7 +33,7 @@ bool test_empty_string()
 	HLString emptyStr = "";
 
 	highloUnit::UnitTest test;
-	return test.AssertEqual<uint32>(timer, emptyStr.Length(), 0);
+	return test.AssertEqual<uint32>(timer, emptyStr.Length(), 2);
 }
 
 int main(int argc, char *argv[])
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	std::vector<highloUnit::UnitTestEntry> funcs = 
 	{
 		{ test_append_to_string, true, "test_append_to_string" },
-		{ test_remove_from_string, false, "test_remove_from_string" },
+		{ test_remove_from_string, true, "test_remove_from_string" },
 		{ test_empty_string, true, "test_empty_string" },
 	};
 

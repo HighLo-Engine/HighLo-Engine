@@ -11,10 +11,9 @@ ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\StringTest\bin\ HighLo-Unit.dll /m
 ECHO done preparation.
 
 ECHO Running String Unit Tests...
+
 cd.>nul
-ECHO BEFORE: %ERRORLEVEL%
 call tests\StringTest\bin\StringTest.exe
-ECHO AFTER: %ERRORLEVEL%
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 
 ECHO All Unit Tests have passed successfully

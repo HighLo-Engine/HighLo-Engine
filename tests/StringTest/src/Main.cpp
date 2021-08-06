@@ -11,17 +11,7 @@ bool test_append_to_string()
 	HLString expected = "Hello World!";
 
 	highloUnit::UnitTest test;
-	bool unitTestResult = test.AssertEqual(timer, *expected, *result);
-	if (!unitTestResult)
-	{
-		std::cout << "Test test_append_to_string succeeded!" << std::endl;
-	}
-	else
-	{
-		std::cout << "Test test_append_to_string failed!" << std::endl;
-	}
-
-	return unitTestResult;
+	return test.AssertEqual(timer, *expected, *result);
 }
 
 bool test_remove_from_string()
@@ -33,17 +23,7 @@ bool test_remove_from_string()
 	HLString expected = "Hello";
 
 	highloUnit::UnitTest test;
-	bool unitTestResult = test.AssertEqual(timer, *expected, *str);
-	if (!unitTestResult)
-	{
-		std::cout << "Test test_remove_from_string succeeded!" << std::endl;
-	}
-	else
-	{
-		std::cout << "Test test_remove_from_string failed!" << std::endl;
-	}
-
-	return unitTestResult;
+	return test.AssertEqual(timer, *expected, *str);
 }
 
 bool test_empty_string()
@@ -53,17 +33,7 @@ bool test_empty_string()
 	HLString emptyStr = "";
 
 	highloUnit::UnitTest test;
-	bool unitTestResult = test.AssertEqual<uint32>(timer, emptyStr.Length(), 0);
-	if (!unitTestResult)
-	{
-		std::cout << "Test test_empty_string succeeded!" << std::endl;
-	}
-	else
-	{
-		std::cout << "Test test_empty_string failed!" << std::endl;
-	}
-
-	return unitTestResult;
+	return test.AssertEqual<uint32>(timer, emptyStr.Length(), 0);
 }
 
 int main(int argc, char *argv[])

@@ -80,7 +80,7 @@ namespace highlo
 		s_Data->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1).As<Texture2D>();
 		s_Data->WhiteTexture->GetData().Write(&whiteTextureData, sizeof(uint32));
 
-		s_Data->BRDFLut = Texture2D::LoadFromFile("assets/textures/brdfMap.png").As<Texture2D>();
+		s_Data->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png").As<Texture2D>();
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 
 		// Define Shader layouts

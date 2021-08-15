@@ -39,12 +39,17 @@ namespace highlo
     static bool s_WindowIsActive = false;
     static bool s_UseMenuBar = false;
     static ImGuiWindowStyle s_ImGuiWindowStyle = ImGuiWindowStyle::None;
+    static ImGuiContext *s_ImGuiContext = nullptr;
 
     void ImGuiRenderer::Init(Window *window, ImGuiWindowStyle windowStyle)
     {
         IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
+        ImGuiContext *context = ImGui::CreateContext();
+        s_ImGuiContext = context;
         s_ImGuiWindowStyle = windowStyle;
+
+        // Globals are not shared accross DLL, so we need to call ImGui::SetCurrentContext
+        ImGui::SetCurrentContext(s_ImGuiContext);
 
         ImGuiIO &io = ImGui::GetIO();
         io.IniFilename = "editorconfig.ini"; // rename imgui.ini to editorconfig to hide the usage from imgui
@@ -99,6 +104,7 @@ namespace highlo
 
     void ImGuiRenderer::Shutdown()
     {
+        ImGui::SetCurrentContext(s_ImGuiContext);
         IMGUI_RENDER_API_IMPL_FN_NAME(Shutdown)();
         IMGUI_WINDOW_IMPL_FN_NAME(Shutdown)();
         ImGui::DestroyContext();
@@ -106,6 +112,7 @@ namespace highlo
 
     void ImGuiRenderer::StartScene()
     {
+        ImGui::SetCurrentContext(s_ImGuiContext);
         IMGUI_RENDER_API_IMPL_FN_NAME(NewFrame)();
         IMGUI_WINDOW_IMPL_FN_NAME(NewFrame)();
         ImGui::NewFrame();
@@ -123,6 +130,8 @@ namespace highlo
     void ImGuiRenderer::EndScene()
     {
         s_CanDraw = false;
+
+        ImGui::SetCurrentContext(s_ImGuiContext);
 
         ImGuiIO &io = ImGui::GetIO();
         io.DisplaySize = ImVec2((float)HLApplication::Get().GetWindow().GetWidth(), (float)HLApplication::Get().GetWindow().GetHeight());
@@ -1101,8 +1110,7 @@ namespace highlo
             ImGui::OpenPopup("mytest");
         }
 
-        bool open = true;
-        if (ImGui::BeginPopupModal("mytest", &open, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::BeginPopup("mytest"))
         {
             if (ImGui::BeginMenu("Test"))
             {

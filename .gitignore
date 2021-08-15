@@ -11,7 +11,7 @@ build/
 builds/
 !vendor/bin/
 
-Visual Studio files
+# Visual Studio files
 **.sln
 **.vcxproj
 **.vcxproj.filters

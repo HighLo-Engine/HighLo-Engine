@@ -46,7 +46,7 @@ void HighLoEditor::OnInitialize()
 	m_MaterialViewer->Initialize(width, height);
 
 	GetWindow().Maximize();
-	GetWindow().SetWindowIcon("assets/textures/HighLoEngine.png", true);
+	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png", true);
 	UpdateWindowTitle("Untitled Scene");
 
 	FileSystem::StartWatching();

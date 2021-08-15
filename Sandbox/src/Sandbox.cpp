@@ -3,7 +3,7 @@
 void Sandbox::OnInitialize()
 {
 	// TODO: Fix for GLFW configuration.
-	//HLApplication::Get().GetWindow().SetWindowIcon("assets/textures/HighLoEngine.ico");
+	//HLApplication::Get().GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.ico");
 
 	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");

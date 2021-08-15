@@ -11,6 +11,14 @@ namespace highlo
 		memcpy(m_Data, data, m_Size);
 	}
 
+	HLString::HLString(const char *data, uint32 length)
+	{
+		m_Size = length;
+		m_Data = new char[m_Size + 1];
+		m_Data[m_Size] = '\0';
+		memcpy(m_Data, data, m_Size);
+	}
+
 	HLString::HLString(const wchar_t *data)
 	{
 		m_Size = (uint32) wcslen(data);
@@ -118,13 +126,13 @@ namespace highlo
 		m_Size = 0;
 	}
 
-	void HLString::Resize(int64 m_Size)
+	void HLString::Resize(int64 size)
 	{
 		if (m_Data)
 			delete[] m_Data;
 
-		m_Size = (uint32) m_Size;
-		m_Data = new char[m_Size];
+		m_Size = (uint32)size;
+		m_Data = new char[size];
 	}
 
 	uint32 HLString::Length() const
@@ -367,9 +375,14 @@ namespace highlo
 
 	uint32 HLString::LastIndexOf(const char letter, uint32 offset) const
 	{
+		HL_ASSERT(offset >= 0 && offset < m_Size, "Offset is out of bounds!");
+
+		if (offset == 0)
+			offset = m_Size;
+
 		// Count how many times the letter exists
 		uint32 letterCount = 0;
-		for (uint32 i = 0; i < m_Size; ++i)
+		for (uint32 i = 0; i < offset; ++i)
 		{
 			if (m_Data[i] == letter)
 				++letterCount;
@@ -382,14 +395,16 @@ namespace highlo
 		// Get the last letter index
 		for (uint32 i = 0; i < m_Size; ++i)
 		{
+			if (letterCount == 1 && m_Data[i] == letter)
+			{
+				return i;
+			}
+
 			if (m_Data[i] == letter && letterCount > 0)
 			{
 				--letterCount;
 				continue;
 			}
-
-			if (m_Data[i] == letter)
-				return i;
 		}
 
 		return NPOS;

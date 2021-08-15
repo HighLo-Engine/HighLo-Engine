@@ -77,12 +77,12 @@ namespace highlo
 			HL_CORE_ERROR("Error: Could not initialize the Encryptor");
 
 		if (!EVP_EncryptUpdate(CipherContext, cipherText, &len, plainText, plainTextLength))
-			HL_CORE_ERROR("Error: ");
+			HL_CORE_ERROR("Error: Could not update the encryption");
 
 		ciphertext_len = len;
 
 		if (!EVP_EncryptFinal_ex(CipherContext, cipherText + len, &len))
-			HL_CORE_ERROR("Error: ");
+			HL_CORE_ERROR("Error: Could not encrypt");
 
 		ciphertext_len += len;
 		cipherText[ciphertext_len] = '\0';
@@ -95,15 +95,15 @@ namespace highlo
 		uint32 plaintext_len = 0;
 
 		if (!EVP_DecryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char *)*Key, (unsigned char *)*IV))
-			HL_CORE_ERROR("Error: ");
+			HL_CORE_ERROR("Error: Could not initialize the decryptor");
 
 		if (!EVP_DecryptUpdate(CipherContext, plainText, &len, cipherText, cipherTextLength))
-			HL_CORE_ERROR("Error: ");
+			HL_CORE_ERROR("Error: Could not update the decryption");
 
 		plaintext_len = len;
 
 		if (!EVP_DecryptFinal_ex(CipherContext, plainText + len, &len))
-			HL_CORE_ERROR("Error: ");
+			HL_CORE_ERROR("Error: Could not decrypt");
 
 		plaintext_len += len;
 		plainText[plaintext_len] = '\0';

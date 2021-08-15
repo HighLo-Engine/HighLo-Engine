@@ -13,6 +13,7 @@ namespace highlo
 
 		HLAPI HLString() = default;
 		HLAPI HLString(const char *data);
+		HLAPI HLString(const char *data, uint32 length);
 		HLAPI HLString(const wchar_t *data);
 		HLAPI HLString(const std::string &str);
 		HLAPI HLString(const std::wstring &wideStr);

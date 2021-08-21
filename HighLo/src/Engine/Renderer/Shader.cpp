@@ -8,7 +8,7 @@
 #include "Engine/Platform/DX11/DX11Shader.h"
 #endif // HIGHLO_API_DX11
 
-#include "Engine/Math/HLMath.h"
+#include "Engine/Math/Math.h"
 
 namespace highlo
 {

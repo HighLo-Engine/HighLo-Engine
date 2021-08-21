@@ -772,7 +772,7 @@ CODE
 //-------------------------------------------------------------------------
 
 #include "HighLoPch.h"
-#include "Engine/Core/HLLog.h"
+#include "Engine/Core/Log.h"
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS

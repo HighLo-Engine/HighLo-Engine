@@ -4,8 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "Engine/Core/HLCore.h"
-#include "HLMath.h"
+#include "Engine/Core/Core.h"
+#include "Math.h"
 
 namespace highlo
 {

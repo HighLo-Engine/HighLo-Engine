@@ -3,7 +3,7 @@
 
 #include "Engine/Renderer/CoreRenderer.h"
 #include "Engine/Window/Window.h"
-#include "Engine/Math/HLMath.h"
+#include "Engine/Math/Math.h"
 
 namespace highlo
 {

@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 
-#include "Engine/Core/HLVirtualFileSystem.h"
+#include "Engine/Core/VirtualFileSystem.h"
 
 namespace highlo
 {

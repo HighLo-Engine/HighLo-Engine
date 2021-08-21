@@ -1,7 +1,7 @@
 #pragma once
 #include "BufferLayout.h"
 #include "UniformBuffer.h"
-#include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Core/DataTypes/String.h"
 #include <map>
 
 namespace highlo

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Math/HLMath.h"
+#include "Engine/Math/Math.h"
 
 namespace highlo
 {

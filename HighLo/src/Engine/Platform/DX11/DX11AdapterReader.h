@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/HLLog.h"
+#include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_DX11
 

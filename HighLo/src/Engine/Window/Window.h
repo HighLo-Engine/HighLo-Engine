@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Engine/Core/HLCore.h"
+#include "Engine/Core/Core.h"
 #include "Engine/Events/Events.h"
-#include "Engine/Core/HLLog.h"
-#include "Engine/Core/dataTypes/HLString.h"
+#include "Engine/Core/Log.h"
+#include "Engine/Core/DataTypes/String.h"
 #include "MenuBar.h"
 
 namespace highlo

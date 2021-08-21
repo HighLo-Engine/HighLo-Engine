@@ -1,7 +1,8 @@
 #pragma once
-#include "Engine/Math/HLMath.h"
+
+#include "Engine/Math/Math.h"
 #include "Engine/Events/Events.h"
-#include "Engine/Core/HLTime.h"
+#include "Engine/Core/Time.h"
 
 namespace highlo
 {

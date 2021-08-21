@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "Engine/Core/DataTypes/HLString.h"
-#include "Engine/Math/HLMath.h"
-#include "Engine/Core/HLAllocator.h"
+#include "Engine/Core/DataTypes/String.h"
+#include "Engine/Math/Math.h"
+#include "Engine/Core/Allocator.h"
 #include "TextureFormat.h"
 
 namespace highlo

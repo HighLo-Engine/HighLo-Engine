@@ -1,7 +1,8 @@
 #pragma once
+
 #include "Mesh.h"
-#include "Engine/Core/DataTypes/HLString.h"
-#include "Engine/Math/HLAABB.h"
+#include "Engine/Core/DataTypes/String.h"
+#include "Engine/Math/AABB.h"
 #include <vector>
 #include <initializer_list>
 

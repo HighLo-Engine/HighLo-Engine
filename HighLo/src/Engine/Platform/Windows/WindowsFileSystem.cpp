@@ -1,5 +1,5 @@
 #include "HighLoPch.h"
-#include "Engine/Core/HLFileSystem.h"
+#include "Engine/Core/FileSystem.h"
 
 #ifdef HL_PLATFORM_WINDOWS
 

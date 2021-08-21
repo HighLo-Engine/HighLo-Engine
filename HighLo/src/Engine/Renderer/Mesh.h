@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Renderer/VertexData.h"
 #include "Engine/Renderer/VertexArray.h"
-#include "Engine/Core/HLTime.h"
+#include "Engine/Core/Time.h"
 #include "Material.h"
 #include "Animation.h"
 

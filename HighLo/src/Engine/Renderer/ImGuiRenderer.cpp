@@ -1,10 +1,10 @@
 #include "HighLoPch.h"
 #include "ImGuiRenderer.h"
 
-#include "Engine/Application/HLApplication.h"
+#include "Engine/Application/Application.h"
 #include "Engine/Window/Window.h"
-#include "Engine/Core/HLTime.h"
-#include "Engine/Core/HLInput.h"
+#include "Engine/Core/Time.h"
+#include "Engine/Core/Input.h"
 #include "Engine/ImGui/imgui.h"
 #include "Engine/ImGui/ImGuizmo.h"
 #include "Engine/ImGui/imgui_internal.h"

@@ -10,7 +10,7 @@
 #include "RendererCapabilities.h"
 #include "RenderPass.h"
 #include "Model.h"
-#include "Engine/Math/HLAABB.h"
+#include "Engine/Math/AABB.h"
 
 namespace highlo
 {

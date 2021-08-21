@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Engine/Core/DataTypes/HLString.h"
-#include "Engine/Math/HLMath.h"
+#include "Engine/Core/DataTypes/String.h"
+#include "Engine/Math/Math.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Window/MenuBar.h"
 #include "Engine/Window/PopupMenu.h"

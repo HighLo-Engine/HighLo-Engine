@@ -1,7 +1,7 @@
 #include "HighLoPch.h"
 #include "Material.h"
 
-#include "Engine/Math/HLMath.h"
+#include "Engine/Math/Math.h"
 #include "Engine/Renderer/Renderer.h"
 
 #include "Animation.h"

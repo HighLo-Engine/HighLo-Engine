@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine/Renderer/VertexBuffer.h"
-#include "Engine/Core/HLLog.h"
+#include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_OPENGL
 

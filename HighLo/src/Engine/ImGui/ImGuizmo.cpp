@@ -33,8 +33,8 @@
 #include "imgui_internal.h"
 #include "ImGuizmo.h"
 
-#include "Engine/Core/HLInput.h"
-#include "Engine/Core/Defines/HLKeyCodes.h"
+#include "Engine/Core/Input.h"
+#include "Engine/Core/Defines/KeyCodes.h"
 
 // includes patches for multiview from
 // https://github.com/CedricGuillemet/ImGuizmo/issues/15

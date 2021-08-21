@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Core/DataTypes/String.h"
 
 namespace highlo
 {
@@ -15,3 +15,4 @@ namespace highlo
 		float MaxAnisotropy = 0.0f;
 	};
 }
+

@@ -4,8 +4,8 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Engine/Window/Window.h"
-#include "Engine/Core/HLInput.h"
-#include "Engine/Core/HLTime.h"
+#include "Engine/Core/Input.h"
+#include "Engine/Core/Time.h"
 
 namespace highlo
 {

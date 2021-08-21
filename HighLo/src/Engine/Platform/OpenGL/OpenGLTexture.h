@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine/Renderer/Texture.h"
-#include "Engine/Core/HLAllocator.h"
+#include "Engine/Core/Allocator.h"
 
 #ifdef HIGHLO_API_OPENGL
 

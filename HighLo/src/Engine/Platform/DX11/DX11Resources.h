@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/Core/HLCore.h"
-#include "Engine/Core/HLLog.h"
+#include "Engine/Core/Core.h"
+#include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_DX11
 #include <d3d11.h>

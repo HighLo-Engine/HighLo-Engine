@@ -1,5 +1,6 @@
 #include "HighLoPch.h"
 #include "AssimpLoader.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -7,7 +8,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "Engine/Core/HLCore.h"
+#include "Engine/Core/Core.h"
 
 namespace highlo
 {

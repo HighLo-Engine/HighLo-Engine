@@ -5,7 +5,7 @@
 
 #include <stb_image.h>
 
-#include "Engine/Core/HLLog.h"
+#include "Engine/Core/Log.h"
 #include "Engine/Utils/ImageUtils.h"
 #include "OpenGLUtils.h"
 

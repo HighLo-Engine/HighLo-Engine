@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/Core/HLCore.h"
-#include "Engine/Math/HLMath.h"
+#include "Engine/Core/Core.h"
+#include "Engine/Math/Math.h"
 
 #include "VertexArray.h"
 #include "Environment.h"

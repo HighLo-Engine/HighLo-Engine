@@ -4,9 +4,9 @@
 #include <math.h>
 #include <cmath>
 
-#include "Engine/Core/HLCore.h"
-#include "Engine/Core/HLLog.h"
-#include "Engine/Core/HLAssert.h"
+#include "Engine/Core/Core.h"
+#include "Engine/Core/Log.h"
+#include "Engine/Core/Assert.h"
 #include "Engine/Renderer/TextureFormat.h"
 
 namespace highlo

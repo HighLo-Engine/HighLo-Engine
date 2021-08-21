@@ -1,10 +1,10 @@
 #include "HighLoPch.h"
-#include "Engine/Core/HLInput.h"
+#include "Engine/Core/Input.h"
 
 #ifndef HIGHLO_API_GLFW
 
 #include <Windows.h>
-#include "Engine/Application/HLApplication.h"
+#include "Engine/Application/Application.h"
 #include "Engine/Utils/InputUtils.h"
 
 namespace highlo

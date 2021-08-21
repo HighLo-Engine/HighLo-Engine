@@ -4,7 +4,7 @@
 
 #include "Engine/Window/Window.h"
 #include "Engine/Renderer/RenderingContext.h"
-#include "Engine/Core/HLLog.h"
+#include "Engine/Core/Log.h"
 
 namespace highlo
 {

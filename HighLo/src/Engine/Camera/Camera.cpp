@@ -2,7 +2,7 @@
 #include "Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include "Engine/Application/HLApplication.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo
 {

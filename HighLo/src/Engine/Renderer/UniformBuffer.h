@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 
-#include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Core/DataTypes/String.h"
 #include "UniformBufferSlotMappings.h"
 
 namespace highlo

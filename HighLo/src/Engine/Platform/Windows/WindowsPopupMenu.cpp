@@ -3,7 +3,7 @@
 
 #ifdef HL_PLATFORM_WINDOWS
 
-#include "Engine/Core/HLInput.h"
+#include "Engine/Core/Input.h"
 
 namespace highlo
 {

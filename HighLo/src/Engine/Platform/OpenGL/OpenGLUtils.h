@@ -4,8 +4,8 @@
 
 #include <glad/glad.h>
 
-#include "Engine/Core/HLLog.h"
-#include "Engine/Core/HLAssert.h"
+#include "Engine/Core/Log.h"
+#include "Engine/Core/Assert.h"
 #include "Engine/Renderer/TextureFormat.h"
 
 namespace highlo

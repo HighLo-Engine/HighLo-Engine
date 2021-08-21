@@ -4,7 +4,7 @@
 
 #include "Shader.h"
 #include "Texture.h"
-#include "Engine/Math/HLMath.h"
+#include "Engine/Math/Math.h"
 
 namespace highlo
 {

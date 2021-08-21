@@ -4,8 +4,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <vector>
 
-#include "Engine/Core/HLTime.h"
-#include "Engine/Math/HLMath.h"
+#include "Engine/Core/Time.h"
+#include "Engine/Math/Math.h"
 #include "Engine/Math/Transform.h"
 
 namespace highlo

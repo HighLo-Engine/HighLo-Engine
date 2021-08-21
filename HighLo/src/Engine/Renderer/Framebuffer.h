@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 
-#include "Engine/Core/HLCore.h"
-#include "Engine/Core/HLLog.h"
-#include "Engine/Core/DataTypes/HLString.h"
+#include "Engine/Core/Core.h"
+#include "Engine/Core/Log.h"
+#include "Engine/Core/DataTypes/String.h"
 #include "Engine/Renderer/TextureFormat.h"
 #include "Engine/Renderer/Texture.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/HLCore.h"
+#include "Engine/Core/Core.h"
 
 namespace highlo
 {

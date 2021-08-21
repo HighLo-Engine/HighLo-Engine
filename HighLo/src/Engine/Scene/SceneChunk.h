@@ -1,7 +1,8 @@
 #pragma once
+
 #include "Engine/ECS/Entity.h"
 #include "Engine/Camera/Camera.h"
-#include "Engine/Math/HLFrustum.h"
+#include "Engine/Math/Frustum.h"
 
 namespace highlo
 {

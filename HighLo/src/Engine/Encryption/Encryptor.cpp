@@ -52,7 +52,7 @@ namespace highlo
 	}
 
 	Encryptor::Encryptor(const HLString &key, const HLString &iv, EncryptionAlgorithm algorithm)
-		: Key(key), IV(iv), Algorithm(algorithm)
+		: m_Key(key), m_IV(iv), m_Algorithm(algorithm)
 	{
 		if (!CipherContext)
 		{
@@ -73,7 +73,7 @@ namespace highlo
 		int32 len = 0;
 		uint32 ciphertext_len = 0;
 
-		if (!EVP_EncryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char*)*Key, (unsigned char*)*IV))
+		if (!EVP_EncryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
 			HL_CORE_ERROR("Error: Could not initialize the Encryptor");
 
 		if (!EVP_EncryptUpdate(CipherContext, cipherText, &len, plainText, plainTextLength))
@@ -94,7 +94,7 @@ namespace highlo
 		int32 len = 0;
 		uint32 plaintext_len = 0;
 
-		if (!EVP_DecryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(Algorithm), NULL, (unsigned char *)*Key, (unsigned char *)*IV))
+		if (!EVP_DecryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
 			HL_CORE_ERROR("Error: Could not initialize the decryptor");
 
 		if (!EVP_DecryptUpdate(CipherContext, plainText, &len, cipherText, cipherTextLength))
@@ -112,24 +112,30 @@ namespace highlo
 	
 	HLString Encryptor::Encrypt(const HLString &plainText)
 	{
-		unsigned char cipherRaw[256];
+		unsigned char *cipherRaw = new unsigned char[plainText.Length()];
 		unsigned char *plainTextRaw = (unsigned char*)*plainText;
 		uint32 plainTextLength = (uint32)plainText.Length();
 		uint32 cipherLength = 0;
 
 		cipherLength = Encrypt(plainTextRaw, plainTextLength, cipherRaw);
-		return HLString((const char*)cipherRaw, cipherLength);
+
+		HLString result((const char*)cipherRaw, cipherLength);
+		delete[] cipherRaw;
+		return result;
 	}
 	
 	HLString Encryptor::Decrypt(const HLString &cipherText)
 	{
-		unsigned char plainTextRaw[256];
+		unsigned char *plainTextRaw = new unsigned char[cipherText.Length()];
 		unsigned char *cipherRaw = (unsigned char*)*cipherText;
 		uint32 cipherLength = (uint32)cipherText.Length();
 		uint32 plainTextLength = 0;
 
 		plainTextLength = Decrypt(cipherRaw, cipherLength, plainTextRaw);
-		return HLString((const char*) plainTextRaw, plainTextLength);
+		
+		HLString result((const char*) plainTextRaw, plainTextLength);
+		delete[] plainTextRaw;
+		return result;
 	}
 	
 	HLString Encryptor::EncryptBase64(const HLString &plainText)

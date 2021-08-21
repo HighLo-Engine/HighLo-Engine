@@ -42,9 +42,9 @@ namespace highlo
 
 	private:
 
-		HLString Key;
-		HLString IV;
-		EncryptionAlgorithm Algorithm;
+		HLString m_Key;
+		HLString m_IV;
+		EncryptionAlgorithm m_Algorithm;
 	};
 }
 

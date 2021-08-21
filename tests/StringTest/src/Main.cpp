@@ -4,6 +4,7 @@
 
 int main(int argc, char *argv[])
 {
+#ifdef HL_RELEASE
 	std::vector<highloUnit::UnitTestEntry> funcs = 
 	{
 		{ test_append_string_to_string, "test_append_string_to_string" },
@@ -94,5 +95,9 @@ int main(int argc, char *argv[])
 	highloUnit::UnitTest unitTest;
 	unitTest.AppendAllTests(funcs);
 	return unitTest.ExecuteTests();
+#else
+	// Debug builds are not supported
+	return 1;
+#endif // HL_RELEASE
 }
 

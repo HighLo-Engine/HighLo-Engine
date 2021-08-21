@@ -90,6 +90,7 @@ namespace highlo
 			{ "in_TexCoord", ShaderDataType::Float2 },
 			{ "in_TexIndex", ShaderDataType::Float },
 			{ "in_TilingFactor", ShaderDataType::Float },
+			{ "in_EntityID", ShaderDataType::Int },
 		};
 		BufferLayout lineLayout2D = {
 			{ "in_Position", ShaderDataType::Float3 },

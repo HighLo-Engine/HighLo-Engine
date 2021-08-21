@@ -17,6 +17,9 @@ namespace highlo
 		glm::vec2 TexCoord;
 		float TexIndex;
 		float TilingFactor;
+
+		// TODO: make this editor-only
+		int32 EntityID;
 	};
 
 	struct Renderer2DData
@@ -89,6 +92,7 @@ namespace highlo
 			{ "in_TexCoord", ShaderDataType::Float2 },
 			{ "in_TexIndex", ShaderDataType::Float },
 			{ "in_TilingFactor", ShaderDataType::Float },
+			{ "in_EntityID", ShaderDataType::Int },
 		};
 
 		static auto cameraBuffer = UniformBuffer::Create(
@@ -169,6 +173,8 @@ namespace highlo
 		uint32 dataSize = (uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase;
 		if (dataSize)
 		{
+			s_2DData->TextureShader->Bind();
+
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 			{
@@ -184,6 +190,9 @@ namespace highlo
 
 	void Renderer2D::Flush()
 	{
+		if (s_2DData->QuadIndexCount == 0)
+			return;
+
 		EndScene();
 
 		s_2DData->QuadIndexCount = 0;
@@ -201,38 +210,23 @@ namespace highlo
 		if (s_2DData->QuadIndexCount >= Renderer2DData::MaxIndices)
 			Flush();
 
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		constexpr uint32 quadVertexCount = 4;
 		const float textureIndex = 0.0f;
 		const float tilingFactor = 1.0f;
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		Transform transform = Transform::FromPosition(position).Scale({ size.x, size.y, 1.0f });
 
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[0];
-		s_2DData->QuadVertexBufferPtr->Color = color;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
-
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[1];
-		s_2DData->QuadVertexBufferPtr->Color = color;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
-
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[2];
-		s_2DData->QuadVertexBufferPtr->Color = color;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
-
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[3];
-		s_2DData->QuadVertexBufferPtr->Color = color;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
+		for (uint32 i = 0; i < quadVertexCount; ++i)
+		{
+			s_2DData->QuadVertexBufferPtr->Position = transform.GetTransform() * s_2DData->QuadVertexPositions[i];
+			s_2DData->QuadVertexBufferPtr->Color = color;
+			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			s_2DData->QuadVertexBufferPtr->EntityID = 0;
+			s_2DData->QuadVertexBufferPtr++;
+		}
 
 		s_2DData->QuadIndexCount += 6;
 	}
@@ -247,8 +241,11 @@ namespace highlo
 		if (s_2DData->QuadIndexCount >= Renderer2DData::MaxIndices)
 			Flush();
 
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		constexpr uint32 quadVertexCount = 4;
+
 		float textureIndex = 0.0f;
-		for (uint32 i = 1; i < s_2DData->TextureSlotIndex; i++)
+		for (uint32 i = 1; i < s_2DData->TextureSlotIndex; ++i)
 		{
 			if (*s_2DData->TextureSlots[i].Get() == *texture.Get())
 			{
@@ -264,35 +261,18 @@ namespace highlo
 			s_2DData->TextureSlotIndex++;
 		}
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+		Transform transform = Transform::FromPosition(position).Scale({ size.x, size.y, 1.0f });
 
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[0];
-		s_2DData->QuadVertexBufferPtr->Color = tintColor;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
-
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[1];
-		s_2DData->QuadVertexBufferPtr->Color = tintColor;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
-
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[2];
-		s_2DData->QuadVertexBufferPtr->Color = tintColor;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
-
-		s_2DData->QuadVertexBufferPtr->Position = transform * s_2DData->QuadVertexPositions[3];
-		s_2DData->QuadVertexBufferPtr->Color = tintColor;
-		s_2DData->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
-		s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-		s_2DData->QuadVertexBufferPtr++;
+		for (uint32 i = 0; i < quadVertexCount; ++i)
+		{
+			s_2DData->QuadVertexBufferPtr->Position = transform.GetTransform() * s_2DData->QuadVertexPositions[i];
+			s_2DData->QuadVertexBufferPtr->Color = tintColor;
+			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
+			s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			s_2DData->QuadVertexBufferPtr->EntityID = 0;
+			s_2DData->QuadVertexBufferPtr++;
+		}
 
 		s_2DData->QuadIndexCount += 6;
 	}

@@ -6,6 +6,7 @@
 #include <stb_image.h>
 
 #include "Engine/Core/Log.h"
+#include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Utils/ImageUtils.h"
 #include "OpenGLUtils.h"
 
@@ -25,6 +26,7 @@ namespace highlo
 		}
 
 		OpenGLTexture2D *instance = new OpenGLTexture2D(data, width, height, format);
+		instance->Name = VirtualFileSystem::Get()->GetFileNameFromPath(filepath);
 		HL_CORE_INFO("Texture2D>    [+] Loaded " + filepath + " [+]");
 
 		return instance;
@@ -32,6 +34,8 @@ namespace highlo
 
 	OpenGLTexture2D *OpenGLTexture2D::CreateFromColor(const glm::vec3 &rgb, TextureFormat format)
 	{
+		OpenGLTexture2D *texture = nullptr;
+
 		if (format == TextureFormat::RGBA8)
 		{
 			Byte data[4];
@@ -39,7 +43,8 @@ namespace highlo
 			data[1] = (Byte)rgb.y;
 			data[2] = (Byte)rgb.z;
 			data[3] = (Byte)255; // 2^8
-			return new OpenGLTexture2D(data, 1, 1, format);
+			texture = new OpenGLTexture2D(data, 1, 1, format);
+			texture->Name = "8-Bit Texture";
 		}
 		else if (format == TextureFormat::RGBA16)
 		{
@@ -48,7 +53,8 @@ namespace highlo
 			data[1] = (uint16)rgb.y;
 			data[2] = (uint16)rgb.z;
 			data[3] = (uint16)65535; // 2^16
-			return new OpenGLTexture2D(data, 1, 1, format);
+			texture = new OpenGLTexture2D(data, 1, 1, format);
+			texture->Name = "16-Bit Texture";
 		}
 		else if (format == TextureFormat::RGBA32)
 		{
@@ -57,15 +63,17 @@ namespace highlo
 			data[1] = (uint32)rgb.y;
 			data[2] = (uint32)rgb.z;
 			data[3] = (uint32)4294967295; // 2^32
-			return new OpenGLTexture2D(data, 1, 1, format);
+			texture = new OpenGLTexture2D(data, 1, 1, format);
+			texture->Name = "32-Bit Texture";
 		}
 
-		return nullptr;
+		return texture;
 	}
 	
 	OpenGLTexture2D *OpenGLTexture2D::CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format)
 	{
 		OpenGLTexture2D *instance = nullptr;
+		uint64 row = 0, column = 0, idx = 0;
 
 #pragma warning( push )
 #pragma warning( disable : 6386)
@@ -73,11 +81,11 @@ namespace highlo
 		{
 			Byte *data = new Byte[(uint64)width * (uint64)height * (uint64)4];
 
-			for (uint64 r = 0; r < (uint64)width * 4; r++)
+			for (row = 0; row < (uint64)width * 4; ++row)
 			{
-				for (uint64 c = 0; c < (uint64)height; c += 4)
+				for (column = 0; column < (uint64)height; column += 4)
 				{
-					uint64 idx = r * width + c;
+					idx = row * width + column;
 					data[idx] = (Byte)(uint32)rgb.r;
 					data[idx + 1] = (Byte)(uint32)rgb.g;
 					data[idx + 2] = (Byte)(uint32)rgb.b;
@@ -86,17 +94,18 @@ namespace highlo
 			}
 
 			instance = new OpenGLTexture2D(data, width, height, format);
+			instance->Name = "8-Bit Texture";
 			delete[] data;
 		}
 		else if (format == TextureFormat::RGBA16)
 		{
-			uint16* data = new uint16[(uint64)width * (uint64)height * (uint64)4];
+			uint16 *data = new uint16[(uint64)width * (uint64)height * (uint64)4];
 
-			for (uint64 r = 0; r < (uint64)width * 4; r++)
+			for (row = 0; row < (uint64)width * 4; ++row)
 			{
-				for (uint64 c = 0; c < (uint64)height; c += 4)
+				for (column = 0; column < (uint64)height; column += 4)
 				{
-					uint64 idx = r * width + c;
+					idx = row * width + column;
 					data[idx] = (uint16)(uint32)rgb.r;
 					data[idx + 1] = (uint16)(uint32)rgb.g;
 					data[idx + 2] = (uint16)(uint32)rgb.b;
@@ -105,17 +114,18 @@ namespace highlo
 			}
 
 			instance = new OpenGLTexture2D(data, width, height, format);
+			instance->Name = "16-Bit Texture";
 			delete[] data;
 		}
 		else if (format == TextureFormat::RGBA32)
 		{
 			uint32 *data = new uint32[(uint64)width * (uint64)height * (uint64)4];
 
-			for (uint64 r = 0; r < (uint64)width * 4; r++)
+			for (row = 0; row < (uint64)width * 4; ++row)
 				{
-				for (uint64 c = 0; c < (uint64)height; c += 4)
+				for (column = 0; column < (uint64)height; column += 4)
 					{
-					uint64 idx = r * width + c;
+					idx = row * width + column;
 					data[idx] = (uint32)rgb.r;
 					data[idx + 1] = (uint32)rgb.g;
 					data[idx + 2] = (uint32)rgb.b;
@@ -124,6 +134,7 @@ namespace highlo
 				}
 
 			instance = new OpenGLTexture2D(data, width, height, format);
+			instance->Name = "32-Bit Texture";
 			delete[] data;
 		}
 #pragma warning( pop )
@@ -131,7 +142,7 @@ namespace highlo
 		return instance;
 	}
 	
-	OpenGLTexture2D::OpenGLTexture2D(void* img_data, uint32 width, uint32 height, TextureFormat format)
+	OpenGLTexture2D::OpenGLTexture2D(void *img_data, uint32 width, uint32 height, TextureFormat format)
 		: m_Width(width), m_Height(height)
 	{
 		m_Buffer = Allocator::Copy(img_data, (uint64)width * (uint64)height * (uint64)4); // 4 byte per pixel
@@ -139,10 +150,17 @@ namespace highlo
 		Format = format;
 		m_DataFormat = GL_RGBA;
 
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		m_Specification.Format = Format;
+		m_Specification.Usage = TextureUsage::Texture;
+		m_Specification.Mips = utils::CalculateMipCount(width, height);
+		Name = "unknown";
+
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 		
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.m_Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -160,6 +178,13 @@ namespace highlo
 		m_Width = width;
 		m_Height = height;
 		m_DataFormat = GL_RGBA;
+
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		m_Specification.Format = Format;
+		m_Specification.Usage = TextureUsage::Texture;
+		m_Specification.Mips = utils::CalculateMipCount(width, height);
+		Name = "unknown";
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);

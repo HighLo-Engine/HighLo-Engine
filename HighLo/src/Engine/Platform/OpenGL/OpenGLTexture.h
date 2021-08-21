@@ -13,11 +13,11 @@ namespace highlo
 	{
 	public:
 
-		static OpenGLTexture2D* LoadFromFile(const HLString& filepath, TextureFormat format = TextureFormat::RGBA8, bool flip_on_load = true);
-		static OpenGLTexture2D* CreateFromColor(const glm::vec3& rgb, TextureFormat format = TextureFormat::RGBA8);
-		static OpenGLTexture2D* CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
+		static OpenGLTexture2D *LoadFromFile(const HLString &filepath, TextureFormat format = TextureFormat::RGBA8, bool flip_on_load = true);
+		static OpenGLTexture2D *CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
+		static OpenGLTexture2D *CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 
-		OpenGLTexture2D(void* img_data, uint32 width, uint32 height, TextureFormat format);
+		OpenGLTexture2D(void *img_data, uint32 width, uint32 height, TextureFormat format);
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
 		~OpenGLTexture2D();
 
@@ -35,7 +35,7 @@ namespace highlo
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
 
 		virtual void UpdateResourceData() override;
-		virtual void UpdateResourceData(void* data) override;
+		virtual void UpdateResourceData(void *data) override;
 		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;

@@ -7,6 +7,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/ECS/ECS_Registry.h"
 #include "Engine/ECS/ECS_SystemManager.h"
+#include "Engine/Encryption/Encryptor.h"
 
 namespace highlo
 {
@@ -40,6 +41,7 @@ namespace highlo
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }
 
 		HLAPI ECS_SystemManager &GetECSSystemManager() { return m_ECS_SystemManager; }
+		HLAPI Ref<Encryptor> &GetEncryptor() { return m_Encryptor; }
 
 	private:
 		static HLApplication* s_Instance;
@@ -47,6 +49,7 @@ namespace highlo
 
 		bool m_Running = false;
 		UniqueRef<Window> m_Window;
+		Ref<Encryptor> m_Encryptor;
 
 		ECS_Registry m_ECS_Registry;
 		ECS_SystemManager m_ECS_SystemManager;

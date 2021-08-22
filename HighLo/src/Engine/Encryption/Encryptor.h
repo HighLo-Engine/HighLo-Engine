@@ -24,12 +24,16 @@ namespace highlo
 
 	};
 
-	class Encryptor
+	class Encryptor : public IsSharedReference
 	{
 	public:
 
+		HLAPI Encryptor() = default;
 		HLAPI Encryptor(const HLString &key, const HLString &iv, EncryptionAlgorithm algorithm = EncryptionAlgorithm::AES_256_CBC);
 		HLAPI ~Encryptor();
+
+		HLAPI void Init();
+		HLAPI void Shutdown();
 
 		HLAPI uint32 Encrypt(unsigned char *plainText, uint32 plainTextLength, unsigned char *cipherText);
 		HLAPI uint32 Decrypt(unsigned char *cipherText, uint32 cipherTextLength, unsigned char *plainText);

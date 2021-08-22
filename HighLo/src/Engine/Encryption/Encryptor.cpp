@@ -6,7 +6,7 @@
 
 namespace highlo
 {
-	static EVP_CIPHER_CTX *CipherContext = nullptr;
+	static EVP_CIPHER_CTX *s_CipherContext = nullptr;
 	
 	namespace utils
 	{
@@ -54,18 +54,43 @@ namespace highlo
 	Encryptor::Encryptor(const HLString &key, const HLString &iv, EncryptionAlgorithm algorithm)
 		: m_Key(key), m_IV(iv), m_Algorithm(algorithm)
 	{
-		if (!CipherContext)
+		if (!s_CipherContext)
 		{
-			CipherContext = EVP_CIPHER_CTX_new();
-			if (!CipherContext)
+			s_CipherContext = EVP_CIPHER_CTX_new();
+			if (!s_CipherContext)
 				HL_CORE_ERROR("Error: Cipher context could not be created!");
 		}
 	}
 
 	Encryptor::~Encryptor()
 	{
-		if (CipherContext)
-			EVP_CIPHER_CTX_free(CipherContext);
+	}
+
+	void Encryptor::Init()
+	{
+		// This Init function is used by the engine itself, without the user being able to manipulate parameters here
+
+		// TODO: all the passphrases, salts, keys and ivs are going to be part of config files in the future, we don't want them to be accessible directly here
+		// because the source is open and it shouldn't be visible to the public. 
+
+		// Pass = secretPassPhrase
+		// Salt = 2986C2DB93452761
+		m_Key = "58E7151818B518BF2A490389C8EE1C150F0C50D9564A9A6688215F9AA9397F77";
+		m_IV = "8ED75991622CE5C4EB201C26B31D60A1";
+		m_Algorithm = EncryptionAlgorithm::AES_256_CBC;
+		
+		if (!s_CipherContext)
+		{
+			s_CipherContext = EVP_CIPHER_CTX_new();
+			if (!s_CipherContext)
+				HL_CORE_ERROR("Error: Cipher context could not be created!");
+		}
+	}
+
+	void Encryptor::Shutdown()
+	{
+		if (s_CipherContext)
+			EVP_CIPHER_CTX_free(s_CipherContext);
 	}
 
 	uint32 Encryptor::Encrypt(unsigned char *plainText, uint32 plainTextLength, unsigned char *cipherText)
@@ -73,15 +98,15 @@ namespace highlo
 		int32 len = 0;
 		uint32 ciphertext_len = 0;
 
-		if (!EVP_EncryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
+		if (!EVP_EncryptInit_ex(s_CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
 			HL_CORE_ERROR("Error: Could not initialize the Encryptor");
 
-		if (!EVP_EncryptUpdate(CipherContext, cipherText, &len, plainText, plainTextLength))
+		if (!EVP_EncryptUpdate(s_CipherContext, cipherText, &len, plainText, plainTextLength))
 			HL_CORE_ERROR("Error: Could not update the encryption");
 
 		ciphertext_len = len;
 
-		if (!EVP_EncryptFinal_ex(CipherContext, cipherText + len, &len))
+		if (!EVP_EncryptFinal_ex(s_CipherContext, cipherText + len, &len))
 			HL_CORE_ERROR("Error: Could not encrypt");
 
 		ciphertext_len += len;
@@ -94,15 +119,15 @@ namespace highlo
 		int32 len = 0;
 		uint32 plaintext_len = 0;
 
-		if (!EVP_DecryptInit_ex(CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
+		if (!EVP_DecryptInit_ex(s_CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
 			HL_CORE_ERROR("Error: Could not initialize the decryptor");
 
-		if (!EVP_DecryptUpdate(CipherContext, plainText, &len, cipherText, cipherTextLength))
+		if (!EVP_DecryptUpdate(s_CipherContext, plainText, &len, cipherText, cipherTextLength))
 			HL_CORE_ERROR("Error: Could not update the decryption");
 
 		plaintext_len = len;
 
-		if (!EVP_DecryptFinal_ex(CipherContext, plainText + len, &len))
+		if (!EVP_DecryptFinal_ex(s_CipherContext, plainText + len, &len))
 			HL_CORE_ERROR("Error: Could not decrypt");
 
 		plaintext_len += len;

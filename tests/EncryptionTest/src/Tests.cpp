@@ -1,8 +1,9 @@
 #include "Tests.h"
 using namespace highlo;
 
-#define KEY ""
-#define IV ""
+// Just example keys and ivs from https://asecuritysite.com/encryption/keygen
+#define KEY "E4D49345E9AFD7A487B6C3117FD574AEF92A27B38D80879A294CD1D72608BEAC"
+#define IV "1A92E5E9C29D0A005E4CCC0D94BE886A"
 
 bool test_encryption_raw()
 {

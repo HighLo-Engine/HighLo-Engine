@@ -40,6 +40,9 @@ namespace highlo
 		Renderer::Init(m_Window.get());
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
+		m_Encryptor = Ref<Encryptor>::Create();
+		m_Encryptor->Init();
+
 		HL_CORE_INFO("Engine Initialized");
 
 		HL_PROFILE_BEGIN_SESSION("GlobalSession", "performance.json");
@@ -49,6 +52,7 @@ namespace highlo
 	{
 		HL_PROFILE_END_SESSION();
 
+		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
 		Renderer::Shutdown();
 		VirtualFileSystem::Shutdown();

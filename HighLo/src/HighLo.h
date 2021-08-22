@@ -51,6 +51,7 @@
 #include "Engine/Camera/Camera.h"
 #include "Engine/Camera/FPSCamera.h"
 #include "Engine/Camera/FreeFlyCamera.h"
+#include "Engine/Camera/EditorCamera.h" // TODO: this should be editor-only
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

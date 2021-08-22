@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Panel.h"
-#include "Camera/EditorCamera.h"
 
 class ViewportPanel : public Panel
 {

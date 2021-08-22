@@ -5,6 +5,8 @@
 bool test_put_to_hashmap();
 bool test_set_to_hashmap();
 bool test_find_in_hashmap();
+bool test_has_key_in_hashmap();
+bool test_has_value_in_hashmap();
 
 bool test_get_first_from_hashmap();
 bool test_get_last_from_hashmap();

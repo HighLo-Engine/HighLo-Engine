@@ -17,7 +17,7 @@ namespace highlo
 			m_Elements.shrink_to_fit();
 		}
 
-		HLAPI bool ContainsKey(KeyType key)
+		HLAPI bool HasKey(const KeyType &key)
 		{
 			for (auto it = m_Elements.begin(); it != m_Elements.end(); ++it)
 			{
@@ -29,7 +29,7 @@ namespace highlo
 			return false;
 		}
 
-		HLAPI bool ContainsValue(ValueType value)
+		HLAPI bool HasValue(const ValueType &value)
 		{
 			for (auto it = m_Elements.begin(); it != m_Elements.end(); ++it)
 			{
@@ -41,9 +41,9 @@ namespace highlo
 			return false;
 		}
 
-		HLAPI bool Put(KeyType key, ValueType value)
+		HLAPI bool Put(const KeyType &key, const ValueType &value)
 		{
-			if (!ContainsKey(key) && !ContainsValue(value))
+			if (!HasKey(key) && !HasValue(value))
 			{
 				std::pair<KeyType, ValueType> pair;
 				pair.first = key;
@@ -55,9 +55,9 @@ namespace highlo
 			return false;
 		}
 
-		HLAPI bool Set(KeyType key, ValueType value)
+		HLAPI bool Set(const KeyType &key, const ValueType &value)
 		{
-			if (ContainsKey(key))
+			if (HasKey(key))
 			{
 				uint32 i;
 				for (i = 0; i < m_Elements.size(); ++i)
@@ -74,9 +74,9 @@ namespace highlo
 			return false;
 		}
 
-		HLAPI bool Remove(KeyType key, ValueType value)
+		HLAPI bool Remove(const KeyType &key, const ValueType &value)
 		{
-			if (ContainsKey(key) && ContainsValue(value))
+			if (HasKey(key) && HasValue(value))
 			{
 				uint32 i;
 				for (i = 0; i < m_Elements.size(); ++i)
@@ -93,9 +93,9 @@ namespace highlo
 			return false;
 		}
 
-		HLAPI bool Remove(KeyType key)
+		HLAPI bool Remove(const KeyType &key)
 		{
-			if (ContainsKey(key))
+			if (HasKey(key))
 			{
 				uint32 i;
 				for (i = 0; i < m_Elements.size(); ++i)
@@ -129,7 +129,7 @@ namespace highlo
 			return true;
 		}
 
-		HLAPI ValueType Find(KeyType key)
+		HLAPI ValueType &Find(const KeyType &key)
 		{
 			static ValueType result;
 
@@ -145,22 +145,22 @@ namespace highlo
 			return result;
 		}
 
-		HLAPI ValueType GetFirst()
+		HLAPI ValueType &GetFirst()
 		{
 			return m_Elements.at(0).second;
 		}
 
-		HLAPI ValueType GetLast()
+		HLAPI ValueType &GetLast()
 		{
 			return m_Elements.at(m_Elements.size() - 1).second;
 		}
 
-		HLAPI ValueType GetAt(int32 i)
+		HLAPI ValueType &GetAt(int32 i)
 		{
 			return m_Elements.at(i).second;
 		}
 
-		HLAPI KeyType GetKey(int32 i)
+		HLAPI KeyType &GetKey(int32 i)
 		{
 			return m_Elements.at(i).first;
 		}
@@ -182,18 +182,6 @@ namespace highlo
 				std::pair<KeyType, ValueType> current = *it;
 				std::cout << current.first << ", " << current.second << std::endl;
 			}
-		}
-
-		HLAPI bool HasKey(const KeyType &key) const
-		{
-			for (uint32 i = 0; i < m_Elements.size(); ++i)
-			{
-				std::pair<KeyType, ValueType> current = m_Elements.at(i);
-				if (current.first == key)
-					return true;
-			}
-
-			return false;
 		}
 
 		HLAPI ValueType &operator[](const KeyType &key)

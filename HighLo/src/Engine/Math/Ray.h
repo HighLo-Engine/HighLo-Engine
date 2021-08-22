@@ -72,7 +72,6 @@ namespace highlo
             float v = -glm::dot(E1, DAO) * invdet;
             t = glm::dot(AO, N) * invdet;
             return (det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
-
 		}
 	};
 }

@@ -10,9 +10,9 @@ namespace highlo
 	public:
 		HLAPI static Ref<Skybox> Create();
 
-		HLAPI inline const Ref<Texture3D>& GetTexture() const { return m_Texture; }
+		HLAPI inline const Ref<Texture3D> &GetTexture() const { return m_Texture; }
 		HLAPI inline void SetTexture(Ref<Texture3D> texture) { m_Texture = texture; }
-		HLAPI void Render(ICamera& camera);
+		HLAPI void Render(ICamera &camera);
 
 	private:
 		Skybox();

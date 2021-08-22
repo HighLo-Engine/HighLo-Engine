@@ -15,7 +15,7 @@ namespace highlo
 	Ref<UniformBuffer> Shader::m_VS_SceneBuffer;
 
 #ifdef HIGHLO_API_OPENGL
-    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout& layout)
+    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout &layout)
     {
 		static bool first_time = true;
 		if (first_time)
@@ -27,14 +27,14 @@ namespace highlo
         return Ref<OpenGLShader>::Create(source);
     }
 	
-	Ref<Shader> Shader::CreateComputeShader(const ShaderSource& source)
+	Ref<Shader> Shader::CreateComputeShader(const ShaderSource &source)
 	{
 		return Ref<OpenGLShader>::Create(source, true);
 	}
 
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout& layout)
+    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout &layout)
     {
 		static bool first_time = true;
 		if (first_time)
@@ -46,14 +46,14 @@ namespace highlo
         return Ref<DX11Shader>::Create(source, layout);
     }
 
-	Ref<Shader> Shader::CreateComputeShader(const ShaderSource& source)
+	Ref<Shader> Shader::CreateComputeShader(const ShaderSource &source)
 	{
 		return Ref<DX11Shader>::Create(source, layout, true);
 	}
 
 #endif // HIGHLO_API_DX11
 
-	Ref<UniformBuffer> Shader::GetBuffer(const HLString& name)
+	Ref<UniformBuffer> Shader::GetBuffer(const HLString &name)
 	{
 		if (m_BufferMap.find(name) != m_BufferMap.end())
 			return m_BufferMap.at(name);
@@ -61,7 +61,7 @@ namespace highlo
 			return nullptr;
 	}
 
-	void Shader::AddBuffer(const HLString& name, Ref<UniformBuffer> buffer)
+	void Shader::AddBuffer(const HLString &name, Ref<UniformBuffer> buffer)
 	{
 		m_BufferMap[name] = buffer;
 	}
@@ -85,7 +85,7 @@ namespace highlo
 		);
 	}
 
-    ShaderSource Shader::LoadShaderSource(const HLString& filename)
+    ShaderSource Shader::LoadShaderSource(const HLString &filename)
     {
 		ShaderSource result;
 
@@ -135,17 +135,17 @@ namespace highlo
 		}
 		catch (std::ifstream::failure e)
 		{
-			HL_CORE_ERROR("Failed to load shader: " + filename);
+			HL_CORE_ERROR("Failed to load shader: {0}", *filename);
 			HL_CORE_ERROR(strerror(errno));
 		}
 
-		result.m_VertexShaderSrc					= HLString(shader_sources[ShaderType::VERTEX_SHADER].str().c_str());
-		result.m_TessellationControlShaderSrc		= HLString(shader_sources[ShaderType::TESS_CONTROL_SHADER].str().c_str());
-		result.m_TessellationEvaluationShaderSrc	= HLString(shader_sources[ShaderType::TESS_EVAL_SHADER].str().c_str());
-		result.m_GeometryShaderSrc					= HLString(shader_sources[ShaderType::GEOMETRY_SHADER].str().c_str());
-		result.m_PixelShaderSrc						= HLString(shader_sources[ShaderType::PIXEL_SHADER].str().c_str());
-		result.m_ComputeShaderSrc					= HLString(shader_sources[ShaderType::COMPUTE_SHADER].str().c_str());
-		result.m_FileName							= filename;
+		result.VertexShaderSrc					= HLString(shader_sources[ShaderType::VERTEX_SHADER].str().c_str());
+		result.TessellationControlShaderSrc		= HLString(shader_sources[ShaderType::TESS_CONTROL_SHADER].str().c_str());
+		result.TessellationEvaluationShaderSrc	= HLString(shader_sources[ShaderType::TESS_EVAL_SHADER].str().c_str());
+		result.GeometryShaderSrc				= HLString(shader_sources[ShaderType::GEOMETRY_SHADER].str().c_str());
+		result.PixelShaderSrc					= HLString(shader_sources[ShaderType::PIXEL_SHADER].str().c_str());
+		result.ComputeShaderSrc					= HLString(shader_sources[ShaderType::COMPUTE_SHADER].str().c_str());
+		result.FileName							= filename;
 
 		HL_CORE_INFO("Shader>       [+] Loaded " + filename + " [+]");
 		return result;

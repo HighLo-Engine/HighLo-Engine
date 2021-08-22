@@ -104,9 +104,7 @@ namespace highlo
 		static Ref<Texture> s_DefaultMetallic  = Texture2D::CreateFromColor({ 255, 255, 255 });
 		static Ref<Texture> s_DefaultRoughness = Texture2D::CreateFromColor({ 255, 255, 255 });
 		static Ref<Texture> s_DefaultAO		   = Texture2D::CreateFromColor({ 255, 255, 255 });
-
-		static uint32 s_BlackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		static Ref<Texture> s_BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &s_BlackTextureData).As<Texture3D>();
+		static Ref<Texture3D> blackCubeTexture = Renderer::GetBlackCubeTexture();
 
 		if (!texture)
 		{
@@ -117,9 +115,9 @@ namespace highlo
 				case HL_MATERIAL_TEXTURE_METALLIC:				{ texture = s_DefaultMetallic; break; }
 				case HL_MATERIAL_TEXTURE_ROUGHNESS:				{ texture = s_DefaultRoughness; break; }
 				case HL_MATERIAL_TEXTURE_AMBIENT_OCCLUSION:		{ texture = s_DefaultAO; break; }
-				case HL_MATERIAL_TEXTURE_IRRADIANCE_MAP:		{ texture = s_BlackCubeTexture; break; }
-				case HL_MATERIAL_TEXTURE_PREFILTER_MAP:			{ texture = s_BlackCubeTexture; break; }
-				case HL_MATERIAL_TEXTURE_BRDF_MAP:				{ texture = s_BlackCubeTexture; break; }
+				case HL_MATERIAL_TEXTURE_IRRADIANCE_MAP:		{ texture = blackCubeTexture; break; }
+				case HL_MATERIAL_TEXTURE_PREFILTER_MAP:			{ texture = blackCubeTexture; break; }
+				case HL_MATERIAL_TEXTURE_BRDF_MAP:				{ texture = blackCubeTexture; break; }
 				default: break;
 			}
 		}

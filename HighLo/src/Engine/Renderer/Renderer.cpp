@@ -84,41 +84,12 @@ namespace highlo
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 
 		// Define Shader layouts
-		BufferLayout textureLayout2D = {
-			{ "in_Position", ShaderDataType::Float3 },
-			{ "in_Color", ShaderDataType::Float4 },
-			{ "in_TexCoord", ShaderDataType::Float2 },
-			{ "in_TexIndex", ShaderDataType::Float },
-			{ "in_TilingFactor", ShaderDataType::Float },
-			{ "in_EntityID", ShaderDataType::Int },
-		};
-		BufferLayout lineLayout2D = {
-			{ "in_Position", ShaderDataType::Float3 },
-			{ "in_Color", ShaderDataType::Float4 }
-		};
-		BufferLayout circleLayout2D = {
-			{ "in_WorldPosition", ShaderDataType::Float3 },
-			{ "in_Thickness", ShaderDataType::Float },
-			{ "in_LocalPosition", ShaderDataType::Float2 },
-			{ "in_Color", ShaderDataType::Float4 },
-		};
-		BufferLayout staticShaderLayout = {
-			{ "POSITION", ShaderDataType::Float3 },
-			{ "UV"		, ShaderDataType::Float2 },
-			{ "NORMAL"	, ShaderDataType::Float3 }
-		};
-		BufferLayout animatedShaderLayout = {
-			{ "POSITION", ShaderDataType::Float3 },
-			{ "UV"		, ShaderDataType::Float2 },
-			{ "NORMAL"	, ShaderDataType::Float3 },
-			{ "TANGENT"	, ShaderDataType::Float3 },
-			{ "BINORMAL", ShaderDataType::Float3 },
-			{ "BONE_IDS", ShaderDataType::Int4 },
-			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
-		};
-		BufferLayout skyboxLayout = {
-			{ "POSITION", ShaderDataType::Float3 },
-		};
+		BufferLayout textureLayout2D = BufferLayout::GetTextureLayout();
+		BufferLayout lineLayout2D = BufferLayout::GetLineLayout();
+		BufferLayout circleLayout2D = BufferLayout::GetCircleLayout();
+		BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
+		BufferLayout animatedShaderLayout = BufferLayout::GetAnimatedShaderLayout();
+		BufferLayout skyboxLayout = BufferLayout::GetSkyboxLayout();
 
 		// Load 3D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);

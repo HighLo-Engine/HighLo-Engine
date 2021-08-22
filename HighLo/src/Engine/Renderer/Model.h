@@ -13,10 +13,10 @@ namespace highlo
 	public:
 		HLAPI Model() {}
 
-		HLAPI Model(const std::initializer_list<Ref<Mesh>>& meshes)
+		HLAPI Model(const std::initializer_list<Ref<Mesh>> &meshes)
 			: m_Meshes(meshes) {}
 
-		HLAPI Model(const std::vector<Ref<Mesh>>& meshes)
+		HLAPI Model(const std::vector<Ref<Mesh>> &meshes)
 			: m_Meshes(meshes) {}
 
 		HLAPI uint64 GetMeshCount()	const { return m_Meshes.size(); }

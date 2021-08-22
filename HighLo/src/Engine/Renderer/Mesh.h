@@ -9,8 +9,8 @@ namespace highlo
 {
 	struct MeshData
 	{
-		std::vector<Vertex> m_Vertices;
-		std::vector<int32>	m_Indices;
+		std::vector<Vertex> Vertices;
+		std::vector<int32>	Indices;
 	};
 
 	class Mesh : public IsSharedReference
@@ -19,31 +19,29 @@ namespace highlo
 
 		HLAPI static Ref<Mesh> Create(const MeshData& data);
 
-		HLAPI MeshData& GetMeshData() { return m_MeshData; }
+		HLAPI MeshData &GetMeshData() { return m_MeshData; }
 		HLAPI void Update(Timestep timestep);
-		HLAPI void UpdateMeshData(std::vector<Vertex>& data);
+		HLAPI void UpdateMeshData(std::vector<Vertex> &data);
 		HLAPI void UpdateMeshData();
 
 		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
 		HLAPI MaterialRenderProperties &GetMaterialRenderProperties();
 		HLAPI MaterialPhysicalProperties &GetMaterialPhysicsProperties();
 
-		HLAPI Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
+		HLAPI Ref<VertexArray> &GetVertexArray() { return m_VertexArray; }
 
 		Ref<Animation> m_Animation = nullptr;
 		Ref<Material> m_Material;
 
-		HLAPI static void Copy(const Ref<Mesh>& src, Ref<Mesh>& dest);
-		HLAPI static Ref<Mesh> Copy(const Ref<Mesh>& src);
+		HLAPI static void Copy(const Ref<Mesh> &src, Ref<Mesh> &dest);
+		HLAPI static Ref<Mesh> Copy(const Ref<Mesh> &src);
 		HLAPI Ref<Mesh> Copy() const;
 
 	private:
-		Mesh(const MeshData& data)
+		Mesh(const MeshData &data)
 			: m_MeshData(data) {}
 
 		MeshData m_MeshData;
-
-	private:
 		Ref<VertexArray> m_VertexArray;
 	};
 }

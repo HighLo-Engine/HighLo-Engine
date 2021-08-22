@@ -37,32 +37,31 @@ namespace highlo
 
 		uint32 BindingSlot = 0;
 
-		inline uint32  GetSize() const { return m_DataSize; }
-		inline void* GetData() const { return m_Data; }
-		inline const HLString& GetName() const { return m_Name; }
+		HLAPI inline uint32  GetSize() const { return m_DataSize; }
+		HLAPI inline void *GetData() const { return m_Data; }
+		HLAPI inline const HLString &GetName() const { return m_Name; }
 
-		void SetVariableValue(const char* name, void* value);
-		void SetBufferValue(void* value);
+		HLAPI void SetVariableValue(const HLString &name, void *value);
+		HLAPI void SetBufferValue(void *value);
 
-		void GetVariableValue(const char* name, void* out_val);
+		HLAPI void GetVariableValue(const HLString &name, void *out_val);
 
 		virtual void UploadToShader() = 0;
 
-		static Ref<UniformBuffer> Create(const HLString& name, const std::vector<UniformVariable>& layout,
+		static Ref<UniformBuffer> Create(const HLString &name, const std::vector<UniformVariable> &layout,
 			UniformBufferParentShader parent, uint32 slot = 0);
 
 	protected:
-		UniformBuffer(const HLString& name, const std::vector<UniformVariable>& layout, UniformBufferParentShader parent, uint32 slot);
+
+		UniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot);
+	
+	protected:
+
 		uint32	m_DataSize = 0;
-		void*	m_Data = nullptr;
-
-	protected:
+		void   *m_Data = nullptr;
 		const HLString m_Name;
-
-	protected:
 		UniformBufferParentShader m_ParentShader;
 
-	protected:
 		// const char* --> name
 		// Pair.first  --> size
 		// Pair.second --> offset

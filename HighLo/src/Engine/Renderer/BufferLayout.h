@@ -88,13 +88,21 @@ namespace highlo
 			CalculateOffsetsAndStride();
 		}
 
-		inline uint32 GetStride() const { return m_Stride; }
-		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
+		HLAPI inline uint32 GetStride() const { return m_Stride; }
+		HLAPI inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
 
-		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-		std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-		std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-		std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+		HLAPI std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
+		HLAPI std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
+		HLAPI std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
+		HLAPI std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+
+		HLAPI static BufferLayout GetTextureLayout();
+		HLAPI static BufferLayout GetLineLayout();
+		HLAPI static BufferLayout GetCircleLayout();
+		HLAPI static BufferLayout GetStaticShaderLayout();
+		HLAPI static BufferLayout GetAnimatedShaderLayout();
+		HLAPI static BufferLayout GetSkyboxLayout();
+
 	private:
 		void CalculateOffsetsAndStride();
 

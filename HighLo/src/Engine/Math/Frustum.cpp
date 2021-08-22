@@ -3,7 +3,7 @@
 
 namespace highlo
 {
-	void HLFrustum::Init(const glm::mat4& mat)
+	void HLFrustum::Init(const glm::mat4 &mat)
 	{
 		Planes[HL_FRUSTUM_RIGHT].Normal.x = mat[0][3] - mat[0][0];
 		Planes[HL_FRUSTUM_RIGHT].Normal.y = mat[1][3] - mat[1][0];
@@ -40,9 +40,9 @@ namespace highlo
 			Planes[i].Normalize();
 	}
 	
-	bool HLFrustum::SphereIntersection(const glm::vec3& center, float radius)
+	bool HLFrustum::SphereIntersection(const glm::vec3 &center, float radius)
 	{
-		for (int i = 0; i < 6; i++)
+		for (int32 i = 0; i < 6; i++)
 		{
 			if (glm::dot(center, Planes[i].Normal) + Planes[i].Distance + radius <= 0)
 				return false;
@@ -51,12 +51,12 @@ namespace highlo
 		return true;
 	}
 	
-	int HLFrustum::AABBIntersection(const AABB& aabb)
+	int32 HLFrustum::AABBIntersection(const AABB &aabb)
 	{
-		int ret = HL_INSIDE;
+		int32 ret = HL_INSIDE;
 		glm::vec3 vmin, vmax;
 
-		for (int i = 0; i < 6; ++i)
+		for (int32 i = 0; i < 6; ++i)
 		{
 			// X axis 
 			if (Planes[i].Normal.x > 0) {

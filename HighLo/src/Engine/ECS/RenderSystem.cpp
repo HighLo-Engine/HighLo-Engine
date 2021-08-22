@@ -1,5 +1,6 @@
 #include "HighLoPch.h"
 #include "RenderSystem.h"
+
 #include "Engine/Renderer/CoreRenderer.h"
 #include "Engine/Renderer/Renderer.h"
 
@@ -37,7 +38,7 @@ namespace highlo
 					Renderer::SetWireframe(false);
 				
 				FrameMeshesRendered++;
-				FrameTrianglesRendered += model->GetMesh(i)->GetMeshData().m_Indices.size() / 3;
+				FrameTrianglesRendered += model->GetMesh(i)->GetMeshData().Indices.size() / 3;
 			}
 
 			if (component.ResetForNextFrame)

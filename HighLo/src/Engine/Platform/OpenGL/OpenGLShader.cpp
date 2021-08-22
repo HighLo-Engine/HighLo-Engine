@@ -10,14 +10,14 @@
 namespace highlo
 {
 	OpenGLShader::OpenGLShader(const ShaderSource& source, bool isCompute)
-		: m_FileName(source.m_FileName)
+		: m_FileName(source.FileName)
 	{
 		if (!isCompute)
 			CompileGLSLProgram(source);
 		else
 			CompileComputeShader(source);
 
-		m_Name = VirtualFileSystem::Get()->GetFileNameFromPath(source.m_FileName);
+		m_Name = VirtualFileSystem::Get()->GetFileNameFromPath(source.FileName);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -66,8 +66,8 @@ namespace highlo
 	{
 		m_ID = glCreateProgram();
 
-		auto vs_id = CompileGLSLShader(source.m_VertexShaderSrc, GL_VERTEX_SHADER);
-		auto ps_id = CompileGLSLShader(source.m_PixelShaderSrc, GL_FRAGMENT_SHADER);
+		auto vs_id = CompileGLSLShader(source.VertexShaderSrc, GL_VERTEX_SHADER);
+		auto ps_id = CompileGLSLShader(source.PixelShaderSrc, GL_FRAGMENT_SHADER);
 
 		uint32 tcs_id = 0;
 		uint32 tes_id = 0;
@@ -76,21 +76,21 @@ namespace highlo
 		glAttachShader(m_ID, vs_id);
 		glAttachShader(m_ID, ps_id);
 
-		if (!source.m_TessellationControlShaderSrc.IsEmpty())
+		if (!source.TessellationControlShaderSrc.IsEmpty())
 		{
-			tcs_id = CompileGLSLShader(source.m_TessellationControlShaderSrc, GL_TESS_CONTROL_SHADER);
+			tcs_id = CompileGLSLShader(source.TessellationControlShaderSrc, GL_TESS_CONTROL_SHADER);
 			glAttachShader(m_ID, tcs_id);
 		}
 
-		if (!source.m_TessellationEvaluationShaderSrc.IsEmpty())
+		if (!source.TessellationEvaluationShaderSrc.IsEmpty())
 		{
-			tes_id = CompileGLSLShader(source.m_TessellationEvaluationShaderSrc, GL_TESS_EVALUATION_SHADER);
+			tes_id = CompileGLSLShader(source.TessellationEvaluationShaderSrc, GL_TESS_EVALUATION_SHADER);
 			glAttachShader(m_ID, tes_id);
 		}
 
-		if (!source.m_GeometryShaderSrc.IsEmpty())
+		if (!source.GeometryShaderSrc.IsEmpty())
 		{
-			gs_id = CompileGLSLShader(source.m_GeometryShaderSrc, GL_GEOMETRY_SHADER);
+			gs_id = CompileGLSLShader(source.GeometryShaderSrc, GL_GEOMETRY_SHADER);
 			glAttachShader(m_ID, gs_id);
 		}
 
@@ -131,7 +131,7 @@ namespace highlo
 	{
 		m_ID = glCreateProgram();
 
-		auto cs_id = CompileGLSLShader(source.m_ComputeShaderSrc, GL_COMPUTE_SHADER);
+		auto cs_id = CompileGLSLShader(source.ComputeShaderSrc, GL_COMPUTE_SHADER);
 
 		glAttachShader(m_ID, cs_id);
 		glLinkProgram(m_ID);

@@ -3,7 +3,7 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class Renderer2DTest : public HLApplication
+class Renderer2DDemo : public HLApplication
 {
 public:
 	

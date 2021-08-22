@@ -16,7 +16,7 @@ namespace highlo
 			free(m_Data);
 	}
 
-	void UniformBuffer::SetVariableValue(const char* name, void* value)
+	void UniformBuffer::SetVariableValue(const HLString &name, void *value)
 	{
 		auto entry = m_UniformVariables.find(name);
 		if (entry != m_UniformVariables.end())
@@ -27,12 +27,12 @@ namespace highlo
 		}
 	}
 	
-	void UniformBuffer::SetBufferValue(void* value)
+	void UniformBuffer::SetBufferValue(void *value)
 	{
 		memcpy_s(m_Data, m_DataSize, value, m_DataSize);
 	}
 	
-	void UniformBuffer::GetVariableValue(const char* name, void* out_val)
+	void UniformBuffer::GetVariableValue(const HLString &name, void *out_val)
 	{
 		auto entry = m_UniformVariables.find(name);
 		if (entry != m_UniformVariables.end())
@@ -43,7 +43,7 @@ namespace highlo
 		}
 	}
 	
-	UniformBuffer::UniformBuffer(const HLString& name, const std::vector<UniformVariable>& layout, UniformBufferParentShader parent, uint32 slot)
+	UniformBuffer::UniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot)
 		: m_Name(name), m_ParentShader(parent), BindingSlot(slot)
 	{
 		uint32 offset = 0;
@@ -60,7 +60,7 @@ namespace highlo
 		m_Data = malloc(m_DataSize);
 	}
 
-	Ref<UniformBuffer> UniformBuffer::Create(const HLString& name, const std::vector<UniformVariable>& layout, UniformBufferParentShader parent, uint32 slot)
+	Ref<UniformBuffer> UniformBuffer::Create(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot)
 	{
 #ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLUniformBuffer>::Create(name, layout, parent, slot);

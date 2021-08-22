@@ -210,7 +210,7 @@ uint32 PBRSceneTest::GetVertexCountFromModel(const Ref<Model> &model)
 	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 	{
 		Ref<Mesh> mesh = model->GetMesh(i);
-		std::vector<Vertex> vertices = mesh->GetMeshData().m_Vertices;
+		std::vector<Vertex> vertices = mesh->GetMeshData().Vertices;
 		for (int32 j = 0; j < vertices.size(); ++j)
 		{
 			count += 3; // 3 vertex positions per vertex
@@ -224,7 +224,7 @@ uint32 PBRSceneTest::GetVertexCountFromMesh(Ref<Mesh> &mesh)
 {
 	uint32 count = 0;
 
-	std::vector<Vertex> vertices = mesh->GetMeshData().m_Vertices;
+	std::vector<Vertex> vertices = mesh->GetMeshData().Vertices;
 	for (uint32 i = 0; i < vertices.size(); ++i)
 	{
 		count += 3; // 3 vertex positions per vertex

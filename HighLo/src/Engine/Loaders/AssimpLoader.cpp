@@ -23,7 +23,7 @@ namespace highlo
 		float zMin, zMax;
 	};
 
-	static ParserMesh ProcessMesh(aiMesh* mesh)
+	static ParserMesh ProcessMesh(aiMesh *mesh)
 	{
 		ParserMesh parser_mesh;
 
@@ -38,7 +38,7 @@ namespace highlo
 		zMin = mesh->mVertices[0].z;
 		zMax = mesh->mVertices[0].z;
 
-		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+		for (uint32 i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex;
 
@@ -89,17 +89,17 @@ namespace highlo
 			if (vertex.Position.z < zMin) zMin = vertex.Position.z;
 		}
 
-		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
+		for (uint32 i = 0; i < mesh->mNumFaces; i++)
 		{
-			auto& face = mesh->mFaces[i];
+			auto &face = mesh->mFaces[i];
 
-			for (uint32_t j = 0; j < face.mNumIndices; j++)
+			for (uint32 j = 0; j < face.mNumIndices; j++)
 				indices.push_back(face.mIndices[j]);
 		}
 
 		MeshData data;
-		data.m_Vertices = vertices;
-		data.m_Indices = indices;
+		data.Vertices = vertices;
+		data.Indices = indices;
 
 		parser_mesh.EngineMesh = Mesh::Create(data);
 		parser_mesh.xMin = xMin;
@@ -112,26 +112,26 @@ namespace highlo
 		return parser_mesh;
 	}
 
-	static void ProcessNode(aiNode* node, const aiScene* scene, std::vector<ParserMesh>& mesh_list)
+	static void ProcessNode(aiNode *node, const aiScene *scene, std::vector<ParserMesh> &mesh_list)
 	{
-		for (uint32_t i = 0; i < node->mNumMeshes; i++)
+		for (uint32 i = 0; i < node->mNumMeshes; i++)
 		{
-			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 			ParserMesh parser_mesh = ProcessMesh(mesh);
 
 			mesh_list.push_back(parser_mesh);
 		}
 
-		for (uint32_t i = 0; i < node->mNumChildren; i++)
+		for (uint32 i = 0; i < node->mNumChildren; i++)
 			ProcessNode(node->mChildren[i], scene, mesh_list);
 	}
 
-	Ref<Model> AssimpLoader::LoadStatic(const HLString& filepath, bool bShouldApplyCorrectionMatrix)
+	Ref<Model> AssimpLoader::LoadStatic(const HLString &filepath, bool bShouldApplyCorrectionMatrix)
 	{
 		s_ShouldApplyCorrectionMatrix = bShouldApplyCorrectionMatrix;
 
 		Assimp::Importer importer;
-		auto* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+		auto *scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
 		if (!scene)
 		{
@@ -154,7 +154,7 @@ namespace highlo
 		zMin = parser_meshes.at(0).zMin;
 		zMax = parser_meshes.at(0).zMax;
 
-		for (auto& mesh : parser_meshes)
+		for (auto &mesh : parser_meshes)
 		{
 			if (mesh.xMax > xMax) xMax = mesh.xMax;
 			if (mesh.xMin < xMin) xMin = mesh.xMin;
@@ -187,14 +187,14 @@ namespace highlo
 		std::vector<BoneTransform> KeyframeTransforms;
 	};
 
-	std::map<std::string, uint32_t> BoneMapping;
+	std::map<std::string, uint32> BoneMapping;
 	std::vector<BoneInfo> BoneInfoList;
 
-	static std::string CalculateBoneTransforms(Bone& RootBone, const aiScene* scene, uint32_t animation_index, glm::mat4 GlobalInverseTransform, float& TicksPerSecond, float& AnimationDuration);
-	static Bone ReadNodeHierarchy(aiAnimation* animation, aiNode* node);
-	static const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const std::string& NodeName);
+	static std::string CalculateBoneTransforms(Bone &RootBone, const aiScene *scene, uint32 animation_index, glm::mat4 GlobalInverseTransform, float &TicksPerSecond, float &AnimationDuration);
+	static Bone ReadNodeHierarchy(aiAnimation *animation, aiNode *node);
+	static const aiNodeAnim* FindNodeAnim(const aiAnimation *animation, const std::string &NodeName);
 
-	static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from)
+	static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4 &from)
 	{
 		glm::mat4 to;
 		//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
@@ -207,7 +207,7 @@ namespace highlo
 
 #pragma warning(push)
 #pragma warning(disable: 4267)
-	static void AddBoneData(std::vector<Vertex>& vertices, uint32_t VertexID, uint32_t BoneID, float Weight)
+	static void AddBoneData(std::vector<Vertex> &vertices, uint32 VertexID, uint32 BoneID, float Weight)
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
@@ -222,14 +222,14 @@ namespace highlo
 	}
 #pragma warning(pop) 
 
-	Ref<Mesh> AssimpLoader::LoadAnimated(const HLString& filepath, bool bShouldApplyCorrectionMatrix)
+	Ref<Mesh> AssimpLoader::LoadAnimated(const HLString &filepath, bool bShouldApplyCorrectionMatrix)
 	{
 		s_ShouldApplyCorrectionMatrix = bShouldApplyCorrectionMatrix;
 		BoneMapping.clear();
 		BoneInfoList.clear();
 
 		Assimp::Importer importer;
-		auto* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+		auto *scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
 		if (!scene)
 		{
@@ -245,12 +245,11 @@ namespace highlo
 		}
 
 		glm::mat4 InverseTransform = glm::inverse(aiMatrix4x4ToGlm(scene->mRootNode->mTransformation));
-
-		aiMesh* mesh = scene->mMeshes[0];
+		aiMesh *mesh = scene->mMeshes[0];
 
 		std::vector<Vertex> vertices;
-		std::vector<int> indices;
-		uint32_t BoneCount = 0;
+		std::vector<int32> indices;
+		uint32 BoneCount = 0;
 
 		// -----------------------------------------------//
 		//				Reading the vertices              //
@@ -263,7 +262,7 @@ namespace highlo
 		zMin = mesh->mVertices[0].z;
 		zMax = mesh->mVertices[0].z;
 
-		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+		for (uint32 i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex;
 			vertex.Position = { mesh->mVertices[i].x,   mesh->mVertices[i].y,   mesh->mVertices[i].z };
@@ -289,11 +288,11 @@ namespace highlo
 		// -----------------------------------------------//
 		//				Reading the indices               //
 		// -----------------------------------------------//
-		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
+		for (uint32 i = 0; i < mesh->mNumFaces; i++)
 		{
-			auto& face = mesh->mFaces[i];
+			auto &face = mesh->mFaces[i];
 
-			for (uint32_t j = 0; j < face.mNumIndices; j++)
+			for (uint32 j = 0; j < face.mNumIndices; j++)
 				indices.push_back(face.mIndices[j]);
 		}
 
@@ -302,9 +301,9 @@ namespace highlo
 		// -----------------------------------------------//
 		for (size_t i = 0; i < mesh->mNumBones; i++)
 		{
-			aiBone* bone = mesh->mBones[i];
+			aiBone *bone = mesh->mBones[i];
 			std::string BoneName(bone->mName.data);
-			uint32_t BoneIndex = 0;
+			uint32 BoneIndex = 0;
 
 			if (BoneMapping.find(BoneName) == BoneMapping.end())
 			{
@@ -323,7 +322,7 @@ namespace highlo
 
 			for (size_t j = 0; j < bone->mNumWeights; j++)
 			{
-				int VertexID = bone->mWeights[j].mVertexId;
+				int32 VertexID = bone->mWeights[j].mVertexId;
 				float Weight = bone->mWeights[j].mWeight;
 				AddBoneData(vertices, VertexID, BoneIndex, Weight);
 			}
@@ -340,7 +339,7 @@ namespace highlo
 			animation_correction_matrix = CORRECTION_MATRIX;
 
 		std::vector<Ref<Animation>> animations;
-		for (uint32_t i = 0; i < scene->mNumAnimations; i++)
+		for (uint32 i = 0; i < scene->mNumAnimations; i++)
 		{
 			Bone RootBone;
 			std::string animation_name = CalculateBoneTransforms(RootBone, scene, i, InverseTransform, TicksPerSecond, AnimationDuration);
@@ -353,8 +352,8 @@ namespace highlo
 		//				   Finalizing Data                //
 		// -----------------------------------------------//
 		MeshData data;
-		data.m_Vertices = vertices;
-		data.m_Indices = indices;
+		data.Vertices = vertices;
+		data.Indices = indices;
 
 		auto EngineMesh = Mesh::Create(data);
 		EngineMesh->m_Animation = animations[0];
@@ -365,7 +364,7 @@ namespace highlo
 		return EngineMesh;
 	}
 
-	std::string CalculateBoneTransforms(Bone& RootBone, const aiScene* scene, uint32_t animation_index, glm::mat4 GlobalInverseTransform, float& TicksPerSecond, float& AnimationDuration)
+	std::string CalculateBoneTransforms(Bone &RootBone, const aiScene *scene, uint32 animation_index, glm::mat4 GlobalInverseTransform, float &TicksPerSecond, float &AnimationDuration)
 	{
 		TicksPerSecond = (float)scene->mAnimations[animation_index]->mTicksPerSecond;
 		AnimationDuration = (float)scene->mAnimations[animation_index]->mDuration;
@@ -374,10 +373,10 @@ namespace highlo
 		return std::string(scene->mAnimations[animation_index]->mName.C_Str());
 	}
 
-	Bone ReadNodeHierarchy(aiAnimation* animation, aiNode* node)
+	Bone ReadNodeHierarchy(aiAnimation *animation, aiNode *node)
 	{
 		std::string name(node->mName.data);
-		const aiNodeAnim* NodeAnim = FindNodeAnim(animation, name);
+		const aiNodeAnim *NodeAnim = FindNodeAnim(animation, name);
 		float keyframe_time = 0;
 
 		Bone bone;
@@ -387,7 +386,7 @@ namespace highlo
 		{
 			if (BoneMapping.find(name) != BoneMapping.end())
 			{
-				for (uint32_t animation_key = 0; animation_key < NodeAnim->mNumPositionKeys; animation_key++)
+				for (uint32 animation_key = 0; animation_key < NodeAnim->mNumPositionKeys; animation_key++)
 				{
 					auto t = NodeAnim->mPositionKeys[animation_key].mValue;
 					glm::vec3 vec = { t.x, t.y, t.z };
@@ -396,7 +395,7 @@ namespace highlo
 					q = q.Normalize();
 					auto quat = glm::quat(q.w, q.x, q.y, q.z);
 
-					uint32_t BoneIndex = BoneMapping[name];
+					uint32 BoneIndex = BoneMapping[name];
 					bone.ID = BoneIndex;
 
 					BoneTransform transform;
@@ -413,7 +412,7 @@ namespace highlo
 			}
 		}
 
-		for (uint32_t i = 0; i < node->mNumChildren; i++)
+		for (uint32 i = 0; i < node->mNumChildren; i++)
 		{
 			if (bone.Keyframes.size() == 0)
 				bone = ReadNodeHierarchy(animation, node->mChildren[i]);
@@ -428,11 +427,11 @@ namespace highlo
 		return bone;
 	}
 
-	const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const std::string& NodeName)
+	const aiNodeAnim *FindNodeAnim(const aiAnimation *animation, const std::string &NodeName)
 	{
-		for (uint32_t i = 0; i < animation->mNumChannels; i++)
+		for (uint32 i = 0; i < animation->mNumChannels; i++)
 		{
-			const aiNodeAnim* nodeAnim = animation->mChannels[i];
+			const aiNodeAnim *nodeAnim = animation->mChannels[i];
 			if (std::string(nodeAnim->mNodeName.data) == NodeName)
 				return nodeAnim;
 		}

@@ -35,13 +35,13 @@ project "SponzaSceneDemo"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/assimp-vc142-mtd.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/libcrypto-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/libssl-3-x64.dll*"),
-				("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/HighLo-Unit.dll*"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/SponzaSceneDemo/bin/" .. outputdir .. "/SponzaSceneDemo/assets"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/SponzaSceneDemo/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
+		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/HighLo.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/libssl-3-x64.dll*"),
+				("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/HighLo-Unit.dll*"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/assets"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/%{prj.name}/assets") -- temporary because visual studio needs the assets in the working directory as well in order to find them
 	}
 
     filter "system:windows"

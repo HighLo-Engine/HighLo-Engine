@@ -7,7 +7,7 @@
 
 namespace highlo
 {
-	static constexpr uint32 SKYBOX_SIZE = 2000;
+	static constexpr uint32 SKYBOX_SIZE = 2048;
 
 	Ref<Skybox> Skybox::Create()
 	{
@@ -16,12 +16,12 @@ namespace highlo
 	
 	Skybox::Skybox()
 	{
-		m_Mesh = MeshFactory::CreateCube({ (float) SKYBOX_SIZE, (float) SKYBOX_SIZE, (float) SKYBOX_SIZE });
+		m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
 		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
 		m_Shader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 	}
 
-	void Skybox::Render(ICamera& camera)
+	void Skybox::Render(ICamera &camera)
 	{
 		if (!m_Texture)
 		{

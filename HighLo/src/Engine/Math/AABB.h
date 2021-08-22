@@ -155,7 +155,7 @@ namespace highlo
 			Max.z = std::ceil(other.Max.z + translation.z);
 		}
 
-		HLAPI void UpdateDimensions(const glm::vec3& min, const glm::vec3& max)
+		HLAPI void UpdateDimensions(const glm::vec3 &min, const glm::vec3 &max)
 		{
 			Min = min;
 			Max = max;

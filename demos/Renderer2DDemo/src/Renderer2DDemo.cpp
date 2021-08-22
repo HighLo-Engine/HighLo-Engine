@@ -1,6 +1,6 @@
-#include "Renderer2DTest.h"
+#include "Renderer2DDemo.h"
 
-void Renderer2DTest::OnInitialize()
+void Renderer2DDemo::OnInitialize()
 {
 	m_Camera = Ref<Camera>::Create();
 	m_Camera->SetOrthographic();
@@ -8,7 +8,7 @@ void Renderer2DTest::OnInitialize()
 	m_Texture = Texture2D::LoadFromFile("assets/textures/Pistol.png").As<Texture2D>();
 }
 
-void Renderer2DTest::OnUpdate(Timestep timestep)
+void Renderer2DDemo::OnUpdate(Timestep timestep)
 {
 	m_Camera->Update();
 
@@ -21,20 +21,21 @@ void Renderer2DTest::OnUpdate(Timestep timestep)
 	Renderer2D::EndScene();
 }
 
-void Renderer2DTest::OnShutdown()
+void Renderer2DDemo::OnShutdown()
 {
 }
 
-void Renderer2DTest::OnEvent(Event &e)
+void Renderer2DDemo::OnEvent(Event &e)
 {
 	m_Camera->OnEvent(e);
 }
 
-void Renderer2DTest::OnUIRender(Timestep timestep)
+void Renderer2DDemo::OnUIRender(Timestep timestep)
 {
 }
 
-void Renderer2DTest::OnResize(uint32 width, uint32 height)
+void Renderer2DDemo::OnResize(uint32 width, uint32 height)
 {
+	m_Camera->OnWindowResize(width, height);
 }
 

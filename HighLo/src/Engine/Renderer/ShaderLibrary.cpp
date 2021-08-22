@@ -27,9 +27,7 @@ namespace highlo
 			shader = Shader::Create(shaderSource, layout);
 		}
 
-		auto &name = shader->GetName();
-		HL_ASSERT(m_Shaders.find(*name) == m_Shaders.end());
-		m_Shaders[*name] = shader;
+		Add(shader);
 	}
 	
 	void ShaderLibrary::Load(const HLString &name, const HLString &path, BufferLayout &layout, bool isCompute)

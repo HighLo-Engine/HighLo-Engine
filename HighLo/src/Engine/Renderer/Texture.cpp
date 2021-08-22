@@ -64,7 +64,7 @@ namespace highlo
 		return nullptr;
 	}
 
-	Ref<Texture> Texture3D::Create(ImageFormat format, uint32 width, uint32 height, const void *data)
+	Ref<Texture> Texture3D::Create(TextureFormat format, uint32 width, uint32 height, const void *data)
 	{
 		// TODO
 		return nullptr

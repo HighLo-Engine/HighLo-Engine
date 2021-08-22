@@ -49,13 +49,13 @@ namespace highlo
 		return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 	}
 
-	std::ostream& operator<<(std::ostream& os, const glm::vec3& vec)
+	std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec)
 	{
 		os << vec.x << ", " << vec.y << ", " << vec.z;
 		return os;
 	}
 
-	std::ostream& operator<<(std::ostream& os, const glm::mat4& mat)
+	std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat)
 	{
 		for (int i = 0; i < 4; ++i)
 		{
@@ -68,12 +68,12 @@ namespace highlo
 		return os;
 	}
 
-	HLString vec3ToString(const glm::vec3& v)
+	HLString vec3ToString(const glm::vec3 &v)
 	{
 		return HLString::ToString(v.x) + ", " + HLString::ToString(v.y) + ", " + HLString::ToString(v.z);
 	}
 
-	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset)
+	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset)
 	{
 		glm::vec2 normalized_device_coords;
 		normalized_device_coords.x = (2.0f * point.x) / view_size.x - 1.0f;
@@ -92,15 +92,13 @@ namespace highlo
 		return glm::normalize(glm::vec3(world_coords.x, world_coords.y, world_coords.z));
 	}
 
-	glm::vec3 WorldToScreen(const glm::vec3& point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset)
+	glm::vec3 WorldToScreen(const glm::vec3 &point, const glm::mat4 &view_matrix, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset)
 	{
 		glm::vec4 WorldPosition = glm::vec4(point, 1.0f);
 		glm::vec4 ClipSpacePos = projection * (view_matrix * WorldPosition);
-
 		glm::vec3 NDCPos = glm::vec3(ClipSpacePos.x, ClipSpacePos.y, ClipSpacePos.z) / ClipSpacePos.w;
 
 		glm::vec2 result = ((glm::vec2(NDCPos) + 1.0f) / 2.0f) * view_size + view_offset;
-
 		return glm::vec3(result.x, result.y, ClipSpacePos.z);
 	}
 
@@ -323,7 +321,7 @@ namespace highlo
 		return s_CachedCos[value];
 	}
 	
-	void MatrixMulSSE(const glm::mat4& A, const glm::mat4& B, glm::mat4& dest)
+	void MatrixMulSSE(const glm::mat4 &A, const glm::mat4 &B, glm::mat4 &dest)
 	{
 		__m128 m2_row_0 = _mm_setr_ps(A[0][0], A[0][1], A[0][2], A[0][3]);
 		__m128 m2_row_1 = _mm_setr_ps(A[1][0], A[1][1], A[1][2], A[1][3]);
@@ -366,7 +364,7 @@ namespace highlo
 		_mm_store_ps(&dest[3][0], out3);
 	}
 	
-	float DistanceSquaredSSE(const glm::vec3& A, const glm::vec3& B)
+	float DistanceSquaredSSE(const glm::vec3 &A, const glm::vec3 &B)
 	{
 		__m128 a4 = _mm_set_ps(A.x, A.y, A.z, 0.0f);
 		__m128 b4 = _mm_set_ps(B.x, B.y, B.z, 0.0f);
@@ -377,7 +375,7 @@ namespace highlo
 		return hsum_ps_sse3(sqr);
 	}
 	
-	bool CompareVectorsSSE(const glm::vec3& A, const glm::vec3& B)
+	bool CompareVectorsSSE(const glm::vec3 &A, const glm::vec3 &B)
 	{
 		__m128i v1 = _mm_load_si128((__m128i*)&A);
 		__m128i v2 = _mm_load_si128((__m128i*)&B);
@@ -386,7 +384,7 @@ namespace highlo
 		return (mask == 0xffff);
 	}
 	
-	float DotProductSSE(const glm::vec3& A, const glm::vec3& B)
+	float DotProductSSE(const glm::vec3 &A, const glm::vec3 &B)
 	{
 		// TODO
 		return 0;

@@ -31,12 +31,12 @@ namespace highlo
 
 	HLAPI float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 
-	HLAPI std::ostream& operator<<(std::ostream& os, const glm::vec3& vec);
-	HLAPI std::ostream& operator<<(std::ostream& os, const glm::mat4& mat);
-	HLAPI HLString vec3ToString(const glm::vec3& v);
+	HLAPI std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec);
+	HLAPI std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat);
+	HLAPI HLString vec3ToString(const glm::vec3 &v);
 
-	HLAPI glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4& view, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
-	HLAPI glm::vec3 WorldToScreen(const glm::vec3& point, const glm::mat4& view_matrix, const glm::mat4& projection, const glm::vec2& view_size, const glm::vec2& view_offset = glm::vec2(0, 0));
+	HLAPI glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset = glm::vec2(0, 0));
+	HLAPI glm::vec3 WorldToScreen(const glm::vec3 &point, const glm::mat4 &view_matrix, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset = glm::vec2(0, 0));
 
 	HLAPI bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation);
 	HLAPI bool DecomposeTranslation(const glm::mat4 &transform, glm::vec3 &translation);
@@ -49,8 +49,8 @@ namespace highlo
 	HLAPI float Sin(float value);
 	HLAPI float Cos(float value);
 
-	HLAPI void	MatrixMulSSE(const glm::mat4& A, const glm::mat4& B, glm::mat4& dest);
-	HLAPI float DistanceSquaredSSE(const glm::vec3& A, const glm::vec3& B);
-	HLAPI bool	CompareVectorsSSE(const glm::vec3& A, const glm::vec3& B);
-	HLAPI float	DotProductSSE(const glm::vec3& A, const glm::vec3& B);
+	HLAPI void	MatrixMulSSE(const glm::mat4 &A, const glm::mat4 &B, glm::mat4 &dest);
+	HLAPI float DistanceSquaredSSE(const glm::vec3 &A, const glm::vec3 &B);
+	HLAPI bool	CompareVectorsSSE(const glm::vec3 &A, const glm::vec3 &B);
+	HLAPI float	DotProductSSE(const glm::vec3 &A, const glm::vec3 &B);
 }

@@ -8,12 +8,12 @@ namespace highlo
         return Ref<Model>::Create();
     }
     
-    Ref<Model> Model::Create(const std::initializer_list<Ref<Mesh>>& meshes)
+    Ref<Model> Model::Create(const std::initializer_list<Ref<Mesh>> &meshes)
     {
         return Ref<Model>::Create(meshes);
     }
     
-    Ref<Model> Model::Create(const std::vector<Ref<Mesh>>& meshes)
+    Ref<Model> Model::Create(const std::vector<Ref<Mesh>> &meshes)
     {
         return Ref<Model>::Create(meshes);
     }

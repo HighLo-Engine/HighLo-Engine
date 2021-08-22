@@ -6,6 +6,7 @@
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Math/Math.h"
 
+#include "Engine/Core/Profiler/ProfilerTimer.h"
 #include "Engine/ECS/RenderSystem.h"
 
 namespace highlo
@@ -40,10 +41,14 @@ namespace highlo
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
 		HL_CORE_INFO("Engine Initialized");
+
+		HL_PROFILE_BEGIN_SESSION("GlobalSession", "performance.json");
 	}
 
 	HLApplication::~HLApplication()
 	{
+		HL_PROFILE_END_SESSION();
+
 		m_ECS_SystemManager.Shutdown();
 		Renderer::Shutdown();
 		VirtualFileSystem::Shutdown();

@@ -75,13 +75,13 @@ namespace highlo
 		indices[35] = 3;
 
 		MeshData data;
-		data.m_Vertices = vertices;
-		data.m_Indices = indices;
+		data.Vertices = vertices;
+		data.Indices = indices;
 
 		return Mesh::Create(data);
 	}
 
-	Model MeshFactory::CreateCubeModel(const glm::vec3& size)
+	Model MeshFactory::CreateCubeModel(const glm::vec3 &size)
 	{
 		Model model = Model({ CreateCube(size) });
 		model.BoundingBox = AABB(glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), glm::vec3(size.x / 2, size.y / 2, size.z / 2));
@@ -138,7 +138,7 @@ namespace highlo
 				vertex.UV.x = s;
 				vertex.UV.y = t;
 
-				data.m_Vertices.push_back(vertex);
+				data.Vertices.push_back(vertex);
 			}
 		}
 
@@ -154,17 +154,17 @@ namespace highlo
 				// k1 => k2 => k1+1
 				if (i != 0)
 				{
-					data.m_Indices.push_back(k1);
-					data.m_Indices.push_back(k2);
-					data.m_Indices.push_back(k1 + 1);
+					data.Indices.push_back(k1);
+					data.Indices.push_back(k2);
+					data.Indices.push_back(k1 + 1);
 				}
 
 				// k1+1 => k2 => k2+1
 				if (i != (stackCount - 1))
 				{
-					data.m_Indices.push_back(k1 + 1);
-					data.m_Indices.push_back(k2);
-					data.m_Indices.push_back(k2 + 1);
+					data.Indices.push_back(k1 + 1);
+					data.Indices.push_back(k2);
+					data.Indices.push_back(k2 + 1);
 				}
 			}
 		}
@@ -246,8 +246,8 @@ namespace highlo
 		}
 
 		MeshData data;
-		data.m_Vertices = vertices;
-		data.m_Indices = indices;
+		data.Vertices = vertices;
+		data.Indices = indices;
 
 		return Mesh::Create(data);
 	}

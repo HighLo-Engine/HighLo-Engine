@@ -22,15 +22,15 @@ namespace highlo
 			Init(glm::mat4(1.0f));
 		}
 
-		HLAPI HLFrustum(const glm::mat4& mat)
+		HLAPI HLFrustum(const glm::mat4 &mat)
 		{
 			Init(mat);
 		}
 
-		HLAPI void Init(const glm::mat4& mat);
+		HLAPI void Init(const glm::mat4 &mat);
 
-		HLAPI bool SphereIntersection(const glm::vec3& center, float radius);
+		HLAPI bool SphereIntersection(const glm::vec3 &center, float radius);
 
-		HLAPI int AABBIntersection(const AABB& aabb);
+		HLAPI int32 AABBIntersection(const AABB &aabb);
 	};
 }

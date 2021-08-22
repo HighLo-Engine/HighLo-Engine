@@ -14,11 +14,11 @@ namespace highlo
 
 		struct Node
 		{
-			T m_Value;
-			Node *m_Next;
+			T Value;
+			Node *Next;
 
 			Node(T value)
-				: m_Value(value), m_Next(nullptr) {}
+				: Value(value), Next(nullptr) {}
 		};
 
 		Node *m_Root;
@@ -26,16 +26,16 @@ namespace highlo
 
 	private:
 
-		HLAPI void Append(Node *node, T value)
+		HLAPI void Append(Node *node, const T &value)
 		{
-			if (parent->m_Next == nullptr)
+			if (node->Next == nullptr)
 			{
-				parent->m_Next = new Node(value);
+				node->Next = new Node(value);
 				m_Length++;
 			}
-		else
+			else
 			{
-				Append(node->m_Next, value);
+				Append(node->Next, value);
 			}
 		}
 
@@ -49,10 +49,9 @@ namespace highlo
 
 		HLAPI ~List()
 		{
-
 		}
 
-		HLAPI void Append(T value)
+		HLAPI void Append(const T &value)
 		{
 			if (m_Root == nullptr)
 			{
@@ -61,22 +60,22 @@ namespace highlo
 			}
 			else
 			{
-				Append(Root->m_Next, value);
+				Append(m_Root, value);
 			}
 		}
 
-		HLAPI void Insert(T value)
+		HLAPI void Insert(const T &value)
 		{
 			Node *node = new Node(value);
 			m_Length++;
 
-			node->m_Next = node;
+			node->Next = node;
 			m_Root = node;
 		}
 
 		HLAPI T GetFirst()
 		{
-			return m_Root->m_Value;
+			return m_Root->Value;
 		}
 
 		HLAPI T GetLast()
@@ -84,15 +83,15 @@ namespace highlo
 			Node *current = m_Root;
 			HL_ASSERT(current, "Root was nullptr!");
 
-			while (current->m_Next != nullptr)
+			while (current->Next != nullptr)
 				{
-				current = current->m_Next;
+				current = current->Next;
 				}
 
-			return current->m_Value;
+			return current->Value;
 		}
 
-		HLAPI T Get(int32 index)
+		HLAPI T Get(uint32 index)
 		{
 			if (index <= 0)
 			{
@@ -106,29 +105,27 @@ namespace highlo
 
 			Node *current = m_Root;
 			HL_ASSERT(current, "Root was nullptr!");
-			T result = NULL;
 			uint32 i = 0;
 
 			while (current != nullptr)
 			{
 				if (i == index)
 				{
-					result = current->m_Value;
-					break;
+					return current->Value;
 				}
 
-				current = current->m_Next;
-				i++;
+				current = current->Next;
+				++i;
 			}
 
-			return result;
+			return {};
 		}
 
 		HLAPI void RemoveFirst()
 		{
 			Node *tmp = m_Root;
 			HL_ASSERT(tmp, "Root was nullptr!");
-			m_Root = m_Root->m_Next;
+			m_Root = m_Root->Next;
 
 			delete tmp;
 			tmp = nullptr;
@@ -151,14 +148,14 @@ namespace highlo
 
 			while (current != nullptr)
 			{
-				if (current->m_Next->m_Next == nullptr)
+				if (current->Next->Next == nullptr)
 				{
-					delete current->m_Next;
-					current->m_Next = nullptr;
+					delete current->Next;
+					current->Next = nullptr;
 					break;
 				}
 
-				current = current->m_Next;
+				current = current->Next;
 			}
 		}
 
@@ -185,23 +182,17 @@ namespace highlo
 			{
 				if ((i + 1) == index)
 				{
-					Node *tmp = current->m_Next;
-					current->m_Next = current->m_Next->m_Next;
+					Node *tmp = current->Next;
+					current->Next = current->Next->Next;
 
 					delete tmp;
 					tmp = nullptr;
 
 					break;
 				}
-				current = current->m_Next;
+				current = current->Next;
 				++i;
 			}
-		}
-
-		HLAPI void RemoveAll()
-		{
-			Clear();
-			delete m_Root;
 		}
 
 		HLAPI bool IsEmpty()
@@ -223,7 +214,7 @@ namespace highlo
 
 				while (current != nullptr)
 				{
-					Node *tmp = current->m_Next;
+					Node *tmp = current->Next;
 					delete current;
 					current = tmp;
 				}
@@ -242,9 +233,9 @@ namespace highlo
 
 			while (current != nullptr)
 			{
-				arr[i] = current->m_Value;
+				arr[i] = current->Value;
 				++i;
-				current = current->m_Next;
+				current = current->Next;
 			}
 
 			return arr;
@@ -263,8 +254,8 @@ namespace highlo
 
 			while (current != nullptr)
 			{
-				std::cout << current->m_Value << std::endl;
-				current = current->m_Next;
+				std::cout << current->Value << std::endl;
+				current = current->Next;
 			}
 		}
 
@@ -279,15 +270,15 @@ namespace highlo
 			{
 				if ((i + 1) == list.Size())
 				{
-					stream << current->m_Value;
+					stream << current->Value;
 				}
 				else
 				{
-					stream << current->m_Value << ",";
+					stream << current->Value << ",";
 				}
 
 				++i;
-				current = current->m_Next;
+				current = current->Next;
 			}
 			stream << "]";
 			return stream;

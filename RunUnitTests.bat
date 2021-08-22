@@ -14,6 +14,14 @@ ROBOCOPY HighLo\vendor\openssl\lib\ tests\EncryptionTest\bin\ libcrypto-3-x64.dl
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\EncryptionTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\EncryptionTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\EncryptionTest\bin\ HighLo-Unit.dll /mt /z > nul
+
+ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\ListTest\bin\ HighLo.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\ListTest\bin\ libcrypto-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\ListTest\bin\ libssl-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\ListTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\ListTest\bin\ HighLo-Unit.dll /mt /z > nul
+
+
 ECHO OK: dlls have been copied!
 ECHO.
 
@@ -26,6 +34,12 @@ ECHO.
 ECHO Running Encryption Unit Tests...
 cd.>nul
 CALL tests\EncryptionTest\bin\EncryptionTest.exe
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+ECHO.
+
+ECHO Running List Unit Tests...
+cd.>nul
+CALL tests\ListTest\bin\ListTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 

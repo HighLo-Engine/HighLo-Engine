@@ -64,6 +64,8 @@
 
 #include "Engine/ECS/Entity.h"
 
+#include "Engine/Exceptions/Exceptions.h"
+
 #include "Engine/Scene/Scene.h"
 
 #include "Engine/Loaders/AssetLoader.h"
@@ -74,6 +76,5 @@
 #include "Engine/Serialization/Serializable.h"
 #include "Engine/Serialization/Serializer.h"
 
-// TODO: include this only if flag is active
-#include "HighLo-Unit.h"
+#include "HighLo-Unit.h" // TODO: include this only if flag is active
 

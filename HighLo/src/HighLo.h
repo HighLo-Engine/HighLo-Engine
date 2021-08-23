@@ -64,7 +64,7 @@
 
 #include "Engine/ECS/Entity.h"
 
-#include "Engine/Exceptions/Exceptions.h"
+#include "Engine/Core/Exceptions/Exceptions.h"
 
 #include "Engine/Scene/Scene.h"
 

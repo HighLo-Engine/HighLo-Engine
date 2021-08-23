@@ -73,13 +73,20 @@ namespace highlo
 				break;
 		#endif
 
-			OnUpdate(Time::GetTimestep());
-			m_ECS_SystemManager.Update();
+			if (!m_Minimized)
+			{
+				OnUpdate(Time::GetTimestep());
+				m_ECS_SystemManager.Update();
+			}
 
 			ImGuiRenderer::StartScene();
-			OnUIRender(Time::GetTimestep());
+			
+			if (!m_Minimized)
+			{
+				OnUIRender(Time::GetTimestep());
+			}
+			
 			m_Window->Update();
-
 			ImGuiRenderer::EndScene();
 		}
 
@@ -97,9 +104,11 @@ namespace highlo
 		if (event.GetWidth() == 0 || event.GetHeight() == 0)
 		{
 			// Window is minimized
+			m_Minimized = true;
 			return false;
 		}
 
+		m_Minimized = false;
 		Renderer::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
 		OnResize(event.GetWidth(), event.GetHeight());
 

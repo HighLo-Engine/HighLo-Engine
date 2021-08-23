@@ -48,6 +48,7 @@ namespace highlo
 		ApplicationStartupSettings m_StartupSettings;
 
 		bool m_Running = false;
+		bool m_Minimized = false;
 		UniqueRef<Window> m_Window;
 		Ref<Encryptor> m_Encryptor;
 

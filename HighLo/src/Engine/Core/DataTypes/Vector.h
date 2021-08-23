@@ -28,9 +28,9 @@ namespace highlo
 
 		HLAPI HLVectorIterator &operator++(int)
 		{
-			HLVectorIterator it = *this;
+			HLVectorIterator tmp = *this;
 			++(*this);
-			return it;
+			return tmp;
 		}
 
 		HLAPI HLVectorIterator &operator--()
@@ -41,9 +41,33 @@ namespace highlo
 
 		HLAPI HLVectorIterator &operator--(int)
 		{
-			HLVectorIterator it = *this;
+			HLVectorIterator tmp = *this;
 			--(*this);
-			return it;
+			return tmp;
+		}
+
+		HLAPI HLVectorIterator &operator+=(uint32 offset)
+		{
+			m_Data += offset;
+			return *this;
+		}
+
+		HLAPI HLVectorIterator &operator+(uint32 offset) const
+		{
+			HLVectorIterator tmp = *this;
+			return tmp += offset;
+		}
+
+		HLAPI HLVectorIterator &operator-=(uint32 offset)
+		{
+			m_Data += -offset;
+			return *this;
+		}
+
+		HLAPI HLVectorIterator &operator-(uint32 offset) const
+		{
+			HLVectorIterator tmp = *this;
+			return tmp -= offset;
 		}
 
 		HLAPI ValueType &operator[](int32 index)
@@ -125,10 +149,87 @@ namespace highlo
 			ReAllocate(2);
 		}
 
+		HLAPI HLVector(const HLVector &other)
+		{
+			m_Size = other.m_Size;
+			m_Capacity = other.m_Capacity;
+
+			ReAllocate(m_Capacity);
+			for (uint32 i = 0; i < m_Size; ++i)
+			{
+				m_Data[i] = std::move(other.m_Data[i]);
+			}
+		}
+
+		HLAPI HLVector(HLVector &&other) noexcept
+		{
+			if (this != &other)
+			{
+				m_Size = other.m_Size;
+				m_Capacity = other.m_Capacity;
+
+				ReAllocate(m_Capacity);
+				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					m_Data[i] = std::move(other.m_Data[i]);
+				}
+
+				for (uint32 i = 0; i < other.m_Size; ++i)
+				{
+					other.m_Data[i]->~T();
+				}
+
+				other.m_Size = 0;
+				other.m_Capacity = 0;
+				other.m_Data = nullptr;
+			}
+		}
+
+		HLAPI HLVector &operator=(const HLVector &other)
+		{
+			m_Size = other.m_Size;
+			m_Capacity = other.m_Capacity;
+
+			ReAllocate(m_Capacity);
+			for (uint32 i = 0; i < m_Size; ++i)
+			{
+				m_Data[i] = std::move(other.m_Data[i]);
+			}
+
+			return *this;
+		}
+
+		HLAPI HLVector &operator=(HLVector &&other) noexcept
+		{
+			if (this != &other)
+			{
+				m_Size = other.m_Size;
+				m_Capacity = other.m_Capacity;
+
+				ReAllocate(m_Capacity);
+				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					m_Data[i] = std::move(other.m_Data[i]);
+				}
+
+				for (uint32 i = 0; i < other.m_Size; ++i)
+				{
+					other.m_Data[i]->~T();
+				}
+
+				other.m_Size = 0;
+				other.m_Capacity = 0;
+				other.m_Data = nullptr;
+			}
+
+			return *this;
+		}
+
 		HLAPI ~HLVector()
 		{
 			Clear();
-			::operator delete();
+			// TODO: check why this is crashing
+			//::operator delete(m_Data, m_Capacity * sizeof(T));
 		}
 
 		HLAPI void PushBack(const T &value)
@@ -140,7 +241,7 @@ namespace highlo
 			++m_Size;
 		}
 
-		HLAPI void PushBack(T &&value) noexcept
+		HLAPI void PushBack(T &&value)
 		{
 			if (m_Size >= m_Capacity)
 				ReAllocate(m_Capacity + m_Capacity / 2);
@@ -156,8 +257,7 @@ namespace highlo
 				ReAllocate(m_Capacity + m_Capacity / 2);
 
 			new(&m_Data[m_Size]) T(std::forward<Args>(args)...);
-			++m_Size;
-			return m_Data[m_Size];
+			return m_Data[m_Size++];
 		}
 
 		HLAPI void PopBack()
@@ -169,9 +269,21 @@ namespace highlo
 			}
 		}
 
+		HLAPI void Remove(uint32 index)
+		{
+			HL_ASSERT(index >= 0 && index < m_Size);
+
+			for (uint32 i = index; i < m_Size - 1; ++i)
+			{
+				m_Data[i] = m_Data[i + 1];
+			}
+
+			--m_Size;
+		}
+
 		HLAPI void Clear()
 		{
-			for (uint23 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < m_Size; ++i)
 				m_Data[i].~T();
 
 			m_Size = 0;
@@ -194,15 +306,52 @@ namespace highlo
 			return Iterator(m_Data + m_Size);
 		}
 
+		HLAPI bool IsEmpty() const { return m_Size == 0; }
 		HLAPI uint32 Size() const { return m_Size; }
 		HLAPI uint32 Capacity() const { return m_Capacity; }
+		HLAPI T &At(uint32 index) { HL_ASSERT(index >= 0 && index < m_Size); return m_Data[index]; }
+		HLAPI const T &At(uint32 index) const { HL_ASSERT(index >= 0 && index < m_Size); return m_Data[index]; }
 
-		HLAPI Iterator Begin()
+		HLAPI void Reserve(uint32 capacity)
+		{
+			if (!m_Data)
+			{
+				m_Size = 0;
+				m_Capacity = 0;
+			}
+
+			T *buf = new T[capacity];
+			uint32 newSize = capacity < m_Size ? capacity : m_Size;
+			for (uint32 i = 0; i < newSize; ++i)
+				buf[i] = std::move(m_Data[i]);
+
+			::operator delete(m_Data, m_Capacity * sizeof(T));
+			m_Capacity = capacity;
+			m_Data = buf;
+		}
+
+		HLAPI void Resize(uint32 size)
+		{
+			Reserve(size);
+			m_Size = size;
+		}
+
+		HLAPI T &Front()
+		{
+			return m_Data[0];
+		}
+
+		HLAPI T &Back()
+		{
+			return m_Data[m_Size - 1];
+		}
+
+		HLAPI Iterator begin()
 		{
 			return Iterator(m_Data);
 		}
 
-		HLAPI Iterator End()
+		HLAPI Iterator end()
 		{
 			return Iterator(m_Data + m_Size);
 		}
@@ -210,13 +359,13 @@ namespace highlo
 		HLAPI T &operator[](uint32 index)
 		{
 			HL_ASSERT(index < m_Size);
-			return m_Data[m_Size];
+			return m_Data[index];
 		}
 
 		HLAPI const T &operator[](uint32 index) const
 		{
 			HL_ASSERT(index < m_Size);
-			return m_Data[m_Size];
+			return m_Data[index];
 		}
 
 		HLAPI friend std::ostream &operator<<(std::ostream &stream, const HLVector<T> &vector)

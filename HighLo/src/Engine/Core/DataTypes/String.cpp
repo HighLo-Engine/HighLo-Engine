@@ -78,11 +78,11 @@ namespace highlo
 
 	HLString::~HLString()
 	{
-		m_Size = 0;
 		if (m_Data)
 		{
 			delete[] m_Data;
 			m_Data = nullptr;
+			m_Size = 0;
 		}
 	}
 
@@ -106,9 +106,6 @@ namespace highlo
 	{
 		if (this != &other)
 		{
-			if (m_Data)
-				delete[] m_Data;
-
 			m_Size = other.m_Size;
 			m_Data = other.m_Data;
 

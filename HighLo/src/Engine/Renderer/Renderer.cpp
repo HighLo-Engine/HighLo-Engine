@@ -68,6 +68,11 @@ namespace highlo
 		s_RenderingAPI->SetDepthTest(bEnabled);
 	}
 
+	void Renderer::SetLineThickness(float thickness)
+	{
+		s_RenderingAPI->SetLineThickness(thickness);
+	}
+
 	void Renderer::Init(Window* window)
 	{
 		s_Data = new RendererData();

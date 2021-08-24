@@ -43,9 +43,9 @@ namespace highlo
 		 * @return Returns the current element from the Queue.
 		 */
 		HLAPI T Front()
-		{
+			{
 			return m_List.GetFirst();
-		}
+			}
 
 		/**
 		 *

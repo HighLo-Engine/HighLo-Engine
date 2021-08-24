@@ -16,8 +16,6 @@ namespace highlo
 		HLAPI static void Init();
 		HLAPI static void Shutdown();
 
-		HLAPI static void SetLineWidth(float width);
-
 		HLAPI static void BeginScene(const glm::mat4 &proj, bool depthTest = true);
 		HLAPI static void EndScene();
 		HLAPI static void Flush();

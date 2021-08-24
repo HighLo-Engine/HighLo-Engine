@@ -33,6 +33,7 @@ namespace highlo
 		HLAPI static void SetBlendMode(bool bEnabled);
 		HLAPI static void SetMultiSample(bool bEnabled);
 		HLAPI static void SetDepthTest(bool bEnabled);
+		HLAPI static void SetLineThickness(float thickness);
 
 		HLAPI static void Init(Window *window);
 		HLAPI static void Shutdown();

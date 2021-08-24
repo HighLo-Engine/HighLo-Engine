@@ -16,6 +16,11 @@ void Renderer2DDemo::OnUpdate(Timestep timestep)
 	Renderer::ClearScreenColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 	Renderer2D::BeginScene(m_Camera->GetViewProjectionMatrix());
+
+	Renderer::SetLineThickness(20.0f);
+	//Renderer2D::DrawLine({ 0.0f, 0.0f, 0.0f }, { 5.0f, 0.0f, 0.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+	//Renderer2D::DrawCircle({ 0.0f, 0.0f, 0.0f }, 90.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
+
 	Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 2.0f, 2.0f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 	Renderer2D::DrawQuad({ 2.0f, 0.0f, 0.0f }, { 2.0f, 2.0f }, m_Texture);
 	Renderer2D::EndScene();

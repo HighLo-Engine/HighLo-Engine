@@ -26,6 +26,9 @@ namespace highlo
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
+
+		// TODO: make this editor-only
+		int32 EntityID;
 	};
 
 	struct CircleVertex
@@ -34,6 +37,9 @@ namespace highlo
 		float Thickness;
 		glm::vec2 LocalPosition;
 		glm::vec4 Color;
+
+		// TODO: make this editor-only
+		int32 EntityID;
 	};
 
 	struct Renderer2DData
@@ -61,12 +67,14 @@ namespace highlo
 		Ref<VertexArray> LineVertexArray;
 		LineVertex *LineVertexBufferBase = nullptr;
 		LineVertex *LineVertexBufferPtr = nullptr;
+		uint32 LineIndexCount = 0;
 
 		// Circles
 		Ref<Shader> CircleShader;
 		Ref<VertexArray> CircleVertexArray;
 		CircleVertex *CircleVertexBufferBase = nullptr;
 		CircleVertex *CircleVertexBufferPtr = nullptr;
+		uint32 CircleIndexCount = 0;
 
 		// Textures
 		uint32 TextureSlotIndex = 1;
@@ -76,7 +84,6 @@ namespace highlo
 		Ref<RenderPass> RenderPass;
 
 		bool DepthTest = true;
-		float LineWidth = 1.0f;
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
 	};
 
@@ -171,11 +178,6 @@ namespace highlo
 		delete s_2DData;
 	}
 
-	void Renderer2D::SetLineWidth(float width)
-	{
-		s_2DData->LineWidth = width;
-	}
-
 	void Renderer2D::BeginScene(const glm::mat4 &proj, bool depthTest)
 	{
 		HL_PROFILE_FUNCTION();
@@ -209,8 +211,8 @@ namespace highlo
 		if (dataSize)
 		{
 			s_2DData->TextureShader->Bind();
-
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
+			
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 			{
 				s_2DData->TextureSlots[i]->Bind(i);
@@ -222,6 +224,30 @@ namespace highlo
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
 
+		dataSize = (uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase;
+		if (dataSize)
+		{
+			s_2DData->LineShader->Bind();
+			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
+
+			s_2DData->LineVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->LineVertexArray->GetIndexBuffer()->Bind();
+			s_2DData->LineVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, false);
+		}
+
+		dataSize = (uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase;
+		if (dataSize)
+		{
+			s_2DData->CircleShader->Bind();
+			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
+
+			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->CircleVertexArray->GetIndexBuffer()->Bind();
+			s_2DData->CircleVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
+		}
+
 		StartBatch();
 	}
 
@@ -231,6 +257,12 @@ namespace highlo
 
 		s_2DData->QuadIndexCount = 0;
 		s_2DData->QuadVertexBufferPtr = s_2DData->QuadVertexBufferBase;
+
+		s_2DData->LineIndexCount = 0;
+		s_2DData->LineVertexBufferPtr = s_2DData->LineVertexBufferBase;
+
+		s_2DData->CircleIndexCount = 0;
+		s_2DData->CircleVertexBufferPtr = s_2DData->CircleVertexBufferBase;
 
 		s_2DData->TextureSlotIndex = 1;
 	}
@@ -303,23 +335,23 @@ namespace highlo
 
 		float textureIndex = 0.0f;
 		for (uint32 i = 1; i < s_2DData->TextureSlotIndex; ++i)
-			{
+		{
 			if (*s_2DData->TextureSlots[i].Get() == *texture.Get())
-				{
+			{
 				textureIndex = (float) i;
 				break;
-				}
 			}
+		}
 
 		if (textureIndex == 0.0f)
-			{
+		{
 			textureIndex = (float) s_2DData->TextureSlotIndex;
 			s_2DData->TextureSlots[s_2DData->TextureSlotIndex] = texture;
 			s_2DData->TextureSlotIndex++;
-			}
+		}
 
 		for (uint32 i = 0; i < quadVertexCount; ++i)
-			{
+		{
 			s_2DData->QuadVertexBufferPtr->Position = transform.GetTransform() * s_2DData->QuadVertexPositions[i];
 			s_2DData->QuadVertexBufferPtr->Color = tintColor;
 			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
@@ -327,7 +359,7 @@ namespace highlo
 			s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
 			s_2DData->QuadVertexBufferPtr->EntityID = 0;
 			s_2DData->QuadVertexBufferPtr++;
-			}
+		}
 
 		s_2DData->QuadIndexCount += 6;
 	}
@@ -339,7 +371,17 @@ namespace highlo
 
 	void Renderer2D::DrawLine(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color)
 	{
+		s_2DData->LineVertexBufferPtr->Position = p1;
+		s_2DData->LineVertexBufferPtr->Color = color;
+		s_2DData->LineVertexBufferPtr->EntityID = 0;
+		s_2DData->LineVertexBufferPtr++;
 
+		s_2DData->LineVertexBufferPtr->Position = p2;
+		s_2DData->LineVertexBufferPtr->Color = color;
+		s_2DData->LineVertexBufferPtr->EntityID = 0;
+		s_2DData->LineVertexBufferPtr++;
+
+		s_2DData->LineIndexCount += 2;
 	}
 
 	void Renderer2D::DrawCircle(const glm::vec2 &p1, float radius, const glm::vec4 &color)
@@ -350,6 +392,8 @@ namespace highlo
 	void Renderer2D::DrawCircle(const glm::vec3 &p1, float radius, const glm::vec4 &color)
 	{
 
+
+		s_2DData->CircleIndexCount++;
 	}
 
 

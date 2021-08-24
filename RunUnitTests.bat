@@ -33,6 +33,18 @@ ROBOCOPY HighLo\vendor\openssl\lib\ tests\VectorTest\bin\ libssl-3-x64.dll /mt /
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\VectorTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\VectorTest\bin\ HighLo-Unit.dll /mt /z > nul
 
+ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\QueueTest\bin\ HighLo.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\QueueTest\bin\ libcrypto-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\QueueTest\bin\ libssl-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\QueueTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\QueueTest\bin\ HighLo-Unit.dll /mt /z > nul
+
+ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\StackTest\bin\ HighLo.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\StackTest\bin\ libcrypto-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\StackTest\bin\ libssl-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\StackTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\StackTest\bin\ HighLo-Unit.dll /mt /z > nul
+
 
 
 ECHO OK: dlls have been copied!
@@ -65,6 +77,18 @@ ECHO.
 ECHO Running Vector Unit Tests...
 cd.>nul
 CALL tests\VectorTest\bin\VectorTest.exe
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+ECHO.
+
+ECHO Running Queue Unit Tests...
+cd.>nul
+CALL tests\QueueTest\bin\QueueTest.exe
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+ECHO.
+
+ECHO Running Stack Unit Tests...
+cd.>nul
+CALL tests\StackTest\bin\StackTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 

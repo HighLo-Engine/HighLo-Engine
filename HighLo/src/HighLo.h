@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Engine/Application/Application.h"
+#include "Engine/Application/ApplicationLayer.h"
+#include "Engine/Application/ApplicationLayerStack.h"
 
 #include "Engine/Core/Defines/Defines.h"
 #include "Engine/Core/Core.h"

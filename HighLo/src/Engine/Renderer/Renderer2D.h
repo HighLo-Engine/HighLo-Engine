@@ -38,3 +38,4 @@ namespace highlo
 		HLAPI static void DrawCircle(const glm::vec3 &p1, float radius, const glm::vec4 &color);
 	};
 }
+

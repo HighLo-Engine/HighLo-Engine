@@ -75,6 +75,9 @@ namespace highlo
 
 			if (!m_Minimized)
 			{
+				for (ApplicationLayer *layer : m_LayerStack)
+					layer->OnUpdate(Time::GetTimestep());
+
 				OnUpdate(Time::GetTimestep());
 				m_ECS_SystemManager.Update();
 			}
@@ -83,6 +86,9 @@ namespace highlo
 			
 			if (!m_Minimized)
 			{
+				for (ApplicationLayer *layer : m_LayerStack)
+					layer->OnUIRender(Time::GetTimestep());
+
 				OnUIRender(Time::GetTimestep());
 			}
 			
@@ -91,6 +97,18 @@ namespace highlo
 		}
 
 		OnShutdown();
+	}
+
+	void HLApplication::PushLayer(ApplicationLayer *layer)
+	{
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
+	}
+
+	void HLApplication::PushOverlay(ApplicationLayer *overlay)
+	{
+		m_LayerStack.PushOverlay(overlay);
+		overlay->OnAttach();
 	}
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &event)
@@ -110,6 +128,10 @@ namespace highlo
 
 		m_Minimized = false;
 		Renderer::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
+		
+		for (ApplicationLayer *layer : m_LayerStack)
+			layer->OnResize(event.GetWidth(), event.GetHeight());
+
 		OnResize(event.GetWidth(), event.GetHeight());
 
 		auto &fbs = FramebufferPool::GetGlobal()->GetAll();
@@ -122,16 +144,24 @@ namespace highlo
 		return true;
 	}
 
-	void HLApplication::InternalEventHandler(Event &event)
+	void HLApplication::InternalEventHandler(Event &e)
 	{
 		// Drop certain input events if the window is not in focus
-		if (!m_Window->IsFocused() && event.IsInCategory(EventCategory::EventCategoryInput))
+		if (!m_Window->IsFocused() && e.IsInCategory(EventCategory::EventCategoryInput))
 			return;
 
-		EventDispatcher dispatcher(event);
+		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
 
-		OnEvent(event);
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (e.m_Handled)
+				break;
+
+			(*it)->OnEvent(e);
+		}
+
+		OnEvent(e);
 	}
 }

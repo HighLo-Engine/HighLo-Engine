@@ -13,9 +13,9 @@ git submodule update --init --recursive
 
 # Build Status
 
-| Linux | Windows | MacOS | Android | IOS |
-|:--------:| :-: | :-: | :-: | :-: |
-| X    | ✓ | X | X | X |
+| Linux | Windows | MacOS | Android | IOS | Web |
+|:--------:| :-: | :-: | :-: | :-: | :-: |
+| X    | ✓ | X | X | X | X |
 
 ![Windows](https://github.com/HighLo-Engine/HighLo-Engine/actions/workflows/Windows.yml/badge.svg?branch=master)
 

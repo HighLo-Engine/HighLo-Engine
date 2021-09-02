@@ -8,7 +8,13 @@ void SponzaSceneTest::OnInitialize()
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
 
-	m_SponzaMesh = AssetLoader::LoadStaticModel("assets/models/sponza.obj");
+	m_SponzaModel = AssetLoader::LoadStaticModel("assets/models/sponza.obj");
+	for (int32 i = 0; i < m_SponzaModel->GetMeshCount(); ++i)
+	{
+		m_SponzaModel->GetMesh(i)->SetTexture(HL_MATERIAL_TEXTURE_IRRADIANCE_MAP, m_Environment->GetIrradianceMap());
+		m_SponzaModel->GetMesh(i)->SetTexture(HL_MATERIAL_TEXTURE_PREFILTER_MAP, m_Environment->GetRadianceMap());
+		m_SponzaModel->GetMesh(i)->SetTexture(HL_MATERIAL_TEXTURE_BRDF_MAP, Renderer::GetBRDFLutTexture());
+	}
 
 	HL_TRACE("SponzaSceneTest Initialized");
 }
@@ -16,18 +22,22 @@ void SponzaSceneTest::OnInitialize()
 void SponzaSceneTest::OnUpdate(Timestep timestep)
 {
 	m_Camera->Update();
-	m_Skybox->Render(*m_Camera);
 
-	for (int32 i = 0; i < m_SponzaMesh->GetMeshCount(); ++i)
+	for (int32 i = 0; i < m_SponzaModel->GetMeshCount(); ++i)
 	{
-		m_SponzaMesh->GetMesh(i)->Update(timestep);
+		m_SponzaModel->GetMesh(i)->Update(timestep);
 	}
 
 	Renderer::ClearScreenBuffers();
-	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
+	Renderer::ClearScreenColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
+	m_Skybox->Render(*m_Camera);
 	CoreRenderer::BeginScene(*m_Camera);
-	
+
+	for (int32 i = 0; i < m_SponzaModel->GetMeshCount(); ++i)
+	{
+		CoreRenderer::DrawMesh(m_SponzaModel->GetMesh(i), Transform::FromPosition({ 0, 0, 0 }));
+	}
 }
 
 void SponzaSceneTest::OnShutdown()

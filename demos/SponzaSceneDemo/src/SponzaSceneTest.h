@@ -16,7 +16,7 @@ public:
 
 private:
 
-	Ref<Model> m_SponzaMesh;
+	Ref<Model> m_SponzaModel;
 	Ref<Environment> m_Environment;
 	Ref<Skybox> m_Skybox;
 	Ref<FreeFlyCamera> m_Camera;

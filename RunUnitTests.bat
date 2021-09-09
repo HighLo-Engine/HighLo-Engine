@@ -3,43 +3,36 @@
 ECHO preparing Unit Tests...
 
 ECHO copying dlls...
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\StringTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\StringTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\StringTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\StringTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\StringTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\EncryptionTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\EncryptionTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\EncryptionTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\EncryptionTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\EncryptionTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\ListTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\ListTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\ListTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\ListTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\ListTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\HashmapTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\HashmapTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\HashmapTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\HashmapTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\HashmapTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\VectorTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\VectorTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\VectorTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\VectorTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\VectorTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\QueueTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\QueueTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\QueueTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\QueueTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\QueueTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\bin\Release-windows-x86_64\HighLo\ tests\StackTest\bin\ HighLo.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\StackTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\StackTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\StackTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
@@ -93,6 +86,6 @@ IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 
 
-
+PAUSE
 EXIT /B 0
 

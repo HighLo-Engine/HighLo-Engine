@@ -32,14 +32,15 @@ void PopupMenuTest::OnEvent(Event &e)
 
 void PopupMenuTest::OnUIRender(Timestep timestep)
 {
-	ImGuiRenderer::StartWindow("RootWindow", true, true);
-	ImGuiRenderer::StartViewport("Test", m_PopupMenu);
-	ImGuiRenderer::EndViewport();
+	UI::BeginWindow("RootWindow", true, true);
+	
+	UI::BeginViewport("Test", m_PopupMenu);
+	UI::EndViewport();
 
-	ImGuiRenderer::StartViewport("Another Test", m_PopupMenu);
-	ImGuiRenderer::EndViewport();
+	UI::BeginViewport("Another Test", m_PopupMenu);
+	UI::EndViewport();
 
-	ImGuiRenderer::EndWindow();
+	UI::EndWindow();
 }
 
 void PopupMenuTest::OnResize(uint32 width, uint32 height)

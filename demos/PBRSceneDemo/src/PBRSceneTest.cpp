@@ -7,7 +7,7 @@ void PBRSceneTest::OnInitialize()
 
 	m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
 
-	ImGuiRenderer::ShouldDisplayDebugInformation(true);
+	//UI::ShouldDisplayDebugInformation(true);
 
 	CreatePBRObjects();
 
@@ -90,17 +90,17 @@ void PBRSceneTest::OnUIRender(Timestep timestep)
 	HLString indicesText = "Indices: ";
 	indicesText += HLString::ToString(m_IndexCount);
 
-	ImGuiRenderer::StartViewport("RendererInfo");
-	ImGuiRenderer::Text(deviceText);
-	ImGuiRenderer::Text(rendererText);
-	ImGuiRenderer::Text(vendorText);
-	ImGuiRenderer::Text(versionText);
-	ImGuiRenderer::Text(maxTextureUnitsText);
-	ImGuiRenderer::Text(maxSamplesText);
-	ImGuiRenderer::Text(maxAnisotropyText);
-	ImGuiRenderer::Text(verticesText);
-	ImGuiRenderer::Text(indicesText);
-	ImGuiRenderer::EndViewport();
+	UI::BeginViewport("RendererInfo");
+	UI::DrawText(deviceText);
+	UI::DrawText(rendererText);
+	UI::DrawText(vendorText);
+	UI::DrawText(versionText);
+	UI::DrawText(maxTextureUnitsText);
+	UI::DrawText(maxSamplesText);
+	UI::DrawText(maxAnisotropyText);
+	UI::DrawText(verticesText);
+	UI::DrawText(indicesText);
+	UI::EndViewport();
 }
 
 void PBRSceneTest::CreatePBRObjects()

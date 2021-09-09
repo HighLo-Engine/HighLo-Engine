@@ -6,6 +6,7 @@
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Math/Math.h"
 
+#include "Engine/ImGui/ImGui.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 #include "Engine/ECS/RenderSystem.h"
 
@@ -45,12 +46,12 @@ namespace highlo
 
 		HL_CORE_INFO("Engine Initialized");
 
-		HL_PROFILE_BEGIN_SESSION("GlobalSession", "performance.json");
+	//	HL_PROFILE_BEGIN_SESSION("GlobalSession", "performance.json");
 	}
 
 	HLApplication::~HLApplication()
 	{
-		HL_PROFILE_END_SESSION();
+	//	HL_PROFILE_END_SESSION();
 
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
@@ -82,7 +83,7 @@ namespace highlo
 				m_ECS_SystemManager.Update();
 			}
 
-			ImGuiRenderer::StartScene();
+			UI::BeginScene();
 			
 			if (!m_Minimized)
 			{
@@ -93,7 +94,7 @@ namespace highlo
 			}
 			
 			m_Window->Update();
-			ImGuiRenderer::EndScene();
+			UI::EndScene();
 		}
 
 		OnShutdown();

@@ -12,8 +12,8 @@
 #endif // HIGHLO_API_DX11
 
 #include "Engine/Events/Events.h"
-#include "Engine/Core/Defines/HLKeyCodes.h"
-#include "Engine/Core/Defines/HLMouseButtonCodes.h"
+#include "Engine/Core/Defines/KeyCodes.h"
+#include "Engine/Core/Defines/MouseButtonCodes.h"
 #include "Engine/Utils/InputUtils.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

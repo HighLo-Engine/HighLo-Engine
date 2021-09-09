@@ -43,7 +43,7 @@
 // -------------------------------------------------------------------------------------------
 // Example 
 #if 0
-void EditTransform(const Camera &camera, matrix_t &matrix)
+void EditTransform(const Camera& camera, matrix_t& matrix)
 {
 	static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
 	static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
@@ -84,20 +84,20 @@ void EditTransform(const Camera &camera, matrix_t &matrix)
 	vec_t snap;
 	switch (mCurrentGizmoOperation)
 	{
-		case ImGuizmo::TRANSLATE:
-			snap = config.mSnapTranslation;
-			ImGui::InputFloat3("Snap", &snap.x);
-			break;
-		case ImGuizmo::ROTATE:
-			snap = config.mSnapRotation;
-			ImGui::InputFloat("Angle Snap", &snap.x);
-			break;
-		case ImGuizmo::SCALE:
-			snap = config.mSnapScale;
-			ImGui::InputFloat("Scale Snap", &snap.x);
-			break;
+	case ImGuizmo::TRANSLATE:
+		snap = config.mSnapTranslation;
+		ImGui::InputFloat3("Snap", &snap.x);
+		break;
+	case ImGuizmo::ROTATE:
+		snap = config.mSnapRotation;
+		ImGui::InputFloat("Angle Snap", &snap.x);
+		break;
+	case ImGuizmo::SCALE:
+		snap = config.mSnapScale;
+		ImGui::InputFloat("Scale Snap", &snap.x);
+		break;
 	}
-	ImGuiIO &io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	ImGuizmo::Manipulate(camera.mView.m16, camera.mProjection.m16, mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m16, NULL, useSnap ? &snap.x : NULL);
 }
@@ -114,20 +114,20 @@ void EditTransform(const Camera &camera, matrix_t &matrix)
 namespace ImGuizmo
 {
 	// call inside your own window and before Manipulate() in order to draw gizmo to that window.
-	IMGUI_API void SetDrawlist();
+	HLAPI void SetDrawlist();
 
 	// call BeginFrame right after ImGui_XXXX_NewFrame();
-	IMGUI_API void BeginFrame();
+	HLAPI void BeginFrame();
 
 	// return true if mouse cursor is over any gizmo control (axis, plan or screen component)
-	IMGUI_API bool IsOver();
+	HLAPI bool IsOver();
 
 	// return true if mouse IsOver or if the gizmo is in moving state
-	IMGUI_API bool IsUsing();
+	HLAPI bool IsUsing();
 
 	// enable/disable the gizmo. Stay in the state until next call to Enable.
 	// gizmo is rendered with gray half transparent color when disabled
-	IMGUI_API void Enable(bool enable);
+	HLAPI void Enable(bool enable);
 
 	// helper functions for manualy editing translation/rotation/scale with an input float
 	// translation, rotation and scale float points to 3 floats each
@@ -141,16 +141,16 @@ namespace ImGuizmo
 	// ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, gizmoMatrix.m16);
 	//
 	// These functions have some numerical stability issues for now. Use with caution.
-	IMGUI_API void DecomposeMatrixToComponents(const float *matrix, float *translation, float *rotation, float *scale);
-	IMGUI_API void RecomposeMatrixFromComponents(const float *translation, const float *rotation, const float *scale, float *matrix);
+	HLAPI void DecomposeMatrixToComponents(const float *matrix, float *translation, float *rotation, float *scale);
+	HLAPI void RecomposeMatrixFromComponents(const float *translation, const float *rotation, const float *scale, float *matrix);
 
-	IMGUI_API void SetRect(float x, float y, float width, float height);
+	HLAPI void SetRect(float x, float y, float width, float height);
 	// default is false
-	IMGUI_API void SetOrthographic(bool isOrthographic);
+	HLAPI void SetOrthographic(bool isOrthographic);
 
 	// Render a cube with face color corresponding to face normal. Usefull for debug/tests
-	IMGUI_API void DrawCube(const float *view, const float *projection, const float *matrix);
-	IMGUI_API void DrawGrid(const float *view, const float *projection, const float *matrix, const float gridSize);
+	HLAPI void DrawCube(const float *view, const float *projection, const float *matrix);
+	HLAPI void DrawGrid(const float *view, const float *projection, const float *matrix, const float gridSize);
 
 	// call it when you want a gizmo
 	// Needs view and projection matrices. 
@@ -170,11 +170,11 @@ namespace ImGuizmo
 		WORLD
 	};
 
-	IMGUI_API void Manipulate(const float *view, const float *projection, OPERATION operation, MODE mode, float *matrix, float *deltaMatrix = 0, float *snap = 0, float *localBounds = NULL, float *boundsSnap = NULL);
-	//
-	// Please note that this cubeview is patented by Autodesk : https://patents.google.com/patent/US7782319B2/en
-	// It seems to be a defensive patent in the US. I don't think it will bring troubles using it as
-	// other software are using the same mechanics. But just in case, you are now warned!
-	//
-	IMGUI_API void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU32 backgroundColor);
+	HLAPI void Manipulate(const float *view, const float *projection, OPERATION operation, MODE mode, float *matrix, float *deltaMatrix = 0, float *snap = 0, float *localBounds = NULL, float *boundsSnap = NULL);
+   //
+   // Please note that this cubeview is patented by Autodesk : https://patents.google.com/patent/US7782319B2/en
+   // It seems to be a defensive patent in the US. I don't think it will bring troubles using it as
+   // other software are using the same mechanics. But just in case, you are now warned!
+   //
+	HLAPI void ViewManipulate(float* view, float length, ImVec2 position, ImVec2 size, ImU32 backgroundColor);
 };

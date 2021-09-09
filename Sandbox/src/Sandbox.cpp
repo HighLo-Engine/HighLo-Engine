@@ -43,7 +43,7 @@ void Sandbox::OnInitialize()
 	}
 
 	m_RenderSystemRef = GetECSSystemManager().GetSystem("RenderSystem").As<RenderSystem>();
-	ImGuiRenderer::ShouldDisplayDebugInformation(true);
+	//UI::ShouldDisplayDebugInformation(true);
 	HL_TRACE("Sandbox Initialized");
 }
 
@@ -68,7 +68,7 @@ void Sandbox::OnEvent(Event& e)
 
 void Sandbox::OnUIRender(Timestep timestep)
 {
-	ImGuiRenderer::StartWindow("Scene Debug Information");
+	UI::BeginWindow("Scene Debug Information");
 
 	HLString entities_total		= "         Total Entities   : " + HLString::ToString(m_Scene->GetEntityCount());
 	HLString entities_processed	= "Processed Entities  : " + HLString::ToString(m_Scene->GetFrameEntitiesProcessed());
@@ -76,14 +76,14 @@ void Sandbox::OnUIRender(Timestep timestep)
 	HLString meshes_rendered	= "Rendered Meshes    : " + HLString::ToString(m_RenderSystemRef->FrameMeshesRendered);
 	HLString triangles_rendered	= "Rendered Triangles : " + HLString::ToString(m_RenderSystemRef->FrameTrianglesRendered);
 
-	ImGuiRenderer::Text(entities_total);
-	ImGuiRenderer::Text(entities_processed);
-	ImGuiRenderer::Text(entities_rendered);
-	ImGuiRenderer::Text(meshes_rendered);
-	ImGuiRenderer::Text(triangles_rendered);
-	ImGuiRenderer::Separator();
+	UI::DrawText(entities_total);
+	UI::DrawText(entities_processed);
+	UI::DrawText(entities_rendered);
+	UI::DrawText(meshes_rendered);
+	UI::DrawText(triangles_rendered);
+	UI::Separator();
 
-	ImGuiRenderer::EndWindow();
+	UI::EndWindow();
 }
 
 void Sandbox::OnResize(uint32 width, uint32 height)

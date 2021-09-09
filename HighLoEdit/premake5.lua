@@ -29,14 +29,8 @@ project "HighLoEdit"
         "HighLo"
     }
 	
-	defines
-	{
-		"HL_USE_DLL"
-	}
-	
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libssl-3-x64.dll*"),
@@ -46,17 +40,29 @@ project "HighLoEdit"
 	}
 
     filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
-        staticruntime "off"
-
         disablewarnings { "5033" }
 
         defines
         {
             "HL_PLATFORM_WINDOWS"
         }
+
+	filter "system:linux"
+		systemversion "latest"
+		
+		defines
+		{
+			"HL_PLATFORM_LINUX"
+		}
+
+	filter "system:macos"
+		systemversion "latest"
+		
+		defines
+		{
+			"HL_PLATFORM_MACOS"
+		}
 
     filter "configurations:Debug"
         defines "HL_DEBUG"
@@ -69,3 +75,5 @@ project "HighLoEdit"
     filter "configurations:Dist"
         defines "HL_DIST"
         optimize "On"
+
+	

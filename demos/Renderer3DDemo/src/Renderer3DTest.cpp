@@ -5,7 +5,9 @@ void Renderer3DTest::OnInitialize()
 	m_Camera = Ref<FPSCamera>::Create();
 
 	Renderer::SetWireframe(true);
-	ImGuiRenderer::ShouldDisplayDebugInformation(true);
+
+	// TODO: implement this
+	//UI::ShouldDisplayDebugInformation(true);
 }
 
 void Renderer3DTest::OnUpdate(Timestep timestep)

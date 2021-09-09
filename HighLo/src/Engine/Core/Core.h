@@ -16,7 +16,7 @@
 
 #else
 
-#define HLAPI /* NOTHING */
+#define HLAPI
 
 #endif
 
@@ -50,12 +50,6 @@ namespace highlo
 		uint32 TotalAllocated = 0;	/**< The total amount of bytes allocated by the program. */
 		uint32 TotalFreed = 0;		/**< The total amount of bytes freed by the program. */
 
-		/**
-		 *
-		 * Returns the current memory usage in bytes.
-		 *
-		 * @return Returns the current memory usage in bytes.
-		 */
 		HLAPI inline uint32 CurrentUsage() { return TotalAllocated - TotalFreed; }
 	};
 }

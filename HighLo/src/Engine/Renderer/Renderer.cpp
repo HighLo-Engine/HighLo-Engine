@@ -113,7 +113,7 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty, true);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty, true);
 
-		ImGuiRenderer::Init(window);
+		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();
 		CoreRenderer::Init();
 		Renderer2D::Init();
@@ -126,7 +126,7 @@ namespace highlo
 		Renderer2D::Shutdown();
 		CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();
-		ImGuiRenderer::Shutdown();
+		UI::ShutdownImGui();
 
 		delete s_Data;
 	}

@@ -29,14 +29,8 @@ project "Sandbox"
         "HighLo"
     }
 
-	defines
-	{
-		"HL_USE_DLL"
-	}
-
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/HighLo-Unit.dll*"),
@@ -45,10 +39,7 @@ project "Sandbox"
 	}
 
     filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
-        staticruntime "off"
 
         disablewarnings { "5033" }
 

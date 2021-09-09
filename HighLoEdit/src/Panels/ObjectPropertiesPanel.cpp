@@ -14,10 +14,10 @@ void ObjectPropertiesPanel::Update(Timestep ts)
 
 void ObjectPropertiesPanel::Render(Timestep ts)
 {
-	ImGuiRenderer::StartViewport("Object Properties");
+	UI::BeginViewport("Object Properties");
 
 
-	ImGuiRenderer::EndViewport();
+	UI::EndViewport();
 }
 
 void ObjectPropertiesPanel::OnEvent(Event &e)

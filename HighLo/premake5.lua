@@ -1,5 +1,5 @@
 project "HighLo"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
@@ -66,7 +66,6 @@ project "HighLo"
 	{
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE",
-		"HIGHLO_USE_DLL",
 		"HIGHLO_LIBRARY_EXPORT",
 		"HIGHLO_ENABLE_PROFILER",
 		"HIGHLO_API_OPENGL",
@@ -76,7 +75,6 @@ project "HighLo"
 
     filter "system:windows"
         systemversion "latest"
-        staticruntime "off"
 
         disablewarnings { "5033" }
 

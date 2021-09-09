@@ -61,13 +61,13 @@ void ViewportPanel::Update(Timestep ts)
 
 void ViewportPanel::Render(Timestep ts)
 {
-	ImGuiRenderer::StartViewport("Viewport");
+	UI::BeginViewport("Viewport");
 
-	m_ViewportPanelMouseOver = ImGuiRenderer::IsWindowHovered();
-	m_ViewportPanelFocused = ImGuiRenderer::IsWindowFocused();
+	m_ViewportPanelMouseOver = UI::IsWindowHovered();
+	m_ViewportPanelFocused = UI::IsWindowFocused();
 
-	auto viewportOffset = ImGuiRenderer::GetCursorPosition(); // Includes tab bar
-	auto viewportSize = ImGuiRenderer::GetContentRegion();
+	auto viewportOffset = UI::GetCursorPosition(); // Includes tab bar
+	auto viewportSize = UI::GetContentRegion();
 	m_ViewportWidth = (uint32)viewportSize.x;
 	m_ViewportHeight = (uint32)viewportSize.y;
 	if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
@@ -77,19 +77,19 @@ void ViewportPanel::Render(Timestep ts)
 	}
 
 	// Render viewport image
-	ImGuiRenderer::DrawFramebuffer(m_ViewportContent, viewportSize, { 0, 1 }, { 1, 0 });
+	UI::Image(m_ViewportContent->GetImage().As<Texture2D>(), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 });
 
-	auto windowSize = ImGuiRenderer::GetWindowSize();
-	glm::vec2 minBound = ImGuiRenderer::GetWindowPos();
+	auto windowSize = UI::GetWindowSize();
+	glm::vec2 minBound = UI::GetWindowPos();
 	minBound.x += viewportOffset.x;
 	minBound.y += viewportOffset.y;
 
 	glm::vec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
 	m_ViewportBounds[0] = { minBound.x, minBound.y };
 	m_ViewportBounds[1] = { maxBound.x, maxBound.y };
-	m_AllowViewportCameraEvents = ImGuiRenderer::IsMouseHoveringRect(minBound, maxBound);
+	m_AllowViewportCameraEvents = UI::IsMouseHoveringRect(minBound, maxBound);
 
-	ImGuiRenderer::EndViewport();
+	UI::EndViewport();
 }
 
 void ViewportPanel::OnEvent(Event &e)
@@ -113,7 +113,7 @@ void ViewportPanel::Focus(const glm::vec3 &translation)
 
 std::pair<float, float> ViewportPanel::GetMouseViewportSpace()
 {
-	glm::vec2 mousePos = ImGuiRenderer::GetMousePosition();
+	glm::vec2 mousePos = UI::GetMousePosition();
 	float mx = mousePos.x;
 	float my = mousePos.y;
 	

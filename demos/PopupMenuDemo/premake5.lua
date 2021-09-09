@@ -28,14 +28,8 @@ project "PopupMenuDemo"
         "HighLo"
     }
 
-	defines
-	{
-		"HL_USE_DLL"
-	}
-
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/HighLo.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/libssl-3-x64.dll*"),
@@ -45,10 +39,7 @@ project "PopupMenuDemo"
 	}
 
     filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
-        staticruntime "off"
 
         disablewarnings { "5033" }
 

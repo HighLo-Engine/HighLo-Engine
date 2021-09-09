@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/Defines/HLKeyCodes.h"
+#include "Engine/Core/Defines/KeyCodes.h"
 
 namespace highlo
 {

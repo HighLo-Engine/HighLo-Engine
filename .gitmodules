@@ -34,3 +34,6 @@
 	path = HighLo/vendor/HighLo-Unit
 	url = https://github.com/HighLo-Engine/HighLo-Unit
 	ignore = dirty
+[submodule "HighLo/vendor/ImGui"]
+	path = HighLo/vendor/ImGui
+	url = https://github.com/HighLo-Engine/imgui

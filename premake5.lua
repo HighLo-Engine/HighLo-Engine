@@ -72,10 +72,6 @@ workspace "HighLo"
 		include "demos"
 	group ""
 
-	group "UnitTests"
-		include "tests"
-	group ""
-
 	group "Games"
 		include "Sandbox"
 		include "HighLoEdit"

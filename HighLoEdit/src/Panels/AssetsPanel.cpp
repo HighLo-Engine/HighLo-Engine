@@ -18,16 +18,16 @@ void AssetsPanel::Update(Timestep ts)
 
 void AssetsPanel::Render(Timestep ts)
 {
-	ImGuiRenderer::StartViewport("Assets");
-	m_IsSelected = ImGuiRenderer::IsWindowFocused();
-	m_IsHovered = ImGuiRenderer::IsWindowHovered();
+	UI::BeginViewport("Assets");
+	m_IsSelected = UI::IsWindowFocused();
+	m_IsHovered = UI::IsWindowHovered();
 
 	if (m_IsHovered)
-		ImGuiRenderer::DrawPopupMenu(m_Popup);
+		UI::DrawPopupMenu(m_Popup);
 
 
 
-	ImGuiRenderer::EndViewport();
+	UI::EndViewport();
 }
 
 void AssetsPanel::OnEvent(Event &e)

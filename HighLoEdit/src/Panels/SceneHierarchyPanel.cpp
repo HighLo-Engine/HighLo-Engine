@@ -49,8 +49,8 @@ void SceneHierarchyPanel::Update(Timestep ts)
 
 void SceneHierarchyPanel::Render(Timestep ts)
 {
-	ImGuiRenderer::StartViewport("Scene Hierarchy");
-	auto windowRect = ImGuiRenderer::GetWindowRect();
+	UI::BeginViewport("Scene Hierarchy");
+	auto windowRect = UI::GetWindowRect();
 
 	if (m_Context)
 	{
@@ -58,7 +58,7 @@ void SceneHierarchyPanel::Render(Timestep ts)
 		
 	}
 
-	ImGuiRenderer::EndViewport();
+	UI::EndViewport();
 }
 
 void SceneHierarchyPanel::OnEvent(Event &e)

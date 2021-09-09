@@ -18,6 +18,9 @@ workspace "HighLo-Tests"
 		"MultiProcessorCompile"
 	}
 
+	group "Engine"
+	include "../HighLo"
+	group ""
 
 	include "StringTest"
 	include "EncryptionTest"

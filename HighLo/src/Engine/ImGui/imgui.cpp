@@ -101,8 +101,7 @@ namespace highlo::UI
 	void InitImGui(Window *window, ImGuiWindowStyle windowStyle)
 	{
 		IMGUI_CHECKVERSION();
-		ImGuiContext *context = ImGui::CreateContext();
-		s_ImGuiContext = context;
+		s_ImGuiContext = ImGui::CreateContext();
 		s_ImGuiWindowStyle = windowStyle;
 
 		// Globals are not shared accross DLL, so we need to call ImGui::SetCurrentContext
@@ -161,7 +160,6 @@ namespace highlo::UI
 
 	void ShutdownImGui()
 	{
-		ImGui::SetCurrentContext(s_ImGuiContext);
 		IMGUI_RENDER_API_IMPL_FN_NAME(Shutdown)();
 		IMGUI_WINDOW_IMPL_FN_NAME(Shutdown)();
 		ImGui::DestroyContext();
@@ -169,7 +167,6 @@ namespace highlo::UI
 
 	void BeginScene()
 	{
-		ImGui::SetCurrentContext(s_ImGuiContext);
 		IMGUI_RENDER_API_IMPL_FN_NAME(NewFrame)();
 		IMGUI_WINDOW_IMPL_FN_NAME(NewFrame)();
 		ImGui::NewFrame();
@@ -181,8 +178,6 @@ namespace highlo::UI
 
 	void EndScene()
 	{
-		ImGui::SetCurrentContext(s_ImGuiContext);
-
 		ImGuiIO &io = ImGui::GetIO();
 		io.DisplaySize = ImVec2((float)HLApplication::Get().GetWindow().GetWidth(), (float)HLApplication::Get().GetWindow().GetHeight());
 

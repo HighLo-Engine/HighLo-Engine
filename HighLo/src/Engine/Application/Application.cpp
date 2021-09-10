@@ -76,25 +76,25 @@ namespace highlo
 
 			if (!m_Minimized)
 			{
-				for (ApplicationLayer *layer : m_LayerStack)
-					layer->OnUpdate(Time::GetTimestep());
-
 				OnUpdate(Time::GetTimestep());
 				m_ECS_SystemManager.Update();
+
+				for (ApplicationLayer *layer : m_LayerStack)
+					layer->OnUpdate(Time::GetTimestep());
 			}
 
 			UI::BeginScene();
 			
 			if (!m_Minimized)
 			{
+				OnUIRender(Time::GetTimestep());
+
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUIRender(Time::GetTimestep());
-
-				OnUIRender(Time::GetTimestep());
 			}
 			
-			m_Window->Update();
 			UI::EndScene();
+			m_Window->Update();
 		}
 
 		OnShutdown();

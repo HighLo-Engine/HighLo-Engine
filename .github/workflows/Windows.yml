@@ -37,7 +37,7 @@ jobs:
           uses: microsoft/setup-msbuild@v1.0.2
           
         - name: Generate Engine
-          run: .\GenerateProjects.bat
+          run: .\scripts\GenerateEngine.bat
 
         - name: Build Engine
           working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -46,7 +46,7 @@ jobs:
           run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.SOLUTION_FILE_PATH}}
           
         - name: Generate Unit-Tests
-          run: .\tests\GenerateUnitTests.bat
+          run: .\scripts\GenerateUnitTests.bat
           
         - name: Build String Unit Test
           working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -77,7 +77,6 @@ jobs:
           run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.STACK_UNIT_TEST_FILE_PATH}}
           
         - name: Run Unit Tests
-          run: .\RunUnitTests.bat
-          
+          run: .\scripts\RunUnitTests.bat
           
           

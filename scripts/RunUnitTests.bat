@@ -1,5 +1,7 @@
 @ECHO off
 
+pushd ..
+
 ECHO preparing Unit Tests...
 
 ECHO copying dlls...
@@ -85,7 +87,7 @@ CALL tests\StackTest\bin\StackTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 
+popd
 
-PAUSE
 EXIT /B 0
 

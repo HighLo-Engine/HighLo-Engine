@@ -274,10 +274,10 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		for (int32 i = 0; i < cacheSize; ++i)
-			{
+		{
 			float cachedValue = std::sin((float)(HL_PI * i / 1000.0f));
 			s_CachedSin.insert({ (float)(HL_PI * i / 1000.0f), cachedValue });
-			}
+		}
 	}
 
 	void CreateCacheCos(float cacheSize)

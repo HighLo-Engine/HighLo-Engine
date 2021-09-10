@@ -14,7 +14,7 @@ namespace highlo
 {
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&HLApplication::fn, this, std::placeholders::_1)
 
-	HLApplication* HLApplication::s_Instance = nullptr;
+	HLApplication *HLApplication::s_Instance = nullptr;
 
 	HLApplication::HLApplication()
 	{

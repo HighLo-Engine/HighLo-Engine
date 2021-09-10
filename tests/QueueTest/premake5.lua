@@ -17,39 +17,33 @@ project "QueueTest"
     includedirs
     {
 		"src",
-		"%{wks.location}/HighLo/src",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}",
-		"%{IncludeDir.HighLo_Unit}"
+		"%{wks.location}/../HighLo/src",
+		"%{wks.location}/../HighLo/vendor/spdlog/include",
+		"%{wks.location}/../HighLo/vendor/glm",
+		"%{wks.location}/../HighLo/vendor/HighLo-Unit/include"
     }
 
     links
     {
-        "HighLo",
-		"%{LibDir.HighLo_Unit}"
+        "%{wks.location}/../HighLo/bin/" .. outputdir .. "/HighLo/HighLo.lib",
+		"%{wks.location}/../HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.lib"
     }
 
 	defines
 	{
-		"HL_USE_DLL",
 		"HIGHLO_UNIT_USE_DLL"
 	}
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/bin/" .. outputdir .. "/HighLo/HighLo.dll %{wks.location}tests/%{prj.name}/bin/HighLo.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/%{prj.name}/bin/assimp-vc142-mtd.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libcrypto-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libssl-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}tests/%{prj.name}/bin/HighLo-Unit.dll*")
+		("{COPY} %{wks.location}/../HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/%{prj.name}/bin/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}/../HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}/../HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libssl-3-x64.dll*"),
+		("{COPY} %{wks.location}/../HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}tests/%{prj.name}/bin/HighLo-Unit.dll*")
 	}
 
     filter "system:windows"
-        cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
-        staticruntime "off"
-
         disablewarnings { "5033" }
 
         defines

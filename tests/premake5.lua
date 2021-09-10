@@ -1,13 +1,12 @@
 include "../vendor/bin/premake/solution_items.lua"
 include "../Dependencies.lua"
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"	
 
-workspace "HighLo-Tests"
+workspace "Highlo-Tests"
     architecture "x64"
-    configurations { "Debug", "Release", "Dist" }
-    startproject "Sandbox"
-
+    configurations { "Release" }
+	
 	solution_items
 	{
 		".editorconfig"
@@ -17,16 +16,13 @@ workspace "HighLo-Tests"
 	{
 		"MultiProcessorCompile"
 	}
-
-	group "Engine"
-	include "../HighLo"
+	
+	group "tests"
+		include "StringTest"
+		include "EncryptionTest"
+		include "ListTest"
+		include "HashmapTest"
+		include "VectorTest"
+		include "StackTest"
+		include "QueueTest"
 	group ""
-
-	include "StringTest"
-	include "EncryptionTest"
-	include "ListTest"
-	include "HashmapTest"
-	include "VectorTest"
-	include "StackTest"
-	include "QueueTest"
-

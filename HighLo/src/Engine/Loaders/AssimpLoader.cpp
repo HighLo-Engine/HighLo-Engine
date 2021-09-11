@@ -356,7 +356,7 @@ namespace highlo
 		data.Indices = indices;
 
 		auto EngineMesh = Mesh::Create(data);
-		EngineMesh->m_Animation = animations[0];
+		EngineMesh->SetAnimation(animations[0]);
 
 		/*model.DefaultBoundingBoxData = BoundingBoxData{ xMax, xMin, yMax, yMin, zMax, zMin };*/
 

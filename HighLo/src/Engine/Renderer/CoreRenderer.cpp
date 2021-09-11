@@ -156,7 +156,7 @@ namespace highlo
 
 	void CoreRenderer::DrawMesh(const Ref<Mesh>& mesh, const Transform& transform)
 	{
-		RenderMesh(mesh, mesh->m_Material, transform);
+		RenderMesh(mesh, mesh->GetMaterial(), transform);
 	}
 
 	void CoreRenderer::DrawRawMeshData(Ref<Mesh>& mesh)
@@ -197,13 +197,13 @@ namespace highlo
 
 	void CoreRenderer::RenderMesh(Ref<Mesh> mesh, Ref<Material> material, const Transform& transform)
 	{
-		Ref<Shader> shader = SelectMaterialShader(material, (mesh->m_Animation != nullptr));
+		Ref<Shader> shader = SelectMaterialShader(material, mesh->HasAnimation());
 		shader->Bind();
 		material->Bind();
 
-		if (mesh->m_Animation)
+		if (mesh->HasAnimation())
 		{
-			glm::mat4* bone_transforms = mesh->m_Animation->GetCurrentPoseTransforms();
+			glm::mat4* bone_transforms = mesh->GetAnimation()->GetCurrentPoseTransforms();
 
 			auto btb = shader->GetBuffer("BoneTransformsBuffer");
 			btb->SetBufferValue(&bone_transforms[0][0][0]);

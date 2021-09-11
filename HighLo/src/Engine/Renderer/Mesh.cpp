@@ -15,7 +15,6 @@ namespace highlo
 
 		instance->m_VertexArray->AddVertexBuffer(vertex_buffer);
 		instance->m_VertexArray->SetIndexBuffer(index_buffer);
-
 		instance->m_VertexArray->Unbind();
 
 		instance->m_Material = Material::Create();
@@ -25,20 +24,20 @@ namespace highlo
 
 	void Mesh::Update(Timestep timestep)
 	{
-		if (m_Animation != nullptr)
-		{
+		if (m_Animation)
 			m_Animation->Update(timestep);
-		}
 	}
 
-	void Mesh::UpdateMeshData(std::vector<Vertex> &data)
+	void Mesh::UpdateMeshData(std::vector<Vertex> &data, uint32 meshIndex)
 	{
-		m_VertexArray->GetVertexBuffers()[0]->UpdateContents(data);
+		HL_ASSERT(meshIndex >= 0 && meshIndex < m_VertexArray->GetVertexBuffers().size());
+		m_VertexArray->GetVertexBuffers()[meshIndex]->UpdateContents(data);
 	}
 	
-	void Mesh::UpdateMeshData()
+	void Mesh::UpdateMeshData(uint32 meshIndex)
 	{
-		m_VertexArray->GetVertexBuffers()[0]->UpdateContents(m_MeshData.Vertices);
+		HL_ASSERT(meshIndex >= 0 && meshIndex < m_VertexArray->GetVertexBuffers().size());
+		m_VertexArray->GetVertexBuffers()[meshIndex]->UpdateContents(m_MeshData.Vertices);
 	}
 
 	void Mesh::SetTexture(int32 type, Ref<Texture> texture)

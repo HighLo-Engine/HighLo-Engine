@@ -3,7 +3,7 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class PBRSceneTest : public HLApplication
+class PBRSceneDemo : public HLApplication
 {
 public:
 
@@ -15,6 +15,11 @@ public:
 	virtual void OnUIRender(Timestep timestep) override;
 
 private:
+
+	void CreatePBRObjects();
+
+	uint32 GetVertexCountFromModel(const Ref<Model> &model);
+	uint32 GetVertexCountFromMesh(Ref<Mesh> &mesh);
 
 	Light m_Light;
 	Ref<FreeFlyCamera> m_Camera;
@@ -30,9 +35,5 @@ private:
 	uint32 m_VertexCount = 0;
 	uint32 m_IndexCount = 0;
 	std::vector<Ref<Mesh>> m_TestSpheres;
-
-	void CreatePBRObjects();
-	uint32 GetVertexCountFromModel(const Ref<Model> &model);
-	uint32 GetVertexCountFromMesh(Ref<Mesh> &mesh);
 };
 

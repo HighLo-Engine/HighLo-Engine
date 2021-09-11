@@ -3,10 +3,10 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class Renderer3DTest : public HLApplication
+class SponzaSceneDemo : public HLApplication
 {
 public:
-	
+
 	virtual void OnInitialize() override;
 	virtual void OnUpdate(Timestep timestep) override;
 	virtual void OnShutdown() override;
@@ -16,7 +16,9 @@ public:
 
 private:
 
-	Ref<FPSCamera> m_Camera;
-	Ref<Mesh> m_Mesh;
+	Ref<Model> m_SponzaModel;
+	Ref<Environment> m_Environment;
+	Ref<Skybox> m_Skybox;
+	Ref<FreeFlyCamera> m_Camera;
 };
 

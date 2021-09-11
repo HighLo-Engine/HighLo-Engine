@@ -1,4 +1,4 @@
-#include "HighLoEdit.h"
+#include "HighLoEditor.h"
 
 #include "MenuItems.h"
 
@@ -8,10 +8,10 @@ namespace editorutils
 	{
 		switch (type)
 		{
-			case HighLoEditor::GizmoType::None:			return -1;
-			case HighLoEditor::GizmoType::Translate:	return 0;
-			case HighLoEditor::GizmoType::Rotate:		return 1;
-			case HighLoEditor::GizmoType::Scale:		return 2;
+				case HighLoEditor::GizmoType::None:			return -1;
+				case HighLoEditor::GizmoType::Translate:	return 0;
+				case HighLoEditor::GizmoType::Rotate:		return 1;
+				case HighLoEditor::GizmoType::Scale:		return 2;
 		}
 
 		return -1;
@@ -84,8 +84,8 @@ void HighLoEditor::OnInitialize()
 	fileMenu->AddSubMenu(importMenu);
 	fileMenu->AddSubMenu(exportMenu);
 	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { Close(); });
-	
+	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { HLApplication::Get().Close(); });
+
 	Ref<FileMenu> editMenu = FileMenu::Create("Edit");
 	editMenu->AddMenuItem("Undo", "Strg+Z", MENU_ITEM_UNDO, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Undo..."); });
 	editMenu->AddMenuItem("Redo", "Strg+Y", MENU_ITEM_REDO, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Redo..."); });
@@ -189,7 +189,7 @@ void HighLoEditor::OnEvent(Event &e)
 void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("RootWindow", true, true);
-	
+
 	m_Viewport->Render(timestep);
 	m_Assets->Render(timestep);
 	m_SceneHierarchy->Render(timestep);
@@ -233,15 +233,14 @@ void HighLoEditor::SelectEntity(Entity entity)
 
 	if (m_SceneState == SceneState::Edit)
 	{
-	//	m_EditorScene->SetSelectedEntity(entity);
+		//	m_EditorScene->SetSelectedEntity(entity);
 		m_CurrentScene = m_EditorScene;
 	}
 	else if (m_SceneState == SceneState::Simulate)
 	{
-	//	m_EditorScene->SetSelectedEntity(entity);
+		//	m_EditorScene->SetSelectedEntity(entity);
 		m_CurrentScene = m_SimulationScene;
 	}
-
 }
 
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
@@ -324,49 +323,49 @@ void HighLoEditor::EnableLightMode(FileMenu *menu, MenuItem *item)
 bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 {
 	if (m_Viewport->IsMouseOver())
-	{
-		switch (e.GetKeyCode())
 		{
-			case HL_KEY_F:
+		switch (e.GetKeyCode())
 			{
+				case HL_KEY_F:
+				{
 				if (m_SelectionContext.size() == 0)
 					break;
 
 				Entity selectedEntity = m_SelectionContext[0].m_Entity;
 				m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
 				break;
-			}
+				}
 
-			case HL_KEY_Q:
-			{
+				case HL_KEY_Q:
+				{
 				m_GizmoType = GizmoType::None;
 				break;
-			}
+				}
 
-			case HL_KEY_W:
-			{
+				case HL_KEY_W:
+				{
 				m_GizmoType = GizmoType::Translate;
 				break;
-			}
+				}
 
-			case HL_KEY_E:
-			{
+				case HL_KEY_E:
+				{
 				m_GizmoType = GizmoType::Rotate;
 				break;
-			}
+				}
 
-			case HL_KEY_R:
-			{
+				case HL_KEY_R:
+				{
 				m_GizmoType = GizmoType::Scale;
 				break;
+				}
 			}
 		}
-	}
 
 	if (Input::IsKeyPressed(HL_KEY_LEFT_CONTROL))
 	{
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT))
-		{
+			{
 			switch (e.GetKeyCode())
 			{
 				case HL_KEY_S:
@@ -383,7 +382,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 			}
 
 			return false;
-		}
+			}
 
 		switch (e.GetKeyCode())
 		{
@@ -462,16 +461,16 @@ bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 		{
 			auto [origin, direction] = m_Viewport->CastRay(mouseX, mouseY);
 			m_SelectionContext.clear();
-		//	m_CurrentScene->SetSelectedEntity({});
+			//	m_CurrentScene->SetSelectedEntity({});
 
-		//	auto meshEntities = m_CurrentScene->GetAllEntitiesWith<MeshComponent>();
-		// TODO
+			//	auto meshEntities = m_CurrentScene->GetAllEntitiesWith<MeshComponent>();
+			// TODO
 		}
 	}
 	return false;
 }
 
-void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
+void HighLoEditor::OnSelected(const HighLoEditor::SelectedMesh &selectionContext)
 {
 	//m_SceneHierarchy->SetSelected(selectionContext.m_Entity);
 	//m_CurrentScene->SetSelectedEntity(selectionContext.m_Entity);
@@ -482,7 +481,7 @@ void HighLoEditor::OnEntityDeleted(Entity e)
 	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].m_Entity == e)
 	{
 		m_SelectionContext.clear();
-	//	m_EditorScene->SetSelectedEntity({});
+		//	m_EditorScene->SetSelectedEntity({});
 	}
 }
 
@@ -493,11 +492,11 @@ void HighLoEditor::OnScenePlay()
 	m_SceneState = SceneState::Play;
 
 	m_RuntimeScene = Ref<Scene>::Create();
-	
+
 	m_EditorScene->CopyTo(m_RuntimeScene);
 	m_RuntimeScene->OnRuntimeStart();
 	//m_SceneHierarchy->SetContext(m_RuntimeScene);
-	
+
 	m_CurrentScene = m_RuntimeScene;
 }
 
@@ -548,11 +547,12 @@ float HighLoEditor::GetSnapValue()
 		case GizmoType::Rotate:		return 45.0f;
 		case GizmoType::Scale:		return 0.5f;
 	}
+
 	return 0.0f;
 }
 
 void HighLoEditor::DeleteEntity(Entity entity)
 {
-
+	// TODO
 }
 

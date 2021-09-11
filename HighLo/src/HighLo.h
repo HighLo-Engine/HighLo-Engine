@@ -65,6 +65,7 @@
 #include "Engine/Window/MenuBar.h"
 
 #include "Engine/ECS/Entity.h"
+#include <Engine/ECS/RenderSystem.h>
 
 #include "Engine/Core/Exceptions/Exceptions.h"
 

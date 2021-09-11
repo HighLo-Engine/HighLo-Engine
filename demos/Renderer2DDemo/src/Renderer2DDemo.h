@@ -14,7 +14,6 @@ public:
 	virtual void OnUIRender(Timestep timestep) override;
 	virtual void OnResize(uint32 width, uint32 height) override;
 
-
 private:
 
 	Ref<Camera> m_Camera;

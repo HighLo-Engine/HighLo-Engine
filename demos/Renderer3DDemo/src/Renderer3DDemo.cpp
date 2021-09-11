@@ -1,6 +1,6 @@
-#include "Renderer3DTest.h"
+#include "Renderer3DDemo.h"
 
-void Renderer3DTest::OnInitialize()
+void Renderer3DDemo::OnInitialize()
 {
 	m_Camera = Ref<FPSCamera>::Create();
 
@@ -10,7 +10,7 @@ void Renderer3DTest::OnInitialize()
 	//UI::ShouldDisplayDebugInformation(true);
 }
 
-void Renderer3DTest::OnUpdate(Timestep timestep)
+void Renderer3DDemo::OnUpdate(Timestep timestep)
 {
 	m_Camera->Update();
 
@@ -23,21 +23,24 @@ void Renderer3DTest::OnUpdate(Timestep timestep)
 	CoreRenderer::DrawCapsule({ 2, 0, 8 }, 1.0f, 30.0f, { 1.0f, 0.3f, 0.2f });
 }
 
-void Renderer3DTest::OnShutdown()
+void Renderer3DDemo::OnShutdown() 
 {
+
 }
 
-void Renderer3DTest::OnEvent(Event &e)
+void Renderer3DDemo::OnEvent(Event &e)
 {
 	if (e.IsInCategory(EventCategory::EventCategoryApplication))
 		HL_TRACE(e.ToString());
 }
 
-void Renderer3DTest::OnUIRender(Timestep timestep)
+void Renderer3DDemo::OnUIRender(Timestep timestep)
 {
+
 }
 
-void Renderer3DTest::OnResize(uint32 width, uint32 height)
+void Renderer3DDemo::OnResize(uint32 width, uint32 height)
 {
+
 }
 

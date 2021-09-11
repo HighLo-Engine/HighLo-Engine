@@ -3,7 +3,7 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class SponzaSceneTest : public HLApplication
+class PopupMenuDemo : public HLApplication
 {
 public:
 
@@ -16,8 +16,6 @@ public:
 
 private:
 
-	Ref<Model> m_SponzaModel;
-	Ref<Environment> m_Environment;
-	Ref<Skybox> m_Skybox;
-	Ref<FreeFlyCamera> m_Camera;
+	Ref<PopupMenu> m_PopupMenu;
 };
+

@@ -28,6 +28,7 @@ void Renderer2DDemo::OnUpdate(Timestep timestep)
 
 void Renderer2DDemo::OnShutdown()
 {
+
 }
 
 void Renderer2DDemo::OnEvent(Event &e)
@@ -37,6 +38,7 @@ void Renderer2DDemo::OnEvent(Event &e)
 
 void Renderer2DDemo::OnUIRender(Timestep timestep)
 {
+
 }
 
 void Renderer2DDemo::OnResize(uint32 width, uint32 height)

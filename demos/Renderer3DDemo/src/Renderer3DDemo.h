@@ -3,9 +3,10 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class PopupMenuTest : public HLApplication
+class Renderer3DDemo : public HLApplication
 {
 public:
+	
 	virtual void OnInitialize() override;
 	virtual void OnUpdate(Timestep timestep) override;
 	virtual void OnShutdown() override;
@@ -14,6 +15,8 @@ public:
 	virtual void OnResize(uint32 width, uint32 height) override;
 
 private:
-	Ref<PopupMenu> m_PopupMenu;
+
+	Ref<FPSCamera> m_Camera;
+	Ref<Mesh> m_Mesh;
 };
 

@@ -3,9 +3,10 @@
 #include <HighLo.h>
 using namespace highlo;
 
-class FileMenuTest : public HLApplication
+class FileMenuDemo : public HLApplication
 {
 public:
+
 	virtual void OnInitialize() override;
 	virtual void OnUpdate(Timestep timestep) override;
 	virtual void OnShutdown() override;

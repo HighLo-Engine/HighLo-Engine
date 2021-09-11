@@ -1,6 +1,6 @@
-#include "SponzaSceneTest.h"
+#include "SponzaSceneDemo.h"
 
-void SponzaSceneTest::OnInitialize()
+void SponzaSceneDemo::OnInitialize()
 {
 	m_Camera = Ref<FreeFlyCamera>::Create();
 
@@ -19,7 +19,7 @@ void SponzaSceneTest::OnInitialize()
 	HL_TRACE("SponzaSceneTest Initialized");
 }
 
-void SponzaSceneTest::OnUpdate(Timestep timestep)
+void SponzaSceneDemo::OnUpdate(Timestep timestep)
 {
 	m_Camera->Update();
 
@@ -40,20 +40,22 @@ void SponzaSceneTest::OnUpdate(Timestep timestep)
 	}
 }
 
-void SponzaSceneTest::OnShutdown()
+void SponzaSceneDemo::OnShutdown()
 {
 	HL_TRACE("SponzaSceneTest shutdown");
 }
 
-void SponzaSceneTest::OnEvent(Event &e)
+void SponzaSceneDemo::OnEvent(Event &e)
 {
+
 }
 
-void SponzaSceneTest::OnUIRender(Timestep timestep)
+void SponzaSceneDemo::OnUIRender(Timestep timestep)
 {
+
 }
 
-void SponzaSceneTest::OnResize(uint32 width, uint32 height)
+void SponzaSceneDemo::OnResize(uint32 width, uint32 height)
 {
 	m_Camera->OnWindowResize(width, height);
 }

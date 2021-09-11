@@ -1,6 +1,6 @@
-#include "FileMenuTest.h"
+#include "FileMenuDemo.h"
 
-void FileMenuTest::OnInitialize()
+void FileMenuDemo::OnInitialize()
 {
 	GetWindow().CenterWindow();
 
@@ -23,24 +23,28 @@ void FileMenuTest::OnInitialize()
 	GetWindow().SetMenuBar(m_Menubar);
 }
 
-void FileMenuTest::OnUpdate(Timestep timestep)
+void FileMenuDemo::OnUpdate(Timestep timestep)
 {
+
 }
 
-void FileMenuTest::OnShutdown()
+void FileMenuDemo::OnShutdown()
 {
+
 }
 
-void FileMenuTest::OnEvent(Event &e)
+void FileMenuDemo::OnEvent(Event &e)
 {
 	m_Menubar->OnEvent(e);
 }
 
-void FileMenuTest::OnUIRender(Timestep timestep)
+void FileMenuDemo::OnUIRender(Timestep timestep)
 {
+
 }
 
-void FileMenuTest::OnResize(uint32 width, uint32 height)
+void FileMenuDemo::OnResize(uint32 width, uint32 height)
 {
+
 }
 

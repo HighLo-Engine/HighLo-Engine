@@ -67,4 +67,7 @@ namespace highlo
 
 		void InternalEventHandler(Event &event);
 	};
+
+	// this will be implemented by the client application
+	HLAPI HLApplication *CreateApp();
 }

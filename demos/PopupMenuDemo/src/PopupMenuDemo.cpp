@@ -1,6 +1,6 @@
-#include "PopupMenuTest.h"
+#include "PopupMenuDemo.h"
 
-void PopupMenuTest::OnInitialize()
+void PopupMenuDemo::OnInitialize()
 {
 	GetWindow().CenterWindow();
 
@@ -16,24 +16,25 @@ void PopupMenuTest::OnInitialize()
 	m_PopupMenu->AddSubMenu(menu);
 }
 
-void PopupMenuTest::OnUpdate(Timestep timestep)
+void PopupMenuDemo::OnUpdate(Timestep timestep)
 {
 	m_PopupMenu->Update();
 }
 
-void PopupMenuTest::OnShutdown()
+void PopupMenuDemo::OnShutdown()
 {
+
 }
 
-void PopupMenuTest::OnEvent(Event &e)
+void PopupMenuDemo::OnEvent(Event &e)
 {
 	m_PopupMenu->OnEvent(e);
 }
 
-void PopupMenuTest::OnUIRender(Timestep timestep)
+void PopupMenuDemo::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("RootWindow", true, true);
-	
+
 	UI::BeginViewport("Test", m_PopupMenu);
 	UI::EndViewport();
 
@@ -43,7 +44,8 @@ void PopupMenuTest::OnUIRender(Timestep timestep)
 	UI::EndWindow();
 }
 
-void PopupMenuTest::OnResize(uint32 width, uint32 height)
+void PopupMenuDemo::OnResize(uint32 width, uint32 height)
 {
+
 }
 

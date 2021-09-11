@@ -3,7 +3,7 @@
 void Sandbox::OnInitialize()
 {
 	// TODO: Fix for GLFW configuration.
-	//HLApplication::Get().GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.ico");
+	// HLApplication::Get().GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.ico");
 
 	VirtualFileSystem::Get()->Mount("textures", "assets/textures/");
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
@@ -60,7 +60,7 @@ void Sandbox::OnShutdown()
 	HL_TRACE("Sandbox Shutdown");
 }
 
-void Sandbox::OnEvent(Event& e)
+void Sandbox::OnEvent(Event &e)
 {
 	if (e.IsInCategory(EventCategory::EventCategoryApplication))
 		HL_TRACE(e.ToString());
@@ -70,11 +70,11 @@ void Sandbox::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("Scene Debug Information");
 
-	HLString entities_total		= "         Total Entities   : " + HLString::ToString(m_Scene->GetEntityCount());
-	HLString entities_processed	= "Processed Entities  : " + HLString::ToString(m_Scene->GetFrameEntitiesProcessed());
-	HLString entities_rendered	= "Rendered Entities    : " + HLString::ToString(m_RenderSystemRef->FrameEntitiesRendered);
-	HLString meshes_rendered	= "Rendered Meshes    : " + HLString::ToString(m_RenderSystemRef->FrameMeshesRendered);
-	HLString triangles_rendered	= "Rendered Triangles : " + HLString::ToString(m_RenderSystemRef->FrameTrianglesRendered);
+	HLString entities_total = "         Total Entities   : " + HLString::ToString(m_Scene->GetEntityCount());
+	HLString entities_processed = "Processed Entities  : " + HLString::ToString(m_Scene->GetFrameEntitiesProcessed());
+	HLString entities_rendered = "Rendered Entities    : " + HLString::ToString(m_RenderSystemRef->FrameEntitiesRendered);
+	HLString meshes_rendered = "Rendered Meshes    : " + HLString::ToString(m_RenderSystemRef->FrameMeshesRendered);
+	HLString triangles_rendered = "Rendered Triangles : " + HLString::ToString(m_RenderSystemRef->FrameTrianglesRendered);
 
 	UI::DrawText(entities_total);
 	UI::DrawText(entities_processed);
@@ -90,3 +90,4 @@ void Sandbox::OnResize(uint32 width, uint32 height)
 {
 	m_Scene->m_Camera->OnWindowResize(width, height);
 }
+

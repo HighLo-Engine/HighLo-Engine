@@ -1,6 +1,6 @@
-#include "PBRSceneTest.h"
+#include "PBRSceneDemo.h"
 
-void PBRSceneTest::OnInitialize()
+void PBRSceneDemo::OnInitialize()
 {
 	Renderer::SetBlendMode(false);
 	m_Camera = Ref<FreeFlyCamera>::Create();
@@ -13,12 +13,12 @@ void PBRSceneTest::OnInitialize()
 
 	m_Skybox = Skybox::Create();
 	m_Skybox->SetTexture(m_Environment->GetSkyboxTexture());
-	
+
 	GetWindow().Maximize();
 	HL_TRACE("PBR Demo Initialized");
 }
 
-void PBRSceneTest::OnUpdate(Timestep timestep)
+void PBRSceneDemo::OnUpdate(Timestep timestep)
 {
 	m_Pistol->Update(timestep);
 	m_Cowboy->Update(timestep);
@@ -41,27 +41,28 @@ void PBRSceneTest::OnUpdate(Timestep timestep)
 	CoreRenderer::DrawMesh(m_DancingStormTrooper, Transform::FromPosition({ 26, -10, 30 }).Scale(2.0f));
 
 	for (uint64 i = 0; i < m_TestSpheres.size(); i++)
-		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float)i * 7 }).Scale(3.0f));
+		CoreRenderer::DrawMesh(m_TestSpheres[i], Transform::FromPosition({ 6, -2, 14 + (float) i * 7 }).Scale(3.0f));
 
 	CoreRenderer::DrawMesh(m_Pistol, Transform::FromPosition({ 30, -3, 0 }).Scale(0.5f));
 	CoreRenderer::DrawMesh(m_Cowboy, Transform::FromPosition({ 26, -5, -12 }).Scale(0.8f).Rotate(-45.0f, { 0, 1, 0 }));
 }
 
-void PBRSceneTest::OnShutdown()
+void PBRSceneDemo::OnShutdown()
 {
 	HL_TRACE("PBR Demo Shutdown");
 }
 
-void PBRSceneTest::OnEvent(Event &e)
+void PBRSceneDemo::OnEvent(Event &e)
 {
+
 }
 
-void PBRSceneTest::OnResize(uint32 width, uint32 height)
+void PBRSceneDemo::OnResize(uint32 width, uint32 height)
 {
 	m_Camera->OnWindowResize(width, height);
 }
 
-void PBRSceneTest::OnUIRender(Timestep timestep)
+void PBRSceneDemo::OnUIRender(Timestep timestep)
 {
 	HLString deviceText = "Device: ";
 	deviceText += Renderer::GetCapabilities().Device;
@@ -103,7 +104,7 @@ void PBRSceneTest::OnUIRender(Timestep timestep)
 	UI::EndViewport();
 }
 
-void PBRSceneTest::CreatePBRObjects()
+void PBRSceneDemo::CreatePBRObjects()
 {
 	m_PBR_Sphere = AssetLoader::LoadStaticModel("assets/models/PBR_Sphere.obj")->GetMesh(0);
 	m_PBR_Sphere->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/PBR_Sphere_Albedo.jpg"));
@@ -153,7 +154,7 @@ void PBRSceneTest::CreatePBRObjects()
 	for (int32 i = 0; i < 10; i++)
 	{
 		auto newSphere = SphereBlueprint->Copy();
-		newSphere->GetMaterialRenderProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
+		newSphere->GetMaterialRenderProperties().Color = { (float) i * 0.02f, (float) i * 0.08f, (float) i * 0.05f, 1.0f };
 		newSphere->GetMaterialRenderProperties().Roughness = 0.1f * i;
 		m_VertexCount += GetVertexCountFromMesh(newSphere);
 		m_IndexCount += newSphere->GetVertexArray()->GetIndexBuffer()->GetCount();
@@ -175,7 +176,7 @@ void PBRSceneTest::CreatePBRObjects()
 	for (int32 i = 0; i < 10; i++)
 	{
 		auto newSphere = SphereBlueprint->Copy();
-		newSphere->GetMaterialRenderProperties().Color = { (float)i * 0.02f, (float)i * 0.08f, (float)i * 0.05f, 1.0f };
+		newSphere->GetMaterialRenderProperties().Color = { (float) i * 0.02f, (float) i * 0.08f, (float) i * 0.05f, 1.0f };
 		newSphere->GetMaterialRenderProperties().Metallic = 0.1f * i;
 		m_VertexCount += GetVertexCountFromMesh(newSphere);
 		m_IndexCount += newSphere->GetVertexArray()->GetIndexBuffer()->GetCount();
@@ -204,7 +205,7 @@ void PBRSceneTest::CreatePBRObjects()
 	m_DancingStormTrooper->m_Animation->Play();
 }
 
-uint32 PBRSceneTest::GetVertexCountFromModel(const Ref<Model> &model)
+uint32 PBRSceneDemo::GetVertexCountFromModel(const Ref<Model> &model)
 {
 	uint32 count = 0;
 	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
@@ -220,7 +221,7 @@ uint32 PBRSceneTest::GetVertexCountFromModel(const Ref<Model> &model)
 	return count;
 }
 
-uint32 PBRSceneTest::GetVertexCountFromMesh(Ref<Mesh> &mesh)
+uint32 PBRSceneDemo::GetVertexCountFromMesh(Ref<Mesh> &mesh)
 {
 	uint32 count = 0;
 
@@ -232,3 +233,4 @@ uint32 PBRSceneTest::GetVertexCountFromMesh(Ref<Mesh> &mesh)
 
 	return count;
 }
+

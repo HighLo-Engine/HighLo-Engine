@@ -130,6 +130,16 @@ namespace highlo
 			return HLString("FileSystemChangedEvent: ") << m_OldName << " -> " << m_NewName;
 		}
 
+		HLAPI void SetTracking(bool value = true)
+		{
+			m_Tracking = value;
+		}
+
+		HLAPI bool IsTracking() const
+		{
+			return m_Tracking;
+		}
+
 		REGISTER_EVENT_CLASS_TYPE(FileSystemChanged)
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
 
@@ -140,5 +150,6 @@ namespace highlo
 		HLString m_OldName = "";
 		HLString m_NewName = "";
 		bool m_IsDirectory = false;
+		bool m_Tracking = false;
 	};
 }

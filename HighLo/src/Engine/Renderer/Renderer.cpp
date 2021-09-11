@@ -89,24 +89,21 @@ namespace highlo
 		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
 
 		// Define Shader layouts
-		BufferLayout textureLayout2D = BufferLayout::GetTextureLayout();
-		BufferLayout lineLayout2D = BufferLayout::GetLineLayout();
-		BufferLayout circleLayout2D = BufferLayout::GetCircleLayout();
 		BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
 		BufferLayout animatedShaderLayout = BufferLayout::GetAnimatedShaderLayout();
-		BufferLayout skyboxLayout = BufferLayout::GetSkyboxLayout();
 
 		// Load 3D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedShaderLayout);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl", staticShaderLayout);
 		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl", animatedShaderLayout);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", skyboxLayout);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", BufferLayout::GetSkyboxLayout());
+		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl", BufferLayout::GetGridLayout());
 
 		// Load 2D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", textureLayout2D);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", lineLayout2D);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", circleLayout2D);
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", BufferLayout::GetTextureLayout());
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", BufferLayout::GetLineLayout());
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", BufferLayout::GetCircleLayout());
 
 		// Load Compute Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl", BufferLayout::Empty, true);

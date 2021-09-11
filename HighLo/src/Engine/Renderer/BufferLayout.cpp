@@ -14,7 +14,7 @@ namespace highlo
 			{ "in_TexCoord", ShaderDataType::Float2 },
 			{ "in_TexIndex", ShaderDataType::Float },
 			{ "in_TilingFactor", ShaderDataType::Float },
-			{ "in_EntityID", ShaderDataType::Int },
+			{ "in_EntityID", ShaderDataType::Int }
 		};
 	}
 
@@ -24,7 +24,7 @@ namespace highlo
 		{
 			{ "in_Position", ShaderDataType::Float3 },
 			{ "in_Color", ShaderDataType::Float4 },
-			{ "in_EntityID", ShaderDataType::Int },
+			{ "in_EntityID", ShaderDataType::Int }
 		};
 	}
 
@@ -36,7 +36,7 @@ namespace highlo
 			{ "in_Thickness", ShaderDataType::Float },
 			{ "in_LocalPosition", ShaderDataType::Float2 },
 			{ "in_Color", ShaderDataType::Float4 },
-			{ "in_EntityID", ShaderDataType::Int },
+			{ "in_EntityID", ShaderDataType::Int }
 		};
 	}
 
@@ -68,7 +68,16 @@ namespace highlo
 	{
 		return
 		{
-			{ "POSITION", ShaderDataType::Float3 },
+			{ "POSITION", ShaderDataType::Float3 }
+		};
+	}
+
+	BufferLayout BufferLayout::GetGridLayout()
+	{
+		return
+		{
+			{ "in_Position", ShaderDataType::Float3 },
+			{ "in_TexCoord", ShaderDataType::Float2 }
 		};
 	}
 

@@ -18,6 +18,7 @@ namespace highlo
 
 	HLApplication::HLApplication()
 	{
+		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
 		s_Instance = this;
 
 		Logger::Init();

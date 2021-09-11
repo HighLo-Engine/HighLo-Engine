@@ -40,7 +40,10 @@ ROBOCOPY HighLo\vendor\openssl\lib\ tests\StackTest\bin\ libssl-3-x64.dll /mt /z
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\StackTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\StackTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\ECSTest\bin\ libcrypto-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\ECSTest\bin\ libssl-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\ECSTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\ECSTest\bin\ HighLo-Unit.dll /mt /z > nul
 
 ECHO OK: dlls have been copied!
 ECHO.
@@ -84,6 +87,12 @@ ECHO.
 ECHO Running Stack Unit Tests...
 cd.>nul
 CALL tests\StackTest\bin\StackTest.exe
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+ECHO.
+
+ECHO Running ECS Unit Tests...
+cd.>nul
+CALL tests\ECSTest\bin\ECSTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 

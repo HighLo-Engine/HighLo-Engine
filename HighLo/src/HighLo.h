@@ -4,6 +4,11 @@
 #include "Engine/Application/ApplicationLayer.h"
 #include "Engine/Application/ApplicationLayerStack.h"
 
+#include "Engine/Assets/Asset.h"
+#include "Engine/Assets/AssetExtensions.h"
+#include "Engine/Assets/AssetManager.h"
+#include "Engine/Assets/AssetTypes.h"
+
 #include "Engine/Core/Defines/Defines.h"
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Assert.h"
@@ -44,6 +49,7 @@
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/MeshFactory.h"
 #include "Engine/Renderer/Material.h"
+#include "Engine/Renderer/MaterialTable.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommandBuffer.h"
 #include "Engine/Renderer/Renderer2D.h"
@@ -64,7 +70,10 @@
 #include "Engine/Window/PopupMenu.h"
 #include "Engine/Window/MenuBar.h"
 
+#include "Engine/ECS/Components.h"
 #include "Engine/ECS/Entity.h"
+#include "Engine/ECS/ECS_Registry.h"
+#include "Engine/ECS/ECS_SystemManager.h"
 #include <Engine/ECS/RenderSystem.h>
 
 #include "Engine/Core/Exceptions/Exceptions.h"

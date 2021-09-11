@@ -8,14 +8,14 @@
 
 namespace highlo
 {
-	struct ProfilerSession
+	struct HLAPI ProfilerSession
 	{
 		HLString Name;
 	};
 
 	using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
-	struct ProfileResult
+	struct HLAPI ProfileResult
 	{
 		HLString Name;
 
@@ -28,20 +28,15 @@ namespace highlo
 	{
 	public:
 
+		// Disable copy and move constructors
 		Profiler(const Profiler&) = delete;
 		Profiler(const Profiler&&) = delete;
 
-		void BeginSession(const HLString &name, const HLString &filePath = "results.json")
+		HLAPI void BeginSession(const HLString &name, const HLString &filePath = "results.json")
 		{
 			std::lock_guard lock(m_Mutex);
 			if (m_CurrentSession)
-			{
-				// If there is already a current session, then close it before beginning new one.
-				// Subsequent profiling output meant for the original session will end up in the
-				// newly opened session instead.  That's better than having badly formatted
-				// profiling output.
 				EndSessionInternal();
-			}
 
 			m_OutputStream.open(*filePath);
 			if (m_OutputStream.is_open())
@@ -51,13 +46,13 @@ namespace highlo
 			}
 		}
 
-		void EndSession()
+		HLAPI void EndSession()
 		{
 			std::lock_guard lock(m_Mutex);
 			EndSessionInternal();
 		}
 
-		void WriteProfile(const ProfileResult &result)
+		HLAPI void WriteProfile(const ProfileResult &result)
 		{
 			std::stringstream json;
 
@@ -65,7 +60,7 @@ namespace highlo
 			json << ",{";
 			json << "\"cat\":\"function\",";
 			json << "\"dur\":" << (result.ElapsedTime.count()) << ',';
-			json << "\"name\":\"" << result.Name << "\",";
+			json << "\"name\":\"" << *result.Name << "\",";
 			json << "\"ph\":\"X\",";
 			json << "\"pid\":0,";
 			json << "\"tid\":" << result.ThreadID << ",";
@@ -80,7 +75,7 @@ namespace highlo
 			}
 		}
 
-		static Profiler &Get()
+		HLAPI static Profiler &Get()
 		{
 			static Profiler instance;
 			return instance;

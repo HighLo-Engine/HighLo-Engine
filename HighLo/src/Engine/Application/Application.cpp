@@ -45,14 +45,10 @@ namespace highlo
 		m_Encryptor->Init();
 
 		HL_CORE_INFO("Engine Initialized");
-
-	//	HL_PROFILE_BEGIN_SESSION("GlobalSession", "performance.json");
 	}
 
 	HLApplication::~HLApplication()
 	{
-	//	HL_PROFILE_END_SESSION();
-
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
 		Renderer::Shutdown();
@@ -76,8 +72,8 @@ namespace highlo
 
 			if (!m_Minimized)
 			{
-				OnUpdate(Time::GetTimestep());
 				m_ECS_SystemManager.Update();
+				OnUpdate(Time::GetTimestep());
 
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUpdate(Time::GetTimestep());
@@ -112,15 +108,18 @@ namespace highlo
 		overlay->OnAttach();
 	}
 
-	bool HLApplication::OnWindowClose(WindowCloseEvent &event)
+	bool HLApplication::OnWindowClose(WindowCloseEvent &e)
 	{
 		Close();
 		return true;
 	}
 
-	bool HLApplication::OnWindowReisze(WindowResizeEvent &event)
+	bool HLApplication::OnWindowReisze(WindowResizeEvent &e)
 	{
-		if (event.GetWidth() == 0 || event.GetHeight() == 0)
+		uint32 width = e.GetWidth();
+		uint32 height = e.GetHeight();
+
+		if (width == 0 || height == 0)
 		{
 			// Window is minimized
 			m_Minimized = true;
@@ -128,18 +127,18 @@ namespace highlo
 		}
 
 		m_Minimized = false;
-		Renderer::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
+		Renderer::SetViewport(0, 0, width, height);
 		
-		for (ApplicationLayer *layer : m_LayerStack)
-			layer->OnResize(event.GetWidth(), event.GetHeight());
+		OnResize(width, height);
 
-		OnResize(event.GetWidth(), event.GetHeight());
+		for (ApplicationLayer *layer : m_LayerStack)
+			layer->OnResize(width, height);
 
 		auto &fbs = FramebufferPool::GetGlobal()->GetAll();
 		for (auto &fb : fbs)
 		{
 			if (!fb->GetSpecification().NoResize)
-				fb->Resize(event.GetWidth(), event.GetHeight());
+				fb->Resize(width, height);
 		}
 
 		return true;

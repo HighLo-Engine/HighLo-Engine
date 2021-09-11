@@ -207,7 +207,11 @@ namespace highlo
 		if (s_2DData->QuadIndexCount == 0)
 			return;
 
+		// Disable warning "Conversion from __int64 to uint32 - possible loss of data"
+	#pragma warning(push)
+	#pragma warning(disable : 4244)
 		uint32 dataSize = (uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase;
+	#pragma warning(pop)
 		if (dataSize)
 		{
 			s_2DData->TextureShader->Bind();
@@ -224,7 +228,10 @@ namespace highlo
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
 
+	#pragma warning(push)
+	#pragma warning(disable : 4244)
 		dataSize = (uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase;
+	#pragma warning(pop)
 		if (dataSize)
 		{
 			s_2DData->LineShader->Bind();
@@ -236,7 +243,10 @@ namespace highlo
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, false);
 		}
 
+	#pragma warning(push)
+	#pragma warning(disable : 4244)
 		dataSize = (uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase;
+	#pragma warning(pop)
 		if (dataSize)
 		{
 			s_2DData->CircleShader->Bind();

@@ -7,13 +7,13 @@ namespace highlo
 	namespace utils
 	{
 		template<size_t N>
-		struct ChangeResult
+		struct HLAPI ChangeResult
 		{
 			char Data[N];
 		};
 
 		template<size_t N, size_t K>
-		constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K])
+		HLAPI constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K])
 		{
 			ChangeResult<N> result{};
 
@@ -41,19 +41,19 @@ namespace highlo
 	{
 	public:
 
-		ProfilerTimer(const HLString &name)
+		HLAPI ProfilerTimer(const HLString &name)
 			: m_Name(name), m_Stopped(false)
 		{
 			m_StartPoint = std::chrono::steady_clock::now();
 		}
 
-		~ProfilerTimer()
+		HLAPI ~ProfilerTimer()
 		{
 			if (!m_Stopped)
 				Stop();
 		}
 
-		void Stop()
+		HLAPI void Stop()
 		{
 			auto endTimepoint = std::chrono::steady_clock::now();
 			auto highResStart = FloatingPointMicroseconds{ m_StartPoint.time_since_epoch() };

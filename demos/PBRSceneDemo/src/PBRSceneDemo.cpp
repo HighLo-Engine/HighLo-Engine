@@ -196,13 +196,13 @@ void PBRSceneDemo::CreatePBRObjects()
 
 	m_Cowboy = AssetLoader::LoadAnimatedModel("assets/models/Cowboy.fbx", true);
 	m_Cowboy->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, Texture2D::LoadFromFile("assets/textures/Cowboy.png"));
-	m_Cowboy->m_Material->IsUsingPBR = false;
+	m_Cowboy->GetMaterial()->IsUsingPBR = false;
 	m_VertexCount += GetVertexCountFromMesh(m_Cowboy);
 	m_IndexCount += m_Cowboy->GetVertexArray()->GetIndexBuffer()->GetCount();
 
-	m_Pistol->m_Animation->Play();
-	m_Cowboy->m_Animation->Play();
-	m_DancingStormTrooper->m_Animation->Play();
+	m_Pistol->GetAnimation()->Play();
+	m_Cowboy->GetAnimation()->Play();
+	m_DancingStormTrooper->GetAnimation()->Play();
 }
 
 uint32 PBRSceneDemo::GetVertexCountFromModel(const Ref<Model> &model)

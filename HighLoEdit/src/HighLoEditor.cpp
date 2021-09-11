@@ -8,10 +8,10 @@ namespace editorutils
 	{
 		switch (type)
 		{
-				case HighLoEditor::GizmoType::None:			return -1;
-				case HighLoEditor::GizmoType::Translate:	return 0;
-				case HighLoEditor::GizmoType::Rotate:		return 1;
-				case HighLoEditor::GizmoType::Scale:		return 2;
+			case HighLoEditor::GizmoType::None:			return -1;
+			case HighLoEditor::GizmoType::Translate:	return 0;
+			case HighLoEditor::GizmoType::Rotate:		return 1;
+			case HighLoEditor::GizmoType::Scale:		return 2;
 		}
 
 		return -1;
@@ -23,32 +23,8 @@ void HighLoEditor::OnInitialize()
 	uint32 width = GetWindow().GetWidth();
 	uint32 height = GetWindow().GetHeight();
 
-	// Initialize panels
-	m_Viewport = MakeUniqueRef<ViewportPanel>();
-	m_Viewport->Initialize(width, height);
-
-	m_Assets = MakeUniqueRef<AssetsPanel>();
-	m_Assets->Initialize(width, height);
-
-	m_SceneHierarchy = MakeUniqueRef<SceneHierarchyPanel>(m_EditorScene);
-	m_SceneHierarchy->Initialize(width, height);
-	m_SceneHierarchy->SetSelectionChangedCallback(HL_BIND_EVENT_FUNCTION(HighLoEditor::SelectEntity));
-	m_SceneHierarchy->SetEntityDeletedCallback(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnEntityDeleted));
-
-	m_ObjectProperties = MakeUniqueRef<ObjectPropertiesPanel>();
-	m_ObjectProperties->Initialize(width, height);
-
-	m_SettingsViewer = MakeUniqueRef<SettingsViewerPanel>();
-	m_SettingsViewer->Initialize(width, height);
-
-	m_ModelViewer = MakeUniqueRef<ModelViewerPanel>();
-	m_ModelViewer->Initialize(width, height);
-
-	m_MaterialViewer = MakeUniqueRef<MaterialViewerPanel>();
-	m_MaterialViewer->Initialize(width, height);
-
 	GetWindow().Maximize();
-	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png", true);
+	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
 	UpdateWindowTitle("Untitled Scene");
 
 	FileSystem::StartWatching();
@@ -57,20 +33,20 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar = MenuBar::Create();
 
 	Ref<FileMenu> importMenu = FileMenu::Create("Import");
-	importMenu->AddMenuItem("Import .obj", "", MENU_ITEM_IMPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing obj"); });
-	importMenu->AddMenuItem("Import .fbx", "", MENU_ITEM_IMPORT_FBX, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing fbx"); });
-	importMenu->AddMenuItem("Import .stl", "", MENU_ITEM_IMPORT_STL, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing stl"); });
-	importMenu->AddMenuItem("Import .3ds", "", MENU_ITEM_IMPORT_3DS, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing 3ds"); });
-	importMenu->AddMenuItem("Import .c4d", "", MENU_ITEM_IMPORT_C4D, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing c4d"); });
-	importMenu->AddMenuItem("Import .mb", "", MENU_ITEM_IMPORT_MB, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing mb"); });
+	importMenu->AddMenuItem("Import .obj", "", MENU_ITEM_IMPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing obj"); }, false);
+	importMenu->AddMenuItem("Import .fbx", "", MENU_ITEM_IMPORT_FBX, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing fbx"); }, false);
+	importMenu->AddMenuItem("Import .stl", "", MENU_ITEM_IMPORT_STL, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing stl"); }, false);
+	importMenu->AddMenuItem("Import .3ds", "", MENU_ITEM_IMPORT_3DS, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing 3ds"); }, false);
+	importMenu->AddMenuItem("Import .c4d", "", MENU_ITEM_IMPORT_C4D, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing c4d"); }, false);
+	importMenu->AddMenuItem("Import .mb", "", MENU_ITEM_IMPORT_MB, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Importing mb"); }, false);
 	Ref<FileMenu> exportMenu = FileMenu::Create("Export");
-	exportMenu->AddMenuItem("Export .obj", "", MENU_ITEM_EXPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting obj"); });
-	exportMenu->AddMenuItem("Export .fbx", "", MENU_ITEM_EXPORT_FBX, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting fbx"); });
-	exportMenu->AddMenuItem("Export .stl", "", MENU_ITEM_EXPORT_STL, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting stl"); });
+	exportMenu->AddMenuItem("Export .obj", "", MENU_ITEM_EXPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting obj"); }, false);
+	exportMenu->AddMenuItem("Export .fbx", "", MENU_ITEM_EXPORT_FBX, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting fbx"); }, false);
+	exportMenu->AddMenuItem("Export .stl", "", MENU_ITEM_EXPORT_STL, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting stl"); }, false);
 	exportMenu->AddSeparator();
-	exportMenu->AddMenuItem("Export .mp4", "", MENU_ITEM_EXPORT_MP4, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mp4"); });
-	exportMenu->AddMenuItem("Export .avi", "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting avi"); });
-	exportMenu->AddMenuItem("Export .mov", "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mov"); });
+	exportMenu->AddMenuItem("Export .mp4", "", MENU_ITEM_EXPORT_MP4, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mp4"); }, false);
+	exportMenu->AddMenuItem("Export .avi", "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting avi"); }, false);
+	exportMenu->AddMenuItem("Export .mov", "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Exporting mov"); }, false);
 
 	Ref<FileMenu> fileMenu = FileMenu::Create("File");
 	fileMenu->AddMenuItem("New Scene", "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { NewScene(menu, item); });
@@ -107,20 +83,34 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar->AddMenu(windowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
+
+	// TEMP
+	m_ViewportWidth = width;
+	m_ViewportHeight = height;
+	m_Camera = Ref<EditorCamera>::Create(glm::perspectiveFov(glm::radians(90.0f), (float)width, (float)height, 0.1f, 1000.0f));
+
+	FramebufferSpecification spec;
+	spec.Width = width;
+	spec.Height = height;
+	spec.Attachments = { TextureFormat::RGBA };
+	spec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
+	m_ViewportContent = Framebuffer::Create(spec);
+
+	Renderer::SetBlendMode(false);
 }
 
 void HighLoEditor::OnUpdate(Timestep timestep)
 {
-	m_Viewport->Update(timestep);
-	m_Assets->Update(timestep);
-	m_SceneHierarchy->Update(timestep);
-	m_ObjectProperties->Update(timestep);
+	// Render Framebuffer
+	m_ViewportContent->Bind();
 
-	m_ModelViewer->Update(timestep);
-	m_MaterialViewer->Update(timestep);
-	m_SettingsViewer->Update(timestep);
+	m_Camera->Update();
 
-	auto [x, y] = m_Viewport->GetMouseViewportSpace();
+	Renderer::ClearScreenColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+	Renderer::ClearScreenBuffers();
+
+	m_ViewportContent->Unbind();
+
 	switch (m_SceneState)
 	{
 		case SceneState::Edit:
@@ -148,14 +138,6 @@ void HighLoEditor::OnUpdate(Timestep timestep)
 void HighLoEditor::OnShutdown()
 {
 	FileSystem::StopWatching();
-
-	m_MaterialViewer->Destroy();
-	m_ModelViewer->Destroy();
-	m_SettingsViewer->Destroy();
-	m_ObjectProperties->Destroy();
-	m_SceneHierarchy->Destroy();
-	m_Assets->Destroy();
-	m_Viewport->Destroy();
 }
 
 void HighLoEditor::OnEvent(Event &e)
@@ -163,22 +145,17 @@ void HighLoEditor::OnEvent(Event &e)
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<KeyPressedEvent>(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnKeyPressedEvent));
 	dispatcher.Dispatch<MouseButtonPressedEvent>(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnMouseButtonPressedEvent));
+	
+	if (m_Camera)
+		m_Camera->OnEvent(e);
 
 	if (m_MenuBar)
 		m_MenuBar->OnEvent(e);
 
-	m_SceneHierarchy->OnEvent(e);
-	m_Assets->OnEvent(e);
-	m_ObjectProperties->OnEvent(e);
-
-	m_ModelViewer->OnEvent(e);
-	m_MaterialViewer->OnEvent(e);
-	m_SettingsViewer->OnEvent(e);
-
 	if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 	{
-		if (m_Viewport->IsMouseOver())
-			m_Viewport->OnEvent(e);
+	//	if (m_Viewport->IsMouseOver())
+	//		m_Viewport->OnEvent(e);
 	}
 	else if (m_SceneState == SceneState::Play)
 	{
@@ -190,26 +167,41 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("RootWindow", true, true);
 
-	m_Viewport->Render(timestep);
-	m_Assets->Render(timestep);
-	m_SceneHierarchy->Render(timestep);
-	m_ObjectProperties->Render(timestep);
-	m_ModelViewer->Render(timestep);
-	m_MaterialViewer->Render(timestep);
-	m_SettingsViewer->Render(timestep);
+	// Render viewport image
+	auto viewportSize = UI::GetContentRegion();
+	m_ViewportWidth = (uint32)viewportSize.x;
+	m_ViewportHeight = (uint32)viewportSize.y;
+	if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
+	{
+		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), viewportSize.x, viewportSize.y, 0.1f, 1000.0f));
+		m_Camera->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+	}
+
+	UI::BeginViewport("Viewport");
+	UI::Image(m_ViewportContent->GetImage().As<Texture2D>(), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 });
+	UI::EndViewport();
+
+	UI::BeginViewport("Assets");
+	UI::EndViewport();
+
+	UI::BeginViewport("SceneHierarchyPanel");
+	UI::EndViewport();
+
+	UI::BeginViewport("Object Properties");
+	UI::EndViewport();
 
 	UI::EndWindow();
 }
 
 void HighLoEditor::OnResize(uint32 width, uint32 height)
 {
-	m_Viewport->OnResize(width, height);
-	m_Assets->OnResize(width, height);
-	m_SceneHierarchy->OnResize(width, height);
-	m_ObjectProperties->OnResize(width, height);
-	m_ModelViewer->OnResize(width, height);
-	m_MaterialViewer->OnResize(width, height);
-	m_SettingsViewer->OnResize(width, height);
+	m_ViewportWidth = width;
+	m_ViewportHeight = height;
+
+	if (m_Camera && m_ViewportWidth > 0 && m_ViewportHeight > 0)
+	{
+		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), (float)m_ViewportWidth, (float)m_ViewportHeight, 0.1f, 1000.0f));
+	}
 }
 
 void HighLoEditor::SelectEntity(Entity entity)
@@ -322,45 +314,45 @@ void HighLoEditor::EnableLightMode(FileMenu *menu, MenuItem *item)
 
 bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 {
-	if (m_Viewport->IsMouseOver())
-		{
+//	if (m_Viewport->IsMouseOver())
+//		{
 		switch (e.GetKeyCode())
 			{
-				case HL_KEY_F:
-				{
+			case HL_KEY_F:
+			{
 				if (m_SelectionContext.size() == 0)
 					break;
 
 				Entity selectedEntity = m_SelectionContext[0].m_Entity;
-				m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
+		//		m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
 				break;
-				}
+			}
 
-				case HL_KEY_Q:
-				{
+			case HL_KEY_Q:
+			{
 				m_GizmoType = GizmoType::None;
 				break;
-				}
+			}
 
-				case HL_KEY_W:
-				{
+			case HL_KEY_W:
+			{
 				m_GizmoType = GizmoType::Translate;
 				break;
-				}
+			}
 
-				case HL_KEY_E:
-				{
+			case HL_KEY_E:
+			{
 				m_GizmoType = GizmoType::Rotate;
 				break;
-				}
+			}
 
-				case HL_KEY_R:
-				{
+			case HL_KEY_R:
+			{
 				m_GizmoType = GizmoType::Scale;
 				break;
-				}
 			}
-		}
+//		}
+	}
 
 	if (Input::IsKeyPressed(HL_KEY_LEFT_CONTROL))
 	{
@@ -451,22 +443,13 @@ bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 {
 	auto [mx, my] = Input::GetMousePosition();
 	if (e.GetMouseButton() == HL_MOUSE_BUTTON_LEFT
-		&& m_Viewport->IsMouseOver()
+//		&& m_Viewport->IsMouseOver()
 		&& !Input::IsKeyPressed(HL_KEY_LEFT_ALT)
 		&& !UI::IsMouseOverGizmo()
 		&& m_SceneState != SceneState::Play)
 	{
-		auto [mouseX, mouseY] = m_Viewport->GetMouseViewportSpace();
-		if (mouseX > -1.0f && mouseX < 1.0f && mouseY > -1.0f && mouseY < 1.0f)
-		{
-			auto [origin, direction] = m_Viewport->CastRay(mouseX, mouseY);
-			m_SelectionContext.clear();
-			//	m_CurrentScene->SetSelectedEntity({});
-
-			//	auto meshEntities = m_CurrentScene->GetAllEntitiesWith<MeshComponent>();
-			// TODO
-		}
 	}
+
 	return false;
 }
 

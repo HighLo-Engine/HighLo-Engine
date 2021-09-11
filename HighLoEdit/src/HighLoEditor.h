@@ -3,14 +3,6 @@
 #include <HighLo.h>
 using namespace highlo;
 
-#include "Panels/ViewportPanel.h"
-#include "Panels/AssetsPanel.h"
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/ObjectPropertiesPanel.h"
-#include "Panels/ModelViewerPanel.h"
-#include "Panels/MaterialViewerPanel.h"
-#include "Panels/SettingsViewerPanel.h"
-
 class HighLoEditor : public HLApplication
 	{
 	public:
@@ -36,10 +28,10 @@ class HighLoEditor : public HLApplication
 
 		enum class GizmoType
 		{
-			None = 0,
-			Translate = 1,
-			Rotate = 2,
-			Scale = 3
+			None		= 0,
+			Translate	= 1,
+			Rotate		= 2,
+			Scale		= 3
 		};
 
 	private:
@@ -53,17 +45,17 @@ class HighLoEditor : public HLApplication
 
 		enum class SceneState
 		{
-			Edit = 0,
-			Play = 1,
-			Pause = 2,
+			Edit	 = 0,
+			Play	 = 1,
+			Pause	 = 2,
 			Simulate = 3
 		};
 
 		enum class SelectionMode
 		{
-			None = 0,
+			None  = 0,
 			Model = 1,
-			Mesh = 2
+			Mesh  = 2
 		};
 
 		bool OnKeyPressedEvent(const KeyPressedEvent &e);
@@ -82,15 +74,6 @@ class HighLoEditor : public HLApplication
 		void DeleteEntity(Entity entity);
 
 	private:
-
-		UniqueRef<ViewportPanel> m_Viewport;
-		UniqueRef<AssetsPanel> m_Assets;
-		UniqueRef<SceneHierarchyPanel> m_SceneHierarchy;
-		UniqueRef<ObjectPropertiesPanel> m_ObjectProperties;
-
-		UniqueRef<SettingsViewerPanel> m_SettingsViewer;
-		UniqueRef<ModelViewerPanel> m_ModelViewer;
-		UniqueRef<MaterialViewerPanel> m_MaterialViewer;
 
 		HLString m_LastSceneFilePath;
 		GizmoType m_GizmoType = GizmoType::None;
@@ -118,4 +101,9 @@ class HighLoEditor : public HLApplication
 
 		Ref<Scene> m_RuntimeScene, m_EditorScene, m_SimulationScene, m_CurrentScene;
 		std::vector<SelectedMesh> m_SelectionContext;
+
+		// TEMP: this is going to move to the engine
+		Ref<EditorCamera> m_Camera;
+		Ref<Framebuffer> m_ViewportContent;
+		uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 	};

@@ -36,10 +36,10 @@ project "QueueTest"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}/../HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/%{prj.name}/bin/assimp-vc142-mtd.dll*"),
-		("{COPY} %{wks.location}/../HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libcrypto-3-x64.dll*"),
-		("{COPY} %{wks.location}/../HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/%{prj.name}/bin/libssl-3-x64.dll*"),
-		("{COPY} %{wks.location}/../HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}tests/%{prj.name}/bin/HighLo-Unit.dll*")
+		("{COPY} %{wks.location}/../HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}/%{prj.name}/bin/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}/../HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}/%{prj.name}/bin/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}/../HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}/%{prj.name}/bin/libssl-3-x64.dll*"),
+		("{COPY} %{wks.location}/../HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.dll %{wks.location}/%{prj.name}/bin/HighLo-Unit.dll*")
 	}
 
     filter "system:windows"

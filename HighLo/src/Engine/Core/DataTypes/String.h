@@ -134,3 +134,17 @@ namespace highlo
 		uint32 m_Size = 0;
 	};
 }
+
+namespace std
+{
+	template<>
+	struct hash<highlo::HLString>
+	{
+		std::size_t operator()(const highlo::HLString &str) const
+		{
+			// TODO: return hash function instead of length
+			return hash<uint32>()((uint32)str.Length());
+		}
+	};
+}
+

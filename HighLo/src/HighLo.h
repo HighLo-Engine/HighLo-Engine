@@ -4,10 +4,12 @@
 #include "Engine/Application/ApplicationLayer.h"
 #include "Engine/Application/ApplicationLayerStack.h"
 
+/*
 #include "Engine/Assets/Asset.h"
 #include "Engine/Assets/AssetExtensions.h"
 #include "Engine/Assets/AssetManager.h"
 #include "Engine/Assets/AssetTypes.h"
+*/
 
 #include "Engine/Core/Defines/Defines.h"
 #include "Engine/Core/Core.h"

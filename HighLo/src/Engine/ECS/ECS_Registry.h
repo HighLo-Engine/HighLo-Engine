@@ -12,10 +12,8 @@ namespace highlo
 
 	class ECS_Registry
 	{
-		friend class HLApplication;
-		ECS_Registry();
-
 	public:
+		HLAPI ECS_Registry();
 
 		HLAPI static ECS_Registry& Get();
 		HLAPI EntityID GenerateEntityID();

@@ -44,6 +44,7 @@ namespace highlo
 		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }
 
+		HLAPI ECS_Registry &GetECSRegistry() { return m_ECS_Registry; }
 		HLAPI ECS_SystemManager &GetECSSystemManager() { return m_ECS_SystemManager; }
 		HLAPI Ref<Encryptor> &GetEncryptor() { return m_Encryptor; }
 

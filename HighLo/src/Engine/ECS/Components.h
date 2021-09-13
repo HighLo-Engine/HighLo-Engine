@@ -56,5 +56,11 @@ namespace highlo
 		bool IsFractured = false;
 	};
 
+	struct RelationshipComponent
+	{
+		UUID ParentHandle = 0;
+		std::vector<UUID> Children;
+	};
+
 
 }

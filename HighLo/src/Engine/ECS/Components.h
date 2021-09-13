@@ -2,6 +2,7 @@
 
 #include "Engine/Renderer/Model.h"
 #include "Engine/Camera/Camera.h"
+#include "Engine/Core/UUID.h"
 
 namespace highlo
 {

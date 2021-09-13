@@ -9,6 +9,7 @@
 namespace highlo
 {
 	typedef uint64 EntityID;
+	class Entity;
 
 	class ECS_Registry
 	{
@@ -112,16 +113,16 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI void ForEach(const std::function<void(EntityID, TransformComponent&, T&)>& callback)
+		HLAPI void ForEach(const std::function<void(Entity, TransformComponent&, T&)>& callback)
 		{
 			auto& type = std::type_index(typeid(T));
 			if (m_Components.find(type) != m_Components.end())
 				for (auto& comp : m_Components[type])
-					callback(comp.first, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), *std::any_cast<T>(&comp.second));
+					callback(Entity(comp.first), *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), *std::any_cast<T>(&comp.second));
 		}
 
 		template <typename... Args>
-		HLAPI void ForEachMultiple(const std::function<void(EntityID, TransformComponent&, std::vector<void*>&)>& callback)
+		HLAPI void ForEachMultiple(const std::function<void(Entity, TransformComponent&, std::vector<void*>&)>& callback)
 		{
 			// Create a list of all types
 			std::vector<std::type_index> component_types;
@@ -137,6 +138,8 @@ namespace highlo
 				for (auto& comp : m_Components[first_type])
 				{
 					EntityID entityID = comp.first;
+					Entity entity = Entity(entityID);
+
 					std::vector<void*> components = { &comp.second };
 
 					bool should_skip_entity = false;
@@ -168,7 +171,7 @@ namespace highlo
 					if (should_skip_entity)
 						continue;
 
-					callback(entityID, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), components);
+					callback(entity, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), components);
 				}
 			}
 		}

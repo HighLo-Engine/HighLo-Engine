@@ -12,7 +12,7 @@ namespace highlo
 		FrameMeshesRendered = 0;
 		FrameTrianglesRendered = 0;
 
-		registry.ForEach<RenderComponent>([&, ts](EntityID entityID, TransformComponent& transform, RenderComponent& component) {
+		registry.ForEach<RenderComponent>([&, ts](Entity entity, TransformComponent& transform, RenderComponent& component) {
 			if (!component.Enabled)
 				return;
 

@@ -33,7 +33,7 @@ bool for_each_component()
 
 	uint32_t entityCount = 0;
 
-	s_ECS_Registry.ForEachMultiple<TagComponent, IDComponent>([&entityCount](EntityID entityID, TransformComponent& transform, std::vector<void*> components) {
+	s_ECS_Registry.ForEachMultiple<TagComponent, IDComponent>([&entityCount](Entity entity, TransformComponent& transform, std::vector<void*> components) {
 		auto tagComponent = reinterpret_cast<TagComponent*>(components[0]);
 		auto idComponent = reinterpret_cast<IDComponent*>(components[1]);
 

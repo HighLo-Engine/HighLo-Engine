@@ -5,7 +5,8 @@ int main(int argc, char *argv[])
 {
 	std::vector<highloUnit::UnitTestEntry> tests =
 	{
-		{ test_add_component, "test_add_component" }
+		{ test_add_component, "test_add_component" },
+		{ for_each_component, "for_each_component" }
 	};
 
 	highloUnit::UnitTest test;

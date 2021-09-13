@@ -4,3 +4,4 @@
 
 bool test_add_component();
 
+bool for_each_component();

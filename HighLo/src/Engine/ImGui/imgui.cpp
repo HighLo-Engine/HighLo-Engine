@@ -710,8 +710,8 @@ namespace highlo::UI
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
-		memset(s_ImGuiIDBuffer + 2, 0, 16);
-		_itoa(s_ImGuiIDCounter++, s_ImGuiIDBuffer + 2, 16);
+		memset(s_ImGuiIDBuffer + 2, 0, 14);
+		_itoa(s_ImGuiIDCounter++, s_ImGuiIDBuffer + 2, 14);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		ImGui::InputText(s_ImGuiIDBuffer, (char*)*value, value.Length(), ImGuiInputTextFlags_ReadOnly);

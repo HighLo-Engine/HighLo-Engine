@@ -123,12 +123,12 @@ namespace highlo
 		m_Size = 0;
 	}
 
-	void HLString::Resize(int64 size)
+	void HLString::Resize(uint32 size)
 	{
 		if (m_Data)
 			delete[] m_Data;
 
-		m_Size = (uint32)size;
+		m_Size = size;
 		m_Data = new char[size];
 	}
 
@@ -623,6 +623,18 @@ namespace highlo
 		for (uint32 i = 0; i < m_Size; ++i)
 			printf("%c", m_Data[i]);
 		printf("\n");
+	}
+
+	uint64 HLString::Hash() const
+	{
+		uint64 hash = 0;
+		const uint32 g = 42;
+		uint32 i = 0;
+
+		for (i = 0; i < m_Size; ++i)
+			hash = g * hash + m_Data[i];
+
+		return hash;
 	}
 
 	bool HLString::IsEmpty() const

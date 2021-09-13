@@ -88,6 +88,10 @@ int main(int argc, char *argv[])
 		{ test_mat4_to_string, "test_mat4_to_string" },
 		{ test_transform_to_string, "test_transform_to_string" },
 
+		{ test_hash_string, "test_hash_string" },
+		{ test_hash_multiple_string, "test_hash_multiple_string" },
+		{ test_hash_different_multiple_string, "test_hash_different_multiple_string" },
+
 		{ test_empty_string, "test_empty_string" },
 	};
 

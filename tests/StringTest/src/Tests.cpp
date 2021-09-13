@@ -803,3 +803,35 @@ bool test_transform_to_string()
 	return test.AssertEqual(timer, true, true);
 }
 
+bool test_hash_string()
+{
+	highloUnit::Timer timer("test_hash_string");
+
+	HLString str = "Hello World!";
+
+	highloUnit::Test test;
+	return test.AssertEqual<uint64>(timer, 16527122995934635225, str.Hash());
+}
+
+bool test_hash_multiple_string()
+{
+	highloUnit::Timer timer("test_hash_multiple_string");
+
+	HLString str = "Hello World!";
+	HLString str1 = "Hello World!";
+
+	highloUnit::Test test;
+	return test.AssertEqual<uint64>(timer, str.Hash(), str1.Hash());
+}
+
+bool test_hash_different_multiple_string()
+{
+	highloUnit::Timer timer("test_hash_different_multiple_string");
+
+	HLString str = "Hello World!";
+	HLString str1 = "abc";
+
+	highloUnit::Test test;
+	return test.AssertNotEqual<uint64>(timer, str.Hash(), str1.Hash());
+}
+

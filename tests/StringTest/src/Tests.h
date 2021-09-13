@@ -84,3 +84,7 @@ bool test_mat3_to_string();
 bool test_mat4_to_string();
 bool test_transform_to_string();
 
+bool test_hash_string();
+bool test_hash_multiple_string();
+bool test_hash_different_multiple_string();
+

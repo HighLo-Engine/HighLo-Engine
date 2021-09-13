@@ -27,7 +27,7 @@ namespace highlo
 		HLAPI HLString &operator=(HLString &&other) noexcept;
 
 		HLAPI void Clear();
-		HLAPI void Resize(int64 size);
+		HLAPI void Resize(uint32 size);
 		HLAPI uint32 Length() const;
 
 		HLAPI wchar_t *W_Str();
@@ -63,6 +63,7 @@ namespace highlo
 		HLAPI const HLString &ToUpperCase() const;
 
 		HLAPI void Print() const;
+		HLAPI uint64 Hash() const;
 
 		HLAPI bool IsEmpty() const;
 		HLAPI bool Contains(const char letter, uint32 offset = 0) const;
@@ -130,6 +131,7 @@ namespace highlo
 		}
 
 	private:
+
 		char *m_Data = 0;
 		uint32 m_Size = 0;
 	};
@@ -142,8 +144,7 @@ namespace std
 	{
 		std::size_t operator()(const highlo::HLString &str) const
 		{
-			// TODO: return hash function instead of length
-			return hash<uint32>()((uint32)str.Length());
+			return hash<uint64>()(str.Hash());
 		}
 	};
 }

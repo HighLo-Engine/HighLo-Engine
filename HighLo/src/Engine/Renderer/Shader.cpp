@@ -1,5 +1,8 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "Shader.h"
+
 #include <filesystem>
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLShader.h"

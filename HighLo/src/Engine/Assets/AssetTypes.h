@@ -1,0 +1,65 @@
+// Copyright (c) 2021 Albert Slepak and Can Karka. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2021-09-14) initial release
+//
+
+#pragma once
+
+namespace highlo
+{
+	enum class AssetFlag : uint16
+	{
+		None = 0,
+		Missing = HL_BIT(0),
+		Invalid = HL_BIT(1)
+	};
+
+	enum class AssetType : uint16
+	{
+		None = 0,
+		Scene = 1,
+		Mesh = 2,
+		Material = 3,
+		Texture = 4,
+		EnvMap = 5,
+
+		MeshAsset = 6,
+	};
+
+	namespace utils
+	{
+		inline AssetType AssetTypeFromString(const HLString &assetType)
+		{
+			if (assetType == "None") return AssetType::None;
+			if (assetType == "Scene") return AssetType::Scene;
+			if (assetType == "Mesh") return AssetType::Mesh;
+			if (assetType == "Material") return AssetType::Material;
+			if (assetType == "Texture") return AssetType::Texture;
+			if (assetType == "EnvMap") return AssetType::EnvMap;
+			if (assetType == "MeshAsset") return AssetType::MeshAsset;
+
+			HL_ASSERT(false, "Unknown Asset");
+			return AssetType::None;
+		}
+
+		inline HLString AssetTypeToString(AssetType assetType)
+		{
+			switch (assetType)
+			{
+				case AssetType::None:		return "None";
+				case AssetType::Scene:		return "Scene";
+				case AssetType::Mesh:		return "Mesh";
+				case AssetType::Material:	return "Material";
+				case AssetType::Texture:	return "Texture";
+				case AssetType::EnvMap:		return "EnvMap";
+				case AssetType::MeshAsset:	return "MeshAsset";
+			}
+
+			HL_ASSERT(false, "Unknown Asset");
+			return "None";
+		}
+	}
+}
+

@@ -1,5 +1,8 @@
+// Copyright (c) 2021 Albert Slepak and Can Karka. All rights reserved.
+
 #include "HighLoPch.h"
 #include "SceneChunk.h"
+
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CoreRenderer.h"
 #include "Engine/Renderer/MeshFactory.h"

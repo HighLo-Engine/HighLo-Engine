@@ -1,3 +1,10 @@
+// Copyright (c) 2021 Albert Slepak and Can Karka. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2021-09-14) initial release
+//
+
 #pragma once
 
  // @See: https://stackoverflow.com/a/63426872/12873837

@@ -20,17 +20,18 @@ namespace highlo
 	class ECS_Registry
 	{
 	public:
+
 		HLAPI ECS_Registry();
 
-		HLAPI static ECS_Registry& Get();
+		HLAPI static ECS_Registry &Get();
 		HLAPI EntityID GenerateEntityID();
 
 		template <typename T>
-		HLAPI const std::vector<T>& GetComponents()
+		HLAPI const std::vector<T> &GetComponents()
 		{
 			static std::vector<T> s_empty;
 
-			for (const auto& [index, components] : m_Components)
+			for (const auto &[index, components] : m_Components)
 				if (index == std::type_index(typeid(T)))
 					return components;
 
@@ -38,10 +39,10 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI T* AddComponent(EntityID entityID)
+		HLAPI T *AddComponent(EntityID entityID)
 		{
 			auto comp = std::make_any<T>();
-			auto& type = std::type_index(typeid(T));
+			auto &type = std::type_index(typeid(T));
 
 			// Add to the list of components
 			m_Components[type].push_back({ entityID, comp });
@@ -52,7 +53,7 @@ namespace highlo
 			// the entity for faster access in the future.
 			m_EntityComponents[entityID].push_back({ type, index });
 
-			T* component_ptr = std::any_cast<T>(&m_Components[type][index].second);
+			T *component_ptr = std::any_cast<T>(&m_Components[type][index].second);
 
 			// Check if it's a transform component
 			static std::type_index transform_type = std::type_index(typeid(TransformComponent));
@@ -63,26 +64,26 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI T* GetComponent(EntityID entityID)
+		HLAPI T *GetComponent(EntityID entityID)
 		{
-			auto& type = std::type_index(typeid(T));
+			auto &type = std::type_index(typeid(T));
 
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return nullptr;
 
-			for (auto& comp_info : m_EntityComponents[entityID])
+			for (auto &comp_info : m_EntityComponents[entityID])
 				if (comp_info.first == type)
 					return std::any_cast<T>(&m_Components[type][comp_info.second].second);
 
 			return nullptr;
 		}
 
-		HLAPI void* GetComponentHandle(EntityID entityID, std::type_index& type)
+		HLAPI void *GetComponentHandle(EntityID entityID, std::type_index &type)
 		{
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return nullptr;
 
-			for (auto& comp_info : m_EntityComponents[entityID])
+			for (auto &comp_info : m_EntityComponents[entityID])
 				if (comp_info.first == type)
 					return reinterpret_cast<void*>(&m_Components[type][comp_info.second].second);
 
@@ -106,8 +107,8 @@ namespace highlo
 				return; // No component with this entityID
 
 			// Find and remove actual component pointer.
-			auto& component_infos = m_EntityComponents[entityID];
-			for (auto& it = component_infos.begin(); it != component_infos.end(); it++)
+			auto &component_infos = m_EntityComponents[entityID];
+			for (auto &it = component_infos.begin(); it != component_infos.end(); ++it)
 			{
 				if (it->first == type)
 				{
@@ -128,7 +129,7 @@ namespace highlo
 		}
 
 		template <typename... Args>
-		HLAPI void ForEachMultiple(const std::function<void(EntityID, TransformComponent&, std::vector<void*>&)>& callback)
+		HLAPI void ForEachMultiple(const std::function<void(EntityID, TransformComponent&, std::vector<void*>&)> &callback)
 		{
 			// Create a list of all types
 			std::vector<std::type_index> component_types;
@@ -149,7 +150,7 @@ namespace highlo
 					bool should_skip_entity = false;
 
 					// Collect other required components from the found entity
-					for (size_t i = 1; i < component_types.size(); i++)
+					for (size_t i = 1; i < component_types.size(); ++i)
 					{
 						// Skip entity if one of the required components is not found
 						if (m_Components.find(component_types[i]) == m_Components.end())

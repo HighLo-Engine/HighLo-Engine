@@ -131,14 +131,14 @@ namespace highlo
     HLString FileSystem::ReadTextFile(const HLString &path)
     {
         HANDLE file = utils::OpenFileInternal(path);
-        int64 size = utils::GetFileSizeInternal(file);
+        uint32 size = (uint32)utils::GetFileSizeInternal(file);
 
         HLString result;
         result.Resize(size);
 
         bool success = utils::ReadFileInternal(file, &result[0], size);
         CloseHandle(file);
-        return success ? result : HLString("");
+        return success ? result : "";
     }
 
     bool FileSystem::WriteFile(const HLString &path, Byte *buffer, int64 size)

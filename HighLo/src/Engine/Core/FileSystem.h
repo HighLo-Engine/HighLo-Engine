@@ -2,7 +2,7 @@
 
 //
 // version history:
-//     - 1.0 (2021-09-15) Added HasEnvironmentVariable, SetEnvironmentVariable, GetEnvironmentVariable
+//     - 1.1 (2021-09-15) Added HasEnvironmentVariable, SetEnvironmentVariable, GetEnvironmentVariable
 //     - 1.0 (2021-09-14) initial release
 //
 

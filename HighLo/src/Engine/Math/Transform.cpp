@@ -121,6 +121,12 @@ namespace highlo
 		m_Transform = glm::translate(glm::mat4(1.0f), m_Position) *
 			glm::scale(glm::mat4(1.0f), m_Scale) * glm::toMat4(glm::quat(m_Rotation));
 	}
+
+	void Transform::SetTransform(const glm::mat4 &transform)
+	{
+		m_Transform = transform;
+		highlo::Decompose(transform, m_Position, m_Scale, m_Rotation);
+	}
 	
 	void Transform::Decompose(const glm::mat4 &transform, Transform &outTransform)
 	{

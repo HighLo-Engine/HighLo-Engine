@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-15) Added SetTransform function to set the transform matrix directly
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -24,11 +25,11 @@ namespace highlo
 
 		HLAPI Transform() = default;
 
-		HLAPI Transform& Translate(const glm::vec3 &translation);
-		HLAPI Transform& Scale(const glm::vec3 &scale);
-		HLAPI Transform& Scale(float scale);
-		HLAPI Transform& Rotate(float angle, const glm::vec3 &axis);
-		HLAPI Transform& Rotate(const glm::quat &rotation);
+		HLAPI Transform &Translate(const glm::vec3 &translation);
+		HLAPI Transform &Scale(const glm::vec3 &scale);
+		HLAPI Transform &Scale(float scale);
+		HLAPI Transform &Rotate(float angle, const glm::vec3 &axis);
+		HLAPI Transform &Rotate(const glm::quat &rotation);
 
 		HLAPI static Transform FromPosition(const glm::vec3 &position);
 		HLAPI static Transform FromRotation(const glm::vec3 &rotation);
@@ -38,6 +39,7 @@ namespace highlo
 		HLAPI void SetRotation(const glm::vec3 &rotation);
 		HLAPI void SetScale(const glm::vec3 &scale);
 		HLAPI void SetScale(float scale);
+		HLAPI void SetTransform(const glm::mat4 &transform);
 
 		HLAPI static void Decompose(const glm::mat4 &transform, Transform &outTransform);
 

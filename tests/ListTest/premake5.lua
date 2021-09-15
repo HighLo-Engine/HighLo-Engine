@@ -59,6 +59,3 @@ project "ListTest"
         defines "HL_RELEASE"
         optimize "On"
 
-    filter "configurations:Dist"
-        defines "HL_DIST"
-        optimize "On"

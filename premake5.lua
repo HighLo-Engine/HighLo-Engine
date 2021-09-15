@@ -6,7 +6,7 @@ include "Dependencies.lua"
 
 workspace "HighLo"
     architecture "x64"
-    configurations { "Debug", "Release", "Dist" }
+    configurations { "Debug", "Release" }
     startproject "Sandbox"
 
 	solution_items

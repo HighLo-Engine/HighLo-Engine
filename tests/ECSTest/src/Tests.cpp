@@ -1,8 +1,6 @@
 #include "Tests.h"
 using namespace highlo;
 
-#include <glm/glm.hpp>
-
 static ECS_Registry s_ECS_Registry;
 
 bool test_add_component()
@@ -20,11 +18,11 @@ bool for_each_component()
 {
 	highloUnit::Timer timer("for_each_component");
 
-	for (uint64_t i = 1; i < 10; i++)
+	for (uint64 i = 1; i < 10; i++)
 	{
 		Entity entity;
-		auto transform = entity.AddComponent<TransformComponent>();
-		transform->Transform.SetTransform(glm::mat4(1.0f));
+		auto transform = entity.AddComponent<SceneComponent>();
+		transform->SceneID = 0;
 
 		if (i % 2 == 0)
 		{
@@ -33,17 +31,15 @@ bool for_each_component()
 		}
 	}
 
-	uint32_t entityCount = 0;
+	uint32 entityCount = 0;
 
-	s_ECS_Registry.ForEachMultiple<TransformComponent, IDComponent>([&entityCount](EntityID entityID, TransformComponent& transform, std::vector<void*> components) {
-		auto transformComponent = reinterpret_cast<TransformComponent*>(components[0]);
+	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](EntityID entityID, TransformComponent& transform, std::vector<void*> components) {
+		auto sceneComponent = reinterpret_cast<SceneComponent *>(components[0]);
 		auto idComponent = reinterpret_cast<IDComponent*>(components[1]);
 
-		entityCount++;
+		++entityCount;
 	});
 
-	constexpr auto CORRECT_SELECTED_ENTITY_COUNT = 4;
-
 	highloUnit::Test test;
-	return test.AssertEqual(timer, entityCount == CORRECT_SELECTED_ENTITY_COUNT, true);
+	return test.AssertEqual<uint32>(timer, entityCount, 4);
 }

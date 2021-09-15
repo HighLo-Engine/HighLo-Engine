@@ -32,11 +32,11 @@ layout(location = 0) out vec4 Color;
 layout(location = 1) out vec4 Padding0;
 layout(location = 2) out vec4 Padding1;
 
-layout(std140, push_constant) uniform Settings
+layout(std140, binding = 5) uniform Settings
 {
-	layout(offset = 64) float Scale;
-	float Size;
-} u_Settings;
+	layout(offset = 64) float u_Scale;
+	float u_Size;
+};
 
 layout(location = 0) in vec2 v_TexCoord;
 
@@ -51,7 +51,7 @@ void main()
 	Padding0 = vec4(0.0);
 	Padding1 = vec4(0.0);
 
-	float x = grid(v_TexCoord * u_Settings.Scale, u_Settings.Size);
+	float x = grid(v_TexCoord * u_Scale, u_Size);
 	Color = vec4(vec3(0.2), 0.5) * (1.0 - x);
 
 	// TODO: measure if this downs our performance -> not every fragment can be assumed to exist with this, so there will be skipped pixels

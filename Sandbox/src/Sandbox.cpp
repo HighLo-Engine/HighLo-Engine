@@ -1,5 +1,8 @@
 #include "Sandbox.h"
 
+// This Sandbox application will render anything,
+// because the underlying API is currently under heavy development!
+
 void Sandbox::OnInitialize()
 {
 	// TODO: Fix for GLFW configuration.
@@ -9,7 +12,7 @@ void Sandbox::OnInitialize()
 	VirtualFileSystem::Get()->Mount("models", "assets/models/");
 
 	m_Scene = Ref<Scene>::Create();
-	m_Scene->m_Camera = Ref<FreeFlyCamera>::Create();
+	//m_Scene->m_Camera = Ref<FreeFlyCamera>::Create();
 
 	auto house_tex = Texture2D::LoadFromFile("assets/textures/WoodenCabin.jpg");
 
@@ -38,7 +41,7 @@ void Sandbox::OnInitialize()
 
 			entity._TransformComponent->Transform = Transform::FromPosition({ i * 5, -2, j * 5 }).Scale(0.03f);
 
-			m_Scene->AddEntity(entity);
+		//	m_Scene->AddEntity(entity);
 		}
 	}
 
@@ -52,7 +55,7 @@ void Sandbox::OnUpdate(Timestep timestep)
 	Renderer::ClearScreenBuffers();
 	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 
-	m_Scene->Update(timestep);
+	//m_Scene->Update(timestep);
 }
 
 void Sandbox::OnShutdown()
@@ -68,26 +71,26 @@ void Sandbox::OnEvent(Event &e)
 
 void Sandbox::OnUIRender(Timestep timestep)
 {
-	UI::BeginWindow("Scene Debug Information");
-
-	HLString entities_total = "         Total Entities   : " + HLString::ToString(m_Scene->GetEntityCount());
-	HLString entities_processed = "Processed Entities  : " + HLString::ToString(m_Scene->GetFrameEntitiesProcessed());
-	HLString entities_rendered = "Rendered Entities    : " + HLString::ToString(m_RenderSystemRef->FrameEntitiesRendered);
-	HLString meshes_rendered = "Rendered Meshes    : " + HLString::ToString(m_RenderSystemRef->FrameMeshesRendered);
-	HLString triangles_rendered = "Rendered Triangles : " + HLString::ToString(m_RenderSystemRef->FrameTrianglesRendered);
-
-	UI::DrawText(entities_total);
-	UI::DrawText(entities_processed);
-	UI::DrawText(entities_rendered);
-	UI::DrawText(meshes_rendered);
-	UI::DrawText(triangles_rendered);
-	UI::Separator();
-
-	UI::EndWindow();
+	// UI::BeginWindow("Scene Debug Information");
+	// 
+	// HLString entities_total = "         Total Entities   : " + HLString::ToString(m_Scene->GetEntityCount());
+	// HLString entities_processed = "Processed Entities  : " + HLString::ToString(m_Scene->GetFrameEntitiesProcessed());
+	// HLString entities_rendered = "Rendered Entities    : " + HLString::ToString(m_RenderSystemRef->FrameEntitiesRendered);
+	// HLString meshes_rendered = "Rendered Meshes    : " + HLString::ToString(m_RenderSystemRef->FrameMeshesRendered);
+	// HLString triangles_rendered = "Rendered Triangles : " + HLString::ToString(m_RenderSystemRef->FrameTrianglesRendered);
+	// 
+	// UI::DrawText(entities_total);
+	// UI::DrawText(entities_processed);
+	// UI::DrawText(entities_rendered);
+	// UI::DrawText(meshes_rendered);
+	// UI::DrawText(triangles_rendered);
+	// UI::Separator();
+	// 
+	// UI::EndWindow();
 }
 
 void Sandbox::OnResize(uint32 width, uint32 height)
 {
-	m_Scene->m_Camera->OnWindowResize(width, height);
+	//m_Scene->m_Camera->OnWindowResize(width, height);
 }
 

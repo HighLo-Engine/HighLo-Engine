@@ -2,10 +2,13 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-15) removed content
 //     - 1.0 (2021-09-14) initial release
 //
 
 #pragma once
+
+#if 0
 
 #include "Engine/ECS/Entity.h"
 #include "Engine/Camera/Camera.h"
@@ -60,3 +63,6 @@ namespace highlo
 		void GenerateSubChunks();
 	};
 }
+
+#endif
+

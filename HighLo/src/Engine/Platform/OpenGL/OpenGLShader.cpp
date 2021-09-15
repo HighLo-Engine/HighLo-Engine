@@ -7,7 +7,7 @@
 
 #include <glad/glad.h>
 
-#include "Engine/Core/VirtualFileSystem.h"
+#include "Engine/Core/File.h"
 
 namespace highlo
 {
@@ -19,7 +19,7 @@ namespace highlo
 		else
 			CompileComputeShader(source);
 
-		m_Name = VirtualFileSystem::Get()->GetFileNameFromPath(source.FileName);
+		m_Name = File::GetFileName(source.FileName);
 	}
 
 	OpenGLShader::~OpenGLShader()

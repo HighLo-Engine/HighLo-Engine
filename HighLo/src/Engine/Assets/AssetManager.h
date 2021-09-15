@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.0 (2021-09-15) Changed FileExtension implementation
 //     - 1.0 (2021-09-14) initial release
 //
 

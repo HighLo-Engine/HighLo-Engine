@@ -3,274 +3,366 @@
 #include "HighLoPch.h"
 #include "Scene.h"
 
-#include "Engine/Renderer/CoreRenderer.h"
-#include "Engine/Window/Window.h"
-#include "Engine/Math/Math.h"
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Core/Profiler/ProfilerTimer.h"
 
 namespace highlo
 {
-	std::unordered_map<uint64, Ref<Scene>> s_ActiveScenes;
+	static const HLString s_DefaultEntityName = "Entity";
+	static std::unordered_map<UUID, Scene*> s_ActiveScenes;
 
-	Scene::Scene(const HLString& name, float worldSize, bool isEditorScene)
-		: m_Name(name), m_CameraFrustum(HLFrustum{}), m_WorldSize(worldSize)
+	Scene::Scene(const HLString &name, bool isEditorScene, bool constructScene)
+		: m_DebugName(name), m_IsEditorScene(isEditorScene)
 	{
-		m_FirstChunkSize = m_WorldSize / m_ChunkRowCount;
-
-		GenerateFirstLayerChunks();
-		
-		SetRenderDistance(100.0f);
-		SetLOD1Distance(50.0f);
-		SetLOD2Distance(80.0f);
+		if (constructScene)
+		{
+			s_ActiveScenes[m_SceneID] = this;
+			Init();
+		}
 	}
 	
-	void Scene::Update(Timestep ts)
+	Scene::~Scene()
 	{
-		if (!m_Camera)
-		{
-			HL_CORE_WARN("Scene>  [-] Failed to Render | Missing Camera [-]");
-			return;
-		}
-
-		m_Camera->Update();
-
-		m_Camera->GetViewProjectionMatrix(m_FrustumInitMatrix);
-		m_CameraFrustum.Init(m_FrustumInitMatrix);
-
-		CoreRenderer::BeginScene(*m_Camera, m_SceneLight);
-
-		auto& CameraPosition = m_Camera->GetPosition();
-		auto& window_size = glm::vec2((float)Window::Get().GetWidth(), (float)Window::Get().GetHeight());
-
-		m_FrameEntitiesProcessed = 0;
-
-		for (auto& chunk : m_Chunks)
-		{
-			if (!chunk->GetEntityCount())
-				continue;
-
-			auto& chunk_pos = chunk->GetPosition();
-			auto chunk_size = chunk->GetSize();
-
-			const auto& p1 = glm::vec3(chunk_pos.x, CameraPosition.y, chunk_pos.z);
-			const auto& p2 = glm::vec3(chunk_pos.x + chunk_size, CameraPosition.y, chunk_pos.z);
-			const auto& p3 = glm::vec3(chunk_pos.x, CameraPosition.y, chunk_pos.z + chunk_size);
-			const auto& p4 = glm::vec3(chunk_pos.x + chunk_size, CameraPosition.y, chunk_pos.z + chunk_size);
-
-			float d1 = DistanceSquaredSSE(CameraPosition, p1);
-			float d2 = DistanceSquaredSSE(CameraPosition, p2);
-			float d3 = DistanceSquaredSSE(CameraPosition, p3);
-			float d4 = DistanceSquaredSSE(CameraPosition, p4);
-
-			if (!(	d1 <= m_RenderDistanceSquared ||
-					d2 <= m_RenderDistanceSquared ||
-					d3 <= m_RenderDistanceSquared ||
-					d4 <= m_RenderDistanceSquared ))
-			{
-				continue;
-			}
-
-			auto wts1 = WorldToScreen(p1, m_Camera->GetViewMatrix(), m_Camera->GetProjection(), window_size);
-			auto wts2 = WorldToScreen(p2, m_Camera->GetViewMatrix(), m_Camera->GetProjection(), window_size);
-			auto wts3 = WorldToScreen(p3, m_Camera->GetViewMatrix(), m_Camera->GetProjection(), window_size);
-			auto wts4 = WorldToScreen(p4, m_Camera->GetViewMatrix(), m_Camera->GetProjection(), window_size);
-
-			if (wts1.z < 0 && wts2.z < 0 && wts3.z < 0 && wts4.z < 0)
-				continue;
-
-			chunk->Update(ts, *m_Camera, m_CameraFrustum, m_FrameEntitiesProcessed);
-			//chunk->RenderDebugMesh();
-		}
+		s_ActiveScenes.erase(m_SceneID);
 	}
 
-	void Scene::UpdateRuntime(Timestep ts)
+	void Scene::Init()
 	{
+		auto skyboxShader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
+		m_SkyboxMaterial = Material::Create();
+		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
 	}
-
-	void Scene::UpdateEditor(Timestep ts, const Camera &camera)
+	
+	void Scene::OnUpdate(Timestep ts)
 	{
-	}
+		HL_PROFILE_FUNCTION();
 
-	void Scene::UpdateSimulation(Timestep ts, const Camera &camera)
+
+	}
+	
+	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
 	{
-	}
+		HL_PROFILE_FUNCTION();
 
+
+	}
+	
+	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)
+	{
+		HL_PROFILE_FUNCTION();
+
+
+	}
+	
+	void Scene::OnSimulate(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)
+	{
+		HL_PROFILE_FUNCTION();
+
+
+	}
+	
 	void Scene::OnEvent(Event &e)
 	{
 	}
-
+	
 	void Scene::OnRuntimeStart()
 	{
-	}
+		HL_PROFILE_FUNCTION();
 
+
+	}
+	
 	void Scene::OnRuntimeStop()
 	{
 	}
-
+	
 	void Scene::OnSimulationStart()
 	{
 	}
-
-	void Scene::OnSimulationEnd()
+	
+	void Scene::OnSimulationStop()
 	{
 	}
-
+	
 	void Scene::SetViewportSize(uint32 width, uint32 height)
 	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
 	}
-
+	
 	void Scene::SetSkybox(const Ref<Texture3D> &skybox)
 	{
+	}
+	
+	Entity Scene::FindEntityByUUID(UUID id)
+	{
+		HL_PROFILE_FUNCTION();
+
+		// TODO
+		return Entity();
+	}
+	
+	Entity Scene::FindEntityByTag(const HLString &tag)
+	{
+		HL_PROFILE_FUNCTION();
+
+		// TODO
+		return Entity();
 	}
 
 	Entity Scene::GetMainCameraEntity()
 	{
-		return Entity();
-	}
+		HL_PROFILE_FUNCTION();
 
-	Entity Scene::CreateEntity(const HLString &name)
-	{
-		return Entity();
-	}
+		// TODO
 
-	Entity Scene::CreateEntityWithID(uint64 uuid, const HLString &name, bool runtimeMap)
-	{
-		return Entity();
-	}
 
-	Entity Scene::FindEntityByTag(const HLString &tag)
-	{
-		return Entity();
+		return {};
 	}
-
-	Entity Scene::FindEntityByUUID(uint64 id)
-	{
-		return Entity();
-	}
-
-	void Scene::DestroyEntity(Entity entity)
-	{
-	}
-
-	void Scene::DuplicateEntity(Entity entity)
-	{
-	}
-
-	void Scene::CopyTo(Ref<Scene> &target)
-	{
-	}
-
+	
 	void Scene::ConvertToLocalSpace(Entity entity)
 	{
-	}
+		HL_PROFILE_FUNCTION();
 
+		/*
+		Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		if (!parent)
+			return;
+		*/
+
+		auto &transform = entity._TransformComponent->Transform;
+		//glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
+
+		//glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
+		//Decompose(localTransform, transform.Tran);
+	}
+	
 	void Scene::ConvertToWorldSpace(Entity entity)
 	{
-	//	Entity parent = FindEntityByUUID(entity.GetParentUUID());
-	//
-	//	if (!parent)
-	//		return;
+		HL_PROFILE_FUNCTION();
 
-	//	auto &transform = entity._TransformComponent->Transform;
-	//	glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
+		/*
+		Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		if (!parent)
+			return;
+		*/
 
-	//	glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
-	//	Transform::Decompose(localTransform, transform);
+		glm::mat4 transform = GetTransformRelativeToParent(entity);
+		auto &entityTransform = entity._TransformComponent->Transform;
+		//Decompose(transform, entityTransform.Transform, entityTransform.Rotation, entityTransform.Scale);
 	}
-
+	
 	glm::mat4 Scene::GetTransformRelativeToParent(Entity entity)
 	{
-		return glm::mat4(1.0f);
-	}
+		HL_PROFILE_FUNCTION();
 
+		glm::mat4 transform(1.0f);
+
+		/*
+		Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		if (parent)
+			transform = GetTransformRelativeToParent(parent);
+		*/
+
+		return transform * entity._TransformComponent->Transform.GetTransform();
+	}
+	
 	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
 	{
-		return glm::mat4(1.0f);
-	}
+		HL_PROFILE_FUNCTION();
 
+		glm::mat4 transform = entity._TransformComponent->Transform.GetTransform();
+		/*
+		while (Entity parent = FindEntityByUUID(entity.GetParentUUID()))
+		{
+			transform = parent._TransformComponent->Transform.GetTransform();
+			entity = parent;
+		}
+		*/
+
+		return transform;
+	}
+	
 	TransformComponent Scene::GetWorldSpaceTransform(Entity entity)
 	{
-		return TransformComponent();
-	}
+		HL_PROFILE_FUNCTION();
 
+		glm::vec3 translation;
+		glm::vec3 scale;
+		glm::vec3 rotation;
+		glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
+
+		TransformComponent component;
+		Transform trans;
+
+		Decompose(transform, translation, scale, rotation);
+		trans.SetPosition(translation);
+		trans.SetScale(scale);
+		trans.SetRotation(rotation);
+
+		component.Transform = trans;
+		return component;
+	}
+	
 	void Scene::ParentEntity(Entity entity, Entity parent)
 	{
-	}
+		HL_PROFILE_FUNCTION();
 
-	void Scene::UnparentEntity(Entity entity)
+		/*
+		if (parent.IsDescendantOf(entity))
+		{
+			UnparentEntity(parent);
+
+			Entity newParent = FindEntityByUUID(entity.GetUUID());
+			if (newParent)
+			{
+				UnparentEntity(entity);
+				ParentEntity(parent, newParent);
+			}
+		}
+		else
+		{
+			Entity prevParent = FindEntityByUUID(entity.GetParentUUID());
+			if (prevParent)
+				UnparentEntity(entity);
+		}
+
+		entity.SetParentUUID(parent.GetUUID());
+		parent.Children().push_back(entity.GetUUID());
+		*/
+
+		ConvertToLocalSpace(entity);
+	}
+	
+	void Scene::UnparentEntity(Entity entity, bool convertToWorldSpace)
 	{
-	}
+		HL_PROFILE_FUNCTION();
 
-	Ref<Scene> Scene::GetScene(uint64 uuid)
+		//Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		//if (!parent)
+		//	return;
+
+		//auto &parentChildren = parent.Children();
+		//parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity.GetUUID(), parentChildren.end()));
+
+		if (convertToWorldSpace)
+			ConvertToWorldSpace(entity);
+
+		//entity.SetParentUUID(0);
+
+	}
+	
+	void Scene::CopyTo(Ref<Scene> &target)
+	{
+		HL_PROFILE_FUNCTION();
+
+		// Lights
+		target->m_Light = m_Light;
+		target->m_LightMultiplier = m_LightMultiplier;
+
+		// Skybox
+		target->m_Environment = m_Environment;
+		target->m_SkyboxTexture = m_SkyboxTexture;
+		target->m_SkyboxMaterial = m_SkyboxMaterial;
+		target->m_SkyboxShader = m_SkyboxShader;
+		target->m_SkyboxLod = m_SkyboxLod;
+
+		// 
+
+	}
+	
+	Ref<Scene> Scene::GetScene(UUID uuid)
 	{
 		if (s_ActiveScenes.find(uuid) != s_ActiveScenes.end())
 			return s_ActiveScenes.at(uuid);
 
 		return {};
 	}
-
-	void Scene::AddEntity(Entity entity)
+	
+	Ref<Scene> Scene::CreateEmpty()
 	{
-		m_Entities.push_back(entity);
+		return Ref<Scene>::Create("Empty", false, false);
+	}
+	
+	Entity Scene::CreateEntity(const HLString &name)
+	{
+		HL_PROFILE_FUNCTION();
 
-		for (auto& chunk : m_Chunks)
+		auto entity = Entity(name);
+		auto idComponent = entity.AddComponent<IDComponent>();
+		idComponent->ID = {};
+
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<RelationshipComponent>();
+
+		m_EntityIDMap[idComponent->ID] = entity;
+		return entity;
+	}
+	
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const HLString &name)
+	{
+		HL_PROFILE_FUNCTION();
+
+		auto entity = Entity(name);
+		auto idComponent = entity.AddComponent<IDComponent>();
+		idComponent->ID = uuid;
+
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<RelationshipComponent>();
+
+		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());
+		m_EntityIDMap[uuid] = entity;
+		return entity;
+	}
+	
+	void Scene::DestroyEntity(Entity entity)
+	{
+		HL_PROFILE_FUNCTION();
+
+
+	}
+	
+	Entity Scene::DuplicateEntity(Entity entity)
+	{
+		HL_PROFILE_FUNCTION();
+
+		Entity newEntity = CreateEntity(entity.Tag);
+		
+		// TODO: copy all components
+
+		/*
+		auto childIds = entity.Children();
+		for (auto childId : childIds)
 		{
-			const auto is_entity_in_chunk = [&](const glm::vec3& entity_pos, SceneChunk& chunk) -> bool {
-				auto& chunk_pos = chunk.GetPosition();
-				auto chunk_size = chunk.GetSize();
+			Entity childDuplicate = DuplicateEntity(FindEntityByUUID(childId));
+			UnparentEntity(childDuplicate, false);
 
-				if (entity_pos.x >= chunk_pos.x && entity_pos.x <= chunk_pos.x + chunk_size &&
-					entity_pos.z >= chunk_pos.z && entity_pos.z <= chunk_pos.z + chunk_size)
-					return true;
-
-				return false;
-			};
-
-			if (is_entity_in_chunk(entity._TransformComponent->Transform.GetPosition(), *chunk))
-				chunk->AddEntity(entity);
+			childDuplicate.SetParentUUID(newEntity.GetUUID());
+			newEntity.Children().push_back(childDuplicate.GetUUID());
 		}
-	}
-	
-	void Scene::SetRenderDistance(float distance)
-	{
-		m_RenderDistanceSquared = distance * distance;
 
-		for (auto& chunk : m_Chunks)
-			chunk->SetRenderDistance(distance);
-	}
-	
-	void Scene::SetLOD1Distance(float distance)
-	{
-		m_LOD1DistanceSquared = distance * distance;
-
-		for (auto& chunk : m_Chunks)
-			chunk->SetLOD1Distance(distance);
-	}
-	
-	void Scene::SetLOD2Distance(float distance)
-	{
-		m_LOD2DistanceSquared = distance * distance;
-
-		for (auto& chunk : m_Chunks)
-			chunk->SetLOD2Distance(distance);
-	}
-
-	void Scene::GenerateFirstLayerChunks()
-	{
-		float start_pos = -m_WorldSize / 2.0f;
-
-		for (int i = 0; i < m_ChunkRowCount; i++)
+		if (entity.HasParent())
 		{
-			for (int j = 0; j < m_ChunkRowCount; j++)
-			{
-				glm::vec3 chunk_pos = {
-					start_pos + (float)i * m_FirstChunkSize,
-					0,
-					start_pos + (float)j * m_FirstChunkSize
-				};
+			Entity parent = FindEntityByUUID(entity.GetParentUUID());
+			HL_ASSERT(parent, "Failed to find parent entity");
 
-				auto chunk = Ref<SceneChunk>::Create(0, m_ChunkLayers - 1, m_FirstChunkSize, chunk_pos);
-				m_Chunks.push_back(chunk);
-			}
+			newEntity.SetParentUUID(entity.GetParentUUID());
+			parent.Children().push_back(newEntity.GetUUID());
 		}
+		*/
+
+		return newEntity;
+	}
+	
+	Entity Scene::CreatePrefabEntity(Entity entity, const glm::vec3 *translation)
+	{
+		// TODO
+		return entity;
+	}
+	
+	Entity Scene::CreatePrefabEntity(Entity entity, Entity parent, const glm::vec3 *translation)
+	{
+		// TODO
+		return entity;
 	}
 }

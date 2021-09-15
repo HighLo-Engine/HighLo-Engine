@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-15) Added SetLineWidth method
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -9,6 +10,7 @@
 
 #include "Engine/Scene/Scene.h"
 #include "Engine/Camera/Camera.h"
+#include "Engine/Renderer/RenderPass.h"
 
 namespace highlo
 {
@@ -34,18 +36,27 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static void Init();
-		HLAPI static void Shutdown();
+		HLAPI SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification = SceneRendererSpecification());
+		HLAPI ~SceneRenderer();
 
-		void SetScene(Ref<Scene> scene);
-		void SetViewportSize(uint32 width, uint32 height);
+		HLAPI void Init();
 
-		void BeginScene();
-		void EndScene();
+		HLAPI void SetScene(Ref<Scene> scene);
+		HLAPI void SetViewportSize(uint32 width, uint32 height);
+		HLAPI void SetLineWidth(float width) { m_LineWidth = width; }
 
-		inline SceneRendererOptions &GetOptions() {  }
+		HLAPI void BeginScene(const SceneRendererCamera &camera);
+		HLAPI void EndScene();
+
+		HLAPI SceneRendererOptions &GetOptions();
+
+		HLAPI Ref<RenderPass> GetFinalRenderPass();
+		HLAPI Ref<Texture2D> GetFinalRenderTexture();
 
 	private:
+
+		void InitGrid();
+		void InitSkybox();
 
 		uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 		float m_InvertedViewportWidth = 0.0f, m_InvertedViewportHeight = 0.0f;
@@ -55,6 +66,7 @@ namespace highlo
 
 		Ref<Scene> m_Scene;
 		SceneRendererSpecification m_Specification;
+		SceneRendererOptions m_RendererOptions;
 		
 		// Grid
 		Ref<VertexArray> m_GridVertexArray;
@@ -63,6 +75,7 @@ namespace highlo
 		Ref<Material> m_OutlineMaterial, m_OutlineAnimMaterial;
 		Ref<Material> m_ColliderMaterial;
 
+		// Scene information
 		struct SceneInfo
 		{
 			SceneRendererCamera SceneCamera;

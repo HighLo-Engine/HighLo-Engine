@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "SceneChunk.h"
 
+#if 0
+
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CoreRenderer.h"
 #include "Engine/Renderer/MeshFactory.h"
@@ -200,3 +202,6 @@ namespace highlo
 		}
 	}
 }
+
+#endif
+

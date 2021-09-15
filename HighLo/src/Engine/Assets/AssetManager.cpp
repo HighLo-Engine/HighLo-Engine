@@ -6,7 +6,7 @@
 #include <Engine/ImGui/imgui.h>
 
 #include "Engine/Core/FileSystem.h"
-#include "Engine/Core/VirtualFileSystem.h"
+#include "Engine/Core/File.h"
 #include "AssetExtensions.h"
 
 namespace highlo
@@ -130,7 +130,7 @@ namespace highlo
 
 	AssetType AssetManager::GetAssetTypeFromPath(const HLString &path)
 	{
-		HLString extension = VirtualFileSystem::Get()->GetFileExtension(path);
+		HLString extension = File::GetFileExtension(path);
 		return GetAssetTypeFromExtension(extension);
 	}
 

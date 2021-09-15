@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-15) Changed ID Types to UUID, Removed TagComponent
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -15,22 +16,17 @@ namespace highlo
 {
 	struct IDComponent
 	{
-		uint64 ID = 0;
+		UUID ID = 0;
 	};
 
 	struct SceneComponent
 	{
-		uint64 SceneID = 0;
+		UUID SceneID = 0;
 	};
 
 	struct TransformComponent
 	{
 		Transform Transform;
-	};
-
-	struct TagComponent
-	{
-		HLString Tag;
 	};
 
 	struct RenderComponent

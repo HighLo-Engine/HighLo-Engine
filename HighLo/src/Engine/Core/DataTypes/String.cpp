@@ -525,7 +525,7 @@ namespace highlo
 
 		while (Contains(find, offset))
 		{
-			occurences++;
+			++occurences;
 			offset = IndexOf(find, offset) + find.Length();
 
 			if (occurencesToReplace && occurences == occurencesToReplace)

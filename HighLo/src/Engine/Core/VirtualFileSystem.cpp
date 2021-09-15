@@ -87,43 +87,6 @@ namespace highlo
 		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::ReadTextFile(physicalPath) : HLString();
 	}
 
-	HLString VirtualFileSystem::GetFileNameFromPath(const HLString &path)
-	{
-		HLString result;
-		int32 pos = path.FirstIndexOf('/');
-		int32 i = 1;
-		while (pos != HLString::NPOS)
-		{
-			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', i);
-			++i;
-		}
-
-		if (result.Contains("."))
-			result = result.Substr(0, result.IndexOf("."));
-
-		return result;
-	}
-
-	HLString VirtualFileSystem::GetFileExtension(const HLString &path)
-	{
-		HLString result;
-		int32 pos = path.FirstIndexOf('/');
-		int32 i = 1;
-		while (pos != HLString::NPOS)
-		{
-			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', i);
-			++i;
-		}
-
-		if (!result.Contains("."))
-			return "-1";
-
-		result = result.Substr(result.IndexOf(".") + 1);
-		return result;
-	}
-
 	bool VirtualFileSystem::WriteFile(const HLString &path, Byte *buffer, int64 size)
 	{
 		HL_ASSERT(s_Instance, "FileSystem not created!");

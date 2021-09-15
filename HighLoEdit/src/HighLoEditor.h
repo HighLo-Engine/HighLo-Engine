@@ -1,3 +1,10 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2021-09-15) initial release
+//
+
 #pragma once
 
 #include <HighLo.h>
@@ -8,10 +15,10 @@ class HighLoEditor : public HLApplication
 	public:
 
 		virtual void OnInitialize() override;
-		virtual void OnUpdate(Timestep timestep) override;
+		virtual void OnUpdate(Timestep ts) override;
 		virtual void OnShutdown() override;
 		virtual void OnEvent(Event &e) override;
-		virtual void OnUIRender(Timestep timestep) override;
+		virtual void OnUIRender(Timestep ts) override;
 		virtual void OnResize(uint32 width, uint32 height) override;
 
 		void SelectEntity(Entity entity);
@@ -77,10 +84,12 @@ class HighLoEditor : public HLApplication
 
 		HLString m_LastSceneFilePath;
 		GizmoType m_GizmoType = GizmoType::None;
+		EditorCamera m_EditorCamera;
 
 		float m_EnvironmentMapRotation = 0.0f;
 		float m_SnapValue = 0.5f;
 		float m_RotationSnapValue = 45.0f;
+		float m_LineWidth = 2.0f;
 
 		bool m_AllowViewportCameraEvents = false;
 		bool m_DrawOnTopBoundingBoxes = false;
@@ -102,8 +111,7 @@ class HighLoEditor : public HLApplication
 		Ref<Scene> m_RuntimeScene, m_EditorScene, m_SimulationScene, m_CurrentScene;
 		std::vector<SelectedMesh> m_SelectionContext;
 
-		// TEMP: this is going to move to the engine
-		Ref<EditorCamera> m_Camera;
-		Ref<Framebuffer> m_ViewportContent;
-		uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
+		// Editor Panels
+		Ref<SceneRenderer> m_ViewportRenderer;
+		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
 	};

@@ -11,12 +11,10 @@
 #include "Engine/Application/ApplicationLayer.h"
 #include "Engine/Application/ApplicationLayerStack.h"
 
-/*
 #include "Engine/Assets/Asset.h"
 #include "Engine/Assets/AssetExtensions.h"
 #include "Engine/Assets/AssetManager.h"
 #include "Engine/Assets/AssetTypes.h"
-*/
 
 #include "Engine/Core/Defines/Defines.h"
 #include "Engine/Core/Core.h"
@@ -29,6 +27,8 @@
 #include "Engine/Core/Timer.h"
 #include "Engine/Core/SharedReference.h"
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Core/File.h"
+#include "Engine/Core/FileSystemPath.h"
 #include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Core/Profiler/Profiler.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
@@ -58,7 +58,7 @@
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/MeshFactory.h"
 #include "Engine/Renderer/Material.h"
-//#include "Engine/Renderer/MaterialTable.h"
+#include "Engine/Renderer/MaterialTable.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommandBuffer.h"
 #include "Engine/Renderer/Renderer2D.h"
@@ -69,6 +69,9 @@
 #include "Engine/Camera/FPSCamera.h"
 #include "Engine/Camera/FreeFlyCamera.h"
 #include "Engine/Camera/EditorCamera.h" // TODO: this should be editor-only
+
+#include "Engine/Editor/EditorColors.h"
+#include "Engine/Editor/SceneHierarchyPanel.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"
@@ -88,6 +91,8 @@
 #include "Engine/Core/Exceptions/Exceptions.h"
 
 #include "Engine/Scene/Scene.h"
+#include "Engine/Scene/Project.h"
+#include "Engine/Scene/UserSettings.h"
 
 #include "Engine/Loaders/AssetLoader.h"
 

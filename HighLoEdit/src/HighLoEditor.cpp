@@ -1,5 +1,6 @@
-#include "HighLoEditor.h"
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
 
+#include "HighLoEditor.h"
 #include "MenuItems.h"
 
 namespace editorutils
@@ -67,6 +68,19 @@ void HighLoEditor::OnInitialize()
 	editMenu->AddMenuItem("Redo", "Strg+Y", MENU_ITEM_REDO, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Redo..."); });
 	editMenu->AddSeparator();
 
+	Ref<FileMenu> modelSubMenu = FileMenu::Create("Create 3D Objects");
+	modelSubMenu->AddMenuItem("Create Null Object", "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) {  });
+	modelSubMenu->AddSeparator();
+	modelSubMenu->AddMenuItem("Create Cube", "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) {  });
+	modelSubMenu->AddMenuItem("Create Sphere", "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) {  });
+	modelSubMenu->AddMenuItem("Create Capsule", "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) {  });
+	modelSubMenu->AddMenuItem("Create Cylinder", "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) {  });
+
+	Ref<FileMenu> gameObjectMenu = FileMenu::Create("Game Objects");
+	gameObjectMenu->AddMenuItem("Create Folder", "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) {  });
+	gameObjectMenu->AddSubMenu(modelSubMenu);
+	gameObjectMenu->AddMenuItem("Create Camera", "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) {  });
+
 	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
 	bool darkThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Dark;
 	bool lightThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Light;
@@ -80,56 +94,53 @@ void HighLoEditor::OnInitialize()
 
 	m_MenuBar->AddMenu(fileMenu);
 	m_MenuBar->AddMenu(editMenu);
+	m_MenuBar->AddMenu(gameObjectMenu);
 	m_MenuBar->AddMenu(windowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
 
-	// TEMP
-	m_ViewportWidth = width;
-	m_ViewportHeight = height;
-	m_Camera = Ref<EditorCamera>::Create(glm::perspectiveFov(glm::radians(90.0f), (float)width, (float)height, 0.1f, 1000.0f));
+	m_EditorCamera = EditorCamera(glm::perspectiveFov(glm::radians(45.0f), (float)width, (float)height, 0.1f, 1000.0f));
 
-	FramebufferSpecification spec;
-	spec.Width = width;
-	spec.Height = height;
-	spec.Attachments = { TextureFormat::RGBA };
-	spec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
-	m_ViewportContent = Framebuffer::Create(spec);
+	// Editor Panels
+	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
+	m_ViewportRenderer->SetLineWidth(m_LineWidth);
 
-	Renderer::SetBlendMode(false);
+	m_SceneHierarchyPanel = MakeUniqueRef<SceneHierarchyPanel>();
+	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
+	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
+	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 }
 
-void HighLoEditor::OnUpdate(Timestep timestep)
+void HighLoEditor::OnUpdate(Timestep ts)
 {
-	// Render Framebuffer
-	m_ViewportContent->Bind();
-
-	m_Camera->Update();
-
-	Renderer::ClearScreenColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-	Renderer::ClearScreenBuffers();
-
-	m_ViewportContent->Unbind();
-
 	switch (m_SceneState)
 	{
 		case SceneState::Edit:
 		{
+			m_EditorCamera.Update();
+			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
 			break;
 		}
 
 		case SceneState::Play:
 		{
+			m_RuntimeScene->OnUpdate(ts);
+			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 
 		case SceneState::Pause:
 		{
+			m_EditorCamera.Update();
+			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 
 		case SceneState::Simulate:
 		{
+			m_EditorCamera.Update();
+			m_SimulationScene->OnUpdate(ts);
+			m_SimulationScene->OnSimulate(m_ViewportRenderer, ts, m_EditorCamera);
 			break;
 		}
 	}
@@ -146,9 +157,6 @@ void HighLoEditor::OnEvent(Event &e)
 	dispatcher.Dispatch<KeyPressedEvent>(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnKeyPressedEvent));
 	dispatcher.Dispatch<MouseButtonPressedEvent>(HL_BIND_EVENT_FUNCTION(HighLoEditor::OnMouseButtonPressedEvent));
 	
-	if (m_Camera)
-		m_Camera->OnEvent(e);
-
 	if (m_MenuBar)
 		m_MenuBar->OnEvent(e);
 
@@ -167,25 +175,13 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("RootWindow", true, true);
 
-	// Render viewport image
-	auto viewportSize = UI::GetContentRegion();
-	m_ViewportWidth = (uint32)viewportSize.x;
-	m_ViewportHeight = (uint32)viewportSize.y;
-	if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
-	{
-		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), viewportSize.x, viewportSize.y, 0.1f, 1000.0f));
-		m_Camera->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
-	}
-
 	UI::BeginViewport("Viewport");
-	UI::Image(m_ViewportContent->GetImage().As<Texture2D>(), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 });
 	UI::EndViewport();
 
 	UI::BeginViewport("Assets");
 	UI::EndViewport();
 
-	UI::BeginViewport("SceneHierarchyPanel");
-	UI::EndViewport();
+	m_SceneHierarchyPanel->OnUIRender();
 
 	UI::BeginViewport("Object Properties");
 	UI::EndViewport();
@@ -195,13 +191,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 void HighLoEditor::OnResize(uint32 width, uint32 height)
 {
-	m_ViewportWidth = width;
-	m_ViewportHeight = height;
-
-	if (m_Camera && m_ViewportWidth > 0 && m_ViewportHeight > 0)
-	{
-		m_Camera->SetProjection(glm::perspectiveFov(glm::radians(90.0f), (float)m_ViewportWidth, (float)m_ViewportHeight, 0.1f, 1000.0f));
-	}
 }
 
 void HighLoEditor::SelectEntity(Entity entity)
@@ -210,14 +199,14 @@ void HighLoEditor::SelectEntity(Entity entity)
 		return;
 
 	SelectedMesh selection;
-	//if (entity.HasComponent<MeshComponent>())
-	//{
-	//	auto &meshComp = entity.GetComponent<MeshComponent>();
-	//	if (meshComp.Mesh && meshComp.Mesh->Type == AssetType::Mesh)
-	//	{
-	//		selection.m_Mesh = &meshComp.Mesh->GetSubmeshes()[0];
-	//	}
-	//}
+	if (entity.HasComponent<ModelComponent>())
+	{
+		auto meshComp = entity.GetComponent<ModelComponent>();
+		/*if (meshComp.Model && meshComp.Model->Type == AssetType::Mesh)
+		{
+			selection.m_Mesh = &meshComp.Mesh->GetSubmeshes()[0];
+		}*/
+	}
 
 	selection.m_Entity = entity;
 	m_SelectionContext.clear();
@@ -225,12 +214,12 @@ void HighLoEditor::SelectEntity(Entity entity)
 
 	if (m_SceneState == SceneState::Edit)
 	{
-		//	m_EditorScene->SetSelectedEntity(entity);
+		m_EditorScene->SetSelectedEntity(entity);
 		m_CurrentScene = m_EditorScene;
 	}
 	else if (m_SceneState == SceneState::Simulate)
 	{
-		//	m_EditorScene->SetSelectedEntity(entity);
+		m_EditorScene->SetSelectedEntity(entity);
 		m_CurrentScene = m_SimulationScene;
 	}
 }
@@ -453,10 +442,10 @@ bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 	return false;
 }
 
-void HighLoEditor::OnSelected(const HighLoEditor::SelectedMesh &selectionContext)
+void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 {
-	//m_SceneHierarchy->SetSelected(selectionContext.m_Entity);
-	//m_CurrentScene->SetSelectedEntity(selectionContext.m_Entity);
+	m_SceneHierarchyPanel->SetSelected(selectionContext.m_Entity);
+	m_EditorScene->SetSelectedEntity(selectionContext.m_Entity);
 }
 
 void HighLoEditor::OnEntityDeleted(Entity e)
@@ -464,7 +453,7 @@ void HighLoEditor::OnEntityDeleted(Entity e)
 	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].m_Entity == e)
 	{
 		m_SelectionContext.clear();
-		//	m_EditorScene->SetSelectedEntity({});
+		m_EditorScene->SetSelectedEntity({});
 	}
 }
 
@@ -478,7 +467,7 @@ void HighLoEditor::OnScenePlay()
 
 	m_EditorScene->CopyTo(m_RuntimeScene);
 	m_RuntimeScene->OnRuntimeStart();
-	//m_SceneHierarchy->SetContext(m_RuntimeScene);
+	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
 
 	m_CurrentScene = m_RuntimeScene;
 }
@@ -492,7 +481,7 @@ void HighLoEditor::OnSceneStop()
 	m_RuntimeScene = nullptr;
 
 	m_SelectionContext.clear();
-	//m_SceneHierarchy->SetContext(m_EditorScene);
+	m_SceneHierarchyPanel->SetContext(m_EditorScene);
 	m_CurrentScene = m_EditorScene;
 }
 
@@ -506,19 +495,19 @@ void HighLoEditor::OnSceneStartSimulation()
 	m_EditorScene->CopyTo(m_SimulationScene);
 
 	m_SimulationScene->OnSimulationStart();
-	//m_SceneHierarchy->SetContext(m_SimulationScene);
+	m_SceneHierarchyPanel->SetContext(m_SimulationScene);
 	m_CurrentScene = m_SimulationScene;
 }
 
 void HighLoEditor::OnSceneEndSimulation()
 {
-	m_SimulationScene->OnSimulationEnd();
+	m_SimulationScene->OnSimulationStop();
 	m_SceneState = SceneState::Edit;
 
 	m_SimulationScene = nullptr;
 
 	m_SelectionContext.clear();
-	//m_SceneHierarchy->SetContext(m_EditorScene);
+	m_SceneHierarchyPanel->SetContext(m_EditorScene);
 	m_CurrentScene = m_EditorScene;
 }
 
@@ -536,6 +525,13 @@ float HighLoEditor::GetSnapValue()
 
 void HighLoEditor::DeleteEntity(Entity entity)
 {
-	// TODO
+	/*
+	auto children = entity.Children();
+	for (auto childId : children)
+		DeleteEntity(m_EditorScene->FindEntityByUUID(childId));
+	*/
+
+	m_EditorScene->UnparentEntity(entity);
+	m_EditorScene->DestroyEntity(entity);
 }
 

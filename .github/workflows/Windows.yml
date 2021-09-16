@@ -52,7 +52,7 @@ jobs:
         - name: Generate Unit-Tests
           run: |
             cd scripts
-            .\GenerateUnitTests.bat
+            .\GenerateUnitTests-Windows.bat
             cd ..
           
         - name: Build String Unit Test

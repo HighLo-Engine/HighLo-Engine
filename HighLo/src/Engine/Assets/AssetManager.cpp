@@ -130,8 +130,7 @@ namespace highlo
 
 	AssetType AssetManager::GetAssetTypeFromPath(const HLString &path)
 	{
-		HLString extension = File::GetFileExtension(path);
-		return GetAssetTypeFromExtension(extension);
+		return GetAssetTypeFromExtension(File::GetFileExtension(path));
 	}
 
 	AssetHandle AssetManager::ImportAsset(const HLString &path)

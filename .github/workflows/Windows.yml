@@ -40,7 +40,7 @@ jobs:
         - name: Generate Engine
           run: |
             cd scripts
-            .\GenerateEngine.bat
+            .\GenerateEngine-Windows.bat
             cd ..
 
         - name: Build Engine

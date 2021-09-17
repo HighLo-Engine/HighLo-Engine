@@ -22,7 +22,6 @@ project "HighLo"
 		"%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.GLFW}",
-        "%{IncludeDir.GLAD}",
         "%{IncludeDir.assimp}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.SPIRV_Cross}",
@@ -34,10 +33,8 @@ project "HighLo"
     links
     {
         "GLFW",
-        "GLAD",
         "stbimage",
         "%{LibDir.assimp}",
-        "opengl32.lib",
 		
 		"%{LibDir.shaderc}",
 		"%{LibDir.shaderc_util}",
@@ -68,20 +65,51 @@ project "HighLo"
 		"GLFW_INCLUDE_NONE",
 		"HIGHLO_LIBRARY_EXPORT",
 		"HIGHLO_ENABLE_PROFILER",
-		"HIGHLO_API_OPENGL",
-		--"HIGHLO_API_DX11",
-		"HIGHLO_API_GLFW"
 	}
 
     filter "system:windows"
         systemversion "latest"
-
         disablewarnings { "5033" }
 
         defines
         {
-            "HL_BUILD",
-            "HL_PLATFORM_WINDOWS"
+            "HL_PLATFORM_WINDOWS",
+			"HIGHLO_API_OPENGL",
+			--"HIGHLO_API_DX11",
+			"HIGHLO_API_GLFW"	
+        }
+
+		includedirs
+		{
+		    "%{IncludeDir.GLAD}",
+		}
+		
+		links
+		{
+		    "GLAD",
+			"opengl32.lib",
+		}
+
+	filter "system:macosx"
+        systemversion "latest"
+        disablewarnings { "5033" }
+		
+        defines
+        {
+            "HL_PLATFORM_MAC",
+			"HIGHLO_API_OPENGL",
+			"HIGHLO_API_GLFW"	
+        }
+
+	filter "system:linux"
+		systemversion "latest"
+        disablewarnings { "5033" }
+
+		defines
+        {
+            "HL_PLATFORM_LINUX",
+			"HIGHLO_API_OPENGL",
+			"HIGHLO_API_GLFW"	
         }
 
     filter "configurations:Debug"

@@ -64,6 +64,7 @@
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/Skybox.h"
 #include "Engine/ImGui/ImGui.h"
+#include "Engine/ImGui/ImGuiScopeHelpers.h"
 
 #include "Engine/Camera/Camera.h"
 #include "Engine/Camera/FPSCamera.h"

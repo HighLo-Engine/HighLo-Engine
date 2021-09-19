@@ -204,11 +204,11 @@ void HighLoEditor::SelectEntity(Entity entity)
 		auto meshComp = entity.GetComponent<ModelComponent>();
 		/*if (meshComp.Model && meshComp.Model->Type == AssetType::Mesh)
 		{
-			selection.m_Mesh = &meshComp.Mesh->GetSubmeshes()[0];
+			selection.Mesh = &meshComp.Mesh->GetSubmeshes()[0];
 		}*/
 	}
 
-	selection.m_Entity = entity;
+	selection.Entity = entity;
 	m_SelectionContext.clear();
 	m_SelectionContext.push_back(selection);
 
@@ -312,7 +312,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 				if (m_SelectionContext.size() == 0)
 					break;
 
-				Entity selectedEntity = m_SelectionContext[0].m_Entity;
+				Entity selectedEntity = m_SelectionContext[0].Entity;
 		//		m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
 				break;
 			}
@@ -403,7 +403,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 				if (m_SelectionContext.size() == 0)
 					break;
 
-				Entity selectedEntity = m_SelectionContext[0].m_Entity;
+				Entity selectedEntity = m_SelectionContext[0].Entity;
 				// TODO
 				break;
 			}
@@ -444,13 +444,13 @@ bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 
 void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 {
-	m_SceneHierarchyPanel->SetSelected(selectionContext.m_Entity);
-	m_EditorScene->SetSelectedEntity(selectionContext.m_Entity);
+	m_SceneHierarchyPanel->SetSelected(selectionContext.Entity);
+	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
 }
 
 void HighLoEditor::OnEntityDeleted(Entity e)
 {
-	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].m_Entity == e)
+	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].Entity == e)
 	{
 		m_SelectionContext.clear();
 		m_EditorScene->SetSelectedEntity({});

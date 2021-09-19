@@ -45,9 +45,9 @@ class HighLoEditor : public HLApplication
 
 		struct SelectedMesh
 		{
-			float m_Distance = 0.0f;
-			Mesh *m_Mesh = nullptr;
-			Entity m_Entity;
+			float Distance = 0.0f;
+			Mesh *Mesh = nullptr;
+			Entity Entity;
 		};
 
 		enum class SceneState

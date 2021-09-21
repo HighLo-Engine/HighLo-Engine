@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-19) Added Prefab Component
 //     - 1.1 (2021-09-15) Changed ID Types to UUID, Removed TagComponent
 //     - 1.0 (2021-09-14) initial release
 //
@@ -64,6 +65,12 @@ namespace highlo
 	{
 		UUID ParentHandle = 0;
 		std::vector<UUID> Children;
+	};
+
+	struct PrefabComponent
+	{
+		UUID PrefabID = 0;
+		UUID EntityID = 0;
 	};
 
 

@@ -63,7 +63,7 @@ namespace highlo
 
 			bool Load(const char *fileName)
 			{
-				if (m_FTHandle && m_FontHandle)
+				if (m_FTHandle)
 				{
 					// Check if font is already loaded
 					if (m_FontFileName && !strcmp(m_FontFileName, fileName))
@@ -135,6 +135,7 @@ namespace highlo
 		bool fixedDimensions = fixedWidth >= 0 && fixedHeight >= 0;
 		bool anyCodepointsAvailable = false;
 		bool floatingPointFormat = true;
+		bool fixedScale = true;
 		
 		msdf_atlas::TightAtlasPacker::DimensionsConstraint atlasSizeConstraint = msdf_atlas::TightAtlasPacker::DimensionsConstraint::MULTIPLE_OF_FOUR_SQUARE;
 		msdf_atlas::Charset charset;
@@ -156,6 +157,7 @@ namespace highlo
 		config.AngleThreshold = HL_FONT_DEFAULT_ANGLE_THRESHOLD;
 		config.MiterLimit = HL_FONT_DEFAULT_MITER_LIMIT;
 		config.EmSize = 40.0;
+		fixedScale = config.EmSize > 0;
 
 		utils::FontHolder font;
 		if (!font.Load(*fontInput.FontFileName))
@@ -195,8 +197,7 @@ namespace highlo
 		if (fontInput.FontName)
 			m_MSDFData->FontGeometry.setName(*fontInput.FontName);
 
-		// Determine final atlas dimensions, scale and range, pack glyphs
-		bool fixedScale = config.EmSize > 0;
+		// Determine final atlas dimensions
 
 		if (fixedDimensions)
 			atlasPacker.setDimensions(fixedWidth, fixedHeight);

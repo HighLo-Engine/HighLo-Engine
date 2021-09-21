@@ -6,10 +6,12 @@
 namespace highlo
 {
 	FileSystemPath::FileSystemPath(const HLString &path)
+		: m_CurrentPath(path)
 	{
 	}
 	
 	FileSystemPath::FileSystemPath(const File &file)
+		: m_CurrentPath(file.GetAbsolutePath())
 	{
 	}
 	

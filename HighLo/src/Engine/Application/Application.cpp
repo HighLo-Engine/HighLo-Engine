@@ -6,6 +6,7 @@
 #include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Renderer/Font.h"
 #include "Engine/Math/Math.h"
 
 #include "Engine/ImGui/ImGui.h"
@@ -46,6 +47,8 @@ namespace highlo
 
 		m_Encryptor = Ref<Encryptor>::Create();
 		m_Encryptor->Init();
+
+		Font::Init(); // Load default font
 
 		HL_CORE_INFO("Engine Initialized");
 	}

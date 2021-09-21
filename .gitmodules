@@ -34,3 +34,7 @@
 	path = HighLo/vendor/HighLo-Unit
 	url = https://github.com/HighLo-Engine/HighLo-Unit
 	ignore = dirty
+[submodule "HighLo/vendor/msdf-atlas-gen"]
+	path = HighLo/vendor/msdf-atlas-gen
+	url = https://github.com/HighLo-Engine/msdf-atlas-gen
+	ignore = dirty

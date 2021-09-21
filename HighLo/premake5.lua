@@ -27,13 +27,17 @@ project "HighLo"
         "%{IncludeDir.SPIRV_Cross}",
 		"%{IncludeDir.shaderc}",
 		"%{IncludeDir.openssl}",
-		"%{IncludeDir.HighLo_Unit}"
+		"%{IncludeDir.HighLo_Unit}",
+		"%{IncludeDir.msdf_atlas_gen}",
+		"%{IncludeDir.msdfgen}",
+
     }
 
     links
     {
         "GLFW",
         "stbimage",
+		"msdf-atlas-gen",
         "%{LibDir.assimp}",
 		
 		"%{LibDir.shaderc}",

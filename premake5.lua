@@ -27,6 +27,7 @@ workspace "HighLo"
 		include "HighLo/vendor/openssl"
 		include "HighLo/vendor/HighLo-Unit"
 		include "HighLo/vendor/stb_image"
+		include "HighLo/vendor/msdf-atlas-gen"
 		
 		filter "system:windows"
 			include "HighLo/vendor/GLAD"

@@ -37,6 +37,10 @@ jobs:
         - name: Add MSBuild to PATH
           uses: microsoft/setup-msbuild@v1.0.2
           
+        - name: Update dependencies
+          run: |
+            git submodule update --init --recursive
+          
         - name: Generate Engine
           run: |
             cd scripts

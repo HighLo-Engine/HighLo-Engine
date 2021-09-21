@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-21) Added Create method that also contains the pixel data
 //     - 1.1 (2021-09-15) Changed Name implementation
 //     - 1.0 (2021-09-14) initial release
 //
@@ -26,6 +27,7 @@ namespace highlo
 		static OpenGLTexture2D *CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 
 		OpenGLTexture2D(void *img_data, uint32 width, uint32 height, TextureFormat format);
+		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
 		~OpenGLTexture2D();
 

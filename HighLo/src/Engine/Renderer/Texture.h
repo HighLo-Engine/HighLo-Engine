@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-21) Added Create method that also contains the pixel data
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -69,6 +70,7 @@ namespace highlo
 		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height);
+		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 
 		HLAPI virtual HLRendererID GetSamplerRendererID() const = 0;
 

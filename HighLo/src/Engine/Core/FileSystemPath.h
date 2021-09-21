@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-21) Added String methods
 //     - 1.0 (2021-09-15) initial release
 //
 
@@ -36,6 +37,9 @@ namespace highlo
 
 		HLAPI FileSystemPath RelativePath();
 		HLAPI FileSystemPath ParentPath();
+
+		HLAPI HLString &String() { return m_CurrentPath; }
+		HLAPI const HLString &String() const { return m_CurrentPath; }
 
 		HLAPI bool operator==(const FileSystemPath &other) const;
 		HLAPI bool operator!=(const FileSystemPath &other) const;

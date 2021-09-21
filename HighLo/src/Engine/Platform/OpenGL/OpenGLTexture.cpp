@@ -155,6 +155,7 @@ namespace highlo
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		m_Specification.Format = Format;
+		m_Specification.Properties = TextureProperties();
 		m_Specification.Usage = TextureUsage::Texture;
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 		Name = "unknown";
@@ -167,7 +168,33 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props)
+		: m_Width(width), m_Height(height)
+	{
+		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
+		Format = format;
+
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		m_Specification.Format = Format;
+		m_Specification.Properties = props;
+		m_Specification.Usage = TextureUsage::Texture;
+		m_Specification.Mips = utils::CalculateMipCount(width, height);
+		Name = "unknown";
+
+		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_2D, RendererID);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -185,6 +212,7 @@ namespace highlo
 		m_Specification.Height = height;
 		m_Specification.Format = Format;
 		m_Specification.Usage = TextureUsage::Texture;
+		m_Specification.Properties = TextureProperties();
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 		Name = "unknown";
 
@@ -194,7 +222,7 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

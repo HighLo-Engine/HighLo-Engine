@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-21) Added Font Assetype
 //     - 1.1 (2021-09-19) Added Prefab Assetype
 //     - 1.0 (2021-09-14) initial release
 //
@@ -26,8 +27,9 @@ namespace highlo
 		Texture = 4,
 		EnvMap = 5,
 		Prefab = 6,
+		Font = 7,
 
-		MeshAsset = 7,
+		MeshAsset = 8,
 	};
 
 	namespace utils

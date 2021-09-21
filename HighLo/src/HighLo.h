@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-21) Added Font include
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -61,6 +62,7 @@
 #include "Engine/Renderer/MaterialTable.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommandBuffer.h"
+#include "Engine/Renderer/Font.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/Skybox.h"
 #include "Engine/ImGui/ImGui.h"

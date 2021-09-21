@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-21) made TextureProperties a member of the TextureSpecification
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -69,6 +70,7 @@ namespace highlo
 	{
 		TextureFormat Format = TextureFormat::RGBA;
 		TextureUsage Usage = TextureUsage::Texture;
+		TextureProperties Properties = TextureProperties();
 		uint32 Width = 0;
 		uint32 Height = 0;
 		uint32 Mips = 1;

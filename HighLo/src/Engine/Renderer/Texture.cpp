@@ -33,6 +33,11 @@ namespace highlo
 		return Ref<OpenGLTexture2D>::Create(format, width, height);
 	}
 
+	Ref<Texture> Texture2D::Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props)
+	{
+		return Ref<OpenGLTexture2D>::Create(format, width, height, data, props);
+	}
+
 	Ref<Texture> Texture3D::LoadFromFiles(const std::vector<HLString> &filepaths)
 	{
 		return Ref<OpenGLTexture3D>::Create(filepaths);
@@ -58,6 +63,16 @@ namespace highlo
 	Ref<Texture> Texture2D::CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format)
 	{
 		return Ref<Texture>(DX11Texture2D::CreateFromColor(rgb, width, height, format));
+	}
+
+	Ref<Texture> Texture2D::Create(TextureFormat format, uint32 width, uint32 height)
+	{
+		return Ref<DX11Texture2D>::Create(format, width, height);
+	}
+
+	Ref<Texture> Texture2D::Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props)
+	{
+		return Ref<DX11Texture2D>::Create(format, width, height, data, props);
 	}
 
 	Ref<Texture> Texture3D::LoadFromFiles(const std::vector<HLString> &filepaths)

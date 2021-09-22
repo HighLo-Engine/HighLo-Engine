@@ -26,4 +26,8 @@ workspace "Highlo-Tests"
 		include "StackTest"
 		include "QueueTest"
 		include "ECSTest"
+		include "FileTest"
+		include "FileSystemTest"
+		include "FileSystemPathTest"
 	group ""
+

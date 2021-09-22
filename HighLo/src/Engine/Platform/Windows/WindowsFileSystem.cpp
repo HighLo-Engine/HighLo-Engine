@@ -309,6 +309,70 @@ namespace highlo
 
         return 0;
     }
+
+    bool FileSystem::HasEnvironmentVariable(const HLString &key)
+    {
+        HKEY hKey;
+        LPCSTR keyPath = "Environment";
+        LSTATUS lOpenStatus = RegOpenKeyExA(HKEY_CURRENT_USER, keyPath, 0, KEY_ALL_ACCESS, &hKey);
+
+        if (lOpenStatus == ERROR_SUCCESS)
+        {
+            lOpenStatus = RegQueryValueExA(hKey, *key, 0, NULL, NULL, NULL);
+            RegCloseKey(hKey);
+        }
+
+        return lOpenStatus == ERROR_SUCCESS;
+    }
+
+    bool FileSystem::SetEnvironmentVariable(const HLString &key, const HLString &value)
+    {
+        HKEY hKey;
+        LPCSTR keyPath = "Environment";
+        DWORD createdNewKey;
+        LSTATUS lOpenStatus = RegCreateKeyExA(HKEY_CURRENT_USER, keyPath, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &createdNewKey);
+        
+        if (lOpenStatus == ERROR_SUCCESS)
+        {
+            LSTATUS lSetStatus = RegSetValueExA(hKey, *key, 0, REG_SZ, (LPBYTE)*value, value.Length() + 1);
+            RegCloseKey(hKey);
+            
+            if (lSetStatus == ERROR_SUCCESS)
+            {
+                SendMessageTimeoutA(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)"Environment", SMTO_BLOCK, 100, NULL);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    HLString FileSystem::GetEnvironmentVariable(const HLString &key)
+    {
+        HKEY hKey;
+        LPCSTR keyPath = "Environment";
+        DWORD createdNewKey;
+        LSTATUS lOpenStatus = RegCreateKeyExA(HKEY_CURRENT_USER, keyPath, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &createdNewKey);
+
+        if (lOpenStatus == ERROR_SUCCESS)
+        {
+            DWORD valueType;
+            char *data = new char[512];
+            DWORD dataSize = 512;
+            LSTATUS status = RegGetValueA(hKey, NULL, *key, RRF_RT_ANY, &valueType, (PVOID)data, &dataSize);
+
+            RegCloseKey(hKey);
+
+            if (status == ERROR_SUCCESS)
+            {
+                HLString result(data);
+                delete[] data;
+                return result;
+            }
+        }
+
+        return {};
+    }
 }
 
 #endif // HL_PLATFORM_WINDOWS

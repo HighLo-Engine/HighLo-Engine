@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-22) Added GetFileCount and SetFullPath
 //     - 1.0 (2021-09-15) initial release
 //
 
@@ -19,6 +20,9 @@ namespace highlo
 		HLAPI ~File();
 
 		HLAPI std::vector<File> GetFileList();
+		HLAPI uint32 GetFileCount() const;
+
+		HLAPI void SetFullPath(const HLString &path);
 
 		HLAPI const HLString &GetRelativePath() const { return m_FilePath; }
 		HLAPI const HLString &GetAbsolutePath() const { return m_AbsoluteFilePath; }

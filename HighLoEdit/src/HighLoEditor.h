@@ -94,6 +94,7 @@ class HighLoEditor : public HLApplication
 		bool m_AllowViewportCameraEvents = false;
 		bool m_DrawOnTopBoundingBoxes = false;
 		bool m_SceneIsSaved = false;
+		bool m_ShowConsolePanel = true;
 
 		bool m_UIShowBoundingBoxes = false;
 		bool m_UIShowBoundingBoxesOnTop = false;
@@ -114,4 +115,5 @@ class HighLoEditor : public HLApplication
 		// Editor Panels
 		Ref<SceneRenderer> m_ViewportRenderer;
 		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
+		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 	};

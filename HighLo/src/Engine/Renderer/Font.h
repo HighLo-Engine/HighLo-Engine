@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-22) Added Name getter
 //     - 1.0 (2021-09-21) initial release
 //
 
@@ -28,6 +29,9 @@ namespace highlo
 		HLAPI const Ref<Texture2D> &GetTextureAtlas() const { return m_TextureAtlas; }
 
 		HLAPI static Ref<Font> GetDefaultFont();
+		
+		HLAPI HLString &GetName() { return m_FontName; }
+		HLAPI const HLString &GetName() const { return m_FontName; }
 
 		HLAPI static AssetType GetStaticType() { return AssetType::Font; }
 		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
@@ -37,6 +41,7 @@ namespace highlo
 	private:
 
 		FileSystemPath m_FilePath;
+		HLString m_FontName;
 		MSDFData *m_MSDFData = nullptr;
 		Ref<Texture2D> m_TextureAtlas;
 	};

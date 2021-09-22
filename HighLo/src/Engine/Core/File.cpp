@@ -8,18 +8,7 @@ namespace highlo
 {
 	File::File(const HLString &path)
 	{
-		m_Handle = std::filesystem::canonical(*path);
-		m_FilePath = m_Handle.string();
-		if (m_FilePath.Contains('\\'))
-			m_FilePath = m_FilePath.Replace("\\", "/", -1);
-
-		m_IsFile = true;
-		if (std::filesystem::is_directory(m_Handle))
-			m_IsFile = false;
-
-		m_AbsoluteFilePath = std::filesystem::absolute(m_Handle).string();
-		if (m_AbsoluteFilePath.Contains('\\'))
-			m_AbsoluteFilePath = m_AbsoluteFilePath.Replace("\\", "/", -1);
+		SetFullPath(path);
 	}
 
 	File::~File()
@@ -34,6 +23,33 @@ namespace highlo
 			result.push_back(File(entry.path().string()));
 
 		return result;
+	}
+
+	uint32 File::GetFileCount() const
+	{
+		uint32 fileCount = 0;
+
+		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
+			++fileCount;
+
+		return fileCount;
+	}
+
+	void File::SetFullPath(const HLString &path)
+	{
+		m_Handle = std::filesystem::canonical(*path);
+		m_FilePath = m_Handle.string();
+		m_IsFile = true;
+
+		if (m_FilePath.Contains('\\'))
+			m_FilePath = m_FilePath.Replace("\\", "/", -1);
+
+		if (std::filesystem::is_directory(m_Handle))
+			m_IsFile = false;
+
+		m_AbsoluteFilePath = std::filesystem::absolute(m_Handle).string();
+		if (m_AbsoluteFilePath.Contains('\\'))
+			m_AbsoluteFilePath = m_AbsoluteFilePath.Replace("\\", "/", -1);
 	}
 
 	HLString File::GetName()

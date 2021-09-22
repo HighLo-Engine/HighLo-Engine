@@ -144,6 +144,7 @@ namespace highlo
 		fontInput.GlyphIdentifier = msdf_atlas::GlyphIdentifierType::UNICODE_CODEPOINT;
 		fontInput.FontScale = -1;
 		fontInput.FontFileName = m_FilePath.String();
+		fontInput.FontName = m_FilePath.GetFile()->GetName();
 
 		utils::FontConfig config = {};
 		//config.ImageType = msdf_atlas::ImageType::MSDF;
@@ -194,7 +195,10 @@ namespace highlo
 			HL_CORE_WARN("Missing {0} of {1} {2}", (int32)charset.size() - glyphsLoaded, (int32)charset.size(), fontInput.GlyphIdentifier == msdf_atlas::GlyphIdentifierType::UNICODE_CODEPOINT ? "codepoints" : "glyphs");
 	
 		if (fontInput.FontName)
+		{
 			m_MSDFData->FontGeometry.setName(*fontInput.FontName);
+			m_FontName = fontInput.FontName;
+		}
 
 		// Determine final atlas dimensions
 

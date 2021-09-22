@@ -76,6 +76,7 @@
 
 #include "Engine/Editor/EditorColors.h"
 #include "Engine/Editor/SceneHierarchyPanel.h"
+#include "Engine/Editor/EditorConsolePanel.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

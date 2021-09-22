@@ -109,6 +109,10 @@ void HighLoEditor::OnInitialize()
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
 	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
+
+	m_EditorConsolePanel = MakeUniqueRef<EditorConsolePanel>();
+
+	HL_EDITOR_ERROR("TEST");
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
@@ -182,6 +186,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	UI::EndViewport();
 
 	m_SceneHierarchyPanel->OnUIRender();
+	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
 
 	UI::BeginViewport("Object Properties");
 	UI::EndViewport();
@@ -468,6 +473,8 @@ void HighLoEditor::OnScenePlay()
 	m_EditorScene->CopyTo(m_RuntimeScene);
 	m_RuntimeScene->OnRuntimeStart();
 	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
+
+	m_EditorConsolePanel->OnScenePlay();
 
 	m_CurrentScene = m_RuntimeScene;
 }

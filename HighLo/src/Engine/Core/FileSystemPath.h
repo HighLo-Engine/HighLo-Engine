@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-22) Added File getter, more overloads and implemented most methods
 //     - 1.1 (2021-09-21) Added String methods
 //     - 1.0 (2021-09-15) initial release
 //
@@ -20,16 +21,15 @@ namespace highlo
 		HLAPI FileSystemPath(const HLString &path);
 		HLAPI FileSystemPath(const File &file);
 		HLAPI ~FileSystemPath();
+
 		HLAPI FileSystemPath &operator=(const FileSystemPath &other);
 
-		HLAPI FileSystemPath &Assign(HLString &source);
+		HLAPI FileSystemPath &Assign(const HLString &source);
 		HLAPI void Swap(FileSystemPath &lhs, FileSystemPath &rhs);
 		HLAPI uint64 Hash();
 
 		HLAPI bool IsEmpty() const;
 		HLAPI bool HasRootPath() const;
-		HLAPI bool HasRootName() const;
-		HLAPI bool HasRootDirectory() const;
 		HLAPI bool HasParentPath() const;
 
 		HLAPI bool IsAbsolute() const;
@@ -37,6 +37,9 @@ namespace highlo
 
 		HLAPI FileSystemPath RelativePath();
 		HLAPI FileSystemPath ParentPath();
+
+		HLAPI Ref<File> &GetFile() { return m_File; }
+		HLAPI const Ref<File> &GetFile() const { return m_File; }
 
 		HLAPI HLString &String() { return m_CurrentPath; }
 		HLAPI const HLString &String() const { return m_CurrentPath; }
@@ -46,10 +49,15 @@ namespace highlo
 		
 		HLAPI FileSystemPath &operator/=(const FileSystemPath &path);
 		HLAPI FileSystemPath &operator+=(const FileSystemPath &path);
-		HLAPI friend FileSystemPath operator/(const FileSystemPath &lhs, const FileSystemPath &rhs);
+		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const FileSystemPath &rhs);
+
+		HLAPI FileSystemPath &operator/=(const HLString &path);
+		HLAPI FileSystemPath &operator+=(const HLString &path);
+		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const HLString &path);
 
 	private:
 
 		HLString m_CurrentPath;
+		Ref<File> m_File = nullptr;
 	};
 }

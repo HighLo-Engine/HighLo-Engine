@@ -9,10 +9,10 @@ namespace highlo
 {
 	static EditorConsolePanel *s_EditorConsoleInstance = nullptr;
 
-	static ImVec4 s_TraceButtonOnTint = ImVec4(0.0f, 1.0f, 0.431372549f, 1.0f);
-	static ImVec4 s_InfoButtonOnTint = ImVec4(0.0f, 0.431372549f, 1.0f, 1.0f);
-	static ImVec4 s_WarningButtonOnTint = ImVec4(1.0f, 0.890196078f, 0.0588235294f, 1.0f);
-	static ImVec4 s_ErrorButtonOnTint = ImVec4(1.0f, 0.309803922f, 0.309803922f, 1.0f);
+	static ImVec4 s_TraceButtonColor = ImVec4(0.0f, 1.0f, 0.431372549f, 1.0f);
+	static ImVec4 s_InfoButtonColor = ImVec4(0.0f, 0.431372549f, 1.0f, 1.0f);
+	static ImVec4 s_WarningButtonColor = ImVec4(1.0f, 0.890196078f, 0.0588235294f, 1.0f);
+	static ImVec4 s_ErrorButtonColor = ImVec4(1.0f, 0.309803922f, 0.309803922f, 1.0f);
 	static ImVec4 s_NoTint = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	EditorConsolePanel::EditorConsolePanel()
@@ -48,10 +48,10 @@ namespace highlo
 
 	void EditorConsolePanel::RenderMenu()
 	{
-		ImVec4 traceButtonTint = (m_MessageFilters & (int16_t) ConsoleMessage::LogLevel::Trace) ? s_TraceButtonOnTint : s_NoTint;
-		ImVec4 infoButtonTint = (m_MessageFilters & (int16_t) ConsoleMessage::LogLevel::Info) ? s_InfoButtonOnTint : s_NoTint;
-		ImVec4 warningButtonTint = (m_MessageFilters & (int16_t) ConsoleMessage::LogLevel::Warning) ? s_WarningButtonOnTint : s_NoTint;
-		ImVec4 errorButtonTint = (m_MessageFilters & (int16_t) ConsoleMessage::LogLevel::Error) ? s_ErrorButtonOnTint : s_NoTint;
+		ImVec4 traceButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Trace) ? s_TraceButtonColor : s_NoTint;
+		ImVec4 infoButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Info) ? s_InfoButtonColor : s_NoTint;
+		ImVec4 warningButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Warning) ? s_WarningButtonColor : s_NoTint;
+		ImVec4 errorButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Error) ? s_ErrorButtonColor : s_NoTint;
 
 		constexpr float buttonOffset = 39;
 		constexpr float rightSideOffset = 15;
@@ -125,7 +125,7 @@ namespace highlo
 				if (i % 2 == 0)
 					ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(ImVec4(0.20f, 0.20f, 0.20f, 1.0f)));
 
-				ImGui::BeginChild(i + 1, ImVec2(0, ImGui::GetFontSize() * 1.75F), false, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
+				ImGui::BeginChild(i + 1, ImVec2(0, ImGui::GetFontSize() * 1.75f), false, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 
 				if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
@@ -143,14 +143,30 @@ namespace highlo
 					ImGui::EndPopup();
 				}
 
-				/*
-				if (msg.GetLogLevel() == ConsoleMessage::LogLevel::Info)
-					UI::Image(m_InfoButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_InfoButtonOnTint);
-				else if (msg.GetLogLevel() == ConsoleMessage::LogLevel::Warning)
-					UI::Image(m_WarningButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_WarningButtonOnTint);
-				else if (msg.GetLogLevel() == ConsoleMessage::LogLevel::Error)
-					UI::Image(m_ErrorButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_ErrorButtonOnTint);
-				*/
+				switch (msg.GetLogLevel())
+				{
+					case ConsoleMessage::LogLevel::Error:
+					case ConsoleMessage::LogLevel::Fatal:
+						// UI::Image(m_ErrorButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_ErrorButtonOnTint);
+						break;
+
+					case ConsoleMessage::LogLevel::Trace:
+						// UI::Image(m_TraceButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_TraceButtonOnTint);
+						break;
+
+					case ConsoleMessage::LogLevel::Warning:
+						// UI::Image(m_WarningButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_WarningButtonOnTint);
+						break;
+
+					case ConsoleMessage::LogLevel::Info:
+						// UI::Image(m_InfoButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_InfoButtonOnTint);
+						break;
+
+					default:
+					case ConsoleMessage::LogLevel::None:
+						// UI::Image(m_NormalButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_NormalButtonOnTint);
+						break;
+				}
 
 				ImGui::SameLine();
 
@@ -164,7 +180,33 @@ namespace highlo
 					}
 				}
 
+				switch (msg.GetLogLevel())
+				{
+					case ConsoleMessage::LogLevel::Error:
+					case ConsoleMessage::LogLevel::Fatal:
+						ImGui::PushStyleColor(ImGuiCol_Text, s_ErrorButtonColor);
+						break;
+
+					case ConsoleMessage::LogLevel::Trace:
+						ImGui::PushStyleColor(ImGuiCol_Text, s_TraceButtonColor);
+						break;
+
+					case ConsoleMessage::LogLevel::Warning:
+						ImGui::PushStyleColor(ImGuiCol_Text, s_WarningButtonColor);
+						break;
+
+					case ConsoleMessage::LogLevel::Info:
+						ImGui::PushStyleColor(ImGuiCol_Text, s_InfoButtonColor);
+						break;
+
+					default:
+					case ConsoleMessage::LogLevel::None:
+						ImGui::PushStyleColor(ImGuiCol_Text, s_NoTint);
+						break;
+				}
+
 				ImGui::TextUnformatted(*messageText);
+				ImGui::PopStyleColor();
 
 				if (m_CollapseMessages && msg.GetCount() > 1)
 				{

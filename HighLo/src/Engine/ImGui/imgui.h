@@ -45,7 +45,7 @@ namespace highlo::UI
 	HLAPI void BeginWindow(const HLString &title, bool pOpen = false, bool fullscreen = false);
 	HLAPI void EndWindow();
 
-	HLAPI void BeginViewport(const HLString &title, const Ref<PopupMenu> &popupMenu = nullptr);
+	HLAPI void BeginViewport(const HLString &title, bool *pOpen = nullptr, const Ref<PopupMenu> &popupMenu = nullptr);
 	HLAPI void EndViewport();
 
 	HLAPI void DisplayDebugInformation();

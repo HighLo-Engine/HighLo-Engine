@@ -25,7 +25,7 @@ namespace highlo
 		HLAPI void SetEntityDeletedCallback(const std::function<void(Entity)> &callback) { m_EntityDeletedCallback = callback; }
 		HLAPI void SetInvalidAssetMetaDataCallback(const std::function<void(Entity, AssetHandle)> &callback) { m_InvalidAssetMetaDataCallback = callback; }
 
-		HLAPI void OnUIRender(bool window = true);
+		HLAPI void OnUIRender(bool window = true, bool *pOpen = nullptr);
 
 	private:
 

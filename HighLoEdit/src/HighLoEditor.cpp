@@ -87,6 +87,8 @@ void HighLoEditor::OnInitialize()
 
 	windowMenu->AddMenuItem("Set Dark Theme", "", MENU_ITEM_DARK_THEME, [=](FileMenu *menu, MenuItem *item) { EnableDarkMode(menu, item); }, !darkThemeActive);
 	windowMenu->AddMenuItem("Set Light Theme", "", MENU_ITEM_LIGHT_THEME, [=](FileMenu *menu, MenuItem *item) { EnableLightMode(menu, item); }, !lightThemeActive);
+	windowMenu->AddSeparator();
+	windowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { m_ShowConsolePanel = !m_ShowConsolePanel; });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
@@ -112,7 +114,11 @@ void HighLoEditor::OnInitialize()
 
 	m_EditorConsolePanel = MakeUniqueRef<EditorConsolePanel>();
 
-	HL_EDITOR_ERROR("TEST");
+	HL_INFO("Info Test");
+	HL_WARN("Warning Test");
+	HL_ERROR("Error Test");
+	HL_FATAL("Fatal Test");
+	HL_TRACE("Trace Test");
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)

@@ -84,10 +84,10 @@ namespace highlo
 			m_SelectionChangedCallback(entity);
 	}
 
-	void SceneHierarchyPanel::OnUIRender(bool window)
+	void SceneHierarchyPanel::OnUIRender(bool window, bool *pOpen)
 	{
 		if (window)
-			ImGui::Begin("Scene Hierarchy");
+			ImGui::Begin("Scene Hierarchy", pOpen);
 
 		ImRect windowRect = { ImGui::GetWindowContentRegionMin(), ImGui::GetContentRegionMax() };
 

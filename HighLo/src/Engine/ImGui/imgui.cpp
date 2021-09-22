@@ -258,9 +258,9 @@ namespace highlo::UI
 		ImGui::End();
 	}
 
-	void BeginViewport(const HLString &title, const Ref<PopupMenu> &popupMenu)
+	void BeginViewport(const HLString &title, bool *pOpen, const Ref<PopupMenu> &popupMenu)
 	{
-		ImGui::Begin(*title);
+		ImGui::Begin(*title, pOpen);
 
 		// Check if the mouse is in the area of the viewport
 		if (popupMenu)

@@ -35,10 +35,10 @@ void PopupMenuDemo::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("RootWindow", true, true);
 
-	UI::BeginViewport("Test", m_PopupMenu);
+	UI::BeginViewport("Test", nullptr, m_PopupMenu);
 	UI::EndViewport();
 
-	UI::BeginViewport("Another Test", m_PopupMenu);
+	UI::BeginViewport("Another Test", nullptr, m_PopupMenu);
 	UI::EndViewport();
 
 	UI::EndWindow();

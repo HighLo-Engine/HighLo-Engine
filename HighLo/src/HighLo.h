@@ -63,6 +63,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommandBuffer.h"
 #include "Engine/Renderer/Font.h"
+#include "Engine/Renderer/FontManager.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/Skybox.h"
 #include "Engine/ImGui/ImGui.h"

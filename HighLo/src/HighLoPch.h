@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-22) Added Singleton class
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -31,6 +32,7 @@
 #include <sstream>
 
 #include "Engine/Core/Core.h"
+#include "Engine/Core/Singleton.h"
 #include "Engine/Core/SharedReference.h"
 #include "Engine/Core/DataTypes/String.h"
 #include "Engine/Core/Exceptions/Exceptions.h"

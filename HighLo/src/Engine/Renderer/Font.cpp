@@ -11,7 +11,6 @@
 #define HL_FONT_LCG_INCREMENT 1442695040888963407ull
 #define HL_FONT_THREADS 8
 
-
 namespace highlo
 {
 	namespace utils

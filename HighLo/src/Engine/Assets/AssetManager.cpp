@@ -202,11 +202,11 @@ namespace highlo
 			switch (e.GetAction())
 			{
 				case FileSystemAction::Added:
-					ImportAsset(e.GetPath());
+					AssetManager::Get()->ImportAsset(e.GetPath());
 					break;
 
 				case FileSystemAction::Deleted:
-					OnAssetDeleted(GetAssetHandleFromFilePath(e.GetPath()));
+					AssetManager::Get()->OnAssetDeleted(AssetManager::Get()->GetAssetHandleFromFilePath(e.GetPath()));
 					break;
 
 				case FileSystemAction::Modified:
@@ -215,17 +215,17 @@ namespace highlo
 
 				case FileSystemAction::Renamed:
 				{
-					AssetType prevType = GetAssetTypeFromPath(e.GetOldName());
-					AssetType type = GetAssetTypeFromPath(e.GetPath());
+					AssetType prevType = AssetManager::Get()->GetAssetTypeFromPath(e.GetOldName());
+					AssetType type = AssetManager::Get()->GetAssetTypeFromPath(e.GetPath());
 
 					if (prevType == AssetType::None && type != AssetType::None)
 					{
-						ImportAsset(e.GetPath());
+						AssetManager::Get()->ImportAsset(e.GetPath());
 					}
 					else
 					{
 						// TODO: Get relative path
-						OnAssetRenamed(GetAssetHandleFromFilePath(/* insert relative path here */ "/" + e.GetOldName()), e.GetPath());
+						OnAssetRenamed(AssetManager::Get()->GetAssetHandleFromFilePath(/* insert relative path here */ "/" + e.GetOldName()), e.GetPath());
 						e.SetTracking(true);
 					}
 					break;
@@ -238,34 +238,34 @@ namespace highlo
 
 	void AssetManager::OnAssetRenamed(AssetHandle handle, const HLString &newFilePath)
 	{
-		AssetMetaData assetInfo = GetMetaData(handle);
+		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
 		
 		s_AssetRegistry.Remove(assetInfo.FilePath);
 		assetInfo.FilePath = newFilePath;
 		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
 		
-		WriteRegistryToFile();
+		AssetManager::Get()->WriteRegistryToFile();
 	}
 
 	void AssetManager::OnAssetMoved(AssetHandle handle, const HLString &destinationFilePath)
 	{
-		AssetMetaData assetInfo = GetMetaData(handle);
+		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
 
 		s_AssetRegistry.Remove(assetInfo.FilePath);
 		assetInfo.FilePath = destinationFilePath + "/" + assetInfo.FilePath;
 		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
 
-		WriteRegistryToFile();
+		AssetManager::Get()->WriteRegistryToFile();
 	}
 
 	void AssetManager::OnAssetDeleted(AssetHandle handle)
 	{
-		AssetMetaData assetInfo = GetMetaData(handle);
+		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
 
 		s_AssetRegistry.Remove(assetInfo.FilePath);
 		s_LoadedAssets.erase(handle);
 
-		WriteRegistryToFile();
+		AssetManager::Get()->WriteRegistryToFile();
 	}
 
 	void AssetManager::OnUIRender(bool &openui)

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-22) Changed AssetManager to be a Singleton class
 //     - 1.1 (2021-09-15) Changed FileExtension implementation
 //     - 1.0 (2021-09-14) initial release
 //
@@ -45,35 +46,35 @@ namespace highlo
 		std::unordered_map<HLString, AssetMetaData> m_AssetRegistry;
 	};
 
-	class AssetManager
+	class AssetManager : public Singleton<AssetManager>
 	{
 	public:
 		using AssetsChangeEventFn = std::function<void(FileSystemChangedEvent)>;
 
 		// Should only be called by the engine
-		HLAPI static void Init();
-		HLAPI static void Shutdown();
+		HLAPI void Init();
+		HLAPI void Shutdown();
 
-		HLAPI static void SetAssetChangeCallback(const AssetsChangeEventFn &callback);
+		HLAPI void SetAssetChangeCallback(const AssetsChangeEventFn &callback);
 
-		HLAPI static AssetMetaData &GetMetaData(AssetHandle handle);
-		HLAPI static AssetMetaData &GetMetaData(const HLString &path);
-		HLAPI static AssetMetaData &GetMetaData(const Ref<Asset> &asset) { return GetMetaData(asset->Handle); }
+		HLAPI AssetMetaData &GetMetaData(AssetHandle handle);
+		HLAPI AssetMetaData &GetMetaData(const HLString &path);
+		HLAPI AssetMetaData &GetMetaData(const Ref<Asset> &asset) { return GetMetaData(asset->Handle); }
 
-		HLAPI static HLString GetFileSystemPath(const AssetMetaData &metaData);
-		HLAPI static HLString GetRelativePath(const HLString &path);
+		HLAPI HLString GetFileSystemPath(const AssetMetaData &metaData);
+		HLAPI HLString GetRelativePath(const HLString &path);
 			 
-		HLAPI static AssetHandle GetAssetHandleFromFilePath(const HLString &path);
-		HLAPI static bool IsAssetHandleValid(AssetHandle handle) { return GetMetaData(handle).IsValid(); }
+		HLAPI AssetHandle GetAssetHandleFromFilePath(const HLString &path);
+		HLAPI bool IsAssetHandleValid(AssetHandle handle) { return GetMetaData(handle).IsValid(); }
 
-		HLAPI static AssetType GetAssetTypeFromExtension(const HLString &extension);
-		HLAPI static AssetType GetAssetTypeFromPath(const HLString &path);
+		HLAPI AssetType GetAssetTypeFromExtension(const HLString &extension);
+		HLAPI AssetType GetAssetTypeFromPath(const HLString &path);
 
-		HLAPI static AssetHandle ImportAsset(const HLString &path);
-		HLAPI static bool ReloadAsset(AssetHandle handle);
+		HLAPI AssetHandle ImportAsset(const HLString &path);
+		HLAPI bool ReloadAsset(AssetHandle handle);
 
 		template<typename T, typename... Args>
-		HLAPI static Ref<T> CreateAsset(const HLString &fileName, const HLString &dirPath, Args&&... args)
+		HLAPI Ref<T> CreateAsset(const HLString &fileName, const HLString &dirPath, Args&&... args)
 		{
 			static_assert(std::is_base_of<Asset, T>::value, "Error: Did you forget to derive your class from Asset?");
 
@@ -128,7 +129,7 @@ namespace highlo
 		}
 
 		template<typename T>
-		HLAPI static Ref<T> GetAsset(AssetHandle handle)
+		HLAPI Ref<T> GetAsset(AssetHandle handle)
 		{
 			auto &assetInfo = GetMetaData(handle);
 
@@ -150,21 +151,21 @@ namespace highlo
 		}
 
 		template<typename T>
-		HLAPI static Ref<T> GetAsset(const HLString &path)
+		HLAPI Ref<T> GetAsset(const HLString &path)
 		{
 			return GetAsset<T>(GetAssetHandleFromFilePath(path));
 		}
 
-		HLAPI static bool AssetExists(AssetMetaData &metaData);
-		HLAPI static void OnUIRender(bool &openui);
+		HLAPI bool AssetExists(AssetMetaData &metaData);
+		HLAPI void OnUIRender(bool &openui);
 
 	private:
 
-		static void LoadAssetRegistry();
-		static void WriteRegistryToFile();
+		void LoadAssetRegistry();
+		void WriteRegistryToFile();
 
-		static void ProcessDirectory(const HLString &dirPath);
-		static void ReloadAllAssets();
+		void ProcessDirectory(const HLString &dirPath);
+		void ReloadAllAssets();
 		
 		static void OnFileSystemChangedEvent(FileSystemChangedEvent &e);
 		static void OnAssetRenamed(AssetHandle handle, const HLString &newFilePath);

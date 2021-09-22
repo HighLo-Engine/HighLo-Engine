@@ -6,6 +6,8 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 
+#include "Engine/ECS/Prefab.h"
+
 namespace highlo
 {
 	static const HLString s_DefaultEntityName = "Entity";

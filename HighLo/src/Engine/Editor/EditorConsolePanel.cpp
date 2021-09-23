@@ -105,13 +105,6 @@ namespace highlo
 
 		if (m_MessageBufferBegin == 0)
 		{
-			m_DisplayMessageInspector = false;
-			m_SelectedMessage = nullptr;
-		}
-
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !m_IsMessageInspectorHovered)
-		{
-			m_DisplayMessageInspector = false;
 			m_SelectedMessage = nullptr;
 		}
 
@@ -130,7 +123,6 @@ namespace highlo
 				if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
 					m_SelectedMessage = &m_MessageBuffer[i];
-					m_DisplayMessageInspector = true;
 				}
 
 				HLString messageText = msg.GetMessage();
@@ -229,25 +221,8 @@ namespace highlo
 			m_NewMessageAdded = false;
 		}
 
-		if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() && !m_DisplayMessageInspector)
+		if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 			ImGui::SetScrollHereY(1.0f);
-
-		if (m_DisplayMessageInspector && m_SelectedMessage != nullptr)
-		{
-			ImGui::Begin("Message Inspector");
-			m_IsMessageInspectorHovered = ImGui::IsWindowHovered();
-
-			ImGui::PushTextWrapPos();
-			const auto &msg = m_SelectedMessage->GetMessage();
-			ImGui::TextUnformatted(*msg);
-			ImGui::PopTextWrapPos();
-
-			ImGui::End();
-		}
-		else
-		{
-			m_IsMessageInspectorHovered = false;
-		}
 
 		ImGui::EndChild();
 	}

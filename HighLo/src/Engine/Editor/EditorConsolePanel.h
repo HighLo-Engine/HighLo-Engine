@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-23) Removed message inspector
 //     - 1.0 (2021-09-22) initial release
 //
 
@@ -38,8 +39,6 @@ namespace highlo
 		int32_t m_MessageFilters = (int16_t) ConsoleMessage::LogLevel::Info | (int16_t) ConsoleMessage::LogLevel::Warning | (int16_t) ConsoleMessage::LogLevel::Error;
 
 		ConsoleMessage *m_SelectedMessage = nullptr;
-		bool m_DisplayMessageInspector = false;
-		bool m_IsMessageInspectorHovered = false;
 
 		friend class EditorConsoleSink;
 	};

@@ -18,6 +18,8 @@ workspace "Highlo-Tests"
 	}
 	
 	group "tests"
+		include "BinaryTreeTest"
+		include "BinarySearchTreeTest"
 		include "StringTest"
 		include "EncryptionTest"
 		include "ListTest"

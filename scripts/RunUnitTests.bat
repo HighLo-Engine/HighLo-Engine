@@ -60,6 +60,16 @@ ROBOCOPY HighLo\vendor\openssl\lib\ tests\FileTest\bin\ libssl-3-x64.dll /mt /z 
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\FileTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\FileTest\bin\ HighLo-Unit.dll /mt /z > nul
 
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\BinaryTreeTest\bin\ libcrypto-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\BinaryTreeTest\bin\ libssl-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\BinaryTreeTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\BinaryTreeTest\bin\ HighLo-Unit.dll /mt /z > nul
+
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\BinarySearchTreeTest\bin\ libcrypto-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\openssl\lib\ tests\BinarySearchTreeTest\bin\ libssl-3-x64.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\BinarySearchTreeTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
+ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\BinarySearchTreeTest\bin\ HighLo-Unit.dll /mt /z > nul
+
 ECHO OK: dlls have been copied!
 ECHO.
 
@@ -126,6 +136,18 @@ ECHO.
 ECHO Running FileSystemPath Unit Tests...
 cd.>nul
 CALL tests\FileSystemPathTest\bin\FileSystemPathTest.exe
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+ECHO.
+
+ECHO Running BinaryTree Unit Tests...
+cd.>nul
+CALL tests\BinaryTreeTest\bin\BinaryTreeTest.exe
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+ECHO.
+
+ECHO Running BinarySearchTree Unit Tests...
+cd.>nul
+CALL tests\BinarySearchTreeTest\bin\BinarySearchTreeTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 

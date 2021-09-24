@@ -114,11 +114,11 @@ void HighLoEditor::OnInitialize()
 
 	m_EditorConsolePanel = MakeUniqueRef<EditorConsolePanel>();
 
-	HL_INFO("Info Test");
-	HL_WARN("Warning Test");
-	HL_ERROR("Error Test");
-	HL_FATAL("Fatal Test");
-	HL_TRACE("Trace Test");
+	HL_EDITOR_INFO("Info Test");
+	HL_EDITOR_WARN("Warning Test");
+	HL_EDITOR_ERROR("Error Test");
+	HL_EDITOR_FATAL("Fatal Test");
+	HL_EDITOR_TRACE("Trace Test");
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)

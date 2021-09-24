@@ -30,7 +30,6 @@ namespace highlo
 
 		std::vector<spdlog::sink_ptr> editorConsoleSinks =
 		{
-			std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
 			std::make_shared<EditorConsoleSink>(1)
 		};
 
@@ -40,7 +39,6 @@ namespace highlo
 		appSinks[1]->set_pattern("[%T] [%l] %n: %v");
 		appSinks[2]->set_pattern("%^[%T] %n: %v%$");
 		editorConsoleSinks[0]->set_pattern("%^[%T] %n: %v%$");
-		editorConsoleSinks[1]->set_pattern("%^[%T] %n: %v%$");
 
 		s_EngineLogger = std::make_shared<spdlog::logger>("Engine", engineSinks.begin(), engineSinks.end());
 		s_EngineLogger->set_level(spdlog::level::trace);
@@ -76,3 +74,4 @@ namespace highlo
 		return s_EditorLogger;
 	}
 }
+

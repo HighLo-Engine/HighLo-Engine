@@ -4,23 +4,21 @@
 #include "EditorConsolePanel.h"
 
 #include "Engine/ImGui/imgui.h"
+#include "EditorColors.h"
 
 namespace highlo
 {
 	static EditorConsolePanel *s_EditorConsoleInstance = nullptr;
-
-	static ImVec4 s_TraceButtonColor = ImVec4(0.0f, 1.0f, 0.431372549f, 1.0f);
-	static ImVec4 s_InfoButtonColor = ImVec4(0.0f, 0.431372549f, 1.0f, 1.0f);
-	static ImVec4 s_WarningButtonColor = ImVec4(1.0f, 0.890196078f, 0.0588235294f, 1.0f);
-	static ImVec4 s_ErrorButtonColor = ImVec4(1.0f, 0.309803922f, 0.309803922f, 1.0f);
-	static ImVec4 s_NoTint = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	EditorConsolePanel::EditorConsolePanel()
 	{
 		HL_ASSERT(s_EditorConsoleInstance == nullptr);
 		s_EditorConsoleInstance = this;
 
-
+		m_ErrorIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogErrorIcon.png").As<Texture2D>();
+		m_WarningIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogWarningIcon.png").As<Texture2D>();
+		m_InfoIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogInfoIcon.png").As<Texture2D>();
+		m_TraceIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogTraceIcon.png").As<Texture2D>();
 	}
 	
 	EditorConsolePanel::~EditorConsolePanel()
@@ -43,15 +41,39 @@ namespace highlo
 	void EditorConsolePanel::OnScenePlay()
 	{
 		if (m_ShouldClearOnPlay)
-			m_MessageBufferBegin = 0;
+			ClearConsole();
+	}
+
+	void EditorConsolePanel::ClearConsole()
+	{
+		m_MessageBufferBegin = 0;
+	}
+
+	bool EditorConsolePanel::IsConsoleCleared() const
+	{
+		return m_MessageBufferBegin == 0;
+	}
+
+	void EditorConsolePanel::SetMessageFilter(ConsoleMessage::LogLevel level, bool enabled)
+	{
+		HL_ASSERT(level != ConsoleMessage::LogLevel::None, "Invalid LogLevel: None is not supported!");
+
+		if (enabled)
+		{
+			m_MessageFilters |= (int16)level;
+		}
+		else
+		{
+			m_MessageFilters &= ~(int16)level;
+		}
 	}
 
 	void EditorConsolePanel::RenderMenu()
 	{
-		ImVec4 traceButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Trace) ? s_TraceButtonColor : s_NoTint;
-		ImVec4 infoButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Info) ? s_InfoButtonColor : s_NoTint;
-		ImVec4 warningButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Warning) ? s_WarningButtonColor : s_NoTint;
-		ImVec4 errorButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Error) ? s_ErrorButtonColor : s_NoTint;
+		ImVec4 traceButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Trace) ? HL_EDITOR_CONSOLE_TRACE_COLOR : HL_EDITOR_WHITE_COLOR;
+		ImVec4 infoButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Info) ? HL_EDITOR_CONSOLE_INFO_COLOR : HL_EDITOR_WHITE_COLOR;
+		ImVec4 warningButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Warning) ? HL_EDITOR_CONSOLE_WARNING_COLOR : HL_EDITOR_WHITE_COLOR;
+		ImVec4 errorButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Error) ? HL_EDITOR_CONSOLE_ERROR_COLOR : HL_EDITOR_WHITE_COLOR;
 
 		constexpr float buttonOffset = 39;
 		constexpr float rightSideOffset = 15;
@@ -63,7 +85,7 @@ namespace highlo
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
 		if (ImGui::Button("Clear"))
-			m_MessageBufferBegin = 0;
+			ClearConsole();
 
 		ImGui::SameLine(0.0f, 5.0f);
 		ImGui::TextUnformatted("Clear On Play:");
@@ -75,25 +97,29 @@ namespace highlo
 		ImGui::SameLine();
 		ImGui::Checkbox("##CollapseMessages", &m_CollapseMessages);
 
-		/*
+		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 4) - rightSideOffset);
+		if (UI::ImageButton(m_TraceIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), traceButtonTint))
+		{
+			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Trace;
+		}
+
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 3) - rightSideOffset);
-		if (UI::ImageButton(m_InfoButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), infoButtonTint))
+		if (UI::ImageButton(m_InfoIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), infoButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Info;
 		}
 
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 2) - rightSideOffset);
-		if (UI::ImageButton(m_WarningButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), warningButtonTint))
+		if (UI::ImageButton(m_WarningIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), warningButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Warning;
 		}
 
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 1) - rightSideOffset);
-		if (UI::ImageButton(m_ErrorButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), errorButtonTint))
+		if (UI::ImageButton(m_ErrorIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), errorButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Error;
 		}
-		*/
 
 		ImGui::PopStyleColor(3);
 		ImGui::PopStyleVar(2);
@@ -121,9 +147,7 @@ namespace highlo
 				ImGui::BeginChild(i + 1, ImVec2(0, ImGui::GetFontSize() * 1.75f), false, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 
 				if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-				{
 					m_SelectedMessage = &m_MessageBuffer[i];
-				}
 
 				HLString messageText = msg.GetMessage();
 
@@ -139,24 +163,19 @@ namespace highlo
 				{
 					case ConsoleMessage::LogLevel::Error:
 					case ConsoleMessage::LogLevel::Fatal:
-						// UI::Image(m_ErrorButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_ErrorButtonOnTint);
+						UI::Image(m_ErrorIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), HL_EDITOR_CONSOLE_ERROR_COLOR);
 						break;
 
 					case ConsoleMessage::LogLevel::Trace:
-						// UI::Image(m_TraceButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_TraceButtonOnTint);
+						UI::Image(m_TraceIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), HL_EDITOR_CONSOLE_TRACE_COLOR);
 						break;
 
 					case ConsoleMessage::LogLevel::Warning:
-						// UI::Image(m_WarningButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_WarningButtonOnTint);
+						UI::Image(m_WarningIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), HL_EDITOR_CONSOLE_WARNING_COLOR);
 						break;
 
 					case ConsoleMessage::LogLevel::Info:
-						// UI::Image(m_InfoButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_InfoButtonOnTint);
-						break;
-
-					default:
-					case ConsoleMessage::LogLevel::None:
-						// UI::Image(m_NormalButtonTex, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), s_NormalButtonOnTint);
+						UI::Image(m_InfoIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), HL_EDITOR_CONSOLE_INFO_COLOR);
 						break;
 				}
 
@@ -168,7 +187,12 @@ namespace highlo
 					if (spacePos != HLString::NPOS)
 					{
 						messageText = messageText.Substr(spacePos, messageText.Length() - 1);
-						messageText += "...";
+						messageText += " [...]";
+					}
+					else
+					{
+						messageText = messageText.Substr(0, 200);
+						messageText += " [...]";
 					}
 				}
 
@@ -176,24 +200,24 @@ namespace highlo
 				{
 					case ConsoleMessage::LogLevel::Error:
 					case ConsoleMessage::LogLevel::Fatal:
-						ImGui::PushStyleColor(ImGuiCol_Text, s_ErrorButtonColor);
+						ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_CONSOLE_ERROR_COLOR);
 						break;
 
 					case ConsoleMessage::LogLevel::Trace:
-						ImGui::PushStyleColor(ImGuiCol_Text, s_TraceButtonColor);
+						ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_CONSOLE_TRACE_COLOR);
 						break;
 
 					case ConsoleMessage::LogLevel::Warning:
-						ImGui::PushStyleColor(ImGuiCol_Text, s_WarningButtonColor);
+						ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_CONSOLE_WARNING_COLOR);
 						break;
 
 					case ConsoleMessage::LogLevel::Info:
-						ImGui::PushStyleColor(ImGuiCol_Text, s_InfoButtonColor);
+						ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_CONSOLE_INFO_COLOR);
 						break;
 
 					default:
 					case ConsoleMessage::LogLevel::None:
-						ImGui::PushStyleColor(ImGuiCol_Text, s_NoTint);
+						ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_WHITE_COLOR);
 						break;
 				}
 

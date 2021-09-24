@@ -23,7 +23,7 @@ namespace highlo
 		if (!data)
 		{
 			stbi_image_free(data);
-			HL_CORE_ERROR("Texture2D> [-] Failed to load texture2D: " + filepath + " [-]");
+			HL_CORE_ERROR("Texture2D> [-] Failed to load Texture2D: " + filepath + " [-]");
 			return nullptr;
 		}
 

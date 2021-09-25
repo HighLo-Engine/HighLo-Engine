@@ -69,6 +69,7 @@ project "HighLo"
 		"GLFW_INCLUDE_NONE",
 		"HIGHLO_LIBRARY_EXPORT",
 		"HIGHLO_ENABLE_PROFILER",
+		"HIGHLO_ENABLE_UNIT_TESTING",
 	}
 
     filter "system:windows"

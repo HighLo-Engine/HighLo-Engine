@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-25) Added condition when to export the Unit Testing framework
 //     - 1.1 (2021-09-21) Added Font include
 //     - 1.0 (2021-09-14) initial release
 //
@@ -110,5 +111,6 @@
 
 #include "Engine/Utils/Utils.h"
 
-#include "HighLo-Unit.h" // TODO: include this only if flag is active
-
+#ifdef HIGHLO_ENABLE_UNIT_TESTING
+	#include "HighLo-Unit.h"
+#endif // HIGHLO_ENABLE_UNIT_TESTING

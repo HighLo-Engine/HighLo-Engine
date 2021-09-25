@@ -111,6 +111,5 @@
 
 #include "Engine/Utils/Utils.h"
 
-#ifdef HIGHLO_ENABLE_UNIT_TESTING
-	#include "HighLo-Unit.h"
-#endif // HIGHLO_ENABLE_UNIT_TESTING
+#include "HighLo-Unit.h"
+

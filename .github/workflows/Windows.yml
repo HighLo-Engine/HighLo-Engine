@@ -65,10 +65,6 @@ jobs:
           working-directory: ${{env.GITHUB_WORKSPACE}}
           run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.STRING_UNIT_TEST_FILE_PATH}}
 
-        - name: Build Encryption Unit Test
-          working-directory: ${{env.GITHUB_WORKSPACE}}
-          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.ENCRYPTION_UNIT_TEST_FILE_PATH}}
-          
         - name: Build List Unit Test
           working-directory: ${{env.GITHUB_WORKSPACE}}
           run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.LIST_UNIT_TEST_FILE_PATH}}

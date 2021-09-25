@@ -79,12 +79,6 @@ CALL tests\StringTest\bin\StringTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 
-ECHO Running Encryption Unit Tests...
-cd.>nul
-CALL tests\EncryptionTest\bin\EncryptionTest.exe
-IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
-ECHO.
-
 ECHO Running List Unit Tests...
 cd.>nul
 CALL tests\ListTest\bin\ListTest.exe

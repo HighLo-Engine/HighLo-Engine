@@ -28,6 +28,7 @@ workspace "HighLo"
 		include "HighLo/vendor/HighLo-Unit"
 		include "HighLo/vendor/stb_image"
 		include "HighLo/vendor/msdf-atlas-gen"
+		include "HighLo/vendor/RapidXML"
 		
 		filter "system:windows"
 			include "HighLo/vendor/GLAD"

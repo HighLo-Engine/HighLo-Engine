@@ -122,6 +122,8 @@ namespace highlo
 		template <typename T>
 		HLAPI void ForEach(const std::function<void(EntityID, TransformComponent&, T&)>& callback)
 		{
+			HL_ASSERT(!m_Components.empty());
+
 			auto& type = std::type_index(typeid(T));
 			if (m_Components.find(type) != m_Components.end())
 				for (auto& comp : m_Components[type])

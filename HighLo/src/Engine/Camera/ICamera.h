@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-26) Added Projection/View matrix setters
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -37,6 +38,9 @@ namespace highlo
 
 		HLAPI void SetPosition(const glm::vec3& position);
 		HLAPI void SetYawPitchRoll(const glm::vec3& orientation);
+
+		HLAPI void SetProjectionMatrix(const glm::mat4 &projectionMatrix) { m_ProjectionMatrix = projectionMatrix; }
+		HLAPI void SetViewMatrix(const glm::mat4 &viewMatrix) { m_ViewMatrix = viewMatrix; }
 
 		HLAPI void SetYaw(float yaw);
 		HLAPI void SetPitch(float pitch);

@@ -1,7 +1,7 @@
 // Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoEditor.h"
-#include "MenuItems.h"
+#include "Core/MenuItems.h"
 
 namespace editorutils
 {
@@ -23,6 +23,20 @@ void HighLoEditor::OnInitialize()
 {
 	uint32 width = GetWindow().GetWidth();
 	uint32 height = GetWindow().GetHeight();
+
+	m_EditorCamera = EditorCamera(glm::perspectiveFov(glm::radians(45.0f), (float) width, (float) height, 0.1f, 1000.0f));
+
+	// Editor Panels
+	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
+	m_ViewportRenderer->SetLineWidth(m_LineWidth);
+
+	m_SceneHierarchyPanel = MakeUniqueRef<SceneHierarchyPanel>();
+	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
+	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
+	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
+
+	m_EditorConsolePanel = MakeUniqueRef<EditorConsolePanel>();
+	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
 
 	GetWindow().Maximize();
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
@@ -81,6 +95,11 @@ void HighLoEditor::OnInitialize()
 	gameObjectMenu->AddSubMenu(modelSubMenu);
 	gameObjectMenu->AddMenuItem("Create Camera", "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) {  });
 
+	Ref<FileMenu> rendererMenu = FileMenu::Create("Renderer");
+	rendererMenu->AddMenuItem("Rendering Settings", "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) {});
+	rendererMenu->AddSeparator();
+	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) {});
+
 	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
 	bool darkThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Dark;
 	bool lightThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Light;
@@ -97,36 +116,27 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar->AddMenu(fileMenu);
 	m_MenuBar->AddMenu(editMenu);
 	m_MenuBar->AddMenu(gameObjectMenu);
+	m_MenuBar->AddMenu(rendererMenu);
 	m_MenuBar->AddMenu(windowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
-
-	m_EditorCamera = EditorCamera(glm::perspectiveFov(glm::radians(45.0f), (float)width, (float)height, 0.1f, 1000.0f));
-
-	// Editor Panels
-	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
-	m_ViewportRenderer->SetLineWidth(m_LineWidth);
-
-	m_SceneHierarchyPanel = MakeUniqueRef<SceneHierarchyPanel>();
-	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
-	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
-	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
-
-	m_EditorConsolePanel = MakeUniqueRef<EditorConsolePanel>();
-
-	HL_EDITOR_INFO("Info Test");
-	HL_EDITOR_WARN("Warning Test");
-	HL_EDITOR_ERROR("Error Test");
-	HL_EDITOR_FATAL("Fatal Test");
-	HL_EDITOR_TRACE("Trace Test");
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
 {
+	if (m_SceneState == SceneState::Edit)
+		OnScenePlay();
+
+	// TODO: For some reason this crashes right away
+	/*else if (m_SceneState != SceneState::Simulate)
+		OnSceneStop();*/
+
 	switch (m_SceneState)
 	{
 		case SceneState::Edit:
 		{
+			UI::SetMouseEnabled(true);
+
 			m_EditorCamera.Update();
 			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
 			break;
@@ -141,6 +151,8 @@ void HighLoEditor::OnUpdate(Timestep ts)
 
 		case SceneState::Pause:
 		{
+			UI::SetMouseEnabled(true);
+
 			m_EditorCamera.Update();
 			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
@@ -185,15 +197,41 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 {
 	UI::BeginWindow("RootWindow", true, true);
 
+	// Viewport
 	UI::BeginViewport("Viewport");
+
+	m_ViewportPanelMouseOver = ImGui::IsWindowHovered();
+	m_ViewportPanelFocused = ImGui::IsWindowFocused();
+
+	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
+	auto viewportSize = ImGui::GetContentRegionAvail();
+	m_ViewportRenderer->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+	m_EditorScene->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+
+	/*
+	if (m_RuntimeScene)
+		m_RuntimeScene->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+	*/
+
+	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), viewportSize.x, viewportSize.y, 0.1f, 1000.0f));
+	m_EditorCamera.SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+
+	// Render viewport image
+	UI::Image(m_ViewportRenderer->GetFinalRenderTexture(), viewportSize, { 0, 1 }, { 1, 0 });
+
 	UI::EndViewport();
 
+	// Asset Window
 	UI::BeginViewport("Assets");
 	UI::EndViewport();
 
+	// Scene Hierarchy Panel
 	m_SceneHierarchyPanel->OnUIRender();
+
+	// Editor Console Panel
 	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
 
+	// Object Properties Panel
 	UI::BeginViewport("Object Properties");
 	UI::EndViewport();
 
@@ -473,10 +511,13 @@ void HighLoEditor::OnScenePlay()
 	m_SelectionContext.clear();
 
 	m_SceneState = SceneState::Play;
+	UI::SetMouseEnabled(true);
+	//Input::SetCursorMode(CursorMode::Normal);
 
+	// Copy current scene to be able to reset after stop button has been pressed
 	m_RuntimeScene = Ref<Scene>::Create();
+	// m_EditorScene->CopyTo(m_RuntimeScene);
 
-	m_EditorScene->CopyTo(m_RuntimeScene);
 	m_RuntimeScene->OnRuntimeStart();
 	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
 
@@ -504,6 +545,7 @@ void HighLoEditor::OnSceneStartSimulation()
 
 	m_SceneState = SceneState::Simulate;
 
+	// Copy current scene to be able to reset after stop button has been pressed
 	m_SimulationScene = Ref<Scene>::Create();
 	m_EditorScene->CopyTo(m_SimulationScene);
 

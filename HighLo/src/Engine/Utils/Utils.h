@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-26) Added String Utils
 //     - 1.0 (2021-09-15) initial release
 //
 
@@ -10,4 +11,5 @@
 #include "HexUtils.h"
 #include "ImageUtils.h"
 #include "InputUtils.h"
+#include "StringUtils.h"
 

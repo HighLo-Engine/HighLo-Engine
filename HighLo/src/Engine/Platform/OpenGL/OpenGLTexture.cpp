@@ -252,8 +252,7 @@ namespace highlo
 
 	void OpenGLTexture2D::Invalidate()
 	{
-		if (RendererID)
-			Release();
+		Release();
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
 		GLenum glInternalFormat = utils::OpenGLTextureInternalFormat(Format);
@@ -271,6 +270,7 @@ namespace highlo
 
 	void OpenGLTexture2D::CreatePerLayerImageViews()
 	{
+		HL_ASSERT(false, "Unsupported in OpenGL");
 	}
 
 	void OpenGLTexture2D::CreateSampler(TextureProperties properties)
@@ -459,8 +459,7 @@ namespace highlo
 
 	void OpenGLTexture3D::Invalidate()
 	{
-		if (RendererID)
-			Release();
+		Release();
 
 		uint32 levels = utils::CalculateMipCount(m_Width, m_Height);
 

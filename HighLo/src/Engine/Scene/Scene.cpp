@@ -38,14 +38,11 @@ namespace highlo
 	void Scene::OnUpdate(Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
-
-
 	}
 	
 	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
-
 
 	}
 	
@@ -53,14 +50,16 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-
+		renderer->BeginScene(editorCamera);
+		renderer->EndScene();
 	}
 	
 	void Scene::OnSimulate(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)
 	{
 		HL_PROFILE_FUNCTION();
 
-
+		renderer->BeginScene(editorCamera);
+		renderer->EndScene();
 	}
 	
 	void Scene::OnEvent(Event &e)

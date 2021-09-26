@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-26) Added CompositeRenderPass
 //     - 1.1 (2021-09-15) Added SetLineWidth method
 //     - 1.0 (2021-09-14) initial release
 //
@@ -45,6 +46,7 @@ namespace highlo
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
 		HLAPI void SetLineWidth(float width) { m_LineWidth = width; }
 
+		HLAPI void BeginScene(const EditorCamera &camera);
 		HLAPI void BeginScene(const SceneRendererCamera &camera);
 		HLAPI void EndScene();
 
@@ -57,6 +59,7 @@ namespace highlo
 
 		void InitGrid();
 		void InitSkybox();
+		void InitCompositePass();
 
 		uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 		float m_InvertedViewportWidth = 0.0f, m_InvertedViewportHeight = 0.0f;
@@ -68,6 +71,8 @@ namespace highlo
 		SceneRendererSpecification m_Specification;
 		SceneRendererOptions m_RendererOptions;
 		
+		Ref<RenderPass> m_CompositeRenderPass;
+
 		// Grid
 		Ref<VertexArray> m_GridVertexArray;
 		Ref<Shader> m_GridShader;

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-26) Added MSDFData getter
 //     - 1.1 (2021-09-22) Added Name getter
 //     - 1.0 (2021-09-21) initial release
 //
@@ -27,6 +28,9 @@ namespace highlo
 
 		HLAPI Ref<Texture2D> &GetTextureAtlas() { return m_TextureAtlas; }
 		HLAPI const Ref<Texture2D> &GetTextureAtlas() const { return m_TextureAtlas; }
+
+		HLAPI MSDFData *GetMSDFData() { return m_MSDFData; }
+		HLAPI const MSDFData *GetMSDFData() const { return m_MSDFData; }
 
 		HLAPI static Ref<Font> GetDefaultFont();
 		

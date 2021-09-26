@@ -23,11 +23,18 @@ namespace highlo
 		{
 			switch (format)
 			{
-				case TextureFormat::RGB:		return GL_RGB;
-				case TextureFormat::SRGB:		return GL_RGB;
-				case TextureFormat::RGBA:		return GL_RGBA;
-				case TextureFormat::RGBA16F:	return GL_RGBA;
-				case TextureFormat::RGBA32F:	return GL_RGBA;
+				case TextureFormat::RGB:			return GL_RGB;
+				case TextureFormat::SRGB:			return GL_RGB;
+				case TextureFormat::RGBA:			return GL_RGBA;
+				case TextureFormat::RGBA8:			return GL_RGBA;
+				case TextureFormat::RGBA16:			return GL_RGBA;
+				case TextureFormat::RGBA16F:		return GL_RGBA;
+				case TextureFormat::RGBA32:			return GL_RGBA;
+				case TextureFormat::RGBA32F:		return GL_RGBA;
+				
+				case TextureFormat::Depth:			return GL_DEPTH24_STENCIL8;
+				case TextureFormat::DEPTH32F:		return GL_DEPTH32F_STENCIL8;
+				case TextureFormat::RED_INTEGER:	return GL_RED_INTEGER;
 			}
 
 		HL_ASSERT(false);
@@ -56,11 +63,11 @@ namespace highlo
 		{
 			switch (format)
 			{
-				case TextureFormat::RGB:		return GL_UNSIGNED_BYTE;
-				case TextureFormat::RGBA:		return GL_UNSIGNED_BYTE;
-				case TextureFormat::SRGB:		return GL_UNSIGNED_BYTE;
-				case TextureFormat::RGBA16F:	return GL_FLOAT;
-				case TextureFormat::RGBA32F:	return GL_FLOAT;
+				case TextureFormat::RGB:
+				case TextureFormat::SRGB:
+				case TextureFormat::RGBA:				return GL_UNSIGNED_BYTE;
+				case TextureFormat::RGBA16F:
+				case TextureFormat::RGBA32F:			return GL_FLOAT;
 			}
 
 			HL_ASSERT(false);

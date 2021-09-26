@@ -21,6 +21,7 @@ namespace highlo
 	{
 		InitGrid();
 		InitSkybox();
+		InitCompositePass();
 	}
 
 	void SceneRenderer::SetScene(Ref<Scene> scene)
@@ -34,9 +35,19 @@ namespace highlo
 		m_ViewportHeight = height;
 	}
 
+	void SceneRenderer::BeginScene(const EditorCamera &camera)
+	{
+		SceneRendererCamera renderCamera;
+		renderCamera.Camera = camera;
+		renderCamera.ViewMatrix = camera.GetViewMatrix();
+		renderCamera.Near = camera.GetPerspectiveNearPlane();
+		renderCamera.Far = camera.GetPerspectiveFarPlane();
+		renderCamera.Fov = camera.GetPerspectiveFOV();
+		BeginScene(renderCamera);
+	}
+
 	void SceneRenderer::BeginScene(const SceneRendererCamera &camera)
 	{
-
 	}
 
 	void SceneRenderer::EndScene()
@@ -51,12 +62,12 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return nullptr;
+		return m_CompositeRenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
 	{
-		return nullptr;
+		return m_CompositeRenderPass->GetSpcification().Framebuffer->GetImage().As<Texture2D>();
 	}
 	
 	void SceneRenderer::InitGrid()
@@ -96,6 +107,30 @@ namespace highlo
 	void SceneRenderer::InitSkybox()
 	{
 
+	}
+
+	void SceneRenderer::InitCompositePass()
+	{
+		FramebufferSpecification framebufferSpec;
+		framebufferSpec.DebugName = "SceneComposite";
+		framebufferSpec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
+		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
+		framebufferSpec.Attachments = { TextureFormat::RGBA };
+		
+		// TODO: combining ColorAttachments with DepthAttachments does not work in our current Framebuffer situation
+		/*
+		if (m_Specification.SwapChain)
+			framebufferSpec.Attachments = { TextureFormat::RGBA };
+		else
+			framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
+		*/
+
+		Ref<Framebuffer> framebuffer = Framebuffer::Create(framebufferSpec);
+
+		RenderPassSpecification renderPassSpec;
+		renderPassSpec.Framebuffer = framebuffer;
+		renderPassSpec.DebugName = "SceneComposite";
+		m_CompositeRenderPass = RenderPass::Create(renderPassSpec);
 	}
 
 

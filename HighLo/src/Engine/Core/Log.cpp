@@ -18,7 +18,10 @@ namespace highlo
 		std::vector<spdlog::sink_ptr> engineSinks =
 		{
 			std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-			std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/engine.log", true)
+			std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/engine.log", true),
+		#ifdef HL_DEBUG
+			std::make_shared<EditorConsoleSink>(1)
+		#endif // HL_DEBUG
 		};
 
 		std::vector<spdlog::sink_ptr> appSinks =
@@ -35,6 +38,9 @@ namespace highlo
 
 		engineSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
+	#ifdef HL_DEBUG
+		engineSinks[2]->set_pattern("[%T] [%l] %n: %v");
+	#endif // HL_DEBUG
 		appSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		appSinks[1]->set_pattern("[%T] [%l] %n: %v");
 		appSinks[2]->set_pattern("%^[%T] %n: %v%$");

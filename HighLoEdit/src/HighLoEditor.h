@@ -60,9 +60,9 @@ class HighLoEditor : public HLApplication
 
 		enum class SelectionMode
 		{
-			None  = 0,
-			Model = 1,
-			Mesh  = 2
+			None   = 0,
+			Entity = 1,
+			Mesh   = 2
 		};
 
 		bool OnKeyPressedEvent(const KeyPressedEvent &e);
@@ -92,6 +92,8 @@ class HighLoEditor : public HLApplication
 		float m_LineWidth = 2.0f;
 
 		bool m_AllowViewportCameraEvents = false;
+		bool m_ViewportPanelMouseOver = false;
+		bool m_ViewportPanelFocused = false;
 		bool m_DrawOnTopBoundingBoxes = false;
 		bool m_SceneIsSaved = false;
 
@@ -100,6 +102,7 @@ class HighLoEditor : public HLApplication
 		bool m_ShowViewportPanel = true;
 		bool m_ShowObjectPropertiesPanel = true;
 		bool m_ShowConsolePanel = true;
+		bool m_ShowSelectedWireframe = false;
 
 		bool m_UIShowBoundingBoxes = false;
 		bool m_UIShowBoundingBoxesOnTop = false;
@@ -109,13 +112,14 @@ class HighLoEditor : public HLApplication
 		Ref<MenuBar> m_MenuBar;
 
 		SceneState m_SceneState = SceneState::Edit;
-		SelectionMode m_SelectionMode = SelectionMode::Model;
+		SelectionMode m_SelectionMode = SelectionMode::Entity;
 
+		std::vector<SelectedMesh> m_SelectionContext;
 		glm::mat4 *m_RelativeTransform = nullptr;
 		glm::mat4 *m_CurrentlySelectedTransform = nullptr;
+		glm::vec2 m_ViewportBounds[2];
 
 		Ref<Scene> m_RuntimeScene, m_EditorScene, m_SimulationScene, m_CurrentScene;
-		std::vector<SelectedMesh> m_SelectionContext;
 
 		// Editor Panels
 		Ref<SceneRenderer> m_ViewportRenderer;

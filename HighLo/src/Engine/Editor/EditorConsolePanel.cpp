@@ -31,7 +31,7 @@ namespace highlo
 		if (!(*show))
 			return;
 
-		ImGui::Begin("Log", show);
+		ImGui::Begin("Log", show, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 		RenderMenu();
 		ImGui::Separator();
 		RenderConsole();

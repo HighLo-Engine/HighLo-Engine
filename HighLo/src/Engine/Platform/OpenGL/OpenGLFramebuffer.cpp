@@ -65,7 +65,7 @@ namespace highlo
 			return 0;
 		}
 
-		static Ref<Texture> CreateAndAttachColorAttachment(int samples, TextureFormat format, uint32 width, uint32 height, int32 index)
+		static Ref<Texture> CreateAndAttachColorAttachment(int32 samples, TextureFormat format, uint32 width, uint32 height, int32 index)
 		{
 			bool multisampled = samples > 1;
 			Ref<Texture> texture;
@@ -85,7 +85,7 @@ namespace highlo
 			return texture;
 		}
 
-		static Ref<Texture> AttachDepthTexture(int samples, TextureFormat format, uint32 width, uint32 height)
+		static Ref<Texture> AttachDepthTexture(int32 samples, TextureFormat format, uint32 width, uint32 height)
 		{
 			bool multisampled = samples > 1;
 			Ref<Texture> texture;
@@ -116,7 +116,7 @@ namespace highlo
 			return false;
 		}
 
-		static GLenum HihloFBTextureFormatToGL(TextureFormat format)
+		static GLenum HighLoFBTextureFormatToGL(TextureFormat format)
 		{
 			switch (format)
 			{
@@ -225,7 +225,7 @@ namespace highlo
 		HL_ASSERT(attachmentIndex < m_ColorAttachments.size());
 
 		auto &format = m_ColorAttachmentFormats[attachmentIndex];
-		glClearTexImage(m_ColorAttachments[attachmentIndex]->GetRendererID(), 0, utils::HihloFBTextureFormatToGL(format), GL_INT, &value);
+		glClearTexImage(m_ColorAttachments[attachmentIndex]->GetRendererID(), 0, utils::HighLoFBTextureFormatToGL(format), GL_INT, &value);
 	}
 	
 	int32 OpenGLFramebuffer::ReadPixel(uint32 attachmentIndex, int32 x, int32 y)

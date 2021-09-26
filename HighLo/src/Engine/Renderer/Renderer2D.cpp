@@ -9,6 +9,9 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "Framebuffer.h"
+#include "FontData.h"
+
+#include "Engine/Utils/StringUtils.h"
 
 namespace highlo
 {
@@ -44,6 +47,14 @@ namespace highlo
 		int32 EntityID;
 	};
 
+	struct TextVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		glm::vec2 TexCoord;
+		float TexIndex;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32 MaxQuads = 20000;
@@ -77,6 +88,16 @@ namespace highlo
 		CircleVertex *CircleVertexBufferBase = nullptr;
 		CircleVertex *CircleVertexBufferPtr = nullptr;
 		uint32 CircleIndexCount = 0;
+
+		// Text
+		Ref<VertexArray> TextVertexArray;
+		Ref<Material> TextMaterial;
+		std::array<Ref<Texture2D>, MaxTextureSlots> FontTextureSlots;
+		uint32 FontTextureSlotIndex = 0;
+
+		uint32 TextIndexCount = 0;
+		TextVertex *TextVertexBufferBase = nullptr;
+		TextVertex *TextVertexBufferPtr = nullptr;
 
 		// Textures
 		uint32 TextureSlotIndex = 1;
@@ -406,6 +427,170 @@ namespace highlo
 
 
 		s_2DData->CircleIndexCount++;
+	}
+
+	void Renderer2D::DrawText(const HLString &text, const glm::vec3 &position, float maxWidth, const glm::vec4 &color)
+	{
+		DrawText(text, Font::GetDefaultFont(), position, maxWidth, color);
+	}
+
+	void Renderer2D::DrawText(const HLString &text, const Ref<Font> &font, const glm::vec3 &position, float maxWidth, const glm::vec4 &color)
+	{
+		DrawText(text, font, Transform::FromPosition(position), maxWidth, color);
+	}
+
+	void Renderer2D::DrawText(const HLString &text, const Ref<Font> &font, const Transform &transform, float maxWidth, const glm::vec4 &color, float lineHeightOffset, float kerningOffset)
+	{
+		if (text.IsEmpty())
+			return;
+
+		float textureIndex = 0.0f;
+
+		std::u32string utf32Str = utils::ConvertToUtf32Str(*text);
+
+		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
+		HL_ASSERT(fontAtlas);
+
+		for (uint32 i = 0; i < s_2DData->FontTextureSlotIndex; ++i)
+		{
+			if (*s_2DData->FontTextureSlots[i].Get() == *fontAtlas.Get())
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			textureIndex = (float)s_2DData->FontTextureSlotIndex;
+			s_2DData->FontTextureSlots[s_2DData->FontTextureSlotIndex] = fontAtlas;
+			++s_2DData->FontTextureSlotIndex;
+		}
+
+		auto &fontGeometry = font->GetMSDFData()->FontGeometry;
+		const auto &metrics = fontGeometry.getMetrics();
+		std::vector<int32> nextLines;
+
+		{
+			double x = 0.0;
+			double fsScale = 1 / (metrics.ascenderY - metrics.descenderY);
+			double y = -fsScale * metrics.ascenderY;
+			int32 lastSpace = -1;
+
+			for (int32 i = 0; i < utf32Str.size(); ++i)
+			{
+				char32_t ch = utf32Str[i];
+				if (ch == '\n')
+				{
+					x = 0.0;
+					y = fsScale * metrics.lineHeight + lineHeightOffset;
+					continue;
+				}
+
+				auto glyph = fontGeometry.getGlyph(ch);
+				if (!glyph)
+					glyph = fontGeometry.getGlyph('?');
+				if (!glyph)
+					continue;
+
+				if (ch != ' ')
+				{
+					// Calc geometry
+					double pl, pb, pr, pt;
+					glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+					glm::vec2 quadMin((float)pl, (float)pb);
+					glm::vec2 quadMax((float)pr, (float)pt);
+
+					quadMin *= fsScale;
+					quadMax *= fsScale;
+					quadMin += glm::vec2(x, y);
+					quadMax += glm::vec2(x, y);
+
+					if (quadMax.x > maxWidth && lastSpace != -1)
+					{
+						i = lastSpace;
+						nextLines.emplace_back(lastSpace);
+						lastSpace = -1;
+						x = 0.0;
+						y -= fsScale * metrics.lineHeight + lineHeightOffset;
+					}
+				}
+				else
+				{
+					lastSpace = i;
+				}
+
+				double advance = glyph->getAdvance();
+				fontGeometry.getAdvance(advance, ch, utf32Str[i + 1]);
+				x += fsScale * advance + kerningOffset;
+			}
+		}
+
+		{
+			double x = 0.0;
+			double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+			double y = 0.0;
+
+			for (int32 i = 0; i < utf32Str.size(); ++i)
+			{
+				char32_t ch = utf32Str[i];
+				if (ch == '\n' || utils::NextLine(i, nextLines))
+				{
+					x = 0.0;
+					y -= fsScale * metrics.lineHeight + lineHeightOffset;
+					continue;
+				}
+
+				auto glyph = fontGeometry.getGlyph(ch);
+				if (!glyph)
+					glyph = fontGeometry.getGlyph('?');
+				if (!glyph)
+					continue;
+
+				double l, b, r, t;
+				glyph->getQuadAtlasBounds(l, b, r, t);
+
+				double pl, pb, pr, pt;
+				glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+
+				pl *= fsScale, pb *= fsScale, pr *= fsScale, pt *= fsScale;
+				pl += x, pb += y, pr += x, pt += y;
+
+				double texelWidth = 1. / fontAtlas->GetWidth();
+				double texelHeight = 1. / fontAtlas->GetHeight();
+				l *= texelWidth, b *= texelHeight, r *= texelWidth, t *= texelHeight;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pl, pb, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = { l, b };
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pl, pt, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = { l, t };
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pr, pt, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = { r, t };
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pr, pb, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = { r, b };
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextIndexCount += 6;
+
+				double advance = glyph->getAdvance();
+				fontGeometry.getAdvance(advance, ch, utf32Str[i + 1]);
+				x += fsScale * advance + kerningOffset;
+			}
+		}
 	}
 
 

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-26) Added DrawText functions
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -13,6 +14,10 @@
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 #include "Texture.h"
 #include "RenderPass.h"
+#include "FontManager.h"
+
+// Windows macro
+#undef DrawText
 
 namespace highlo
 {
@@ -43,6 +48,12 @@ namespace highlo
 
 		HLAPI static void DrawCircle(const glm::vec2 &p1, float radius, const glm::vec4 &color);
 		HLAPI static void DrawCircle(const glm::vec3 &p1, float radius, const glm::vec4 &color);
+
+		HLAPI static void DrawText(const HLString &text, const glm::vec3 &position, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
+		HLAPI static void DrawText(const HLString &text, const Ref<Font> &font, const glm::vec3 &position, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
+		HLAPI static void DrawText(const HLString &text, const Ref<Font> &font, const Transform &transform, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f }, float lineHeightOffset = 0.0f, float kerningOffset = 0.0f);
+
+
 	};
 }
 

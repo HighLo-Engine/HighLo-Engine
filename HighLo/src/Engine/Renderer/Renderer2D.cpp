@@ -431,7 +431,7 @@ namespace highlo
 
 	void Renderer2D::DrawText(const HLString &text, const glm::vec3 &position, float maxWidth, const glm::vec4 &color)
 	{
-		DrawText(text, Font::GetDefaultFont(), position, maxWidth, color);
+		DrawText(text, FontManager::Get()->GetDefaultFont(), position, maxWidth, color);
 	}
 
 	void Renderer2D::DrawText(const HLString &text, const Ref<Font> &font, const glm::vec3 &position, float maxWidth, const glm::vec4 &color)

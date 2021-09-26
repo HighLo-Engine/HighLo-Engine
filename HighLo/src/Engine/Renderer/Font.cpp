@@ -112,8 +112,6 @@ namespace highlo
 		}
 	}
 
-	static Ref<Font> s_DefaultFont;
-
 	Font::Font(const FileSystemPath &path)
 		: m_FilePath(path), m_MSDFData(new MSDFData())
 	{
@@ -188,7 +186,8 @@ namespace highlo
 		}
 
 		HL_ASSERT(glyphsLoaded >= 0);
-		HL_CORE_TRACE("Loaded Font Geometry of {0} out of {1} glyphs.", glyphsLoaded, (int32)charset.size());
+		HL_CORE_INFO("Font>         [+] Loaded {0} [+]", path.GetFile()->GetRelativePath());
+		HL_CORE_INFO("Loaded Font Geometry of {0} out of {1} glyphs.", glyphsLoaded, (int32)charset.size());
 
 		// Check if any glyphs are missing
 		if (glyphsLoaded < (int32)charset.size())
@@ -237,10 +236,10 @@ namespace highlo
 		config.PxRange = atlasPacker.getPixelRange();
 
 		if (!fixedScale)
-			HL_CORE_TRACE("Glyph size: {0} pixels/EM", config.EmSize);
+			HL_CORE_INFO("Glyph size: {0} pixels/EM", config.EmSize);
 
 		if (!fixedDimensions)
-			HL_CORE_TRACE("Atlas Dimensions: {0}x{1}", config.Width, config.Height);
+			HL_CORE_INFO("Atlas Dimensions: {0}x{1}", config.Width, config.Height);
 
 		// Edge Coloring
 
@@ -298,16 +297,6 @@ namespace highlo
 	Font::~Font()
 	{
 		delete m_MSDFData;
-	}
-
-	void Font::Init()
-	{
-		s_DefaultFont = Font::Create(FileSystemPath("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf"));
-	}
-
-	Ref<Font> Font::GetDefaultFont()
-	{
-		return s_DefaultFont;
 	}
 
 	Ref<Font> Font::Create(const FileSystemPath &path)

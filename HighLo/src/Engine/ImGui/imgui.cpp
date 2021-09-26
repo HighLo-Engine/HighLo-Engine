@@ -1444,16 +1444,14 @@ namespace highlo::UI
 	void Image(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-		ImGui::Image((ImTextureID)(size_t)glTexture->GetRendererID(), size, uv0, uv1, tintColor, borderColor);
+		ImGui::Image((ImTextureID)(size_t)texture->GetRendererID(), size, uv0, uv1, tintColor, borderColor);
 	#endif // HIGHLO_API_OPENGL
 	}
 	
 	void Image(const Ref<Texture2D> &texture, uint32 layer, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-		ImGui::Image((ImTextureID)(size_t)glTexture->GetRendererID(), size, uv0, uv1, tintColor, borderColor);
+		ImGui::Image((ImTextureID)(size_t)texture->GetRendererID(), size, uv0, uv1, tintColor, borderColor);
 	#endif // HIGHLO_API_OPENGL
 	}
 	
@@ -1479,8 +1477,7 @@ namespace highlo::UI
 		if (!texture)
 			return false;
 
-		Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-		return ImGui::ImageButton((ImTextureID)(size_t)glTexture->GetRendererID(), size, uv0, uv1, framePadding, bgColor, tintColor);
+		return ImGui::ImageButton((ImTextureID)(size_t)texture->GetRendererID(), size, uv0, uv1, framePadding, bgColor, tintColor);
 	#else
 		return false;
 	#endif // HIGHLO_API_OPENGL

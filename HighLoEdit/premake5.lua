@@ -42,7 +42,7 @@ project "HighLoEdit"
 
     filter "system:windows"
         systemversion "latest"
-        disablewarnings { "5033" }
+        disablewarnings { "5033", "4996" }
 
         defines
         {

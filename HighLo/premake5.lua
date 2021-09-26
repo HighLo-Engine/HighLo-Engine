@@ -73,7 +73,7 @@ project "HighLo"
 
     filter "system:windows"
         systemversion "latest"
-        disablewarnings { "5033" }
+        disablewarnings { "5033", "4996" }
 
         defines
         {
@@ -96,7 +96,7 @@ project "HighLo"
 
 	filter "system:macosx"
         systemversion "latest"
-        disablewarnings { "5033" }
+        disablewarnings { "5033", "4996" }
 		
         defines
         {
@@ -107,7 +107,7 @@ project "HighLo"
 
 	filter "system:linux"
 		systemversion "latest"
-        disablewarnings { "5033" }
+        disablewarnings { "5033", "4996" }
 
 		defines
         {

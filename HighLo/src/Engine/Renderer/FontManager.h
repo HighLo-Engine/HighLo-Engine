@@ -2,12 +2,14 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-26) Moved the DefaultFont function from Font to here and added GetFonts for all fonts
 //     - 1.0 (2021-09-22) initial release
 //
 
 #pragma once
 
 #include "Font.h"
+#include "Engine/Core/Singleton.h"
 
 namespace highlo
 {
@@ -18,14 +20,16 @@ namespace highlo
 		HLAPI void Init();
 		HLAPI void Shutdown();
 
-		HLAPI void Add(const Ref<Font> &font);
-		HLAPI void Add(const HLString &fontName, const Ref<Font> &font);
+		HLAPI void AddFont(const Ref<Font> &font);
+		HLAPI void AddFont(const HLString &fontName, const Ref<Font> &font);
 
-		HLAPI void Load(const FileSystemPath &path);
-		HLAPI void Load(const HLString &fontName, const FileSystemPath &path);
+		HLAPI void LoadFont(const FileSystemPath &path);
+		HLAPI void LoadFont(const HLString &fontName, const FileSystemPath &path);
 
+		HLAPI std::vector<Ref<Font>> GetFonts();
 		HLAPI Ref<Font> GetFont(const HLString &fontName);
-		HLAPI bool Has(const HLString &fontName) const;
+		HLAPI Ref<Font> GetDefaultFont();
+		HLAPI bool HasFont(const HLString &fontName) const;
 
 	private:
 

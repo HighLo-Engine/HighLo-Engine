@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-09-26) Added constructor and operator= for the Strings
 //     - 1.2 (2021-09-22) Added File getter, more overloads and implemented most methods
 //     - 1.1 (2021-09-21) Added String methods
 //     - 1.0 (2021-09-15) initial release
@@ -18,11 +19,13 @@ namespace highlo
 	public:
 
 		HLAPI FileSystemPath() = default;
+		HLAPI FileSystemPath(const char *path);
 		HLAPI FileSystemPath(const HLString &path);
 		HLAPI FileSystemPath(const File &file);
 		HLAPI ~FileSystemPath();
 
 		HLAPI FileSystemPath &operator=(const FileSystemPath &other);
+		HLAPI FileSystemPath &operator=(const HLString &str);
 
 		HLAPI FileSystemPath &Assign(const HLString &source);
 		HLAPI void Swap(FileSystemPath &lhs, FileSystemPath &rhs);

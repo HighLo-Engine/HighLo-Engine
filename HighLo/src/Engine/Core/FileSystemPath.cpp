@@ -5,6 +5,12 @@
 
 namespace highlo
 {
+	FileSystemPath::FileSystemPath(const char *path)
+	{
+		m_CurrentPath = path;
+		m_File = File::Create(m_CurrentPath);
+	}
+	
 	FileSystemPath::FileSystemPath(const HLString &path)
 	{
 		m_File = File::Create(path);
@@ -25,6 +31,13 @@ namespace highlo
 	{
 		m_CurrentPath = other.m_CurrentPath;
 		m_File = other.m_File;
+		return *this;
+	}
+
+	FileSystemPath &FileSystemPath::operator=(const HLString &str)
+	{
+		m_CurrentPath = str;
+		m_File = File::Create(str);
 		return *this;
 	}
 

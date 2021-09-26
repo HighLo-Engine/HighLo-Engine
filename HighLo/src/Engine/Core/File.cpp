@@ -38,7 +38,7 @@ namespace highlo
 	void File::SetFullPath(const HLString &path)
 	{
 		m_Handle = std::filesystem::canonical(*path);
-		m_FilePath = m_Handle.string();
+		m_FilePath = path;
 		m_IsFile = true;
 
 		if (m_FilePath.Contains('\\'))

@@ -8,6 +8,7 @@ namespace highlo
 	void FontManager::Init()
 	{
 		// Load Default fonts
+		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf"));
 	}
 	
 	void FontManager::Shutdown()
@@ -19,28 +20,38 @@ namespace highlo
 		m_Fonts.clear();
 	}
 
-	void FontManager::Add(const Ref<Font> &font)
+	void FontManager::AddFont(const Ref<Font> &font)
 	{
 		HL_ASSERT(m_Fonts.find(font->GetName()) == m_Fonts.end());
 		m_Fonts.insert({ font->GetName(), font });
 	}
 
-	void FontManager::Add(const HLString &fontName, const Ref<Font> &font)
+	void FontManager::AddFont(const HLString &fontName, const Ref<Font> &font)
 	{
 		HL_ASSERT(m_Fonts.find(fontName) == m_Fonts.end());
 		m_Fonts.insert({ fontName, font });
 	}
 
-	void FontManager::Load(const FileSystemPath &path)
+	void FontManager::LoadFont(const FileSystemPath &path)
 	{
 		Ref<Font> font = Font::Create(path);
-		Add(font->GetName(), font);
+		AddFont(font->GetName(), font);
 	}
 
-	void FontManager::Load(const HLString &fontName, const FileSystemPath &path)
+	void FontManager::LoadFont(const HLString &fontName, const FileSystemPath &path)
 	{
 		Ref<Font> font = Font::Create(path);
-		Add(fontName, font);
+		AddFont(fontName, font);
+	}
+
+	std::vector<Ref<Font>> FontManager::GetFonts()
+	{
+		std::vector<Ref<Font>> fonts;
+
+		for (auto &[fontName, font] : m_Fonts)
+			fonts.push_back(font);
+
+		return fonts;
 	}
 
 	Ref<Font> FontManager::GetFont(const HLString &fontName)
@@ -49,7 +60,12 @@ namespace highlo
 		return m_Fonts[fontName];
 	}
 
-	bool FontManager::Has(const HLString &fontName) const
+	Ref<Font> FontManager::GetDefaultFont()
+	{
+		return GetFonts()[0];
+	}
+
+	bool FontManager::HasFont(const HLString &fontName) const
 	{
 		for (auto &[name, font] : m_Fonts)
 		{

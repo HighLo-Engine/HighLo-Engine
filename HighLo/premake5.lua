@@ -30,7 +30,8 @@ project "HighLo"
 		"%{IncludeDir.HighLo_Unit}",
 		"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.msdfgen}",
-		"%{IncludeDir.rapixXML}",
+		"%{IncludeDir.rapidXML}",
+		"%{IncludeDir.rapidJSON}",
 
     }
 

@@ -11,7 +11,8 @@ IncludeDir["openssl"]                = "%{wks.location}/HighLo/vendor/openssl/in
 IncludeDir["HighLo_Unit"]            = "%{wks.location}/HighLo/vendor/HighLo-Unit/include"
 IncludeDir["msdf_atlas_gen"]         = "%{wks.location}/HighLo/vendor/msdf-atlas-gen/msdf-atlas-gen"
 IncludeDir["msdfgen"]                = "%{wks.location}/HighLo/vendor/msdf-atlas-gen/msdfgen"
-IncludeDir["rapixXML"]               = "%{wks.location}/HighLo/vendor/RapidXML"
+IncludeDir["rapidXML"]               = "%{wks.location}/HighLo/vendor/RapidXML"
+IncludeDir["rapidJSON"]              = "%{wks.location}/HighLo/vendor/RapidJSON/include"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"

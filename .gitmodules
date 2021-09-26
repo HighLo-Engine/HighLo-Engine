@@ -38,3 +38,8 @@
 	path = HighLo/vendor/msdf-atlas-gen
 	url = https://github.com/HighLo-Engine/msdf-atlas-gen
 	ignore = dirty
+[submodule "HighLo/vendor/RapidJSON"]
+	path = HighLo/vendor/RapidJSON
+	url = https://github.com/HighLo-Engine/rapidjson
+	ignore = dirty
+

@@ -30,6 +30,7 @@ workspace "HighLo"
 		include "HighLo/vendor/msdf-atlas-gen"
 		include "HighLo/vendor/RapidXML"
 		include "HighLo/vendor/RapidJSON"
+		include "HighLo/vendor/yaml-cpp"
 		
 		filter "system:windows"
 			include "HighLo/vendor/GLAD"

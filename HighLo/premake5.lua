@@ -32,6 +32,7 @@ project "HighLo"
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.rapidXML}",
 		"%{IncludeDir.rapidJSON}",
+		"%{IncludeDir.yamlCpp}",
 
     }
 

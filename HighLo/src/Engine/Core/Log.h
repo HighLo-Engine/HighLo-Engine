@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-26) Changed the logging init function to check first if the engine should log into a file
 //     - 1.1 (2021-09-22) Added Shutdown function and engine logger
 //     - 1.0 (2021-09-14) initial release
 //

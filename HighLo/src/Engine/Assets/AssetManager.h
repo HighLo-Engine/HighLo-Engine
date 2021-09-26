@@ -11,6 +11,7 @@
 
 #include "Asset.h"
 #include "Engine/Events/Events.h"
+#include "Engine/Loaders/AssetLoader.h"
 
 namespace highlo
 {
@@ -136,11 +137,14 @@ namespace highlo
 			Ref<Asset> asset = nullptr;
 			if (!assetInfo.IsDataLoaded)
 			{
+				// TODO
+				/*
 				assetInfo.IsDataLoaded = AssetImporter::TryLoadData(assetInfo, asset);
 				if (!assetInfo.IsDataLoaded)
 					return nullptr;
 
 				s_LoadedAssets[handle] = asset;
+				*/
 			}
 			else
 			{

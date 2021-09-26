@@ -18,16 +18,10 @@
 #include "Engine/ECS/ECS_SystemManager.h"
 #include "Engine/Encryption/Encryptor.h"
 
+#include "ApplicationSettings.h"
+
 namespace highlo
 {
-	struct ApplicationStartupSettings
-	{
-		bool Fullscreen = false;
-		uint32 WindowWidth = 1270;
-		uint32 WindowHeight = 920;
-		HLString WindowTitle = "HighLo Engine";
-	};
-
 	class HLApplication
 	{
 	public:
@@ -50,7 +44,8 @@ namespace highlo
 		HLAPI virtual void OnResize(uint32 width, uint32 height) {}
 
 		inline void Close() { m_Running = false; }
-		HLAPI void SetApplicationStartupSettings(const ApplicationStartupSettings &settings) { m_StartupSettings = settings; }
+		HLAPI void SetApplicationSettings(const ApplicationSettings &settings) { m_Settings = settings; }
+		HLAPI ApplicationSettings &GetApplicationSettings() { return m_Settings; }
 
 		HLAPI ECS_Registry &GetECSRegistry() { return m_ECS_Registry; }
 		HLAPI ECS_SystemManager &GetECSSystemManager() { return m_ECS_SystemManager; }
@@ -58,7 +53,7 @@ namespace highlo
 
 	private:
 		static HLApplication *s_Instance;
-		ApplicationStartupSettings m_StartupSettings;
+		ApplicationSettings m_Settings;
 
 		bool m_Running = false;
 		bool m_Minimized = false;

@@ -7,7 +7,18 @@
 
 #pragma once
 
-#include "Engine/Core/DataTypes/String.h"
+#define HL_SERIALIZE(name)
+#define HL_SERIALIZE_MEMBER(name, member)
+
+#define HL_DESERIALIZE(name)
+#define HL_DESERIALIZE_MEMBER(name, member)
+
+// Helpers for bit fields
+#define HL_SERIALIZE_BIT(name)
+#define HL_SERIALIZE_BIT_MEMBER(name, member)
+
+#define HL_DESERIALIZE_BIT(name)
+#define HL_DESERIALIZE_BIT_MEMBER(name, member)
 
 namespace highlo
 {
@@ -20,3 +31,4 @@ namespace highlo
 
 	};
 }
+

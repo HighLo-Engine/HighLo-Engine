@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-	void Serializer::Serialize(const HLString &path, Serializable &object)
+	void Serializer::Serialize(const HLString &path, const Serializable &object)
 	{
 	}
 
@@ -13,3 +13,4 @@ namespace highlo
 	{
 	}
 }
+

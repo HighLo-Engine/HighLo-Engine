@@ -33,7 +33,12 @@
 #define HL_BIT(X)	 (1 << X)
 
 #define HL_BIND_EVENT_FUNCTION(fn) std::bind(&fn, this, std::placeholders::_1)
-#define HL_OUT_OF_MEMORY HL_CORE_FATAL("Out of memory error!\nFile: {0}\nLine: {1}", __FILE__, __LINE__)
+
+#define HL_COPYABLE(className) HLAPI className(const className&) = default; HLAPI className& operator=(const className&) = default
+#define HL_NON_COPYABLE(className) HLAPI className(const className&) = delete; HLAPI className &operator=(const className&) = delete
+
+#define HL_MOVABLE(className) HLAPI className(className&&) = default; HLAPI className &operator=(className&&) = default
+#define HL_NON_MOVABLE(className) HLAPI className(className&&) = delete; HLAPI className &operator=(className&&) = delete
 
 using HLRendererID = uint32;
 using Byte = unsigned char;

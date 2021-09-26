@@ -2,7 +2,7 @@
 
 //
 // version history:
-//     - 1.2 (2021-09-25) Added condition when to export the Unit Testing framework
+//     - 1.2 (2021-09-26) Added Color, AssetEditor, AssetEditorPanel include
 //     - 1.1 (2021-09-21) Added Font include
 //     - 1.0 (2021-09-14) initial release
 //
@@ -35,6 +35,7 @@
 #include "Engine/Core/Profiler/Profiler.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 
+#include "Engine/Math/Color.h"
 #include "Engine/Math/Math.h"
 #include "Engine/Math/AABB.h"
 #include "Engine/Math/Ray.h"
@@ -78,6 +79,8 @@
 #include "Engine/Editor/EditorColors.h"
 #include "Engine/Editor/SceneHierarchyPanel.h"
 #include "Engine/Editor/EditorConsolePanel.h"
+#include "Engine/Editor/AssetEditor.h"
+#include "Engine/Editor/AssetEditorPanel.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

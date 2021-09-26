@@ -15,7 +15,8 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static void Serialize(const HLString &path, Serializable &object);
+		HLAPI static void Serialize(const HLString &path, const Serializable &object);
 		HLAPI static void Deserialize(const HLString &path, Serializable &object);
 	};
 }
+

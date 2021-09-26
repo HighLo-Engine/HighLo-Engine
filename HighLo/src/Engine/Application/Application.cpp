@@ -33,11 +33,11 @@ namespace highlo
 
 		// Init Window
 		m_Window = UniqueRef<Window>(Window::Create(WindowData(
-			m_StartupSettings.Fullscreen,
-			m_StartupSettings.WindowWidth,
-			m_StartupSettings.WindowHeight,
-			m_StartupSettings.WindowTitle))
-			);
+			m_Settings.Fullscreen,
+			m_Settings.WindowWidth,
+			m_Settings.WindowHeight,
+			m_Settings.WindowTitle))
+		);
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 

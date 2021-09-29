@@ -5,7 +5,13 @@ bool test_get_file_list()
 {
 	highloUnit::Timer timer("test_get_file_list");
 
+	/*
+	File *file = new File("assets");
+	std::vector<File> dirList = file->GetFileList();
 
+	for (uint32 i = 0; i < dirList.size(); ++i)
+		std::cout << dirList[i].GetAbsolutePath() << std::endl;
+	*/
 
 	highloUnit::Test test;
 	return test.AssertEqual(timer, true, true);

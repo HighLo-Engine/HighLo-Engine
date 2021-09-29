@@ -25,6 +25,10 @@ project "FileTest"
 
     links
     {
+		"GLFW",
+        "stbimage",
+		"msdf-atlas-gen",
+	
         "%{wks.location}/../HighLo/bin/" .. outputdir .. "/HighLo/HighLo.lib",
 		"%{wks.location}/../HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.lib"
     }
@@ -50,6 +54,12 @@ project "FileTest"
         {
             "HL_PLATFORM_WINDOWS"
         }
+		
+		links
+		{
+			"GLAD",
+			"opengl32.lib"
+		}
 
     filter "configurations:Debug"
         defines "HL_DEBUG"

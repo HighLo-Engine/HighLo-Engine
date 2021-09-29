@@ -810,7 +810,7 @@ bool test_hash_string()
 	HLString str = "Hello World!";
 
 	highloUnit::Test test;
-	return test.AssertEqual<uint64>(timer, 16527122995934635225, str.Hash());
+	return test.AssertEqual<uint64>(timer, 2005729231029082450, str.Hash());
 }
 
 bool test_hash_multiple_string()

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-29) Added Renderer2DText Shader loading to init function
 //     - 1.0 (2021-09-14) initial release
 //
 

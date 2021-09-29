@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-09-29) Refactored DrawText functions
 //     - 1.1 (2021-09-26) Added DrawText functions
 //     - 1.0 (2021-09-14) initial release
 //

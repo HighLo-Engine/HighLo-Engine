@@ -42,6 +42,17 @@ namespace highlo
 		};
 	}
 
+	BufferLayout BufferLayout::GetTextLayout()
+	{
+		return
+		{
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_TexIndex", ShaderDataType::Float },
+			{ "a_Color", ShaderDataType::Float4 },
+		};
+	}
+
 	BufferLayout BufferLayout::GetStaticShaderLayout()
 	{
 		return

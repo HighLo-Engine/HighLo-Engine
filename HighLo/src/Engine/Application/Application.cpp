@@ -41,6 +41,9 @@ namespace highlo
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
+		// Init Fonts
+		FontManager::Get()->Init();
+
 		// Init Renderer
 		Renderer::Init(m_Window.get());
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
@@ -48,17 +51,15 @@ namespace highlo
 		m_Encryptor = Ref<Encryptor>::Create();
 		m_Encryptor->Init();
 
-		FontManager::Get()->Init();
-
 		HL_CORE_INFO("Engine Initialized");
 	}
 
 	HLApplication::~HLApplication()
 	{
-		FontManager::Get()->Shutdown();
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
 		Renderer::Shutdown();
+		FontManager::Get()->Shutdown();
 
 		VirtualFileSystem::Shutdown();
 		Logger::Shutdown();

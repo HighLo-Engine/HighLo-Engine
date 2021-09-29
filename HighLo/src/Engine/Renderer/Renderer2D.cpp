@@ -90,6 +90,7 @@ namespace highlo
 		uint32 CircleIndexCount = 0;
 
 		// Text
+		Ref<Shader> TextShader;
 		Ref<VertexArray> TextVertexArray;
 		Ref<Material> TextMaterial;
 		std::array<Ref<Texture2D>, MaxTextureSlots> FontTextureSlots;
@@ -181,6 +182,35 @@ namespace highlo
 		s_2DData->CircleShader->AddBuffer("CameraBuffer", cameraBuffer);
 		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices]; // TODO: check maxVertices
 
+		// Text
+		s_2DData->TextShader = Renderer::GetShaderLibrary()->Get("Renderer2DText");
+		s_2DData->TextShader->AddBuffer("CameraBuffer", cameraBuffer);
+		s_2DData->TextVertexArray = VertexArray::Create();
+		s_2DData->TextMaterial = Material::Create();
+		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
+
+		std::vector<int32> textIndices;
+		offset = 0;
+		for (uint32 i = 0; i < s_2DData->MaxIndices; ++i)
+		{
+			textIndices.push_back(offset + 0);
+			textIndices.push_back(offset + 1);
+			textIndices.push_back(offset + 2);
+
+			textIndices.push_back(offset + 2);
+			textIndices.push_back(offset + 3);
+			textIndices.push_back(offset + 0);
+
+			offset += 4;
+		}
+
+		Ref<VertexBuffer> textVertexBuffer = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(TextVertex));
+		textVertexBuffer->SetLayout(BufferLayout::GetTextLayout());
+		Ref<IndexBuffer> textIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
+
+		s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
+		s_2DData->TextVertexArray->SetIndexBuffer(textIndexBuffer);
+
 		/*
 		s_2DData->CircleVertexArray = VertexArray::Create();
 		Ref<VertexBuffer> circleVbo = VertexBuffer::Create();
@@ -213,6 +243,21 @@ namespace highlo
 		buffer->SetBufferValue(&s_2DData->CameraProjection);
 		buffer->UploadToShader();
 
+		s_2DData->LineShader->Bind();
+		Ref<UniformBuffer> lineBuffer = s_2DData->LineShader->GetBuffer("CameraBuffer");
+		lineBuffer->SetBufferValue(&s_2DData->CameraProjection);
+		lineBuffer->UploadToShader();
+
+		s_2DData->CircleShader->Bind();
+		Ref<UniformBuffer> circleBuffer = s_2DData->CircleShader->GetBuffer("CameraBuffer");
+		circleBuffer->SetBufferValue(&s_2DData->CameraProjection);
+		circleBuffer->UploadToShader();
+
+		s_2DData->TextShader->Bind();
+		Ref<UniformBuffer> textBuffer = s_2DData->TextShader->GetBuffer("CameraBuffer");
+		textBuffer->SetBufferValue(&s_2DData->CameraProjection);
+		textBuffer->UploadToShader();
+
 		StartBatch();
 	}
 
@@ -241,9 +286,7 @@ namespace highlo
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
 			
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
-			{
 				s_2DData->TextureSlots[i]->Bind(i);
-			}
 
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->Bind();
 			s_2DData->QuadVertexArray->GetIndexBuffer()->Bind();
@@ -281,6 +324,24 @@ namespace highlo
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
 
+	#pragma warning(push)
+	#pragma warning(disable : 4244)
+		dataSize = (uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase;
+	#pragma warning(pop)
+		if (dataSize)
+		{
+			s_2DData->TextShader->Bind();
+			s_2DData->TextVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->TextVertexBufferBase, dataSize);
+
+			for (uint32 i = 0; i < s_2DData->FontTextureSlotIndex; ++i)
+				s_2DData->FontTextureSlots[i]->Bind(i);
+
+			s_2DData->TextVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->TextVertexArray->GetIndexBuffer()->Bind();
+			s_2DData->TextVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
+		}
+
 		StartBatch();
 	}
 
@@ -297,7 +358,17 @@ namespace highlo
 		s_2DData->CircleIndexCount = 0;
 		s_2DData->CircleVertexBufferPtr = s_2DData->CircleVertexBufferBase;
 
+		s_2DData->TextIndexCount = 0;
+		s_2DData->TextVertexBufferPtr = s_2DData->TextVertexBufferBase;
+
 		s_2DData->TextureSlotIndex = 1;
+		s_2DData->FontTextureSlotIndex = 0;
+
+		for (uint32 i = 1; i < s_2DData->TextureSlots.size(); ++i)
+			s_2DData->TextureSlots[i] = nullptr;
+
+		for (uint32 i = 0; i < s_2DData->FontTextureSlots.size(); ++i)
+			s_2DData->FontTextureSlots[i] = nullptr;
 	}
 
 	void Renderer2D::NextBatch()
@@ -445,8 +516,7 @@ namespace highlo
 			return;
 
 		float textureIndex = 0.0f;
-
-		std::u32string utf32Str = utils::ConvertToUtf32Str(*text);
+		HLString32 utf32Text = (HLString32)"Hello World!";
 
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);
@@ -477,9 +547,9 @@ namespace highlo
 			double y = -fsScale * metrics.ascenderY;
 			int32 lastSpace = -1;
 
-			for (int32 i = 0; i < utf32Str.size(); ++i)
+			for (uint32 i = 0; i < utf32Text.Length(); ++i)
 			{
-				char32_t ch = utf32Str[i];
+				char32_t ch = utf32Text[i];
 				if (ch == '\n')
 				{
 					x = 0.0;
@@ -521,7 +591,7 @@ namespace highlo
 				}
 
 				double advance = glyph->getAdvance();
-				fontGeometry.getAdvance(advance, ch, utf32Str[i + 1]);
+				fontGeometry.getAdvance(advance, ch, utf32Text[i + 1]);
 				x += fsScale * advance + kerningOffset;
 			}
 		}
@@ -531,9 +601,9 @@ namespace highlo
 			double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 			double y = 0.0;
 
-			for (int32 i = 0; i < utf32Str.size(); ++i)
+			for (uint32 i = 0; i < utf32Text.Length(); ++i)
 			{
-				char32_t ch = utf32Str[i];
+				char32_t ch = utf32Text[i];
 				if (ch == '\n' || utils::NextLine(i, nextLines))
 				{
 					x = 0.0;
@@ -559,6 +629,15 @@ namespace highlo
 				double texelWidth = 1. / fontAtlas->GetWidth();
 				double texelHeight = 1. / fontAtlas->GetHeight();
 				l *= texelWidth, b *= texelHeight, r *= texelWidth, t *= texelHeight;
+
+			#ifdef HL_DEBUG
+				/*
+				ImGui::Begin("Font Debugger");
+				ImGui::Text("Size: %dx%d", fontAtlas->GetWidth(), fontAtlas->GetHeight());
+				UI::Image(fontAtlas, ImVec2((float)fontAtlas->GetWidth(), (float)fontAtlas->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
+				ImGui::End();
+				*/
+			#endif // HL_DEBUG
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pl, pb, 0.0f, 1.0f);
 				s_2DData->TextVertexBufferPtr->Color = color;
@@ -587,7 +666,7 @@ namespace highlo
 				s_2DData->TextIndexCount += 6;
 
 				double advance = glyph->getAdvance();
-				fontGeometry.getAdvance(advance, ch, utf32Str[i + 1]);
+				fontGeometry.getAdvance(advance, ch, utf32Text[i + 1]);
 				x += fsScale * advance + kerningOffset;
 			}
 		}

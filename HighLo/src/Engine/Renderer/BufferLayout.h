@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-09-29) Added GetTextLayout
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -106,6 +107,7 @@ namespace highlo
 		HLAPI static BufferLayout GetTextureLayout();
 		HLAPI static BufferLayout GetLineLayout();
 		HLAPI static BufferLayout GetCircleLayout();
+		HLAPI static BufferLayout GetTextLayout();
 		HLAPI static BufferLayout GetStaticShaderLayout();
 		HLAPI static BufferLayout GetAnimatedShaderLayout();
 		HLAPI static BufferLayout GetSkyboxLayout();

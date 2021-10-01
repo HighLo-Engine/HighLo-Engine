@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-10-01) fixed GetFileList function (it now pushes only relative paths into the vector and you can retrieve the absolute path from each entry inidividually)
 //     - 1.1 (2021-09-22) Added GetFileCount and SetFullPath
 //     - 1.0 (2021-09-15) initial release
 //
@@ -33,6 +34,7 @@ namespace highlo
 
 		HLAPI bool IsFile() const { return m_IsFile; }
 		HLAPI bool IsDirectory() const { return !m_IsFile; }
+		HLAPI bool IsSymLink() const;
 
 		HLAPI bool operator==(const File &other) const;
 		HLAPI bool operator!=(const File &other) const;

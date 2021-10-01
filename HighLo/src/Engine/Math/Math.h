@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-01) Added ultra-fast FastSquareRoot function (source: https://www.youtube.com/watch?v=p8u_k2LIZyo)
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -41,6 +42,8 @@ namespace highlo
 	HLAPI std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec);
 	HLAPI std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat);
 	HLAPI HLString vec3ToString(const glm::vec3 &v);
+
+	HLAPI float FastInverseSquareRoot(float value);
 
 	HLAPI glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset = glm::vec2(0, 0));
 	HLAPI glm::vec3 WorldToScreen(const glm::vec3 &point, const glm::mat4 &view_matrix, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset = glm::vec2(0, 0));

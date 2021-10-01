@@ -75,6 +75,28 @@ namespace highlo
 		return HLString::ToString(v.x) + ", " + HLString::ToString(v.y) + ", " + HLString::ToString(v.z);
 	}
 
+	float FastInverseSquareRoot(float value)
+	{
+		uint32 i;
+		float x2, y;
+
+		x2 = value * 0.5f;
+		y = value;
+
+		// 
+		//i = *(uint32*)&y;
+		memcpy(&i, &y, 4);
+		i = 0x5f3759df - (i >> 1);
+		//y = *(uint32*)&i;
+		memcpy(&y, &i, 4);
+
+		// Newton iteration
+		y = y * (1.5f - (x2 * y * y));
+		y = y * (1.5f - (x2 * y * y));
+
+		return y;
+	}
+
 	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset)
 	{
 		glm::vec2 normalized_device_coords;

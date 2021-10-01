@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-10-01) fixed Bug in Contains methods - the engine does not longer crash if the checked string is empty
 //     - 1.1 (2021-09-29) Refactored hole class to support multibyte Strings as well
 //     - 1.0 (2021-09-14) initial release
 //
@@ -668,6 +669,9 @@ namespace highlo
 		{
 			bool hasLetter = false;
 
+			if (IsEmpty())
+				return false;
+
 			for (uint32 i = offset; i < m_Size; ++i)
 			{
 				if (m_Data[i] == letter)
@@ -684,6 +688,9 @@ namespace highlo
 			{
 			uint32 i = offset;
 			uint32 j = 0;
+
+			if (IsEmpty())
+				return false;
 
 			while (m_Data[i] != '\0')
 			{

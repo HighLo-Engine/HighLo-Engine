@@ -20,7 +20,7 @@ namespace highlo
 		std::vector<File> result;
 
 		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
-			result.push_back(File(entry.path().string()));
+			result.push_back(File(entry.path().filename().string()));
 
 		return result;
 	}
@@ -37,8 +37,8 @@ namespace highlo
 
 	void File::SetFullPath(const HLString &path)
 	{
-		m_Handle = std::filesystem::canonical(*path);
 		m_FilePath = path;
+		m_Handle = std::filesystem::canonical(*path);
 		m_IsFile = true;
 
 		if (m_FilePath.Contains('\\'))
@@ -94,6 +94,12 @@ namespace highlo
 	int64 File::GetSize()
 	{
 		return FileSystem::GetFileSize(m_AbsoluteFilePath);
+	}
+
+	bool File::IsSymLink() const
+	{
+		const auto &handle = std::filesystem::directory_entry(m_Handle);
+		return handle.is_symlink();
 	}
 
 	bool File::operator==(const File &other) const

@@ -17,6 +17,7 @@ namespace highlo
 	{
 	public:
 
+		HLAPI File() = default;
 		HLAPI File(const HLString &path);
 		HLAPI ~File();
 

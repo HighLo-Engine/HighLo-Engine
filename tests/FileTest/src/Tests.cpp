@@ -67,42 +67,60 @@ bool test_get_size()
 {
 	highloUnit::Timer timer("test_get_size");
 
+	File *file = new File("./premake5.lua");
+	int64 size = file->GetSize();
+	delete file;
 
+	std::filesystem::path p = std::filesystem::canonical("./premake5.lua");
+	uintmax_t realSize = std::filesystem::file_size(p);
 
 	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual<int64>(timer, size, realSize);
 }
 
 bool test_get_name()
 {
 	highloUnit::Timer timer("test_get_name");
 
+	File *file = new File("./premake5.lua");
+	HLString name = file->GetName();
+	delete file;
 
+	std::filesystem::path p = std::filesystem::canonical("premake5.lua");
+	std::string realFileName = p.stem().string();
 
 	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual<char*>(timer, *name, (char*)realFileName.c_str());
 }
 
 bool test_get_extension()
 {
 	highloUnit::Timer timer("test_get_extension");
 
+	File *file = new File("./premake5.lua");
+	HLString extension = file->GetExtension();
+	delete file;
 
+	std::filesystem::path p = std::filesystem::canonical("./premake5.lua");
+	std::string realfileExtension = p.extension().string();
 
 	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual<char*>(timer, *extension, (char*)realfileExtension.c_str());
 }
 
 bool test_is_file()
 {
 	highloUnit::Timer timer("test_is_file");
 
-	File *file = new File("");
+	File *file = new File("./premake5.lua");
 	bool isFile = file->IsFile();
 	delete file;
 
+	std::filesystem::path p = std::filesystem::canonical("./premake5.lua");
+	bool isRealFile = !std::filesystem::is_directory(p);
+
 	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual(timer, isFile, isRealFile);
 }
 
 bool test_is_directory()
@@ -113,7 +131,10 @@ bool test_is_directory()
 	bool isDir = file->IsDirectory();
 	delete file;
 
+	std::filesystem::path p = std::filesystem::canonical("bin/");
+	bool isRealDir = std::filesystem::is_directory(p);
+
 	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual(timer, isDir, isRealDir);
 }
 

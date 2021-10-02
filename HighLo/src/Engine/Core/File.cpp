@@ -39,13 +39,10 @@ namespace highlo
 	{
 		m_FilePath = path;
 		m_Handle = std::filesystem::canonical(*path);
-		m_IsFile = true;
+		m_IsFile = !std::filesystem::is_directory(m_Handle);
 
 		if (m_FilePath.Contains('\\'))
 			m_FilePath = m_FilePath.Replace("\\", "/", -1);
-
-		if (std::filesystem::is_directory(m_Handle))
-			m_IsFile = false;
 
 		m_AbsoluteFilePath = std::filesystem::absolute(m_Handle).string();
 		if (m_AbsoluteFilePath.Contains('\\'))
@@ -87,7 +84,7 @@ namespace highlo
 		if (!result.Contains("."))
 			return "-1";
 
-		result = result.Substr(result.IndexOf(".") + 1);
+		result = result.Substr(result.IndexOf("."));
 		return result;
 	}
 
@@ -147,7 +144,7 @@ namespace highlo
 		if (!result.Contains("."))
 			return "-1";
 
-		result = result.Substr(result.IndexOf(".") + 1);
+		result = result.Substr(result.IndexOf("."));
 		return result;
 	}
 

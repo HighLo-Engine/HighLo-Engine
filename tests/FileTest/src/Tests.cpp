@@ -12,7 +12,10 @@ bool test_get_file_list()
 	for (uint32 i = 0; i < dirList.size(); ++i)
 	{
 		if (dirList[i].IsDirectory())
+		{
+			std::cout << dirList[i].GetRelativePath() << std::endl;
 			result.push_back(dirList[i].GetRelativePath());
+		}
 	}
 
 	delete file;

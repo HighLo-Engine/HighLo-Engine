@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-10-02) Added begin and end functions to be able to use ForEach loops over Strings
 //     - 1.2 (2021-10-01) fixed Bug in Contains methods - the engine does not longer crash if the checked string is empty
 //     - 1.1 (2021-09-29) Refactored hole class to support multibyte Strings as well
 //     - 1.0 (2021-09-14) initial release
@@ -141,6 +142,16 @@ namespace highlo
 			}
 
 			return *this;
+		}
+
+		HLAPI StringType *begin()
+		{
+			return m_Data[0];
+		}
+
+		HLAPI StringType *end()
+		{
+			return m_Data[m_Size];
 		}
 
 		HLAPI void Clear()

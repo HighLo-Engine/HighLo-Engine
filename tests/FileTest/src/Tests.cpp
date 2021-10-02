@@ -1,9 +1,33 @@
 #include "Tests.h"
 using namespace highlo;
 
+#include <filesystem>
+
+static std::vector<File> GetCorrectFileList(const char *path, bool onlyDir = true)
+{
+	std::vector<File> result;
+
+	std::filesystem::path p = std::filesystem::canonical(path);
+	for (const auto &entry : std::filesystem::directory_iterator(p))
+	{
+		if (onlyDir)
+		{
+			if (std::filesystem::is_directory(entry.path()))
+				result.push_back(File(entry.path().filename().string()));
+		}
+		else
+		{
+			result.push_back(File(entry.path().filename().string()));
+		}
+	}
+
+	return result;
+}
+
 bool test_get_file_list()
 {
 	highloUnit::Timer timer("test_get_file_list");
+	std::vector<File> correctFileList = GetCorrectFileList(".");
 
 	File *file = new File(".");
 	std::vector<File> dirList = file->GetFileList();
@@ -12,60 +36,31 @@ bool test_get_file_list()
 	for (uint32 i = 0; i < dirList.size(); ++i)
 	{
 		if (dirList[i].IsDirectory())
-		{
-			std::cout << dirList[i].GetRelativePath() << std::endl;
 			result.push_back(dirList[i].GetRelativePath());
-		}
 	}
 
 	delete file;
 
 	highloUnit::Test test;
-	return test.AssertEqual<char*>(timer, *result[0], "bin")
-		&& test.AssertEqual<char*>(timer, *result[1], "bin-obj")
-		&& test.AssertEqual<char*>(timer, *result[2], "src");
+	for (uint32 i = 0; i < result.size(); ++i)
+	{
+		test.AssertEqual<char*>(timer, (char*)*result[i], (char*)*correctFileList[i].GetRelativePath());
+	}
+
+	return false;
 }
 
 bool test_get_file_list_count()
 {
 	highloUnit::Timer timer("test_get_file_list_count");
+	std::vector<File> correctFileList = GetCorrectFileList(".", false);
 
 	File *file = new File(".");
 	uint32 fileCount = file->GetFileCount();
 	delete file;
 
 	highloUnit::Test test;
-	return test.AssertEqual<uint32>(timer, 7, fileCount);
-}
-
-bool test_set_full_path()
-{
-	highloUnit::Timer timer("test_set_full_path");
-
-
-
-	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
-}
-
-bool test_get_relative_path()
-{
-	highloUnit::Timer timer("test_get_relative_path");
-
-
-
-	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
-}
-
-bool test_get_absolute_path()
-{
-	highloUnit::Timer timer("test_get_absolute_path");
-
-
-
-	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual<uint32>(timer, (uint32)correctFileList.size(), fileCount);
 }
 
 bool test_get_size()
@@ -88,31 +83,11 @@ bool test_get_name()
 	return test.AssertEqual(timer, true, true);
 }
 
-bool test_get_static_name()
-{
-	highloUnit::Timer timer("test_get_static_name");
-
-	HLString fileName = File::GetFileName("");
-
-	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
-}
-
 bool test_get_extension()
 {
 	highloUnit::Timer timer("test_get_extension");
 
 
-
-	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
-}
-
-bool test_get_static_extension()
-{
-	highloUnit::Timer timer("test_get_static_extension");
-
-	HLString fileExtension = File::GetFileExtension("");
 
 	highloUnit::Test test;
 	return test.AssertEqual(timer, true, true);

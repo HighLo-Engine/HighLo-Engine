@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "FileSystemPath.h"
 
+#include "FileSystem.h"
+
 namespace highlo
 {
 	FileSystemPath::FileSystemPath(const char *path)
@@ -19,7 +21,7 @@ namespace highlo
 	
 	FileSystemPath::FileSystemPath(const File &file)
 	{
-		m_File = File::Create(file.GetAbsolutePath());
+		m_File = File::Create(file.GetRelativePath());
 		m_CurrentPath = m_File->GetAbsolutePath();
 	}
 	
@@ -31,6 +33,7 @@ namespace highlo
 	{
 		m_CurrentPath = other.m_CurrentPath;
 		m_File = other.m_File;
+
 		return *this;
 	}
 
@@ -38,6 +41,7 @@ namespace highlo
 	{
 		m_CurrentPath = str;
 		m_File = File::Create(str);
+
 		return *this;
 	}
 
@@ -45,6 +49,7 @@ namespace highlo
 	{
 		m_CurrentPath = source;
 		m_File = File::Create(source);
+		
 		return *this;
 	}
 
@@ -55,7 +60,7 @@ namespace highlo
 		rhs = tmp;
 	}
 
-	uint64 FileSystemPath::Hash()
+	uint64 FileSystemPath::Hash() const
 	{
 		return m_CurrentPath.Hash();
 	}
@@ -78,8 +83,15 @@ namespace highlo
 
 	bool FileSystemPath::HasParentPath() const
 	{
-		// TODO
-		return false;
+		uint32 minSlashes = 0;
+		
+		if (HasRootPath())
+			++minSlashes;
+		
+		if (m_CurrentPath.EndsWith("/"))
+			++minSlashes;
+
+		return minSlashes > 0;
 	}
 
 	bool FileSystemPath::IsAbsolute() const
@@ -92,16 +104,26 @@ namespace highlo
 		return !HasRootPath();
 	}
 
-	FileSystemPath FileSystemPath::RelativePath()
+	FileSystemPath FileSystemPath::RelativePath() const
 	{
-		// TODO
-		return {};
+		return m_File->GetRelativePath();
 	}
 
-	FileSystemPath FileSystemPath::ParentPath()
+	FileSystemPath FileSystemPath::ParentPath() const
 	{
-		// TODO
-		return {};
+		if (HasParentPath())
+		{
+			HLString result = m_CurrentPath;
+			
+			uint32 offset = 0;
+			if (result.EndsWith("/"))
+				offset = 1;
+
+			result = result.Substr(0, result.LastIndexOf("/", offset));
+			return FileSystemPath(result);
+		}
+	
+		return FileSystemPath(m_CurrentPath);
 	}
 	
 	bool FileSystemPath::operator==(const FileSystemPath &other) const

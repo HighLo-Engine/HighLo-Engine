@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.4 (2021-10-04) Refactored some functions to work in a const environment as well
 //     - 1.3 (2021-09-26) Added constructor and operator= for the Strings
 //     - 1.2 (2021-09-22) Added File getter, more overloads and implemented most methods
 //     - 1.1 (2021-09-21) Added String methods
@@ -29,7 +30,7 @@ namespace highlo
 
 		HLAPI FileSystemPath &Assign(const HLString &source);
 		HLAPI void Swap(FileSystemPath &lhs, FileSystemPath &rhs);
-		HLAPI uint64 Hash();
+		HLAPI uint64 Hash() const;
 
 		HLAPI bool IsEmpty() const;
 		HLAPI bool HasRootPath() const;
@@ -38,8 +39,8 @@ namespace highlo
 		HLAPI bool IsAbsolute() const;
 		HLAPI bool IsRelative() const;
 
-		HLAPI FileSystemPath RelativePath();
-		HLAPI FileSystemPath ParentPath();
+		HLAPI FileSystemPath RelativePath() const;
+		HLAPI FileSystemPath ParentPath() const;
 
 		HLAPI Ref<File> &GetFile() { return m_File; }
 		HLAPI const Ref<File> &GetFile() const { return m_File; }

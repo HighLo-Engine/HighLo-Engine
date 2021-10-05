@@ -9,6 +9,8 @@
 #include "Engine/Core/File.h"
 #include "AssetExtensions.h"
 
+#include "Engine/Core/FileSystemWatcher.h"
+
 namespace highlo
 {
 	// ====================================================================================
@@ -69,7 +71,7 @@ namespace highlo
 	void AssetManager::Init()
 	{
 		LoadAssetRegistry();
-		FileSystem::SetChangeCallback(AssetManager::OnFileSystemChangedEvent);
+		FileSystemWatcher::Get()->SetChangeCallback(AssetManager::OnFileSystemChangedEvent);
 		ReloadAllAssets();
 	}
 

@@ -49,7 +49,7 @@ namespace highlo
 			m_AbsoluteFilePath = m_AbsoluteFilePath.Replace("\\", "/", -1);
 	}
 
-	HLString File::GetName()
+	HLString File::GetName() const
 	{
 		HLString result;
 		int32 pos = m_FilePath.FirstIndexOf('/');
@@ -68,7 +68,7 @@ namespace highlo
 		return result;
 	}
 
-	HLString File::GetExtension()
+	HLString File::GetExtension() const
 	{
 		HLString result;
 		int32 pos = m_FilePath.FirstIndexOf('/');
@@ -88,9 +88,14 @@ namespace highlo
 		return result;
 	}
 
-	int64 File::GetSize()
+	int64 File::GetSize() const
 	{
 		return FileSystem::GetFileSize(m_AbsoluteFilePath);
+	}
+
+	bool File::Exists() const
+	{
+		return FileSystem::FileExists(m_FilePath);
 	}
 
 	bool File::IsSymLink() const
@@ -151,6 +156,22 @@ namespace highlo
 	Ref<File> File::Create(const HLString &path)
 	{
 		return Ref<File>::Create(path);
+	}
+	
+	HLString File::ExtractFullFileName(const HLString &filePath) const
+	{
+		HLString result;
+		int32 pos = filePath.FirstIndexOf('/');
+		int32 i = 1;
+
+		while (pos != HLString::NPOS)
+		{
+			result = filePath.Substr(pos + 1);
+			pos = filePath.FirstIndexOf('/', i);
+			++i;
+		}
+
+		return result;
 	}
 }
 

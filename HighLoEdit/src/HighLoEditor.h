@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-04) refactored watcher functions from FileSystem to FileSystemWatcher class
 //     - 1.0 (2021-09-15) initial release
 //
 

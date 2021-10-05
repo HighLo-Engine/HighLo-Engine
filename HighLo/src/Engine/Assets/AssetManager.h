@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-10-04) Refactored initialization to use the FileSystemWatcher instead of FileSystem class
 //     - 1.2 (2021-09-22) Changed AssetManager to be a Singleton class
 //     - 1.1 (2021-09-15) Changed FileExtension implementation
 //     - 1.0 (2021-09-14) initial release

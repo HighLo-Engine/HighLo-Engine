@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-10-04) Added FileSystemWatcher
 //     - 1.2 (2021-09-26) Added Color, AssetEditor, AssetEditorPanel include
 //     - 1.1 (2021-09-21) Added Font include
 //     - 1.0 (2021-09-14) initial release
@@ -31,6 +32,7 @@
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Core/File.h"
 #include "Engine/Core/FileSystemPath.h"
+#include "Engine/Core/FileSystemWatcher.h"
 #include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Core/Profiler/Profiler.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"

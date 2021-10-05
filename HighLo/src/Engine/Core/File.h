@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-10-04) Added GetFullName function and refactored some functions to also be callable in a const environment
 //     - 1.2 (2021-10-01) fixed GetFileList function (it now pushes only relative paths into the vector and you can retrieve the absolute path from each entry inidividually)
 //     - 1.1 (2021-09-22) Added GetFileCount and SetFullPath
 //     - 1.0 (2021-09-15) initial release
@@ -29,9 +30,13 @@ namespace highlo
 		HLAPI const HLString &GetRelativePath() const { return m_FilePath; }
 		HLAPI const HLString &GetAbsolutePath() const { return m_AbsoluteFilePath; }
 
-		HLAPI HLString GetName();
-		HLAPI HLString GetExtension();
-		HLAPI int64 GetSize();
+		HLAPI HLString GetFullName() { return ExtractFullFileName(m_FilePath); }
+		HLAPI const HLString GetFullName() const { return ExtractFullFileName(m_FilePath); }
+
+		HLAPI HLString GetName() const;
+		HLAPI HLString GetExtension() const;
+		HLAPI int64 GetSize() const;
+		HLAPI bool Exists() const;
 
 		HLAPI bool IsFile() const { return m_IsFile; }
 		HLAPI bool IsDirectory() const { return !m_IsFile; }
@@ -47,6 +52,8 @@ namespace highlo
 		HLAPI static Ref<File> Create(const HLString &path);
 
 	private:
+
+		HLString ExtractFullFileName(const HLString &filePath) const;
 
 		std::filesystem::path m_Handle;
 		HLString m_FilePath;

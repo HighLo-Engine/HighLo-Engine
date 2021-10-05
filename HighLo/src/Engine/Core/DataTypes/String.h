@@ -650,13 +650,6 @@ namespace highlo
 			return *this;
 		}
 
-		HLAPI void Print() const
-		{
-			for (uint32 i = 0; i < m_Size; ++i)
-				printf("%c", m_Data[i]);
-			printf("\n");
-		}
-
 		HLAPI uint64 Hash() const
 		{
 			/*

@@ -42,7 +42,7 @@ void HighLoEditor::OnInitialize()
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
 	UpdateWindowTitle("Untitled Scene");
 
-	FileSystem::StartWatching();
+	FileSystemWatcher::Get()->Start("assets");
 
 	// Create FileMenu
 	m_MenuBar = MenuBar::Create();
@@ -170,7 +170,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 
 void HighLoEditor::OnShutdown()
 {
-	FileSystem::StopWatching();
+	FileSystemWatcher::Get()->Stop();
 }
 
 void HighLoEditor::OnEvent(Event &e)

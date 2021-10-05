@@ -5,6 +5,9 @@ bool test_file_exists()
 {
 	highloUnit::Timer timer("test_file_exists");
 
+	FileSystemPath fs("./premake5.lua");
+	bool result = FileSystem::FileExists(fs);
+
 
 
 	highloUnit::Test test;
@@ -14,6 +17,8 @@ bool test_file_exists()
 bool test_path_exists()
 {
 	highloUnit::Timer timer("test_path_exists");
+
+	FileSystemPath fs("bin/");
 
 
 
@@ -25,6 +30,8 @@ bool test_remove_file()
 {
 	highloUnit::Timer timer("test_remove_file");
 
+	FileSystemPath fs("./premake5.lua");
+
 
 
 	highloUnit::Test test;
@@ -35,6 +42,8 @@ bool test_rename_file()
 {
 	highloUnit::Timer timer("test_rename_file");
 
+	FileSystemPath fs("./premake5.lua");
+	
 
 
 	highloUnit::Test test;
@@ -44,6 +53,8 @@ bool test_rename_file()
 bool test_move_file()
 {
 	highloUnit::Timer timer("test_move_file");
+
+	FileSystemPath fs("./premake5.lua");
 
 
 
@@ -55,6 +66,8 @@ bool test_get_file_size()
 {
 	highloUnit::Timer timer("test_get_file_size");
 
+	FileSystemPath fs("./premake5.lua");
+
 
 
 	highloUnit::Test test;
@@ -64,6 +77,8 @@ bool test_get_file_size()
 bool test_create_folder()
 {
 	highloUnit::Timer timer("test_create_folder");
+
+	FileSystemPath fs("testFolder");
 
 
 
@@ -75,6 +90,8 @@ bool test_remove_folder()
 {
 	highloUnit::Timer timer("test_remove_folder");
 
+	FileSystemPath fs("testFolder");
+
 
 
 	highloUnit::Test test;
@@ -84,6 +101,8 @@ bool test_remove_folder()
 bool test_read_file()
 {
 	highloUnit::Timer timer("test_read_file");
+
+	FileSystemPath fs("./premake5.lua");
 
 
 
@@ -95,6 +114,8 @@ bool test_read_text_file()
 {
 	highloUnit::Timer timer("test_read_text_file");
 
+	FileSystemPath fs("./premake5.lua");
+
 
 
 	highloUnit::Test test;
@@ -105,6 +126,8 @@ bool test_write_file()
 {
 	highloUnit::Timer timer("test_write_file");
 
+	FileSystemPath fs("./premake5.lua");
+
 
 
 	highloUnit::Test test;
@@ -114,6 +137,8 @@ bool test_write_file()
 bool test_write_text_file()
 {
 	highloUnit::Timer timer("test_write_text_file");
+
+	FileSystemPath fs("./premake5.lua");
 
 
 

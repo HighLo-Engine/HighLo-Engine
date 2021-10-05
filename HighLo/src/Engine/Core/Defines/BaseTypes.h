@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-04) Added LONG and ULONG Definition
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -15,12 +16,14 @@ using Byte = unsigned char;
 typedef unsigned char uint8;		// 8-bit  unsigned
 typedef unsigned short uint16;		// 16-bit unsigned
 typedef unsigned int uint32;		// 32-bit unsigned
+typedef unsigned long ULONG;		// 32-Bit unsigned
 typedef unsigned long long uint64;  // 64-bit unsigned
 
 // Signed base types
 typedef signed char int8;			// 8-bit  signed
 typedef signed short int16;			// 16-bit signed
 typedef signed int int32;			// 32-bit signed
+typedef signed long LONG;			// 32-bit signed
 typedef signed long long int64;		// 64-bit signed
 
 // Pointer size

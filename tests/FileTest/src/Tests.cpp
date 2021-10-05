@@ -53,14 +53,14 @@ bool test_get_file_list()
 bool test_get_file_list_count()
 {
 	highloUnit::Timer timer("test_get_file_list_count");
-	std::vector<File> correctFileList = GetCorrectFileList(".", false);
+	uint32 correctSize = (uint32)GetCorrectFileList(".", false).size();
 
 	File *file = new File(".");
 	uint32 fileCount = file->GetFileCount();
 	delete file;
 
 	highloUnit::Test test;
-	return test.AssertEqual<uint32>(timer, (uint32)correctFileList.size(), fileCount);
+	return test.AssertEqual<uint32>(timer, correctSize, fileCount);
 }
 
 bool test_get_size()
@@ -72,7 +72,7 @@ bool test_get_size()
 	delete file;
 
 	std::filesystem::path p = std::filesystem::canonical("./premake5.lua");
-	uintmax_t realSize = std::filesystem::file_size(p);
+	int64 realSize = (int64)std::filesystem::file_size(p);
 
 	highloUnit::Test test;
 	return test.AssertEqual<int64>(timer, size, realSize);

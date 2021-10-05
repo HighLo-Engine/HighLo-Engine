@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-10-05) Fixed warning in Release mode, because HL_ASSERT was used in release
 //     - 1.2 (2021-09-26) Added MSDFData getter and moved GetDefaultFont to FontManager
 //     - 1.1 (2021-09-22) Added Name getter
 //     - 1.0 (2021-09-21) initial release

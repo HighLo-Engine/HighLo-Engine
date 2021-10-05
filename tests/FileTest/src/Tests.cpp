@@ -131,7 +131,7 @@ bool test_is_directory()
 	bool isDir = file->IsDirectory();
 	delete file;
 
-	std::filesystem::path p = std::filesystem::canonical("bin/");
+	std::filesystem::path p("bin/");
 	bool isRealDir = std::filesystem::is_directory(p);
 
 	highloUnit::Test test;

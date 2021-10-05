@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 		{ test_get_extension, "test_get_extension" },
 
 		{ test_is_file, "test_is_file" },
-	//	{ test_is_directory, "test_is_directory" },
+		{ test_is_directory, "test_is_directory" },
 	};
 
 	highloUnit::UnitTest test;

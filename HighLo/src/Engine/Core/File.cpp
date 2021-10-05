@@ -39,7 +39,6 @@ namespace highlo
 	void File::SetFullPath(const HLString &path)
 	{
 		m_FilePath = path;
-		m_IsFile = !std::filesystem::is_directory(m_Handle);
 
 		if (m_ExistsOnHardDrive)
 		{
@@ -49,6 +48,7 @@ namespace highlo
 		if (m_FilePath.Contains('\\'))
 			m_FilePath = m_FilePath.Replace("\\", "/", -1);
 
+		m_IsFile = !std::filesystem::is_directory(m_Handle);
 		m_AbsoluteFilePath = std::filesystem::absolute(m_Handle).string();
 		if (m_AbsoluteFilePath.Contains('\\'))
 			m_AbsoluteFilePath = m_AbsoluteFilePath.Replace("\\", "/", -1);

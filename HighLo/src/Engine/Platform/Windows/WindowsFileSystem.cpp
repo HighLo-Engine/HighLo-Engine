@@ -40,13 +40,21 @@ namespace highlo
 
     bool FileSystem::FileExists(const FileSystemPath &path)
     {
-        DWORD result = GetFileAttributesW(path.String().W_Str());
+        HLString pathStr = path.String();
+        if (pathStr.IsEmpty())
+            return false;
+
+        DWORD result = GetFileAttributesW(pathStr.W_Str());
         return !(result == INVALID_FILE_ATTRIBUTES && GetLastError() == ERROR_FILE_NOT_FOUND);
     }
 
     bool FileSystem::PathExists(const FileSystemPath &path)
     {
-        DWORD result = GetFileAttributesW(path.String().W_Str());
+        HLString pathStr = path.String();
+        if (pathStr.IsEmpty())
+            return false;
+
+        DWORD result = GetFileAttributesW(pathStr.W_Str());
         return (result != INVALID_FILE_ATTRIBUTES && (result & FILE_ATTRIBUTE_DIRECTORY));
     }
 

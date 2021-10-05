@@ -9,20 +9,21 @@ namespace highlo
 {
 	FileSystemPath::FileSystemPath(const char *path)
 	{
+		m_File = File::Create(path, FileSystem::FileExists(*this));
 		m_CurrentPath = path;
-		m_File = File::Create(m_CurrentPath);
+
 	}
 	
 	FileSystemPath::FileSystemPath(const HLString &path)
 	{
-		m_File = File::Create(path);
-		m_CurrentPath = m_File->GetAbsolutePath();
+		m_File = File::Create(path, FileSystem::FileExists(*this));
+		m_CurrentPath = path;
 	}
 	
 	FileSystemPath::FileSystemPath(const File &file)
 	{
-		m_File = File::Create(file.GetRelativePath());
-		m_CurrentPath = m_File->GetAbsolutePath();
+		m_File = File::Create(file.GetRelativePath(), FileSystem::FileExists(*this));
+		m_CurrentPath = file.GetAbsolutePath();
 	}
 	
 	FileSystemPath::~FileSystemPath()
@@ -39,16 +40,16 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator=(const HLString &str)
 	{
+		m_File = File::Create(str, FileSystem::FileExists(*this));
 		m_CurrentPath = str;
-		m_File = File::Create(str);
 
 		return *this;
 	}
 
 	FileSystemPath &FileSystemPath::Assign(const HLString &source)
 	{
+		m_File = File::Create(source, FileSystem::FileExists(*this));
 		m_CurrentPath = source;
-		m_File = File::Create(source);
 		
 		return *this;
 	}

@@ -2,6 +2,8 @@
 
 //
 // version history:
+//     - 1.6 (2021-10-05) Refactored implementation to be able to handle non-existent files on the hard drive
+//     - 1.5 (2021-10-05) Fixed bug where the engine would crash if a Filepath does not exist
 //     - 1.4 (2021-10-04) Refactored some functions to work in a const environment as well
 //     - 1.3 (2021-09-26) Added constructor and operator= for the Strings
 //     - 1.2 (2021-09-22) Added File getter, more overloads and implemented most methods
@@ -23,6 +25,7 @@ namespace highlo
 		HLAPI FileSystemPath(const char *path);
 		HLAPI FileSystemPath(const HLString &path);
 		HLAPI FileSystemPath(const File &file);
+		HLAPI FileSystemPath(const FileSystemPath&) = default;
 		HLAPI ~FileSystemPath();
 
 		HLAPI FileSystemPath &operator=(const FileSystemPath &other);

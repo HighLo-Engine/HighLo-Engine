@@ -6,7 +6,8 @@
 
 namespace highlo
 {
-	File::File(const HLString &path)
+	File::File(const HLString &path, bool exists)
+		: m_ExistsOnHardDrive(exists)
 	{
 		SetFullPath(path);
 	}
@@ -38,8 +39,12 @@ namespace highlo
 	void File::SetFullPath(const HLString &path)
 	{
 		m_FilePath = path;
-		m_Handle = std::filesystem::canonical(*path);
 		m_IsFile = !std::filesystem::is_directory(m_Handle);
+
+		if (m_ExistsOnHardDrive)
+		{
+			m_Handle = std::filesystem::canonical(*path);
+		}
 
 		if (m_FilePath.Contains('\\'))
 			m_FilePath = m_FilePath.Replace("\\", "/", -1);
@@ -153,9 +158,9 @@ namespace highlo
 		return result;
 	}
 
-	Ref<File> File::Create(const HLString &path)
+	Ref<File> File::Create(const HLString &path, bool exists)
 	{
-		return Ref<File>::Create(path);
+		return Ref<File>::Create(path, exists);
 	}
 	
 	HLString File::ExtractFullFileName(const HLString &filePath) const

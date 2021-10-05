@@ -1,17 +1,20 @@
 #include "Tests.h"
 using namespace highlo;
 
+#include <filesystem>
+
 bool test_file_exists()
 {
 	highloUnit::Timer timer("test_file_exists");
 
-	FileSystemPath fs("./premake5.lua");
+	FileSystemPath fs("./premake5.lua");	
 	bool result = FileSystem::FileExists(fs);
 
-
+	std::filesystem::path realPath("./premake5.lua");
+	bool realExists = std::filesystem::exists(realPath);
 
 	highloUnit::Test test;
-	return test.AssertEqual(timer, true, true);
+	return test.AssertEqual(timer, result, realExists);
 }
 
 bool test_path_exists()

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.4 (2021-10-05) Refactored File implementation to carry a new flag along that determines whether a file actually exists on the hard drive
 //     - 1.3 (2021-10-04) Added GetFullName function and refactored some functions to also be callable in a const environment
 //     - 1.2 (2021-10-01) fixed GetFileList function (it now pushes only relative paths into the vector and you can retrieve the absolute path from each entry inidividually)
 //     - 1.1 (2021-09-22) Added GetFileCount and SetFullPath
@@ -19,7 +20,7 @@ namespace highlo
 	public:
 
 		HLAPI File() = default;
-		HLAPI File(const HLString &path);
+		HLAPI File(const HLString &path, bool exists = true);
 		HLAPI ~File();
 
 		HLAPI std::vector<File> GetFileList();
@@ -49,7 +50,7 @@ namespace highlo
 
 		HLAPI static HLString GetFileName(const HLString &path);
 		HLAPI static HLString GetFileExtension(const HLString &path);
-		HLAPI static Ref<File> Create(const HLString &path);
+		HLAPI static Ref<File> Create(const HLString &path, bool exists = true);
 
 	private:
 
@@ -59,5 +60,6 @@ namespace highlo
 		HLString m_FilePath;
 		HLString m_AbsoluteFilePath;
 		bool m_IsFile;
+		bool m_ExistsOnHardDrive;
 	};
 }

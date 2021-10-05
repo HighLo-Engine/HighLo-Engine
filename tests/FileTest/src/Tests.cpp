@@ -127,11 +127,11 @@ bool test_is_directory()
 {
 	highloUnit::Timer timer("test_is_directory");
 
-	File *file = new File("bin/");
+	File *file = new File("./premake5.lua");
 	bool isDir = file->IsDirectory();
 	delete file;
 
-	std::filesystem::path p("bin/");
+	std::filesystem::path p = std::filesystem::canonical("./premake5.lua");
 	bool isRealDir = std::filesystem::is_directory(p);
 
 	highloUnit::Test test;

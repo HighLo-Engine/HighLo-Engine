@@ -8,9 +8,9 @@ int main(int argc, char *argv[])
 		{ test_file_exists, "test_file_exists" },
 		{ test_path_exists, "test_path_exists" },
 
-		{ test_remove_file, "test_remove_file" },
+	//	{ test_remove_file, "test_remove_file" },
 		{ test_get_file_size, "test_get_file_size" },
-	//	{ test_rename_file, "test_rename_file" },
+		{ test_rename_file, "test_rename_file" },
 		{ test_move_file, "test_move_file" },
 
 		{ test_create_folder, "test_create_folder" },

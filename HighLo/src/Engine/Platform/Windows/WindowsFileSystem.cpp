@@ -100,16 +100,22 @@ namespace highlo
     HLString FileSystem::Rename(const FileSystemPath &path, const FileSystemPath &newName)
     {
         FileSystemWatcher::Get()->DisableWatchUntilNextAction();
-        HLString newFilePath = path.ParentPath().String() + "/" + newName.String() + path.GetFile()->GetExtension();
-        MoveFileA(*path.String(), *newFilePath);
+        HLString newFilePath;
+
+        if (path.HasParentPath())
+            newFilePath = path.ParentPath().String() + "/" + newName.String();
+        else
+            newFilePath = newName.String();
+
+        BOOL result = MoveFileW(path.String().W_Str(), newFilePath.W_Str());
+        HL_ASSERT(result);
         return newFilePath;
     }
 
     bool FileSystem::Move(const FileSystemPath &filePath, const FileSystemPath &dest)
     {
         FileSystemWatcher::Get()->DisableWatchUntilNextAction();
-        HLString destFilePath = dest.String() + "/" + HLString(filePath.GetFile()->GetFullName());
-        BOOL result = MoveFileA(*filePath.String(), *destFilePath);
+        BOOL result = MoveFileW(filePath.String().W_Str(), dest.String().W_Str());
         return result != 0;
     }
 

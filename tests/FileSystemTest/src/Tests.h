@@ -21,5 +21,4 @@ bool test_write_text_file();
 
 bool test_add_env_var();
 bool test_has_env_var();
-bool test_get_env_var();
 

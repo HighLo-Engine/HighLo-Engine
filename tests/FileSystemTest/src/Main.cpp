@@ -16,15 +16,14 @@ int main(int argc, char *argv[])
 		{ test_create_folder, "test_create_folder" },
 		{ test_remove_folder, "test_remove_folder" },
 
-		{ test_read_file, "test_read_file" },
-		{ test_read_text_file, "test_read_text_file" },
+	//	{ test_read_file, "test_read_file" },				TODO
+	//	{ test_write_file, "test_write_file" },				TODO
 
-		{ test_write_file, "test_write_file" },
-		{ test_write_text_file, "test_write_text_file" },
+	//	{ test_read_text_file, "test_read_text_file" },		TODO
+	//	{ test_write_text_file, "test_write_text_file" },	TODO
 
 		{ test_add_env_var, "test_add_env_var" },
 		{ test_has_env_var, "test_has_env_var" },
-		{ test_get_env_var, "test_get_env_var" },
 	};
 
 	highloUnit::UnitTest test;

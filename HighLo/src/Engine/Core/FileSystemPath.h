@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.7 (2021-10-14) Fixed ParentPath implementation to take non root paths into account
 //     - 1.6 (2021-10-05) Refactored implementation to be able to handle non-existent files on the hard drive
 //     - 1.5 (2021-10-05) Fixed bug where the engine would crash if a Filepath does not exist
 //     - 1.4 (2021-10-04) Refactored some functions to work in a const environment as well

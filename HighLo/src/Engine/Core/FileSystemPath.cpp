@@ -124,7 +124,7 @@ namespace highlo
 			return FileSystemPath(result);
 		}
 	
-		return FileSystemPath(m_CurrentPath);
+		return *this;
 	}
 	
 	bool FileSystemPath::operator==(const FileSystemPath &other) const

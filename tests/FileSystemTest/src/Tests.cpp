@@ -100,6 +100,9 @@ bool test_get_file_size()
 	std::filesystem::path p("./premake5.lua");
 	uint64 realSize = (uint64)std::filesystem::file_size(p);
 
+	std::cout << size << std::endl;
+	std::cout << realSize << std::endl;
+
 	highloUnit::Test test;
 	return test.AssertEqual<uint64>(timer, size, realSize);
 }

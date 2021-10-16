@@ -60,7 +60,7 @@ namespace highlo
 	{
 	public:
 		HLAPI Animation() = default;
-		HLAPI Animation(const HLString& name, float duration, float ticks_per_second, glm::mat4 inverse_transform, int bone_count, Bone root_bone, glm::mat4 correction_matrix);
+		HLAPI Animation(const HLString &name, float duration, float ticksPerSecond, glm::mat4 inverseTransform, int32 boneCount, Bone rootBone, glm::mat4 correctionMatrix);
 
 		HLString Name;
 

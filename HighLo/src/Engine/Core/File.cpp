@@ -95,12 +95,12 @@ namespace highlo
 
 	int64 File::GetSize() const
 	{
-		return FileSystem::GetFileSize(m_AbsoluteFilePath);
+		return FileSystem::Get()->GetFileSize(m_AbsoluteFilePath);
 	}
 
 	bool File::Exists() const
 	{
-		return FileSystem::FileExists(m_FilePath);
+		return FileSystem::Get()->FileExists(m_FilePath);
 	}
 
 	bool File::IsSymLink() const

@@ -17,7 +17,7 @@ namespace highlo
 	{
 		m_Name = File::GetFileName(source.FileName);
 
-		if (!FileSystem::FileExists(source.FileName))
+		if (!FileSystem::Get()->FileExists(source.FileName))
 		{
 			HL_CORE_ERROR("Shader {0} does not exist!", *m_FileName);
 			return;

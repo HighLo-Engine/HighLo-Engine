@@ -163,7 +163,7 @@ namespace highlo
 	bool AssetManager::AssetExists(AssetMetaData &metaData)
 	{
 		// TODO: add root dir to the beginning of the path
-		return FileSystem::FileExists(metaData.FilePath);
+		return FileSystem::Get()->FileExists(metaData.FilePath);
 	}
 
 	void AssetManager::LoadAssetRegistry()

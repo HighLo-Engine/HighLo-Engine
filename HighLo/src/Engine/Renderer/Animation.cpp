@@ -55,18 +55,18 @@ namespace highlo
 		return result;
 	}
 
-	Animation::Animation(const HLString &name, float duration, float ticks_per_second, glm::mat4 inverse_transform, int bone_count, Bone root_bone, glm::mat4 correction_matrix)
-		: Name(name), Duration(duration), TicksPerSecond(ticks_per_second), m_InverseTransform(inverse_transform), m_RootBone(root_bone),
-		m_BoneCount((uint32)bone_count), m_CorrectionMatrix(correction_matrix)
+	Animation::Animation(const HLString &name, float duration, float ticksPerSecond, glm::mat4 inverseTransform, int32 bone_count, Bone rootBone, glm::mat4 correctionMatrix)
+		: Name(name), Duration(duration), TicksPerSecond(ticksPerSecond), m_InverseTransform(inverseTransform), m_RootBone(rootBone),
+		m_BoneCount((uint32)bone_count), m_CorrectionMatrix(correctionMatrix)
 	{
 		for (uint64 i = 0; i < HL_MAX_SKELETAL_BONES; i++)
 			m_BoneFrameTransforms[i] = glm::mat4(1.0f);
 	}
 
-	void Animation::CalculateFinalBoneTransforms(Bone &bone, glm::mat4 parent_transform, float animation_time)
+	void Animation::CalculateFinalBoneTransforms(Bone &bone, glm::mat4 parentTransform, float animationTime)
 	{
-		auto frames = GetPreviousAndNextFrames(bone, animation_time);
-		auto progression = CalculateProgression(bone, frames.first, frames.second, animation_time);
+		auto frames = GetPreviousAndNextFrames(bone, animationTime);
+		auto progression = CalculateProgression(bone, frames.first, frames.second, animationTime);
 
 		// Sanity check
 		if (frames.first > bone.Keyframes.size() - 1)
@@ -76,12 +76,12 @@ namespace highlo
 			frames.second = 0;
 
 		Transform current_pose = InterpolatePoses(bone.Keyframes[frames.first].Transform, bone.Keyframes[frames.second].Transform, progression);
-		glm::mat4 transform = parent_transform * current_pose.GetTransform();
+		glm::mat4 transform = parentTransform * current_pose.GetTransform();
 
 		bone.FinalTransform = m_InverseTransform * transform * bone.OffsetMatrix;
 
-		for (auto& child : bone.Children)
-			CalculateFinalBoneTransforms(child, transform, animation_time);
+		for (auto &child : bone.Children)
+			CalculateFinalBoneTransforms(child, transform, animationTime);
 	}
 
 	void Animation::AddBoneTransform(Bone &bone)
@@ -95,7 +95,7 @@ namespace highlo
 			AddBoneTransform(child);
 	}
 
-	glm::mat4* Animation::GetCurrentPoseTransforms()
+	glm::mat4 *Animation::GetCurrentPoseTransforms()
 	{
 		if (m_IsPlaying)
 		{
@@ -111,11 +111,11 @@ namespace highlo
 		return m_BoneFrameTransforms;
 	}
 
-	Bone* Animation::FindBone(const HLString &name)
+	Bone *Animation::FindBone(const HLString &name)
 	{
-		Bone* result = nullptr;
+		Bone *result = nullptr;
 
-		ForEachBone(m_RootBone, [&name, &result](Bone& bone) {
+		ForEachBone(m_RootBone, [&name, &result](Bone &bone) {
 			if (bone.Name == (name))
 				result = &bone;
 		});
@@ -154,10 +154,10 @@ namespace highlo
 		return { previousFrameIndex, nextFrameIndex };
 	}
 
-	float Animation::CalculateProgression(Bone &bone, uint64 previousFrameIndex, uint64 nextFrameIndex, float animation_time)
+	float Animation::CalculateProgression(Bone &bone, uint64 previousFrameIndex, uint64 nextFrameIndex, float animationTime)
 	{
 		float totalTime = bone.Keyframes[nextFrameIndex].Timestamp - bone.Keyframes[previousFrameIndex].Timestamp;
-		float currentTime = animation_time - bone.Keyframes[previousFrameIndex].Timestamp;
+		float currentTime = animationTime - bone.Keyframes[previousFrameIndex].Timestamp;
 		return currentTime / totalTime;
 	}
 

@@ -7,22 +7,8 @@
 
 namespace highlo
 {
-	VirtualFileSystem *VirtualFileSystem::s_Instance = nullptr;
-
-	void VirtualFileSystem::Init()
-	{
-		s_Instance = new VirtualFileSystem();
-	}
-
-	void VirtualFileSystem::Shutdown()
-	{
-		delete s_Instance;
-	}
-
 	void VirtualFileSystem::Mount(const HLString &virtualPath, const HLString &physicalPath)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
-
 		if (m_MountPoints.HasKey(virtualPath))
 		{
 			m_MountPoints[virtualPath].push_back(physicalPath);
@@ -37,7 +23,6 @@ namespace highlo
 
 	void VirtualFileSystem::Unmount(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		m_MountPoints[path].clear();
 	}
 
@@ -49,7 +34,7 @@ namespace highlo
 		if (path[0] != '/')
 		{
 			outPath = path;
-			return FileSystem::FileExists(path);
+			return FileSystem::Get()->FileExists(path);
 		}
 
 		path = path.Substr(1);
@@ -63,7 +48,7 @@ namespace highlo
 		for (const HLString &physicalPath : m_MountPoints[virtualDir])
 		{
 			HLString p = physicalPath + fileName;
-			if (FileSystem::FileExists(p) || FileSystem::PathExists(physicalPath))
+			if (FileSystem::Get()->FileExists(p) || FileSystem::Get()->PathExists(physicalPath))
 			{
 				outPath = p;
 				return true;
@@ -75,82 +60,72 @@ namespace highlo
 
 	Byte *VirtualFileSystem::ReadFile(const HLString &path, int64 *outSize)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::ReadFile(physicalPath, outSize) : nullptr;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->ReadFile(physicalPath, outSize) : nullptr;
 	}
 
 	HLString VirtualFileSystem::ReadTextFile(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::ReadTextFile(physicalPath) : HLString();
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->ReadTextFile(physicalPath) : HLString();
 	}
 
 	bool VirtualFileSystem::WriteFile(const HLString &path, Byte *buffer, int64 size)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::WriteFile(physicalPath, buffer, size) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->WriteFile(physicalPath, buffer, size) : false;
 	}
 
 	bool VirtualFileSystem::WriteTextFile(const HLString &path, const HLString &text)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::WriteTextFile(physicalPath, text) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->WriteTextFile(physicalPath, text) : false;
 	}
 
 	bool VirtualFileSystem::RemoveFile(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::RemoveFile(physicalPath) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->RemoveFile(physicalPath) : false;
 	}
 
 	int64 VirtualFileSystem::GetFileSize(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::GetFileSize(physicalPath) : -1;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->GetFileSize(physicalPath) : -1;
 	}
 
 	bool VirtualFileSystem::FileExists(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::FileExists(physicalPath) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->FileExists(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::PathExists(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::PathExists(physicalPath) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->PathExists(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::CreateFolder(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::CreateFolder(physicalPath) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->CreateFolder(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::RemoveFolder(const HLString &path)
 	{
-		HL_ASSERT(s_Instance, "FileSystem not created!");
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::RemoveFolder(physicalPath) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->RemoveFolder(physicalPath) : false;
 	}
 
 	void VirtualFileSystem::OpenInExplorer(const HLString &path)
 	{
-		FileSystem::OpenInExplorer(path);
+		FileSystem::Get()->OpenInExplorer(path);
 	}
 
 	void VirtualFileSystem::OpenInBrowser(const HLString &url)
 	{
-		FileSystem::OpenInBrowser(url);
+		FileSystem::Get()->OpenInBrowser(url);
 	}
 
 	HLString VirtualFileSystem::GetAbsoluteFilePath(const HLString &path)
@@ -159,10 +134,5 @@ namespace highlo
 		HLString p = path;
 		ResolvePhysicalPath(p, physicalPath);
 		return physicalPath;
-	}
-
-	VirtualFileSystem *VirtualFileSystem::Get()
-	{
-		return s_Instance;
 	}
 }

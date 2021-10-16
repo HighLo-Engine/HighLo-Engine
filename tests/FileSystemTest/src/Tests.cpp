@@ -9,7 +9,7 @@ bool test_file_exists()
 	highloUnit::Timer timer("test_file_exists");
 
 	FileSystemPath fs("./premake5.lua");	
-	bool result = FileSystem::FileExists(fs);
+	bool result = FileSystem::Get()->FileExists(fs);
 
 	std::filesystem::path realPath("./premake5.lua");
 	bool realExists = std::filesystem::exists(realPath);
@@ -23,7 +23,7 @@ bool test_path_exists()
 	highloUnit::Timer timer("test_path_exists");
 
 	FileSystemPath fs("bin/");
-	bool result = FileSystem::PathExists(fs);
+	bool result = FileSystem::Get()->PathExists(fs);
 
 	std::filesystem::path p("bin/");
 	bool realExists = std::filesystem::is_directory(p);
@@ -38,7 +38,7 @@ bool test_remove_file()
 	char *fileName = "testFiles/testFileToRemove.txt";
 
 	FileSystemPath fs(fileName);
-	bool result = FileSystem::RemoveFile(fs);
+	bool result = FileSystem::Get()->RemoveFile(fs);
 
 	std::filesystem::path p(fileName);
 	bool shouldNotExist = !std::filesystem::exists(p);
@@ -55,7 +55,7 @@ bool test_rename_file()
 
 	FileSystemPath fs(fileName);
 	FileSystemPath newFs(fileNameAfter);
-	HLString newFilePath = FileSystem::Rename(fs, newFs);
+	HLString newFilePath = FileSystem::Get()->Rename(fs, newFs);
 	
 
 	std::filesystem::path oldP(fileName);
@@ -76,7 +76,7 @@ bool test_move_file()
 	FileSystemPath fs(fileName);
 	FileSystemPath movedFs(fileNameAfter);
 
-	bool result = FileSystem::Move(fs, movedFs);
+	bool result = FileSystem::Get()->Move(fs, movedFs);
 	if (!result)
 		return true;
 
@@ -95,7 +95,7 @@ bool test_get_file_size()
 	highloUnit::Timer timer("test_get_file_size");
 
 	FileSystemPath fs("./premake5.lua");
-	uint64 size = FileSystem::GetFileSize(fs);
+	uint64 size = FileSystem::Get()->GetFileSize(fs);
 
 	std::filesystem::path p("./premake5.lua");
 	uint64 realSize = (uint64)std::filesystem::file_size(p);
@@ -109,7 +109,7 @@ bool test_create_folder()
 	highloUnit::Timer timer("test_create_folder");
 
 	FileSystemPath fs("testFolder");
-	bool result = FileSystem::CreateFolder(fs);
+	bool result = FileSystem::Get()->CreateFolder(fs);
 
 	std::filesystem::path p("testFolder");
 	bool realResult = std::filesystem::is_directory(p);
@@ -123,7 +123,7 @@ bool test_remove_folder()
 	highloUnit::Timer timer("test_remove_folder");
 
 	FileSystemPath fs("testFolder");
-	bool result = FileSystem::RemoveFolder(fs);
+	bool result = FileSystem::Get()->RemoveFolder(fs);
 
 	std::filesystem::path p("testFolder");
 	bool realResult = !std::filesystem::is_directory(p);
@@ -149,7 +149,7 @@ bool test_read_text_file()
 	highloUnit::Timer timer("test_read_text_file");
 
 	FileSystemPath fs("./premake5.lua");
-	HLString text = FileSystem::ReadTextFile(fs);
+	HLString text = FileSystem::Get()->ReadTextFile(fs);
 
 	char realText[4096];
 	std::ifstream file("./premake5.lua");
@@ -171,7 +171,7 @@ bool test_write_file()
 	char *fileName = "./premake5.lua";
 
 	FileSystemPath fs(fileName);
-	bool result = FileSystem::WriteTextFile(fs, textToWrite);
+	bool result = FileSystem::Get()->WriteTextFile(fs, textToWrite);
 
 	std::ofstream file(fileName);
 
@@ -191,11 +191,11 @@ bool test_write_text_file()
 	HLString textToWrite = "__TEST__";
 
 	FileSystemPath fs("./premake5.lua");
-	bool result = FileSystem::WriteTextFile(fs, textToWrite);
+	bool result = FileSystem::Get()->WriteTextFile(fs, textToWrite);
 	if (!result)
 		return true;
 
-	HLString readText = FileSystem::ReadTextFile(fs);
+	HLString readText = FileSystem::Get()->ReadTextFile(fs);
 
 	highloUnit::Test test;
 	return test.AssertEqual(timer, readText.Contains(textToWrite), true);
@@ -207,9 +207,9 @@ bool test_add_env_var()
 	HLString userName = "John Doe";
 	HLString resultUserName;
 
-	FileSystem::SetEnvironmentVariable("HIGHLO_ENV_USERNAME", userName);
-	if (FileSystem::HasEnvironmentVariable("HIGHLO_ENV_USERNAME"))
-		resultUserName = FileSystem::GetEnvironmentVariable("HIGHLO_ENV_USERNAME");
+	FileSystem::Get()->SetEnvironmentVariable("HIGHLO_ENV_USERNAME", userName);
+	if (FileSystem::Get()->HasEnvironmentVariable("HIGHLO_ENV_USERNAME"))
+		resultUserName = FileSystem::Get()->GetEnvironmentVariable("HIGHLO_ENV_USERNAME");
 
 	highloUnit::Test test;
 	return test.AssertEqual<char*>(timer, *userName, *resultUserName);
@@ -219,8 +219,8 @@ bool test_has_env_var()
 {
 	highloUnit::Timer timer("test_has_env_var");
 
-	FileSystem::SetEnvironmentVariable("HIGHLO_ENV_USERNAME", "John Doe");
-	bool result = FileSystem::HasEnvironmentVariable("HIGHLO_ENV_USERNAME");
+	FileSystem::Get()->SetEnvironmentVariable("HIGHLO_ENV_USERNAME", "John Doe");
+	bool result = FileSystem::Get()->HasEnvironmentVariable("HIGHLO_ENV_USERNAME");
 
 	highloUnit::Test test;
 	return test.AssertEqual(timer, result, true);

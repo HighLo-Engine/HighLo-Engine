@@ -2,7 +2,7 @@
 
 //
 // version history:
-//     - 1.0 (2021-09-15) removed comments
+//     - 1.1 (2021-10-17) Refactored VirtualFileSystem to be a Singleton class
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -14,12 +14,9 @@
 
 namespace highlo
 {
-	class VirtualFileSystem
+	class VirtualFileSystem : public Singleton<VirtualFileSystem>
 	{
 	public:
-
-		HLAPI static void Init();
-		HLAPI static void Shutdown();
 
 		HLAPI void Mount(const HLString &virtualPath, const HLString &physicalPath);
 		HLAPI void Unmount(const HLString &path);
@@ -45,11 +42,9 @@ namespace highlo
 		HLAPI void OpenInBrowser(const HLString &url);
 
 		HLAPI HLString GetAbsoluteFilePath(const HLString &path);
-		HLAPI static VirtualFileSystem *Get();
 
 	private:
 
-		static VirtualFileSystem *s_Instance;
 		HLHashmap<HLString, std::vector<HLString>> m_MountPoints;
 	};
 }

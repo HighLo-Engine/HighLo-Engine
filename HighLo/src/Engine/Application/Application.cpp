@@ -25,7 +25,6 @@ namespace highlo
 		s_Instance = this;
 
 		Logger::Init();
-		VirtualFileSystem::Init();
 
 		// Create cache for sin() and cos()
 		CreateCacheSin();
@@ -61,7 +60,6 @@ namespace highlo
 		Renderer::Shutdown();
 		FontManager::Get()->Shutdown();
 
-		VirtualFileSystem::Shutdown();
 		Logger::Shutdown();
 	}
 

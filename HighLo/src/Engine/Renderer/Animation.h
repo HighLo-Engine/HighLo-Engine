@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-16) fixed indentations
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -79,30 +80,29 @@ namespace highlo
 		HLAPI void Stop();
 		HLAPI void Update(Timestep ts);
 
-		HLAPI glm::mat4* GetCurrentPoseTransforms();
+		HLAPI glm::mat4 *GetCurrentPoseTransforms();
 
-		HLAPI glm::mat4 GetCorrectionMatrix() const { return m_CorrectionMatrix; }
+		HLAPI glm::mat4 &GetCorrectionMatrix() { return m_CorrectionMatrix; }
+		HLAPI const glm::mat4 &GetCorrectionMatrix() const { return m_CorrectionMatrix; }
 
-		HLAPI Bone* FindBone(const HLString& name);
-		HLAPI void ForEachBone(Bone& bone, std::function<void(Bone&)> lambda);
+		HLAPI Bone *FindBone(const HLString &name);
+		HLAPI void ForEachBone(Bone &bone, const std::function<void(Bone&)> &lambda);
 
-		HLAPI Bone& GetRootBone() { return m_RootBone; }
-
-	private:
-		bool m_IsPlaying = false;
+		HLAPI Bone &GetRootBone() { return m_RootBone; }
 
 	private:
+
 		glm::mat4 m_InverseTransform = glm::mat4(1.0f);
+		glm::mat4 m_CorrectionMatrix = glm::mat4(1.0f);
 		Bone m_RootBone = Bone();
 		uint32 m_BoneCount = 0;
-		glm::mat4 m_CorrectionMatrix = glm::mat4(1.0f);
-
-	private:
+		bool m_IsPlaying = false;
 		glm::mat4 m_BoneFrameTransforms[HL_MAX_SKELETAL_BONES];
 
 	private:
-		void CalculateFinalBoneTransforms(Bone& bone, glm::mat4 parent_transform, float animation_time);
-		void AddBoneTransform(Bone& bone);
+
+		void CalculateFinalBoneTransforms(Bone &bone, glm::mat4 parentTransform, float animation_time);
+		void AddBoneTransform(Bone &bone);
 
 		std::pair<uint64, uint64> GetPreviousAndNextFrames(Bone& bone, float animation_time);
 		float CalculateProgression(Bone& bone, uint64 previous_frame_index, uint64 next_frame_index, float animation_time);

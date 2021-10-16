@@ -7,7 +7,7 @@
 
 #pragma once
 
-// undefine Windows contant
+// undefine Windows constants
 #undef INFINITE
 #include <msdf-atlas-gen.h>
 

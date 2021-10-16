@@ -55,7 +55,7 @@ namespace highlo
 		return result;
 	}
 
-	Animation::Animation(const HLString& name, float duration, float ticks_per_second, glm::mat4 inverse_transform, int bone_count, Bone root_bone, glm::mat4 correction_matrix)
+	Animation::Animation(const HLString &name, float duration, float ticks_per_second, glm::mat4 inverse_transform, int bone_count, Bone root_bone, glm::mat4 correction_matrix)
 		: Name(name), Duration(duration), TicksPerSecond(ticks_per_second), m_InverseTransform(inverse_transform), m_RootBone(root_bone),
 		m_BoneCount((uint32)bone_count), m_CorrectionMatrix(correction_matrix)
 	{
@@ -63,7 +63,7 @@ namespace highlo
 			m_BoneFrameTransforms[i] = glm::mat4(1.0f);
 	}
 
-	void Animation::CalculateFinalBoneTransforms(Bone& bone, glm::mat4 parent_transform, float animation_time)
+	void Animation::CalculateFinalBoneTransforms(Bone &bone, glm::mat4 parent_transform, float animation_time)
 	{
 		auto frames = GetPreviousAndNextFrames(bone, animation_time);
 		auto progression = CalculateProgression(bone, frames.first, frames.second, animation_time);
@@ -84,7 +84,7 @@ namespace highlo
 			CalculateFinalBoneTransforms(child, transform, animation_time);
 	}
 
-	void Animation::AddBoneTransform(Bone& bone)
+	void Animation::AddBoneTransform(Bone &bone)
 	{
 		glm::mat4 boneFrameTransform = bone.UserTransformation * m_CorrectionMatrix * bone.FinalTransform;
 
@@ -111,7 +111,7 @@ namespace highlo
 		return m_BoneFrameTransforms;
 	}
 
-	Bone* Animation::FindBone(const HLString& name)
+	Bone* Animation::FindBone(const HLString &name)
 	{
 		Bone* result = nullptr;
 
@@ -123,15 +123,15 @@ namespace highlo
 		return result;
 	}
 
-	void Animation::ForEachBone(Bone& bone, std::function<void(Bone&)> lambda)
+	void Animation::ForEachBone(Bone &bone, const std::function<void(Bone&)> &lambda)
 	{
 		lambda(bone);
 
-		for (auto& child : bone.Children)
+		for (auto &child : bone.Children)
 			ForEachBone(child, lambda);
 	}
 
-	std::pair<uint64, uint64> Animation::GetPreviousAndNextFrames(Bone& bone, float animation_time)
+	std::pair<uint64, uint64> Animation::GetPreviousAndNextFrames(Bone &bone, float animationTime)
 	{
 		float previousFrame = bone.Keyframes[0].Timestamp;
 		float nextFrame = bone.Keyframes[0].Timestamp;
@@ -144,7 +144,7 @@ namespace highlo
 			nextFrame = bone.Keyframes[i].Timestamp;
 			nextFrameIndex = i;
 
-			if (nextFrame > animation_time)
+			if (nextFrame > animationTime)
 				break;
 
 			previousFrame = bone.Keyframes[i].Timestamp;
@@ -154,16 +154,16 @@ namespace highlo
 		return { previousFrameIndex, nextFrameIndex };
 	}
 
-	float Animation::CalculateProgression(Bone& bone, uint64 previous_frame_index, uint64 next_frame_index, float animation_time)
+	float Animation::CalculateProgression(Bone &bone, uint64 previousFrameIndex, uint64 nextFrameIndex, float animation_time)
 	{
-		float totalTime = bone.Keyframes[next_frame_index].Timestamp - bone.Keyframes[previous_frame_index].Timestamp;
-		float currentTime = animation_time - bone.Keyframes[previous_frame_index].Timestamp;
+		float totalTime = bone.Keyframes[nextFrameIndex].Timestamp - bone.Keyframes[previousFrameIndex].Timestamp;
+		float currentTime = animation_time - bone.Keyframes[previousFrameIndex].Timestamp;
 		return currentTime / totalTime;
 	}
 
-	Transform Animation::InterpolatePoses(BoneTransform previous_pose, BoneTransform next_pose, float progression)
+	Transform Animation::InterpolatePoses(BoneTransform previousPose, BoneTransform nextPose, float progression)
 	{
-		return BoneTransform::Interpolate(previous_pose, next_pose, progression).GetLocalTransform();
+		return BoneTransform::Interpolate(previousPose, nextPose, progression).GetLocalTransform();
 	}
 
 	void Animation::Play()
@@ -205,3 +205,4 @@ namespace highlo
 		CurrentAnimationTime += (ts * AnimationSpeed) / AnimationSpeedDenominator;
 	}
 }
+

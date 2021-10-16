@@ -8,18 +8,25 @@
 #include <glad/glad.h>
 
 #include "Engine/Core/File.h"
+#include "Engine/Core/FileSystem.h"
 
 namespace highlo
 {
-	OpenGLShader::OpenGLShader(const ShaderSource& source, bool isCompute)
+	OpenGLShader::OpenGLShader(const ShaderSource &source, bool isCompute)
 		: m_FileName(source.FileName)
 	{
+		m_Name = File::GetFileName(source.FileName);
+
+		if (!FileSystem::FileExists(source.FileName))
+		{
+			HL_CORE_ERROR("Shader {0} does not exist!", *m_FileName);
+			return;
+		}
+
 		if (!isCompute)
 			CompileGLSLProgram(source);
 		else
 			CompileComputeShader(source);
-
-		m_Name = File::GetFileName(source.FileName);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -37,34 +44,34 @@ namespace highlo
 		return m_ID;
 	}
 
-	uint32 OpenGLShader::CompileGLSLShader(const char* code, uint32 type)
+	uint32 OpenGLShader::CompileGLSLShader(const char *code, uint32 type)
 	{
-		uint32 shader_id = glCreateShader(type);
+		uint32 shaderID = glCreateShader(type);
 
-		glShaderSource(shader_id, 1, &code, 0);
-		glCompileShader(shader_id);
+		glShaderSource(shaderID, 1, &code, 0);
+		glCompileShader(shaderID);
 
-		int is_compiled = 0;
-		glGetShaderiv(shader_id, GL_COMPILE_STATUS, &is_compiled);
-		if (is_compiled == GL_FALSE)
+		int32 isCompiled = 0;
+		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &isCompiled);
+		if (isCompiled == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &maxLength);
+			glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
 
 			std::vector<char> info_log(maxLength);
-			glGetShaderInfoLog(shader_id, maxLength, &maxLength, &info_log[0]);
+			glGetShaderInfoLog(shaderID, maxLength, &maxLength, &info_log[0]);
 
-			glDeleteShader(shader_id);
+			glDeleteShader(shaderID);
 
 			HL_CORE_ERROR(info_log.data());
 			HL_CORE_ERROR("Failed to compile shader {0}", *m_FileName);
 			return 0;
 		}
 
-		return shader_id;
+		return shaderID;
 	}
 
-	void OpenGLShader::CompileGLSLProgram(const ShaderSource& source)
+	void OpenGLShader::CompileGLSLProgram(const ShaderSource &source)
 	{
 		m_ID = glCreateProgram();
 
@@ -98,9 +105,9 @@ namespace highlo
 
 		glLinkProgram(m_ID);
 
-		int is_linked = 0;
-		glGetProgramiv(m_ID, GL_LINK_STATUS, (int*)&is_linked);
-		if (is_linked == GL_FALSE)
+		int32 isLinked = 0;
+		glGetProgramiv(m_ID, GL_LINK_STATUS, (int32*)&isLinked);
+		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
 			glGetProgramiv(m_ID, GL_INFO_LOG_LENGTH, &maxLength);
@@ -138,9 +145,9 @@ namespace highlo
 		glAttachShader(m_ID, cs_id);
 		glLinkProgram(m_ID);
 
-		int is_linked = 0;
-		glGetProgramiv(m_ID, GL_LINK_STATUS, (int*)&is_linked);
-		if (is_linked == GL_FALSE)
+		int32 isLinked = 0;
+		glGetProgramiv(m_ID, GL_LINK_STATUS, (int32*)&isLinked);
+		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
 			glGetProgramiv(m_ID, GL_INFO_LOG_LENGTH, &maxLength);

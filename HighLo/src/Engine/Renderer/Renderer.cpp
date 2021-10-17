@@ -34,6 +34,7 @@ namespace highlo
 	};
 
 	static RendererData *s_Data = nullptr;
+	static RenderCommandQueue *s_CommandQueue = nullptr;
 
 	void Renderer::ClearScreenColor(const glm::vec4& color)
 	{
@@ -78,6 +79,7 @@ namespace highlo
 	void Renderer::Init(Window* window)
 	{
 		s_Data = new RendererData();
+		s_CommandQueue = new RenderCommandQueue();
 		s_Data->ShaderLib = Ref<ShaderLibrary>::Create();
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
@@ -115,6 +117,9 @@ namespace highlo
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();
+
+		WaitAndRender();
+
 		CoreRenderer::Init();
 		Renderer2D::Init();
 	}
@@ -126,6 +131,7 @@ namespace highlo
 		s_RenderingAPI->Shutdown();
 		UI::ShutdownImGui();
 
+		delete s_CommandQueue;
 		delete s_Data;
 	}
 
@@ -137,6 +143,12 @@ namespace highlo
 	void Renderer::EndFrame()
 	{
 		s_RenderingAPI->EndFrame();
+	}
+
+	void Renderer::WaitAndRender()
+	{
+		HL_PROFILE_FUNCTION();
+		s_CommandQueue->Execute();
 	}
 
 	void Renderer::BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear)
@@ -250,5 +262,10 @@ namespace highlo
 	Ref<Environment> Renderer::CreateEnvironment(const HLString &path)
 	{
 		return s_RenderingAPI->CreateEnvironment(path);
+	}
+	
+	RenderCommandQueue &Renderer::GetRenderCommandQueue()
+	{
+		return *s_CommandQueue;
 	}
 }

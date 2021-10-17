@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-10-17) Made all Texture classes a AssetType
 //     - 1.1 (2021-09-21) Added Create method that also contains the pixel data
 //     - 1.0 (2021-09-14) initial release
 //
@@ -14,6 +15,7 @@
 #include "Engine/Math/Math.h"
 #include "Engine/Core/Allocator.h"
 #include "TextureFormat.h"
+#include "Engine/Assets/Asset.h"
 
 namespace highlo
 {
@@ -26,7 +28,7 @@ namespace highlo
 		PIXEL_SHADER
 	};
 
-	class Texture : public IsSharedReference
+	class Texture : public Asset
 	{
 	public:
 
@@ -36,8 +38,9 @@ namespace highlo
 
 		TextureFormat Format = TextureFormat::RGBA8;
 
-		HLAPI virtual ~Texture() = default;
+		HLAPI virtual ~Texture() {}
 		HLAPI virtual uint32 GetDimensions() const = 0;
+		HLAPI virtual TextureType GetType() const = 0;
 		HLAPI virtual uint32 GetWidth() const = 0;
 		HLAPI virtual uint32 GetHeight() const = 0;
 		HLAPI virtual Allocator GetData() = 0;
@@ -65,6 +68,7 @@ namespace highlo
 	public:
 
 		HLAPI virtual uint32 GetDimensions() const override { return 2; };
+		HLAPI virtual TextureType GetType() const override { return TextureType::Texture2D; }
 
 		HLAPI static Ref<Texture> LoadFromFile(const HLString &filepath, TextureFormat format = TextureFormat::RGBA8, bool flip_on_load = false);
 		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
@@ -79,6 +83,9 @@ namespace highlo
 
 		HLAPI virtual TextureSpecification &GetSpecification() = 0;
 		HLAPI virtual const TextureSpecification &GetSpecification() const = 0;
+
+		HLAPI static AssetType GetStaticType() { return AssetType::Texture; }
+		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	};
 
 	class Texture3D : public Texture
@@ -86,8 +93,12 @@ namespace highlo
 	public:
 
 		HLAPI virtual uint32 GetDimensions() const override { return 3; };
+		HLAPI virtual TextureType GetType() const override { return TextureType::Texture3D; }
 
 		HLAPI static Ref<Texture> LoadFromFiles(const std::vector<HLString> &filepaths);
 		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
+
+		HLAPI static AssetType GetStaticType() { return AssetType::EnvMap; }
+		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	};
 }

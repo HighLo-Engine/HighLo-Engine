@@ -45,6 +45,7 @@ namespace highlo
 
 		// Init Renderer
 		Renderer::Init(m_Window.get());
+		Renderer::WaitAndRender();
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
 		m_Encryptor = Ref<Encryptor>::Create();
@@ -80,15 +81,22 @@ namespace highlo
 
 			if (!m_Minimized)
 			{
+				// Update Entities and Client Application
 				m_ECS_SystemManager.Update();
 				OnUpdate(Time::GetTimestep());
 
+				// Update all layers pushed by the Client Application
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUpdate(Time::GetTimestep());
+
+				// Render all submitted objects to the screen
+				Renderer::BeginFrame();
+				Renderer::WaitAndRender();
+				Renderer::EndFrame();
 			}
 
+			// Update UI (render this after everything else to render it on top of the actual rendering)
 			UI::BeginScene();
-			
 			if (!m_Minimized)
 			{
 				OnUIRender(Time::GetTimestep());
@@ -96,8 +104,9 @@ namespace highlo
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUIRender(Time::GetTimestep());
 			}
-			
 			UI::EndScene();
+			
+			// Swap Window Buffers (Double buffer)
 			m_Window->Update();
 		}
 

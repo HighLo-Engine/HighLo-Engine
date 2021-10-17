@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-17) Refactored Encryption class to not have a extra unsigned char* function
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -41,9 +42,6 @@ namespace highlo
 
 		HLAPI void Init();
 		HLAPI void Shutdown();
-
-		HLAPI uint32 Encrypt(unsigned char *plainText, uint32 plainTextLength, unsigned char *cipherText);
-		HLAPI uint32 Decrypt(unsigned char *cipherText, uint32 cipherTextLength, unsigned char *plainText);
 
 		HLAPI HLString Encrypt(const HLString &plainText);
 		HLAPI HLString Decrypt(const HLString &cipherText);

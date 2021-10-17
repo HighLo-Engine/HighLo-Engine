@@ -85,7 +85,7 @@ namespace highlo
 		{
 			s_CipherContext = EVP_CIPHER_CTX_new();
 			if (!s_CipherContext)
-				HL_CORE_ERROR("Error: Cipher context could not be created!");
+				std::cout << "Error: Cipher context could not be created!" << std::endl;
 		}
 	}
 
@@ -94,75 +94,53 @@ namespace highlo
 		if (s_CipherContext)
 			EVP_CIPHER_CTX_free(s_CipherContext);
 	}
-
-	uint32 Encryptor::Encrypt(unsigned char *plainText, uint32 plainTextLength, unsigned char *cipherText)
-	{
-		int32 len = 0;
-		uint32 ciphertext_len = 0;
-
-		if (!EVP_EncryptInit_ex(s_CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
-			HL_CORE_ERROR("Error: Could not initialize the Encryptor");
-
-		if (!EVP_EncryptUpdate(s_CipherContext, cipherText, &len, plainText, plainTextLength))
-			HL_CORE_ERROR("Error: Could not update the encryption");
-
-		ciphertext_len = len;
-
-		if (!EVP_EncryptFinal_ex(s_CipherContext, cipherText + len, &len))
-			HL_CORE_ERROR("Error: Could not encrypt");
-
-		ciphertext_len += len;
-		cipherText[ciphertext_len] = '\0';
-		return ciphertext_len;
-	}
-
-	uint32 Encryptor::Decrypt(unsigned char *cipherText, uint32 cipherTextLength, unsigned char *plainText)
-	{
-		int32 len = 0;
-		uint32 plaintext_len = 0;
-
-		if (!EVP_DecryptInit_ex(s_CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
-			HL_CORE_ERROR("Error: Could not initialize the decryptor");
-
-		if (!EVP_DecryptUpdate(s_CipherContext, plainText, &len, cipherText, cipherTextLength))
-			HL_CORE_ERROR("Error: Could not update the decryption");
-
-		plaintext_len = len;
-
-		if (!EVP_DecryptFinal_ex(s_CipherContext, plainText + len, &len))
-			HL_CORE_ERROR("Error: Could not decrypt");
-
-		plaintext_len += len;
-		plainText[plaintext_len] = '\0';
-		return plaintext_len;
-	}
 	
 	HLString Encryptor::Encrypt(const HLString &plainText)
 	{
-		unsigned char *cipherRaw = new unsigned char[plainText.Length()];
+	//	HL_ASSERT(s_CipherContext, "Class has not been initialized!");
+
+		int32 length = 0;
+		uint32 ciphertextLength = 0;
+		unsigned char resultCipher[4096];
 		unsigned char *plainTextRaw = (unsigned char*)*plainText;
-		uint32 plainTextLength = (uint32)plainText.Length();
-		uint32 cipherLength = 0;
 
-		cipherLength = Encrypt(plainTextRaw, plainTextLength, cipherRaw);
+		if (!EVP_EncryptInit_ex(s_CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
+			std::cout << "Error: Could not initialize the Encryptor" << std::endl;
 
-		HLString result((const char*)cipherRaw, cipherLength);
-		delete[] cipherRaw;
-		return result;
+		if (!EVP_EncryptUpdate(s_CipherContext, resultCipher, &length, plainTextRaw, plainText.Length()))
+			std::cout << "Error: Could not update the encryption" << std::endl;
+
+		ciphertextLength = length;
+
+		if (!EVP_EncryptFinal_ex(s_CipherContext, resultCipher + length, &length))
+			std::cout << "Error: Could not encrypt" << std::endl;
+
+		ciphertextLength += length;
+		return HLString((const char*)resultCipher, ciphertextLength);
 	}
 	
 	HLString Encryptor::Decrypt(const HLString &cipherText)
 	{
-		unsigned char *plainTextRaw = new unsigned char[cipherText.Length()];
-		unsigned char *cipherRaw = (unsigned char*)*cipherText;
-		uint32 cipherLength = (uint32)cipherText.Length();
-		uint32 plainTextLength = 0;
+	//	HL_ASSERT(s_CipherContext, "Class has not been initialized!");
 
-		plainTextLength = Decrypt(cipherRaw, cipherLength, plainTextRaw);
-		
-		HLString result((const char*) plainTextRaw, plainTextLength);
-		delete[] plainTextRaw;
-		return result;
+		int32 length = 0;
+		uint32 plaintextLength = 0;
+		unsigned char resultPlainText[4096];
+		unsigned char *cipherTextRaw = (unsigned char*)*cipherText;
+
+		if (!EVP_DecryptInit_ex(s_CipherContext, utils::ConvertAlgorithmFromType(m_Algorithm), NULL, (unsigned char*)*m_Key, (unsigned char*)*m_IV))
+			std::cout << "Error: Could not initialize the decryptor" << std::endl;
+
+		if (!EVP_DecryptUpdate(s_CipherContext, resultPlainText, &length, cipherTextRaw, cipherText.Length()))
+			std::cout << "Error: Could not update the decryption" << std::endl;
+
+		plaintextLength = length;
+
+		if (!EVP_DecryptFinal_ex(s_CipherContext, resultPlainText + length, &length))
+			std::cout << "Error: Could not decrypt" << std::endl;
+
+		plaintextLength += length;
+		return HLString((const char*)resultPlainText, plaintextLength);
 	}
 	
 	HLString Encryptor::EncryptBase64(const HLString &plainText)

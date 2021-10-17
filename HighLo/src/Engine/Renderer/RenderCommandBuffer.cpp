@@ -5,8 +5,27 @@
 
 namespace highlo
 {
-	Ref<RenderCommandBuffer> RenderCommandBuffer::Create(uint32 count)
+	Ref<RenderCommandBuffer> RenderCommandBuffer::Create(const HLString &debugName)
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return nullptr;
+	#elif HIGHLO_API_VULKAN
+
+	#else
+		HL_ASSERT(false);
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
+	}
+
+	Ref<RenderCommandBuffer> RenderCommandBuffer::Create(const HLString &debugName, uint32 count)
+	{
+	#ifdef HIGHLO_API_OPENGL
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+
+	#else
+		HL_ASSERT(false);
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
 }

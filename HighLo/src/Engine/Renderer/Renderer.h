@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-10-17) Added RenderCommandQueue
 //     - 1.1 (2021-09-29) Added Renderer2DText Shader loading to init function
 //     - 1.0 (2021-09-14) initial release
 //
@@ -19,6 +20,8 @@
 #include "RenderPass.h"
 #include "Model.h"
 #include "Engine/Math/AABB.h"
+#include "RenderCommandQueue.h"
+#include "RenderCommandBuffer.h"
 
 namespace highlo
 {
@@ -49,6 +52,22 @@ namespace highlo
 		HLAPI static void BeginFrame();
 		HLAPI static void EndFrame();
 
+		template<typename T>
+		HLAPI static void Submit(T &&func)
+		{
+			auto renderCmd = [](void *ptr)
+			{
+				auto pFunc = (T*)ptr;
+				(*pFunc)();
+				pFunc->~T();
+			};
+
+			auto storageBuffer = GetRenderCommandQueue().Allocate(renderCmd, sizeof(func));
+			new (storageBuffer) T(std::forward<T>(func));
+		}
+
+		HLAPI static void WaitAndRender();
+
 		HLAPI static void BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear = true);
 		HLAPI static void EndRenderPass();
 
@@ -67,9 +86,13 @@ namespace highlo
 		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
 
 	private:
+
+		static RenderCommandQueue &GetRenderCommandQueue();
+
 		static UniqueRef<RenderingAPI> s_RenderingAPI;
 
 	private:
+
 		friend class CoreRenderer;
 		friend class Renderer2D;
 	};

@@ -7,9 +7,8 @@ int main(int argc, char *argv[])
 #ifdef HL_RELEASE
 	std::vector<highloUnit::UnitTestEntry> tests =
 	{
-		{ test_encryption_raw, "test_encryption_raw" },
-		{ test_encryption_with_string, "test_encryption_with_string" },
-		{ test_encryption_with_base64_string, "test_encryption_with_base64_string" }
+		{ test_encryption, "test_encryption" },
+		{ test_encryption_with_base64, "test_encryption_with_base64" }
 	};
 	
 	highloUnit::UnitTest test;

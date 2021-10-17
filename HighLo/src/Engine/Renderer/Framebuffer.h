@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-17) Added Blendmode to framebuffer
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -17,6 +18,15 @@
 
 namespace highlo
 {
+	enum class FramebufferBlendMode
+	{
+		None = 0,
+		OneZero,
+		SrcAlphaOneMinusSrcAlpha,
+		Additive,
+		ZeroSrcColor
+	};
+
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
@@ -24,6 +34,8 @@ namespace highlo
 			: Format(format) {}
 
 		TextureFormat Format;
+		bool Blend = true;
+		FramebufferBlendMode BlendMode = FramebufferBlendMode::SrcAlphaOneMinusSrcAlpha;
 	};
 
 	struct FramebufferAttachmentSpecification
@@ -47,6 +59,9 @@ namespace highlo
 
 		bool NoResize = false;
 		bool SwapChainTarget = false;
+
+		bool Blend = true;
+		FramebufferBlendMode BlendMode = FramebufferBlendMode::None;
 
 		HLString DebugName;
 	};

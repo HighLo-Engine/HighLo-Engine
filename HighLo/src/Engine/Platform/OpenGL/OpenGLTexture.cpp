@@ -15,10 +15,10 @@
 
 namespace highlo
 {
-	OpenGLTexture2D *OpenGLTexture2D::LoadFromFile(const HLString &filepath, TextureFormat format, bool flip_on_load)
+	OpenGLTexture2D *OpenGLTexture2D::LoadFromFile(const HLString &filepath, TextureFormat format, bool flipOnLoad)
 	{
 		int32 width, height, channels;
-		stbi_set_flip_vertically_on_load(flip_on_load);
+		stbi_set_flip_vertically_on_load(flipOnLoad);
 
 		stbi_uc *data = stbi_load(*filepath, &width, &height, &channels, STBI_rgb_alpha);
 		if (!data)
@@ -424,17 +424,17 @@ namespace highlo
 	//												3D Texture
 	// ====================================================================================================================
 
-	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString> &filePaths)
+	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString> &filePaths, bool flipOnLoad)
 	{
 		m_Specification.Format = TextureFormat::RGBA;
 
 		Ref<OpenGLTexture3D> instance = this;
-		Renderer::Submit([instance, filePaths]() mutable
+		Renderer::Submit([instance, filePaths, flipOnLoad]() mutable
 		{
 			glGenTextures(1, &instance->RendererID);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, instance->RendererID);
 
-			stbi_set_flip_vertically_on_load(1);
+			stbi_set_flip_vertically_on_load(flipOnLoad);
 
 			int32 width, height, nrComponents;
 			for (uint64 i = 0; i < filePaths.size(); i++)

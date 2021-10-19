@@ -99,7 +99,7 @@ namespace highlo
 		HLAPI virtual uint32 GetDimensions() const override { return 3; };
 		HLAPI virtual TextureType GetType() const override { return TextureType::Texture3D; }
 
-		HLAPI static Ref<Texture> LoadFromFiles(const std::vector<HLString> &filepaths);
+		HLAPI static Ref<Texture> LoadFromFiles(const std::vector<HLString> &filepaths, bool flipOnLoad = false);
 		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
 
 		HLAPI static AssetType GetStaticType() { return AssetType::EnvMap; }

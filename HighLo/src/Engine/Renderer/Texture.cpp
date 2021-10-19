@@ -38,9 +38,9 @@ namespace highlo
 		return Ref<OpenGLTexture2D>::Create(format, width, height, data, props);
 	}
 
-	Ref<Texture> Texture3D::LoadFromFiles(const std::vector<HLString> &filepaths)
+	Ref<Texture> Texture3D::LoadFromFiles(const std::vector<HLString> &filepaths, bool flipOnLoad)
 	{
-		return Ref<OpenGLTexture3D>::Create(filepaths);
+		return Ref<OpenGLTexture3D>::Create(filepaths, flipOnLoad);
 	}
 	
 	Ref<Texture> Texture3D::Create(TextureFormat format, uint32 width, uint32 height, const void *data)

@@ -24,9 +24,7 @@ namespace highlo
 			{
 				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
 				std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/engine.log", true),
-		#ifdef HL_DEBUG
 				std::make_shared<EditorConsoleSink>(1)
-		#endif // HL_DEBUG
 			};
 
 			appSinks =
@@ -41,9 +39,7 @@ namespace highlo
 			engineSinks =
 			{
 				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-		#ifdef HL_DEBUG
 				std::make_shared<EditorConsoleSink>(1)
-		#endif // HL_DEBUG
 			};
 
 			appSinks =
@@ -63,16 +59,11 @@ namespace highlo
 		if (shouldLogToFile)
 		{
 			engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
-
-		#ifdef HL_DEBUG
 			engineSinks[2]->set_pattern("[%T] [%l] %n: %v");
-		#endif // HL_DEBUG
 		}
 		else
 		{
-		#ifdef HL_DEBUG
 			engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
-		#endif // HL_DEBUG
 		}
 
 		// App patterns

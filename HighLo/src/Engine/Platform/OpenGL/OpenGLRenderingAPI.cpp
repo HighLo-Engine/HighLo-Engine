@@ -77,9 +77,9 @@ namespace highlo
 
 			// Load Renderer Caps
 			auto &caps = Renderer::GetCapabilities();
-			caps.Vendor = (const char *) glGetString(GL_VENDOR);
-			caps.Device = (const char *) glGetString(GL_RENDERER);
-			caps.Version = (const char *) glGetString(GL_VERSION);
+			caps.Vendor = (const char*)glGetString(GL_VENDOR);
+			caps.Device = (const char*)glGetString(GL_RENDERER);
+			caps.Version = (const char*)glGetString(GL_VERSION);
 			glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
 			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
 			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
@@ -113,7 +113,7 @@ namespace highlo
 	{
 	}
 
-	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4& color)
+	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4 &color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
 	}
@@ -123,7 +123,7 @@ namespace highlo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray>& va, PrimitiveType type)
+	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray> &va, PrimitiveType type)
 	{
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
@@ -139,7 +139,7 @@ namespace highlo
 			SetDepthTest(true);
 	}
 
-	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count, PrimitiveType type)
+	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type)
 	{
 		glDrawElementsInstanced(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
 	}

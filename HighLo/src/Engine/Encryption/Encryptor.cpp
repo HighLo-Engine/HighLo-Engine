@@ -115,7 +115,7 @@ namespace highlo
 
 		ciphertextLength += length;
 		HLString result = HLString((const char*)resultCipher, ciphertextLength);
-		delete[] &resultCipher;
+	//	delete[] &resultCipher;
 		return result;
 	}
 	
@@ -139,7 +139,7 @@ namespace highlo
 
 		plaintextLength += length;
 		HLString result = HLString((const char*)resultPlainText, plaintextLength);
-		delete[] &resultPlainText;
+	//	delete[] &resultPlainText;
 		return result;
 	}
 	

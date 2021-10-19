@@ -97,8 +97,6 @@ namespace highlo
 	
 	HLString Encryptor::Encrypt(const HLString &plainText)
 	{
-	//	HL_ASSERT(s_CipherContext, "Class has not been initialized!");
-
 		int32 length = 0;
 		uint32 ciphertextLength = 0;
 		unsigned char resultCipher[4096];
@@ -116,13 +114,13 @@ namespace highlo
 			std::cout << "Error: Could not encrypt" << std::endl;
 
 		ciphertextLength += length;
-		return HLString((const char*)resultCipher, ciphertextLength);
+		HLString result = HLString((const char*)resultCipher, ciphertextLength);
+		delete[] &resultCipher;
+		return result;
 	}
 	
 	HLString Encryptor::Decrypt(const HLString &cipherText)
 	{
-	//	HL_ASSERT(s_CipherContext, "Class has not been initialized!");
-
 		int32 length = 0;
 		uint32 plaintextLength = 0;
 		unsigned char resultPlainText[4096];
@@ -140,7 +138,9 @@ namespace highlo
 			std::cout << "Error: Could not decrypt" << std::endl;
 
 		plaintextLength += length;
-		return HLString((const char*)resultPlainText, plaintextLength);
+		HLString result = HLString((const char*)resultPlainText, plaintextLength);
+		delete[] &resultPlainText;
+		return result;
 	}
 	
 	HLString Encryptor::EncryptBase64(const HLString &plainText)

@@ -115,15 +115,11 @@ namespace highlo
 		framebufferSpec.DebugName = "SceneComposite";
 		framebufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
-		framebufferSpec.Attachments = { TextureFormat::RGBA };
 		
-		// TODO: combining ColorAttachments with DepthAttachments does not work in our current Framebuffer situation
-		/*
 		if (m_Specification.SwapChain)
 			framebufferSpec.Attachments = { TextureFormat::RGBA };
 		else
 			framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
-		*/
 
 		Ref<Framebuffer> framebuffer = Framebuffer::Create(framebufferSpec);
 

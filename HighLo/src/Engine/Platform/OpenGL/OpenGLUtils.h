@@ -87,6 +87,8 @@ namespace highlo
 				case TextureFormat::RGB:
 				case TextureFormat::SRGB:
 				case TextureFormat::RGBA:
+				case TextureFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH32F:
 					return GL_UNSIGNED_BYTE;
 
 				case TextureFormat::RGBA16F:

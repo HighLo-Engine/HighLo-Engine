@@ -31,12 +31,17 @@ namespace highlo
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
 		~OpenGLTexture2D();
 
-		virtual uint32 GetWidth() const override { return m_Width; };
-		virtual uint32 GetHeight() const override { return m_Height; };
-		virtual Allocator GetData() override { return m_Buffer; }
+		virtual uint32 GetWidth() const override { return m_Specification.Width; };
+		virtual uint32 GetHeight() const override { return m_Specification.Height; };
+		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
+		virtual Allocator GetData() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
+		virtual bool IsLoaded() const override { return m_Loaded; }
+
+		virtual void Lock() override;
+		virtual void Unlock() override;
 
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
@@ -53,14 +58,16 @@ namespace highlo
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 
 		virtual void Bind(uint32 slot) const override;
+		virtual void Unbind(uint32 slot) const override;
 
 	private:
 
 		Allocator m_Buffer;
 		HLRendererID m_SamplerRendererID = 0;
-		uint32 m_Width = 0, m_Height = 0;
 		GLenum m_InternalFormat, m_DataFormat;
 		TextureSpecification m_Specification;
+		bool m_Locked = false;
+		bool m_Loaded = false;
 	};
 
 	class OpenGLTexture3D : public Texture3D
@@ -70,12 +77,17 @@ namespace highlo
 		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
 		virtual ~OpenGLTexture3D();
 
-		virtual uint32 GetWidth() const override { return m_Width; }
-		virtual uint32 GetHeight() const override { return m_Height; }
-		virtual Allocator GetData() override { return m_Buffer; }
+		virtual uint32 GetWidth() const override { return m_Specification.Width; }
+		virtual uint32 GetHeight() const override { return m_Specification.Height; }
+		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
+		virtual Allocator GetData() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
+		virtual bool IsLoaded() const override { return m_Loaded; }
+
+		virtual void Lock() override;
+		virtual void Unlock() override;
 
 		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
@@ -83,13 +95,18 @@ namespace highlo
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
 
+		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
+		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
+
 		virtual void Bind(uint32 slot) const override;
+		virtual void Unbind(uint32 slot) const override;
 
 	private:
 
-		uint32 m_Width = 0, m_Height = 0;
-		TextureFormat m_Format;
 		Allocator m_Buffer;
+		TextureSpecification m_Specification;
+		bool m_Locked = false;
+		bool m_Loaded = false;
 	};
 }
 

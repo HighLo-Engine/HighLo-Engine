@@ -107,8 +107,7 @@ namespace highlo
 			TextureProperties props;
 			props.GenerateMips = false;
 			props.SamplerWrap = TextureWrap::Clamp;
-			Ref<Texture2D> texture = Texture2D::Create(TextureFormat::RGBA32F, bitmap.width, bitmap.height, bitmap.pixels, props);
-			return texture;
+			return Texture2D::Create(TextureFormat::RGBA32F, bitmap.width, bitmap.height, bitmap.pixels, props);
 		}
 	}
 
@@ -299,7 +298,8 @@ namespace highlo
 
 	Font::~Font()
 	{
-		delete m_MSDFData;
+		if (m_MSDFData)
+			delete m_MSDFData;
 	}
 
 	Ref<Font> Font::Create(const FileSystemPath &path)

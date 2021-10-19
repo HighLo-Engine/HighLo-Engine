@@ -12,31 +12,36 @@
 
 namespace highlo
 {
-#ifdef HIGHLO_API_OPENGL
-	Ref<VertexBuffer> VertexBuffer::Create(std::vector<Vertex>& vertices, VertexBufferUsage usage)
+	Ref<VertexBuffer> VertexBuffer::Create(std::vector<Vertex> &vertices, VertexBufferUsage usage)
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLVertexBuffer>::Create(vertices, usage);
+	#elif HIGHLO_API_DX11
+		return Ref<DX11VertexBuffer>::Create(vertices, usage);
+	#else
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32 stride, VertexBufferUsage usage)
+	Ref<VertexBuffer> VertexBuffer::Create(void *data, uint32 size, VertexBufferUsage usage)
 	{
-		return Ref<OpenGLVertexBuffer>::Create(data, size, stride, usage);
+	#ifdef HIGHLO_API_OPENGL
+		return Ref<OpenGLVertexBuffer>::Create(data, size, usage);
+	#elif HIGHLO_API_DX11
+		return Ref<DX11VertexBuffer>::Create(data, size, usage);
+	#else
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(size_t size, VertexBufferUsage usage)
+	Ref<VertexBuffer> VertexBuffer::Create(uint32 size, VertexBufferUsage usage)
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLVertexBuffer>::Create(size, usage);
+	#elif HIGHLO_API_DX11
+		return Ref<DX11VertexBuffer>::Create(size, usage);
+	#else
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
-	Ref<VertexBuffer> VertexBuffer::Create(std::vector<Vertex>& vertices, VertexBufferUsage usage)
-	{
-		return Ref<DX11VertexBuffer>::Create(vertices);
-	}
-
-	Ref<VertexBuffer> VertexBuffer::Create(void* data, size_t size, uint32 stride, VertexBufferUsage usage)
-	{
-		return Ref<DX11VertexBuffer>::Create(data, size, stride);
-	}
-#endif // HIGHLO_API_DX11
 }

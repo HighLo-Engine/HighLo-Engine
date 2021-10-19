@@ -35,6 +35,7 @@ namespace highlo
 		static Ref<Shader> CreateComputeShader(const ShaderSource &source);
 
 		virtual void Bind() const = 0;
+		virtual void Unbind() = 0;
 		virtual HLRendererID GetRendererID() = 0;
 		virtual const HLString &GetName() const = 0;
 

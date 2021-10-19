@@ -31,8 +31,8 @@ namespace highlo
 		inline virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { return m_ColorAttachments[attachmentIndex]; }
 		inline virtual Ref<Texture> GetDepthImage() const override { return m_DepthAttachment; }
 
-		inline virtual uint32 GetWidth() const override { return m_Width; }
-		inline virtual uint32 GetHeight() const override { return m_Height; }
+		inline virtual uint32 GetWidth() const override { return m_Specification.Width; }
+		inline virtual uint32 GetHeight() const override { return m_Specification.Height; }
 
 		virtual void ClearAttachment(uint32 attachmentIndex, int32 value) override;
 		virtual int32 ReadPixel(uint32 attachmentIndex, int32 x, int32 y) override;
@@ -52,9 +52,6 @@ namespace highlo
 
 		std::vector<TextureFormat> m_ColorAttachmentFormats;
 		TextureFormat m_DepthAttachmentFormat = TextureFormat::None;
-
-		uint32 m_Width = 0;
-		uint32 m_Height = 0;
 	};
 }
 

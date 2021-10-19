@@ -12,6 +12,7 @@
 #include "Engine/ImGui/ImGui.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 #include "Engine/ECS/RenderSystem.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace highlo
 {
@@ -40,13 +41,13 @@ namespace highlo
 
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
-		// Init Fonts
-		FontManager::Get()->Init();
-
 		// Init Renderer
 		Renderer::Init(m_Window.get());
 		Renderer::WaitAndRender();
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
+
+		// Init Fonts
+		FontManager::Get()->Init();
 
 		m_Encryptor = Ref<Encryptor>::Create();
 		m_Encryptor->Init();
@@ -58,8 +59,8 @@ namespace highlo
 	{
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
-		Renderer::Shutdown();
 		FontManager::Get()->Shutdown();
+		Renderer::Shutdown();
 
 		Logger::Shutdown();
 	}
@@ -67,6 +68,7 @@ namespace highlo
 	void HLApplication::Run()
 	{
 		m_Running = true;
+		m_IsShuttingDown = false;
 		OnInitialize();
 
 		// Main Rendering Thread
@@ -128,6 +130,7 @@ namespace highlo
 	bool HLApplication::OnWindowClose(WindowCloseEvent &e)
 	{
 		Close();
+		m_IsShuttingDown = true;
 		return true;
 	}
 

@@ -31,7 +31,7 @@ namespace highlo
 	
 	void UniformBuffer::SetBufferValue(void *value)
 	{
-		memcpy_s(m_Data, m_DataSize, value, m_DataSize);
+		memcpy_s(m_Data, m_Size, value, m_Size);
 	}
 	
 	void UniformBuffer::GetVariableValue(const HLString &name, void *out_val)
@@ -51,15 +51,15 @@ namespace highlo
 		uint32 offset = 0;
 		uint32 size = 0;
 
-		for (auto& element : layout)
+		for (auto &element : layout)
 		{
 			m_UniformVariables[element.Name] = { (uint32)element.Size, (uint32)offset };
 			offset += element.Size;
 			size += element.Size;
 		}
 
-		m_DataSize = size;
-		m_Data = malloc(m_DataSize);
+		m_Size = size;
+		m_Data = malloc(m_Size);
 	}
 
 	Ref<UniformBuffer> UniformBuffer::Create(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot)

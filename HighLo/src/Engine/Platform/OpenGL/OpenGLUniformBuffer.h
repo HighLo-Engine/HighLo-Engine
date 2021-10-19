@@ -15,13 +15,14 @@ namespace highlo
 	class OpenGLUniformBuffer : public UniformBuffer
 	{
 	public:
-		OpenGLUniformBuffer(const HLString& name, const std::vector<UniformVariable>& layout, UniformBufferParentShader parent, uint32 slot = 0);
+		OpenGLUniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot = 0);
 		~OpenGLUniformBuffer();
 
-		virtual void UploadToShader() override;
+		virtual void UploadToShader(uint32 offset = 0) override;
 
 	private:
-		uint32 m_ID = 0;
+
+		HLRendererID m_ID = 0;
 	};
 }
 

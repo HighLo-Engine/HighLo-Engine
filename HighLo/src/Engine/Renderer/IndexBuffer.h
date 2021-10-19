@@ -20,8 +20,8 @@ namespace highlo
 		virtual void Unbind() const = 0;
 
 		virtual uint32 GetCount() = 0;
-		virtual void UpdateContents(void *data, uint32 size) = 0;
-		virtual void UpdateContents(std::vector<int32> &indices) = 0;
+		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
+		virtual void UpdateContents(std::vector<int32> &indices, uint32 offset = 0) = 0;
 
 		virtual HLRendererID GetRendererID() = 0;
 

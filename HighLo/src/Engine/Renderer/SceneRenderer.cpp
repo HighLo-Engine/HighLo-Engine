@@ -113,7 +113,7 @@ namespace highlo
 	{
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "SceneComposite";
-		framebufferSpec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
+		framebufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
 		framebufferSpec.Attachments = { TextureFormat::RGBA };
 		

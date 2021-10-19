@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "Engine/Application/Application.h"
 #include "Engine/ImGui/ImGui.h"
 #include "RenderingAPI.h"
 #include "CoreRenderer.h"
@@ -55,6 +56,9 @@ namespace highlo
 		template<typename T>
 		HLAPI static void Submit(T &&func)
 		{
+			if (HLApplication::Get().IsShuttingDown())
+				return;
+
 			auto renderCmd = [](void *ptr)
 			{
 				auto pFunc = (T*)ptr;

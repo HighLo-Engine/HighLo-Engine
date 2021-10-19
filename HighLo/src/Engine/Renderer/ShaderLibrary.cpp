@@ -21,13 +21,9 @@ namespace highlo
 		Ref<Shader> shader = nullptr;
 
 		if (isCompute)
-		{
 			shader = Shader::CreateComputeShader(shaderSource);
-		}
 		else
-		{
 			shader = Shader::Create(shaderSource, layout);
-		}
 
 		Add(shader);
 	}
@@ -38,13 +34,9 @@ namespace highlo
 		Ref<Shader> shader = nullptr;
 
 		if (isCompute)
-		{
 			shader = Shader::CreateComputeShader(shaderSource);
-		}
 		else
-		{
 			shader = Shader::Create(shaderSource, layout);
-		}
 
 		HL_ASSERT(m_Shaders.find(*name) == m_Shaders.end());
 		m_Shaders[*name] = shader;

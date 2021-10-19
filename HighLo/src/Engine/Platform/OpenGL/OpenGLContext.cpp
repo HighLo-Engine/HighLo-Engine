@@ -73,7 +73,7 @@ namespace highlo
 	void OpenGLContext::Init()
 	{
 		PIXELFORMATDESCRIPTOR pfd =
-			{
+		{
 			sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
 			1,							   // version number
 			PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_TYPE_RGBA,
@@ -89,7 +89,7 @@ namespace highlo
 			PFD_MAIN_PLANE,				   // main layer
 			0,							   // reserved
 			0, 0, 0						   // layer masks ignored
-			};
+		};
 
 		dc = GetDC((HWND)m_OpenGLWindowHandle);
 		SetPixelFormat(dc, ChoosePixelFormat(dc, &pfd), &pfd);

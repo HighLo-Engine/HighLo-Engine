@@ -33,7 +33,7 @@ namespace highlo
 
 		virtual uint32 GetWidth() const override { return m_Width; };
 		virtual uint32 GetHeight() const override { return m_Height; };
-		virtual Allocator GetData() override;
+		virtual Allocator GetData() override { return m_Buffer; }
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
@@ -67,12 +67,12 @@ namespace highlo
 	{
 	public:
 		OpenGLTexture3D(const std::vector<HLString> &filePaths);
-		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void* data);
+		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
 		virtual ~OpenGLTexture3D();
 
-		virtual uint32 GetWidth() const override;
-		virtual uint32 GetHeight() const override;
-		virtual Allocator GetData() override;
+		virtual uint32 GetWidth() const override { return m_Width; }
+		virtual uint32 GetHeight() const override { return m_Height; }
+		virtual Allocator GetData() override { return m_Buffer; }
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
@@ -86,6 +86,7 @@ namespace highlo
 		virtual void Bind(uint32 slot) const override;
 
 	private:
+
 		uint32 m_Width = 0, m_Height = 0;
 		TextureFormat m_Format;
 		Allocator m_Buffer;

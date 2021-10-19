@@ -76,7 +76,7 @@ namespace highlo
 		s_RenderingAPI->SetLineThickness(thickness);
 	}
 
-	void Renderer::Init(Window* window)
+	void Renderer::Init(Window *window)
 	{
 		s_Data = new RendererData();
 		s_CommandQueue = new RenderCommandQueue();

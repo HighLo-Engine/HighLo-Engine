@@ -26,6 +26,6 @@ namespace highlo
 		virtual void EndTimestampQuery(uint64 queryID) = 0;
 
 		static Ref<RenderCommandBuffer> Create(const HLString &debugName = "", uint32 count = 0);
-		static Ref<RenderCommandBuffer> Create(const HLString &debugName = "");
+		static Ref<RenderCommandBuffer> CreateFromSwapChain(const HLString &debugName = "");
 	};
 }

@@ -18,25 +18,23 @@ namespace highlo
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const ShaderSource &source, bool isCompute = false);
+		OpenGLShader(const ShaderSource &source);
 		~OpenGLShader();
 
 		// Inherited via Shader
 		virtual void Bind() const override;
-		virtual HLRendererID GetRendererID() override;
+		virtual void Unbind() override;
+		virtual HLRendererID GetRendererID() override { return m_ID; }
 		virtual const HLString &GetName() const override { return m_Name; }
 
 	private:
+
 		uint32 CompileGLSLShader(const char *code, uint32 type);
 		void CompileGLSLProgram(const ShaderSource &source);
 
-		uint32 m_ID = 0;
-
-	private:
-		void CompileComputeShader(const ShaderSource &source);
-
 		HLString m_FileName;
 		HLString m_Name;
+		HLRendererID m_ID = 0;
 	};
 }
 

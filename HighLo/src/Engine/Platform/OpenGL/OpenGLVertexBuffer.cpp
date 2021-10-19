@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "OpenGLVertexBuffer.h"
 
+#include "Engine/Renderer/Renderer.h"
+
 #ifdef HIGHLO_API_OPENGL
 #include <glad/glad.h>
 
@@ -27,53 +29,95 @@ namespace highlo
 		}
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<Vertex>& vertices, VertexBufferUsage usage)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<Vertex> &vertices, VertexBufferUsage usage)
 		: m_Usage(usage)
 	{
-		glGenBuffers(1, &m_ID);
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], utils::ConvertUsageToOpenGL(usage));
+		m_Size = (uint32)(vertices.size() * sizeof(Vertex));
+		m_LocalData = Allocator::Copy(&vertices[0], m_Size);
+
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			glCreateBuffers(1, &instance->m_ID);
+			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.m_Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
+		});
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, size_t size, uint32 stride, VertexBufferUsage usage)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32 size, VertexBufferUsage usage)
 		: m_Usage(usage)
 	{
-		glGenBuffers(1, &m_ID);
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ARRAY_BUFFER, size, data, utils::ConvertUsageToOpenGL(usage));
+		m_Size = size;
+		m_LocalData = Allocator::Copy(data, size);
+
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			glCreateBuffers(1, &instance->m_ID);
+			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.m_Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
+		});
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(size_t size, VertexBufferUsage usage)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage)
 		: m_Usage(usage)
 	{
-		glGenBuffers(1, &m_ID);
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ARRAY_BUFFER, size, nullptr, utils::ConvertUsageToOpenGL(usage));
+		m_Size = size;
+
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			glCreateBuffers(1, &instance->m_ID);
+			glNamedBufferData(instance->m_ID, instance->m_Size, nullptr, utils::ConvertUsageToOpenGL(instance->m_Usage));
+		});
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
-		glDeleteBuffers(1, &m_ID);
+		GLuint rendererID = m_ID;
+		Renderer::Submit([rendererID]()
+		{
+			glDeleteBuffers(1, &rendererID);
+		});
 	}
 
 	void OpenGLVertexBuffer::Bind() const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
+		Ref<const OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]()
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, instance->m_ID);
+		});
 	}
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		Renderer::Submit([]()
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		});
 	}
 
-	void OpenGLVertexBuffer::UpdateContents(std::vector<Vertex>& vertices)
+	void OpenGLVertexBuffer::UpdateContents(std::vector<Vertex> &vertices, uint32 offset)
 	{
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), &vertices[0]);
+		m_Size = ((uint32)vertices.size()) * sizeof(Vertex);
+		m_LocalData = Allocator::Copy(&vertices[0], m_Size);
+
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance, offset]()
+		{
+			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.m_Data);
+		});
 	}
 	
-	void OpenGLVertexBuffer::UpdateContents(void* data, size_t size)
+	void OpenGLVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
 	{
-		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+		m_Size = size;
+		m_LocalData = Allocator::Copy(data, size);
+
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance, offset]()
+		{
+			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.m_Data);
+		});
 	}
 }
 

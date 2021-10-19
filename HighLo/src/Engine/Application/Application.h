@@ -13,7 +13,6 @@
 #include "ApplicationLayerStack.h"
 #include "Engine/Window/Window.h"
 #include "Engine/Events/Events.h"
-#include "Engine/Renderer/Renderer.h"
 #include "Engine/ECS/ECS_Registry.h"
 #include "Engine/ECS/ECS_SystemManager.h"
 #include "Engine/Encryption/Encryptor.h"
@@ -46,6 +45,7 @@ namespace highlo
 		inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationSettings(const ApplicationSettings &settings) { m_Settings = settings; }
 		HLAPI ApplicationSettings &GetApplicationSettings() { return m_Settings; }
+		HLAPI bool IsShuttingDown() const { return m_IsShuttingDown; }
 
 		HLAPI ECS_Registry &GetECSRegistry() { return m_ECS_Registry; }
 		HLAPI ECS_SystemManager &GetECSSystemManager() { return m_ECS_SystemManager; }
@@ -57,6 +57,7 @@ namespace highlo
 
 		bool m_Running = false;
 		bool m_Minimized = false;
+		bool m_IsShuttingDown = false;
 		UniqueRef<Window> m_Window;
 		Ref<Encryptor> m_Encryptor;
 

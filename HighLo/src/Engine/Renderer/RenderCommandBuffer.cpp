@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-	Ref<RenderCommandBuffer> RenderCommandBuffer::Create(const HLString &debugName)
+	Ref<RenderCommandBuffer> RenderCommandBuffer::CreateFromSwapChain(const HLString &debugName)
 	{
 	#ifdef HIGHLO_API_OPENGL
 		return nullptr;

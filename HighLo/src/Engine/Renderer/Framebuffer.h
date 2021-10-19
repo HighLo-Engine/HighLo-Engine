@@ -53,7 +53,7 @@ namespace highlo
 		uint32 Width = 0;
 		uint32 Height = 0;
 
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		glm::vec4 ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		FramebufferAttachmentSpecification Attachments;
 		uint32 Samples = 1;
 

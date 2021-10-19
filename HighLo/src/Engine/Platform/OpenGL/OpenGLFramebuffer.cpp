@@ -8,6 +8,7 @@
 #include <glad/glad.h>
 
 #include "Engine/Application/Application.h"
+#include "Engine/Renderer/Renderer.h"
 #include "OpenGLTexture.h"
 #include "OpenGLUtils.h"
 
@@ -130,7 +131,7 @@ namespace highlo
 	}
 
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification &spec)
-		: m_Specification(spec), m_Width(spec.Width), m_Height(spec.Height)
+		: m_Specification(spec)
 	{
 		HL_ASSERT(spec.Attachments.Attachments.size());
 		for (auto format : m_Specification.Attachments.Attachments)
@@ -144,97 +145,121 @@ namespace highlo
 		uint32 width = spec.Width;
 		uint32 height = spec.Height;
 		if (0 == width)
-		{
 			width = HLApplication::Get().GetWindow().GetWidth();
+
+		if (0 == height)
 			height = HLApplication::Get().GetWindow().GetHeight();
-		}
 
 		Resize(width, height, true);
 	}
 
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
-		glDeleteFramebuffers(1, &m_RendererID);
+		Ref<OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance]()
+		{
+			glDeleteFramebuffers(1, &instance->m_RendererID);
+		});
 	}
 
 	void OpenGLFramebuffer::Resize(uint32 width, uint32 height, bool forceRecreate)
 	{
-		if (!forceRecreate && (m_Width == width && m_Height == height))
+		if (!forceRecreate && (m_Specification.Width == width && m_Specification.Height == height) && m_Specification.NoResize)
 			return;
 
-		m_Width = width;
-		m_Height = height;
+		m_Specification.Width = width;
+		m_Specification.Height = height;
 
-		if (m_RendererID)
+		Ref<OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance]() mutable
 		{
-			glDeleteFramebuffers(1, &m_RendererID);
-			m_ColorAttachments.clear();
-		}
+			if (instance->m_RendererID)
+			{
+				glDeleteFramebuffers(1, &instance->m_RendererID);
+				instance->m_ColorAttachments.clear();
+			}
 
-		glGenFramebuffers(1, &m_RendererID);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+			glGenFramebuffers(1, &instance->m_RendererID);
+			glBindFramebuffer(GL_FRAMEBUFFER, instance->m_RendererID);
 
-		if (m_ColorAttachmentFormats.size())
-		{
-			m_ColorAttachments.resize(m_ColorAttachmentFormats.size());
+			if (instance->m_ColorAttachmentFormats.size())
+			{
+				instance->m_ColorAttachments.resize(instance->m_ColorAttachmentFormats.size());
 
-			// Create Color attachments
-			for (int32 i = 0; i < m_ColorAttachments.size(); ++i)
-				m_ColorAttachments[i] = utils::CreateAndAttachColorAttachment(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Width, m_Height, i);
-		}
+				// Create color attachments
+				for (size_t i = 0; i < instance->m_ColorAttachments.size(); i++)
+					instance->m_ColorAttachments[i] = utils::CreateAndAttachColorAttachment(instance->m_Specification.Samples, instance->m_ColorAttachmentFormats[i], instance->m_Specification.Width, instance->m_Specification.Height, int32(i));
+			}
 
-		if (m_DepthAttachmentFormat != TextureFormat::None)
-		{
-			m_DepthAttachment = utils::AttachDepthTexture(m_Specification.Samples, m_DepthAttachmentFormat, m_Width, m_Height);
-		}
+			if (instance->m_DepthAttachmentFormat != TextureFormat::None)
+				instance->m_DepthAttachment = utils::AttachDepthTexture(instance->m_Specification.Samples, instance->m_DepthAttachmentFormat, instance->m_Specification.Width, instance->m_Specification.Height);
 
-		if (m_ColorAttachments.size() > 1)
-		{
-			HL_ASSERT(m_ColorAttachments.size() <= 4);
-			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-			glDrawBuffers((GLsizei)m_ColorAttachments.size(), buffers);
-		}
-		else if (m_ColorAttachments.empty())
-		{
-			// Draw only the depth pass
-			glDrawBuffer(GL_NONE);
-		}
+			if (instance->m_ColorAttachments.size() > 1)
+			{
+				HL_ASSERT(instance->m_ColorAttachments.size() <= 4, "We only support 4 color passes for now");
+				GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+				glDrawBuffers((GLsizei)instance->m_ColorAttachments.size(), buffers);
+			}
+			else if (instance->m_ColorAttachments.empty())
+			{
+				// Draw only depth-pass
+				glDrawBuffer(GL_NONE);
+			}
 
-		HL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//	HL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		});
 	}
 
 	void OpenGLFramebuffer::Bind() const
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-		glViewport(0, 0, m_Width, m_Height);
+		Ref<const OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance]()
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, instance->m_RendererID);
+			glViewport(0, 0, instance->m_Specification.Width, instance->m_Specification.Height);
+		});
 	}
 
 	void OpenGLFramebuffer::Unbind() const
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		Renderer::Submit([]()
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		});
 	}
 
 	void OpenGLFramebuffer::BindTexture(uint32 attachmentIndex, uint32 slot) const
 	{
-		glBindTextureUnit(slot, m_ColorAttachments[attachmentIndex]->GetRendererID());
+		Ref<const OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance, slot, attachmentIndex]()
+		{
+			glBindTextureUnit(slot, instance->m_ColorAttachments[attachmentIndex]->GetRendererID());
+		});
 	}
 
 	void OpenGLFramebuffer::ClearAttachment(uint32 attachmentIndex, int32 value)
 	{
 		HL_ASSERT(attachmentIndex < m_ColorAttachments.size());
-
 		auto &format = m_ColorAttachmentFormats[attachmentIndex];
-		glClearTexImage(m_ColorAttachments[attachmentIndex]->GetRendererID(), 0, utils::HighLoFBTextureFormatToGL(format), GL_INT, &value);
+
+		Ref<OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance, format, attachmentIndex, value]()
+		{
+			glClearTexImage(instance->m_ColorAttachments[attachmentIndex]->GetRendererID(), 0, utils::HighLoFBTextureFormatToGL(format), GL_INT, &value);
+		});
 	}
 	
 	int32 OpenGLFramebuffer::ReadPixel(uint32 attachmentIndex, int32 x, int32 y)
 	{
 		HL_ASSERT(attachmentIndex < m_ColorAttachments.size());
-
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
 		int32 pixelData;
-		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+
+		Renderer::Submit([attachmentIndex, x, y, pixelData]() mutable
+		{
+			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+			glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		});
 
 		return pixelData;
 	}

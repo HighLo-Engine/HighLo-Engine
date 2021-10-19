@@ -9,10 +9,11 @@
 
 #include "Engine/Core/File.h"
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace highlo
 {
-	OpenGLShader::OpenGLShader(const ShaderSource &source, bool isCompute)
+	OpenGLShader::OpenGLShader(const ShaderSource &source)
 		: m_FileName(source.FileName)
 	{
 		m_Name = File::GetFileName(source.FileName);
@@ -23,25 +24,33 @@ namespace highlo
 			return;
 		}
 
-		if (!isCompute)
-			CompileGLSLProgram(source);
-		else
-			CompileComputeShader(source);
+		CompileGLSLProgram(source);
 	}
 
 	OpenGLShader::~OpenGLShader()
 	{
-		glDeleteProgram(m_ID);
+		GLuint rendererID = m_ID;
+		Renderer::Submit([rendererID]()
+		{
+			glDeleteProgram(rendererID);
+		});
 	}
 
 	void OpenGLShader::Bind() const
 	{
-		glUseProgram(m_ID);
+		Ref<const OpenGLShader> instance = this;
+		Renderer::Submit([instance]()
+		{
+			glUseProgram(instance->m_ID);
+		});
 	}
 
-	HLRendererID OpenGLShader::GetRendererID()
+	void OpenGLShader::Unbind()
 	{
-		return m_ID;
+		Renderer::Submit([]()
+		{
+			glUseProgram(0);
+		});
 	}
 
 	uint32 OpenGLShader::CompileGLSLShader(const char *code, uint32 type)
@@ -73,97 +82,87 @@ namespace highlo
 
 	void OpenGLShader::CompileGLSLProgram(const ShaderSource &source)
 	{
-		m_ID = glCreateProgram();
-
-		auto vs_id = CompileGLSLShader(source.VertexShaderSrc, GL_VERTEX_SHADER);
-		auto ps_id = CompileGLSLShader(source.PixelShaderSrc, GL_FRAGMENT_SHADER);
-
-		uint32 tcs_id = 0;
-		uint32 tes_id = 0;
-		uint32 gs_id = 0;
-
-		glAttachShader(m_ID, vs_id);
-		glAttachShader(m_ID, ps_id);
-
-		if (!source.TessellationControlShaderSrc.IsEmpty())
+		Ref<OpenGLShader> instance = this;
+		Renderer::Submit([instance, source]() mutable
 		{
-			tcs_id = CompileGLSLShader(source.TessellationControlShaderSrc, GL_TESS_CONTROL_SHADER);
-			glAttachShader(m_ID, tcs_id);
-		}
+			instance->m_ID = glCreateProgram();
 
-		if (!source.TessellationEvaluationShaderSrc.IsEmpty())
-		{
-			tes_id = CompileGLSLShader(source.TessellationEvaluationShaderSrc, GL_TESS_EVALUATION_SHADER);
-			glAttachShader(m_ID, tes_id);
-		}
+			uint32 vs_id = 0;
+			uint32 ps_id = 0;
+			uint32 tcs_id = 0;
+			uint32 tes_id = 0;
+			uint32 gs_id = 0;
+			uint32 cs_id = 0;
 
-		if (!source.GeometryShaderSrc.IsEmpty())
-		{
-			gs_id = CompileGLSLShader(source.GeometryShaderSrc, GL_GEOMETRY_SHADER);
-			glAttachShader(m_ID, gs_id);
-		}
+			if (!source.VertexShaderSrc.IsEmpty())
+			{
+				vs_id = instance->CompileGLSLShader(*source.VertexShaderSrc, GL_VERTEX_SHADER);
+				glAttachShader(instance->m_ID, vs_id);
+			}
 
-		glLinkProgram(m_ID);
+			if (!source.PixelShaderSrc.IsEmpty())
+			{
+				ps_id = instance->CompileGLSLShader(*source.PixelShaderSrc, GL_FRAGMENT_SHADER);
+				glAttachShader(instance->m_ID, ps_id);
+			}
 
-		int32 isLinked = 0;
-		glGetProgramiv(m_ID, GL_LINK_STATUS, (int32*)&isLinked);
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxLength = 0;
-			glGetProgramiv(m_ID, GL_INFO_LOG_LENGTH, &maxLength);
+			if (!source.TessellationControlShaderSrc.IsEmpty())
+			{
+				tcs_id = instance->CompileGLSLShader(*source.TessellationControlShaderSrc, GL_TESS_CONTROL_SHADER);
+				glAttachShader(instance->m_ID, tcs_id);
+			}
 
-			std::vector<GLchar> info_log(maxLength);
-			glGetProgramInfoLog(m_ID, maxLength, &maxLength, &info_log[0]);
+			if (!source.TessellationEvaluationShaderSrc.IsEmpty())
+			{
+				tes_id = instance->CompileGLSLShader(*source.TessellationEvaluationShaderSrc, GL_TESS_EVALUATION_SHADER);
+				glAttachShader(instance->m_ID, tes_id);
+			}
 
-			glDeleteProgram(m_ID);
-			glDeleteShader(vs_id);
-			glDeleteShader(ps_id);
+			if (!source.GeometryShaderSrc.IsEmpty())
+			{
+				gs_id = instance->CompileGLSLShader(*source.GeometryShaderSrc, GL_GEOMETRY_SHADER);
+				glAttachShader(instance->m_ID, gs_id);
+			}
 
-			if (tcs_id) glDeleteShader(tcs_id);
-			if (tes_id) glDeleteShader(tes_id);
-			if (gs_id)  glDeleteShader(gs_id);
+			if (!source.ComputeShaderSrc.IsEmpty())
+			{
+				cs_id = instance->CompileGLSLShader(*source.ComputeShaderSrc, GL_COMPUTE_SHADER);
+				glAttachShader(instance->m_ID, cs_id);
+			}
 
-			HL_CORE_ERROR(info_log.data());
-			HL_CORE_ERROR("Failed to link shader {0}", *m_FileName);
-			return;
-		}
+			glLinkProgram(instance->m_ID);
 
-		glDetachShader(m_ID, vs_id);
-		glDetachShader(m_ID, ps_id);
+			int32 isLinked = 0;
+			glGetProgramiv(instance->m_ID, GL_LINK_STATUS, (int32*)&isLinked);
+			if (isLinked == GL_FALSE)
+			{
+				GLint maxLength = 0;
+				glGetProgramiv(instance->m_ID, GL_INFO_LOG_LENGTH, &maxLength);
 
-		if (tcs_id) glDetachShader(m_ID, tcs_id);
-		if (tes_id) glDetachShader(m_ID, tes_id);
-		if (gs_id)  glDetachShader(m_ID, gs_id);
-	}
+				std::vector<GLchar> info_log(maxLength);
+				glGetProgramInfoLog(instance->m_ID, maxLength, &maxLength, &info_log[0]);
 
-	void OpenGLShader::CompileComputeShader(const ShaderSource& source)
-	{
-		m_ID = glCreateProgram();
+				glDeleteProgram(instance->m_ID);
 
-		auto cs_id = CompileGLSLShader(source.ComputeShaderSrc, GL_COMPUTE_SHADER);
+				if (vs_id)  glDeleteShader(vs_id);
+				if (ps_id)  glDeleteShader(ps_id);
+				if (tcs_id) glDeleteShader(tcs_id);
+				if (tes_id) glDeleteShader(tes_id);
+				if (gs_id)  glDeleteShader(gs_id);
+				if (cs_id)  glDeleteShader(cs_id);
 
-		glAttachShader(m_ID, cs_id);
-		glLinkProgram(m_ID);
+				HL_CORE_ERROR(info_log.data());
+				HL_CORE_ERROR("Failed to link shader {0}", *instance->m_FileName);
+				return;
+			}
 
-		int32 isLinked = 0;
-		glGetProgramiv(m_ID, GL_LINK_STATUS, (int32*)&isLinked);
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxLength = 0;
-			glGetProgramiv(m_ID, GL_INFO_LOG_LENGTH, &maxLength);
-
-			std::vector<GLchar> info_log(maxLength);
-			glGetProgramInfoLog(m_ID, maxLength, &maxLength, &info_log[0]);
-
-			glDeleteProgram(m_ID);
-			glDeleteShader(cs_id);
-
-			HL_CORE_ERROR(info_log.data());
-			HL_CORE_ERROR("Failed to link compute shader");
-			return;
-		}
-
-		glDetachShader(m_ID, cs_id);
+			if (vs_id)  glDetachShader(instance->m_ID, vs_id);
+			if (ps_id)  glDetachShader(instance->m_ID, ps_id);
+			if (tcs_id) glDetachShader(instance->m_ID, tcs_id);
+			if (tes_id) glDetachShader(instance->m_ID, tes_id);
+			if (gs_id)  glDetachShader(instance->m_ID, gs_id);
+			if (cs_id)  glDetachShader(instance->m_ID, cs_id);
+		});
 	}
 }
 

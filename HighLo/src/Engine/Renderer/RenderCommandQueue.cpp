@@ -20,13 +20,16 @@ namespace highlo
 	void *RenderCommandQueue::Allocate(RenderCommandFn func, uint32 size)
 	{
 		*(RenderCommandFn*)m_CommandBufferPtr = func;
+		m_CommandBufferPtr += sizeof(RenderCommandFn);
+
+		*(uint32*)m_CommandBufferPtr = size;
 		m_CommandBufferPtr += sizeof(uint32);
 
-		void *mem = m_CommandBufferPtr;
+		void *memory = m_CommandBufferPtr;
 		m_CommandBufferPtr += size;
 
 		++m_CommandCount;
-		return mem;
+		return memory;
 	}
 	
 	void RenderCommandQueue::Execute()

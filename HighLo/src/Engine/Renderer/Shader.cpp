@@ -18,7 +18,7 @@ namespace highlo
 	Ref<UniformBuffer> Shader::m_VS_SceneBuffer;
 
 #ifdef HIGHLO_API_OPENGL
-    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout &layout)
+    Ref<Shader> Shader::Create(const ShaderSource &source, const BufferLayout &layout)
     {
 		static bool first_time = true;
 		if (first_time)
@@ -32,12 +32,12 @@ namespace highlo
 	
 	Ref<Shader> Shader::CreateComputeShader(const ShaderSource &source)
 	{
-		return Ref<OpenGLShader>::Create(source, true);
+		return Ref<OpenGLShader>::Create(source);
 	}
 
 #endif // HIGHLO_API_OPENGL
 #ifdef HIGHLO_API_DX11
-    Ref<Shader> Shader::Create(const ShaderSource& source, const BufferLayout &layout)
+    Ref<Shader> Shader::Create(const ShaderSource &source, const BufferLayout &layout)
     {
 		static bool first_time = true;
 		if (first_time)
@@ -97,13 +97,13 @@ namespace highlo
 			NONE = -1, VERTEX_SHADER = 0, TESS_CONTROL_SHADER = 2, TESS_EVAL_SHADER = 3, GEOMETRY_SHADER = 4, PIXEL_SHADER = 5, COMPUTE_SHADER = 6
 		};
 
-		std::unordered_map<ShaderType, std::stringstream> shader_sources;
-		shader_sources[ShaderType::VERTEX_SHADER] = std::stringstream();
-		shader_sources[ShaderType::TESS_CONTROL_SHADER] = std::stringstream();
-		shader_sources[ShaderType::TESS_EVAL_SHADER] = std::stringstream();
-		shader_sources[ShaderType::GEOMETRY_SHADER] = std::stringstream();
-		shader_sources[ShaderType::PIXEL_SHADER] = std::stringstream();
-		shader_sources[ShaderType::COMPUTE_SHADER] = std::stringstream();
+		std::unordered_map<ShaderType, std::stringstream> shaderSources;
+		shaderSources[ShaderType::VERTEX_SHADER] = std::stringstream();
+		shaderSources[ShaderType::TESS_CONTROL_SHADER] = std::stringstream();
+		shaderSources[ShaderType::TESS_EVAL_SHADER] = std::stringstream();
+		shaderSources[ShaderType::GEOMETRY_SHADER] = std::stringstream();
+		shaderSources[ShaderType::PIXEL_SHADER] = std::stringstream();
+		shaderSources[ShaderType::COMPUTE_SHADER] = std::stringstream();
 
 		std::ifstream file;
 		try
@@ -132,7 +132,7 @@ namespace highlo
 				}
 				else
 				{
-					shader_sources[type] << line << "\n";
+					shaderSources[type] << line << "\n";
 				}
 			}
 		}
@@ -142,12 +142,12 @@ namespace highlo
 			HL_CORE_ERROR(strerror(errno));
 		}
 
-		result.VertexShaderSrc					= HLString(shader_sources[ShaderType::VERTEX_SHADER].str().c_str());
-		result.TessellationControlShaderSrc		= HLString(shader_sources[ShaderType::TESS_CONTROL_SHADER].str().c_str());
-		result.TessellationEvaluationShaderSrc	= HLString(shader_sources[ShaderType::TESS_EVAL_SHADER].str().c_str());
-		result.GeometryShaderSrc				= HLString(shader_sources[ShaderType::GEOMETRY_SHADER].str().c_str());
-		result.PixelShaderSrc					= HLString(shader_sources[ShaderType::PIXEL_SHADER].str().c_str());
-		result.ComputeShaderSrc					= HLString(shader_sources[ShaderType::COMPUTE_SHADER].str().c_str());
+		result.VertexShaderSrc					= HLString(shaderSources[ShaderType::VERTEX_SHADER].str().c_str());
+		result.TessellationControlShaderSrc		= HLString(shaderSources[ShaderType::TESS_CONTROL_SHADER].str().c_str());
+		result.TessellationEvaluationShaderSrc	= HLString(shaderSources[ShaderType::TESS_EVAL_SHADER].str().c_str());
+		result.GeometryShaderSrc				= HLString(shaderSources[ShaderType::GEOMETRY_SHADER].str().c_str());
+		result.PixelShaderSrc					= HLString(shaderSources[ShaderType::PIXEL_SHADER].str().c_str());
+		result.ComputeShaderSrc					= HLString(shaderSources[ShaderType::COMPUTE_SHADER].str().c_str());
 		result.FileName							= filename;
 
 		HL_CORE_INFO("Shader>       [+] Loaded " + filename + " [+]");

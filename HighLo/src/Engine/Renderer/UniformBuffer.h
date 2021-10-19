@@ -44,7 +44,7 @@ namespace highlo
 
 		uint32 BindingSlot = 0;
 
-		HLAPI inline uint32  GetSize() const { return m_DataSize; }
+		HLAPI inline uint32  GetSize() const { return m_Size; }
 		HLAPI inline void *GetData() const { return m_Data; }
 		HLAPI inline const HLString &GetName() const { return m_Name; }
 
@@ -53,7 +53,7 @@ namespace highlo
 
 		HLAPI void GetVariableValue(const HLString &name, void *out_val);
 
-		virtual void UploadToShader() = 0;
+		virtual void UploadToShader(uint32 offset = 0) = 0;
 
 		static Ref<UniformBuffer> Create(const HLString &name, const std::vector<UniformVariable> &layout,
 			UniformBufferParentShader parent, uint32 slot = 0);
@@ -64,7 +64,7 @@ namespace highlo
 	
 	protected:
 
-		uint32	m_DataSize = 0;
+		uint32	m_Size = 0;
 		void   *m_Data = nullptr;
 		const HLString m_Name;
 		UniformBufferParentShader m_ParentShader;

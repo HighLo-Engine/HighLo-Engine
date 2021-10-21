@@ -67,6 +67,9 @@ namespace highlo
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
 
+		// TEMP
+		void TestFastInverseSquareRoot(float value);
+
 	private:
 
 		void InternalEventHandler(Event &event);

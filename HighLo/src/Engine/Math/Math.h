@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-10-21) Added ultra-fast DotProduct in SSE (source: https://stackoverflow.com/a/42924346/12873837)
 //     - 1.1 (2021-10-01) Added ultra-fast FastSquareRoot function (source: https://www.youtube.com/watch?v=p8u_k2LIZyo)
 //     - 1.0 (2021-09-14) initial release
 //
@@ -37,11 +38,17 @@ namespace highlo
 #define HL_INSIDE		1
 #define HL_OUTSIDE		2
 
-	HLAPI float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
+	HLAPI float BarryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 
+	HLAPI std::ostream &operator<<(std::ostream &os, const glm::vec2 &vec);
 	HLAPI std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec);
+	HLAPI std::ostream &operator<<(std::ostream &os, const glm::vec4 &vec);
+	HLAPI std::ostream &operator<<(std::ostream &os, const glm::mat2 &mat);
+	HLAPI std::ostream &operator<<(std::ostream &os, const glm::mat3 &mat);
 	HLAPI std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat);
-	HLAPI HLString vec3ToString(const glm::vec3 &v);
+	HLAPI HLString Vec2ToString(const glm::vec2 &v);
+	HLAPI HLString Vec3ToString(const glm::vec3 &v);
+	HLAPI HLString Vec4ToString(const glm::vec4 &v);
 
 	HLAPI float FastInverseSquareRoot(float value);
 
@@ -59,8 +66,8 @@ namespace highlo
 	HLAPI float Sin(float value);
 	HLAPI float Cos(float value);
 
-	HLAPI void	MatrixMulSSE(const glm::mat4 &A, const glm::mat4 &B, glm::mat4 &dest);
-	HLAPI float DistanceSquaredSSE(const glm::vec3 &A, const glm::vec3 &B);
-	HLAPI bool	CompareVectorsSSE(const glm::vec3 &A, const glm::vec3 &B);
-	HLAPI float	DotProductSSE(const glm::vec3 &A, const glm::vec3 &B);
+	HLAPI void	MatrixMulSSE(const glm::mat4 &a, const glm::mat4 &b, glm::mat4 &dest);
+	HLAPI float DistanceSquaredSSE(const glm::vec3 &a, const glm::vec3 &b);
+	HLAPI bool	CompareVectorsSSE(const glm::vec3 &a, const glm::vec3 &b);
+	HLAPI float	DotProductSSE(const glm::vec3 &a, const glm::vec3 &b);
 }

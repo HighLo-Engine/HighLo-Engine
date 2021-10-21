@@ -33,7 +33,7 @@
 
 namespace highlo
 {
-	float hsum_ps_sse3(__m128 v)
+	static float HSumPsSse3(__m128 v)
 	{
 		__m128 shuf = _mm_movehdup_ps(v);
 		__m128 sums = _mm_add_ps(v, shuf);
@@ -42,7 +42,7 @@ namespace highlo
 		return _mm_cvtss_f32(sums);
 	}
 
-	float barry_centric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)
+	float BarryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)
 	{
 		float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
 		float l1 = ((p2.z - p3.z) * (pos.x - p3.x) + (p3.x - p2.x) * (pos.y - p3.z)) / det;
@@ -51,28 +51,76 @@ namespace highlo
 		return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 	}
 
-	std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec)
+	std::ostream &operator<<(std::ostream &os, const glm::vec2 &vec)
 	{
-		os << vec.x << ", " << vec.y << ", " << vec.z;
-		return os;
+		return os << vec.x << ", " << vec.y;
 	}
 
-	std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat)
+	std::ostream &operator<<(std::ostream &os, const glm::vec3 &vec)
 	{
-		for (int i = 0; i < 4; ++i)
+		return os << vec.x << ", " << vec.y << ", " << vec.z;
+	}
+
+	std::ostream &operator<<(std::ostream &os, const glm::vec4 &vec)
+	{
+		return os << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w;
+	}
+
+	std::ostream &operator<<(std::ostream &os, const glm::mat2 &mat)
+	{
+		for (uint32 i = 0; i < 2; ++i)
 		{
-			for (int j = 0; j < 4; ++j)
+			for (uint32 j = 0; j < 2; ++j)
 			{
 				os << mat[i][j] << " ";
 			}
 			os << "\n";
 		}
+
 		return os;
 	}
 
-	HLString vec3ToString(const glm::vec3 &v)
+	std::ostream &operator<<(std::ostream &os, const glm::mat3 &mat)
+	{
+		for (uint32 i = 0; i < 3; ++i)
+		{
+			for (uint32 j = 0; j < 3; ++j)
+			{
+				os << mat[i][j] << " ";
+			}
+			os << "\n";
+		}
+
+		return os;
+	}
+
+	std::ostream &operator<<(std::ostream &os, const glm::mat4 &mat)
+	{
+		for (uint32 i = 0; i < 4; ++i)
+		{
+			for (uint32 j = 0; j < 4; ++j)
+			{
+				os << mat[i][j] << " ";
+			}
+			os << "\n";
+		}
+
+		return os;
+	}
+
+	HLString Vec2ToString(const glm::vec2 &v)
+	{
+		return HLString::ToString(v.x) + ", " + HLString::ToString(v.y);
+	}
+
+	HLString Vec3ToString(const glm::vec3 &v)
 	{
 		return HLString::ToString(v.x) + ", " + HLString::ToString(v.y) + ", " + HLString::ToString(v.z);
+	}
+
+	HLString Vec4ToString(const glm::vec4 &v)
+	{
+		return HLString::ToString(v.x) + ", " + HLString::ToString(v.y) + ", " + HLString::ToString(v.z) + ", " + HLString::ToString(v.w);
 	}
 
 	float FastInverseSquareRoot(float value)
@@ -84,46 +132,45 @@ namespace highlo
 		y = value;
 
 		// 
-		//i = *(uint32*)&y;
-		memcpy(&i, &y, 4);
+		i = *(long*)&y;
 		i = 0x5f3759df - (i >> 1);
-		//y = *(uint32*)&i;
-		memcpy(&y, &i, 4);
+		y = *(float*)&i;
 
 		// Newton iteration
+		y = y * (1.5f - (x2 * y * y));
 		y = y * (1.5f - (x2 * y * y));
 		y = y * (1.5f - (x2 * y * y));
 
 		return y;
 	}
 
-	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset)
+	glm::vec3 ScreenToWorldRay(glm::vec2 point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &viewSize, const glm::vec2 &viewOffset)
 	{
-		glm::vec2 normalized_device_coords;
-		normalized_device_coords.x = (2.0f * point.x) / view_size.x - 1.0f;
-		normalized_device_coords.y = -1.0f * ((2.0f * point.y) / view_size.y - 1.0f);
+		glm::vec2 normalizedDeviceCoords;
+		normalizedDeviceCoords.x = (2.0f * point.x) / viewSize.x - 1.0f;
+		normalizedDeviceCoords.y = -1.0f * ((2.0f * point.y) / viewSize.y - 1.0f);
 
-		normalized_device_coords -= view_offset;
+		normalizedDeviceCoords -= viewOffset;
 
-		glm::vec4 clip_space_coords = glm::vec4(normalized_device_coords.x, normalized_device_coords.y, -1.0f, 1.0f);
+		glm::vec4 clipSpaceCoords = glm::vec4(normalizedDeviceCoords.x, normalizedDeviceCoords.y, -1.0f, 1.0f);
 
-		glm::vec4 eye_space_coords = glm::inverse(projection) * clip_space_coords;
-		eye_space_coords.z = -1.0f;
-		eye_space_coords.w = 0.0f;
+		glm::vec4 eyeSpaceCoords = glm::inverse(projection) * clipSpaceCoords;
+		eyeSpaceCoords.z = -1.0f;
+		eyeSpaceCoords.w = 0.0f;
 
-		glm::vec4 world_coords = glm::inverse(view) * eye_space_coords;
+		glm::vec4 worldCoords = glm::inverse(view) * eyeSpaceCoords;
 
-		return glm::normalize(glm::vec3(world_coords.x, world_coords.y, world_coords.z));
+		return glm::normalize(glm::vec3(worldCoords.x, worldCoords.y, worldCoords.z));
 	}
 
-	glm::vec3 WorldToScreen(const glm::vec3 &point, const glm::mat4 &view_matrix, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset)
+	glm::vec3 WorldToScreen(const glm::vec3 &point, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec2 &viewSize, const glm::vec2 &viewOffset)
 	{
-		glm::vec4 WorldPosition = glm::vec4(point, 1.0f);
-		glm::vec4 ClipSpacePos = projection * (view_matrix * WorldPosition);
-		glm::vec3 NDCPos = glm::vec3(ClipSpacePos.x, ClipSpacePos.y, ClipSpacePos.z) / ClipSpacePos.w;
+		glm::vec4 worldPosition = glm::vec4(point, 1.0f);
+		glm::vec4 clipSpacePos = projection * (view * worldPosition);
+		glm::vec3 ndcPos = glm::vec3(clipSpacePos.x, clipSpacePos.y, clipSpacePos.z) / clipSpacePos.w;
 
-		glm::vec2 result = ((glm::vec2(NDCPos) + 1.0f) / 2.0f) * view_size + view_offset;
-		return glm::vec3(result.x, result.y, ClipSpacePos.z);
+		glm::vec2 result = ((glm::vec2(ndcPos) + 1.0f) / 2.0f) * viewSize + viewOffset;
+		return glm::vec3(result.x, result.y, clipSpacePos.z);
 	}
 
 	bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation)
@@ -345,17 +392,17 @@ namespace highlo
 		return s_CachedCos[value];
 	}
 	
-	void MatrixMulSSE(const glm::mat4 &A, const glm::mat4 &B, glm::mat4 &dest)
+	void MatrixMulSSE(const glm::mat4 &a, const glm::mat4 &b, glm::mat4 &dest)
 	{
-		__m128 m2_row_0 = _mm_setr_ps(A[0][0], A[0][1], A[0][2], A[0][3]);
-		__m128 m2_row_1 = _mm_setr_ps(A[1][0], A[1][1], A[1][2], A[1][3]);
-		__m128 m2_row_2 = _mm_setr_ps(A[2][0], A[2][1], A[2][2], A[2][3]);
-		__m128 m2_row_3 = _mm_setr_ps(A[3][0], A[3][1], A[3][2], A[3][3]);
+		__m128 m2_row_0 = _mm_setr_ps(a[0][0], a[0][1], a[0][2], a[0][3]);
+		__m128 m2_row_1 = _mm_setr_ps(a[1][0], a[1][1], a[1][2], a[1][3]);
+		__m128 m2_row_2 = _mm_setr_ps(a[2][0], a[2][1], a[2][2], a[2][3]);
+		__m128 m2_row_3 = _mm_setr_ps(a[3][0], a[3][1], a[3][2], a[3][3]);
 
-		__m128 m1_row_0 = _mm_setr_ps(B[0][0], B[0][1], B[0][2], B[0][3]);
-		__m128 m1_row_1 = _mm_setr_ps(B[1][0], B[1][1], B[1][2], B[1][3]);
-		__m128 m1_row_2 = _mm_setr_ps(B[2][0], B[2][1], B[2][2], B[2][3]);
-		__m128 m1_row_3 = _mm_setr_ps(B[3][0], B[3][1], B[3][2], B[3][3]);
+		__m128 m1_row_0 = _mm_setr_ps(b[0][0], b[0][1], b[0][2], b[0][3]);
+		__m128 m1_row_1 = _mm_setr_ps(b[1][0], b[1][1], b[1][2], b[1][3]);
+		__m128 m1_row_2 = _mm_setr_ps(b[2][0], b[2][1], b[2][2], b[2][3]);
+		__m128 m1_row_3 = _mm_setr_ps(b[3][0], b[3][1], b[3][2], b[3][3]);
 
 		__m128 out0;
 		__m128 out1;
@@ -388,29 +435,41 @@ namespace highlo
 		_mm_store_ps(&dest[3][0], out3);
 	}
 	
-	float DistanceSquaredSSE(const glm::vec3 &A, const glm::vec3 &B)
+	float DistanceSquaredSSE(const glm::vec3 &a, const glm::vec3 &b)
 	{
-		__m128 a4 = _mm_set_ps(A.x, A.y, A.z, 0.0f);
-		__m128 b4 = _mm_set_ps(B.x, B.y, B.z, 0.0f);
+		__m128 a4 = _mm_set_ps(a.x, a.y, a.z, 0.0f);
+		__m128 b4 = _mm_set_ps(b.x, b.y, b.z, 0.0f);
 		
 		__m128 diff = _mm_sub_ps(b4, a4);
 		__m128 sqr = _mm_mul_ps(diff, diff);
 
-		return hsum_ps_sse3(sqr);
+		return HSumPsSse3(sqr);
 	}
 	
-	bool CompareVectorsSSE(const glm::vec3 &A, const glm::vec3 &B)
+	bool CompareVectorsSSE(const glm::vec3 &a, const glm::vec3 &b)
 	{
-		__m128i v1 = _mm_load_si128((__m128i*)&A);
-		__m128i v2 = _mm_load_si128((__m128i*)&B);
+		__m128i v1 = _mm_load_si128((__m128i*)&a);
+		__m128i v2 = _mm_load_si128((__m128i*)&b);
 		__m128i vcmp = _mm_cmpeq_epi32(v1, v2);
 		uint16_t mask = _mm_movemask_epi8(vcmp);
 		return (mask == 0xffff);
 	}
 	
-	float DotProductSSE(const glm::vec3 &A, const glm::vec3 &B)
+	float DotProductSSE(const glm::vec3 &a, const glm::vec3 &b)
 	{
-		// TODO
-		return 0;
+		__m128 mulRes, shufReg, sumReg, a4, b4;
+		
+		a4 = _mm_set_ps(a.x, a.y, a.z, 0.0f);
+		b4 = _mm_set_ps(b.x, b.y, b.z, 0.0f);
+		mulRes    = _mm_mul_ps(a4, b4);
+
+		// Calculate the sum of SSE Registers
+		shufReg   = _mm_movehdup_ps(mulRes); // Broadcast elements 3,1 to 2,0
+		sumReg    = _mm_add_ps(mulRes, shufReg);
+		shufReg   = _mm_movehl_ps(shufReg, sumReg); // High Half -> Low Half
+		sumReg    = _mm_add_ss(sumReg, shufReg);
+		
+		// The Result is in the lower part of the SSE Register
+		return _mm_cvtss_f32(sumReg);
 	}
 }

@@ -37,13 +37,13 @@ namespace highlo
 	{
 	public:
 
-		SharedReference()
+		HLAPI SharedReference()
 			: m_Instance(nullptr) {}
 
-		SharedReference(std::nullptr_t)
+		HLAPI SharedReference(std::nullptr_t)
 			: m_Instance(nullptr) {}
 
-		SharedReference(T *instance)
+		HLAPI SharedReference(T *instance)
 			: m_Instance(instance)
 		{
 			static_assert(std::is_base_of<IsSharedReference, T>::value, "Class is not RefCounted!");
@@ -51,38 +51,38 @@ namespace highlo
 		}
 
 		template<typename T2>
-		SharedReference(const SharedReference<T2> &other)
+		HLAPI SharedReference(const SharedReference<T2> &other)
 		{
 			m_Instance = (T*)other.m_Instance;
 			IncRef();
 		}
 
 		template<typename T2>
-		SharedReference(SharedReference<T2> &&other)
+		HLAPI SharedReference(SharedReference<T2> &&other)
 		{
 			m_Instance = (T*)other.m_Instance;
 			other.m_Instance = nullptr;
 		}
 
-		~SharedReference()
+		HLAPI ~SharedReference()
 		{
 			DecRef();
 		}
 
-		SharedReference(const SharedReference<T> &other)
+		HLAPI SharedReference(const SharedReference<T> &other)
 			: m_Instance(other.m_Instance)
 		{
 			IncRef();
 		}
 
-		SharedReference &operator=(std::nullptr_t)
+		HLAPI SharedReference &operator=(std::nullptr_t)
 		{
 			DecRef();
 			m_Instance = nullptr;
 			return *this;
 		}
 
-		SharedReference &operator=(const SharedReference<T> &other)
+		HLAPI SharedReference &operator=(const SharedReference<T> &other)
 		{
 			other.IncRef();
 			DecRef();
@@ -92,7 +92,7 @@ namespace highlo
 		}
 
 		template<typename T2>
-		SharedReference &operator=(const SharedReference<T2> &other)
+		HLAPI SharedReference &operator=(const SharedReference<T2> &other)
 		{
 			other.IncRef();
 			DecRef();
@@ -102,7 +102,7 @@ namespace highlo
 		}
 
 		template<typename T2>
-		SharedReference &operator=(SharedReference<T2> &&other)
+		HLAPI SharedReference &operator=(SharedReference<T2> &&other)
 		{
 			DecRef();
 
@@ -111,52 +111,57 @@ namespace highlo
 			return *this;
 		}
 
-		operator bool() { return m_Instance != nullptr; }
-		operator bool() const { return m_Instance != nullptr; }
+		HLAPI operator bool() { return m_Instance != nullptr; }
+		HLAPI operator bool() const { return m_Instance != nullptr; }
 
-		T *operator->() { return m_Instance; }
-		const T *operator->() const { return m_Instance; }
+		HLAPI T *operator->() { return m_Instance; }
+		HLAPI const T *operator->() const { return m_Instance; }
 
-		T &operator*() { return *m_Instance; }
-		const T &operator*() const { return *m_Instance; }
+		HLAPI T &operator*() { return *m_Instance; }
+		HLAPI const T &operator*() const { return *m_Instance; }
 
-		T *Get() { return  m_Instance; }
-		const T *Get() const { return  m_Instance; }
+		HLAPI T *Get() { return m_Instance; }
+		HLAPI const T *Get() const { return m_Instance; }
 
-		void Reset(T *instance = nullptr)
+		HLAPI void Reset(T *instance = nullptr)
 		{
 			DecRef();
 			m_Instance = instance;
 		}
 
 		template<typename T2>
-		SharedReference<T2> As() const
+		HLAPI SharedReference<T2> As() const
 		{
 			return SharedReference<T2>(*this);
 		}
 
 		template<typename... Args>
-		static SharedReference<T> Create(Args &&...args)
+		HLAPI static SharedReference<T> Create(Args &&...args)
 		{
 			return SharedReference<T>(new T(std::forward<Args>(args)...));
 		}
 
-		bool operator==(const SharedReference<T> &other) const
+		HLAPI bool operator==(const SharedReference<T> &other) const
 		{
 			return m_Instance == other.m_Instance;
 		}
 
-		bool operator!=(const SharedReference<T> &other) const
+		HLAPI bool operator!=(const SharedReference<T> &other) const
 		{
 			return !(*this == other);
 		}
 
-		bool Equals(const SharedReference<T> &other)
+		HLAPI bool Equals(const SharedReference<T> &other) const
 		{
 			if (!m_Instance || !other.m_Instance)
 				return false;
 
 			return *m_Instance == *other.m_Instance;
+		}
+
+		HLAPI bool IsValid() const
+		{
+			return m_Instance != nullptr;
 		}
 
 	private:

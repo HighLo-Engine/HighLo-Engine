@@ -148,7 +148,6 @@ namespace highlo
 		ProcessNode(scene->mRootNode, scene, parser_meshes);
 
 		float xMin, xMax, yMin, yMax, zMin, zMax;
-
 		xMin = parser_meshes.at(0).xMin;
 		xMax = parser_meshes.at(0).xMax;
 		yMin = parser_meshes.at(0).yMin;
@@ -346,7 +345,7 @@ namespace highlo
 			Bone RootBone;
 			std::string animation_name = CalculateBoneTransforms(RootBone, scene, i, InverseTransform, TicksPerSecond, AnimationDuration);
 
-			auto animation = Ref<Animation>::Create(animation_name, AnimationDuration, TicksPerSecond, InverseTransform, BoneCount, RootBone, animation_correction_matrix);
+			auto animation = Animation::Create(animation_name, AnimationDuration, TicksPerSecond, InverseTransform, BoneCount, RootBone, animation_correction_matrix);
 			animations.push_back(animation);
 		}
 

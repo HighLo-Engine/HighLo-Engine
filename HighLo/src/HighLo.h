@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.4 (2021-10-19) Added RenderCommandQueue
 //     - 1.3 (2021-10-04) Added FileSystemWatcher
 //     - 1.2 (2021-09-26) Added Color, AssetEditor, AssetEditorPanel include
 //     - 1.1 (2021-09-21) Added Font include
@@ -66,6 +67,7 @@
 #include "Engine/Renderer/MaterialTable.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommandBuffer.h"
+#include "Engine/Renderer/RenderCommandQueue.h"
 #include "Engine/Renderer/Font.h"
 #include "Engine/Renderer/FontManager.h"
 #include "Engine/Renderer/Renderer2D.h"

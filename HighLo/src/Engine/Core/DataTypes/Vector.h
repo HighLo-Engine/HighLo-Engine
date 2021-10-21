@@ -327,14 +327,14 @@ namespace highlo
 				m_Capacity = 0;
 			}
 
-			T *buf = new T[capacity];
+			T *buffer = new T[capacity];
 			uint32 newSize = capacity < m_Size ? capacity : m_Size;
 			for (uint32 i = 0; i < newSize; ++i)
-				buf[i] = std::move(m_Data[i]);
+				buffer[i] = std::move(m_Data[i]);
 
 			::operator delete(m_Data, m_Capacity * sizeof(T));
 			m_Capacity = capacity;
-			m_Data = buf;
+			m_Data = buffer;
 		}
 
 		HLAPI void Resize(uint32 size)

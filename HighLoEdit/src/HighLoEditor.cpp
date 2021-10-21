@@ -30,12 +30,12 @@ void HighLoEditor::OnInitialize()
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
 	m_ViewportRenderer->SetLineWidth(m_LineWidth);
 
-	m_SceneHierarchyPanel = MakeUniqueRef<SceneHierarchyPanel>();
+	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create();
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
 	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
-	m_EditorConsolePanel = MakeUniqueRef<EditorConsolePanel>();
+	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
 	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
 
 	GetWindow().Maximize();
@@ -83,22 +83,22 @@ void HighLoEditor::OnInitialize()
 	editMenu->AddSeparator();
 
 	Ref<FileMenu> modelSubMenu = FileMenu::Create("Create 3D Objects");
-	modelSubMenu->AddMenuItem("Create Null Object", "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) {  });
+	modelSubMenu->AddMenuItem("Create Null Object", "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating Null Object..."); });
 	modelSubMenu->AddSeparator();
-	modelSubMenu->AddMenuItem("Create Cube", "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) {  });
-	modelSubMenu->AddMenuItem("Create Sphere", "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) {  });
-	modelSubMenu->AddMenuItem("Create Capsule", "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) {  });
-	modelSubMenu->AddMenuItem("Create Cylinder", "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) {  });
+	modelSubMenu->AddMenuItem("Create Cube", "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating cube..."); });
+	modelSubMenu->AddMenuItem("Create Sphere", "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating Sphere..."); });
+	modelSubMenu->AddMenuItem("Create Capsule", "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating Capsule..."); });
+	modelSubMenu->AddMenuItem("Create Cylinder", "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating Cylinder..."); });
 
 	Ref<FileMenu> gameObjectMenu = FileMenu::Create("Game Objects");
-	gameObjectMenu->AddMenuItem("Create Folder", "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) {  });
+	gameObjectMenu->AddMenuItem("Create Folder", "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating Folder..."); });
 	gameObjectMenu->AddSubMenu(modelSubMenu);
-	gameObjectMenu->AddMenuItem("Create Camera", "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) {  });
+	gameObjectMenu->AddMenuItem("Create Camera", "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Creating Camera..."); });
 
 	Ref<FileMenu> rendererMenu = FileMenu::Create("Renderer");
-	rendererMenu->AddMenuItem("Rendering Settings", "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) {});
+	rendererMenu->AddMenuItem("Rendering Settings", "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Showing Renderer Settings Window..."); });
 	rendererMenu->AddSeparator();
-	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) {});
+	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Showing Offline Renderer Window..."); });
 
 	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
 	bool darkThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Dark;

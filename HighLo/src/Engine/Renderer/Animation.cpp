@@ -131,6 +131,11 @@ namespace highlo
 			ForEachBone(child, lambda);
 	}
 
+	Ref<Animation> Animation::Create(const HLString &name, float duration, float ticksPerSecond, glm::mat4 inverseTransform, int32 boneCount, Bone rootBone, glm::mat4 correctionMatrix)
+	{
+		return Ref<Animation>::Create(name, duration, ticksPerSecond, inverseTransform, boneCount, rootBone, correctionMatrix);
+	}
+
 	std::pair<uint64, uint64> Animation::GetPreviousAndNextFrames(Bone &bone, float animationTime)
 	{
 		float previousFrame = bone.Keyframes[0].Timestamp;

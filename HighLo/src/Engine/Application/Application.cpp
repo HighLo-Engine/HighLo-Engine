@@ -42,7 +42,7 @@ namespace highlo
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
 		// Init Renderer
-		Renderer::Init(m_Window.get());
+		Renderer::Init(m_Window.Get());
 		Renderer::WaitAndRender();
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 

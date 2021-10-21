@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-10-21) added Create function and a const version of GetRootBone
 //     - 1.1 (2021-10-16) fixed indentations
 //     - 1.0 (2021-09-14) initial release
 //
@@ -89,6 +90,9 @@ namespace highlo
 		HLAPI void ForEachBone(Bone &bone, const std::function<void(Bone&)> &lambda);
 
 		HLAPI Bone &GetRootBone() { return m_RootBone; }
+		HLAPI const Bone &GetRootBone() const { return m_RootBone; }
+
+		HLAPI static Ref<Animation> Create(const HLString &name, float duration, float ticksPerSecond, glm::mat4 inverseTransform, int32 boneCount, Bone rootBone, glm::mat4 correctionMatrix);
 
 	private:
 

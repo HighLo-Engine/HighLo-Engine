@@ -7,10 +7,10 @@
 
 #include <stb_image.h>
 
-#include "Engine/Core/Log.h"
 #include "Engine/Core/File.h"
 #include "Engine/Utils/ImageUtils.h"
 #include "Engine/Renderer/Renderer.h"
+
 #include "OpenGLUtils.h"
 
 namespace highlo
@@ -49,6 +49,7 @@ namespace highlo
 			data[3] = (Byte)255; // 2^8
 			texture = new OpenGLTexture2D(data, 1, 1, format);
 			texture->Name = "8-Bit Texture";
+			texture->m_Loaded = true;
 		}
 		else if (format == TextureFormat::RGBA16)
 		{
@@ -59,6 +60,7 @@ namespace highlo
 			data[3] = (uint16)65535; // 2^16
 			texture = new OpenGLTexture2D(data, 1, 1, format);
 			texture->Name = "16-Bit Texture";
+			texture->m_Loaded = true;
 		}
 		else if (format == TextureFormat::RGBA32)
 		{
@@ -69,6 +71,7 @@ namespace highlo
 			data[3] = (uint32)4294967295; // 2^32
 			texture = new OpenGLTexture2D(data, 1, 1, format);
 			texture->Name = "32-Bit Texture";
+			texture->m_Loaded = true;
 		}
 
 		return texture;
@@ -99,6 +102,7 @@ namespace highlo
 
 			instance = new OpenGLTexture2D(data, width, height, format);
 			instance->Name = "8-Bit Texture";
+			instance->m_Loaded = true;
 			delete[] data;
 		}
 		else if (format == TextureFormat::RGBA16)
@@ -119,6 +123,7 @@ namespace highlo
 
 			instance = new OpenGLTexture2D(data, width, height, format);
 			instance->Name = "16-Bit Texture";
+			instance->m_Loaded = true;
 			delete[] data;
 		}
 		else if (format == TextureFormat::RGBA32)
@@ -139,6 +144,7 @@ namespace highlo
 
 			instance = new OpenGLTexture2D(data, width, height, format);
 			instance->Name = "32-Bit Texture";
+			instance->m_Loaded = true;
 			delete[] data;
 		}
 #pragma warning( pop )
@@ -159,6 +165,7 @@ namespace highlo
 		m_Specification.Usage = TextureUsage::Texture;
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 		Name = "unknown";
+		m_Loaded = true;
 
 		Ref<OpenGLTexture2D> instance = this;
 		Renderer::Submit([instance]() mutable
@@ -190,6 +197,7 @@ namespace highlo
 		m_Specification.Usage = TextureUsage::Texture;
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 		Name = "unknown";
+		m_Loaded = true;
 
 		Ref<OpenGLTexture2D> instance = this;
 		Renderer::Submit([instance]() mutable
@@ -222,6 +230,7 @@ namespace highlo
 		m_Specification.Properties = TextureProperties();
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 		Name = "unknown";
+		m_Loaded = true;
 
 		Ref<OpenGLTexture2D> instance = this;
 		Renderer::Submit([instance]() mutable
@@ -262,6 +271,7 @@ namespace highlo
 				glDeleteTextures(1, &rendererID);
 			});
 			RendererID = 0;
+			m_Loaded = false;
 		}
 	}
 
@@ -284,6 +294,7 @@ namespace highlo
 			{
 				glTextureSubImage2D(instance->RendererID, 0, 0, 0, instance->m_Specification.Width, instance->m_Specification.Height, glFormat, glType, instance->m_Buffer.m_Data);
 				glGenerateTextureMipmap(instance->RendererID);
+				instance->m_Loaded = true;
 			}
 		});
 	}
@@ -469,6 +480,7 @@ namespace highlo
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		m_Specification.Format = format;
+		m_Loaded = true;
 
 		if (data)
 			m_Buffer = Allocator::Copy(data, width * height * 4 * 6); // Six Layers
@@ -513,6 +525,7 @@ namespace highlo
 				glDeleteTextures(1, &rendererID);
 			});
 			RendererID = 0;
+			m_Loaded = false;
 		}
 	}
 
@@ -529,7 +542,10 @@ namespace highlo
 			glTextureStorage2D(instance->RendererID, levels, utils::OpenGLTextureInternalFormat(instance->m_Specification.Format), instance->m_Specification.Width, instance->m_Specification.Height);
 
 			if (instance->m_Buffer.m_Data)
+			{
 				glTextureSubImage3D(instance->RendererID, 0, 0, 0, 0, instance->m_Specification.Width, instance->m_Specification.Height, 6, utils::OpenGLTextureFormat(instance->m_Specification.Format), utils::OpenGLFormatDataType(instance->m_Specification.Format), instance->m_Buffer.m_Data);
+				instance->m_Loaded = true;
+			}
 
 			glTextureParameteri(instance->RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(instance->m_Specification.Properties.SamplerFilter, levels > 1));
 			glTextureParameteri(instance->RendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(instance->m_Specification.Properties.SamplerFilter, false));

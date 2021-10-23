@@ -5,6 +5,7 @@
 
 #include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Core/Input.h"
+#include "Engine/Core/Service.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Renderer/FontManager.h"
 #include "Engine/Math/Math.h"
@@ -13,6 +14,7 @@
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 #include "Engine/ECS/RenderSystem.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Threading/ThreadRegistry.h"
 
 namespace highlo
 {
@@ -24,6 +26,7 @@ namespace highlo
 	{
 		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
 		s_Instance = this;
+		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
 
 		Logger::Init();
 
@@ -53,11 +56,17 @@ namespace highlo
 		m_Encryptor = Ref<Encryptor>::Create();
 		m_Encryptor->Init();
 
+		ThreadRegistry::Get()->Init();
+
+		// Sort all registered services
+		Service::Sort();
+
 		HL_CORE_INFO("Engine Initialized");
 	}
 
 	HLApplication::~HLApplication()
 	{
+		ThreadRegistry::Get()->Shutdown();
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
 		FontManager::Get()->Shutdown();
@@ -71,6 +80,7 @@ namespace highlo
 		m_Running = true;
 		m_IsShuttingDown = false;
 		OnInitialize();
+		Service::OnInit();
 
 		// Main Rendering Thread
 		while (m_Running)
@@ -91,6 +101,9 @@ namespace highlo
 				// Update all layers pushed by the Client Application
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUpdate(Time::GetTimestep());
+
+				// Update all services
+				Service::OnUpdate();
 
 				// Render all submitted objects to the screen
 				Renderer::BeginFrame();
@@ -114,6 +127,7 @@ namespace highlo
 		}
 
 		OnShutdown();
+		Service::OnExit();
 	}
 
 	void HLApplication::PushLayer(ApplicationLayer *layer)

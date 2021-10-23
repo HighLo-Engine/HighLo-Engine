@@ -110,8 +110,8 @@ void HighLoEditor::OnInitialize()
 	windowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { m_ShowConsolePanel = !m_ShowConsolePanel; });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
-	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
-	helpMenu->AddMenuItem("Documentation", "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { VirtualFileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
+	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { FileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
+	helpMenu->AddMenuItem("Documentation", "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { FileSystem::Get()->OpenInBrowser("https://docs.highlo-engine.com"); });
 
 	m_MenuBar->AddMenu(fileMenu);
 	m_MenuBar->AddMenu(editMenu);

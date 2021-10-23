@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.5 (2021-10-23) Added Atomic and Service
 //     - 1.4 (2021-10-19) Added RenderCommandQueue
 //     - 1.3 (2021-10-04) Added FileSystemWatcher
 //     - 1.2 (2021-09-26) Added Color, AssetEditor, AssetEditorPanel include
@@ -22,6 +23,8 @@
 
 #include "Engine/Core/Defines/Defines.h"
 #include "Engine/Core/Core.h"
+#include "Engine/Core/Atomic.h"
+#include "Engine/Core/Service.h"
 #include "Engine/Core/Assert.h"
 #include "Engine/Core/Allocator.h"
 #include "Engine/Core/DataTypes/DataTypes.h"

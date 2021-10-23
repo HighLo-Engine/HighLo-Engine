@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-21) Added Threading Events
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -26,7 +27,8 @@ namespace highlo
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoves, FileMenu, FileSystemChanged,
 		KeyPressed, KeyReleased, KeyTyped,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		ThreadStarting, ThreadEnding
 	};
 
 	enum EventCategory

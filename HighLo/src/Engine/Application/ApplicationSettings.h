@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-23) Added MainThreadID
 //     - 1.0 (2021-09-26) initial release
 //
 
@@ -47,6 +48,11 @@ namespace highlo
 		/// Determines the rendering api that should be used in the backend to render, if Headless is false
 		/// </summary>
 		HLString RenderingAPI = "OpenGL";
+
+		/// <summary>
+		/// Determines the Main Thread ID of the main thread
+		/// </summary>
+		uint64 MainThreadID;
 	};
 }
 

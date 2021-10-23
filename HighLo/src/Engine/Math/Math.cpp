@@ -459,8 +459,8 @@ namespace highlo
 	{
 		__m128 mulRes, shufReg, sumReg, a4, b4;
 		
-		a4 = _mm_set_ps(a.x, a.y, a.z, 0.0f);
-		b4 = _mm_set_ps(b.x, b.y, b.z, 0.0f);
+		a4        = _mm_set_ps(a.x, a.y, a.z, 0.0f);
+		b4        = _mm_set_ps(b.x, b.y, b.z, 0.0f);
 		mulRes    = _mm_mul_ps(a4, b4);
 
 		// Calculate the sum of SSE Registers

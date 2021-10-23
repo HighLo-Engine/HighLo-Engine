@@ -2,12 +2,15 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-21) Added Threading Events
 //     - 1.0 (2021-09-14) initial release
 //
 
 #pragma once
 
 #include "EventBase.h"
+
+#include "Engine/Threading/Thread.h"
 
 namespace highlo
 {
@@ -158,5 +161,51 @@ namespace highlo
 		HLString m_NewName = "";
 		bool m_IsDirectory = false;
 		bool m_Tracking = false;
+	};
+
+	class ThreadStartingEvent : public Event
+	{
+	public:
+
+		HLAPI ThreadStartingEvent(Thread *thread)
+		{
+			m_Thread = thread;
+		}
+
+		HLAPI HLString ToString() const override
+		{
+			return HLString("ThreadStarting: " + m_Thread->GetName());
+		}
+
+		REGISTER_EVENT_CLASS_TYPE(ThreadStarting)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+
+		Thread *m_Thread;
+	};
+
+	class ThreadEndingEvent : public Event
+	{
+	public:
+
+		HLAPI ThreadEndingEvent(Thread *thread, int32 exitCode)
+		{
+			m_Thread = thread;
+			m_ExitCode = exitCode;
+		}
+
+		HLAPI HLString ToString() const override
+		{
+			return HLString("ThreadEnding: " + m_Thread->GetName() + " with exit code: " + m_ExitCode);
+		}
+
+		REGISTER_EVENT_CLASS_TYPE(ThreadEnding)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+
+		int32 m_ExitCode;
+		Thread *m_Thread;
 	};
 }

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-10-23) Added Threads limit
 //     - 1.2 (2021-10-21) Removed std variable types and replaced them with our own
 //     - 1.1 (2021-10-04) Added LONG and ULONG Definition
 //     - 1.0 (2021-09-14) initial release
@@ -60,4 +61,8 @@ typedef int32 intptr;
 #define MAX_INT64 ((int64)9223372036854775807)
 #define MAX_FLOAT (3.402823466e+38f)
 #define MAX_DOUBLE (1.7976931348623158e+308)
+
+#ifndef HL_PLATFORM_THREADS_LIMIT
+#define HL_PLATFORM_THREADS_LIMIT 64
+#endif
 

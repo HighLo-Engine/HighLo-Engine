@@ -45,7 +45,8 @@ namespace highlo
 
 	void Allocator::Free(void *memory)
 	{
-		_aligned_free(memory);
+		if (memory)
+			_aligned_free(memory);
 	}
 
 	void Allocator::ZeroInitialize()

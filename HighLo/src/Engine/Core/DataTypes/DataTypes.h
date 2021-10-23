@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-10-22) Added Sorting
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -13,4 +14,5 @@
 #include "Stack.h"
 #include "Hashmap.h"
 #include "Vector.h"
+#include "Sorting.h"
 

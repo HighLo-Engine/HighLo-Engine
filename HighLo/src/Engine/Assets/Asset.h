@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Core/UUID.h"
+#include "Engine/Core/FileSystemPath.h"
 #include "AssetTypes.h"
 
 namespace highlo
@@ -53,7 +54,7 @@ namespace highlo
 		AssetHandle Handle = 0;
 		AssetType Type;
 
-		HLString FilePath;
+		FileSystemPath FilePath;
 		bool IsDataLoaded = false;
 
 		bool IsValid() const { return Handle != 0; }

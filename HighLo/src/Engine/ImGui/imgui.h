@@ -48,6 +48,9 @@ namespace highlo::UI
 	HLAPI void BeginViewport(const HLString &title, bool *pOpen = nullptr, const Ref<PopupMenu> &popupMenu = nullptr);
 	HLAPI void EndViewport();
 
+	HLAPI bool BeginPopup(const char *id, ImGuiWindowFlags flags = 0);
+	HLAPI void EndPopup();
+	
 	HLAPI void DisplayDebugInformation();
 	HLAPI void SetDarkThemeColors();
 	HLAPI void SetLightThemeColors();
@@ -61,6 +64,10 @@ namespace highlo::UI
 
 	HLAPI void PushID();
 	HLAPI void PopID();
+	HLAPI const char *GenerateID();
+
+	HLAPI void SetToolTipV(const char *format, va_list args);
+	HLAPI void SetToolTip(const char *format, ...);
 
 	HLAPI void Separator();
 
@@ -94,6 +101,38 @@ namespace highlo::UI
 	HLAPI void DisableMenuBar();
 	HLAPI ImGuiWindowStyle GetCurrentWindowStyle();
 
+	// Colors helpers
+	HLAPI ImU32 ColorWithValue(const ImColor &color, float value);
+	HLAPI ImU32 ColorWithMultipliedValue(const ImColor &color, float multiplier);
+	HLAPI ImU32 ColorWithSaturation(const ImColor &color, float saturation);
+	HLAPI ImU32 ColorWithMultipliedSaturation(const ImColor &color, float multiplier);
+	HLAPI ImU32 ColorWithHue(const ImColor &color, float hue);
+	HLAPI ImU32 ColorWithMultipliedHue(const ImColor &color, float multiplier);
+
+	// Shadow
+	HLAPI void DrawShadow(const Ref<Texture2D> &shadowIcon, int32 radius, ImVec2 rectMin, ImVec2 rectMax, float alphaMultiplier = 1.0f, float lengthStretch = 10.0f, bool drawLeft = true, bool drawRight = true, bool drawTop = true, bool drawBottom = true);
+	HLAPI void DrawShadow(const Ref<Texture2D> &shadowIcon, int32 radius, ImRect rectangle, float alphaMultiplier = 1.0f, float lengthStretch = 10.0f, bool drawLeft = true, bool drawRight = true, bool drawTop = true, bool drawBottom = true);
+	HLAPI void DrawShadow(const Ref<Texture2D> &shadowIcon, int32 radius, float alphaMultiplier = 1.0f, float lengthStretch = 10.0f, bool drawLeft = true, bool drawRight = true, bool drawTop = true, bool drawBottom = true);
+
+	HLAPI void DrawShadowInner(const Ref<Texture2D> &shadowIcon, int32 radius, ImVec2 rectMin, ImVec2 rectMax, float alpha = 1.0f, float lengthStretch = 10.0f, bool drawLeft = true, bool drawRight = true, bool drawTop = true, bool drawBottom = true);
+	HLAPI void DrawShadowInner(const Ref<Texture2D> &shadowIcon, int32 radius, ImRect rectangle, float alpha = 1.0f, float lengthStretch = 10.0f, bool drawLeft = true, bool drawRight = true, bool drawTop = true, bool drawBottom = true);
+	HLAPI void DrawShadowInner(const Ref<Texture2D> &shadowIcon, int32 radius, float alpha = 1.0f, float lengthStretch = 10.0f, bool drawLeft = true, bool drawRight = true, bool drawTop = true, bool drawBottom = true);
+
+	HLAPI void DrawItemActivityOutline(float rounding = 0.0f, bool drawWhenInactive = false, ImColor colorWhenActive = ImColor(80, 80, 80));
+
+	// Rect
+	HLAPI ImRect GetItemRect();
+	HLAPI ImRect RectExpanded(const ImRect &rect, float x, float y);
+	HLAPI ImRect RectExpanded(const ImRect &rect, const ImVec2 &xy);
+	HLAPI ImRect RectOffset(const ImRect &rect, float x, float y);
+	HLAPI ImRect RectOffset(const ImRect &rect, const ImVec2 &xy);
+
+	// Cursor
+	HLAPI void ShiftCursor(float x, float y);
+	HLAPI void ShiftCursorX(float distance);
+	HLAPI void ShiftCursorY(float distance);
+
+	// UI Rendering
 	HLAPI void DrawText(const HLString &text);
 	HLAPI void DrawInputText(const HLString &label, const HLString &value);
 	HLAPI bool DrawInputText(const HLString &label, HLString &value);
@@ -165,10 +204,20 @@ namespace highlo::UI
 	HLAPI bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, int32 *selected);
 	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 optionsCount, int32 *selected);
 
+	HLAPI ImTextureID GetTextureID(const Ref<Texture2D> &texture);
+
 	HLAPI void Image(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0 = ImVec2(0, 0), const ImVec2 &uv1 = ImVec2(1, 1), const ImVec4 &tintColor = ImVec4(1, 1, 1, 1), const ImVec4 &borderColor = ImVec4(0, 0, 0, 0));
 	HLAPI void Image(const Ref<Texture2D> &texture, uint32 layer, const ImVec2 &size, const ImVec2 &uv0 = ImVec2(0, 0), const ImVec2 &uv1 = ImVec2(1, 1), const ImVec4 &tintColor = ImVec4(1, 1, 1, 1), const ImVec4 &borderColor = ImVec4(0, 0, 0, 0));
 	HLAPI void ImageMip(const Ref<Texture2D> &texture, uint32 mip, const ImVec2 &size, const ImVec2 &uv0 = ImVec2(0, 0), const ImVec2 &uv1 = ImVec2(1, 1), const ImVec4 &tintColor = ImVec4(1, 1, 1, 1), const ImVec4 &borderColor = ImVec4(0, 0, 0, 0));
 	HLAPI bool ImageButton(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0 = ImVec2(0, 0), const ImVec2 &uv1 = ImVec2(1, 1), int32 framePadding = -1, const ImVec4 &bgColor = ImVec4(0, 0, 0, 0), const ImVec4 &tintColor = ImVec4(1, 1, 1, 1));
 	HLAPI bool ImageButton(const HLString &id, const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0 = ImVec2(0, 0), const ImVec2 &uv1 = ImVec2(1, 1), int32 framePadding = -1, const ImVec4 &bgColor = ImVec4(0, 0, 0, 0), const ImVec4 &tintColor = ImVec4(1, 1, 1, 1));
+
+	// Image Buttons
+	HLAPI void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImVec2 rectMin, ImVec2 rectMax);
+	HLAPI void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImRect rectangle);
+	HLAPI void DrawButtonImage(const Ref<Texture2D> &texture, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImVec2 rectMin, ImVec2 rectMax);
+	HLAPI void DrawButtonImage(const Ref<Texture2D> &texture, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImRect rectangle);
+	HLAPI void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed);
+	HLAPI void DrawButtonImage(const Ref<Texture2D> &texture, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed);
 }
 

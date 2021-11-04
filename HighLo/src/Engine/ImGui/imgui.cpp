@@ -27,6 +27,8 @@
 	#define IMGUI_WINDOW_IMPL_FN_NAME(fn) ImGui_ImplWin32_##fn
 #endif // HIGHLO_API_GLFW
 
+#include "ImGuiWidgets.h"
+
 namespace highlo::UI
 {
 	namespace utils
@@ -158,10 +160,14 @@ namespace highlo::UI
 	#ifdef HIGHLO_API_DX11
 		ImGui_ImplDX11_Init(DX11Resources::s_Device.Get(), DX11Resources::s_DeviceContext.Get());
 	#endif // HIGHLO_API_DX11
+
+		Widgets::Init();
 	}
 
 	void ShutdownImGui()
 	{
+		Widgets::Shutdown();
+
 		IMGUI_RENDER_API_IMPL_FN_NAME(Shutdown)();
 		IMGUI_WINDOW_IMPL_FN_NAME(Shutdown)();
 		ImGui::DestroyContext();
@@ -279,6 +285,38 @@ namespace highlo::UI
 	void EndViewport()
 	{
 		ImGui::End();
+	}
+
+	bool BeginPopup(const char *id, ImGuiWindowFlags flags)
+	{
+		bool opened = false;
+
+		if (ImGui::BeginPopup(id, flags))
+		{
+			opened = true;
+
+			const float padding = ImGui::GetStyle().WindowBorderSize;
+			const ImRect windowRect = UI::RectExpanded(ImGui::GetCurrentWindow()->Rect(), -padding, -padding);
+			ImGui::PushClipRect(windowRect.Min, windowRect.Max, false);
+			const ImColor color1 = ImGui::GetStyleColorVec4(ImGuiCol_PopupBg);
+			const ImColor color2 = UI::ColorWithMultipliedValue(color1, 0.8f);
+			ImGui::GetWindowDrawList()->AddRectFilledMultiColor(windowRect.Min, windowRect.Max, color1, color1, color2, color2);
+			ImGui::GetWindowDrawList()->AddRect(windowRect.Min, windowRect.Max, UI::ColorWithMultipliedValue(color1, 1.1f));
+			ImGui::PopClipRect();
+
+			// Popped in EndPopup()
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(0, 0, 0, 80));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0, 1.0f));
+		}
+
+		return opened;
+	}
+
+	void EndPopup()
+	{
+		ImGui::PopStyleVar();
+		ImGui::PopStyleColor();
+		ImGui::EndPopup();
 	}
 
 	void DisplayDebugInformation()
@@ -557,6 +595,30 @@ namespace highlo::UI
 		--s_ImGuiUIContextID;
 	}
 
+	const char *GenerateID()
+	{
+		s_ImGuiIDBuffer[0] = '#';
+		s_ImGuiIDBuffer[1] = '#';
+		memset(s_ImGuiIDBuffer + 2, 0, 14);
+		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		return &s_ImGuiIDBuffer[0];
+	}
+
+	void SetToolTipV(const char *format, va_list args)
+	{
+		ImGui::BeginTooltipEx(0, ImGuiTooltipFlags_OverridePreviousTooltip);
+		ImGui::TextV(format, args);
+		ImGui::EndTooltip();
+	}
+
+	void SetToolTip(const char *format, ...)
+	{
+		va_list args;
+		va_start(args, format);
+		SetToolTipV(format, args);
+		va_end(args);
+	}
+
 	void Separator()
 	{
 		ImGui::Separator();
@@ -697,6 +759,195 @@ namespace highlo::UI
 	ImGuiWindowStyle GetCurrentWindowStyle()
 	{
 		return s_ImGuiWindowStyle;
+	}
+
+	ImU32 ColorWithValue(const ImColor &color, float value)
+	{
+		const ImVec4 &colorRow = color.Value;
+		float hue, sat, val;
+		ImGui::ColorConvertRGBtoHSV(colorRow.x, colorRow.y, colorRow.z, hue, sat, val);
+		return ImColor::HSV(hue, sat, val, std::min(value, 1.0f));
+	}
+
+	ImU32 ColorWithMultipliedValue(const ImColor &color, float multiplier)
+	{
+		const ImVec4 &colorRow = color.Value;
+		float hue, sat, val;
+		ImGui::ColorConvertRGBtoHSV(colorRow.x, colorRow.y, colorRow.z, hue, sat, val);
+		return ImColor::HSV(hue, sat, val, std::min(val * multiplier, 1.0f));
+	}
+
+	ImU32 ColorWithSaturation(const ImColor &color, float saturation)
+	{
+		const ImVec4 &colorRow = color.Value;
+		float hue, sat, val;
+		ImGui::ColorConvertRGBtoHSV(colorRow.x, colorRow.y, colorRow.z, hue, sat, val);
+		return ImColor::HSV(hue, std::min(saturation, 1.0f), val);
+	}
+
+	ImU32 ColorWithMultipliedSaturation(const ImColor &color, float multiplier)
+	{
+		const ImVec4 &colorRow = color.Value;
+		float hue, sat, val;
+		ImGui::ColorConvertRGBtoHSV(colorRow.x, colorRow.y, colorRow.z, hue, sat, val);
+		return ImColor::HSV(hue, std::min(sat * multiplier, 1.0f), val);
+	}
+
+	ImU32 ColorWithHue(const ImColor &color, float hue)
+	{
+		const ImVec4 &colorRow = color.Value;
+		float h, s, v;
+		ImGui::ColorConvertRGBtoHSV(colorRow.x, colorRow.y, colorRow.z, h, s, v);
+		return ImColor::HSV(std::min(hue, 1.0f), s, v);
+	}
+
+	ImU32 ColorWithMultipliedHue(const ImColor &color, float multiplier)
+	{
+		const ImVec4 &colorRow = color.Value;
+		float hue, sat, val;
+		ImGui::ColorConvertRGBtoHSV(colorRow.x, colorRow.y, colorRow.z, hue, sat, val);
+		return ImColor::HSV(std::min(hue * multiplier, 1.0f), sat, val);
+	}
+
+	void DrawShadow(const Ref<Texture2D> &shadowIcon, int32 radius, ImVec2 rectMin, ImVec2 rectMax, float alphaMultiplier, float lengthStretch, bool drawLeft, bool drawRight, bool drawTop, bool drawBottom)
+	{
+		const float widthOffset = lengthStretch;
+		const float alphaTop = std::min(0.25f * alphaMultiplier, 1.0f);
+		const float alphaSides = std::min(0.30f * alphaMultiplier, 1.0f);
+		const float alphaBottom = std::min(0.60f * alphaMultiplier, 1.0f);
+		const auto p1 = rectMin;
+		const auto p2 = rectMax;
+
+		ImTextureID texId = GetTextureID(shadowIcon);
+		auto *drawList = ImGui::GetWindowDrawList();
+
+		if (drawLeft)
+			drawList->AddImage(texId, { p1.x - widthOffset, p1.y - radius }, { p2.x + widthOffset, p1.y }, ImVec2(0, 0), ImVec2(1, 1), ImColor(0.0f, 0.0f, 0.0f, alphaTop));
+
+		if (drawRight)
+			drawList->AddImage(texId, { p1.x - widthOffset, p2.y }, { p2.x + widthOffset, p2.y + radius }, ImVec2(0, 0), ImVec2(1, 1), ImColor(0.0f, 0.0f, 0.0f, alphaBottom));
+
+		if (drawTop)
+			drawList->AddImageQuad(texId, { p1.x - radius, p1.y - widthOffset }, { p1.x, p1.y - widthOffset }, { p1.x, p2.y + widthOffset }, { p1.x - radius, p2.y + widthOffset },
+								   ImVec2(0, 0), ImVec2(0, 1), ImVec2(1, 1), ImVec2(1, 0), ImColor(0.0f, 0.0f, 0.0f, alphaSides));
+
+		if (drawBottom)
+			drawList->AddImageQuad(texId, { p2.x, p1.y - widthOffset }, { p2.x + radius, p1.y - widthOffset }, { p2.x + radius, p2.y + widthOffset }, { p2.x, p2.y + widthOffset },
+								   ImVec2(0, 1), ImVec2(0, 0), ImVec2(1, 0), ImVec2(1, 1), ImColor(0.0f, 0.0f, 0.0f, alphaSides));
+	}
+
+	void DrawShadow(const Ref<Texture2D> &shadowIcon, int32 radius, ImRect rectangle, float alphaMultiplier, float lengthStretch, bool drawLeft, bool drawRight, bool drawTop, bool drawBottom)
+	{
+		DrawShadow(shadowIcon, radius, rectangle.Min, rectangle.Max, alphaMultiplier, lengthStretch, drawLeft, drawRight, drawTop, drawBottom);
+	}
+
+	void DrawShadow(const Ref<Texture2D> &shadowIcon, int32 radius, float alphaMultiplier, float lengthStretch, bool drawLeft, bool drawRight, bool drawTop, bool drawBottom)
+	{
+		DrawShadow(shadowIcon, radius, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), alphaMultiplier, lengthStretch, drawLeft, drawRight, drawTop, drawBottom);
+	}
+
+	void DrawShadowInner(const Ref<Texture2D> &shadowIcon, int32 radius, ImVec2 rectMin, ImVec2 rectMax, float alpha, float lengthStretch, bool drawLeft, bool drawRight, bool drawTop, bool drawBottom)
+	{
+		const float widthOffset = lengthStretch;
+		const auto p1 = ImVec2(rectMin.x + radius, rectMin.y + radius);
+		const auto p2 = ImVec2(rectMax.x - radius, rectMax.y - radius);
+		auto *drawList = ImGui::GetWindowDrawList();
+
+		ImTextureID textureID = GetTextureID(shadowIcon);
+
+		if (drawTop)
+			drawList->AddImage(textureID, { p1.x - widthOffset,  p1.y - radius }, { p2.x + widthOffset, p1.y }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f), ImColor(0.0f, 0.0f, 0.0f, alpha));
+
+		if (drawBottom)
+			drawList->AddImage(textureID, { p1.x - widthOffset,  p2.y }, { p2.x + widthOffset, p2.y + radius }, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImColor(0.0f, 0.0f, 0.0f, alpha));
+
+		if (drawLeft)
+			drawList->AddImageQuad(textureID, { p1.x - radius, p1.y - widthOffset }, { p1.x, p1.y - widthOffset }, { p1.x, p2.y + widthOffset }, { p1.x - radius, p2.y + widthOffset },
+								   { 0.0f, 1.0f }, { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, ImColor(0.0f, 0.0f, 0.0f, alpha));
+		if (drawRight)
+			drawList->AddImageQuad(textureID, { p2.x, p1.y - widthOffset }, { p2.x + radius, p1.y - widthOffset }, { p2.x + radius, p2.y + widthOffset }, { p2.x, p2.y + widthOffset },
+								   { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f }, ImColor(0.0f, 0.0f, 0.0f, alpha));
+	}
+
+	void DrawShadowInner(const Ref<Texture2D> &shadowIcon, int32 radius, ImRect rectangle, float alpha, float lengthStretch, bool drawLeft, bool drawRight, bool drawTop, bool drawBottom)
+	{
+		DrawShadowInner(shadowIcon, radius, rectangle.Min, rectangle.Max, alpha, lengthStretch, drawLeft, drawRight, drawTop, drawBottom);
+	}
+
+	void DrawShadowInner(const Ref<Texture2D> &shadowIcon, int32 radius, float alpha, float lengthStretch, bool drawLeft, bool drawRight, bool drawTop, bool drawBottom)
+	{
+		DrawShadowInner(shadowIcon, radius, ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), alpha, lengthStretch, drawLeft, drawRight, drawTop, drawBottom);
+	}
+
+	void DrawItemActivityOutline(float rounding, bool drawWhenInactive, ImColor colorWhenActive)
+	{
+		auto *drawList = ImGui::GetWindowDrawList();
+		const ImRect rect = UI::RectExpanded(UI::GetItemRect(), 1.0, 1.0f);
+
+		if (ImGui::IsItemHovered() && !ImGui::IsItemActive())
+		{
+			drawList->AddRect(rect.Min, rect.Max, ImColor(60, 60, 60), rounding, 0, 1.5f);
+		}
+
+		if (ImGui::IsItemActive())
+		{
+			drawList->AddRect(rect.Min, rect.Max, colorWhenActive, rounding, 0, 1.0f);
+		}
+		else if (!ImGui::IsItemHovered() && drawWhenInactive)
+		{
+			drawList->AddRect(rect.Min, rect.Max, ImColor(50, 50, 50), rounding, 0, 1.0f);
+		}
+	}
+
+	ImRect GetItemRect()
+	{
+		return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+	}
+
+	ImRect RectExpanded(const ImRect &rect, float x, float y)
+	{
+		ImRect result = rect;
+		result.Min.x -= x;
+		result.Min.y -= y;
+		result.Max.x += x;
+		result.Max.y += y;
+		return result;
+	}
+
+	ImRect RectExpanded(const ImRect &rect, const ImVec2 &xy)
+	{
+		return RectExpanded(rect, xy.x, xy.y);
+	}
+
+	ImRect RectOffset(const ImRect &rect, float x, float y)
+	{
+		ImRect result = rect;
+		result.Min.x += x;
+		result.Min.y += y;
+		result.Max.x += x;
+		result.Max.y += y;
+		return result;
+	}
+
+	ImRect RectOffset(const ImRect &rect, const ImVec2 &xy)
+	{
+		return RectOffset(rect, xy.x, xy.y);
+	}
+
+	void ShiftCursor(float x, float y)
+	{
+		const ImVec2 cursor = ImGui::GetCursorPos();
+		ImGui::SetCursorPos(ImVec2(cursor.x + x, cursor.y + y));
+	}
+
+	void ShiftCursorX(float distance)
+	{
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + distance);
+	}
+
+	void ShiftCursorY(float distance)
+	{
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + distance);
 	}
 
 	void DrawText(const HLString &text)
@@ -1441,18 +1692,21 @@ namespace highlo::UI
 		return changed;
 	}
 
-	void Image(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
+	ImTextureID GetTextureID(const Ref<Texture2D> &texture)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		ImGui::Image((ImTextureID)(size_t)texture->GetRendererID(), size, uv0, uv1, tintColor, borderColor);
+		return (ImTextureID)(size_t)texture->GetRendererID();
 	#endif // HIGHLO_API_OPENGL
+	}
+
+	void Image(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
+	{
+		ImGui::Image(GetTextureID(texture), size, uv0, uv1, tintColor, borderColor);
 	}
 	
 	void Image(const Ref<Texture2D> &texture, uint32 layer, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
 	{
-	#ifdef HIGHLO_API_OPENGL
-		ImGui::Image((ImTextureID)(size_t)texture->GetRendererID(), size, uv0, uv1, tintColor, borderColor);
-	#endif // HIGHLO_API_OPENGL
+		ImGui::Image(GetTextureID(texture), size, uv0, uv1, tintColor, borderColor);
 	}
 	
 	void ImageMip(const Ref<Texture2D> &texture, uint32 mip, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
@@ -1473,14 +1727,46 @@ namespace highlo::UI
 	
 	bool ImageButton(const HLString &id, const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, int32 framePadding, const ImVec4 &bgColor, const ImVec4 &tintColor)
 	{
-	#ifdef HIGHLO_API_OPENGL
 		if (!texture)
 			return false;
 
-		return ImGui::ImageButton((ImTextureID)(size_t)texture->GetRendererID(), size, uv0, uv1, framePadding, bgColor, tintColor);
-	#else
-		return false;
-	#endif // HIGHLO_API_OPENGL
+		return ImGui::ImageButton(GetTextureID(texture), size, uv0, uv1, framePadding, bgColor, tintColor);
+	}
+
+	void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImVec2 rectMin, ImVec2 rectMax)
+	{
+		auto *drawList = ImGui::GetWindowDrawList();
+		if (ImGui::IsItemActive())
+			drawList->AddImage(GetTextureID(texturePressed), rectMin, rectMax, ImVec2(0, 0), ImVec2(1, 1), tintPressed);
+		else if (ImGui::IsItemHovered())
+			drawList->AddImage(GetTextureID(textureHovered), rectMin, rectMax, ImVec2(0, 0), ImVec2(1, 1), tintHovered);
+		else
+			drawList->AddImage(GetTextureID(texture), rectMin, rectMax, ImVec2(0, 0), ImVec2(1, 1), tintNormal);
+	}
+	
+	void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImRect rectangle)
+	{
+		DrawButtonImage(texture, textureHovered, texturePressed, tintNormal, tintHovered, tintPressed, rectangle.Min, rectangle.Max);
+	}
+	
+	void DrawButtonImage(const Ref<Texture2D> &texture, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImVec2 rectMin, ImVec2 rectMax)
+	{
+		DrawButtonImage(texture, texture, texture, tintNormal, tintHovered, tintPressed, rectMin, rectMax);
+	}
+	
+	void DrawButtonImage(const Ref<Texture2D> &texture, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImRect rectangle)
+	{
+		DrawButtonImage(texture, texture, texture, tintNormal, tintHovered, tintPressed, rectangle.Min, rectangle.Max);
+	}
+	
+	void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed)
+	{
+		DrawButtonImage(texture, textureHovered, texturePressed, tintNormal, tintHovered, tintPressed, ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+	}
+	
+	void DrawButtonImage(const Ref<Texture2D> &texture, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed)
+	{
+		DrawButtonImage(texture, texture, texture, tintNormal, tintHovered, tintPressed, ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 	}
 }
 

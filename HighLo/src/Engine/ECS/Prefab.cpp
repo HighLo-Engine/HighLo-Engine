@@ -18,6 +18,17 @@ namespace highlo
 	{
 
 	}
+
+	void Prefab::Create(Entity e, bool serialize)
+	{
+		m_Scene = Scene::CreateEmpty();
+		m_Entity = CreatePrefabFromEntity(e);
+
+		if (serialize)
+		{
+			// TODO: Serialize data
+		}
+	}
 	
 	Entity Prefab::CreatePrefabFromEntity(Entity entity)
 	{

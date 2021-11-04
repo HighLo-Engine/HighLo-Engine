@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.8 (2021-11-02) Added operator overloading for native char* strings
 //     - 1.7 (2021-10-14) Fixed ParentPath implementation to take non root paths into account
 //     - 1.6 (2021-10-05) Refactored implementation to be able to handle non-existent files on the hard drive
 //     - 1.5 (2021-10-05) Fixed bug where the engine would crash if a Filepath does not exist
@@ -44,6 +45,7 @@ namespace highlo
 		HLAPI bool IsRelative() const;
 
 		HLAPI FileSystemPath RelativePath() const;
+		HLAPI FileSystemPath RelativePath(const FileSystemPath &parentPath) const;
 		HLAPI FileSystemPath ParentPath() const;
 
 		HLAPI Ref<File> &GetFile() { return m_File; }
@@ -51,6 +53,16 @@ namespace highlo
 
 		HLAPI HLString &String() { return m_CurrentPath; }
 		HLAPI const HLString &String() const { return m_CurrentPath; }
+
+		HLAPI HLString operator*()
+		{
+			return m_CurrentPath;
+		}
+
+		HLAPI const HLString operator*() const
+		{
+			return m_CurrentPath;
+		}
 
 		HLAPI bool operator==(const FileSystemPath &other) const;
 		HLAPI bool operator!=(const FileSystemPath &other) const;
@@ -63,9 +75,26 @@ namespace highlo
 		HLAPI FileSystemPath &operator+=(const HLString &path);
 		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const HLString &path);
 
+		HLAPI FileSystemPath &operator/=(const char *path);
+		HLAPI FileSystemPath &operator+=(const char *path);
+		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const char *path);
+
 	private:
 
 		HLString m_CurrentPath;
 		Ref<File> m_File = nullptr;
 	};
 }
+
+namespace std
+{
+	template<>
+	struct hash<highlo::FileSystemPath>
+	{
+		std::size_t operator()(const highlo::FileSystemPath &path) const
+		{
+			return hash<uint64>()(path.Hash());
+		}
+	};
+}
+

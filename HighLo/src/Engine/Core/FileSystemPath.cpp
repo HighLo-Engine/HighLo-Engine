@@ -9,21 +9,21 @@ namespace highlo
 {
 	FileSystemPath::FileSystemPath(const char *path)
 	{
-		m_File = File::Create(path, FileSystem::Get()->FileExists(*this));
 		m_CurrentPath = path;
+		m_File = File::Create(path, FileSystem::Get()->FileExists(*this));
 
 	}
 	
 	FileSystemPath::FileSystemPath(const HLString &path)
 	{
-		m_File = File::Create(path, FileSystem::Get()->FileExists(*this));
 		m_CurrentPath = path;
+		m_File = File::Create(path, FileSystem::Get()->FileExists(*this));
 	}
 	
 	FileSystemPath::FileSystemPath(const File &file)
 	{
-		m_File = File::Create(file.GetRelativePath(), FileSystem::Get()->FileExists(*this));
 		m_CurrentPath = file.GetAbsolutePath();
+		m_File = File::Create(file.GetRelativePath(), FileSystem::Get()->FileExists(*this));
 	}
 	
 	FileSystemPath::~FileSystemPath()
@@ -110,6 +110,11 @@ namespace highlo
 		return m_File->GetRelativePath();
 	}
 
+	FileSystemPath FileSystemPath::RelativePath(const FileSystemPath &parentPath) const
+	{
+		return m_File->GetRelativePath(parentPath.String());
+	}
+
 	FileSystemPath FileSystemPath::ParentPath() const
 	{
 		if (HasParentPath())
@@ -139,7 +144,12 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator/=(const FileSystemPath &path)
 	{
-		m_CurrentPath += "/";
+		if (path.String().IsEmpty())
+			return *this;
+
+		if (!m_CurrentPath.EndsWith('/'))
+			m_CurrentPath += "/";
+
 		m_CurrentPath += path.String();
 		m_File->SetFullPath(m_CurrentPath);
 		return *this;
@@ -147,7 +157,12 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator+=(const FileSystemPath &path)
 	{
-		m_CurrentPath += "/";
+		if (path.String().IsEmpty())
+			return *this;
+
+		if (!m_CurrentPath.EndsWith('/'))
+			m_CurrentPath += "/";
+
 		m_CurrentPath += path.String();
 		m_File->SetFullPath(m_CurrentPath);
 		return *this;
@@ -155,7 +170,12 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator/=(const HLString &path)
 	{
-		m_CurrentPath += "/";
+		if (path.IsEmpty())
+			return *this;
+
+		if (!m_CurrentPath.EndsWith('/'))
+			m_CurrentPath += "/";
+
 		m_CurrentPath += path;
 		m_File->SetFullPath(m_CurrentPath);
 		return *this;
@@ -163,7 +183,38 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator+=(const HLString &path)
 	{
-		m_CurrentPath += "/";
+		if (path.IsEmpty())
+			return *this;
+
+		if (!m_CurrentPath.EndsWith('/'))
+			m_CurrentPath += "/";
+
+		m_CurrentPath += path;
+		m_File->SetFullPath(m_CurrentPath);
+		return *this;
+	}
+
+	FileSystemPath &FileSystemPath::operator/=(const char *path)
+	{
+		if (strlen(path) == 0)
+			return *this;
+
+		if (!m_CurrentPath.EndsWith('/'))
+			m_CurrentPath += "/";
+
+		m_CurrentPath += path;
+		m_File->SetFullPath(m_CurrentPath);
+		return *this;
+	}
+
+	FileSystemPath &FileSystemPath::operator+=(const char *path)
+	{
+		if (strlen(path) == 0)
+			return *this;
+
+		if (!m_CurrentPath.EndsWith('/'))
+			m_CurrentPath += "/";
+
 		m_CurrentPath += path;
 		m_File->SetFullPath(m_CurrentPath);
 		return *this;
@@ -171,13 +222,46 @@ namespace highlo
 	
 	FileSystemPath operator/(FileSystemPath &lhs, const FileSystemPath &rhs)
 	{
-		HLString newPath = lhs.String() + "/" + rhs.String();
+		if (rhs.String().IsEmpty())
+			return lhs;
+
+		HLString newPath = "";
+
+		if (lhs.String().EndsWith('/'))
+			newPath = lhs.String() + rhs.String();
+		else
+			newPath = lhs.String() + "/" + rhs.String();
+
 		return FileSystemPath(newPath);
 	}
 	
 	FileSystemPath operator/(FileSystemPath &lhs, const HLString &path)
 	{
-		HLString newPath = lhs.String() + "/" + path;
+		if (path.IsEmpty())
+			return lhs;
+
+		HLString newPath = "";
+
+		if (lhs.String().EndsWith('/'))
+			newPath = lhs.String() + path;
+		else
+			newPath = lhs.String() + "/" + path;
+
+		return FileSystemPath(newPath);
+	}
+
+	FileSystemPath operator/(FileSystemPath &lhs, const char *path)
+	{
+		if (strlen(path) == 0)
+			return lhs;
+
+		HLString newPath = "";
+
+		if (lhs.String().EndsWith('/'))
+			newPath = lhs.String() + path;
+		else
+			newPath = lhs.String() + "/" + path;
+
 		return FileSystemPath(newPath);
 	}
 }

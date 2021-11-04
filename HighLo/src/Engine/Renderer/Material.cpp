@@ -12,7 +12,7 @@ namespace highlo
 {
 	Ref<Material> Material::Create(MaterialProperties props)
 	{
-		return Ref<Material>(new Material(props));
+		return Ref<Material>::Create(props);
 	}
 
 	Material::Material(MaterialProperties props)
@@ -34,14 +34,12 @@ namespace highlo
 
 	void Material::CreateShaders()
 	{
-		static auto BoneTransformsBuffer = UniformBuffer::Create(
-			"BoneTransformsBuffer",
+		auto BoneTransformsBuffer = UniformBuffer::Create("BoneTransformsBuffer",
 			{
 				UniformVariable("u_BoneTransforms", sizeof(glm::mat4) * HL_MAX_SKELETAL_BONES)
 			},
 			UniformBufferParentShader::VERTEX_SHADER,
-			(uint32)HL_UB_SLOT::BONE_TRANSFORMS_BUFFER
-		);
+			(uint32)HL_UB_SLOT::BONE_TRANSFORMS_BUFFER);
 
 		m_StaticShader   = Renderer::GetShaderLibrary()->Get("DefaultShader");
 		m_AnimatedShader = Renderer::GetShaderLibrary()->Get("DefaultAnimatedShader");

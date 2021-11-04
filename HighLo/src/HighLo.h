@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.6 (2021-11-01) Added Threading headers
 //     - 1.5 (2021-10-23) Added Atomic and Service
 //     - 1.4 (2021-10-19) Added RenderCommandQueue
 //     - 1.3 (2021-10-04) Added FileSystemWatcher
@@ -40,6 +41,12 @@
 #include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Core/Profiler/Profiler.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
+
+#include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGuiTreeNode.h"
+#include "Engine/ImGui/ImGuiWidgets.h"
+#include "Engine/ImGui/ImGuiScopeHelpers.h"
+#include "Engine/ImGui/ImGuizmo.h"
 
 #include "Engine/Math/Color.h"
 #include "Engine/Math/Math.h"
@@ -83,11 +90,24 @@
 #include "Engine/Camera/FreeFlyCamera.h"
 #include "Engine/Camera/EditorCamera.h" // TODO: this should be editor-only
 
+#include "Engine/Threading/LocalThread.h"
+#include "Engine/Threading/Runnable.h"
+#include "Engine/Threading/Task.h"
+#include "Engine/Threading/Thread.h"
+#include "Engine/Threading/ThreadLocker.h"
+#include "Engine/Threading/ThreadRegistry.h"
+#include "Engine/Threading/ThreadPool.h"
+
 #include "Engine/Editor/EditorColors.h"
 #include "Engine/Editor/SceneHierarchyPanel.h"
 #include "Engine/Editor/EditorConsolePanel.h"
 #include "Engine/Editor/AssetEditor.h"
 #include "Engine/Editor/AssetEditorPanel.h"
+
+#include "Engine/Editor/AssetBrowser/AssetBrowserItem.h"
+#include "Engine/Editor/AssetBrowser/AssetBrowserItemList.h"
+#include "Engine/Editor/AssetBrowser/SelectionStack.h"
+#include "Engine/Editor/AssetBrowser/AssetBrowserPanel.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

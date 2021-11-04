@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Asset.h"
+#include "Engine/Core/FileSystemPath.h"
 #include "Engine/Events/Events.h"
 #include "Engine/Loaders/AssetLoader.h"
 
@@ -31,21 +32,21 @@ namespace highlo
 	{
 	public:
 
-		HLAPI AssetMetaData &operator[](const HLString &path);
-		HLAPI const AssetMetaData &Get(const HLString &path) const;
+		HLAPI AssetMetaData &operator[](const FileSystemPath &path);
+		HLAPI const AssetMetaData &Get(const FileSystemPath &path) const;
 
 		HLAPI size_t Count() const { return m_AssetRegistry.size(); }
-		HLAPI bool Contains(const HLString &path) const; 
-		HLAPI size_t Remove(const HLString &path);
+		HLAPI bool Contains(const FileSystemPath &path) const; 
+		HLAPI size_t Remove(const FileSystemPath &path);
 		HLAPI void Clear();
 
-		HLAPI std::unordered_map<HLString, AssetMetaData>::iterator begin() { return m_AssetRegistry.begin(); }
-		HLAPI std::unordered_map<HLString, AssetMetaData>::iterator end() { return m_AssetRegistry.end(); }
-		HLAPI std::unordered_map<HLString, AssetMetaData>::const_iterator cbegin() { return m_AssetRegistry.begin(); }
-		HLAPI std::unordered_map<HLString, AssetMetaData>::const_iterator cend() { return m_AssetRegistry.end(); }
+		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::iterator begin() { return m_AssetRegistry.begin(); }
+		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::iterator end() { return m_AssetRegistry.end(); }
+		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cbegin() { return m_AssetRegistry.begin(); }
+		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cend() { return m_AssetRegistry.end(); }
 
 	private:
-		std::unordered_map<HLString, AssetMetaData> m_AssetRegistry;
+		std::unordered_map<FileSystemPath, AssetMetaData> m_AssetRegistry;
 	};
 
 	class AssetManager : public Singleton<AssetManager>
@@ -60,19 +61,19 @@ namespace highlo
 		HLAPI void SetAssetChangeCallback(const AssetsChangeEventFn &callback);
 
 		HLAPI AssetMetaData &GetMetaData(AssetHandle handle);
-		HLAPI AssetMetaData &GetMetaData(const HLString &path);
+		HLAPI AssetMetaData &GetMetaData(const FileSystemPath &path);
 		HLAPI AssetMetaData &GetMetaData(const Ref<Asset> &asset) { return GetMetaData(asset->Handle); }
 
-		HLAPI HLString GetFileSystemPath(const AssetMetaData &metaData);
-		HLAPI HLString GetRelativePath(const HLString &path);
+		HLAPI FileSystemPath GetFileSystemPath(const AssetMetaData &metaData);
+		HLAPI FileSystemPath GetRelativePath(const FileSystemPath &path);
 			 
-		HLAPI AssetHandle GetAssetHandleFromFilePath(const HLString &path);
+		HLAPI AssetHandle GetAssetHandleFromFilePath(const FileSystemPath &path);
 		HLAPI bool IsAssetHandleValid(AssetHandle handle) { return GetMetaData(handle).IsValid(); }
 
 		HLAPI AssetType GetAssetTypeFromExtension(const HLString &extension);
-		HLAPI AssetType GetAssetTypeFromPath(const HLString &path);
+		HLAPI AssetType GetAssetTypeFromPath(const FileSystemPath &path);
 
-		HLAPI AssetHandle ImportAsset(const HLString &path);
+		HLAPI AssetHandle ImportAsset(const FileSystemPath &path);
 		HLAPI bool ReloadAsset(AssetHandle handle);
 
 		template<typename T, typename... Args>
@@ -101,15 +102,15 @@ namespace highlo
 
 				while (!foundAvailableFileName)
 				{
-					HLString nextFilePath = dirPath + "/" + assetInfo.FilePath.Stem().String();
+					HLString nextFilePath = dirPath + "/" + assetInfo.FilePath.GetFile()->GetName();
 					if (current < 10)
 						nextFilePath += " (0" + HLString::ToString(current) + ")";
 					else
 						nextFilePath += " (" + HLString::ToString(current) + ")";
 
-					nextFilePath += assetInfo.FilePath.Extension().ToString();
+					nextFilePath += assetInfo.FilePath.GetFile()->GetExtension();
 
-					if (!FileSystem::FileExists(nextFilePath))
+					if (!FileSystem::Get()->FileExists(nextFilePath))
 					{
 						foundAvailableFileName = true;
 						assetInfo.FilePath = nextFilePath;
@@ -120,7 +121,7 @@ namespace highlo
 				}
 			}
 
-			s_AssetRegistry[assetInfo.FilePath] = assetInfo;
+			s_AssetRegistry[assetInfo.FilePath.GetFile()->GetAbsolutePath()] = assetInfo;
 			WriteRegistryToFile();
 
 			Ref<Asset> asset = Ref<T>::Create(std::forward<Args>(args)...);
@@ -173,8 +174,8 @@ namespace highlo
 		void ReloadAllAssets();
 		
 		static void OnFileSystemChangedEvent(FileSystemChangedEvent &e);
-		static void OnAssetRenamed(AssetHandle handle, const HLString &newFilePath);
-		static void OnAssetMoved(AssetHandle handle, const HLString &destinationFilePath);
+		static void OnAssetRenamed(AssetHandle handle, const FileSystemPath &newFilePath);
+		static void OnAssetMoved(AssetHandle handle, FileSystemPath &destinationFilePath);
 		static void OnAssetDeleted(AssetHandle handle);
 
 	private:
@@ -182,6 +183,12 @@ namespace highlo
 		static std::unordered_map<AssetHandle, Ref<Asset>> s_LoadedAssets;
 		static AssetsChangeEventFn s_AssetsChangeCallback;
 		inline static AssetRegistry s_AssetRegistry;
+
+	private:
+
+		friend class AssetBrowserBaseItem;
+		friend class AssetBrowserItem;
+		friend class AssetBrowserDirectory;
 	};
 }
 

@@ -17,8 +17,7 @@ namespace highlo
 
 	void ThreadRegistry::Shutdown()
 	{
-		if (s_Lock)
-			delete s_Lock;
+		delete s_Lock;
 	}
 
 	Thread *ThreadRegistry::GetThread(UUID uuid)

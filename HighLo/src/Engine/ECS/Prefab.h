@@ -16,6 +16,8 @@ namespace highlo
 		HLAPI Prefab(Entity e);
 		HLAPI ~Prefab();
 
+		HLAPI void Create(Entity e, bool serialize = true);
+
 		HLAPI static AssetType GetStaticType() { return AssetType::Prefab; }
 		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
 

@@ -2,29 +2,33 @@
 
 //
 // version history:
+//     - 1.1 (2021-11-02) Added More getters for ProjectConfig values
 //     - 1.0 (2021-09-15) initial release
 //
 
 #pragma once
 
+#include "Engine/Core/FileSystemPath.h"
+
 namespace highlo
 {
+	// TODO: The values should not be hardcoded, they should be loaded from the serialized scene file
 	struct ProjectConfig
 	{
-		HLString Name;
+		HLString Name = "Unnamed Project";
 
-		HLString AssetDirectory;
-		HLString AssetRegistryPath;
+		HLString AssetDirectory = "assets/";
+		HLString AssetRegistryPath = "";
 
-		HLString MeshPath;
-		HLString MeshSourcePath;
+		HLString MeshPath = "assets/models/";
+		HLString MeshSourcePath = "";
 
 		HLString StartScene;
 
 		bool ReloadScriptAssemblyOnPlay;
 
-		HLString ProjectFileName;
-		HLString ProjectDirectory;
+		HLString ProjectFileName = "Unnamed_highlo_project.hlproject";
+		HLString ProjectDirectory = "";
 	};
 
 	class Project : public IsSharedReference
@@ -45,13 +49,36 @@ namespace highlo
 			return s_ActiveProject->GetConfig().Name;
 		}
 
-		HLAPI static const HLString &GetProjectDirectory()
+		HLAPI static FileSystemPath GetProjectDirectory()
 		{
 			HL_ASSERT(s_ActiveProject);
-			return s_ActiveProject->GetConfig().ProjectDirectory;
+			return FileSystemPath(s_ActiveProject->GetConfig().ProjectDirectory);
 		}
 
+		HLAPI static FileSystemPath GetAssetDirectory()
+		{
+			HL_ASSERT(s_ActiveProject);
+			//return FileSystemPath(s_ActiveProject->GetConfig().ProjectDirectory) / FileSystemPath(s_ActiveProject->GetConfig().AssetDirectory);
+			return FileSystemPath(s_ActiveProject->GetConfig().AssetDirectory);
+		}
 
+		HLAPI static FileSystemPath GetAssetRegistryPath()
+		{
+			HL_ASSERT(s_ActiveProject);
+			return FileSystemPath(s_ActiveProject->GetConfig().ProjectDirectory) / FileSystemPath(s_ActiveProject->GetConfig().AssetRegistryPath);
+		}
+
+		HLAPI static FileSystemPath GetMeshPath()
+		{
+			HL_ASSERT(s_ActiveProject);
+			return FileSystemPath(s_ActiveProject->GetConfig().ProjectDirectory) / FileSystemPath(s_ActiveProject->GetConfig().MeshPath);
+		}
+
+		HLAPI static FileSystemPath GetCacheDirectory()
+		{
+			HL_ASSERT(s_ActiveProject);
+			return FileSystemPath(s_ActiveProject->GetConfig().ProjectDirectory) / "Cache";
+		}
 
 	private:
 

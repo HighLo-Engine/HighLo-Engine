@@ -6,10 +6,11 @@
 #include <Engine/ImGui/imgui.h>
 
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Core/FileSystemWatcher.h"
 #include "Engine/Core/File.h"
 #include "AssetExtensions.h"
 
-#include "Engine/Core/FileSystemWatcher.h"
+#include "Engine/Scene/Project.h"
 
 namespace highlo
 {
@@ -17,40 +18,43 @@ namespace highlo
 	//                                   AssetRegistry
 	// ====================================================================================
 
-	static HLString GetKey(const HLString &path)
+	static FileSystemPath GetKey(const FileSystemPath &path)
 	{
-		// TODO
-		return "";
+		auto key = path.RelativePath(Project::GetAssetDirectory());
+		if (key.String().IsEmpty())
+			key = path.String();
+
+		return key;
 	}
 
-	AssetMetaData &AssetRegistry::operator[](const HLString &path)
+	AssetMetaData &AssetRegistry::operator[](const FileSystemPath &path)
 	{
 		auto key = GetKey(path);
-		HL_CORE_INFO("[AssetManager] Retrieving Asset '{0}' with key '{1}'", *path, *key);
+		HL_CORE_INFO("[AssetManager] Retrieving Asset '{0}' with key '{1}'", **path, **key);
 		HL_ASSERT(m_AssetRegistry.find(key) != m_AssetRegistry.end());
-		HL_ASSERT(!key.IsEmpty());
+		HL_ASSERT(!key.String().IsEmpty());
 		return m_AssetRegistry[key];
 	}
 	
-	const AssetMetaData &AssetRegistry::Get(const HLString &path) const
+	const AssetMetaData &AssetRegistry::Get(const FileSystemPath &path) const
 	{
 		const auto key = GetKey(path);
-		HL_CORE_INFO("[AssetManager] Retrieving Asset '{0}' with key '{1}'", *path, *key);
+		HL_CORE_INFO("[AssetManager] Retrieving Asset '{0}' with key '{1}'", **path, **key);
 		HL_ASSERT(m_AssetRegistry.find(key) != m_AssetRegistry.end());
-		HL_ASSERT(!key.IsEmpty());
+		HL_ASSERT(!key.String().IsEmpty());
 		return m_AssetRegistry.at(key);
 	}
 	
-	bool AssetRegistry::Contains(const HLString &path) const
+	bool AssetRegistry::Contains(const FileSystemPath &path) const
 	{
 		auto key = GetKey(path);
 		return m_AssetRegistry.find(key) != m_AssetRegistry.end();
 	}
 	
-	size_t AssetRegistry::Remove(const HLString &path)
+	size_t AssetRegistry::Remove(const FileSystemPath &path)
 	{
 		auto key = GetKey(path);
-		HL_CORE_INFO("[AssetManager] Removing Asset '{0}'", *path);
+		HL_CORE_INFO("[AssetManager] Removing Asset '{0}'", **path);
 		return m_AssetRegistry.erase(key);
 	}
 	
@@ -99,27 +103,31 @@ namespace highlo
 		return s_NullMetaData;
 	}
 
-	AssetMetaData &AssetManager::GetMetaData(const HLString &path)
+	AssetMetaData &AssetManager::GetMetaData(const FileSystemPath &path)
 	{
-		if (s_AssetRegistry.Contains(path))
-			return s_AssetRegistry[path];
+		if (s_AssetRegistry.Contains(path.String()))
+			return s_AssetRegistry[*path];
 
 		return s_NullMetaData;
 	}
 
-	HLString AssetManager::GetFileSystemPath(const AssetMetaData &metaData)
+	FileSystemPath AssetManager::GetFileSystemPath(const AssetMetaData &metaData)
 	{
-		return "";
+		return Project::GetAssetDirectory() / metaData.FilePath;
 	}
 
-	HLString AssetManager::GetRelativePath(const HLString &path)
+	FileSystemPath AssetManager::GetRelativePath(const FileSystemPath &path)
 	{
-		return "";
+		HLString temp = path.String();
+		if (temp.IndexOf(Project::GetActive()->GetAssetDirectory().String()) != HLString::NPOS)
+			return path.RelativePath(Project::GetActive()->GetAssetDirectory());
+
+		return path;
 	}
 
-	AssetHandle AssetManager::GetAssetHandleFromFilePath(const HLString &path)
+	AssetHandle AssetManager::GetAssetHandleFromFilePath(const FileSystemPath &path)
 	{
-		return s_AssetRegistry.Contains(path) ? s_AssetRegistry[path].Handle : 0;
+		return s_AssetRegistry.Contains(*path) ? s_AssetRegistry[*path].Handle : 0;
 	}
 
 	AssetType AssetManager::GetAssetTypeFromExtension(const HLString &extension)
@@ -130,12 +138,12 @@ namespace highlo
 		return s_AssetExtesions.at(extension.ToLowerCase());
 	}
 
-	AssetType AssetManager::GetAssetTypeFromPath(const HLString &path)
+	AssetType AssetManager::GetAssetTypeFromPath(const FileSystemPath &path)
 	{
-		return GetAssetTypeFromExtension(File::GetFileExtension(path));
+		return GetAssetTypeFromExtension(path.GetFile()->GetExtension());
 	}
 
-	AssetHandle AssetManager::ImportAsset(const HLString &path)
+	AssetHandle AssetManager::ImportAsset(const FileSystemPath &path)
 	{
 		// TODO
 		return 0;
@@ -238,24 +246,24 @@ namespace highlo
 		s_AssetsChangeCallback(e);
 	}
 
-	void AssetManager::OnAssetRenamed(AssetHandle handle, const HLString &newFilePath)
+	void AssetManager::OnAssetRenamed(AssetHandle handle, const FileSystemPath &newFilePath)
 	{
 		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
 		
-		s_AssetRegistry.Remove(assetInfo.FilePath);
+		s_AssetRegistry.Remove(*assetInfo.FilePath);
 		assetInfo.FilePath = newFilePath;
-		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
+		s_AssetRegistry[*assetInfo.FilePath] = assetInfo;
 		
 		AssetManager::Get()->WriteRegistryToFile();
 	}
 
-	void AssetManager::OnAssetMoved(AssetHandle handle, const HLString &destinationFilePath)
+	void AssetManager::OnAssetMoved(AssetHandle handle, FileSystemPath &destinationFilePath)
 	{
 		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
 
-		s_AssetRegistry.Remove(assetInfo.FilePath);
-		assetInfo.FilePath = destinationFilePath + "/" + assetInfo.FilePath;
-		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
+		s_AssetRegistry.Remove(*assetInfo.FilePath);
+		assetInfo.FilePath = destinationFilePath / assetInfo.FilePath;
+		s_AssetRegistry[*assetInfo.FilePath] = assetInfo;
 
 		AssetManager::Get()->WriteRegistryToFile();
 	}
@@ -264,7 +272,7 @@ namespace highlo
 	{
 		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
 
-		s_AssetRegistry.Remove(assetInfo.FilePath);
+		s_AssetRegistry.Remove(*assetInfo.FilePath);
 		s_LoadedAssets.erase(handle);
 
 		AssetManager::Get()->WriteRegistryToFile();
@@ -295,7 +303,7 @@ namespace highlo
 			for (const auto &[path, assetInfo] : s_AssetRegistry)
 			{
 				HLString handleStr = fmt::format("{0}", assetInfo.Handle);
-				HLString filePath = assetInfo.FilePath;
+				HLString filePath = assetInfo.FilePath.String();
 				HLString typeStr = utils::AssetTypeToString(assetInfo.Type);
 
 				if (searchBuffer[0] != 0)

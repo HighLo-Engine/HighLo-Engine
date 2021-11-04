@@ -26,9 +26,16 @@ void HighLoEditor::OnInitialize()
 
 	m_EditorCamera = EditorCamera(glm::perspectiveFov(glm::radians(45.0f), (float) width, (float) height, 0.1f, 1000.0f));
 
+	// Project
+	Ref<Project> project = Ref<Project>::Create();
+	// TODO: Deserialize project data here
+	Project::SetActive(project);
+
 	// Editor Panels
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
 	m_ViewportRenderer->SetLineWidth(m_LineWidth);
+
+	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
 
 	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create();
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
@@ -37,6 +44,8 @@ void HighLoEditor::OnInitialize()
 
 	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
 	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
+
+	AssetEditorPanel::Init();
 
 	GetWindow().Maximize();
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
@@ -166,10 +175,14 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			break;
 		}
 	}
+
+	AssetEditorPanel::OnUpdate(ts);
 }
 
 void HighLoEditor::OnShutdown()
 {
+	AssetEditorPanel::Shutdown();
+
 	FileSystemWatcher::Get()->Stop();
 }
 
@@ -191,6 +204,9 @@ void HighLoEditor::OnEvent(Event &e)
 	{
 		m_RuntimeScene->OnEvent(e);
 	}
+
+	AssetEditorPanel::OnEvent(e);
+	m_AssetBrowserPanel->OnEvent(e);
 }
 
 void HighLoEditor::OnUIRender(Timestep timestep)
@@ -221,14 +237,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	UI::EndViewport();
 
-	// Asset Window
-	UI::BeginViewport("Assets");
-	UI::EndViewport();
-
-	// Scene Hierarchy Panel
+	m_AssetBrowserPanel->OnUIRender();
 	m_SceneHierarchyPanel->OnUIRender();
-
-	// Editor Console Panel
 	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
 
 	// Object Properties Panel
@@ -236,6 +246,9 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	UI::EndViewport();
 
 	UI::EndWindow();
+
+	AssetEditorPanel::OnUIRender(timestep);
+	//AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
 }
 
 void HighLoEditor::OnResize(uint32 width, uint32 height)

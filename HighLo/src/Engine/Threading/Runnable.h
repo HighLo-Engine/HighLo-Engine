@@ -11,6 +11,9 @@
 
 namespace highlo
 {
+	/// <summary>
+	/// Defines the function scope for a Runnable function inside Thread operations.
+	/// </summary>
 	class IRunnable
 	{
 	public:
@@ -29,6 +32,9 @@ namespace highlo
 
 	using RunnableCallback = std::function<int32()>;
 
+	/// <summary>
+	/// Represents a function that can be run inside a Thread operation.
+	/// </summary>
 	class Runnable : public IRunnable
 	{
 	public:

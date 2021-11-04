@@ -58,9 +58,10 @@ namespace highlo
 	{
 		friend class CoreRenderer;
 
-		Material(MaterialProperties props = MaterialProperties());
-
 	public:
+
+		HLAPI Material(MaterialProperties props = MaterialProperties());
+
 		HLAPI static Ref<Material> Create(MaterialProperties props = MaterialProperties());
 
 		MaterialProperties Properties;

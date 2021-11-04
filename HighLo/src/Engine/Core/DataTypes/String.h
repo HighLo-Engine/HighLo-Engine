@@ -743,6 +743,9 @@ namespace highlo
 
 		HLAPI bool EndsWith(const StringType letter) const
 		{
+			if (IsEmpty())
+				return false;
+
 			if (m_Data[m_Size - 1] == letter)
 				return true;
 

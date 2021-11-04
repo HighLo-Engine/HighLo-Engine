@@ -33,7 +33,6 @@ namespace highlo
 		// Create cache for sin() and cos()
 		CreateCacheSin();
 		CreateCacheCos();
-		TestFastInverseSquareRoot(12.0f);
 
 		// Init Window
 		m_Window = UniqueRef<Window>(Window::Create(WindowData(
@@ -177,14 +176,6 @@ namespace highlo
 		}
 
 		return true;
-	}
-
-	void HLApplication::TestFastInverseSquareRoot(float value)
-	{
-		HL_PROFILE_FUNCTION();
-
-		float result = FastInverseSquareRoot(value);
-		HL_CORE_TRACE("Value: {0}, Result: {1}", value, result);
 	}
 
 	void HLApplication::InternalEventHandler(Event &e)

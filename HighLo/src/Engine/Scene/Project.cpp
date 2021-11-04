@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "Project.h"
 
+#include "Engine/Assets/AssetManager.h"
+
 namespace highlo
 {
 	Project::Project()
@@ -15,7 +17,14 @@ namespace highlo
 	
 	void Project::SetActive(Ref<Project> project)
 	{
+		if (s_ActiveProject)
+			AssetManager::Get()->Shutdown();
+
 		s_ActiveProject = project;
+		if (s_ActiveProject)
+		{
+			AssetManager::Get()->Init();
+		}
 	}
 }
 

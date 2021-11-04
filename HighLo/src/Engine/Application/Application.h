@@ -41,7 +41,7 @@ namespace highlo
 		HLAPI virtual void OnUIRender(Timestep timestep) {}
 		HLAPI virtual void OnResize(uint32 width, uint32 height) {}
 
-		inline void Close() { m_Running = false; }
+		HLAPI inline void Close() { m_Running = false; }
 		HLAPI void SetApplicationSettings(const ApplicationSettings &settings) { m_Settings = settings; }
 		HLAPI ApplicationSettings &GetApplicationSettings() { return m_Settings; }
 		HLAPI bool IsShuttingDown() const { return m_IsShuttingDown; }
@@ -66,9 +66,6 @@ namespace highlo
 
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
-
-		// TEMP
-		void TestFastInverseSquareRoot(float value);
 
 	private:
 

@@ -102,8 +102,9 @@ class HighLoEditor : public HLApplication
 		bool m_ShowSceneHierarchyPanel = true;
 		bool m_ShowViewportPanel = true;
 		bool m_ShowObjectPropertiesPanel = true;
-		bool m_ShowConsolePanel = true;
+		bool m_ShowConsolePanel = false;
 		bool m_ShowSelectedWireframe = false;
+		bool m_AssetManagerPanelOpen = true;
 
 		bool m_UIShowBoundingBoxes = false;
 		bool m_UIShowBoundingBoxesOnTop = false;
@@ -126,4 +127,5 @@ class HighLoEditor : public HLApplication
 		Ref<SceneRenderer> m_ViewportRenderer;
 		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
+		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
 	};

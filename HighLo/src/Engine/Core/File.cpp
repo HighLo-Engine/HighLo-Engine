@@ -16,12 +16,12 @@ namespace highlo
 	{
 	}
 	
-	std::vector<File> File::GetFileList()
+	std::vector<File> File::GetFileList() const
 	{
 		std::vector<File> result;
 
 		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
-			result.push_back(File(entry.path().filename().string()));
+			result.push_back(File(entry.path().filename().string(), FileSystem::Get()->FileExists(entry.path().filename().string().c_str())));
 
 		return result;
 	}
@@ -41,9 +41,7 @@ namespace highlo
 		m_FilePath = path;
 
 		if (m_ExistsOnHardDrive)
-		{
 			m_Handle = std::filesystem::canonical(*path);
-		}
 
 		if (m_FilePath.Contains('\\'))
 			m_FilePath = m_FilePath.Replace("\\", "/", -1);
@@ -52,6 +50,13 @@ namespace highlo
 		m_AbsoluteFilePath = std::filesystem::absolute(m_Handle).string();
 		if (m_AbsoluteFilePath.Contains('\\'))
 			m_AbsoluteFilePath = m_AbsoluteFilePath.Replace("\\", "/", -1);
+	}
+
+	HLString File::GetRelativePath(const HLString &parentPath) const
+	{
+		std::filesystem::path parentHandle(*parentPath);
+		std::filesystem::path relativeHandle = std::filesystem::relative(m_Handle, parentHandle);
+		return relativeHandle.string();
 	}
 
 	HLString File::GetName() const

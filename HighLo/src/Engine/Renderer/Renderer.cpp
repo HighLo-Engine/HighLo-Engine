@@ -33,7 +33,7 @@ namespace highlo
 		Ref<RenderPass> ActiveRenderPass;
 	};
 
-	static RendererData *s_Data = nullptr;
+	static RendererData *s_MainRendererData = nullptr;
 	static RenderCommandQueue *s_CommandQueue = nullptr;
 
 	void Renderer::ClearScreenColor(const glm::vec4& color)
@@ -78,21 +78,18 @@ namespace highlo
 
 	void Renderer::Init(Window *window)
 	{
-		s_Data = new RendererData();
+		s_MainRendererData = new RendererData();
 		s_CommandQueue = new RenderCommandQueue();
-		s_Data->ShaderLib = Ref<ShaderLibrary>::Create();
+		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		s_Data->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
+		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
 		
-		uint32 whiteTextureData = 0xffffffff;
-		s_Data->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1).As<Texture2D>();
-		s_Data->WhiteTexture->Lock();
-		s_Data->WhiteTexture->GetData().Write(&whiteTextureData, sizeof(uint32));
-		s_Data->WhiteTexture->Unlock();
+		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
+		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData).As<Texture2D>();
 
-		s_Data->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png").As<Texture2D>();
-		s_Data->EmptyEnvironment = Ref<Environment>::Create(s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture, s_Data->BlackCubeTexture);
+		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png").As<Texture2D>();
+		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
 
 		// Define Shader layouts
 		BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
@@ -134,7 +131,7 @@ namespace highlo
 		UI::ShutdownImGui();
 
 		delete s_CommandQueue;
-		delete s_Data;
+		delete s_MainRendererData;
 	}
 
 	void Renderer::BeginFrame()
@@ -156,7 +153,7 @@ namespace highlo
 	void Renderer::BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear)
 	{
 		HL_ASSERT(renderPass, "Renderpass can not be null!");
-		s_Data->ActiveRenderPass = renderPass;
+		s_MainRendererData->ActiveRenderPass = renderPass;
 
 		renderPass->GetSpcification().Framebuffer->Bind();
 		if (clear)
@@ -169,9 +166,9 @@ namespace highlo
 
 	void Renderer::EndRenderPass()
 	{
-		HL_ASSERT(s_Data->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
-		s_Data->ActiveRenderPass->GetSpcification().Framebuffer->Unbind();
-		s_Data->ActiveRenderPass = nullptr;
+		HL_ASSERT(s_MainRendererData->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
+		s_MainRendererData->ActiveRenderPass->GetSpcification().Framebuffer->Unbind();
+		s_MainRendererData->ActiveRenderPass = nullptr;
 	}
 
 	void Renderer::DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color)
@@ -211,37 +208,37 @@ namespace highlo
 
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()
 	{
-		return s_Data->BlackCubeTexture;
+		return s_MainRendererData->BlackCubeTexture;
 	}
 
 	Ref<Texture2D> Renderer::GetWhiteTexture()
 	{
-		return s_Data->WhiteTexture;
+		return s_MainRendererData->WhiteTexture;
 	}
 
 	Ref<Environment> Renderer::GetEmptyEnvironment()
 	{
-		return s_Data->EmptyEnvironment;
+		return s_MainRendererData->EmptyEnvironment;
 	}
 
 	RendererConfig &Renderer::GetConfig()
 	{
-		return s_Data->Config;
+		return s_MainRendererData->Config;
 	}
 
 	Ref<ShaderLibrary> Renderer::GetShaderLibrary()
 	{
-		return s_Data->ShaderLib;
+		return s_MainRendererData->ShaderLib;
 	}
 
 	RendererCapabilities &Renderer::GetCapabilities()
 	{
-		return s_Data->Capabilities;
+		return s_MainRendererData->Capabilities;
 	}
 
 	Ref<Texture2D> &Renderer::GetBRDFLutTexture()
 	{
-		return s_Data->BRDFLut;
+		return s_MainRendererData->BRDFLut;
 	}
 
 	HLString Renderer::GetCurrentRenderingAPI()

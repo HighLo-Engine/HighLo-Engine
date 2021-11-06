@@ -90,6 +90,7 @@ namespace highlo
 		Ref<Texture2D> m_FolderIcon;
 		Ref<Texture2D> m_BackBtnIcon;
 		Ref<Texture2D> m_FrontBtnIcon;
+		Ref<Texture2D> m_UpBtnIcon;
 		Ref<Texture2D> m_RefreshBtnIcon;
 		Ref<Texture2D> m_Shadow;
 

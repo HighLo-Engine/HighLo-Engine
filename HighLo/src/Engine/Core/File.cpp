@@ -7,9 +7,8 @@
 namespace highlo
 {
 	File::File(const HLString &path, bool exists)
-		: m_ExistsOnHardDrive(exists)
 	{
-		SetFullPath(path);
+		SetFullPath(path, exists);
 	}
 
 	File::~File()
@@ -36,9 +35,10 @@ namespace highlo
 		return fileCount;
 	}
 
-	void File::SetFullPath(const HLString &path)
+	void File::SetFullPath(const HLString &path, bool exists)
 	{
 		m_FilePath = path;
+		m_ExistsOnHardDrive = exists;
 
 		if (m_ExistsOnHardDrive)
 			m_Handle = std::filesystem::canonical(*path);

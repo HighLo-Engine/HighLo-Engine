@@ -47,6 +47,7 @@ namespace highlo
 
 		m_BackBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/back.png").As<Texture2D>();
 		m_FrontBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/front.png").As<Texture2D>();
+		m_UpBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/parentFolder.png").As<Texture2D>();
 		m_RefreshBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/refresh.png").As<Texture2D>();
 
 		// Load Asset Icons
@@ -130,12 +131,12 @@ namespace highlo
 							{
 								if (ImGui::MenuItem("Folder"))
 								{
-									FileSystemPath newFilePath = Project::GetAssetDirectory() / m_CurrentDirectory->FilePath / "NewFolder";
+									FileSystemPath newFilePath = Project::GetAssetDirectory() / m_CurrentDirectory->FilePath / "New Folder";
 									bool created = FileSystem::Get()->CreateFolder(newFilePath);
 									if (created)
 									{
 										Refresh();
-										const auto &directoryInfo = GetDirectory(m_CurrentDirectory->FilePath / "NewFolder");
+										const auto &directoryInfo = GetDirectory(newFilePath);
 										uint32 index = m_CurrentItems.Find(directoryInfo->Handle);
 										if (index != AssetBrowserItemList::InvalidItem)
 											m_CurrentItems[index]->StartRenaming();
@@ -175,7 +176,7 @@ namespace highlo
 							ImGui::Separator();
 
 							if (ImGui::MenuItem("Show in Explorer"))
-								FileSystem::Get()->OpenInExplorer(Project::GetAssetDirectory() / m_CurrentDirectory->FilePath);
+								FileSystem::Get()->OpenInExplorer((Project::GetAssetDirectory() / m_CurrentDirectory->FilePath).GetFile()->GetAbsolutePath());
 
 							ImGui::EndPopup();
 						}
@@ -267,6 +268,8 @@ namespace highlo
 			dirInfo->FilePath = dirPath.RelativePath();
 
 		std::vector<File> dirList = dirPath.GetFile()->GetFileList();
+		HL_CORE_TRACE("Logged {0} files in directory {1}", dirList.size(), *dirPath.GetFile()->GetName());
+
 		for (uint32 i = 0; i < dirPath.GetFile()->GetFileCount(); ++i)
 		{
 			File entry = dirList[i];
@@ -484,6 +487,14 @@ namespace highlo
 			}
 
 		//	UI::SetToolTip("Next Directory");
+			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
+
+			if (ContentBrowserButton("##parentDir", m_UpBtnIcon))
+			{
+				HL_CORE_TRACE("Going one directory up");
+			}
+
+		//	UI::SetToolTip("Parent Directory");
 			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
 
 			if (ContentBrowserButton("##refresh", m_RefreshBtnIcon))

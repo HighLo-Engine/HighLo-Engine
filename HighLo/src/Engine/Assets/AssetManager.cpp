@@ -195,6 +195,7 @@ namespace highlo
 
 	void AssetManager::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
+		HL_CORE_TRACE("OnFileSystemChangedEvent: {0}", e.GetName());
 		// TODO: insert asset directory before this
 		e.SetFilePath("" + e.GetPath());
 		

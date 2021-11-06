@@ -60,3 +60,4 @@ namespace highlo
 		bool IsValid() const { return Handle != 0; }
 	};
 }
+

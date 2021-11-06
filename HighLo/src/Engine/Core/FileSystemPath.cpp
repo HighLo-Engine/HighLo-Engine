@@ -40,16 +40,16 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator=(const HLString &str)
 	{
-		m_File = File::Create(str, FileSystem::Get()->FileExists(*this));
 		m_CurrentPath = str;
+		m_File = File::Create(str, FileSystem::Get()->FileExists(*this));
 
 		return *this;
 	}
 
 	FileSystemPath &FileSystemPath::Assign(const HLString &source)
 	{
-		m_File = File::Create(source, FileSystem::Get()->FileExists(*this));
 		m_CurrentPath = source;
+		m_File = File::Create(source, FileSystem::Get()->FileExists(*this));
 		
 		return *this;
 	}

@@ -26,7 +26,7 @@ namespace highlo
 		HLAPI std::vector<File> GetFileList() const;
 		HLAPI uint32 GetFileCount() const;
 
-		HLAPI void SetFullPath(const HLString &path);
+		HLAPI void SetFullPath(const HLString &path, bool exists = true);
 
 		HLAPI const HLString &GetRelativePath() const { return m_FilePath; }
 		HLAPI HLString GetRelativePath(const HLString &parentPath) const;
@@ -60,7 +60,7 @@ namespace highlo
 		std::filesystem::path m_Handle;
 		HLString m_FilePath;
 		HLString m_AbsoluteFilePath;
-		bool m_IsFile = true;
-		bool m_ExistsOnHardDrive = true;
+		bool m_IsFile;
+		bool m_ExistsOnHardDrive;
 	};
 }

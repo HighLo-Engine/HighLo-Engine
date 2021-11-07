@@ -31,6 +31,7 @@ workspace "HighLo"
 		include "HighLo/vendor/RapidXML"
 		include "HighLo/vendor/RapidJSON"
 		include "HighLo/vendor/yaml-cpp"
+		include "HighLo/vendor/IconFontCppHeaders"
 		
 		filter "system:windows"
 			include "HighLo/vendor/GLAD"

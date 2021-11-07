@@ -101,6 +101,7 @@ namespace highlo::UI
 	static bool s_UseMenuBar = false;
 	static ImGuiWindowStyle s_ImGuiWindowStyle = ImGuiWindowStyle::None;
 	static ImGuiContext *s_ImGuiContext = nullptr;
+	static const ImWchar s_FontAwesomeIconsRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
 	void InitImGui(Window *window, ImGuiWindowStyle windowStyle)
 	{
@@ -123,6 +124,12 @@ namespace highlo::UI
 		ImFont *font = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f);
 		ImFont *boldFont = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
 		io.FontDefault = io.Fonts->Fonts[0];
+
+		// Add FontAwesome 5
+		ImFontConfig iconsConfig;
+		iconsConfig.MergeMode = true;
+		iconsConfig.PixelSnapH = true;
+		io.Fonts->AddFontFromFileTTF("assets/fonts/FontAwesome/fa-solid-900.ttf", 16.0f, &iconsConfig, s_FontAwesomeIconsRanges);
 
 		// Internal method used to override ImGui's theme colors with our own
 		if (windowStyle == ImGuiWindowStyle::Dark)

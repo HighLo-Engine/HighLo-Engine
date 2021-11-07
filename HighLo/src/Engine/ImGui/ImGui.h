@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <IconsFontAwesome5.h>
+
 // defined in Windows.h
 #undef DrawText
 

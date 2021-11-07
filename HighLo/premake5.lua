@@ -33,6 +33,7 @@ project "HighLo"
 		"%{IncludeDir.rapidXML}",
 		"%{IncludeDir.rapidJSON}",
 		"%{IncludeDir.yamlCpp}",
+		"%{IncludeDir.IconFontCppHeaders}",
 
     }
 

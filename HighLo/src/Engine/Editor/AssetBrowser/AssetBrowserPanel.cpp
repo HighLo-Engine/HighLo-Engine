@@ -182,7 +182,7 @@ namespace highlo
 
 							ImGui::Separator();
 
-							if (ImGui::MenuItem("Show in Explorer"))
+							if (ImGui::MenuItem(ICON_FA_PAINT_BRUSH " Show in Explorer"))
 								FileSystem::Get()->OpenInExplorer(Project::GetAssetDirectory() / m_CurrentDirectory->FilePath);
 
 							ImGui::EndPopup();
@@ -494,14 +494,6 @@ namespace highlo
 			}
 
 		//	UI::SetToolTip("Next Directory");
-			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
-
-			if (ContentBrowserButton("##parentDir", m_UpBtnIcon))
-			{
-				HL_CORE_TRACE("Going one directory up");
-			}
-
-		//	UI::SetToolTip("Parent Directory");
 			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
 
 			if (ContentBrowserButton("##refresh", m_RefreshBtnIcon))

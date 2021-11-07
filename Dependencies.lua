@@ -14,6 +14,7 @@ IncludeDir["msdfgen"]                = "%{wks.location}/HighLo/vendor/msdf-atlas
 IncludeDir["rapidXML"]               = "%{wks.location}/HighLo/vendor/RapidXML"
 IncludeDir["rapidJSON"]              = "%{wks.location}/HighLo/vendor/RapidJSON/include"
 IncludeDir["yamlCpp"]                = "%{wks.location}/HighLo/vendor/yaml-cpp/include"
+IncludeDir["IconFontCppHeaders"]     = "%{wks.location}/HighLo/vendor/IconFontCppHeaders"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"

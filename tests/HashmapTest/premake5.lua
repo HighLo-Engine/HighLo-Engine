@@ -20,7 +20,8 @@ project "HashmapTest"
 		"%{wks.location}/../HighLo/src",
 		"%{wks.location}/../HighLo/vendor/spdlog/include",
 		"%{wks.location}/../HighLo/vendor/glm",
-		"%{wks.location}/../HighLo/vendor/HighLo-Unit/include"
+		"%{wks.location}/../HighLo/vendor/HighLo-Unit/include",
+		"%{wks.location}/../HighLo/vendor/IconFontCppHeaders"
     }
 
     links

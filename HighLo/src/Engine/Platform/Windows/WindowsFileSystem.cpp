@@ -36,6 +36,22 @@ namespace highlo
             OVERLAPPED ol = { 0 };
             return ReadFileEx(file, buffer, (DWORD) size, &ol, FileIOCompleteRoutine);
         }
+
+        static HLString TranslateErrorCodeIntoHumanReadable(DWORD errorCode)
+        {
+            switch (errorCode)
+            {
+                case 183:
+                    return "File could not be created - File already exists!";
+            }
+
+            return "";
+        }
+
+        static LPWSTR CreateErrorMessageAsString(DWORD errorCode)
+        {
+            
+        }
     }
 
     bool FileSystem::FileExists(const FileSystemPath &path)
@@ -89,7 +105,11 @@ namespace highlo
 
     bool FileSystem::CreateFolder(const FileSystemPath &path)
     {
-        return CreateDirectoryW(path.String().W_Str(), NULL);
+        bool success = CreateDirectoryW(path.String().W_Str(), NULL);
+        if (!success)
+            HL_CORE_ERROR("WinAPI Error: {0}", *utils::TranslateErrorCodeIntoHumanReadable(GetLastError()));
+
+        return success;
     }
 
     bool FileSystem::RemoveFolder(const FileSystemPath &path)
@@ -166,12 +186,12 @@ namespace highlo
 
     void FileSystem::OpenInExplorer(const FileSystemPath &path)
     {
-        ShellExecuteW(0, L"open", path.String().W_Str(), 0, 0, SW_SHOWDEFAULT);
+        ShellExecuteW(0, L"open", path.GetFile()->GetAbsolutePath().W_Str(), 0, 0, SW_SHOWDEFAULT);
     }
 
     void FileSystem::OpenInBrowser(const HLString &url)
     {
-        ShellExecuteW(0, L"explore", url.W_Str(), 0, 0, SW_SHOW);
+        ShellExecuteW(0, 0, url.W_Str(), 0, 0, SW_SHOW);
     }
 
     bool FileSystem::HasEnvironmentVariable(const HLString &key)

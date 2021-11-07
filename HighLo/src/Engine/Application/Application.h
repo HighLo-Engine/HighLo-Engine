@@ -41,7 +41,7 @@ namespace highlo
 		HLAPI virtual void OnUIRender(Timestep timestep) {}
 		HLAPI virtual void OnResize(uint32 width, uint32 height) {}
 
-		HLAPI inline void Close() { m_Running = false; }
+		HLAPI void Close();
 		HLAPI void SetApplicationSettings(const ApplicationSettings &settings) { m_Settings = settings; }
 		HLAPI ApplicationSettings &GetApplicationSettings() { return m_Settings; }
 		HLAPI bool IsShuttingDown() const { return m_IsShuttingDown; }

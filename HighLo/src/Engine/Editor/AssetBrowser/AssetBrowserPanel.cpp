@@ -137,9 +137,16 @@ namespace highlo
 									{
 										Refresh();
 										const auto &directoryInfo = GetDirectory(newFilePath);
-										uint32 index = m_CurrentItems.Find(directoryInfo->Handle);
-										if (index != AssetBrowserItemList::InvalidItem)
-											m_CurrentItems[index]->StartRenaming();
+										if (directoryInfo)
+										{
+											uint32 index = m_CurrentItems.Find(directoryInfo->Handle);
+											if (index != AssetBrowserItemList::InvalidItem)
+												m_CurrentItems[index]->StartRenaming();
+										}
+										else
+										{
+											HL_CORE_ERROR("Could not retrieve directory info for {0}", **newFilePath);
+										}
 									}
 									else
 									{
@@ -176,7 +183,7 @@ namespace highlo
 							ImGui::Separator();
 
 							if (ImGui::MenuItem("Show in Explorer"))
-								FileSystem::Get()->OpenInExplorer((Project::GetAssetDirectory() / m_CurrentDirectory->FilePath).GetFile()->GetAbsolutePath());
+								FileSystem::Get()->OpenInExplorer(Project::GetAssetDirectory() / m_CurrentDirectory->FilePath);
 
 							ImGui::EndPopup();
 						}

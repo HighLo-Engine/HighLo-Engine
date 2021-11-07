@@ -48,8 +48,8 @@ namespace highlo
 		HLAPI FileSystemPath RelativePath(const FileSystemPath &parentPath) const;
 		HLAPI FileSystemPath ParentPath() const;
 
-		HLAPI Ref<File> &GetFile() { return m_File; }
-		HLAPI const Ref<File> &GetFile() const { return m_File; }
+		HLAPI Ref<File> &GetFile() { HL_ASSERT(m_File, "File is nullptr!"); return m_File; }
+		HLAPI const Ref<File> &GetFile() const { HL_ASSERT(m_File, "File is nullptr!"); return m_File; }
 
 		HLAPI HLString &String() { return m_CurrentPath; }
 		HLAPI const HLString &String() const { return m_CurrentPath; }

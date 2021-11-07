@@ -141,10 +141,15 @@ namespace highlo
 		overlay->OnAttach();
 	}
 
+	void HLApplication::Close()
+	{
+		m_IsShuttingDown = true;
+		m_Running = false;
+	}
+
 	bool HLApplication::OnWindowClose(WindowCloseEvent &e)
 	{
 		Close();
-		m_IsShuttingDown = true;
 		return true;
 	}
 

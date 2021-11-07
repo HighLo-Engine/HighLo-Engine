@@ -20,7 +20,8 @@ project "SponzaSceneDemo"
 		"%{wks.location}/HighLo/src",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.HighLo_Unit}"
+		"%{IncludeDir.HighLo_Unit}",
+		"%{IncludeDir.IconFontCppHeaders}"
     }
 
     links

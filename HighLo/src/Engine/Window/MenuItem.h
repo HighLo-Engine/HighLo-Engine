@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.1 (2021-11-08) Added equal operators and copy operator
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -16,7 +17,7 @@ namespace highlo
 
 	using MenuItemCallback = std::function<void(FileMenu*, MenuItem*)>;
 
-	struct MenuItem
+	struct MenuItem : public IsSharedReference
 	{
 		HLString Name = "Default Menu Item";
 		HLString Shortcut = "";
@@ -25,16 +26,34 @@ namespace highlo
 		bool Visible = true;
 		bool Separator = false;
 		bool IsSubmenu = false;
+		bool IsSelected = false;
 
 		MenuItemCallback Callback = nullptr;
 
-		std::vector<MenuItem> SubmenuItems;
+		std::vector<Ref<MenuItem>> SubmenuItems;
 
 		HLAPI MenuItem() = default;
 		HLAPI MenuItem(const MenuItem&) = default;
+		HLAPI MenuItem &operator=(const MenuItem&) = default;
 
 		HLAPI MenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible = true, bool separator = false)
 			: Name(name), ID(id), Visible(visible), Separator(separator), Callback(callback) {}
 
+		HLAPI bool operator==(const MenuItem &other) const
+		{
+			return Name == other.Name
+				&& Shortcut == other.Shortcut
+				&& Visible == other.Visible
+				&& Separator == other.Separator
+				&& IsSubmenu == other.IsSubmenu
+				&& IsSelected == other.IsSelected
+				&& SubmenuItems == other.SubmenuItems;
+		}
+
+		HLAPI bool operator!=(const MenuItem &other) const
+		{
+			return !(*this == other);
+		}
 	};
 }
+

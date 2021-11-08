@@ -24,11 +24,12 @@ namespace highlo
 		~GLFWWindow();
 
 		virtual void SetEventCallback(const EventCallbackFn &callback) override;
+		virtual const EventCallbackFn &GetEventCallback() const override;
 
 		virtual void Update() override;
 
-		virtual uint32 GetWidth() override { return m_Properties.m_Width; }
-		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
+		virtual uint32 GetWidth() override { return m_Properties.Width; }
+		virtual uint32 GetHeight() override { return m_Properties.Height; }
 		virtual void *GetNativeHandle() override { return (void*)m_NativeHandle; }
 		virtual void *GetNativeContext() override { return (void*) m_Context->GetCurrentContext(); }
 
@@ -50,12 +51,12 @@ namespace highlo
 		virtual void CenterWindow() override;
 		virtual void SetTitle(const HLString &title) override;
 
-		virtual bool IsVisible() override { return m_Properties.m_Visible; }
-		virtual bool IsCursorHidden() override { return !m_Properties.m_CursorVisible; }
-		virtual bool IsMaximized() override { return m_Properties.m_Maximized; }
-		virtual bool IsFullscreen() override { return m_Properties.m_Fullscreen; }
-		virtual bool IsCentered() override { return m_Properties.m_Centered; }
-		virtual const HLString &GetTitle() override { return m_Properties.m_Title; }
+		virtual bool IsVisible() override { return m_Properties.Visible; }
+		virtual bool IsCursorHidden() override { return !m_Properties.CursorVisible; }
+		virtual bool IsMaximized() override { return m_Properties.Maximized; }
+		virtual bool IsFullscreen() override { return m_Properties.Fullscreen; }
+		virtual bool IsCentered() override { return m_Properties.Centered; }
+		virtual const HLString &GetTitle() override { return m_Properties.Title; }
 		virtual bool HasMenuBar() override { return m_MenuBar != nullptr; }
 		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;

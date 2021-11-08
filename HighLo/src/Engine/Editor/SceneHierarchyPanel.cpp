@@ -115,15 +115,15 @@ namespace highlo
 
 			if (ImGui::BeginPopupContextWindow(0, 1, false))
 			{
-				if (ImGui::BeginMenu("Create"))
+				if (ImGui::BeginMenu(ICON_FA_PLUS " New"))
 				{
-					if (ImGui::MenuItem("Null Object"))
+					if (ImGui::MenuItem(ICON_FA_SQUARE " Null Object"))
 					{
 						auto newEntity = m_Context->CreateEntity("Null Object");
 						SetSelected(newEntity);
 					}
 
-					if (ImGui::MenuItem("Camera"))
+					if (ImGui::MenuItem(ICON_FA_VIDEO " Camera"))
 					{
 						auto newEntity = m_Context->CreateEntity("Camera");
 						newEntity.AddComponent<CameraComponent>();

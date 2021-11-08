@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-11-08) Added FileMenuChanged Event
 //     - 1.1 (2021-10-21) Added Threading Events
 //     - 1.0 (2021-09-14) initial release
 //
@@ -25,7 +26,7 @@ namespace highlo
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoves, FileMenu, FileSystemChanged,
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoves, FileMenu, FileMenuChanged, FileSystemChanged,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
 		ThreadStarting, ThreadEnding

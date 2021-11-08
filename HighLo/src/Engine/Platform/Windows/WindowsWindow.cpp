@@ -66,13 +66,13 @@ namespace highlo
 		RECT window_rect;
 		window_rect.left = 0;
 		window_rect.top = 30;
-		window_rect.right = window_rect.left + m_Properties.m_Width;
-		window_rect.bottom = window_rect.top + m_Properties.m_Height;
+		window_rect.right = window_rect.left + m_Properties.Width;
+		window_rect.bottom = window_rect.top + m_Properties.Height;
 
 		AdjustWindowRect(&window_rect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
 
 		HWND hwnd = CreateWindowExA(
-			WS_EX_OVERLAPPEDWINDOW, "HLEngineWindowClass", m_Properties.m_Title, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
+			WS_EX_OVERLAPPEDWINDOW, "HLEngineWindowClass", m_Properties.Title, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
 			window_rect.left, window_rect.top, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top,
 			NULL, NULL, NULL, &m_Properties
 		);
@@ -84,7 +84,7 @@ namespace highlo
 
 		m_NativeHandle = hwnd;
 
-		if (m_Properties.m_Fullscreen)
+		if (m_Properties.Fullscreen)
 		{
 			auto WindowHDC = GetDC(hwnd);
 			auto FullscreenWidth = GetDeviceCaps(WindowHDC, DESKTOPHORZRES);
@@ -99,8 +99,8 @@ namespace highlo
 			ShowWindow(hwnd, SW_MAXIMIZE);
 			UpdateWindow(hwnd);
 
-			m_Properties.m_Width = FullscreenWidth;
-			m_Properties.m_Height = FullscreenHeight;
+			m_Properties.Width = FullscreenWidth;
+			m_Properties.Height = FullscreenHeight;
 		}
 		else
 		{
@@ -112,7 +112,7 @@ namespace highlo
 		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, m_NativeHandle));
 		m_Context->Init();
 	#elif HIGHLO_API_OPENGL
-		m_Context = UniqueRef<RenderingContext>(new OpenGLContext(m_NativeHandle));
+		m_Context = RenderingContext::Create(m_NativeHandle);
 		m_Context->Init();
 	#endif // HIGHLO_API_DX11
 		}
@@ -121,7 +121,13 @@ namespace highlo
 	{
 		m_CallbackData.EventCallback = callback;
 		m_CallbackData.p_EngineWindow = this;
+		m_Properties.EventCallback = callback;
 		SetWindowLongPtr(m_NativeHandle, GWLP_USERDATA, (DWORD_PTR) &m_CallbackData);
+	}
+
+	const EventCallbackFn &WindowsWindow::GetEventCallback() const
+	{
+		return m_Properties.EventCallback;
 	}
 
 	void WindowsWindow::SetWindowIcon(const HLString &path, bool flip)
@@ -157,7 +163,7 @@ namespace highlo
 	void WindowsWindow::CloseWindow()
 	{
 		WindowCloseEvent event;
-		m_Properties.m_EventCallback(event);
+		m_Properties.EventCallback(event);
 		PostQuitMessage(0);
 	}
 
@@ -245,19 +251,19 @@ namespace highlo
 
 	void WindowsWindow::SetVSync(bool bEnabled)
 	{
-		m_Properties.m_VSync = bEnabled;
+		m_Properties.VSync = bEnabled;
 		m_Context->SetSwapInterval(bEnabled);
 	}
 
 	void WindowsWindow::SetVisible(bool bVisible)
 	{
-		m_Properties.m_Visible = bVisible;
+		m_Properties.Visible = bVisible;
 		ShowWindow(m_NativeHandle, bVisible);
 	}
 
 	void WindowsWindow::SetFocus(bool bEnabled)
 	{
-		m_Properties.m_Focused = bEnabled;
+		m_Properties.Focused = bEnabled;
 		if (bEnabled)
 			::SetFocus(m_NativeHandle);
 		else
@@ -266,7 +272,7 @@ namespace highlo
 
 	void WindowsWindow::SetFullscreen(bool bEnabled)
 	{
-		m_Properties.m_Fullscreen = bEnabled;
+		m_Properties.Fullscreen = bEnabled;
 		if (bEnabled)
 		{
 			auto [width, height] = GetWindowDimensions();
@@ -295,27 +301,27 @@ namespace highlo
 
 	void WindowsWindow::ShowCursor()
 	{
-		m_Properties.m_CursorVisible = true;
+		m_Properties.CursorVisible = true;
 		SetCursor(m_Cursor);
 		::ShowCursor(true);
 	}
 
 	void WindowsWindow::HideCursor()
 	{
-		m_Properties.m_CursorVisible = false;
+		m_Properties.CursorVisible = false;
 		SetCursor(NULL);
 		::ShowCursor(false);
 	}
 
 	void WindowsWindow::Maximize()
 	{
-		m_Properties.m_Maximized = true;
+		m_Properties.Maximized = true;
 		ShowWindow(m_NativeHandle, SW_MAXIMIZE);
 	}
 
 	void WindowsWindow::CenterWindow()
 	{
-		m_Properties.m_Centered = true;
+		m_Properties.Centered = true;
 
 		RECT windowRect;
 		GetWindowRect(m_NativeHandle, &windowRect);
@@ -327,7 +333,7 @@ namespace highlo
 
 	void WindowsWindow::SetTitle(const HLString &title)
 	{
-		m_Properties.m_Title = title;
+		m_Properties.Title = title;
 		SetWindowTextW(m_NativeHandle, title.W_Str());
 	}
 
@@ -343,8 +349,8 @@ namespace highlo
 
 	void WindowsWindow::OnResize(uint32 width, uint32 height)
 	{
-		m_Properties.m_Width = width;
-		m_Properties.m_Height = height;
+		m_Properties.Width = width;
+		m_Properties.Height = height;
 	}
 
 	void WindowsWindow::Update()

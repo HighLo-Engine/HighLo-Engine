@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.2 (2021-11-08) Added FileMenuChanged Event
 //     - 1.1 (2021-10-21) Added Threading Events
 //     - 1.0 (2021-09-14) initial release
 //
@@ -11,6 +12,7 @@
 #include "EventBase.h"
 
 #include "Engine/Threading/Thread.h"
+#include "Engine/Window/MenuItem.h"
 
 namespace highlo
 {
@@ -74,6 +76,29 @@ namespace highlo
 		int32 m_ID;
 	};
 
+	class FileMenuChangedEvent : public Event
+	{
+	public:
+
+		HLAPI FileMenuChangedEvent(Ref<MenuItem> item)
+			: m_Item(item) {}
+
+		HLAPI Ref<MenuItem> &GetItem() { return m_Item; }
+		HLAPI const Ref<MenuItem> &GetItem() const { return m_Item; }
+
+		HLAPI HLString ToString() const override
+		{
+			return HLString("FileMenuChangedEvent: ") << m_Item->Name;
+		}
+
+		REGISTER_EVENT_CLASS_TYPE(FileMenuChanged)
+		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+
+		Ref<MenuItem> m_Item;
+	};
+
 	class FileSystemChangedEvent : public Event
 	{
 	public:
@@ -81,9 +106,7 @@ namespace highlo
 		HLAPI FileSystemChangedEvent() = default;
 
 		HLAPI FileSystemChangedEvent(const HLString &oldName, const HLString &newName, const HLString &path, FileSystemAction action, bool isDirectory)
-			: m_OldName(oldName), m_NewName(newName), m_FilePath(path), m_Action(action), m_IsDirectory(isDirectory)
-		{
-		}
+			: m_OldName(oldName), m_NewName(newName), m_FilePath(path), m_Action(action), m_IsDirectory(isDirectory) {}
 
 		HLAPI const HLString &GetOldName() const
 		{
@@ -168,9 +191,7 @@ namespace highlo
 	public:
 
 		HLAPI ThreadStartingEvent(Thread *thread)
-		{
-			m_Thread = thread;
-		}
+			: m_Thread(thread) {}
 
 		HLAPI HLString ToString() const override
 		{
@@ -190,10 +211,7 @@ namespace highlo
 	public:
 
 		HLAPI ThreadEndingEvent(Thread *thread, int32 exitCode)
-		{
-			m_Thread = thread;
-			m_ExitCode = exitCode;
-		}
+			: m_Thread(thread), m_ExitCode(exitCode) {}
 
 		HLAPI HLString ToString() const override
 		{
@@ -209,3 +227,4 @@ namespace highlo
 		Thread *m_Thread;
 	};
 }
+

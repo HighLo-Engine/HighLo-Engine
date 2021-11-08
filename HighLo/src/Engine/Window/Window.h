@@ -19,20 +19,20 @@ namespace highlo
 
 	struct WindowData
 	{
-		uint32 m_Width;
-		uint32 m_Height;
-		HLString m_Title;
-		bool m_Fullscreen = false;
-		bool m_Maximized = false;
-		bool m_Focused = false;
-		bool m_CursorVisible = true;
-		bool m_Centered = false;
-		bool m_VSync = true;
-		bool m_Visible = true;
-		EventCallbackFn m_EventCallback = nullptr;
+		uint32 Width;
+		uint32 Height;
+		HLString Title;
+		bool Fullscreen = false;
+		bool Maximized = false;
+		bool Focused = false;
+		bool CursorVisible = true;
+		bool Centered = false;
+		bool VSync = true;
+		bool Visible = true;
+		EventCallbackFn EventCallback = nullptr;
 
 		WindowData(bool fullscreen = false, uint32 width = 1270, uint32 height = 720, const HLString &title = "HLEngine")
-			: m_Fullscreen(fullscreen), m_Width(width), m_Height(height), m_Title(title) {}
+			: Fullscreen(fullscreen), Width(width), Height(height), Title(title) {}
 	};
 
 	enum class WindowMessageButtonType
@@ -60,7 +60,8 @@ namespace highlo
 	class Window
 	{
 	public:
-		HLAPI virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		HLAPI virtual void SetEventCallback(const EventCallbackFn &callback) = 0;
+		HLAPI virtual const EventCallbackFn &GetEventCallback() const = 0;
 
 		HLAPI static Window& Get();
 

@@ -18,7 +18,7 @@ namespace highlo
 	class OpenGLContext : public RenderingContext
 	{
 	public:
-		OpenGLContext(void* handle);
+		OpenGLContext(void *handle);
 		virtual ~OpenGLContext();
 
 		virtual void Init() override;

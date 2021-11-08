@@ -31,13 +31,14 @@ namespace highlo
 		~WindowsWindow();
 
 		virtual void SetEventCallback(const EventCallbackFn &callback) override;
+		virtual const EventCallbackFn &GetEventCallback() const override;
 
 		virtual void Update() override;
 
-		virtual uint32 GetWidth() override { return m_Properties.m_Width; }
-		virtual uint32 GetHeight() override { return m_Properties.m_Height; }
-		virtual void *GetNativeHandle() override { return (void*) m_NativeHandle; }
-		virtual void *GetNativeContext() override { return (void*) m_Context->GetCurrentContext(); }
+		virtual uint32 GetWidth() override { return m_Properties.Width; }
+		virtual uint32 GetHeight() override { return m_Properties.Height; }
+		virtual void *GetNativeHandle() override { return (void*)m_NativeHandle; }
+		virtual void *GetNativeContext() override { return (void*)m_Context->GetCurrentContext(); }
 
 		virtual void SetWindowIcon(const HLString &path, bool flip = false) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
@@ -57,13 +58,13 @@ namespace highlo
 		virtual void CenterWindow() override;
 		virtual void SetTitle(const HLString &title) override;
 
-		virtual bool IsVisible() override { return m_Properties.m_Visible; }
-		virtual bool IsCursorHidden() override { return !m_Properties.m_CursorVisible; }
-		virtual bool IsMaximized() override { return m_Properties.m_Maximized; }
-		virtual bool IsFullscreen() override { return m_Properties.m_Fullscreen; }
-		virtual bool IsCentered() override { return m_Properties.m_Centered; }
+		virtual bool IsVisible() override { return m_Properties.Visible; }
+		virtual bool IsCursorHidden() override { return !m_Properties.CursorVisible; }
+		virtual bool IsMaximized() override { return m_Properties.Maximized; }
+		virtual bool IsFullscreen() override { return m_Properties.Fullscreen; }
+		virtual bool IsCentered() override { return m_Properties.Centered; }
 		virtual bool HasMenuBar() override;
-		virtual const HLString &GetTitle() override { return m_Properties.m_Title; }
+		virtual const HLString &GetTitle() override { return m_Properties.Title; }
 		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
 
@@ -83,7 +84,7 @@ namespace highlo
 
 		void Init();
 
-		std::unique_ptr<RenderingContext> m_Context;
+		UniqueRef<RenderingContext> m_Context;
 
 		HWND m_NativeHandle = nullptr;
 		HICON m_WindowIcon = NULL;

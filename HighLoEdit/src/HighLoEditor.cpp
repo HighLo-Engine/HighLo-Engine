@@ -110,13 +110,7 @@ void HighLoEditor::OnInitialize()
 	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) { HL_TRACE("Showing Offline Renderer Window..."); });
 
 	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
-	bool darkThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Dark;
-	bool lightThemeActive = UI::GetCurrentWindowStyle() == UI::ImGuiWindowStyle::Light;
-
-	windowMenu->AddMenuItem("Set Dark Theme", "", MENU_ITEM_DARK_THEME, [=](FileMenu *menu, MenuItem *item) { EnableDarkMode(menu, item); }, !darkThemeActive);
-	windowMenu->AddMenuItem("Set Light Theme", "", MENU_ITEM_LIGHT_THEME, [=](FileMenu *menu, MenuItem *item) { EnableLightMode(menu, item); }, !lightThemeActive);
-	windowMenu->AddSeparator();
-	windowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { m_ShowConsolePanel = !m_ShowConsolePanel; });
+	windowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { m_ShowConsolePanel = !m_ShowConsolePanel; item->IsSelected = !item->IsSelected; });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { FileSystem::Get()->OpenInBrowser("https://www.highlo-engine.com"); });
@@ -248,6 +242,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	UI::EndWindow();
 
 	AssetEditorPanel::OnUIRender(timestep);
+
+	// TODO: This breaks
 	//AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
 }
 
@@ -347,20 +343,6 @@ void HighLoEditor::SaveSceneAs(FileMenu *menu, MenuItem *item)
 	{
 		// Serialize scene
 	}
-}
-
-void HighLoEditor::EnableDarkMode(FileMenu *menu, MenuItem *item)
-{
-	UI::SetDarkThemeColors();
-	menu->EnableMenuItem(item->ID, false);
-	menu->EnableMenuItem(item->ID + 1, true);
-}
-
-void HighLoEditor::EnableLightMode(FileMenu *menu, MenuItem *item)
-{
-	UI::SetLightThemeColors();
-	menu->EnableMenuItem(item->ID, false);
-	menu->EnableMenuItem(item->ID - 1, true);
 }
 
 bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)

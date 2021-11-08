@@ -47,7 +47,6 @@ namespace highlo
 
 		m_BackBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/back.png").As<Texture2D>();
 		m_FrontBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/front.png").As<Texture2D>();
-		m_UpBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/parentFolder.png").As<Texture2D>();
 		m_RefreshBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/refresh.png").As<Texture2D>();
 
 		// Load Asset Icons
@@ -127,9 +126,9 @@ namespace highlo
 						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 4.0f));
 						if (ImGui::BeginPopupContextWindow(0, 1, false))
 						{
-							if (ImGui::BeginMenu("New"))
+							if (ImGui::BeginMenu(ICON_FA_PLUS "  New"))
 							{
-								if (ImGui::MenuItem("Folder"))
+								if (ImGui::MenuItem(ICON_FA_FOLDER " Folder"))
 								{
 									FileSystemPath newFilePath = Project::GetAssetDirectory() / m_CurrentDirectory->FilePath / "New Folder";
 									bool created = FileSystem::Get()->CreateFolder(newFilePath);
@@ -154,27 +153,27 @@ namespace highlo
 									}
 								}
 
-								if (ImGui::MenuItem("Scene"))
+								if (ImGui::MenuItem(ICON_FA_FILM " Scene"))
 									CreateAssetRepresentation<Scene>("New Scene.hlscene");
 
 								ImGui::EndMenu();
 							}
 
-							if (ImGui::MenuItem("Import"))
+							if (ImGui::MenuItem(ICON_FA_TRUCK_LOADING " Import"))
 							{
 								// TODO
 							}
 
-							if (ImGui::MenuItem("Refresh"))
+							if (ImGui::MenuItem(ICON_FA_SYNC_ALT " Refresh"))
 								Refresh();
 
-							if (ImGui::MenuItem("Copy", "Ctrl+C", nullptr, m_SelectionStack.Count() > 0))
+							if (ImGui::MenuItem(ICON_FA_COPY " Copy", "Ctrl+C", nullptr, m_SelectionStack.Count() > 0))
 								m_CopiedAssets.CopyFrom(m_SelectionStack);
 
-							if (ImGui::MenuItem("Paste", "Ctrl+V", nullptr, m_CopiedAssets.Count() > 0))
+							if (ImGui::MenuItem(ICON_FA_PASTE " Paste", "Ctrl+V", nullptr, m_CopiedAssets.Count() > 0))
 								PasteCopiedAssets();
 
-							if (ImGui::MenuItem("Duplicate", "Ctrl+D", nullptr, m_SelectionStack.Count() > 0))
+							if (ImGui::MenuItem(ICON_FA_CLONE " Duplicate", "Ctrl+D", nullptr, m_SelectionStack.Count() > 0))
 							{
 								m_CopiedAssets.CopyFrom(m_SelectionStack);
 								PasteCopiedAssets();
@@ -182,7 +181,7 @@ namespace highlo
 
 							ImGui::Separator();
 
-							if (ImGui::MenuItem(ICON_FA_PAINT_BRUSH " Show in Explorer"))
+							if (ImGui::MenuItem(ICON_FA_EXTERNAL_LINK_ALT " Show in Explorer"))
 								FileSystem::Get()->OpenInExplorer(Project::GetAssetDirectory() / m_CurrentDirectory->FilePath);
 
 							ImGui::EndPopup();
@@ -465,6 +464,7 @@ namespace highlo
 		// ====================================================================================================================================
 		{
 			UI::ScopedStyle spacing(ImGuiStyleVar_ItemSpacing, ImVec2(2.0f, 0.0f));
+			/*
 			auto ContentBrowserButton = [height](const char *labelId, const Ref<Texture2D> &icon)
 			{
 				const ImU32 buttonColor = Colors::Theme::BackgroundDark;
@@ -477,8 +477,21 @@ namespace highlo
 				UI::DrawButtonImage(icon, Colors::Theme::TextDarker, UI::ColorWithMultipliedValue(Colors::Theme::TextDarker, 1.2f), UI::ColorWithMultipliedValue(Colors::Theme::TextDarker, 0.8f), UI::RectExpanded(UI::GetItemRect(), -iconPadding, -iconPadding));
 				return clicked;
 			};
+			*/
 
-			if (ContentBrowserButton("##back", m_BackBtnIcon))
+			auto ContentBrowserButton = [height](const HLString &icon)
+			{
+				const ImU32 buttonColor = Colors::Theme::BackgroundDark;
+				const ImU32 buttonColorP = UI::ColorWithMultipliedValue(Colors::Theme::BackgroundDark, 0.8f);
+				UI::ScopedColorStack buttonColors(ImGuiCol_Button, buttonColor, ImGuiCol_ButtonHovered, buttonColor, ImGuiCol_ButtonActive, buttonColorP);
+
+				const float iconSize = std::min(24.0f, height);
+				const float iconPadding = 3.0f;
+				return ImGui::Button(icon, ImVec2(iconSize, iconSize));
+			};
+
+			//if (ContentBrowserButton("##back", m_BackBtnIcon))
+			if (ContentBrowserButton(ICON_FA_ARROW_LEFT))
 			{
 				m_NextDirectory = m_CurrentDirectory;
 				m_PrevDirectory = m_CurrentDirectory->Parent;
@@ -488,7 +501,8 @@ namespace highlo
 		//	UI::SetToolTip("Previous Directory");
 			ImGui::Spring(-1.0f, edgeOffset);
 
-			if (ContentBrowserButton("##front", m_FrontBtnIcon))
+		//	if (ContentBrowserButton("##front", m_FrontBtnIcon))
+			if (ContentBrowserButton(ICON_FA_ARROW_RIGHT))
 			{
 				ChangeDirectory(m_NextDirectory);
 			}
@@ -496,7 +510,8 @@ namespace highlo
 		//	UI::SetToolTip("Next Directory");
 			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
 
-			if (ContentBrowserButton("##refresh", m_RefreshBtnIcon))
+		//	if (ContentBrowserButton("##refresh", m_RefreshBtnIcon))
+			if (ContentBrowserButton(ICON_FA_SYNC_ALT))
 				Refresh();
 
 		//	UI::SetToolTip("Refresh");

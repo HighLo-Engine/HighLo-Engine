@@ -183,6 +183,12 @@ namespace highlo
 		return true;
 	}
 
+	bool HLApplication::OnFileMenuChangedEvent(FileMenuChangedEvent &event)
+	{
+	//	HL_CORE_TRACE("FileMenu {0} has changed!", event.GetItem()->Name);
+		return false;
+	}
+
 	void HLApplication::InternalEventHandler(Event &e)
 	{
 		// Drop certain input events if the window is not in focus
@@ -192,6 +198,7 @@ namespace highlo
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
+		dispatcher.Dispatch<FileMenuChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileMenuChangedEvent));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{

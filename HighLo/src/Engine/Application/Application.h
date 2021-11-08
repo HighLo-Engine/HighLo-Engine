@@ -66,6 +66,7 @@ namespace highlo
 
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
+		bool OnFileMenuChangedEvent(FileMenuChangedEvent &event);
 
 	private:
 

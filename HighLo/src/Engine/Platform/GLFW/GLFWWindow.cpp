@@ -41,7 +41,12 @@ namespace highlo
 
 	void GLFWWindow::SetEventCallback(const EventCallbackFn &callback)
 	{
-		m_Properties.m_EventCallback = callback;
+		m_Properties.EventCallback = callback;
+	}
+
+	const EventCallbackFn &GLFWWindow::GetEventCallback() const
+	{
+		return m_Properties.EventCallback;
 	}
 
 	void GLFWWindow::Update()
@@ -77,7 +82,7 @@ namespace highlo
 	void GLFWWindow::CloseWindow()
 	{
 		WindowCloseEvent event;
-		m_Properties.m_EventCallback(event);
+		m_Properties.EventCallback(event);
 		glfwDestroyWindow(m_NativeHandle);
 		glfwTerminate();
 	}
@@ -96,13 +101,13 @@ namespace highlo
 
 	void GLFWWindow::SetVSync(bool bEnabled)
 	{
-		m_Properties.m_VSync = bEnabled;
+		m_Properties.VSync = bEnabled;
 		m_Context->SetSwapInterval(bEnabled);
 	}
 
 	void GLFWWindow::SetVisible(bool bVisible)
 	{
-		m_Properties.m_Visible = bVisible;
+		m_Properties.Visible = bVisible;
 		if (bVisible)
 			glfwShowWindow(m_NativeHandle);
 		else
@@ -111,7 +116,7 @@ namespace highlo
 
 	void GLFWWindow::SetFocus(bool bEnabled)
 	{
-		m_Properties.m_Focused = bEnabled;
+		m_Properties.Focused = bEnabled;
 		if (bEnabled)
 			glfwFocusWindow(m_NativeHandle);
 		else
@@ -120,7 +125,7 @@ namespace highlo
 
 	void GLFWWindow::SetFullscreen(bool bEnabled)
 	{
-		m_Properties.m_Fullscreen = bEnabled;
+		m_Properties.Fullscreen = bEnabled;
 
 		if (bEnabled)
 		{
@@ -143,25 +148,25 @@ namespace highlo
 
 	void GLFWWindow::ShowCursor()
 	{
-		m_Properties.m_CursorVisible = true;
+		m_Properties.CursorVisible = true;
 		glfwSetInputMode(m_NativeHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
 	void GLFWWindow::HideCursor()
 	{
-		m_Properties.m_CursorVisible = false;
+		m_Properties.CursorVisible = false;
 		glfwSetInputMode(m_NativeHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	void GLFWWindow::Maximize()
 	{
-		m_Properties.m_Maximized = true;
+		m_Properties.Maximized = true;
 		glfwMaximizeWindow(m_NativeHandle);
 	}
 
 	void GLFWWindow::CenterWindow()
 	{
-		m_Properties.m_Centered = true;
+		m_Properties.Centered = true;
 
 		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode *mode = glfwGetVideoMode(monitor);
@@ -181,7 +186,7 @@ namespace highlo
 
 	void GLFWWindow::SetTitle(const HLString &title)
 	{
-		m_Properties.m_Title = title;
+		m_Properties.Title = title;
 		glfwSetWindowTitle(m_NativeHandle, *title);
 	}
 
@@ -203,10 +208,10 @@ namespace highlo
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	#endif
 
-		m_NativeHandle = glfwCreateWindow((int) m_Properties.m_Width, (int) m_Properties.m_Height, m_Properties.m_Title, nullptr, nullptr);
+		m_NativeHandle = glfwCreateWindow((int32)m_Properties.Width, (int32)m_Properties.Height, m_Properties.Title, nullptr, nullptr);
 
 	#ifdef HIGHLO_API_OPENGL
-		m_Context = UniqueRef<RenderingContext>(new OpenGLContext((void*)m_NativeHandle));
+		m_Context = RenderingContext::Create((void*)m_NativeHandle);
 		m_Context->Init();
 	#elif HIGHLO_API_DX11
 		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, glfwGetWin32Window(m_NativeHandle)));
@@ -224,11 +229,11 @@ namespace highlo
 		glfwSetWindowSizeCallback(m_NativeHandle, [](GLFWwindow *window, int width, int height)
 		{
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.m_Width = width;
-			data.m_Height = height;
+			data.Width = width;
+			data.Height = height;
 
 			WindowResizeEvent event(width, height);
-			data.m_EventCallback(event);
+			data.EventCallback(event);
 		});
 
 		glfwSetWindowCloseCallback(m_NativeHandle, [](GLFWwindow *window)
@@ -236,7 +241,7 @@ namespace highlo
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			WindowCloseEvent event;
-			data.m_EventCallback(event);
+			data.EventCallback(event);
 		});
 
 		glfwSetKeyCallback(m_NativeHandle, [](GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -248,21 +253,21 @@ namespace highlo
 				case GLFW_PRESS:
 				{
 					KeyPressedEvent event(key, 0);
-					data.m_EventCallback(event);
+					data.EventCallback(event);
 					break;
 				}
 
 				case GLFW_RELEASE:
 				{
 					KeyReleasedEvent event(key);
-					data.m_EventCallback(event);
+					data.EventCallback(event);
 					break;
 				}
 
 				case GLFW_REPEAT:
 				{
 					KeyPressedEvent event(key, 1);
-					data.m_EventCallback(event);
+					data.EventCallback(event);
 					break;
 				}
 			}
@@ -273,7 +278,7 @@ namespace highlo
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			KeyReleasedEvent event(keycode);
-			data.m_EventCallback(event);
+			data.EventCallback(event);
 		});
 
 		glfwSetMouseButtonCallback(m_NativeHandle, [](GLFWwindow *window, int button, int action, int mods)
@@ -285,14 +290,14 @@ namespace highlo
 				case GLFW_PRESS:
 				{
 					MouseButtonPressedEvent event(button);
-					data.m_EventCallback(event);
+					data.EventCallback(event);
 					break;
 				}
 
 				case GLFW_RELEASE:
 				{
 					MouseButtonReleasedEvent event(button);
-					data.m_EventCallback(event);
+					data.EventCallback(event);
 					break;
 				}
 			}
@@ -303,7 +308,7 @@ namespace highlo
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			MouseScrolledEvent event((float) xOffset, (float) yOffset);
-			data.m_EventCallback(event);
+			data.EventCallback(event);
 		});
 
 		glfwSetCursorPosCallback(m_NativeHandle, [](GLFWwindow *window, double xPos, double yPos)
@@ -316,7 +321,7 @@ namespace highlo
 			float dy = (float) yPos - previous_y_pos;
 
 			MouseMovedEvent event((float) xPos, (float) yPos, dx, dy);
-			data.m_EventCallback(event);
+			data.EventCallback(event);
 
 			previous_x_pos = (float) xPos;
 			previous_y_pos = (float) yPos;
@@ -325,7 +330,7 @@ namespace highlo
 		glfwSetWindowFocusCallback(m_NativeHandle, [](GLFWwindow *window, int focused)
 		{
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.m_Focused = (bool) focused;
+			data.Focused = (bool) focused;
 		});
 	}
 }

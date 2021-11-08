@@ -41,28 +41,6 @@ namespace highlo
 
 	#endif // HIGHLO_API_GLFW
 
-		m_MenuItems.push_back(*item);
-	}
-
-	void WindowsFileMenu::AddMenuItem(const MenuItem &item)
-	{
-	#ifndef HIGHLO_API_GLFW
-		if (!m_NativeHandle)
-			return;
-
-		HLString name = "";
-		if (!item.Shortcut.IsEmpty())
-			name = item.Name + "\t" + item.Shortcut;
-		else
-			name = item.Name;
-
-		if (item.Visible)
-			AppendMenuW(m_NativeHandle, MF_STRING, item.ID, name.W_Str());
-		else
-			AppendMenuW(m_NativeHandle, MF_STRING | MF_GRAYED, item.ID, name.W_Str());
-
-	#endif // HIGHLO_API_GLFW
-
 		m_MenuItems.push_back(item);
 	}
 	
@@ -85,14 +63,7 @@ namespace highlo
 
 	#endif // HIGHLO_API_GLFW
 
-		MenuItem item;
-		item.Name = name;
-		item.Shortcut = shortcut;
-		item.ID = id;
-		item.Visible = visible;
-		item.Separator = false;
-		item.Callback = callback;
-		item.IsSubmenu = false;
+		Ref<MenuItem> item = Ref<MenuItem>::Create(name, id, callback, visible, false);
 		m_MenuItems.push_back(item);
 	}
 	
@@ -103,15 +74,9 @@ namespace highlo
 		AppendMenuW(m_NativeHandle, MF_POPUP, (UINT_PTR)menuItem, other->GetName().W_Str());
 	#endif // HIGHLO_API_GLFW
 
-		MenuItem item;
-		item.Name = other->GetName();
-		item.Shortcut = "";
-		item.ID = -1;
-		item.Visible = true;
-		item.Separator = true;
-		item.Callback = nullptr;
-		item.IsSubmenu = true;
-		item.SubmenuItems = other->GetMenuItems();
+		Ref<MenuItem> item = Ref<MenuItem>::Create(other->GetName(), -1, nullptr, true, true);
+		item->IsSubmenu = true;
+		item->SubmenuItems = other->GetMenuItems();
 		m_MenuItems.push_back(item);
 	}
 	
@@ -121,14 +86,7 @@ namespace highlo
 		AppendMenuW(m_NativeHandle, MF_SEPARATOR, 0, NULL);
 	#endif // HIGHLO_API_GLFW
 
-		MenuItem item;
-		item.Name = "";
-		item.Shortcut = "";
-		item.ID = -1;
-		item.Visible = true;
-		item.Separator = true;
-		item.Callback = nullptr;
-		item.IsSubmenu = false;
+		Ref<MenuItem> item = Ref<MenuItem>::Create("", -1, nullptr, true, true);
 		m_MenuItems.push_back(item);
 	}
 
@@ -137,9 +95,9 @@ namespace highlo
 		bool itemFound = false;
 		for (int32 i = 0; i < m_MenuItems.size(); ++i)
 		{
-			if (id == m_MenuItems[i].ID)
+			if (id == m_MenuItems[i]->ID)
 			{
-				m_MenuItems[i].Visible = bEnabled;
+				m_MenuItems[i]->Visible = bEnabled;
 				itemFound = true;
 				break;
 			}
@@ -154,6 +112,42 @@ namespace highlo
 		return itemFound;
 	#endif // HIGHLO_API_GLFW
 	}
+	
+	bool WindowsFileMenu::SetCheckmark(int32 id, bool bEnabled)
+	{
+		bool itemFound = false;
+		for (int32 i = 0; i < m_MenuItems.size(); ++i)
+		{
+			if (m_MenuItems[i]->ID == id)
+			{
+				itemFound = true;
+				m_MenuItems[i]->IsSelected = bEnabled;
+				break;
+			}
+		}
+
+	#ifndef HIGHLO_API_GLFW
+
+		int32 result = -1;
+
+		if (bEnabled)
+			result = ::CheckMenuItem(m_NativeHandle, id, MF_CHECKED);
+		else
+			result = ::CheckMenuItem(m_NativeHandle, id, MF_UNCHECKED);
+
+		if (result == -1)
+		{
+			HL_CORE_ERROR("Did not find the Menu Item with the ID {0}!", id);
+			HL_ASSERT(false);
+			return false;
+		}
+
+		return result == MF_CHECKED;
+	#else
+		return itemFound;
+	#endif // HIGHLO_API_GLFW
+	}
 }
 
 #endif // HL_PLATFORM_WINDOWS
+

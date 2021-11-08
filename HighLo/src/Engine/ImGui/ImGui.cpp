@@ -38,23 +38,36 @@ namespace highlo::UI
 			// TODO
 		}
 
-		static void DrawSubMenuInternal(Ref<FileMenu> &parentMenu, const HLString &menuName, const std::vector<MenuItem> &items)
+		static void DrawSubMenuInternal(Ref<FileMenu> &parentMenu, const HLString &menuName, const std::vector<Ref<MenuItem>> &items)
 		{
 		if (ImGui::BeginMenu(*menuName))
 		{
-			for (MenuItem currentItem : items)
+			for (uint32 i = 0; i < items.size(); ++i)
 			{
-				if (currentItem.IsSubmenu)
-					DrawSubMenuInternal(parentMenu, currentItem.Name, currentItem.SubmenuItems);
+				Ref<MenuItem> currentItem = items[i];
+				if (currentItem->IsSubmenu)
+					DrawSubMenuInternal(parentMenu, currentItem->Name, currentItem->SubmenuItems);
 
-				if (currentItem.Separator)
+				if (currentItem->Separator)
 				{
 					ImGui::Separator();
 					continue;
 				}
 
-				if (ImGui::MenuItem(*currentItem.Name, *currentItem.Shortcut, false, currentItem.Visible))
-					currentItem.Callback(parentMenu.Get(), &currentItem);
+				if (ImGui::MenuItem(*currentItem->Name, *currentItem->Shortcut, currentItem->IsSelected, currentItem->Visible))
+				{
+					Ref<MenuItem> before = Ref<MenuItem>::Create(currentItem->Name, currentItem->ID, currentItem->Callback, currentItem->Visible, currentItem->Separator);
+					before->IsSelected = currentItem->IsSelected;
+					before->IsSubmenu = currentItem->IsSubmenu;
+					before->SubmenuItems = currentItem->SubmenuItems;
+					before->Shortcut = currentItem->Shortcut;
+					currentItem->Callback(parentMenu.Get(), currentItem.Get());
+					if (!before.Equals(currentItem))
+					{
+						FileMenuChangedEvent e(currentItem);
+						HLApplication::Get().GetWindow().GetEventCallback()(e);
+					}
+				}
 			}
 
 			ImGui::EndMenu();
@@ -65,21 +78,33 @@ namespace highlo::UI
 		{
 			if (ImGui::BeginMenu(*fileMenu->GetName()))
 			{
-				const std::vector<MenuItem> items = fileMenu->GetMenuItems();
-				for (int32 i = 0; i < items.size(); ++i)
+				std::vector<Ref<MenuItem>> items = fileMenu->GetMenuItems();
+				for (uint32 i = 0; i < items.size(); ++i)
 				{
-					MenuItem currentItem = items[i];
-					if (currentItem.IsSubmenu)
-						DrawSubMenuInternal(fileMenu, currentItem.Name, currentItem.SubmenuItems);
+					Ref<MenuItem> currentItem = items[i];
+					if (currentItem->IsSubmenu)
+						DrawSubMenuInternal(fileMenu, currentItem->Name, currentItem->SubmenuItems);
 
-					if (currentItem.Separator)
+					if (currentItem->Separator)
 					{
 						ImGui::Separator();
 						continue;
 					}
 
-					if (ImGui::MenuItem(*currentItem.Name, *currentItem.Shortcut, false, currentItem.Visible))
-						currentItem.Callback(fileMenu.Get(), &currentItem);
+					if (ImGui::MenuItem(*currentItem->Name, *currentItem->Shortcut, currentItem->IsSelected, currentItem->Visible))
+					{
+						Ref<MenuItem> before = Ref<MenuItem>::Create(currentItem->Name, currentItem->ID, currentItem->Callback, currentItem->Visible, currentItem->Separator);
+						before->IsSelected = currentItem->IsSelected;
+						before->IsSubmenu = currentItem->IsSubmenu;
+						before->SubmenuItems = currentItem->SubmenuItems;
+						before->Shortcut = currentItem->Shortcut;
+						currentItem->Callback(fileMenu.Get(), items[i].Get());
+						if (!before.Equals(items[i].Get()))
+						{
+							FileMenuChangedEvent e(currentItem);
+							HLApplication::Get().GetWindow().GetEventCallback()(e);
+						}
+					}
 				}
 
 				ImGui::EndMenu();
@@ -121,9 +146,8 @@ namespace highlo::UI
 		io.ConfigViewportsNoAutoMerge = true;
 		io.ConfigViewportsNoTaskBarIcon = true;
 
-		ImFont *font = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f);
-		ImFont *boldFont = io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
-		io.FontDefault = io.Fonts->Fonts[0];
+		io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f);
+		//io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
 
 		// Add FontAwesome 5
 		ImFontConfig iconsConfig;

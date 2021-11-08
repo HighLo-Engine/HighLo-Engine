@@ -35,7 +35,8 @@ namespace highlo
 	private:
 
 		bool OnFileMenuClicked(FileMenuEvent &e);
-		bool RenderSubMenu(const HLString &name, std::vector<MenuItem> &items, Ref<FileMenu> parentMenu, int32 eventID);
+		bool OnFileMenuChanged(FileMenuChangedEvent &e);
+		bool RenderSubMenu(const HLString &name, std::vector<Ref<MenuItem>> &items, Ref<FileMenu> parentMenu, int32 eventID);
 
 		HMENU m_NativeHandle;
 		std::vector<Ref<FileMenu>> m_Menus;

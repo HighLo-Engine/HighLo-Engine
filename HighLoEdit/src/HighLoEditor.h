@@ -31,9 +31,6 @@ class HighLoEditor : public HLApplication
 		void SaveScene(FileMenu *menu, MenuItem *item);
 		void SaveSceneAs(FileMenu *menu, MenuItem *item);
 
-		void EnableDarkMode(FileMenu *menu, MenuItem *item);
-		void EnableLightMode(FileMenu *menu, MenuItem *item);
-
 		enum class GizmoType
 		{
 			None		= 0,

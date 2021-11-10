@@ -105,8 +105,8 @@ namespace highlo
 				return; // No component with this entityID
 
 			// Find and remove actual component pointer.
-			auto &component_infos = m_EntityComponents[entityID];
-			for (auto &it = component_infos.begin(); it != component_infos.end(); ++it)
+			auto &componentInfos = m_EntityComponents[entityID];
+			for (auto &it = componentInfos.begin(); it != componentInfos.end(); ++it)
 			{
 				if (it->first == type)
 				{
@@ -120,9 +120,9 @@ namespace highlo
 		template <typename T>
 		HLAPI void ForEach(const std::function<void(UUID, TransformComponent&, T&)> &callback)
 		{
-			auto& type = std::type_index(typeid(T));
+			auto &type = std::type_index(typeid(T));
 			if (m_Components.find(type) != m_Components.end())
-				for (auto& comp : m_Components[type])
+				for (auto &comp : m_Components[type])
 					callback(comp.first, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), *std::any_cast<T>(&comp.second));
 		}
 
@@ -130,48 +130,48 @@ namespace highlo
 		HLAPI void ForEachMultiple(const std::function<void(UUID, TransformComponent&, std::vector<void*>&)> &callback)
 		{
 			// Create a list of all types
-			std::vector<std::type_index> component_types;
-			component_types.insert(component_types.end(), { typeid(Args)... });
+			std::vector<std::type_index> componentTypes;
+			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
 
-			HL_ASSERT(component_types.size() > 1, "At least two component types must be specified!");
+			HL_ASSERT(componentTypes.size() > 1, "At least two component types must be specified!");
 
-			auto& first_type = component_types[0];
+			auto &firstType = componentTypes[0];
 
 			// Iterate over components of the first specified type
-			if (m_Components.find(first_type) != m_Components.end())
+			if (m_Components.find(firstType) != m_Components.end())
 			{
-				for (auto& comp : m_Components[first_type])
+				for (auto &comp : m_Components[firstType])
 				{
-					EntityID entityID = comp.first;
+					UUID entityID = comp.first;
 					std::vector<void*> components = { &comp.second };
 
-					bool should_skip_entity = false;
+					bool shouldSkipEntity = false;
 
 					// Collect other required components from the found entity
-					for (size_t i = 1; i < component_types.size(); ++i)
+					for (size_t i = 1; i < componentTypes.size(); ++i)
 					{
 						// Skip entity if one of the required components is not found
-						if (m_Components.find(component_types[i]) == m_Components.end())
+						if (m_Components.find(componentTypes[i]) == m_Components.end())
 						{
-							should_skip_entity = true;
+							shouldSkipEntity = true;
 							break;
 						}
 
-						auto component_handle = GetComponentHandle(entityID, component_types[i]);
+						auto componentHandle = GetComponentHandle(entityID, componentTypes[i]);
 
 						// Skip entity if the required component handle is nullptr
-						if (!component_handle)
+						if (!componentHandle)
 						{
-							should_skip_entity = true;
+							shouldSkipEntity = true;
 							break;
 						}
 
 						// If all checks are passed, add the component handle to the list
-						components.push_back(component_handle);
+						components.push_back(componentHandle);
 					}
 
 					// If entity should be skipped, skip
-					if (should_skip_entity)
+					if (shouldSkipEntity)
 						continue;
 
 					callback(entityID, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), components);

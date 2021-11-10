@@ -21,6 +21,11 @@ namespace highlo
 	using EntityMap = std::unordered_map<UUID, Entity>;
 	class SceneRenderer;
 
+	struct SceneSpecification
+	{
+
+	};
+
 	class Scene : public Asset
 	{
 	public:

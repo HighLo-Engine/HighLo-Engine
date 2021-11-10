@@ -33,8 +33,8 @@ bool for_each_component()
 
 	uint32 entityCount = 0;
 
-	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](EntityID entityID, TransformComponent& transform, std::vector<void*> components) {
-		auto sceneComponent = reinterpret_cast<SceneComponent *>(components[0]);
+	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](UUID entityID, TransformComponent& transform, std::vector<void*> components) {
+		auto sceneComponent = reinterpret_cast<SceneComponent*>(components[0]);
 		auto idComponent = reinterpret_cast<IDComponent*>(components[1]);
 
 		++entityCount;

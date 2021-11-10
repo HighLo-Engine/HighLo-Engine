@@ -44,7 +44,7 @@ namespace highlo
 		m_MenuItems.push_back(item);
 	}
 	
-	void WindowsFileMenu::AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, MenuItemCallback callback, bool visible)
+	void WindowsFileMenu::AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, const MenuItemCallback &callback, bool visible)
 	{
 	#ifndef HIGHLO_API_GLFW
 		if (!m_NativeHandle)

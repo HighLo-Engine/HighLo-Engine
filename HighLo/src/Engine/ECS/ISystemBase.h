@@ -16,8 +16,9 @@ namespace highlo
 	{
 	public:
 
-		HLAPI virtual void OnCreate(ECS_Registry& registry) {}
-		HLAPI virtual void OnDestroy(ECS_Registry& registry) {}
-		HLAPI virtual void OnUpdate(Timestep ts, ECS_Registry& registry) {}
+		HLAPI virtual void OnCreate(ECS_Registry &registry) {}
+		HLAPI virtual void OnDestroy(ECS_Registry &registry) {}
+		HLAPI virtual void OnUpdate(Timestep ts, ECS_Registry &registry) {}
 	};
 }
+

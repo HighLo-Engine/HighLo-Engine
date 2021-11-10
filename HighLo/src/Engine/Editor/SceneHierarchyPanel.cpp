@@ -145,7 +145,7 @@ namespace highlo
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		HLString name = entity.Tag;
+		HLString name = entity.Tag();
 
 		ImGuiTreeNodeFlags flags = (entity == m_SelectedEntity ? ImGuiTreeNodeFlags_Selected : 0)
 			| ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -160,7 +160,7 @@ namespace highlo
 		if (missingMesh)
 			ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_ERROR_COLOR);
 
-		const bool opened = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity.ID, flags, *name);
+		const bool opened = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity.GetUUID(), flags, *name);
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_None) && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 		{
 			m_SelectedEntity = entity;
@@ -184,7 +184,7 @@ namespace highlo
 		// Define Drag Drop source
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 		{
-			ImGui::Text(entity.Tag.C_Str());
+			ImGui::Text(entity.Tag().C_Str());
 			ImGui::SetDragDropPayload("scene_entity_hierarchy", &entity, sizeof(Entity));
 			ImGui::EndDragDropSource();
 		}
@@ -225,47 +225,6 @@ namespace highlo
 
 	void SceneHierarchyPanel::DrawEntityComponents(Entity entity)
 	{
-		ImGui::AlignTextToFramePadding();
-		ImVec2 contentRegionAvail = ImGui::GetContentRegionAvail();
-
-		// Render Tag
-		auto &tag = entity.Tag;
-		char buffer[256];
-		memset(buffer, 0, 256);
-		memcpy(buffer, *tag, tag.Length());
-		ImGui::PushItemWidth(contentRegionAvail.x * 0.5f);
-		if (ImGui::InputText("##Tag", buffer, 256))
-		{
-			tag = HLString(buffer);
-		}
-		ImGui::PopItemWidth();
-
-		// Render ID
-		ImGui::SameLine();
-		ImGui::TextDisabled("%u", entity.ID);
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 textSize = ImGui::CalcTextSize("Add Component");
-		ImGui::SameLine(contentRegionAvail.x - (textSize.x + GImGui->Style.FramePadding.y));
-		if (ImGui::Button("Add Component"))
-		{
-			ImGui::OpenPopup("AddComponentPanel");
-		}
-
-		if (ImGui::BeginPopup("AddComponentPanel"))
-		{
-			// TODO
-			std::vector<HLString> options =
-			{
-				"Test",
-				"Test 2"
-			};
-
-			UI::DrawDropdown("Add Component", options, 2, 0);
-
-			ImGui::EndPopup();
-		}
-
-
 	}
 }
 

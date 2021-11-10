@@ -16,7 +16,7 @@ namespace highlo
 	public:
 
 		template <typename T>
-		HLAPI void RegisterSystem(const HLString& name = "")
+		HLAPI void RegisterSystem(const HLString &name = "")
 		{
 			auto instance = Ref<T>::Create();
 			instance->OnCreate(ECS_Registry::Get());
@@ -27,7 +27,7 @@ namespace highlo
 				m_SystemMappings[name] = instance;
 		}
 
-		HLAPI Ref<ISystemBase> GetSystem(const HLString& name)
+		HLAPI Ref<ISystemBase> GetSystem(const HLString &name)
 		{
 			if (m_SystemMappings.find(name) != m_SystemMappings.end())
 				return m_SystemMappings[name];

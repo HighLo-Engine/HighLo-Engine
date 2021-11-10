@@ -8,17 +8,17 @@
 
 namespace highlo
 {
-	void RenderSystem::OnUpdate(Timestep ts, ECS_Registry& registry)
+	void RenderSystem::OnUpdate(Timestep ts, ECS_Registry &registry)
 	{
 		FrameEntitiesRendered = 0;
 		FrameMeshesRendered = 0;
 		FrameTrianglesRendered = 0;
 
-		registry.ForEach<RenderComponent>([&, ts](EntityID entityID, TransformComponent& transform, RenderComponent& component) {
+		registry.ForEach<RenderComponent>([&, ts](UUID entityID, TransformComponent &transform, RenderComponent &component) {
 			if (!component.Enabled)
 				return;
 
-			Ref<Model>& model = component.MainModel;
+			Ref<Model> &model = component.MainModel;
 			if (component.UseLOD)
 			{
 				switch (component.LodLevel)

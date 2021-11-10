@@ -36,7 +36,7 @@ namespace highlo
 		HLAPI MenuItem(const MenuItem&) = default;
 		HLAPI MenuItem &operator=(const MenuItem&) = default;
 
-		HLAPI MenuItem(const HLString &name, int32 id, MenuItemCallback callback, bool visible = true, bool separator = false)
+		HLAPI MenuItem(const HLString &name, int32 id, const MenuItemCallback &callback, bool visible = true, bool separator = false)
 			: Name(name), ID(id), Visible(visible), Separator(separator), Callback(callback) {}
 
 		HLAPI bool operator==(const MenuItem &other) const

@@ -209,6 +209,7 @@ namespace highlo
 	#endif
 
 		m_NativeHandle = glfwCreateWindow((int32)m_Properties.Width, (int32)m_Properties.Height, m_Properties.Title, nullptr, nullptr);
+		glfwSetCursor(m_NativeHandle, m_NativeCursor);
 
 	#ifdef HIGHLO_API_OPENGL
 		m_Context = RenderingContext::Create((void*)m_NativeHandle);

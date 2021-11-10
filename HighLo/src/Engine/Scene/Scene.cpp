@@ -100,7 +100,7 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		// TODO
-		return Entity();
+		return Entity{};
 	}
 	
 	Entity Scene::FindEntityByTag(const HLString &tag)
@@ -108,7 +108,7 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		// TODO
-		return Entity();
+		return Entity{};
 	}
 
 	Entity Scene::GetMainCameraEntity()
@@ -125,32 +125,34 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		/*
-		Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		Entity parent = entity.GetParent();
 		if (!parent)
 			return;
-		*/
 
-		auto &transform = entity._TransformComponent->Transform;
-		//glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
+		auto &transform = entity.Transform();
+		glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
 
-		//glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
-		//Decompose(localTransform, transform.Tran);
+		glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
+		
+		// TODO: test if this works
+		glm::vec3 translation, rotation, scale;
+		Decompose(localTransform, translation, scale, rotation);
+		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
 	}
 	
 	void Scene::ConvertToWorldSpace(Entity entity)
 	{
 		HL_PROFILE_FUNCTION();
 
-		/*
-		Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		Entity parent = entity.GetParent();
 		if (!parent)
 			return;
-		*/
 
+		// TODO: test if this works
 		glm::mat4 transform = GetTransformRelativeToParent(entity);
-		auto &entityTransform = entity._TransformComponent->Transform;
-		//Decompose(transform, entityTransform.Transform, entityTransform.Rotation, entityTransform.Scale);
+		glm::vec3 translation, rotation, scale;
+		Decompose(transform, translation, scale, rotation);
+		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
 	}
 	
 	glm::mat4 Scene::GetTransformRelativeToParent(Entity entity)
@@ -159,27 +161,23 @@ namespace highlo
 
 		glm::mat4 transform(1.0f);
 
-		/*
-		Entity parent = FindEntityByUUID(entity.GetParentUUID());
+		Entity parent = entity.GetParent();
 		if (parent)
 			transform = GetTransformRelativeToParent(parent);
-		*/
 
-		return transform * entity._TransformComponent->Transform.GetTransform();
+		return transform * entity.Transform().GetTransform();
 	}
 	
 	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
 	{
 		HL_PROFILE_FUNCTION();
 
-		glm::mat4 transform = entity._TransformComponent->Transform.GetTransform();
-		/*
+		glm::mat4 transform = entity.Transform().GetTransform();
 		while (Entity parent = FindEntityByUUID(entity.GetParentUUID()))
 		{
-			transform = parent._TransformComponent->Transform.GetTransform();
+			transform = parent.Transform().GetTransform();
 			entity = parent;
 		}
-		*/
 
 		return transform;
 	}
@@ -209,7 +207,6 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		/*
 		if (parent.IsDescendantOf(entity))
 		{
 			UnparentEntity(parent);
@@ -230,8 +227,6 @@ namespace highlo
 
 		entity.SetParentUUID(parent.GetUUID());
 		parent.Children().push_back(entity.GetUUID());
-		*/
-
 		ConvertToLocalSpace(entity);
 	}
 	
@@ -239,17 +234,17 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		//Entity parent = FindEntityByUUID(entity.GetParentUUID());
-		//if (!parent)
-		//	return;
+		Entity parent = entity.GetParent();
+		if (!parent)
+			return;
 
-		//auto &parentChildren = parent.Children();
-		//parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity.GetUUID(), parentChildren.end()));
+		auto &parentChildren = parent.Children();
+		parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity.GetUUID()), parentChildren.end());
 
 		if (convertToWorldSpace)
 			ConvertToWorldSpace(entity);
 
-		//entity.SetParentUUID(0);
+		entity.SetParentUUID(0);
 
 	}
 	
@@ -282,14 +277,19 @@ namespace highlo
 	
 	Ref<Scene> Scene::CreateEmpty()
 	{
-		return Ref<Scene>::Create("Empty", false, false);
+		return Scene::Create("Empty", false, false);
+	}
+
+	Ref<Scene> Scene::Create(const HLString &name, bool isEditorScene, bool constructScene)
+	{
+		return Ref<Scene>::Create(name, isEditorScene, constructScene);
 	}
 	
 	Entity Scene::CreateEntity(const HLString &name)
 	{
 		HL_PROFILE_FUNCTION();
 
-		auto entity = Entity(name);
+		auto entity = Entity(m_SceneID, name);
 		auto idComponent = entity.AddComponent<IDComponent>();
 		idComponent->ID = {};
 
@@ -304,7 +304,7 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		auto entity = Entity(name);
+		auto entity = Entity(m_SceneID, name);
 		auto idComponent = entity.AddComponent<IDComponent>();
 		idComponent->ID = uuid;
 
@@ -327,11 +327,10 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		Entity newEntity = CreateEntity(entity.Tag);
+		Entity newEntity = CreateEntity(entity.Tag());
 		
 		// TODO: copy all components
 
-		/*
 		auto childIds = entity.Children();
 		for (auto childId : childIds)
 		{
@@ -350,7 +349,6 @@ namespace highlo
 			newEntity.SetParentUUID(entity.GetParentUUID());
 			parent.Children().push_back(newEntity.GetUUID());
 		}
-		*/
 
 		return newEntity;
 	}

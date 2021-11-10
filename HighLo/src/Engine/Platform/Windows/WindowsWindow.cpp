@@ -302,14 +302,14 @@ namespace highlo
 	void WindowsWindow::ShowCursor()
 	{
 		m_Properties.CursorVisible = true;
-		SetCursor(m_Cursor);
+		::SetCursor(m_Cursor);
 		::ShowCursor(true);
 	}
 
 	void WindowsWindow::HideCursor()
 	{
 		m_Properties.CursorVisible = false;
-		SetCursor(NULL);
+		::SetCursor(NULL);
 		::ShowCursor(false);
 	}
 

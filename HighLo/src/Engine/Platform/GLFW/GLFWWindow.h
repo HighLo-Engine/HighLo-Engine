@@ -32,6 +32,7 @@ namespace highlo
 		virtual uint32 GetHeight() override { return m_Properties.Height; }
 		virtual void *GetNativeHandle() override { return (void*)m_NativeHandle; }
 		virtual void *GetNativeContext() override { return (void*) m_Context->GetCurrentContext(); }
+		virtual void *GetNativeCursor() override { return (void*)m_NativeCursor; }
 
 		virtual void SetWindowIcon(const HLString &path, bool flip = false) override;
 		virtual std::pair<int32, int32> GetWindowDimensions() override;
@@ -76,6 +77,7 @@ namespace highlo
 		UniqueRef<RenderingContext> m_Context;
 
 		GLFWwindow *m_NativeHandle = nullptr;
+		GLFWcursor *m_NativeCursor = nullptr;
 		bool m_CursorLocked = false;
 
 		void SetCallbacks();

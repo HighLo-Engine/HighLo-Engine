@@ -18,6 +18,9 @@ namespace highlo
 		HLAPI EditorCamera() = default;
 		HLAPI EditorCamera(const glm::mat4 &projectionMatrix);
 
+		HLAPI void SetActive(bool active = true) { m_Active = active; }
+		HLAPI bool GetActive() const { return m_Active; }
+
 		HLAPI void Focus(const glm::vec3 &focusPoint);
 		HLAPI virtual void Update() override;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) override;
@@ -52,6 +55,7 @@ namespace highlo
 		glm::vec3 m_Rotation, m_FocalPoint;
 
 		bool m_Panning, m_Rotating;
+		bool m_Active = false;
 
 		glm::vec2 m_InitialMousePosition;
 		glm::vec3 m_InitialFocalPoint, m_InitialRotation;

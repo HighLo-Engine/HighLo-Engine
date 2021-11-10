@@ -39,7 +39,7 @@ void Sandbox::OnInitialize()
 			rc->ModelLOD2 = houseLod2;
 			rc->UseLOD = true;
 
-			entity._TransformComponent->Transform = Transform::FromPosition({ i * 5, -2, j * 5 }).Scale(0.03f);
+			entity.SetTransform(Transform::FromPosition({ i * 5, -2, j * 5 }).Scale(0.03f));
 
 		//	m_Scene->AddEntity(entity);
 		}

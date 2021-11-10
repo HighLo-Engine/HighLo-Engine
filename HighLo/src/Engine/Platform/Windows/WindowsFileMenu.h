@@ -23,7 +23,7 @@ namespace highlo
 		virtual ~WindowsFileMenu();
 
 		virtual void AddMenuItem(const Ref<MenuItem> &item) override;
-		virtual void AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, MenuItemCallback callback, bool visible = true) override;
+		virtual void AddMenuItem(const HLString &name, const HLString &shortcut, int32 id, const MenuItemCallback &callback, bool visible = true) override;
 
 		virtual void AddSubMenu(const Ref<FileMenu> &other) override;
 		virtual void AddSeparator() override;

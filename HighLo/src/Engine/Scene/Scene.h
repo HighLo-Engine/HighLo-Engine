@@ -100,6 +100,8 @@ namespace highlo
 		// TODO: Only in editor
 		HLAPI void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
+		HLAPI static Ref<Scene> Create(const HLString &name = "Scene1", bool isEditorScene = false, bool constructScene = true);
+
 	private:
 
 		UUID m_SceneID = 0;
@@ -133,3 +135,4 @@ namespace highlo
 		friend class SceneHierarchyPanel;
 	};
 }
+

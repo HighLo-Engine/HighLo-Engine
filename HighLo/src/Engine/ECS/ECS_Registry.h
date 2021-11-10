@@ -12,11 +12,10 @@
 #include <unordered_map>
 #include <typeindex>
 #include "Components.h"
+#include "Engine/Core/UUID.h"
 
 namespace highlo
 {
-	typedef uint64 EntityID;
-
 	class ECS_Registry
 	{
 	public:
@@ -24,7 +23,6 @@ namespace highlo
 		HLAPI ECS_Registry();
 
 		HLAPI static ECS_Registry &Get();
-		HLAPI EntityID GenerateEntityID();
 
 		template <typename T>
 		HLAPI const std::vector<T> &GetComponents()
@@ -39,7 +37,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI T *AddComponent(EntityID entityID)
+		HLAPI T *AddComponent(UUID entityID)
 		{
 			auto comp = std::make_any<T>();
 			auto &type = std::type_index(typeid(T));
@@ -64,7 +62,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI T *GetComponent(EntityID entityID)
+		HLAPI T *GetComponent(UUID entityID)
 		{
 			auto &type = std::type_index(typeid(T));
 
@@ -78,7 +76,7 @@ namespace highlo
 			return nullptr;
 		}
 
-		HLAPI void *GetComponentHandle(EntityID entityID, std::type_index &type)
+		HLAPI void *GetComponentHandle(UUID entityID, std::type_index &type)
 		{
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return nullptr;
@@ -91,7 +89,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI bool HasComponent(EntityID entityID)
+		HLAPI bool HasComponent(UUID entityID)
 		{
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return false;
@@ -100,7 +98,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI void RemoveComponent(EntityID entityID)
+		HLAPI void RemoveComponent(UUID entityID)
 		{
 			auto &type = std::type_index(typeid(T));
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
@@ -120,7 +118,7 @@ namespace highlo
 		}
 
 		template <typename T>
-		HLAPI void ForEach(const std::function<void(EntityID, TransformComponent&, T&)>& callback)
+		HLAPI void ForEach(const std::function<void(UUID, TransformComponent&, T&)> &callback)
 		{
 			auto& type = std::type_index(typeid(T));
 			if (m_Components.find(type) != m_Components.end())
@@ -129,7 +127,7 @@ namespace highlo
 		}
 
 		template <typename... Args>
-		HLAPI void ForEachMultiple(const std::function<void(EntityID, TransformComponent&, std::vector<void*>&)> &callback)
+		HLAPI void ForEachMultiple(const std::function<void(UUID, TransformComponent&, std::vector<void*>&)> &callback)
 		{
 			// Create a list of all types
 			std::vector<std::type_index> component_types;
@@ -182,8 +180,10 @@ namespace highlo
 		}
 
 	private:
-		std::unordered_map<std::type_index, std::vector<std::pair<EntityID, std::any>>> m_Components;
-		std::unordered_map<EntityID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;
-		std::unordered_map<EntityID, void*> m_TransformComponents;
+
+		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;
+		std::unordered_map<UUID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;
+		std::unordered_map<UUID, void*> m_TransformComponents;
 	};
 }
+

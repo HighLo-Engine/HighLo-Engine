@@ -3,6 +3,7 @@
 #include "HighLoPch.h"
 #include "Engine/Core/Input.h"
 
+//#undef HIGHLO_API_GLFW
 #ifndef HIGHLO_API_GLFW
 
 #include <Windows.h>
@@ -79,6 +80,88 @@ namespace highlo
 	{
 		auto [x, y] = GetAbsoluteMousePosition();
 		return y;
+	}
+
+	void Input::SetCursorMode(CursorMode mode)
+	{
+		HWND window = static_cast<HWND>(HLApplication::Get().GetWindow().GetNativeHandle());
+
+		switch (mode)
+		{
+			case CursorMode::Hidden:
+				::ShowCursor(FALSE);
+				break;
+
+			case CursorMode::Locked:
+				RECT r;
+				::GetWindowRect(window, &r);
+				::ClipCursor(&r);
+				break;
+
+			case CursorMode::Normal:
+				::ShowCursor(TRUE);
+				break;
+		}
+	}
+
+	CursorMode Input::GetCursorMode()
+	{
+		PCURSORINFO cursor;
+		cursor->cbSize = sizeof(CURSORINFO);
+		cursor->hCursor = (HCURSOR)HLApplication::Get().GetWindow().GetNativeCursor();
+
+		BOOL result = ::GetCursorInfo(cursor);
+		if (!result)
+		{
+			HL_ASSERT(false, "GetCursorMode failed with error {0} ", ::GetLastError());
+		}
+
+		if (cursor->flags == CURSOR_SHOWING)
+			return CursorMode::Normal;
+		else if (cursor->flags == 0)
+			return CursorMode::Hidden;
+		else
+			return CursorMode::Locked;
+	}
+
+	void Input::Update()
+	{
+
+	}
+
+	bool Input::HasController(int32 id)
+	{
+
+	}
+
+	std::vector<int32> Input::GetConnectedControllerIDs()
+	{
+
+	}
+
+	const Controller *Input::GetController(int32 id)
+	{
+
+	}
+
+	HLString Input::GetControllerName(int32 id)
+	{
+
+	}
+
+	bool Input::IsControllerButtonPressed(int32 id, int32 button)
+	{
+
+	}
+
+	float Input::GetControllerAxis(int32 id, int32 axis)
+	{
+
+	}
+
+	uint8 Input::GetControllerHat(int32 id, int32 hat)
+	{
+
 	}
 }
 

@@ -36,6 +36,9 @@ namespace highlo
 
 	void EditorCamera::Update()
 	{
+		if (!m_Active)
+			return;
+
 		if (Input::IsKeyPressed(HL_KEY_LEFT_ALT))
 		{
 			const glm::vec2 &mouse = { Input::GetMouseX(), Input::GetMouseY() };

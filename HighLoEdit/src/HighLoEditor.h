@@ -65,6 +65,7 @@ class HighLoEditor : public HLApplication
 
 		bool OnKeyPressedEvent(const KeyPressedEvent &e);
 		bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e);
+		void OnFileMenuPressed(FileMenu *menu, MenuItem *item);
 
 		void OnSelected(const SelectedMesh &selectionContext);
 		void OnEntityDeleted(Entity e);

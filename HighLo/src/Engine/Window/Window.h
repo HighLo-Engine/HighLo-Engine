@@ -60,13 +60,11 @@ namespace highlo
 	class Window
 	{
 	public:
+
+		HLAPI virtual ~Window() = default;
+
 		HLAPI virtual void SetEventCallback(const EventCallbackFn &callback) = 0;
 		HLAPI virtual const EventCallbackFn &GetEventCallback() const = 0;
-
-		HLAPI static Window& Get();
-
-		HLAPI static Window* Create(const WindowData& properties = WindowData());
-		HLAPI virtual ~Window() = default;
 
 		HLAPI virtual void Update() = 0;
 
@@ -100,8 +98,12 @@ namespace highlo
 
 		HLAPI virtual uint32 GetWidth() = 0;
 		HLAPI virtual uint32 GetHeight() = 0;
-		HLAPI virtual void* GetNativeHandle() = 0;
+		HLAPI virtual void *GetNativeHandle() = 0;
 		HLAPI virtual void *GetNativeContext() = 0;
+		HLAPI virtual void *GetNativeCursor() = 0;
+
+		HLAPI static Window &Get();
+		HLAPI static Window *Create(const WindowData &properties = WindowData());
 
 	protected:
 

@@ -81,8 +81,8 @@ namespace highlo
 
 		bool m_Initialized = false;
 		HLString m_Tag;
-		const UUID m_ID = 0;
-		UUID m_SceneID = 0;
+		const UUID m_ID;
+		UUID m_SceneID;
 		TransformComponent *m_TransformComponent;
 	};
 }

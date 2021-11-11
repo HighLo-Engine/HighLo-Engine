@@ -23,7 +23,7 @@ bool for_each_component()
 		Entity entity;
 		auto transform = entity.AddComponent<SceneComponent>();
 		transform->SceneID = 0;
-
+		
 		if (i % 2 == 0)
 		{
 			auto id = entity.AddComponent<IDComponent>();
@@ -32,11 +32,10 @@ bool for_each_component()
 	}
 
 	uint32 entityCount = 0;
-
-	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](UUID entityID, TransformComponent& transform, std::vector<void*> components) {
+	
+	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](UUID entityID, TransformComponent &transform, std::vector<void*> components) {
 		auto sceneComponent = reinterpret_cast<SceneComponent*>(components[0]);
 		auto idComponent = reinterpret_cast<IDComponent*>(components[1]);
-
 		++entityCount;
 	});
 

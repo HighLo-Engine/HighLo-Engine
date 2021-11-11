@@ -2,7 +2,6 @@
 
 #include "HighLoPch.h"
 #include "ECS_Registry.h"
-#include <atomic>
 
 namespace highlo
 {

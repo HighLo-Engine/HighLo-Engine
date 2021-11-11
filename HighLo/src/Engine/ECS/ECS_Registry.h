@@ -21,7 +21,6 @@ namespace highlo
 	public:
 
 		HLAPI ECS_Registry();
-
 		HLAPI static ECS_Registry &Get();
 
 		template <typename T>

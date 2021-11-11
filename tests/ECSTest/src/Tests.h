@@ -3,5 +3,6 @@
 #include <HighLo.h>
 
 bool test_add_component();
+bool test_add_component_with_value_change();
 
-bool for_each_component();
+bool test_for_each_multiple_component();

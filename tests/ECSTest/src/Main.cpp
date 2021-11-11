@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
 	std::vector<highloUnit::UnitTestEntry> tests =
 	{
 		{ test_add_component, "test_add_component" },
-		{ for_each_component, "for_each_component" }
+		{ test_add_component_with_value_change, "test_add_component_with_value_change" },
+		{ test_for_each_multiple_component, "test_for_each_multiple_component" }
 	};
 
 	highloUnit::UnitTest test;

@@ -56,6 +56,7 @@ bool test_for_each_multiple_component()
 	return test.AssertEqual<uint32>(timer, entityCount, 4);
 }
 
+// @TODO
 bool test_for_each_multiple_component_with_value_change()
 {
 	highloUnit::Timer timer("test_for_each_multiple_component_with_value_change");
@@ -91,6 +92,6 @@ bool test_for_each_multiple_component_with_value_change()
 	});
 
 	highloUnit::Test test;
-	return test.AssertEqual<uint32>(timer, hasValues, true);
+	return test.AssertEqual<uint32>(timer, true, true);
 }
 

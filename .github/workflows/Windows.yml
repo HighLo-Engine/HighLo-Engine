@@ -18,7 +18,6 @@ env:
   QUEUE_UNIT_TEST_FILE_PATH: .\tests\QueueTest\
   STACK_UNIT_TEST_FILE_PATH: .\tests\StackTest\
   ECS_UNIT_TEST_FILE_PATH: .\tests\ECSTest\
-  FILE_UNIT_TEST_FILE_PATH: .\tests\FileTest\
   FILE_SYSTEM_UNIT_TEST_FILE_PATH: .\tests\FileSystemTest\
   FILE_SYSTEM_PATH_UNIT_TEST_FILE_PATH: .\tests\FileSystemPathTest\
   BINARY_TREE_UNIT_TEST_FILE_PATH: .\tests\BinaryTreeTest\
@@ -92,10 +91,6 @@ jobs:
         - name: Build ECS Unit Test
           working-directory: ${{env.GITHUB_WORKSPACE}}
           run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.ECS_UNIT_TEST_FILE_PATH}}
-        
-        - name: Build File Unit Test
-          working-directory: ${{env.GITHUB_WORKSPACE}}
-          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.FILE_UNIT_TEST_FILE_PATH}}
         
         - name: Build FileSystem Unit Test
           working-directory: ${{env.GITHUB_WORKSPACE}}

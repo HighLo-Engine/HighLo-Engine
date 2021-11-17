@@ -55,11 +55,6 @@ ROBOCOPY HighLo\vendor\openssl\lib\ tests\FileSystemPathTest\bin\ libssl-3-x64.d
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\FileSystemPathTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\FileSystemPathTest\bin\ HighLo-Unit.dll /mt /z > nul
 
-ROBOCOPY HighLo\vendor\openssl\lib\ tests\FileTest\bin\ libcrypto-3-x64.dll /mt /z > nul
-ROBOCOPY HighLo\vendor\openssl\lib\ tests\FileTest\bin\ libssl-3-x64.dll /mt /z > nul
-ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\FileTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
-ROBOCOPY HighLo\vendor\HighLo-Unit\lib\ tests\FileTest\bin\ HighLo-Unit.dll /mt /z > nul
-
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\BinaryTreeTest\bin\ libcrypto-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\openssl\lib\ tests\BinaryTreeTest\bin\ libssl-3-x64.dll /mt /z > nul
 ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\BinaryTreeTest\bin\ assimp-vc142-mtd.dll /mt /z > nul
@@ -124,12 +119,6 @@ ECHO.
 ECHO Running FileSystem Unit Tests...
 cd.>nul
 CALL tests\FileSystemTest\bin\FileSystemTest.exe
-IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
-ECHO.
-
-ECHO Running File Unit Tests...
-cd.>nul
-CALL tests\FileTest\bin\FileTest.exe
 IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 ECHO.
 

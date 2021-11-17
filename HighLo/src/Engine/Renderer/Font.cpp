@@ -141,7 +141,7 @@ namespace highlo
 		fontInput.GlyphIdentifier = msdf_atlas::GlyphIdentifierType::UNICODE_CODEPOINT;
 		fontInput.FontScale = -1;
 		fontInput.FontFileName = m_FilePath.String();
-		fontInput.FontName = m_FilePath.GetFile()->GetName();
+		fontInput.FontName = m_FilePath.Filename();
 
 		utils::FontConfig config = {};
 		//config.ImageType = msdf_atlas::ImageType::MSDF;
@@ -188,7 +188,7 @@ namespace highlo
 		}
 
 		HL_ASSERT(glyphsLoaded >= 0);
-		HL_CORE_INFO("Font>         [+] Loaded {0} [+]", path.GetFile()->GetRelativePath());
+		HL_CORE_INFO("Font>         [+] Loaded {0} [+]", *path.RelativePath().String());
 		HL_CORE_INFO("Loaded Font Geometry of {0} out of {1} glyphs.", glyphsLoaded, (int32)charset.size());
 
 		// Check if any glyphs are missing

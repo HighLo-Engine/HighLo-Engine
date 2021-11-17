@@ -9,21 +9,17 @@ namespace highlo
 {
 	FileSystemPath::FileSystemPath(const char *path)
 	{
-		m_CurrentPath = path;
-		m_File = File::Create(path, FileSystem::Get()->FileExists(*this));
-
+		Assign(path);
 	}
 	
 	FileSystemPath::FileSystemPath(const HLString &path)
 	{
-		m_CurrentPath = path;
-		m_File = File::Create(path, FileSystem::Get()->FileExists(*this));
+		Assign(path);
 	}
-	
+
 	FileSystemPath::FileSystemPath(const File &file)
 	{
-		m_CurrentPath = file.GetAbsolutePath();
-		m_File = File::Create(file.GetRelativePath(), FileSystem::Get()->FileExists(*this));
+		Assign(file.FullPath);
 	}
 	
 	FileSystemPath::~FileSystemPath()
@@ -32,26 +28,51 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator=(const FileSystemPath &other)
 	{
-		m_CurrentPath = other.m_CurrentPath;
-		m_File = other.m_File;
-
+		Assign(other.String());
 		return *this;
 	}
 
 	FileSystemPath &FileSystemPath::operator=(const HLString &str)
 	{
-		m_CurrentPath = str;
-		m_File = File::Create(str, FileSystem::Get()->FileExists(*this));
-
+		Assign(str);
 		return *this;
 	}
 
-	FileSystemPath &FileSystemPath::Assign(const HLString &source)
+	FileSystemPath &FileSystemPath::operator=(const File &file)
+	{
+		Assign(file.FullPath);
+		return *this;
+	}
+
+	void FileSystemPath::Assign(const HLString &source)
 	{
 		m_CurrentPath = source;
-		m_File = File::Create(source, FileSystem::Get()->FileExists(*this));
-		
-		return *this;
+		if (m_CurrentPath.Contains('\\'))
+			m_CurrentPath = m_CurrentPath.Replace("\\", "/");
+
+		if (Exists())
+		{
+			m_Handle = std::filesystem::path(*m_CurrentPath);
+			m_File.ExistsOnHardDrive = true;
+			m_File.IsFile = !std::filesystem::is_directory(m_Handle);
+			m_File.Size = Size();
+			m_File.FullPath = std::filesystem::absolute(m_Handle).string();
+
+			if (m_File.FullPath.Contains('\\'))
+				m_File.FullPath = m_File.FullPath.Replace("\\", "/");
+
+			if (m_File.IsFile)
+			{
+				m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
+				m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath);
+			}
+			else
+			{
+				m_File.Extension = "folder";
+				m_File.Name = ExtractFolderNameFromPath(m_File.FullPath);
+
+			}
+		}
 	}
 
 	void FileSystemPath::Swap(FileSystemPath &lhs, FileSystemPath &rhs)
@@ -68,10 +89,7 @@ namespace highlo
 
 	bool FileSystemPath::IsEmpty() const
 	{
-		if (m_File->IsFile())
-			return false;
-
-		return m_File->GetFileCount() == 0;
+		return m_CurrentPath.IsEmpty();
 	}
 
 	bool FileSystemPath::HasRootPath() const
@@ -105,14 +123,102 @@ namespace highlo
 		return !HasRootPath();
 	}
 
+	std::vector<File> FileSystemPath::GetFileList() const
+	{
+		std::vector<File> result;
+
+		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
+		{
+			int64 size = FileSystem::Get()->GetFileSize(entry.path().string().c_str());
+
+			File file;
+			file.ExistsOnHardDrive = entry.is_block_file() || entry.is_regular_file() || entry.is_directory() || entry.is_character_file() || entry.is_other() || entry.is_symlink();
+			file.IsFile = !entry.is_directory();
+			file.FullPath = std::filesystem::absolute(entry).string().c_str();
+			file.Size = size;
+
+			if (file.FullPath.Contains('\\'))
+				file.FullPath = file.FullPath.Replace("\\", "/");
+
+			if (file.IsFile)
+			{
+				file.Extension = ExtractFileExtensionFromPath(file.FullPath);
+				file.Name = ExtractFileNameFromPath(file.FullPath);
+			}
+			else
+			{
+				file.Extension = "folder";
+				file.Name = ExtractFolderNameFromPath(file.FullPath);
+			}
+
+			result.push_back(file);
+		}
+
+		return result;
+	}
+
+	uint32 FileSystemPath::GetFileCount() const
+	{
+		uint32 fileCount = 0;
+
+		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
+			++fileCount;
+
+		return fileCount;
+	}
+
+	bool FileSystemPath::Exists() const
+	{
+		return FileSystem::Get()->FileExists(*this) || FileSystem::Get()->FolderExists(*this);
+	}
+
+	int64 FileSystemPath::Size() const
+	{
+		return FileSystem::Get()->GetFileSize(*this);
+	}
+
+	const HLString &FileSystemPath::Absolute() const
+	{
+		return m_File.FullPath;
+	}
+
+	const HLString &FileSystemPath::Filename() const
+	{
+		return m_File.Name;
+	}
+
+	const HLString &FileSystemPath::Extension() const
+	{
+		return m_File.Extension;
+	}
+
+	bool FileSystemPath::IsFile() const
+	{
+		return m_File.IsFile;
+	}
+
+	bool FileSystemPath::IsDirectory() const
+	{
+		return !m_File.IsFile;
+	}
+
+	bool FileSystemPath::IsSymLink() const
+	{
+		const auto &handle = std::filesystem::directory_entry(m_Handle);
+		return handle.is_symlink();
+	}
+
 	FileSystemPath FileSystemPath::RelativePath() const
 	{
-		return m_File->GetRelativePath();
+		std::filesystem::path relativeHandle = std::filesystem::relative(m_Handle);
+		return relativeHandle.string();
 	}
 
 	FileSystemPath FileSystemPath::RelativePath(const FileSystemPath &parentPath) const
 	{
-		return m_File->GetRelativePath(parentPath.String());
+		std::filesystem::path parentHandle(**parentPath);
+		std::filesystem::path relativeHandle = std::filesystem::relative(m_Handle, parentHandle);
+		return relativeHandle.string();
 	}
 
 	FileSystemPath FileSystemPath::ParentPath() const
@@ -151,7 +257,6 @@ namespace highlo
 			m_CurrentPath += "/";
 
 		m_CurrentPath += path.String();
-		m_File->SetFullPath(m_CurrentPath);
 		return *this;
 	}
 
@@ -164,7 +269,6 @@ namespace highlo
 			m_CurrentPath += "/";
 
 		m_CurrentPath += path.String();
-		m_File->SetFullPath(m_CurrentPath);
 		return *this;
 	}
 
@@ -177,7 +281,6 @@ namespace highlo
 			m_CurrentPath += "/";
 
 		m_CurrentPath += path;
-		m_File->SetFullPath(m_CurrentPath);
 		return *this;
 	}
 
@@ -190,7 +293,6 @@ namespace highlo
 			m_CurrentPath += "/";
 
 		m_CurrentPath += path;
-		m_File->SetFullPath(m_CurrentPath);
 		return *this;
 	}
 
@@ -203,7 +305,6 @@ namespace highlo
 			m_CurrentPath += "/";
 
 		m_CurrentPath += path;
-		m_File->SetFullPath(m_CurrentPath);
 		return *this;
 	}
 
@@ -216,10 +317,56 @@ namespace highlo
 			m_CurrentPath += "/";
 
 		m_CurrentPath += path;
-		m_File->SetFullPath(m_CurrentPath);
 		return *this;
 	}
-	
+
+	HLString FileSystemPath::ExtractFileNameFromPath(const HLString &path)
+	{
+		HLString result;
+		int32 pos = path.FirstIndexOf('/');
+		int32 i = 1;
+
+		while (pos != HLString::NPOS)
+		{
+			result = path.Substr(pos + 1);
+			pos = path.FirstIndexOf('/', i);
+			++i;
+		}
+
+		return result;
+	}
+
+	HLString FileSystemPath::ExtractFileExtensionFromPath(const HLString &path, bool excludeDot)
+	{
+		HLString result;
+		int32 pos = path.FirstIndexOf('/');
+		int32 i = 1;
+
+		while (pos != HLString::NPOS)
+		{
+			result = path.Substr(pos + 1);
+			pos = path.FirstIndexOf('/', i);
+			++i;
+		}
+
+		if (!result.Contains("."))
+			return "-1";
+
+		if (!excludeDot)
+			result = result.Substr(result.IndexOf("."));
+
+		return result;
+	}
+
+	HLString FileSystemPath::ExtractFolderNameFromPath(const HLString &path)
+	{
+		HLString result = path;
+		if (result.EndsWith('/'))
+			result = result.Substr(0, result.LastIndexOf('/'));
+
+		return result.Substr(result.LastIndexOf('/') + 1);
+	}
+
 	FileSystemPath operator/(FileSystemPath &lhs, const FileSystemPath &rhs)
 	{
 		if (rhs.String().IsEmpty())
@@ -263,6 +410,12 @@ namespace highlo
 			newPath = lhs.String() + "/" + path;
 
 		return FileSystemPath(newPath);
+	}
+	
+	std::ostream &operator<<(std::ostream &stream, const FileSystemPath &other)
+	{
+		stream << other.Filename();
+		return stream;
 	}
 }
 

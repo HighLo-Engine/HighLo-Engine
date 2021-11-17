@@ -126,42 +126,7 @@ namespace highlo
 
 	void Input::Update()
 	{
-
-	}
-
-	bool Input::HasController(int32 id)
-	{
-
-	}
-
-	std::vector<int32> Input::GetConnectedControllerIDs()
-	{
-
-	}
-
-	const Controller *Input::GetController(int32 id)
-	{
-
-	}
-
-	HLString Input::GetControllerName(int32 id)
-	{
-
-	}
-
-	bool Input::IsControllerButtonPressed(int32 id, int32 button)
-	{
-
-	}
-
-	float Input::GetControllerAxis(int32 id, int32 axis)
-	{
-
-	}
-
-	uint8 Input::GetControllerHat(int32 id, int32 hat)
-	{
-
+		// TODO
 	}
 }
 

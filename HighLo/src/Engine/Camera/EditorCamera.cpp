@@ -36,21 +36,21 @@ namespace highlo
 
 	void EditorCamera::Update()
 	{
-		if (!m_Active)
-			return;
+		const glm::vec2 &mouse = { Input::GetMouseX(), Input::GetMouseY() };
+		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+		m_InitialMousePosition = mouse;
 
-		if (Input::IsKeyPressed(HL_KEY_LEFT_ALT))
+		if (m_Active)
 		{
-			const glm::vec2 &mouse = { Input::GetMouseX(), Input::GetMouseY() };
-			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
-			m_InitialMousePosition = mouse;
-
-			if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_LEFT))
-				MouseRotate(delta);
-			else if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_RIGHT))
-				MouseZoom(delta.y);
-			else if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_MIDDLE))
-				MousePan(delta);
+			if (Input::IsKeyPressed(HL_KEY_LEFT_ALT))
+			{
+				if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_LEFT))
+					MouseRotate(delta);
+				else if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_RIGHT))
+					MouseZoom(delta.y);
+				else if (Input::IsMouseButtonPressed(HL_MOUSE_BUTTON_MIDDLE))
+					MousePan(delta);
+			}
 		}
 
 		UpdateCameraView();

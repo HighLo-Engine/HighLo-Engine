@@ -45,6 +45,16 @@ namespace highlo
 		bool NoLog = false;
 
 		/// <summary>
+		/// Determines, whether the rendering window should be maximized, if Headless is false
+		/// </summary>
+		bool Maximized = false;
+
+		/// <summary>
+		/// Determines, whether the framerate should be locked to the maximum display framerate, if Headless is false
+		/// </summary>
+		bool VSync = false;
+
+		/// <summary>
 		/// Determines the rendering api that should be used in the backend to render, if Headless is false
 		/// </summary>
 		HLString RenderingAPI = "OpenGL";

@@ -11,14 +11,14 @@
 
 namespace highlo
 {
-	Window* Window::s_WindowInstance = nullptr;
+	Window *Window::s_WindowInstance = nullptr;
 
-	Window& Window::Get()
+	Window &Window::Get()
 	{
 		return *Window::s_WindowInstance;
 	}
 
-	Window* Window::Create(const WindowData& properties)
+	Window* Window::Create(const WindowData &properties)
 	{
 #ifdef HIGHLO_API_GLFW
 		return new GLFWWindow(properties);

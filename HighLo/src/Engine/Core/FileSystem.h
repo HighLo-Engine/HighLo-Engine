@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.4 (2021-11-14) Added CreateFolderInPersistentStorage method, that creates a new folder in the roaming path
 //     - 1.3 (2021-10-17) Refactored FileSystem to be a Singleton class
 //     - 1.2 (2021-10-04) Refactored FileSystem: Excluded FileSystemWatcher functions to own class
 //     - 1.1 (2021-09-15) Added HasEnvironmentVariable, SetEnvironmentVariable, GetEnvironmentVariable
@@ -33,8 +34,10 @@ namespace highlo
 		HLAPI int64 GetFileSize(const FileSystemPath &path);
 		
 		HLAPI bool CreateFolder(const FileSystemPath &path);
+		HLAPI FileSystemPath CreateFolderInPersistentStorage(const HLString &folderName);
 		HLAPI bool RemoveFolder(const FileSystemPath &path);
-		
+		HLAPI bool FolderExists(const FileSystemPath &path);
+
 		HLAPI Byte *ReadFile(const FileSystemPath &path, int64 *outSize);
 		HLAPI HLString ReadTextFile(const FileSystemPath &path);
 		

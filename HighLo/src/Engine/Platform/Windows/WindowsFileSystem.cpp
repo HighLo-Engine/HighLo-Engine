@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <shellapi.h>
 #include <fileapi.h>
+#include <Shlobj.h>
 
 #include "Engine/Core/FileSystemWatcher.h"
 
@@ -62,6 +63,16 @@ namespace highlo
 
         DWORD result = GetFileAttributesW(pathStr.W_Str());
         return !(result == INVALID_FILE_ATTRIBUTES && GetLastError() == ERROR_FILE_NOT_FOUND);
+    }
+
+    bool FileSystem::FolderExists(const FileSystemPath &path)
+    {
+        HLString pathStr = path.String();
+        if (pathStr.IsEmpty())
+            return false;
+
+        DWORD result = GetFileAttributesW(pathStr.W_Str());
+        return (result != INVALID_FILE_ATTRIBUTES && (result & FILE_ATTRIBUTE_DIRECTORY));
     }
 
     bool FileSystem::PathExists(const FileSystemPath &path)
@@ -186,7 +197,7 @@ namespace highlo
 
     void FileSystem::OpenInExplorer(const FileSystemPath &path)
     {
-        ShellExecuteW(0, L"open", path.GetFile()->GetAbsolutePath().W_Str(), 0, 0, SW_SHOWDEFAULT);
+        ShellExecuteW(0, L"open", path.Absolute().W_Str(), 0, 0, SW_SHOWDEFAULT);
     }
 
     void FileSystem::OpenInBrowser(const HLString &url)
@@ -256,6 +267,26 @@ namespace highlo
         }
 
         return {};
+    }
+
+    FileSystemPath FileSystem::CreateFolderInPersistentStorage(const HLString &folderName)
+    {
+        PWSTR roamingFilePath;
+        HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_DEFAULT, NULL, &roamingFilePath);
+        HL_ASSERT(result == S_OK);
+
+        std::wstring filepath = roamingFilePath;
+        std::replace(filepath.begin(), filepath.end(), L'\\', L'/');
+        std::filesystem::path tempPath = filepath + L"/" + folderName.W_Str();
+        FileSystemPath resultPath = tempPath.string();
+
+        HL_CORE_TRACE("Registering folder in roaming folder: {0}", **resultPath);
+        if (!FileSystem::Get()->FolderExists(resultPath))
+        {
+            FileSystem::Get()->CreateFolder(resultPath);
+        }
+        
+        return resultPath;
     }
 }
 

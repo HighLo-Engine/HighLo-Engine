@@ -106,12 +106,9 @@ namespace highlo
 
 		HLAPI ~HLStringBase()
 		{
-			if (m_Data)
-			{
-				delete[] m_Data;
-				m_Data = nullptr;
-				m_Size = 0;
-			}
+			delete[] m_Data;
+			m_Data = nullptr;
+			m_Size = 0;
 		}
 
 		HLAPI HLStringBase &operator=(const HLStringBase &other)

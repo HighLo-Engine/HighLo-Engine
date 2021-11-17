@@ -35,7 +35,6 @@
 #include "Engine/Core/Timer.h"
 #include "Engine/Core/SharedReference.h"
 #include "Engine/Core/FileSystem.h"
-#include "Engine/Core/File.h"
 #include "Engine/Core/FileSystemPath.h"
 #include "Engine/Core/FileSystemWatcher.h"
 #include "Engine/Core/VirtualFileSystem.h"

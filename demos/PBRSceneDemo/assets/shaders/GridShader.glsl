@@ -6,23 +6,18 @@ layout(location = 1) in vec2 a_TexCoord;
 
 layout(std140, binding = 3) uniform Camera
 {
-	mat4 u_ViewProjectionMatrix;
-	mat4 u_ViewInverseViewProjectionMatrix;
-	mat4 u_ProjectionMatrix;
+	mat4 u_ViewProjection;
+	mat4 u_ViewInverseViewProjection;
+	mat4 u_Projection;
 	mat4 u_ViewMatrix;
 };
-
-layout(push_constant) uniform Transform
-{
-	mat4 Transform;
-} u_RenderTransform;
 
 layout(location = 0) out vec2 v_TexCoord;
 
 void main()
 {
 	v_TexCoord = a_TexCoord;
-	gl_Position = u_ViewProjectionMatrix * u_RenderTransform.Transform * vec4(a_Position, 1.0);
+	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
 
 #shader pixel

@@ -15,6 +15,9 @@ class HighLoEditor : public HLApplication
 	{
 	public:
 
+		HighLoEditor(const ApplicationSettings &settings, const HLString &projectPath);
+		~HighLoEditor();
+
 		virtual void OnInitialize() override;
 		virtual void OnUpdate(Timestep ts) override;
 		virtual void OnShutdown() override;
@@ -80,6 +83,10 @@ class HighLoEditor : public HLApplication
 		void DeleteEntity(Entity entity);
 
 	private:
+
+		HLString m_ProjectPath;
+		FileSystemPath m_RoamingPath;
+		Ref<UserSettings> m_UserSettings;
 
 		HLString m_LastSceneFilePath;
 		GizmoType m_GizmoType = GizmoType::None;

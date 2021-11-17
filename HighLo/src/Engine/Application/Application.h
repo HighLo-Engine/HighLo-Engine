@@ -27,6 +27,7 @@ namespace highlo
 		HLAPI Window &GetWindow() { return *m_Window; }
 
 		HLAPI HLApplication();
+		HLAPI HLApplication(const ApplicationSettings &settings);
 		HLAPI ~HLApplication();
 
 		HLAPI void Run();
@@ -67,6 +68,7 @@ namespace highlo
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
 		bool OnFileMenuChangedEvent(FileMenuChangedEvent &event);
+		bool OnFileSystemChangedEvent(FileSystemChangedEvent &event);
 
 	private:
 
@@ -74,5 +76,6 @@ namespace highlo
 	};
 
 	// this will be implemented by the client application
-	HLAPI HLApplication *CreateApp();
+	HLAPI HLApplication *CreateApp(int argc, char *argv[]);
 }
+

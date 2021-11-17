@@ -3,8 +3,19 @@
 #include <Engine/Core/EntryPoint.h>
 #include "HighLoEditor.h"
 
-highlo::HLApplication *highlo::CreateApp()
+highlo::HLApplication *highlo::CreateApp(int argc, char *argv[])
 {
-	return new HighLoEditor();
+	highlo::HLString projectPath;
+	if (argc > 1)
+		projectPath = argv[1];
+
+	highlo::ApplicationSettings settings;
+	settings.WindowTitle = "";
+	settings.WindowWidth = 1600;
+	settings.WindowHeight = 900;
+	settings.Maximized = true;
+	settings.VSync = true;
+
+	return new HighLoEditor(settings, projectPath);
 }
 

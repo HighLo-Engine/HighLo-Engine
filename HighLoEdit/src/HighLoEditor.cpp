@@ -19,6 +19,26 @@ namespace editorutils
 	}
 }
 
+HighLoEditor::HighLoEditor(const ApplicationSettings &settings, const HLString &projectPath)
+	: HLApplication(settings), m_ProjectPath(projectPath), m_UserSettings(Ref<UserSettings>::Create())
+{
+	if (projectPath.IsEmpty())
+		m_ProjectPath = "SandboxProject/Sandbox.hlproj";
+
+	// Register persistent storage
+	m_RoamingPath = FileSystem::Get()->CreateFolderInPersistentStorage("HighLo");
+
+	// TODO: Write UserPreferences into roaming path
+	// The UserPreferences file should contain the following data:
+	// - an array of the recent projects
+	// - whether or not to display the splash screen
+	// - whether or not to display the welcome popup
+}
+
+HighLoEditor::~HighLoEditor()
+{
+}
+
 void HighLoEditor::OnInitialize()
 {
 	uint32 width = GetWindow().GetWidth();
@@ -51,7 +71,7 @@ void HighLoEditor::OnInitialize()
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
 	UpdateWindowTitle("Untitled Scene");
 
-	FileSystemWatcher::Get()->Start("assets");
+	FileSystemWatcher::Get()->Start(project->GetConfig().AssetDirectory);
 
 	// Create FileMenu
 	m_MenuBar = MenuBar::Create();

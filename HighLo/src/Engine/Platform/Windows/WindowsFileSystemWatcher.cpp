@@ -2,6 +2,9 @@
 
 #include "HighLoPch.h"
 #include "Engine/Core/FileSystemWatcher.h"
+#include "Engine/Application/Application.h"
+#include "Engine/Scene/Project.h"
+#include "Engine/Core/FileSystem.h"
 
 #ifdef HL_PLATFORM_WINDOWS
 
@@ -11,8 +14,6 @@
 
 namespace highlo
 {
-	FileSystemWatcher::FileSystemChangedCallbackFn FileSystemWatcher::s_Callback;
-
 	static bool s_Watching = false;
     static bool s_IgnoreNextChange = false;
 	static HANDLE s_WatcherThread;
@@ -35,11 +36,6 @@ namespace highlo
 		CloseHandle(s_WatcherThread);
 	}
 
-    void FileSystemWatcher::SetChangeCallback(const FileSystemChangedCallbackFn &callback)
-    {
-        s_Callback = callback;
-    }
-
     void FileSystemWatcher::SetWatchPath(const HLString &filePath)
     {
         s_WatchPath = filePath;
@@ -55,124 +51,99 @@ namespace highlo
 
 	ULONG FileSystemWatcher::Watch(void *param)
 	{
-        HLString filePath = s_WatchPath;
-        std::vector<BYTE> buffer;
-        buffer.resize(10 * 1024);
-        OVERLAPPED overlapped = { 0 };
-        HANDLE handle = NULL;
-        DWORD bytesReturned = 0;
+		FileSystemPath assetDir = Project::GetActive()->GetAssetDirectory();
+		wchar_t *wString = assetDir.String().W_Str();
+		HL_CORE_TRACE("Listening on path {0}", **assetDir);
 
-        handle = CreateFileW(
-            filePath.W_Str(),
-            FILE_LIST_DIRECTORY,
-            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-            NULL,
-            OPEN_EXISTING,
-            FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-            NULL);
+		char buffer[2048];
+		DWORD bytesReturned;
+		FileSystemPath filePath;
+		BOOL result = true;
 
-        ZeroMemory(&overlapped, sizeof(overlapped));
+		HANDLE dirHandle = CreateFile(wString, GENERIC_READ | FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
+		if (dirHandle == INVALID_HANDLE_VALUE)
+		{
+			HL_ASSERT(false, "failed to open directory!");
+			return 0;
+		}
 
-        if (handle == INVALID_HANDLE_VALUE)
-            HL_CORE_ERROR("Unable to accquire directory handle: {0}", GetLastError());
+		OVERLAPPED pollingOverlap;
+		pollingOverlap.OffsetHigh = 0;
+		pollingOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-        overlapped.hEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+		while (s_Watching && result)
+		{
+			result = ReadDirectoryChangesW(dirHandle, &buffer, sizeof(buffer), TRUE, FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_SIZE, &bytesReturned, &pollingOverlap, NULL);
 
-        if (overlapped.hEvent == NULL)
-        {
-            HL_CORE_ERROR("CreateEvent failed!");
-            return 0;
-        }
+			WaitForSingleObject(pollingOverlap.hEvent, INFINITE);
 
-        while (s_Watching)
-        {
-            DWORD status = ReadDirectoryChangesW(
-                handle,
-                &buffer[0],
-                (DWORD)buffer.size(),
-                TRUE,
-                FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME,
-                &bytesReturned,
-                &overlapped,
-                NULL);
+			if (s_IgnoreNextChange)
+			{
+				s_IgnoreNextChange = false;
+				result = false;
+				continue;
+			}
 
-            if (!status)
-                HL_CORE_ERROR(GetLastError());
+			FILE_NOTIFY_INFORMATION *pNotify;
+			int32 offset = 0;
+			HLString oldName;
 
-            DWORD waitOperation = WaitForSingleObject(overlapped.hEvent, 5000);
-            if (waitOperation != WAIT_OBJECT_0)
-                continue;
+			do
+			{
+				pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buffer + offset);
+				uint32 fileNameLength = pNotify->FileNameLength / (sizeof(wchar_t));
 
-            if (s_IgnoreNextChange)
-            {
-                s_IgnoreNextChange = false;
-                continue;
-            }
+				FileSystemChangedEvent e;
+				e.FilePath = FileSystemPath(HLString(pNotify->FileName, fileNameLength));
+				e.IsDirectory = FileSystem::Get()->FolderExists(e.FilePath);
 
-            std::string oldName;
-            char fileName[MAX_PATH * 10] = "";
+				switch (pNotify->Action)
+				{
+					case FILE_ACTION_ADDED:
+					{
+						e.Action = FileSystemAction::Added;
+						break;
+					}
 
-            BYTE *buf = buffer.data();
-            for (;;)
-            {
-                FILE_NOTIFY_INFORMATION &fni = *(FILE_NOTIFY_INFORMATION*)buf;
-                ZeroMemory(fileName, sizeof(fileName));
-                WideCharToMultiByte(CP_ACP, 0, fni.FileName, fni.FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
-                FileSystemPath filePath = "assets/" + HLString(fileName);
+					case FILE_ACTION_REMOVED:
+					{
+						e.Action = FileSystemAction::Deleted;
+						break;
+					}
 
-                FileSystemChangedEvent e;
-                e.SetFilePath(filePath.String());
-                e.SetNewName(filePath.GetFile()->GetName());
-                e.SetOldName(filePath.GetFile()->GetName());
-                e.SetIsDirectory(filePath.GetFile()->IsDirectory());
+					case FILE_ACTION_MODIFIED:
+					{
+						e.Action = FileSystemAction::Modified;
+						break;
+					}
 
-                switch (fni.Action)
-                {
-                    case FILE_ACTION_ADDED:
-                    {
-                        e.SetAction(FileSystemAction::Added);
-                        s_Callback(e);
-                        break;
-                    }
+					case FILE_ACTION_RENAMED_OLD_NAME:
+					{
+						oldName = e.FilePath.Filename();
+						break;
+					}
 
-                    case FILE_ACTION_REMOVED:
-                    {
-                        //  e.SetIsDirectory(AssetManager::IsDirectory(e.GetFilePath())); // @TODO
-                        e.SetAction(FileSystemAction::Deleted);
-                        s_Callback(e);
-                        break;
-                    }
+					case FILE_ACTION_RENAMED_NEW_NAME:
+					{
+						e.OldName = oldName;
+						e.Action = FileSystemAction::Renamed;
+						break;
+					}
+				}
 
-                    case FILE_ACTION_MODIFIED:
-                    {
-                        e.SetAction(FileSystemAction::Modified);
-                        s_Callback(e);
-                        break;
-                    }
+				if (pNotify->Action != FILE_ACTION_RENAMED_OLD_NAME)
+				{
+					HL_CORE_TRACE("Triggering FileSystemChangedEvent {0}", *e.ToString());
+					HLApplication::Get().GetWindow().GetEventCallback()(e);
+				}
 
-                    case FILE_ACTION_RENAMED_OLD_NAME:
-                    {
-                        oldName = filePath.GetFile()->GetName();
-                        break;
-                    }
+				offset += pNotify->NextEntryOffset;
 
-                    case FILE_ACTION_RENAMED_NEW_NAME:
-                    {
-                        e.SetOldName(oldName);
-                        e.SetAction(FileSystemAction::Renamed);
-                        s_Callback(e);
-                        break;
-                    }
-                }
+			} while (pNotify->NextEntryOffset);
+		}
 
-                if (!fni.NextEntryOffset)
-                    break;
-
-                buf += fni.NextEntryOffset;
-            }
-        }
-
-        return 0;
+		CloseHandle(dirHandle);
+		return 0;
 	}
 
 

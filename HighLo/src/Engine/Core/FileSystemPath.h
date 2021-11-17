@@ -15,10 +15,32 @@
 
 #pragma once
 
-#include "File.h"
+#include <filesystem>
+
+// FileSystemPath path = "Hello" / "World" -> Hello/World
 
 namespace highlo
 {
+	struct File
+	{
+		HLString Name;
+		HLString Extension;
+		HLString FullPath;
+		int64 Size = 0;
+		bool ExistsOnHardDrive = false;
+		bool IsFile = false;
+
+		HLAPI File() = default;
+
+		HLAPI File(const HLString &name, int64 size, bool existsOnHardDrive = false, bool isFile = false)
+			: Name(name), Size(size), ExistsOnHardDrive(existsOnHardDrive), IsFile(isFile)
+		{
+		}
+
+		HLAPI File(const File&) = default;
+		HLAPI File &operator=(const File&) = default;
+	};
+
 	class FileSystemPath : public IsSharedReference
 	{
 	public:
@@ -32,8 +54,9 @@ namespace highlo
 
 		HLAPI FileSystemPath &operator=(const FileSystemPath &other);
 		HLAPI FileSystemPath &operator=(const HLString &str);
+		HLAPI FileSystemPath &operator=(const File &file);
 
-		HLAPI FileSystemPath &Assign(const HLString &source);
+		HLAPI void Assign(const HLString &source);
 		HLAPI void Swap(FileSystemPath &lhs, FileSystemPath &rhs);
 		HLAPI uint64 Hash() const;
 
@@ -44,12 +67,22 @@ namespace highlo
 		HLAPI bool IsAbsolute() const;
 		HLAPI bool IsRelative() const;
 
+		HLAPI std::vector<File> GetFileList() const;
+		HLAPI uint32 GetFileCount() const;
+
+		HLAPI bool Exists() const;
+		HLAPI int64 Size() const;
+		HLAPI const HLString &Absolute() const;
+		HLAPI const HLString &Filename() const;
+		HLAPI const HLString &Extension() const;
+
+		HLAPI bool IsFile() const;
+		HLAPI bool IsDirectory() const;
+		HLAPI bool IsSymLink() const;
+
 		HLAPI FileSystemPath RelativePath() const;
 		HLAPI FileSystemPath RelativePath(const FileSystemPath &parentPath) const;
 		HLAPI FileSystemPath ParentPath() const;
-
-		HLAPI Ref<File> &GetFile() { HL_ASSERT(m_File, "File is nullptr!"); return m_File; }
-		HLAPI const Ref<File> &GetFile() const { HL_ASSERT(m_File, "File is nullptr!"); return m_File; }
 
 		HLAPI HLString &String() { return m_CurrentPath; }
 		HLAPI const HLString &String() const { return m_CurrentPath; }
@@ -79,10 +112,17 @@ namespace highlo
 		HLAPI FileSystemPath &operator+=(const char *path);
 		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const char *path);
 
+		HLAPI static HLString ExtractFileNameFromPath(const HLString &path);
+		HLAPI static HLString ExtractFileExtensionFromPath(const HLString &path, bool excludeDot = false);
+		HLAPI static HLString ExtractFolderNameFromPath(const HLString &path);
+
+		HLAPI friend std::ostream &operator<<(std::ostream &stream, const FileSystemPath &other);
+
 	private:
 
 		HLString m_CurrentPath;
-		Ref<File> m_File = nullptr;
+		File m_File;
+		std::filesystem::path m_Handle;
 	};
 }
 

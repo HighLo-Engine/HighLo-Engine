@@ -35,13 +35,59 @@ namespace highlo
 		CreateCacheCos();
 
 		// Init Window
-		m_Window = UniqueRef<Window>(Window::Create(WindowData(
-			m_Settings.Fullscreen,
-			m_Settings.WindowWidth,
-			m_Settings.WindowHeight,
-			m_Settings.WindowTitle))
-		);
+		WindowData data;
+		data.Title = m_Settings.WindowTitle;
+		data.Width = m_Settings.WindowWidth;
+		data.Height = m_Settings.WindowHeight;
+		data.Fullscreen = m_Settings.Fullscreen;
+		data.Maximized = m_Settings.Maximized;
+		data.VSync = m_Settings.VSync;
 
+		m_Window = UniqueRef<Window>(Window::Create(data));
+		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+
+		// Init Renderer
+		Renderer::Init(m_Window.Get());
+		Renderer::WaitAndRender();
+		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
+
+		// Init Fonts
+		FontManager::Get()->Init();
+
+		m_Encryptor = Ref<Encryptor>::Create();
+		m_Encryptor->Init();
+
+		ThreadRegistry::Get()->Init();
+
+		// Sort all registered services
+		Service::Sort();
+
+		HL_CORE_INFO("Engine Initialized");
+	}
+
+	HLApplication::HLApplication(const ApplicationSettings &settings)
+	{
+		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
+		s_Instance = this;
+		m_Settings = settings;
+		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
+
+		Logger::Init();
+
+		// Create cache for sin() and cos()
+		CreateCacheSin();
+		CreateCacheCos();
+
+		// Init Window
+		WindowData data;
+		data.Title = m_Settings.WindowTitle;
+		data.Width = m_Settings.WindowWidth;
+		data.Height = m_Settings.WindowHeight;
+		data.Fullscreen = m_Settings.Fullscreen;
+		data.Maximized = m_Settings.Maximized;
+		data.VSync = m_Settings.VSync;
+
+		m_Window = UniqueRef<Window>(Window::Create(data));
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
 		// Init Renderer
@@ -189,6 +235,12 @@ namespace highlo
 		return false;
 	}
 
+	bool HLApplication::OnFileSystemChangedEvent(FileSystemChangedEvent &event)
+	{
+		HL_CORE_INFO("{0}", *event.ToString());
+		return false;
+	}
+
 	void HLApplication::InternalEventHandler(Event &e)
 	{
 		// Drop certain input events if the window is not in focus
@@ -199,6 +251,7 @@ namespace highlo
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
 		dispatcher.Dispatch<FileMenuChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileMenuChangedEvent));
+		dispatcher.Dispatch<FileSystemChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileSystemChangedEvent));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{

@@ -13,6 +13,7 @@
 
 #include "Engine/Threading/Thread.h"
 #include "Engine/Window/MenuItem.h"
+#include "Engine/Core/FileSystemPath.h"
 
 namespace highlo
 {
@@ -103,87 +104,25 @@ namespace highlo
 	{
 	public:
 
+		FileSystemAction Action = FileSystemAction::Added;
+		FileSystemPath FilePath = "";
+		HLString OldName = "";
+		HLString NewName = "";
+		bool IsDirectory = false;
+		bool Tracking = false;
+
 		HLAPI FileSystemChangedEvent() = default;
 
 		HLAPI FileSystemChangedEvent(const HLString &oldName, const HLString &newName, const HLString &path, FileSystemAction action, bool isDirectory)
-			: m_OldName(oldName), m_NewName(newName), m_FilePath(path), m_Action(action), m_IsDirectory(isDirectory) {}
-
-		HLAPI const HLString &GetOldName() const
-		{
-			return m_OldName;
-		}
-
-		HLAPI const HLString &GetNewName() const
-		{
-			return m_NewName;
-		}
-
-		HLAPI const HLString &GetPath() const
-		{
-			return m_FilePath;
-		}
-
-		HLAPI FileSystemAction GetAction()
-		{
-			return m_Action;
-		}
-
-		HLAPI bool IsDirectory() const
-		{
-			return m_IsDirectory;
-		}
-
-		HLAPI void SetAction(FileSystemAction action)
-		{
-			m_Action = action;
-		}
-
-		HLAPI void SetIsDirectory(bool isDirectory)
-		{
-			m_IsDirectory = isDirectory;
-		}
-
-		HLAPI void SetFilePath(const HLString &path)
-		{
-			m_FilePath = path;
-		}
-
-		HLAPI void SetOldName(const HLString &oldName)
-		{
-			m_OldName = oldName;
-		}
-
-		HLAPI void SetNewName(const HLString &newName)
-		{
-			m_NewName = newName;
-		}
+			: OldName(oldName), NewName(newName), FilePath(path), Action(action), IsDirectory(isDirectory) {}
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("FileSystemChangedEvent: ") << m_OldName << " -> " << m_NewName;
-		}
-
-		HLAPI void SetTracking(bool value = true)
-		{
-			m_Tracking = value;
-		}
-
-		HLAPI bool IsTracking() const
-		{
-			return m_Tracking;
+			return HLString("FileSystemChangedEvent: ") << OldName << " -> " << NewName;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(FileSystemChanged)
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
-
-	private:
-
-		FileSystemAction m_Action = FileSystemAction::Added;
-		HLString m_FilePath = "";
-		HLString m_OldName = "";
-		HLString m_NewName = "";
-		bool m_IsDirectory = false;
-		bool m_Tracking = false;
 	};
 
 	class ThreadStartingEvent : public Event

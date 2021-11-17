@@ -318,23 +318,23 @@ namespace highlo
 
 	void AssetBrowserBaseItem::OnContextMenuOpen(AssetBrowserActionResult &actionResult)
 	{
-		if (ImGui::MenuItem("Reload"))
+		if (ImGui::MenuItem(ICON_FA_SYNC_ALT " Reload"))
 			actionResult.Set(AssetBrowserAction::Reload);
 
-		if (ImGui::MenuItem("Rename"))
+		if (ImGui::MenuItem(ICON_FA_EDIT " Rename"))
 			actionResult.Set(AssetBrowserAction::StartRenaming);
 
-		if (ImGui::MenuItem("Copy"))
+		if (ImGui::MenuItem(ICON_FA_COPY " Copy"))
 			actionResult.Set(AssetBrowserAction::Copy);
 
-		if (ImGui::MenuItem("Delete"))
+		if (ImGui::MenuItem(ICON_FA_TRASH_ALT " Delete"))
 			actionResult.Set(AssetBrowserAction::OpenDeleteDialogue);
 
-		if (ImGui::MenuItem("Show in Explorer"))
+		if (ImGui::MenuItem(ICON_FA_EXTERNAL_LINK_ALT " Show in Explorer"))
 			actionResult.Set(AssetBrowserAction::ShowInExplorer);
 
-		if (ImGui::MenuItem("Open externally"))
-			actionResult.Set(AssetBrowserAction::OpenExternal);
+	//	if (ImGui::MenuItem( " Open externally"))
+	//		actionResult.Set(AssetBrowserAction::OpenExternal);
 
 		RenderCustomContextItems();
 	}
@@ -344,7 +344,7 @@ namespace highlo
 	// ====================================================================================================================================
 
 	AssetBrowserDirectory::AssetBrowserDirectory(const Ref<DirectoryInfo> &dirInfo, const Ref<Texture2D> &icon)
-		: AssetBrowserBaseItem(AssetBrowserBaseItem::ItemType::Directory, dirInfo->Handle, dirInfo->FilePath.GetFile()->GetName(), icon), m_DirectoryInfo(dirInfo)
+		: AssetBrowserBaseItem(AssetBrowserBaseItem::ItemType::Directory, dirInfo->Handle, dirInfo->FilePath.Filename(), icon), m_DirectoryInfo(dirInfo)
 	{
 	}
 
@@ -423,7 +423,7 @@ namespace highlo
 	// ====================================================================================================================================
 
 	AssetBrowserItem::AssetBrowserItem(const AssetMetaData &metaData, const Ref<Texture2D> &icon)
-		: AssetBrowserBaseItem(AssetBrowserBaseItem::ItemType::Asset, metaData.Handle, metaData.FilePath.GetFile()->GetName(), icon), m_AssetInfo(metaData)
+		: AssetBrowserBaseItem(AssetBrowserBaseItem::ItemType::Asset, metaData.Handle, metaData.FilePath.Filename(), icon), m_AssetInfo(metaData)
 	{
 	}
 
@@ -450,7 +450,7 @@ namespace highlo
 	void AssetBrowserItem::OnRenamed(const HLString &newName)
 	{
 		auto filepath = AssetManager::Get()->GetFileSystemPath(m_AssetInfo);
-		FileSystemPath newFilepath = fmt::format("{0}\\{1}{2}", filepath.ParentPath().String(), newName, filepath.GetFile()->GetExtension());
+		FileSystemPath newFilepath = fmt::format("{0}\\{1}{2}", filepath.ParentPath().String(), newName, filepath.Extension());
 
 		if (!FileSystem::Get()->FileExists(newFilepath))
 		{

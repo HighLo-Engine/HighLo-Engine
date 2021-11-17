@@ -35,14 +35,37 @@ bool test_add_component_with_value_change()
 
 bool test_for_each_multiple_component()
 {
-	highloUnit::Timer timer("for_each_component");
+	highloUnit::Timer timer("test_for_each_multiple_component");
+
+	for (uint64 i = 1; i < 10; i++)
+	{
+		Entity entity;
+		entity.AddComponent<SceneComponent>();
+		
+		if (i % 2 == 0)
+			entity.AddComponent<IDComponent>();
+	}
+
+	uint32 entityCount = 0;
+	
+	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](UUID entityID, TransformComponent &transform, std::vector<void*> &components) {
+		++entityCount;
+	});
+
+	highloUnit::Test test;
+	return test.AssertEqual<uint32>(timer, entityCount, 4);
+}
+
+bool test_for_each_multiple_component_with_value_change()
+{
+	highloUnit::Timer timer("test_for_each_multiple_component_with_value_change");
 
 	for (uint64 i = 1; i < 10; i++)
 	{
 		Entity entity;
 		SceneComponent *scene = entity.AddComponent<SceneComponent>();
 		scene->SceneID = 42;
-		
+
 		if (i % 2 == 0)
 		{
 			IDComponent *id = entity.AddComponent<IDComponent>();
@@ -50,14 +73,24 @@ bool test_for_each_multiple_component()
 		}
 	}
 
-	uint32 entityCount = 0;
-	
-	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&entityCount](UUID entityID, TransformComponent &transform, std::vector<void*> components) {
+	bool hasValues = false;
+	s_ECS_Registry.ForEachMultiple<SceneComponent, IDComponent>([&hasValues](UUID entityID, TransformComponent &transform, std::vector<void*> &components)
+	{
 		SceneComponent *sceneComponent = reinterpret_cast<SceneComponent*>(components[0]);
 		IDComponent *idComponent = reinterpret_cast<IDComponent*>(components[1]);
-		++entityCount;
+
+		std::cout << "SceneID: " << sceneComponent->SceneID << std::endl;
+		std::cout << "ID     : " << idComponent->ID << std::endl;
+		std::cout << std::endl;
+
+		if (sceneComponent->SceneID == 42 && idComponent->ID != 0)
+		{
+			hasValues = true;
+		}
+
 	});
 
 	highloUnit::Test test;
-	return test.AssertEqual<uint32>(timer, entityCount, 4);
+	return test.AssertEqual<uint32>(timer, hasValues, true);
 }
+

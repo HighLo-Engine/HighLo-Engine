@@ -26,7 +26,7 @@ namespace highlo
 	{
 		auto &services = GetServices();
 		if (!services.empty())
-			Sorting::QuickSort(&services[0], services.size(), &utils::CompareServices);
+			Sorting::QuickSort(&services[0], (int32)services.size(), &utils::CompareServices);
 	}
 
 	bool Service::Init()

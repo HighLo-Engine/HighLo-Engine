@@ -7,7 +7,6 @@
 
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Core/FileSystemWatcher.h"
-#include "Engine/Core/File.h"
 #include "AssetExtensions.h"
 
 #include "Engine/Scene/Project.h"
@@ -20,11 +19,12 @@ namespace highlo
 
 	static FileSystemPath GetKey(const FileSystemPath &path)
 	{
-		auto key = path.RelativePath(Project::GetAssetDirectory());
-		if (key.String().IsEmpty())
-			key = path.String();
+	// TODO
+	//	auto key = path.RelativePath(Project::GetAssetDirectory());
+	//	if (key.String().IsEmpty())
+	//		key = path.String();
 
-		return key;
+		return path;
 	}
 
 	AssetMetaData &AssetRegistry::operator[](const FileSystemPath &path)
@@ -70,12 +70,10 @@ namespace highlo
 
 	static AssetMetaData s_NullMetaData;
 	std::unordered_map<AssetHandle, Ref<Asset>> AssetManager::s_LoadedAssets;
-	AssetManager::AssetsChangeEventFn AssetManager::s_AssetsChangeCallback;
 
 	void AssetManager::Init()
 	{
 		LoadAssetRegistry();
-		FileSystemWatcher::Get()->SetChangeCallback(AssetManager::OnFileSystemChangedEvent);
 		ReloadAllAssets();
 	}
 
@@ -87,9 +85,10 @@ namespace highlo
 		s_LoadedAssets.clear();
 	}
 
-	void AssetManager::SetAssetChangeCallback(const AssetsChangeEventFn &callback)
+	void AssetManager::OnEvent(Event &e)
 	{
-		s_AssetsChangeCallback = callback;
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<FileSystemChangedEvent>(HL_BIND_EVENT_FUNCTION(AssetManager::OnFileSystemChangedEvent));
 	}
 
 	AssetMetaData &AssetManager::GetMetaData(AssetHandle handle)
@@ -140,7 +139,7 @@ namespace highlo
 
 	AssetType AssetManager::GetAssetTypeFromPath(const FileSystemPath &path)
 	{
-		return GetAssetTypeFromExtension(path.GetFile()->GetExtension());
+		return GetAssetTypeFromExtension(path.Extension());
 	}
 
 	AssetHandle AssetManager::ImportAsset(const FileSystemPath &path)
@@ -193,31 +192,31 @@ namespace highlo
 		WriteRegistryToFile();
 	}
 
-	void AssetManager::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
+	bool AssetManager::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
 		HL_CORE_TRACE("OnFileSystemChangedEvent: {0}", e.GetName());
 		// TODO: insert asset directory before this
-		e.SetFilePath("" + e.GetPath());
+		e.FilePath = Project::GetActive()->GetAssetDirectory() / e.FilePath;
 		
 	#ifdef HL_PLATFORM_WINDOWS
-		HLString temp = e.GetPath();
+		HLString temp = e.FilePath.String();
 		temp.Replace("\\", "/");
-		e.SetFilePath(temp);
+		e.FilePath = temp;
 	#endif // HL_PLATFORM_WINDOWS
 
 		// TOOD: Remove extension in NewName
 		// e.SetNewName();
 
-		if (!e.IsDirectory())
+		if (!e.IsDirectory)
 		{
-			switch (e.GetAction())
+			switch (e.Action)
 			{
 				case FileSystemAction::Added:
-					AssetManager::Get()->ImportAsset(e.GetPath());
+					AssetManager::Get()->ImportAsset(e.FilePath);
 					break;
 
 				case FileSystemAction::Deleted:
-					AssetManager::Get()->OnAssetDeleted(AssetManager::Get()->GetAssetHandleFromFilePath(e.GetPath()));
+					AssetManager::Get()->OnAssetDeleted(AssetManager::Get()->GetAssetHandleFromFilePath(e.FilePath));
 					break;
 
 				case FileSystemAction::Modified:
@@ -226,25 +225,25 @@ namespace highlo
 
 				case FileSystemAction::Renamed:
 				{
-					AssetType prevType = AssetManager::Get()->GetAssetTypeFromPath(e.GetOldName());
-					AssetType type = AssetManager::Get()->GetAssetTypeFromPath(e.GetPath());
+					AssetType prevType = AssetManager::Get()->GetAssetTypeFromPath(e.OldName);
+					AssetType type = AssetManager::Get()->GetAssetTypeFromPath(e.FilePath);
 
 					if (prevType == AssetType::None && type != AssetType::None)
 					{
-						AssetManager::Get()->ImportAsset(e.GetPath());
+						AssetManager::Get()->ImportAsset(e.FilePath);
 					}
 					else
 					{
 						// TODO: Get relative path
-						OnAssetRenamed(AssetManager::Get()->GetAssetHandleFromFilePath(/* insert relative path here */ "/" + e.GetOldName()), e.GetPath());
-						e.SetTracking(true);
+						OnAssetRenamed(AssetManager::Get()->GetAssetHandleFromFilePath(/* insert relative path here */ "/" + e.OldName), e.FilePath);
+						e.Tracking = true;
 					}
 					break;
 				}
 			}
 		}
 
-		s_AssetsChangeCallback(e);
+		return true;
 	}
 
 	void AssetManager::OnAssetRenamed(AssetHandle handle, const FileSystemPath &newFilePath)

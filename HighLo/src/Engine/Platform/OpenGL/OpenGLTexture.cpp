@@ -7,7 +7,6 @@
 
 #include <stb_image.h>
 
-#include "Engine/Core/File.h"
 #include "Engine/Utils/ImageUtils.h"
 #include "Engine/Renderer/Renderer.h"
 
@@ -29,7 +28,7 @@ namespace highlo
 		}
 
 		OpenGLTexture2D *instance = new OpenGLTexture2D(data, width, height, format);
-		instance->Name = File::GetFileName(filepath);
+		instance->Name = FileSystemPath::ExtractFileNameFromPath(filepath);
 		instance->m_Loaded = true;
 		HL_CORE_INFO("Texture2D>    [+] Loaded " + filepath + " [+]");
 

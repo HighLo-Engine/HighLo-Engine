@@ -29,7 +29,7 @@ namespace highlo
 		}
 	}
 
-	AssetBrowserPanel *AssetBrowserPanel::s_Instance;
+	AssetBrowserPanel *AssetBrowserPanel::s_Instance = nullptr;
 	static float s_Padding = 2.0f;
 	static float s_ThumbnailSize = 128.0f;
 	static std::mutex s_LockMutex;
@@ -38,19 +38,22 @@ namespace highlo
 		: m_Project(project)
 	{
 		s_Instance = this;
-		AssetManager::Get()->SetAssetChangeCallback(HL_BIND_EVENT_FUNCTION(AssetBrowserPanel::OnFileSystemChangedEvent));
 
 		// Load Textures
-		m_FolderIcon = Texture2D::LoadFromFile("assets/Resources/icons/folder.png").As<Texture2D>();
-		m_FileIcon = Texture2D::LoadFromFile("assets/Resources/icons/file.png").As<Texture2D>();
 		m_Shadow = Texture2D::LoadFromFile("assets/Resources/icons/shadow.png").As<Texture2D>();
-
-		m_BackBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/back.png").As<Texture2D>();
-		m_FrontBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/front.png").As<Texture2D>();
-		m_RefreshBtnIcon = Texture2D::LoadFromFile("assets/Resources/icons/refresh.png").As<Texture2D>();
+		m_FileIcon = Texture2D::LoadFromFile("assets/Resources/icons/file.png").As<Texture2D>();
+		m_FolderIcon = Texture2D::LoadFromFile("assets/Resources/icons/folder.png").As<Texture2D>();
 
 		// Load Asset Icons
-		// TODO
+	//	m_AssetIconMap[".fbx"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".obj"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".wav"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".png"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".otf"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/textFile.png").As<Texture2D>();
+	//	m_AssetIconMap[".hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
 
 		AssetHandle baseDirHandle = ProcessDirectory(project->GetAssetDirectory().String(), nullptr);
 		m_BaseDirectory = m_Directories[baseDirHandle];
@@ -221,7 +224,7 @@ namespace highlo
 					auto data = ImGui::AcceptDragDropPayload("scene_entity_hierarchy");
 					if (data)
 					{
-						Entity &e = *(Entity *) data->Data;
+						Entity &e = *(Entity*)data->Data;
 						Ref<Prefab> prefab = CreateAssetRepresentation<Prefab>("New Prefab.hprefab");
 						prefab->Create(e);
 
@@ -273,22 +276,22 @@ namespace highlo
 		else
 			dirInfo->FilePath = dirPath.RelativePath();
 
-		std::vector<File> dirList = dirPath.GetFile()->GetFileList();
-		HL_CORE_TRACE("Logged {0} files in directory {1}", dirList.size(), *dirPath.GetFile()->GetName());
+		std::vector<File> dirList = dirPath.GetFileList();
+		HL_CORE_TRACE("Logged {0} files in directory {1}", dirList.size(), *dirPath.Filename());
 
-		for (uint32 i = 0; i < dirPath.GetFile()->GetFileCount(); ++i)
+		for (uint32 i = 0; i < dirPath.GetFileCount(); ++i)
 		{
-			File entry = dirList[i];
+			File &entry = dirList[i];
 			FileSystemPath entryPath = entry;
 
-			if (entry.IsDirectory())
+			if (!entry.IsFile)
 			{
 				AssetHandle subDirHandle = ProcessDirectory(entryPath, dirInfo);
 				dirInfo->SubDirectories[subDirHandle] = m_Directories[subDirHandle];
 				continue;
 			}
 
-			auto metaData = AssetManager::Get()->GetMetaData(entry.GetRelativePath());
+			auto metaData = AssetManager::Get()->GetMetaData(entry.FullPath);
 			if (!metaData.IsValid())
 			{
 				AssetType type = AssetManager::Get()->GetAssetTypeFromPath(entryPath);
@@ -300,7 +303,10 @@ namespace highlo
 
 			// Failed to import asset
 			if (!metaData.IsValid())
+			{
+			//	HL_CORE_WARN("Failed to import {0}", *entry.FullPath);
 				continue;
+			}
 
 			dirInfo->Assets.push_back(metaData.Handle);
 		}
@@ -315,18 +321,17 @@ namespace highlo
 			return;
 
 		m_UpdateNavigationPath = true;
+		m_CurrentItems.Clear();
 
 		for (auto &[subDirHandle, subDir] : dirInfo->SubDirectories)
-		{
 			m_CurrentItems.Items.push_back(Ref<AssetBrowserDirectory>::Create(subDir, m_FolderIcon));
-		}
 
 		std::vector<AssetHandle> invalidAssets;
 		for (auto assetHandle : dirInfo->Assets)
 		{
 			AssetMetaData metaData = AssetManager::Get()->GetMetaData(assetHandle);
 			if (metaData.IsValid())
-				m_CurrentItems.Items.push_back(Ref<AssetBrowserItem>::Create(metaData, m_AssetIconMap.find(metaData.FilePath.GetFile()->GetExtension()) != m_AssetIconMap.end() ? m_AssetIconMap[metaData.FilePath.GetFile()->GetExtension()] : m_FileIcon));
+				m_CurrentItems.Items.push_back(Ref<AssetBrowserItem>::Create(metaData, m_AssetIconMap.find(metaData.FilePath.Extension()) != m_AssetIconMap.end() ? m_AssetIconMap[metaData.FilePath.Extension()] : m_FileIcon));
 		}
 
 		SortItemList();
@@ -352,12 +357,17 @@ namespace highlo
 		dirInfo->Assets.clear();
 
 		m_Directories.erase(m_Directories.find(dirInfo->Handle));
+		bool result = FileSystem::Get()->RemoveFolder(dirInfo->FilePath);
+		if (!result)
+			HL_CORE_ERROR("Could not delete {0}", *dirInfo->FilePath);
 	}
 	
 	void AssetBrowserPanel::RenderDirectoryHierarchy(Ref<DirectoryInfo> &dirInfo)
 	{
-		HLString name = dirInfo->FilePath.GetFile()->GetName();
-		HLString id = name + "_TreeNode";
+		const HLString name = dirInfo->FilePath.Filename();
+		HLString id = HLString::ToString(dirInfo->Handle) + "_TreeNode";
+		
+
 		bool prevState = ImGui::TreeNodeBehaviorIsOpen(ImGui::GetID(*id));
 
 		auto *window = ImGui::GetCurrentWindow();
@@ -464,33 +474,17 @@ namespace highlo
 		// ====================================================================================================================================
 		{
 			UI::ScopedStyle spacing(ImGuiStyleVar_ItemSpacing, ImVec2(2.0f, 0.0f));
-			/*
-			auto ContentBrowserButton = [height](const char *labelId, const Ref<Texture2D> &icon)
-			{
-				const ImU32 buttonColor = Colors::Theme::BackgroundDark;
-				const ImU32 buttonColorP = UI::ColorWithMultipliedValue(Colors::Theme::BackgroundDark, 0.8f);
-				UI::ScopedColorStack buttonColors(ImGuiCol_Button, buttonColor, ImGuiCol_ButtonHovered, buttonColor, ImGuiCol_ButtonActive, buttonColorP);
-
-				const float iconSize = std::min(24.0f, height);
-				const float iconPadding = 3.0f;
-				const bool clicked = ImGui::Button(labelId, ImVec2(iconSize, iconSize));
-				UI::DrawButtonImage(icon, Colors::Theme::TextDarker, UI::ColorWithMultipliedValue(Colors::Theme::TextDarker, 1.2f), UI::ColorWithMultipliedValue(Colors::Theme::TextDarker, 0.8f), UI::RectExpanded(UI::GetItemRect(), -iconPadding, -iconPadding));
-				return clicked;
-			};
-			*/
-
 			auto ContentBrowserButton = [height](const HLString &icon)
 			{
 				const ImU32 buttonColor = Colors::Theme::BackgroundDark;
 				const ImU32 buttonColorP = UI::ColorWithMultipliedValue(Colors::Theme::BackgroundDark, 0.8f);
 				UI::ScopedColorStack buttonColors(ImGuiCol_Button, buttonColor, ImGuiCol_ButtonHovered, buttonColor, ImGuiCol_ButtonActive, buttonColorP);
 
-				const float iconSize = std::min(24.0f, height);
+				const float iconSize = std::min(26.0f, height);
 				const float iconPadding = 3.0f;
 				return ImGui::Button(icon, ImVec2(iconSize, iconSize));
 			};
 
-			//if (ContentBrowserButton("##back", m_BackBtnIcon))
 			if (ContentBrowserButton(ICON_FA_ARROW_LEFT))
 			{
 				m_NextDirectory = m_CurrentDirectory;
@@ -501,7 +495,6 @@ namespace highlo
 		//	UI::SetToolTip("Previous Directory");
 			ImGui::Spring(-1.0f, edgeOffset);
 
-		//	if (ContentBrowserButton("##front", m_FrontBtnIcon))
 			if (ContentBrowserButton(ICON_FA_ARROW_RIGHT))
 			{
 				ChangeDirectory(m_NextDirectory);
@@ -510,7 +503,6 @@ namespace highlo
 		//	UI::SetToolTip("Next Directory");
 			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
 
-		//	if (ContentBrowserButton("##refresh", m_RefreshBtnIcon))
 			if (ContentBrowserButton(ICON_FA_SYNC_ALT))
 				Refresh();
 
@@ -576,7 +568,7 @@ namespace highlo
 			{
 				ImGui::Text("/");
 
-				HLString dirName = dir->FilePath.GetFile()->GetName();
+				HLString dirName = dir->FilePath.Filename();
 				ImVec2 textSize = ImGui::CalcTextSize(*dirName);
 				if (ImGui::Selectable(*dirName, false, 0, ImVec2(textSize.x, textSize.y + textPadding)))
 				{
@@ -814,7 +806,7 @@ namespace highlo
 						return HLString::ToString(counter);
 				}();
 
-				HLString basePath = p.GetFile()->GetName() + "_" + CounterAsStr + p.GetFile()->GetExtension();
+				HLString basePath = p.Filename() + "_" + CounterAsStr + p.Extension();
 				if (FileSystem::Get()->FileExists(basePath))
 					return checkFileName(checkFileName);
 				else
@@ -910,7 +902,7 @@ namespace highlo
 		
 		for (auto &[handle, subDir] : dirInfo->SubDirectories)
 		{
-			HLString subDirName = subDir->FilePath.GetFile()->GetName().ToLowerCase();
+			HLString subDirName = subDir->FilePath.Filename().ToLowerCase();
 			if (subDirName.IndexOf(queryLower) != HLString::NPOS)
 				results.Items.push_back(Ref<AssetBrowserDirectory>::Create(subDir, m_FolderIcon));
 
@@ -921,16 +913,16 @@ namespace highlo
 		for (auto &assetHandle : dirInfo->Assets)
 		{
 			auto &asset = AssetManager::Get()->GetMetaData(assetHandle);
-			HLString fileName = asset.FilePath.GetFile()->GetName().ToLowerCase();
+			HLString fileName = asset.FilePath.Filename().ToLowerCase();
 
 			if (fileName.IndexOf(queryLower) != HLString::NPOS)
-				results.Items.push_back(Ref<AssetBrowserItem>::Create(asset, m_AssetIconMap.find(asset.FilePath.GetFile()->GetExtension()) != m_AssetIconMap.end() ? m_AssetIconMap[asset.FilePath.GetFile()->GetExtension()] : m_FileIcon));
+				results.Items.push_back(Ref<AssetBrowserItem>::Create(asset, m_AssetIconMap.find(asset.FilePath.Extension()) != m_AssetIconMap.end() ? m_AssetIconMap[asset.FilePath.Extension()] : m_FileIcon));
 
 			if (queryLower[0] != '.')
 				continue;
 
-			if (asset.FilePath.GetFile()->GetExtension().IndexOf(&queryLower[1]) != HLString::NPOS)
-				results.Items.push_back(Ref<AssetBrowserItem>::Create(asset, m_AssetIconMap.find(asset.FilePath.GetFile()->GetExtension()) != m_AssetIconMap.end() ? m_AssetIconMap[asset.FilePath.GetFile()->GetExtension()] : m_FileIcon));
+			if (asset.FilePath.Extension().IndexOf(&queryLower[1]) != HLString::NPOS)
+				results.Items.push_back(Ref<AssetBrowserItem>::Create(asset, m_AssetIconMap.find(asset.FilePath.Extension()) != m_AssetIconMap.end() ? m_AssetIconMap[asset.FilePath.Extension()] : m_FileIcon));
 		}
 
 		return results;
@@ -938,6 +930,7 @@ namespace highlo
 	
 	void AssetBrowserPanel::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
+		HL_CORE_INFO("FileSystemChangedEvent: ", *e.ToString());
 		Refresh();
 	}
 	

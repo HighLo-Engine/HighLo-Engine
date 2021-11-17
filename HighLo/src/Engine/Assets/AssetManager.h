@@ -52,13 +52,12 @@ namespace highlo
 	class AssetManager : public Singleton<AssetManager>
 	{
 	public:
-		using AssetsChangeEventFn = std::function<void(FileSystemChangedEvent)>;
-
+		
 		// Should only be called by the engine
 		HLAPI void Init();
 		HLAPI void Shutdown();
 
-		HLAPI void SetAssetChangeCallback(const AssetsChangeEventFn &callback);
+		HLAPI void OnEvent(Event &e);
 
 		HLAPI AssetMetaData &GetMetaData(AssetHandle handle);
 		HLAPI AssetMetaData &GetMetaData(const FileSystemPath &path);
@@ -102,13 +101,13 @@ namespace highlo
 
 				while (!foundAvailableFileName)
 				{
-					HLString nextFilePath = dirPath + "/" + assetInfo.FilePath.GetFile()->GetName();
+					HLString nextFilePath = dirPath + "/" + assetInfo.FilePath.Filename();
 					if (current < 10)
 						nextFilePath += " (0" + HLString::ToString(current) + ")";
 					else
 						nextFilePath += " (" + HLString::ToString(current) + ")";
 
-					nextFilePath += assetInfo.FilePath.GetFile()->GetExtension();
+					nextFilePath += assetInfo.FilePath.Extension();
 
 					if (!FileSystem::Get()->FileExists(nextFilePath))
 					{
@@ -121,7 +120,7 @@ namespace highlo
 				}
 			}
 
-			s_AssetRegistry[assetInfo.FilePath.GetFile()->GetAbsolutePath()] = assetInfo;
+			s_AssetRegistry[assetInfo.FilePath.Absolute()] = assetInfo;
 			WriteRegistryToFile();
 
 			Ref<Asset> asset = Ref<T>::Create(std::forward<Args>(args)...);
@@ -173,7 +172,7 @@ namespace highlo
 		void ProcessDirectory(const HLString &dirPath);
 		void ReloadAllAssets();
 		
-		static void OnFileSystemChangedEvent(FileSystemChangedEvent &e);
+		bool OnFileSystemChangedEvent(FileSystemChangedEvent &e);
 		static void OnAssetRenamed(AssetHandle handle, const FileSystemPath &newFilePath);
 		static void OnAssetMoved(AssetHandle handle, FileSystemPath &destinationFilePath);
 		static void OnAssetDeleted(AssetHandle handle);
@@ -181,7 +180,6 @@ namespace highlo
 	private:
 
 		static std::unordered_map<AssetHandle, Ref<Asset>> s_LoadedAssets;
-		static AssetsChangeEventFn s_AssetsChangeCallback;
 		inline static AssetRegistry s_AssetRegistry;
 
 	private:

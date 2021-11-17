@@ -7,8 +7,8 @@
 
 #include <glad/glad.h>
 
-#include "Engine/Core/File.h"
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Core/FileSystemPath.h"
 #include "Engine/Renderer/Renderer.h"
 
 namespace highlo
@@ -16,7 +16,11 @@ namespace highlo
 	OpenGLShader::OpenGLShader(const ShaderSource &source)
 		: m_FileName(source.FileName)
 	{
-		m_Name = File::GetFileName(source.FileName);
+		m_Name = FileSystemPath(source.FileName).Filename();
+		if (m_Name.Contains("."))
+		{
+			m_Name = m_Name.Substr(0, m_Name.IndexOf("."));
+		}
 
 		if (!FileSystem::Get()->FileExists(source.FileName))
 		{

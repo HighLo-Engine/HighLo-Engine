@@ -1,5 +1,6 @@
 #pragma once
 
+#undef TEST_CATEGORY
 #define TEST_CATEGORY StringTests
 
 #include <HighLo.h>

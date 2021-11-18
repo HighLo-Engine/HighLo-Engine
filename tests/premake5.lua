@@ -41,7 +41,7 @@ project "HighLoTest"
 
     filter "system:windows"
         systemversion "latest"
-        disablewarnings { "5033", "4996" }
+        disablewarnings { "5033", "4996", "4217", "4006" }
 
         defines
         {

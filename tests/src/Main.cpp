@@ -1,8 +1,8 @@
 #include <HighLo.h>
 #include <gtest/gtest.h>
 
-#include "EncryptionTests.h"
-#include "StringTests.h"
+#include "tests/StringTests.h"
+#include "tests/EncryptionTests.h"
 
 TEST(DemoTest, DemoTest)
 {

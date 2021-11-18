@@ -8,7 +8,6 @@ IncludeDir["stb_image"]              = "%{wks.location}/HighLo/vendor/stb_image"
 IncludeDir["SPIRV_Cross"]            = "%{wks.location}/HighLo/vendor/SPIRV-Cross"
 IncludeDir["shaderc"]                = "%{wks.location}/HighLo/vendor/shaderc/libshaderc/include"
 IncludeDir["openssl"]                = "%{wks.location}/HighLo/vendor/openssl/include"
-IncludeDir["HighLo_Unit"]            = "%{wks.location}/HighLo/vendor/HighLo-Unit/include"
 IncludeDir["msdf_atlas_gen"]         = "%{wks.location}/HighLo/vendor/msdf-atlas-gen/msdf-atlas-gen"
 IncludeDir["msdfgen"]                = "%{wks.location}/HighLo/vendor/msdf-atlas-gen/msdfgen"
 IncludeDir["rapidXML"]               = "%{wks.location}/HighLo/vendor/RapidXML"
@@ -38,5 +37,4 @@ LibDir["SPIRV_Tools"]                = "%{wks.location}/HighLo/vendor/SPIRV-Tool
 LibDir["SPIRV_Tools_opt"]            = "%{wks.location}/HighLo/vendor/SPIRV-Tools/lib/%{cfg.buildcfg}/SPIRV-Tools-opt.lib"
 LibDir["openssl_libssl"]             = "%{wks.location}/HighLo/vendor/openssl/lib/libssl.lib"
 LibDir["openssl_libcrypto"]          = "%{wks.location}/HighLo/vendor/openssl/lib/libcrypto.lib"
-LibDir["HighLo_Unit"]                = "%{wks.location}/HighLo/vendor/HighLo-Unit/lib/HighLo-Unit.lib"
 

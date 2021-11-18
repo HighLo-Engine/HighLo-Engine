@@ -20,7 +20,6 @@ project "PBRSceneDemo"
 		"%{wks.location}/HighLo/src",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.HighLo_Unit}",
 		"%{IncludeDir.IconFontCppHeaders}"
     }
 

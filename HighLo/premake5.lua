@@ -27,7 +27,6 @@ project "HighLo"
         "%{IncludeDir.SPIRV_Cross}",
 		"%{IncludeDir.shaderc}",
 		"%{IncludeDir.openssl}",
-		"%{IncludeDir.HighLo_Unit}",
 		"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.rapidXML}",
@@ -64,7 +63,6 @@ project "HighLo"
 		"%{LibDir.SPIRV_Tools_opt}",
 		"%{LibDir.openssl_libssl}",
 		"%{LibDir.openssl_libcrypto}",
-		"%{LibDir.HighLo_Unit}"
     }
 
     defines

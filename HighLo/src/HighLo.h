@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.7 (2021-11-18) Removed HighLo-Unit
 //     - 1.6 (2021-11-01) Added Threading headers
 //     - 1.5 (2021-10-23) Added Atomic and Service
 //     - 1.4 (2021-10-19) Added RenderCommandQueue
@@ -139,6 +140,4 @@
 #include "Engine/Serialization/Serializer.h"
 
 #include "Engine/Utils/Utils.h"
-
-#include "HighLo-Unit.h"
 

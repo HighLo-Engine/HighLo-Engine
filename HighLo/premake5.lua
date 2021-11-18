@@ -33,7 +33,8 @@ project "HighLo"
 		"%{IncludeDir.rapidJSON}",
 		"%{IncludeDir.yamlCpp}",
 		"%{IncludeDir.IconFontCppHeaders}",
-
+		"%{IncludeDir.gtest}",
+		"%{IncludeDir.gmock}"
     }
 
     links
@@ -121,8 +122,26 @@ project "HighLo"
     filter "configurations:Debug"
         defines "HL_DEBUG"
         symbols "On"
+		
+		links
+		{
+			"%{LibDir.gtest_debug}",
+			"%{LibDir.gtest_main_debug}",
+			"%{LibDir.gmock_debug}",
+			"%{LibDir.gmock_main_debug}",
+		}
 
     filter "configurations:Release"
         defines "HL_RELEASE"
         optimize "On"
 
+		
+		links
+		{
+			"%{LibDir.gtest_release}",
+			"%{LibDir.gtest_main_release}",
+			"%{LibDir.gmock_release}",
+			"%{LibDir.gmock_main_release}",
+		}
+		
+		

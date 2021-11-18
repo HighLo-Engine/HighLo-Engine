@@ -48,11 +48,10 @@ jobs:
         
         - name: Copy DLLs
           run: |
-         	ROBOCOPY HighLo\vendor\openssl\lib\ tests\bin\Release-windows-x86_64\HighLoTest\ libcrypto-3-x64.dll /mt /z > nul
-            ROBOCOPY HighLo\vendor\openssl\lib\ tests\bin\Release-windows-x86_64\HighLoTest\ libssl-3-x64.dll /mt /z > nul
-            ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\bin\Release-windows-x86_64\HighLoTest\ assimp-vc142-mtd.dll /mt /z > nul
+            cd scripts
+            .\CopyDlls.bat
+            cd ..
             
-          
         - name: Run Unit Tests
           run: |
             cd tests\bin\Release-windows-x86_64\HighLoTest

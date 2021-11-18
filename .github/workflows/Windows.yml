@@ -36,15 +36,22 @@ jobs:
             .\GenerateEngine-Windows.bat
             cd ..
 
-        - name: Build Engine
-          working-directory: ${{env.GITHUB_WORKSPACE}}
+        #- name: Build Engine
+        #  working-directory: ${{env.GITHUB_WORKSPACE}}
           # Add additional options to the MSBuild command line here (like platform or verbosity level).
           # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-          run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.SOLUTION_FILE_PATH}}
+        #  run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.SOLUTION_FILE_PATH}}
           
         - name: Build Unit Tests
           working-directory: ${{env.GITHUB_WORKSPACE}}
           run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} /p:PostBuildEventUseInBuild=false ${{env.TEST_FILE_PATH}}
+          
+        -name: Copy DLLs
+         run: |
+         	ROBOCOPY HighLo\vendor\openssl\lib\ tests\bin\Release-windows-x86_64\HighLoTest\ libcrypto-3-x64.dll /mt /z > nul
+            ROBOCOPY HighLo\vendor\openssl\lib\ tests\bin\Release-windows-x86_64\HighLoTest\ libssl-3-x64.dll /mt /z > nul
+            ROBOCOPY HighLo\vendor\assimp\lib\Debug\ tests\bin\Release-windows-x86_64\HighLoTest\ assimp-vc142-mtd.dll /mt /z > nul
+            
           
         - name: Run Unit Tests
           run: |

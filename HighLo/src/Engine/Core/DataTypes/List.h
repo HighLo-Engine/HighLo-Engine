@@ -231,7 +231,7 @@ namespace highlo
 			}
 		}
 
-		HLAPI T *ToArray()
+		HLAPI T *ToArray(uint32 *outSize = nullptr)
 		{
 			T *arr = new T[m_Length];
 			Node *current = m_Root;
@@ -244,6 +244,9 @@ namespace highlo
 				++i;
 				current = current->Next;
 			}
+
+			if (outSize)
+				*outSize = m_Length;
 
 			return arr;
 		}

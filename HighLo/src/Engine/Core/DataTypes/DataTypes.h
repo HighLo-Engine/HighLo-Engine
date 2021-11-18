@@ -15,4 +15,6 @@
 #include "Hashmap.h"
 #include "Vector.h"
 #include "Sorting.h"
+#include "BinaryTree.h"
+#include "BinarySearchTree.h"
 

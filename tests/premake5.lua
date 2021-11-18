@@ -1,51 +1,91 @@
-include "../vendor/bin/premake/solution_items.lua"
-include "../Dependencies.lua"
+project "HighLoTest"
+    kind "ConsoleApp"
+    language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+	entrypoint "mainCRTStartup"
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"	
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    debugdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
-workspace "Highlo-Tests"
-    architecture "x64"
-    configurations { "Release" }
+    files
+    { 
+        "src/**.h",
+        "src/**.cpp"
+    }
+
+    includedirs
+    {
+		"src",
+		"../HighLo/src",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.IconFontCppHeaders}",
+		"%{IncludeDir.gtest}",
+		"%{IncludeDir.gmock}"
+    }
+
+    links
+    {
+        "HighLo",
+    }
 	
-	solution_items
+	postbuildcommands
 	{
-		".editorconfig"
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/libssl-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/assets/editorconfig.ini %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/editorconfig.ini*"),
 	}
 
-	flags
-	{
-		"MultiProcessorCompile"
-	}
-	
-	group "Dependencies"
-		include "../HighLo/vendor/glfw"
-		include "../HighLo/vendor/glm"
-		include "../HighLo/vendor/assimp"
-		include "../HighLo/vendor/spdlog"
-		include "../HighLo/vendor/openssl"
-		include "../HighLo/vendor/HighLo-Unit"
-		include "../HighLo/vendor/stb_image"
-		include "../HighLo/vendor/msdf-atlas-gen"
-		include "../HighLo/vendor/RapidXML"
-		include "../HighLo/vendor/RapidJSON"
-		include "../HighLo/vendor/yaml-cpp"
+    filter "system:windows"
+        systemversion "latest"
+        disablewarnings { "5033", "4996" }
+
+        defines
+        {
+            "HL_PLATFORM_WINDOWS"
+        }
+
+	filter "system:linux"
+		systemversion "latest"
 		
-		filter "system:windows"
-			include "../HighLo/vendor/GLAD"
-	group ""
-	
-	group "tests"
-		include "BinaryTreeTest"
-		include "BinarySearchTreeTest"
-		include "StringTest"
-		include "EncryptionTest"
-		include "ListTest"
-		include "HashmapTest"
-		include "VectorTest"
-		include "StackTest"
-		include "QueueTest"
-		include "ECSTest"
-		include "FileSystemTest"
-		include "FileSystemPathTest"
-	group ""
+		defines
+		{
+			"HL_PLATFORM_LINUX"
+		}
 
+	filter "system:macos"
+		systemversion "latest"
+		
+		defines
+		{
+			"HL_PLATFORM_MACOS"
+		}
+
+    filter "configurations:Debug"
+        defines "HL_DEBUG"
+        symbols "On"
+
+		links
+		{
+			"%{LibDir.gtest_debug}",
+			"%{LibDir.gtest_main_debug}",
+			"%{LibDir.gmock_debug}",
+			"%{LibDir.gmock_main_debug}",
+		}
+
+    filter "configurations:Release"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		links
+		{
+			"%{LibDir.gtest_release}",
+			"%{LibDir.gtest_main_release}",
+			"%{LibDir.gmock_release}",
+			"%{LibDir.gmock_main_release}",
+		}
+		
+		

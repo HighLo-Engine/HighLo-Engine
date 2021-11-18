@@ -31,6 +31,7 @@ workspace "HighLo"
 		include "HighLo/vendor/RapidJSON"
 		include "HighLo/vendor/yaml-cpp"
 		include "HighLo/vendor/IconFontCppHeaders"
+		include "HighLo/vendor/googletest"
 		
 		filter "system:windows"
 			include "HighLo/vendor/GLAD"
@@ -42,6 +43,10 @@ workspace "HighLo"
 
 	group "Demos"
 		include "demos"
+	group ""
+
+	group "tests"
+		include "tests"
 	group ""
 
 	group "Games"

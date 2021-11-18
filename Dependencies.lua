@@ -14,6 +14,8 @@ IncludeDir["rapidXML"]               = "%{wks.location}/HighLo/vendor/RapidXML"
 IncludeDir["rapidJSON"]              = "%{wks.location}/HighLo/vendor/RapidJSON/include"
 IncludeDir["yamlCpp"]                = "%{wks.location}/HighLo/vendor/yaml-cpp/include"
 IncludeDir["IconFontCppHeaders"]     = "%{wks.location}/HighLo/vendor/IconFontCppHeaders"
+IncludeDir["gtest"]     			 = "%{wks.location}/HighLo/vendor/googletest/googletest/include"
+IncludeDir["gmock"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlemock/include"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"
@@ -37,4 +39,13 @@ LibDir["SPIRV_Tools"]                = "%{wks.location}/HighLo/vendor/SPIRV-Tool
 LibDir["SPIRV_Tools_opt"]            = "%{wks.location}/HighLo/vendor/SPIRV-Tools/lib/%{cfg.buildcfg}/SPIRV-Tools-opt.lib"
 LibDir["openssl_libssl"]             = "%{wks.location}/HighLo/vendor/openssl/lib/libssl.lib"
 LibDir["openssl_libcrypto"]          = "%{wks.location}/HighLo/vendor/openssl/lib/libcrypto.lib"
+
+LibDir["gtest_debug"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Debug/gtestd.lib"
+LibDir["gtest_main_debug"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Debug/gtest_maind.lib"
+LibDir["gmock_debug"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Debug/gmockd.lib"
+LibDir["gmock_main_debug"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Debug/gmock_maind.lib"
+LibDir["gtest_release"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gtest.lib"
+LibDir["gtest_main_release"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gtest_main.lib"
+LibDir["gmock_release"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gmock.lib"
+LibDir["gmock_main_release"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gmock_main.lib"
 

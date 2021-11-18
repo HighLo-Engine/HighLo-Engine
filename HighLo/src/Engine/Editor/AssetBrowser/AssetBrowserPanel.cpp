@@ -291,7 +291,7 @@ namespace highlo
 				continue;
 			}
 
-			auto metaData = AssetManager::Get()->GetMetaData(entry.FullPath);
+			AssetMetaData &metaData = AssetManager::Get()->GetMetaData(entry.FullPath);
 			if (!metaData.IsValid())
 			{
 				AssetType type = AssetManager::Get()->GetAssetTypeFromPath(entryPath);
@@ -304,7 +304,7 @@ namespace highlo
 			// Failed to import asset
 			if (!metaData.IsValid())
 			{
-			//	HL_CORE_WARN("Failed to import {0}", *entry.FullPath);
+				HL_CORE_WARN("Failed to import {0}", *entry.FullPath);
 				continue;
 			}
 

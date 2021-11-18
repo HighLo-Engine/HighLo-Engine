@@ -50,4 +50,7 @@
 	path = HighLo/vendor/IconFontCppHeaders
 	url = https://github.com/HighLo-Engine/IconFontCppHeaders
 	ignore = dirty
-
+[submodule "HighLo/vendor/googletest"]
+	path = HighLo/vendor/googletest
+	url = https://github.com/HighLo-Engine/googletest
+	ignore = dirty

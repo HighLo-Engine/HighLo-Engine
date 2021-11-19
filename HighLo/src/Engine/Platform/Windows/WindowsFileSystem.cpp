@@ -53,6 +53,18 @@ namespace highlo
         {
             
         }
+
+        static FileSystemPath GetFolderById(const KNOWNFOLDERID &id)
+        {
+            PWSTR filePath;
+            HRESULT result = SHGetKnownFolderPath(id, KF_FLAG_DEFAULT, NULL, &filePath);
+            HL_ASSERT(result == S_OK);
+
+            std::wstring filepathWstr = filePath;
+            std::replace(filepathWstr.begin(), filepathWstr.end(), L'\\', L'/');
+            std::filesystem::path resultPath = filepathWstr + L"/";
+            return FileSystemPath(resultPath.string());
+        }
     }
 
     bool FileSystem::FileExists(const FileSystemPath &path)
@@ -269,24 +281,39 @@ namespace highlo
         return {};
     }
 
-    FileSystemPath FileSystem::CreateFolderInPersistentStorage(const HLString &folderName)
+    FileSystemPath FileSystem::GetPersistentStoragePath()
     {
-        PWSTR roamingFilePath;
-        HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_DEFAULT, NULL, &roamingFilePath);
-        HL_ASSERT(result == S_OK);
+        return utils::GetFolderById(FOLDERID_RoamingAppData);
+    }
 
-        std::wstring filepath = roamingFilePath;
-        std::replace(filepath.begin(), filepath.end(), L'\\', L'/');
-        std::filesystem::path tempPath = filepath + L"/" + folderName.W_Str();
-        FileSystemPath resultPath = tempPath.string();
+    FileSystemPath FileSystem::GetUserDocumentsPath()
+    {
+        return utils::GetFolderById(FOLDERID_Documents);
+    }
 
-        HL_CORE_TRACE("Registering folder in roaming folder: {0}", **resultPath);
-        if (!FileSystem::Get()->FolderExists(resultPath))
-        {
-            FileSystem::Get()->CreateFolder(resultPath);
-        }
-        
-        return resultPath;
+    FileSystemPath FileSystem::GetUserDownloadsPath()
+    {
+        return utils::GetFolderById(FOLDERID_Downloads);
+    }
+
+    FileSystemPath FileSystem::GetUserDesktopPath()
+    {
+        return utils::GetFolderById(FOLDERID_Desktop);
+    }
+
+    FileSystemPath FileSystem::GetStartMenuPath()
+    {
+        return utils::GetFolderById(FOLDERID_StartMenu);
+    }
+
+    FileSystemPath FileSystem::GetProgamsFilesPath()
+    {
+        return utils::GetFolderById(FOLDERID_ProgramFiles);
+    }
+
+    FileSystemPath FileSystem::GetProgamsX86FilesPath()
+    {
+        return utils::GetFolderById(FOLDERID_ProgramFilesX86);
     }
 }
 

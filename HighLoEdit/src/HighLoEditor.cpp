@@ -26,7 +26,14 @@ HighLoEditor::HighLoEditor(const ApplicationSettings &settings, const HLString &
 		m_ProjectPath = "SandboxProject/Sandbox.hlproj";
 
 	// Register persistent storage
-	m_RoamingPath = FileSystem::Get()->CreateFolderInPersistentStorage("HighLo");
+	FileSystemPath roamingPath = FileSystem::Get()->GetPersistentStoragePath();
+	m_RoamingPath = roamingPath / "HighLo";
+
+	HL_CORE_TRACE("Registering folder in roaming folder: {0}", **m_RoamingPath);
+	if (!FileSystem::Get()->FolderExists(m_RoamingPath))
+	{
+		FileSystem::Get()->CreateFolder(m_RoamingPath);
+	}
 
 	// TODO: Write UserPreferences into roaming path
 	// The UserPreferences file should contain the following data:

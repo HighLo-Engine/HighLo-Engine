@@ -55,7 +55,14 @@ namespace highlo
 		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/textFile.png").As<Texture2D>();
 	//	m_AssetIconMap[".hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
 
-		AssetHandle baseDirHandle = ProcessDirectory(project->GetAssetDirectory().String(), nullptr);
+		HLString basePath = project->GetAssetDirectory().String();
+		if (basePath.EndsWith('/'))
+		{
+			basePath = basePath.Substr(0, basePath.LastIndexOf('/'));
+		}
+		m_BasePath = basePath;
+
+		AssetHandle baseDirHandle = ProcessDirectory(basePath, nullptr);
 		m_BaseDirectory = m_Directories[baseDirHandle];
 		ChangeDirectory(m_BaseDirectory);
 
@@ -96,7 +103,8 @@ namespace highlo
 						UI::ScopedStyle spacing(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 						UI::ScopedColorStack itemBg(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
 
-						// TODO: Sort these alphabetically
+						SortSubDirectories();
+
 						for (auto &[handle, directory] : m_BaseDirectory->SubDirectories)
 							RenderDirectoryHierarchy(directory);
 					}
@@ -555,7 +563,8 @@ namespace highlo
 			UI::ScopedFont boldFont(ImGui::GetIO().Fonts->Fonts[0]);
 			UI::ScopedColor textColor(ImGuiCol_Text, Colors::Theme::TextDarker);
 
-			const HLString &assetDirName = m_Project->GetConfig().AssetDirectory;
+		//	const HLString &assetDirName = m_Project->GetConfig().AssetDirectory;
+			const HLString &assetDirName = m_BasePath;
 			ImVec2 textSize = ImGui::CalcTextSize(*assetDirName);
 			const float textPadding = ImGui::GetStyle().FramePadding.y;
 
@@ -893,6 +902,36 @@ namespace highlo
 
 			return (uint16)item1->GetType() < (uint16)item2->GetType();
 		});
+	}
+
+	void AssetBrowserPanel::SortSubDirectories()
+	{
+		std::unordered_map<AssetHandle, Ref<DirectoryInfo>> directories = m_BaseDirectory->SubDirectories;
+		for (auto it = directories.begin(); it != directories.end(); ++it)
+		{
+			AssetHandle currentHandle = it->first;
+			Ref<DirectoryInfo> &currentDir = it->second;
+
+			for (auto nextIt = ++it; nextIt != directories.end(); ++nextIt)
+			{
+				AssetHandle nextHandle = nextIt->first;
+				Ref<DirectoryInfo> &nextDir = nextIt->second;
+
+				for (uint32 i = 0; i < 5; ++i)
+				{
+					for (uint32 j = i + 1; j < 5; ++j)
+					{
+						if (currentDir->FilePath.String() > nextDir->FilePath.String())
+						{
+							// Swap 
+							
+						}
+					}
+				}
+			}
+		}
+
+
 	}
 	
 	AssetBrowserItemList AssetBrowserPanel::Search(const HLString &query, const Ref<DirectoryInfo> &dirInfo)

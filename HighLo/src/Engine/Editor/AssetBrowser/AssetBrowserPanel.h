@@ -53,6 +53,7 @@ namespace highlo
 
 		void UpdateDropArea(const Ref<DirectoryInfo> &target);
 		void SortItemList();
+		void SortSubDirectories();
 		AssetBrowserItemList Search(const HLString &query, const Ref<DirectoryInfo> &dirInfo);
 
 		void OnFileSystemChangedEvent(FileSystemChangedEvent &e);
@@ -85,6 +86,7 @@ namespace highlo
 		static AssetBrowserPanel *s_Instance;
 
 		Ref<Project> m_Project;
+		HLString m_BasePath;
 
 		Ref<Texture2D> m_FileIcon;
 		Ref<Texture2D> m_FolderIcon;

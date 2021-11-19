@@ -2,13 +2,12 @@
 
 //
 // version history:
+//     - 1.2 (2021-11-19) Added Compare functions
 //     - 1.1 (2021-09-29) Removed String conversion function because it should be natively now possible with our own String class
 //     - 1.0 (2021-09-26) initial release
 //
 
 #pragma once
-
-#include <string>
 
 namespace highlo
 {
@@ -47,8 +46,6 @@ namespace highlo
 
 			return nameSanitized.Contains(searchString);
 		}
-
-
 	}
 }
 

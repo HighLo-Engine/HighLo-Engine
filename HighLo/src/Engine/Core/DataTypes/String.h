@@ -12,9 +12,52 @@
 
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Log.h"
+#include "Engine/Core/Defines/BaseTypes.h"
+
+#include <iostream>
 
 namespace highlo
 {
+	namespace utils
+	{
+		static char *CopySubStr(const char *str, uint32 pos, uint32 size)
+		{
+			HL_ASSERT(pos < size);
+
+			char *result = new char[size + 1];
+			result[size] = '\0';
+			memcpy(result, str + pos, size);
+
+			return result;
+		}
+
+		static int32 Compare(const char *str1, const char *str2, uint32 size)
+		{
+			return memcmp((const void*)str1, (const void*)str2, (size_t)size);
+		}
+
+		static int32 Compare(const char *str1, uint32 pos1, uint32 size1, const char *str2, uint32 pos2, uint32 size2, uint32 *outLhsSize, uint32 *outRhsSize)
+		{
+			char *str1Copied = utils::CopySubStr(str1, pos1, size1);
+			char *str2Copied = utils::CopySubStr(str2, pos2, size2);
+
+			uint32 str1Len = (uint32)strlen(str1Copied);
+			uint32 str2Len = (uint32)strlen(str2Copied);
+			int32 result = utils::Compare(str1Copied, str2Copied, str1Len <= str2Len ? str1Len : str2Len);
+
+			if (outLhsSize)
+				*outLhsSize = str1Len;
+
+			if (outRhsSize)
+				*outRhsSize = str2Len;
+
+			delete[] str1Copied;
+			delete[] str2Copied;
+
+			return result;
+		}
+	}
+
 	template<typename T>
 	class HLStringBase;
 
@@ -769,6 +812,61 @@ namespace highlo
 			return false;
 		}
 
+		HLAPI int32 Compare(const HLStringBase &other) const
+		{
+			uint32 lhsSize = Length();
+			uint32 rhsSize = other.Length();
+
+			int32 result = utils::Compare(m_Data, other.m_Data, lhsSize <= rhsSize ? lhsSize : rhsSize);
+
+			if (result != 0)
+				return result;
+
+			if (lhsSize < rhsSize)
+				return -1;
+
+			if (lhsSize > rhsSize)
+				return 1;
+
+			return 0;
+		}
+
+		HLAPI int32 Compare(uint32 pos1, uint32 count1, const HLStringBase &other, uint32 pos2 = 0, uint32 count2 = NPOS) const
+		{
+			if (count2 == NPOS)
+				count2 = other.Length();
+
+			uint32 lhsSize = pos1 + count1;
+			uint32 rhsSize = pos2 + count2;
+
+			uint32 newLhsSize;
+			uint32 newRhsSize;
+			int32 result = utils::Compare(m_Data, pos1, lhsSize, other.m_Data, pos2, rhsSize, &newLhsSize, &newRhsSize);
+
+			if (result != 0)
+				return result;
+
+			if (newLhsSize < newRhsSize)
+				return -1;
+
+			if (newLhsSize > newRhsSize)
+				return 1;
+
+			return 0;
+		}
+
+		template<typename IteratorType1, typename IteratorType2>
+		HLAPI static bool LexicographicalCompare(IteratorType1 first1, IteratorType1 last1, IteratorType2 first2, IteratorType2 last2)
+		{
+			for (; (first1 != last1) && (first2 != last2); ++first1, (void)++first2)
+			{
+				if (*first1 < *first2) return true;
+				if (*first2 < *first1) return false;
+			}
+
+			return (first1 == last1) && (first2 != last2);
+		}
+
 		HLAPI StringType *operator*()
 		{
 			return m_Data;
@@ -791,38 +889,12 @@ namespace highlo
 
 		HLAPI bool operator==(const StringType *other) const
 		{
-			if (m_Size != strlen(other))
-				return false;
-
-			uint32 equalCount = 0;
-			for (uint32 i = 0; i < m_Size; ++i)
-			{
-				if (m_Data[i] == other[i])
-					++equalCount;
-			}
-
-			if (equalCount == m_Size)
-				return true;
-
-			return false;
+			return Compare(HLStringBase(other)) == 0;
 		}
 
 		HLAPI bool operator==(const HLStringBase &other) const
 		{
-			if (m_Size != other.m_Size)
-				return false;
-
-			uint32 equalCount = 0;
-			for (uint32 i = 0; i < m_Size; ++i)
-			{
-				if (m_Data[i] == other[i])
-					++equalCount;
-			}
-
-			if (equalCount == m_Size)
-				return true;
-
-			return false;
+			return Compare(other) == 0;
 		}
 
 		HLAPI bool operator!=(const StringType *other) const
@@ -837,42 +909,42 @@ namespace highlo
 
 		HLAPI bool operator<(const StringType *other) const
 		{
-			return m_Size < strlen(other);
+			return Compare(HLStringBase(other)) < 0;
 		}
 
 		HLAPI bool operator<(const HLStringBase &other) const
 		{
-			return m_Size < other.m_Size;
+			return Compare(other) < 0;
 		}
 
 		HLAPI bool operator>(const StringType *other) const
 		{
-			return m_Size > strlen(other);
+			return Compare(HLStringBase(other)) > 0;
 		}
 
 		HLAPI bool operator>(const HLStringBase &other) const
 		{
-			return m_Size > other.m_Size;
+			return Compare(other) > 0;
 		}
 
 		HLAPI bool operator<=(const StringType *other) const
 		{
-			return m_Size <= strlen(other);
+			return Compare(HLStringBase(other)) <= 0;
 		}
 
 		HLAPI bool operator<=(const HLStringBase &other) const
 		{
-			return m_Size <= other.m_Size;
+			return Compare(other) <= 0;
 		}
 
 		HLAPI bool operator>=(const StringType *other) const
 		{
-			return m_Size >= strlen(other);
+			return Compare(HLStringBase(other)) >= 0;
 		}
 
 		HLAPI bool operator>=(const HLStringBase &other) const
 		{
-			return m_Size >= other.m_Size;
+			return Compare(other) >= 0;
 		}
 
 		HLAPI friend HLStringBase operator-(HLStringBase str, const HLStringBase &other)
@@ -946,7 +1018,7 @@ namespace highlo
 		}
 
 		template<typename T>
-		HLAPI FORCEINLINE static HLStringBase ToString(const T &value)
+		HLAPI HL_FORCE_INLINE static HLStringBase ToString(const T &value)
 		{
 			std::stringstream ss;
 			ss << value;
@@ -954,14 +1026,14 @@ namespace highlo
 		}
 
 		template<typename T>
-		HLAPI FORCEINLINE friend HLStringBase &operator<<(HLStringBase &str, const T &value)
+		HLAPI HL_FORCE_INLINE friend HLStringBase &operator<<(HLStringBase &str, const T &value)
 		{
 			HLStringBase newStr = HLStringBase::ToString(value);
 			return str.Append(newStr);
 		}
 
 		template<typename T>
-		HLAPI FORCEINLINE friend HLStringBase &operator>>(HLStringBase &str, const T &value)
+		HLAPI HL_FORCE_INLINE friend HLStringBase &operator>>(HLStringBase &str, const T &value)
 		{
 			HLStringBase newStr = HLStringBase::ToString(value);
 			return str.Remove(newStr);

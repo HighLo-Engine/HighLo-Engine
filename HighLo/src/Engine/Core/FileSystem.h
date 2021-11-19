@@ -34,9 +34,16 @@ namespace highlo
 		HLAPI int64 GetFileSize(const FileSystemPath &path);
 		
 		HLAPI bool CreateFolder(const FileSystemPath &path);
-		HLAPI FileSystemPath CreateFolderInPersistentStorage(const HLString &folderName);
 		HLAPI bool RemoveFolder(const FileSystemPath &path);
 		HLAPI bool FolderExists(const FileSystemPath &path);
+
+		HLAPI FileSystemPath GetPersistentStoragePath();
+		HLAPI FileSystemPath GetUserDocumentsPath();
+		HLAPI FileSystemPath GetUserDownloadsPath();
+		HLAPI FileSystemPath GetUserDesktopPath();
+		HLAPI FileSystemPath GetStartMenuPath();
+		HLAPI FileSystemPath GetProgamsFilesPath();
+		HLAPI FileSystemPath GetProgamsX86FilesPath();
 
 		HLAPI Byte *ReadFile(const FileSystemPath &path, int64 *outSize);
 		HLAPI HLString ReadTextFile(const FileSystemPath &path);

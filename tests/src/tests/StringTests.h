@@ -592,5 +592,95 @@ TEST(TEST_CATEGORY, HashDifferentStrings)
 	EXPECT_NE(str.Hash(), str1.Hash());
 }
 
+TEST(TEST_CATEGORY, Compare1)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	int32 result = a.Compare(b);
+	HLString resultText = result < 0 ? "Batman comes before Superman" : result > 0 ? "Superman comes before Batman" : "Superman and Batman are the same";
+
+	EXPECT_EQ(StringEquals(resultText, "Batman comes before Superman"), true);
+}
+
+TEST(TEST_CATEGORY, Compare2)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	int32 result = a.Compare(3, 3, b);
+	HLString resultText = result < 0 ? "man comes before Superman" : result > 0 ? "Superman comes before man" : "Superman and man are the same";
+
+	EXPECT_EQ(StringEquals(resultText, "Superman comes before man"), true);
+}
+
+TEST(TEST_CATEGORY, Compare3)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	int32 result = a.Compare(3, 3, b, 5, 3);
+	HLString resultText = result < 0 ? "man comes before man" : result > 0 ? "man comes before man" : "man and man are the same";
+
+	EXPECT_EQ(StringEquals(resultText, "man and man are the same"), true);
+}
+
+TEST(TEST_CATEGORY, LexicographicalCompare)
+{
+	std::vector<HLString> v1{ "A", "b", "c", "d" };
+	std::vector<HLString> v2{ "a", "b", "c", "d" };
+
+	bool isLess = HLString::LexicographicalCompare(v1.begin(), v1.end(), v2.begin(), v2.end());
+	EXPECT_EQ(isLess, true);
+}
+
+TEST(TEST_CATEGORY, EqualsOperator)
+{
+	HLString a = "Batman";
+	HLString b = "Batman";
+
+	EXPECT_EQ(a == b, true);
+}
+
+TEST(TEST_CATEGORY, NotEqualsOperator)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	EXPECT_EQ(a != b, true);
+}
+
+TEST(TEST_CATEGORY, LessOperator)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	EXPECT_EQ(a < b, true);
+}
+
+TEST(TEST_CATEGORY, LessOrEqualOperator)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	EXPECT_EQ(a <= b, true);
+}
+
+TEST(TEST_CATEGORY, GreaterOperator)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	EXPECT_EQ(a > b, false);
+}
+
+TEST(TEST_CATEGORY, GreaterOrEqualOperator)
+{
+	HLString a = "Batman";
+	HLString b = "Superman";
+
+	EXPECT_EQ(a >= b, false);
+}
+
 // TOOD: Add Matrix/Vectors ToString checks
 

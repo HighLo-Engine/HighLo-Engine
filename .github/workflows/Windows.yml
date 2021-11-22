@@ -30,14 +30,13 @@ jobs:
         - name: Add MSBuild to PATH
           uses: microsoft/setup-msbuild@v1.0.2
           
-        - name: Generate Engine
+        - name: Setup Python runner
           uses: actions/setup-python@v2
           with:
-            python-version: 3.8 #install the python needed
+            python-version: 3.8 # install the python needed
            
-        - name: download vulkan sdk and run the premake script # run the run.py to get the latest data
-          run: |
-            python tests\GenerateEngine-Windows.py
+        - name: Generate Engine
+          run: python \tests\GenerateEngine-Windows.py
 
         - name: Build Unit Tests
           working-directory: ${{env.GITHUB_WORKSPACE}}

@@ -7,29 +7,9 @@ The HighLo Engine is a free open source game engine made only by two very passio
 ```sh
 git clone --recursive https://github.com/HighLo-Engine/HighLo-Engine.git
 cd HighLo-Engine
-```
 
-# Windows Build
-```sh
-# Generate Visual Studio solution and open the solution located in the root folder
-python3 scripts/GenerateEngine-Windows.py
-```
-
-# Linux Build
-```sh
-# Generate Makefile
-python3 scripts/GenerateEngine-Linux.py
-```
-
-```sh
-# Run the makefile
-make
-```
-
-# MacOS Build
-```sh
-# Generate XCode project and open the solution located in the root folder
-python3 scripts/GenerateEngine-MacOS.py
+# Generate the Solution files for windows and mac or the makefiles for linux
+python3 scripts/GenerateEngine.py
 ```
 
 # Build Status
@@ -37,8 +17,6 @@ python3 scripts/GenerateEngine-MacOS.py
 | Linux | Windows | MacOS | Android | IOS | Web |
 |:--------:| :-: | :-: | :-: | :-: | :-: |
 | X    | ✓ | X | X | X | X |
-
-![Windows](https://github.com/HighLo-Engine/HighLo-Engine/actions/workflows/Windows.yml/badge.svg?branch=master)
 
 # Contributing
 

@@ -31,7 +31,10 @@ jobs:
           uses: microsoft/setup-msbuild@v1.0.2
            
         - name: Generate Engine
-          run: python ./tests/GenerateEngine-Windows.py
+          run: |
+            cd scripts
+            .\GenerateEngine-Windows.bat
+            cd ..
 
         - name: Build Unit Tests
           working-directory: ${{env.GITHUB_WORKSPACE}}

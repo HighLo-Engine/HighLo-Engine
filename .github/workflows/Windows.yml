@@ -37,7 +37,7 @@ jobs:
            
         - name: download vulkan sdk and run the premake script # run the run.py to get the latest data
           run: |
-            python GenerateEngine-Windows.py
+            python tests\GenerateEngine-Windows.py
 
         - name: Build Unit Tests
           working-directory: ${{env.GITHUB_WORKSPACE}}

@@ -34,7 +34,8 @@ project "HighLo"
 		"%{IncludeDir.yamlCpp}",
 		"%{IncludeDir.IconFontCppHeaders}",
 		"%{IncludeDir.gtest}",
-		"%{IncludeDir.gmock}"
+		"%{IncludeDir.gmock}",
+		"%{IncludeDir.vulkan}",
     }
 
     links
@@ -64,6 +65,9 @@ project "HighLo"
 		"%{LibDir.SPIRV_Tools_opt}",
 		"%{LibDir.openssl_libssl}",
 		"%{LibDir.openssl_libcrypto}",
+		"%{LibDir.vulkan_sdk}",
+		"%{LibDir.vulkan_sdk_utils}",
+
     }
 
     defines

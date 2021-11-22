@@ -43,7 +43,7 @@ namespace highlo
 		data.Maximized = m_Settings.Maximized;
 		data.VSync = m_Settings.VSync;
 
-		m_Window = UniqueRef<Window>(Window::Create(data));
+		m_Window = Window::Create(data);
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
 		// Init Renderer
@@ -87,7 +87,7 @@ namespace highlo
 		data.Maximized = m_Settings.Maximized;
 		data.VSync = m_Settings.VSync;
 
-		m_Window = UniqueRef<Window>(Window::Create(data));
+		m_Window = Window::Create(data);
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
 		// Init Renderer

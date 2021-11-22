@@ -1,3 +1,5 @@
+VULKAN_SDK = os.getenv("VULKAN_SDK")
+
 IncludeDir = {}
 IncludeDir["GLFW"]                   = "%{wks.location}/HighLo/vendor/glfw/include"
 IncludeDir["GLAD"]                   = "%{wks.location}/HighLo/vendor/GLAD/include"
@@ -16,6 +18,8 @@ IncludeDir["yamlCpp"]                = "%{wks.location}/HighLo/vendor/yaml-cpp/i
 IncludeDir["IconFontCppHeaders"]     = "%{wks.location}/HighLo/vendor/IconFontCppHeaders"
 IncludeDir["gtest"]     			 = "%{wks.location}/HighLo/vendor/googletest/googletest/include"
 IncludeDir["gmock"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlemock/include"
+IncludeDir["vulkan"]     			 = "%{VULKAN_SDK}/Include"
+IncludeDir["vulkan_local"] 			 = "%{wks.location}/HighLo/vendor/VulkanSDK/Include"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"
@@ -48,4 +52,8 @@ LibDir["gtest_release"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/R
 LibDir["gtest_main_release"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gtest_main.lib"
 LibDir["gmock_release"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gmock.lib"
 LibDir["gmock_main_release"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gmock_main.lib"
+
+LibDir["vulkan_sdk_folder"]  		 = "%{VULKAN_SDK}/Lib"
+LibDir["vulkan_sdk"]   		 		 = "%{LibDir.vulkan_sdk_folder}/vulkan-1.lib"
+LibDir["vulkan_sdk_utils"]  		 = "%{LibDir.vulkan_sdk_folder}/VKLayer_utils.lib"
 

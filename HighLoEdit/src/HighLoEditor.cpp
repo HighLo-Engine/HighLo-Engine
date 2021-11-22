@@ -417,7 +417,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 	if (Input::IsKeyPressed(HL_KEY_LEFT_CONTROL))
 	{
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT))
-			{
+		{
 			switch (e.GetKeyCode())
 			{
 				case HL_KEY_S:
@@ -434,7 +434,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 			}
 
 			return false;
-			}
+		}
 
 		switch (e.GetKeyCode())
 		{
@@ -705,11 +705,9 @@ float HighLoEditor::GetSnapValue()
 
 void HighLoEditor::DeleteEntity(Entity entity)
 {
-	/*
 	auto children = entity.Children();
 	for (auto childId : children)
 		DeleteEntity(m_EditorScene->FindEntityByUUID(childId));
-	*/
 
 	m_EditorScene->UnparentEntity(entity);
 	m_EditorScene->DestroyEntity(entity);

@@ -906,32 +906,7 @@ namespace highlo
 
 	void AssetBrowserPanel::SortSubDirectories()
 	{
-		std::unordered_map<AssetHandle, Ref<DirectoryInfo>> directories = m_BaseDirectory->SubDirectories;
-		for (auto it = directories.begin(); it != directories.end(); ++it)
-		{
-			AssetHandle currentHandle = it->first;
-			Ref<DirectoryInfo> &currentDir = it->second;
-
-			for (auto nextIt = ++it; nextIt != directories.end(); ++nextIt)
-			{
-				AssetHandle nextHandle = nextIt->first;
-				Ref<DirectoryInfo> &nextDir = nextIt->second;
-
-				for (uint32 i = 0; i < 5; ++i)
-				{
-					for (uint32 j = i + 1; j < 5; ++j)
-					{
-						if (currentDir->FilePath.String() > nextDir->FilePath.String())
-						{
-							// Swap 
-							
-						}
-					}
-				}
-			}
-		}
-
-
+		// TODO
 	}
 	
 	AssetBrowserItemList AssetBrowserPanel::Search(const HLString &query, const Ref<DirectoryInfo> &dirInfo)

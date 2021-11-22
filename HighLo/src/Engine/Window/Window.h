@@ -10,6 +10,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Events/Events.h"
 #include "Engine/Core/Log.h"
+#include "Engine/Core/UniqueReference.h"
 #include "Engine/Core/DataTypes/String.h"
 #include "MenuBar.h"
 
@@ -103,7 +104,7 @@ namespace highlo
 		HLAPI virtual void *GetNativeCursor() = 0;
 
 		HLAPI static Window &Get();
-		HLAPI static Window *Create(const WindowData &properties = WindowData());
+		HLAPI static UniqueRef<Window> Create(const WindowData &properties = WindowData());
 
 	protected:
 

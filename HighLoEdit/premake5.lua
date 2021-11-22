@@ -21,7 +21,8 @@ project "HighLoEdit"
 		"../HighLo/src",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.IconFontCppHeaders}"
+		"%{IncludeDir.IconFontCppHeaders}",
+		"%{IncludeDir.vulkan}",
     }
 
     links
@@ -67,6 +68,11 @@ project "HighLoEdit"
     filter "configurations:Debug"
         defines "HL_DEBUG"
         symbols "On"
+		
+		postbuildcommands
+		{
+			'{COPY} "../HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
 
     filter "configurations:Release"
         defines "HL_RELEASE"

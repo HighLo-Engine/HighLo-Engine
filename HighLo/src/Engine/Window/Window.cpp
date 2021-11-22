@@ -18,12 +18,12 @@ namespace highlo
 		return *Window::s_WindowInstance;
 	}
 
-	Window* Window::Create(const WindowData &properties)
+	UniqueRef<Window> Window::Create(const WindowData &properties)
 	{
 #ifdef HIGHLO_API_GLFW
-		return new GLFWWindow(properties);
+		return UniqueRef<GLFWWindow>::Create(properties);
 #else
-		return new WindowsWindow(properties);
+		return UniqueRef<WindowsWindow>::Create(properties);
 #endif
 	}
 }

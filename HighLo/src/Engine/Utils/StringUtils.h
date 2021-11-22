@@ -23,29 +23,6 @@ namespace highlo
 
 			return false;
 		}
-
-		static bool IsMatchingSearch(HLString &item, HLString &searchQuery, bool caseSensitive = false, bool stripWhiteSpaces = true, bool stripUnderscores = true)
-		{
-			if (searchQuery.IsEmpty())
-				return true;
-
-			if (item.IsEmpty())
-				return false;
-
-			HLString nameSanitized = stripUnderscores ? item.Replace("_", "") : item;
-			if (stripWhiteSpaces)
-				nameSanitized = nameSanitized.Replace(" ", "");
-
-			HLString searchString = stripWhiteSpaces ? searchQuery.Replace(" ", "") : searchQuery;
-
-			if (!caseSensitive)
-			{
-				nameSanitized = nameSanitized.ToLowerCase();
-				searchString = searchString.ToLowerCase();
-			}
-
-			return nameSanitized.Contains(searchString);
-		}
 	}
 }
 

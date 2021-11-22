@@ -36,7 +36,7 @@ jobs:
             python-version: 3.8 # install the python needed
            
         - name: Generate Engine
-          run: python \tests\GenerateEngine-Windows.py
+          run: python ./tests/GenerateEngine-Windows.py
 
         - name: Build Unit Tests
           working-directory: ${{env.GITHUB_WORKSPACE}}

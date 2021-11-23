@@ -17,6 +17,11 @@ cd HighLo-Engine
 python3 scripts/GenerateEngine.py
 ```
 
+# Run Unit Tests
+
+To Run the unit tests, you have to build the project from source.
+After that you will be able to select the "HighLoTest" project as the starting project and execute it.
+
 # Build Status
 
 | Linux | Windows | MacOS | Android | IOS | Web |
@@ -29,7 +34,8 @@ You can always create pull requests but keep in mind that the engine is in activ
 
 # Screenshots
 
-![HighLo-Engine](/Screenshots/HighLo-Screenshot-1.png?raw=true "HIghLo-Engine-1")
-![HighLo-Engine](/Screenshots/HighLo-Screenshot-2.png?raw=true "HIghLo-Engine-2")
-![HighLo-Engine](/Screenshots/HighLo-Screenshot-3.png?raw=true "HIghLo-Engine-3")
-![HighLo-Engine](/Screenshots/HighLo-Screenshot-4.png?raw=true "HIghLo-Engine-4")
+![HighLo-Engine](/Screenshots/HighLo-Screenshot-1.png?raw=true "HighLo-Engine-1")
+![HighLo-Engine](/Screenshots/HighLo-Screenshot-2.png?raw=true "HighLo-Engine-2")
+![HighLo-Engine](/Screenshots/HighLo-Screenshot-3.png?raw=true "HighLo-Engine-3")
+![HighLo-Engine](/Screenshots/HighLo-Screenshot-4.png?raw=true "HighLo-Engine-4")
+

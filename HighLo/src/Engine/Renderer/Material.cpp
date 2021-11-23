@@ -99,12 +99,12 @@ namespace highlo
 
 	void Material::SetTexture(int32 type, Ref<Texture> texture)
 	{
-		static Ref<Texture> s_DefaultAlbedo    = Texture2D::CreateFromColor({ 255, 255, 255 });
-		static Ref<Texture> s_DefaultNormal    = Texture2D::CreateFromColor({ 128, 128, 255 });
-		static Ref<Texture> s_DefaultMetallic  = Texture2D::CreateFromColor({ 255, 255, 255 });
-		static Ref<Texture> s_DefaultRoughness = Texture2D::CreateFromColor({ 255, 255, 255 });
-		static Ref<Texture> s_DefaultAO		   = Texture2D::CreateFromColor({ 255, 255, 255 });
-		static Ref<Texture3D> blackCubeTexture = Renderer::GetBlackCubeTexture();
+		static Ref<Texture2D> s_DefaultAlbedo    = Texture2D::CreateFromColor({ 255, 255, 255 });
+		static Ref<Texture2D> s_DefaultNormal    = Texture2D::CreateFromColor({ 128, 128, 255 });
+		static Ref<Texture2D> s_DefaultMetallic  = Texture2D::CreateFromColor({ 255, 255, 255 });
+		static Ref<Texture2D> s_DefaultRoughness = Texture2D::CreateFromColor({ 255, 255, 255 });
+		static Ref<Texture2D> s_DefaultAO		 = Texture2D::CreateFromColor({ 255, 255, 255 });
+		static Ref<Texture3D> blackCubeTexture	 = Renderer::GetBlackCubeTexture();
 
 		if (!texture)
 		{
@@ -125,9 +125,9 @@ namespace highlo
 		m_Textures[type] = texture;
 	}
 
-	void Material::Bind(bool update_properties)
+	void Material::Bind(bool updateProperties)
 	{
-		if (update_properties)
+		if (updateProperties)
 			ApplyNewProperties();
 
 		for (auto const& [slot, texture] : m_Textures)

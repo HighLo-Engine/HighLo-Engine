@@ -31,7 +31,7 @@ namespace highlo
 		HLAPI void UpdateMeshData(std::vector<Vertex> &data, uint32 meshIndex = 0);
 		HLAPI void UpdateMeshData(uint32 meshIndex = 0);
 
-		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
+		HLAPI void SetTexture(int32 type, Ref<Texture2D> texture);
 		HLAPI MaterialRenderProperties &GetMaterialRenderProperties();
 		HLAPI MaterialPhysicalProperties &GetMaterialPhysicsProperties();
 		

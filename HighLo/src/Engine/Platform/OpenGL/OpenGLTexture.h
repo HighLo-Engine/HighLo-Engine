@@ -22,11 +22,10 @@ namespace highlo
 	{
 	public:
 
-		static OpenGLTexture2D *LoadFromFile(const HLString &filepath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
-		static OpenGLTexture2D *CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
-		static OpenGLTexture2D *CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
-
-		OpenGLTexture2D(void *img_data, uint32 width, uint32 height, TextureFormat format);
+		OpenGLTexture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
+		OpenGLTexture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
+		OpenGLTexture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
+		OpenGLTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
 		~OpenGLTexture2D();
@@ -73,6 +72,7 @@ namespace highlo
 	class OpenGLTexture3D : public Texture3D
 	{
 	public:
+
 		OpenGLTexture3D(const std::vector<HLString> &filePaths, bool flipOnLoad = false);
 		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
 		virtual ~OpenGLTexture3D();
@@ -111,3 +111,4 @@ namespace highlo
 }
 
 #endif
+

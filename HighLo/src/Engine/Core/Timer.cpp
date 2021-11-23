@@ -43,4 +43,11 @@ namespace highlo
 			HL_CORE_TRACE("{0}", *m_OutputString);
 		}
 	}
+	
+	void Timer::Sleep(uint32 seconds)
+	{
+		std::chrono::seconds s(seconds);
+		std::this_thread::sleep_for(s);
+	}
 }
+

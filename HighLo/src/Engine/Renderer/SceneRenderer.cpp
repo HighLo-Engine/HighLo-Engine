@@ -67,7 +67,7 @@ namespace highlo
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
 	{
-		return m_CompositeRenderPass->GetSpcification().Framebuffer->GetImage().As<Texture2D>();
+		return m_CompositeRenderPass->GetSpcification().Framebuffer->GetImage();
 	}
 	
 	void SceneRenderer::InitGrid()

@@ -42,7 +42,7 @@ namespace highlo
 		m_VertexArray->GetVertexBuffers()[meshIndex]->UpdateContents(m_MeshData.Vertices);
 	}
 
-	void Mesh::SetTexture(int32 type, Ref<Texture> texture)
+	void Mesh::SetTexture(int32 type, Ref<Texture2D> texture)
 	{
 		m_Material->SetTexture(type, texture);
 	}

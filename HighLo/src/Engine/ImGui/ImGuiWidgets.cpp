@@ -11,9 +11,9 @@ namespace highlo::UI
 
 	void Widgets::Init()
 	{
-		s_SearchIcon = Texture2D::LoadFromFile("assets/Resources/icons/search.png").As<Texture2D>();
-		s_ClearIcon = Texture2D::LoadFromFile("assets/Resources/icons/close.png").As<Texture2D>();
-		s_GearIcon = Texture2D::LoadFromFile("assets/Resources/icons/settings.png").As<Texture2D>();
+		s_SearchIcon = Texture2D::LoadFromFile("assets/Resources/icons/search.png");
+		s_ClearIcon = Texture2D::LoadFromFile("assets/Resources/icons/close.png");
+		s_GearIcon = Texture2D::LoadFromFile("assets/Resources/icons/settings.png");
 	}
 	
 	void Widgets::Shutdown()

@@ -40,26 +40,25 @@ namespace highlo
 		s_Instance = this;
 
 		// Load Textures
-		m_Shadow = Texture2D::LoadFromFile("assets/Resources/icons/shadow.png").As<Texture2D>();
-		m_FileIcon = Texture2D::LoadFromFile("assets/Resources/icons/file.png").As<Texture2D>();
-		m_FolderIcon = Texture2D::LoadFromFile("assets/Resources/icons/folder.png").As<Texture2D>();
+		m_Shadow = Texture2D::LoadFromFile("assets/Resources/icons/shadow.png");
+		m_FileIcon = Texture2D::LoadFromFile("assets/Resources/icons/file.png");
+		m_FolderIcon = Texture2D::LoadFromFile("assets/Resources/icons/folder.png");
 
 		// Load Asset Icons
-	//	m_AssetIconMap[".fbx"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-	//	m_AssetIconMap[".obj"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-	//	m_AssetIconMap[".wav"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-	//	m_AssetIconMap[".png"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-	//	m_AssetIconMap[".ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-	//	m_AssetIconMap[".ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-	//	m_AssetIconMap[".otf"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
-		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/textFile.png").As<Texture2D>();
-	//	m_AssetIconMap[".hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/").As<Texture2D>();
+	//	m_AssetIconMap[".fbx"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap[".obj"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap[".wav"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap[".png"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap[".ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap[".ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap[".otf"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/textFile.png");
+	//	m_AssetIconMap[".hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
 
 		HLString basePath = project->GetAssetDirectory().String();
 		if (basePath.EndsWith('/'))
-		{
 			basePath = basePath.Substr(0, basePath.LastIndexOf('/'));
-		}
+
 		m_BasePath = basePath;
 
 		AssetHandle baseDirHandle = ProcessDirectory(basePath, nullptr);

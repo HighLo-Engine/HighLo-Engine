@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2021-11-23) Changed FilePath paramater from String to FileSystemPath
 //     - 1.2 (2021-10-17) Made all Texture classes a AssetType
 //     - 1.1 (2021-09-21) Added Create method that also contains the pixel data
 //     - 1.0 (2021-09-14) initial release
@@ -14,6 +15,7 @@
 #include "Engine/Core/DataTypes/String.h"
 #include "Engine/Math/Math.h"
 #include "Engine/Core/Allocator.h"
+#include "Engine/Core/FileSystemPath.h"
 #include "TextureFormat.h"
 #include "Engine/Assets/Asset.h"
 
@@ -77,11 +79,11 @@ namespace highlo
 		HLAPI virtual uint32 GetDimensions() const override { return 2; };
 		HLAPI virtual TextureType GetType() const override { return TextureType::Texture2D; }
 
-		HLAPI static Ref<Texture> LoadFromFile(const HLString &filepath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = false);
-		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
-		HLAPI static Ref<Texture> CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
-		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height);
-		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
+		HLAPI static Ref<Texture2D> LoadFromFile(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = false);
+		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
+		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
+		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height);
+		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 
 		HLAPI virtual HLRendererID GetSamplerRendererID() const = 0;
 
@@ -99,10 +101,11 @@ namespace highlo
 		HLAPI virtual uint32 GetDimensions() const override { return 3; };
 		HLAPI virtual TextureType GetType() const override { return TextureType::Texture3D; }
 
-		HLAPI static Ref<Texture> LoadFromFiles(const std::vector<HLString> &filepaths, bool flipOnLoad = false);
-		HLAPI static Ref<Texture> Create(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
+		HLAPI static Ref<Texture3D> LoadFromFiles(const std::vector<HLString> &filepaths, bool flipOnLoad = false);
+		HLAPI static Ref<Texture3D> Create(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
 
 		HLAPI static AssetType GetStaticType() { return AssetType::EnvMap; }
 		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	};
 }
+

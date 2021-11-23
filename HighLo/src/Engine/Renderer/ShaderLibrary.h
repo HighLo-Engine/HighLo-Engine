@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Shader.h"
+#include "Engine/Core/FileSystemPath.h"
 
 namespace highlo
 {
@@ -19,13 +20,14 @@ namespace highlo
 		HLAPI ~ShaderLibrary();
 
 		HLAPI void Add(const Ref<Shader> &shader);
-		HLAPI void Load(const HLString &path, BufferLayout &layout = BufferLayout::Empty, bool isCompute = false);
-		HLAPI void Load(const HLString &name, const HLString &path, BufferLayout &layout = BufferLayout::Empty, bool isCompute = false);
+		HLAPI void Add(const HLString &name, const Ref<Shader> &shader);
+		HLAPI void Load(const FileSystemPath &filePath, BufferLayout &layout = BufferLayout::Empty);
+		HLAPI void Load(const HLString &name, const FileSystemPath &filePath, BufferLayout &layout = BufferLayout::Empty);
 		
 		HLAPI const Ref<Shader> &Get(const HLString &name);
 
 	private:
 
-		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+		std::unordered_map<HLString, Ref<Shader>> m_Shaders;
 	};
 }

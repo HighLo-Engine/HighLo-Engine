@@ -18,6 +18,7 @@ namespace highlo
 	class OpenGLShader : public Shader
 	{
 	public:
+
 		OpenGLShader(const ShaderSource &source);
 		~OpenGLShader();
 
@@ -29,10 +30,6 @@ namespace highlo
 
 	private:
 
-		uint32 CompileGLSLShader(const char *code, uint32 type);
-		void CompileGLSLProgram(const ShaderSource &source);
-
-		HLString m_FileName;
 		HLString m_Name;
 		HLRendererID m_ID = 0;
 	};

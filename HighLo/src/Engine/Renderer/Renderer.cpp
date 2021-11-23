@@ -83,36 +83,40 @@ namespace highlo
 		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData).As<Texture3D>();
+		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData);
 		
 		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
-		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData).As<Texture2D>();
+		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
 
-		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png").As<Texture2D>();
+		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
 		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
 
 		// Define Shader layouts
-		BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
-		BufferLayout animatedShaderLayout = BufferLayout::GetAnimatedShaderLayout();
+		
+		Renderer::Submit([=]()
+		{
+			BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
+			BufferLayout animatedShaderLayout = BufferLayout::GetAnimatedShaderLayout();
 
-		// Load 3D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedShaderLayout);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl", staticShaderLayout);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl", animatedShaderLayout);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", BufferLayout::GetSkyboxLayout());
-		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl", BufferLayout::GetGridLayout());
+			// Load 3D Shaders
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedShaderLayout);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl", staticShaderLayout);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl", animatedShaderLayout);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", BufferLayout::GetSkyboxLayout());
+			Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl", BufferLayout::GetGridLayout());
 
-		// Load 2D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", BufferLayout::GetTextureLayout());
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", BufferLayout::GetLineLayout());
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", BufferLayout::GetCircleLayout());
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl", BufferLayout::GetTextLayout());
+			// Load 2D Shaders
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", BufferLayout::GetTextureLayout());
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", BufferLayout::GetLineLayout());
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", BufferLayout::GetCircleLayout());
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl", BufferLayout::GetTextLayout());
 
-		// Load Compute Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl", BufferLayout::Empty, true);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty, true);
-		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty, true);
+			// Load Compute Shaders
+			Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl", BufferLayout::Empty);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty);
+		});
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();

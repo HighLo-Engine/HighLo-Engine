@@ -61,7 +61,7 @@ namespace highlo
 	
 	std::vector<Byte> Base64::Decode(const HLString &encodedString)
 	{
-        int32 in_len = (int)encodedString.Length();
+        int32 in_len = (int32)encodedString.Length();
         int32 i = 0;
         int32 j = 0;
         int32 in_ = 0;
@@ -107,7 +107,7 @@ namespace highlo
 	
 	HLString Base64::DecodeToString(const HLString &encodedString)
 	{
-        int32 in_len = (int)encodedString.Length();
+        int32 in_len = (int32)encodedString.Length();
         int32 i = 0;
         int32 j = 0;
         int32 in_ = 0;

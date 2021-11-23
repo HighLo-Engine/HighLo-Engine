@@ -5,7 +5,7 @@ void Renderer2DDemo::OnInitialize()
 	m_Camera = Ref<Camera>::Create();
 	m_Camera->SetOrthographic();
 	GetWindow().CenterWindow();
-	m_Texture = Texture2D::LoadFromFile("assets/textures/Pistol.png").As<Texture2D>();
+	m_Texture = Texture2D::LoadFromFile("assets/textures/Pistol.png");
 }
 
 void Renderer2DDemo::OnUpdate(Timestep timestep)

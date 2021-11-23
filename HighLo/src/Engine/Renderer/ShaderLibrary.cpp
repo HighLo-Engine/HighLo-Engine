@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "ShaderLibrary.h"
 
+#include "ShaderCompiler.h"
+
 namespace highlo
 {
 	ShaderLibrary::ShaderLibrary() {}
@@ -11,35 +13,46 @@ namespace highlo
 	void ShaderLibrary::Add(const Ref<Shader> &shader)
 	{
 		auto &name = shader->GetName();
-		HL_ASSERT(m_Shaders.find(*name) == m_Shaders.end());
-		m_Shaders[*name] = shader;
+		HL_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+		m_Shaders[name] = shader;
 	}
 	
-	void ShaderLibrary::Load(const HLString &path, BufferLayout &layout, bool isCompute)
+	void ShaderLibrary::Add(const HLString &name, const Ref<Shader> &shader)
 	{
-		auto shaderSource = Shader::LoadShaderSource(path);
-		Ref<Shader> shader = nullptr;
+		HL_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+		m_Shaders[name] = shader;
+	}
 
-		if (isCompute)
-			shader = Shader::CreateComputeShader(shaderSource);
-		else
-			shader = Shader::Create(shaderSource, layout);
+	void ShaderLibrary::Load(const FileSystemPath &filePath, BufferLayout &layout)
+	{
+		Ref<ShaderCompiler> compiler = ShaderCompiler::Create(filePath, layout);
+		compiler->Compile();
+		compiler->Link();
+		
+		Ref<Shader> shader = compiler->GetCompiledShader();
+		if (!shader)
+		{
+			HL_CORE_ERROR("Failed to load shader into shaderlibrary!");
+			return;
+		}
 
 		Add(shader);
 	}
 	
-	void ShaderLibrary::Load(const HLString &name, const HLString &path, BufferLayout &layout, bool isCompute)
+	void ShaderLibrary::Load(const HLString &name, const FileSystemPath &filePath, BufferLayout &layout)
 	{
-		auto shaderSource = Shader::LoadShaderSource(path);
-		Ref<Shader> shader = nullptr;
+		Ref<ShaderCompiler> compiler = ShaderCompiler::Create(filePath, layout);
+		compiler->Compile();
+		compiler->Link();
+		
+		Ref<Shader> shader = compiler->GetCompiledShader();
+		if (!shader)
+		{
+			HL_CORE_ERROR("Failed to load shader into shaderlibrary!");
+			return;
+		}
 
-		if (isCompute)
-			shader = Shader::CreateComputeShader(shaderSource);
-		else
-			shader = Shader::Create(shaderSource, layout);
-
-		HL_ASSERT(m_Shaders.find(*name) == m_Shaders.end());
-		m_Shaders[*name] = shader;
+		Add(name, shader);
 	}
 	
 	const Ref<Shader> &ShaderLibrary::Get(const HLString &name)
@@ -48,3 +61,4 @@ namespace highlo
 		return m_Shaders[*name];
 	}
 }
+

@@ -26,6 +26,8 @@ namespace highlo
 		HLAPI const HLString &GetName() const { return m_Name; }
 		HLAPI const HLString &GetOutputString() const { return m_OutputString; }
 
+		HLAPI static void Sleep(uint32 seconds);
+
 	private:
 
 		HLString m_Name;

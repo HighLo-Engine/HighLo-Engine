@@ -15,10 +15,10 @@ namespace highlo
 		HL_ASSERT(s_EditorConsoleInstance == nullptr);
 		s_EditorConsoleInstance = this;
 
-		m_ErrorIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogErrorIcon.png").As<Texture2D>();
-		m_WarningIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogWarningIcon.png").As<Texture2D>();
-		m_InfoIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogInfoIcon.png").As<Texture2D>();
-		m_TraceIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogTraceIcon.png").As<Texture2D>();
+		m_ErrorIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogErrorIcon.png");
+		m_WarningIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogWarningIcon.png");
+		m_InfoIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogInfoIcon.png");
+		m_TraceIcon = Texture2D::LoadFromFile("assets/Resources/Icons/LogTraceIcon.png");
 	}
 	
 	EditorConsolePanel::~EditorConsolePanel()

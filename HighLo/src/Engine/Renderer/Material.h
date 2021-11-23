@@ -71,7 +71,7 @@ namespace highlo
 		HLAPI void SetTexture(int32 type, Ref<Texture> texture);
 		HLAPI uint32 GetTextureCount() const { return (uint32)m_Textures.size(); }
 
-		HLAPI virtual void Bind(bool update_properties = true);
+		HLAPI virtual void Bind(bool updateProperties = true);
 
 		HLAPI uint32 GetFlags() const;
 		HLAPI bool GetFlag(MaterialFlag flag) const;

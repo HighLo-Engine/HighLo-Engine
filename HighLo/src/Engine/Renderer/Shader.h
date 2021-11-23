@@ -11,43 +11,33 @@
 
 #include "BufferLayout.h"
 #include "UniformBuffer.h"
+#include "ShaderSource.h"
 #include "Engine/Core/DataTypes/String.h"
 
 namespace highlo
 {
-	struct ShaderSource
-	{
-		HLString FileName;
-		HLString VertexShaderSrc;
-		HLString TessellationControlShaderSrc;
-		HLString TessellationEvaluationShaderSrc;
-		HLString GeometryShaderSrc;
-		HLString PixelShaderSrc;
-		HLString ComputeShaderSrc;
-	};
-
 	class Shader : public IsSharedReference
 	{
 	public:
-		static ShaderSource LoadShaderSource(const HLString &filename);
 
-		static Ref<Shader> Create(const ShaderSource &source, const BufferLayout &layout);
-		static Ref<Shader> CreateComputeShader(const ShaderSource &source);
+		HLAPI virtual void Bind() const = 0;
+		HLAPI virtual void Unbind() = 0;
+		HLAPI virtual HLRendererID GetRendererID() = 0;
+		HLAPI virtual const HLString &GetName() const = 0;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() = 0;
-		virtual HLRendererID GetRendererID() = 0;
-		virtual const HLString &GetName() const = 0;
+		HLAPI Ref<UniformBuffer> GetBuffer(const HLString &name);
+		HLAPI void AddBuffer(const HLString &name, Ref<UniformBuffer> buffer);
 
-		Ref<UniformBuffer> GetBuffer(const HLString &name);
-		void AddBuffer(const HLString &name, Ref<UniformBuffer> buffer);
+		HLAPI static Ref<UniformBuffer> &GetVSSceneUniformBuffer() { return m_VS_SceneBuffer; }
 
-		static Ref<UniformBuffer> &GetVSSceneUniformBuffer() { return m_VS_SceneBuffer; }
+		HLAPI static Ref<Shader> Create(const ShaderSource &source, const BufferLayout &layout);
 
 	private:
+
 		std::map<HLString, Ref<UniformBuffer>> m_BufferMap;
 
 		static void CreateVSSceneBuffer();
 		static Ref<UniformBuffer> m_VS_SceneBuffer;
 	};
 }
+

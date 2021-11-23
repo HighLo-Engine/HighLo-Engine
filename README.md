@@ -6,8 +6,13 @@ The HighLo Engine is a free open source game engine made only by two very passio
 
 ```sh
 git clone --recursive https://github.com/HighLo-Engine/HighLo-Engine.git
-cd HighLo-Engine
+```
 
+```sh
+cd HighLo-Engine
+```
+
+```sh
 # Generate the Solution files for windows and mac or the makefiles for linux
 python3 scripts/GenerateEngine.py
 ```

@@ -84,11 +84,7 @@ namespace highlo
 			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
 			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
 
-			HLString output = "\nOpenGL Info:\n";
-			output += "    Vendor    :  " + caps.Vendor + "\n";
-			output += "    Renderer  :  " + caps.Device + "\n";
-			output += "    Version   :  " + caps.Version + "\n";
-			HL_CORE_INFO(*output);
+			utils::DumpGPUInfos();
 
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // for seamless cube maps
 			glFrontFace(GL_CCW);

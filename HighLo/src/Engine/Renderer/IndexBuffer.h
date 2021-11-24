@@ -14,19 +14,21 @@ namespace highlo
 	class IndexBuffer : public IsSharedReference
 	{
 	public:
-		virtual ~IndexBuffer() = default;
+		
+		HLAPI virtual ~IndexBuffer() = default;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
+		HLAPI virtual void Bind() const = 0;
+		HLAPI virtual void Unbind() const = 0;
 
-		virtual uint32 GetCount() = 0;
-		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
-		virtual void UpdateContents(std::vector<int32> &indices, uint32 offset = 0) = 0;
+		HLAPI virtual uint32 GetCount() = 0;
+		HLAPI virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
+		HLAPI virtual void UpdateContents(std::vector<int32> &indices, uint32 offset = 0) = 0;
 
-		virtual HLRendererID GetRendererID() = 0;
+		HLAPI virtual HLRendererID GetRendererID() = 0;
 
-		static Ref<IndexBuffer> Create(std::vector<int32>& indices);
-		static Ref<IndexBuffer> Create(void *data, uint32 size);
-		static Ref<IndexBuffer> Create(uint32 size);
+		HLAPI static Ref<IndexBuffer> Create(std::vector<int32>& indices);
+		HLAPI static Ref<IndexBuffer> Create(void *data, uint32 size);
+		HLAPI static Ref<IndexBuffer> Create(uint32 size);
 	};
 }
+

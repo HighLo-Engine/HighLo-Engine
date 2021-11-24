@@ -22,7 +22,8 @@
 #include "Model.h"
 #include "Engine/Math/AABB.h"
 #include "RenderCommandQueue.h"
-#include "RenderCommandBuffer.h"
+#include "CommandBuffer.h"
+#include "RenderingContext.h"
 
 namespace highlo
 {
@@ -89,6 +90,8 @@ namespace highlo
 
 		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
 
+		HLAPI static Ref<RenderingContext> GetContext();
+
 	private:
 
 		static RenderCommandQueue &GetRenderCommandQueue();
@@ -100,4 +103,17 @@ namespace highlo
 		friend class CoreRenderer;
 		friend class Renderer2D;
 	};
+
+	namespace utils
+	{
+		inline void DumpGPUInfos()
+		{
+			auto &caps = Renderer::GetCapabilities();
+			HL_CORE_TRACE("GPU Info:");
+			HL_CORE_TRACE("  Vendor: {0}", *caps.Vendor);
+			HL_CORE_TRACE("  Device: {0}", *caps.Device);
+			HL_CORE_TRACE("  Version: {0}", *caps.Version);
+		}
+	}
 }
+

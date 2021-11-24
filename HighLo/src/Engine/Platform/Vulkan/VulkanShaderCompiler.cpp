@@ -5,7 +5,12 @@
 
 #include "Engine/Core/FileSystem.h"
 
+#include <spirv_glsl.hpp>
+#include <spirv-tools/libspirv.h>
+
 #ifdef HIGHLO_API_VULKAN
+
+#define SHADER_LOG_PREFIX "Shader>       "
 
 namespace highlo
 {
@@ -30,7 +35,7 @@ namespace highlo
 
 		if (!FileSystem::Get()->FileExists(m_Source.FilePath))
 		{
-			HL_CORE_ERROR("Shader {0} does not exist!", *m_Source.FilePath.String());
+			HL_CORE_ERROR("{0} [-] Shader {1} does not exist! [-]", SHADER_LOG_PREFIX, *m_Source.FilePath.String());
 			return;
 		}
 
@@ -84,7 +89,7 @@ namespace highlo
 		}
 		catch (std::ifstream::failure e)
 		{
-			HL_CORE_ERROR("Failed to load shader: {0}", *m_Source.FilePath.String());
+			HL_CORE_ERROR("{0} [-] Failed to load shader: {1} [-]", SHADER_LOG_PREFIX, *m_Source.FilePath.String());
 			HL_CORE_ERROR(strerror(errno));
 		}
 
@@ -95,7 +100,7 @@ namespace highlo
 		m_Source.PixelShaderSrc = HLString(shaderSources[ShaderType::PIXEL_SHADER].str().c_str());
 		m_Source.ComputeShaderSrc = HLString(shaderSources[ShaderType::COMPUTE_SHADER].str().c_str());
 		m_State = ShaderCompilerState::Ready;
-		HL_CORE_INFO("Shader>       [+] Loaded {0} [+]", *m_Source.FilePath.String());
+		HL_CORE_INFO("{0}[+] Loaded {1} [+]", SHADER_LOG_PREFIX, *m_Source.FilePath.String());
 	}
 
 	VulkanShaderCompiler::~VulkanShaderCompiler()

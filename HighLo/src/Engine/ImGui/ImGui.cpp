@@ -7,16 +7,18 @@
 #include "ImGuizmo.h"
 
 #ifdef HIGHLO_API_OPENGL
-	#include "Engine/ImGui/ImGui/backends/imgui_impl_opengl3.h"
-	#include "Engine/Platform/OpenGL/OpenGLTexture.h"
-	#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplOpenGL3_##fn
+#include "Engine/ImGui/ImGui/backends/imgui_impl_opengl3.h"
+#include "Engine/Platform/OpenGL/OpenGLTexture.h"
+#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplOpenGL3_##fn
+#elif HIGHLO_API_DX11
+#include "Engine/ImGui/ImGui/backends/imgui_impl_dx11.h"
+#include "Engine/Platform/DX11/DX11Resources.h"
+#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplDX11_##fn
+#elif HIGHLO_API_VULKAN
+#include "Engine/ImGui/ImGui/backends/imgui_impl_vulkan.h"
+#include "Engine/Platform/Vulkan/VulkanTexture.h"
+#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplVulkan_##fn
 #endif // HIGHLO_API_OPENGL
-
-#ifdef HIGHLO_API_DX11
-	#include "Engine/ImGui/ImGui/backends/imgui_impl_dx11.h"
-	#include "Engine/Platform/DX11/DX11Resources.h"
-	#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplDX11_##fn
-#endif // HIGHLO_API_DX11
 
 #ifdef HIGHLO_API_GLFW
 	#include <GLFW/glfw3.h>
@@ -221,7 +223,11 @@ namespace highlo::UI
 		io.DisplaySize = ImVec2((float)HLApplication::Get().GetWindow().GetWidth(), (float)HLApplication::Get().GetWindow().GetHeight());
 
 		ImGui::Render();
+	#ifdef HIGHLO_API_VULKAN
+		IMGUI_RENDER_API_IMPL_FN_NAME(RenderDrawData)(ImGui::GetDrawData(), );
+	#else
 		IMGUI_RENDER_API_IMPL_FN_NAME(RenderDrawData)(ImGui::GetDrawData());
+	#endif // HIGHLO_API_VULKAN
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{

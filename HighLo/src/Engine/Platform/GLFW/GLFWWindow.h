@@ -62,6 +62,8 @@ namespace highlo
 		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
 
+		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
+
 	private:
 
 		struct WNDPlacement
@@ -74,7 +76,7 @@ namespace highlo
 		WNDPlacement m_Placement;
 
 		Ref<MenuBar> m_MenuBar = nullptr;
-		UniqueRef<RenderingContext> m_Context;
+		Ref<RenderingContext> m_Context;
 
 		GLFWwindow *m_NativeHandle = nullptr;
 		GLFWcursor *m_NativeCursor = nullptr;

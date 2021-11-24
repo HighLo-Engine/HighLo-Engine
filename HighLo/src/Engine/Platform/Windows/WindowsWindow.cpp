@@ -108,14 +108,9 @@ namespace highlo
 			UpdateWindow(hwnd);
 		}
 
-	#ifdef HIGHLO_API_DX11
-		m_Context = UniqueRef<RenderingContext>(new DX11Context(m_Properties, m_NativeHandle));
-		m_Context->Init();
-	#elif HIGHLO_API_OPENGL
 		m_Context = RenderingContext::Create(m_NativeHandle);
 		m_Context->Init();
-	#endif // HIGHLO_API_DX11
-		}
+	}
 
 	void WindowsWindow::SetEventCallback(const EventCallbackFn &callback)
 	{

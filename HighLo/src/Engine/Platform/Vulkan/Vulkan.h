@@ -66,8 +66,6 @@ namespace highlo::utils
 		return "Unknown Error";
 	}
 
-	void DumpGPUInfos();
-
 	inline void CheckResult(VkResult result)
 	{
 		if (result != VK_SUCCESS)

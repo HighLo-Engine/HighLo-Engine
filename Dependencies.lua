@@ -20,6 +20,7 @@ IncludeDir["gtest"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlete
 IncludeDir["gmock"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlemock/include"
 IncludeDir["vulkan"]     			 = "%{VULKAN_SDK}/Include"
 IncludeDir["vulkan_local"] 			 = "%{wks.location}/HighLo/vendor/VulkanSDK/Include"
+IncludeDir["vulkan_memory_alloc"] 	 = "%{wks.location}/HighLo/vendor/VulkanMemoryAllocator"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"

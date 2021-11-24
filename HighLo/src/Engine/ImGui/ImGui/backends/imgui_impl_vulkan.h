@@ -25,9 +25,6 @@
 #pragma once
 #include "Engine/ImGui/ImGui/imgui.h"     // IMGUI_IMPL_API
 
-// Until we support vulkan
-#if 0
-
 // [Configuration] in order to use a custom Vulkan function loader:
 // (1) You'll need to disable default Vulkan function prototypes.
 //     We provide a '#define IMGUI_IMPL_VULKAN_NO_PROTOTYPES' convenience configuration flag.
@@ -151,4 +148,3 @@ struct ImGui_ImplVulkanH_Window
     }
 };
 
-#endif

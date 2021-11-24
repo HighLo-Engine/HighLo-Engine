@@ -40,6 +40,7 @@ namespace highlo
 	class UniformBuffer : public IsSharedReference
 	{
 	public:
+
 		virtual ~UniformBuffer();
 
 		uint32 BindingSlot = 0;
@@ -51,11 +52,11 @@ namespace highlo
 		HLAPI void SetVariableValue(const HLString &name, void *value);
 		HLAPI void SetBufferValue(void *value);
 
-		HLAPI void GetVariableValue(const HLString &name, void *out_val);
+		HLAPI void GetVariableValue(const HLString &name, void *outVal);
 
-		virtual void UploadToShader(uint32 offset = 0) = 0;
+		HLAPI virtual void UploadToShader(uint32 offset = 0) = 0;
 
-		static Ref<UniformBuffer> Create(const HLString &name, const std::vector<UniformVariable> &layout,
+		HLAPI static Ref<UniformBuffer> Create(const HLString &name, const std::vector<UniformVariable> &layout,
 			UniformBufferParentShader parent, uint32 slot = 0);
 
 	protected:

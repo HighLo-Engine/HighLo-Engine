@@ -69,6 +69,8 @@ namespace highlo
 		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
 
+		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
+
 		// Specific to DX11Window
 		void OnResize(uint32 width, uint32 height);
 
@@ -85,7 +87,7 @@ namespace highlo
 
 		void Init();
 
-		UniqueRef<RenderingContext> m_Context;
+		Ref<RenderingContext> m_Context;
 
 		HWND m_NativeHandle = nullptr;
 		HICON m_WindowIcon = NULL;

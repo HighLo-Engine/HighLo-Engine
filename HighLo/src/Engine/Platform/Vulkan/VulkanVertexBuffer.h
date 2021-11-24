@@ -12,6 +12,7 @@
 #include "Vulkan.h"
 #include "Engine/Renderer/VertexBuffer.h"
 #include "Engine/Core/Allocator.h"
+#include "VulkanAllocator.h"
 
 namespace highlo
 {
@@ -19,9 +20,9 @@ namespace highlo
 	{
 	public:
 
-		VulkanVertexBuffer(const std::vector<Vertex> &vertices, VertexBufferUsage usage);
-		VulkanVertexBuffer(void *data, uint32 size, VertexBufferUsage usage);
-		VulkanVertexBuffer(uint32 size, VertexBufferUsage usage);
+		VulkanVertexBuffer(const std::vector<Vertex> &vertices, VertexBufferUsage usage = VertexBufferUsage::Static);
+		VulkanVertexBuffer(void *data, uint32 size, VertexBufferUsage usage = VertexBufferUsage::Static);
+		VulkanVertexBuffer(uint32 size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 		virtual ~VulkanVertexBuffer();
 
 		virtual void Bind() const override;
@@ -36,6 +37,8 @@ namespace highlo
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }
 		virtual VertexBufferUsage GetUsage() override { return m_Usage; }
 
+		VkBuffer GetVulkanBuffer() const { return m_VulkanBuffer; }
+
 	private:
 
 		uint32 m_Size = 0;
@@ -44,7 +47,9 @@ namespace highlo
 		HLRendererID m_RendererID = 0;
 
 		VkBuffer m_VulkanBuffer = nullptr;
+		VmaAllocation m_MemoryAllocation;
 
+		BufferLayout m_Layout;
 	};
 }
 

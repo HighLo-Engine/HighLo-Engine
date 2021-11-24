@@ -26,7 +26,19 @@ namespace highlo
 			first_time = false;
 		}
 
+	#ifdef HIGHLO_API_OPENGL
         return Ref<OpenGLShader>::Create(source);
+	#elif HIGHLO_API_DX11
+		return Ref<DX11Shader>::Create(source, layout);
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanShader>::Create(source, layout);
+	#else
+		HL_ASSERT(false);
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
     }
 
 	Ref<UniformBuffer> Shader::GetBuffer(const HLString &name)

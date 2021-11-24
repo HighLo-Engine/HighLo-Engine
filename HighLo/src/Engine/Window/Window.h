@@ -12,6 +12,7 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Core/UniqueReference.h"
 #include "Engine/Core/DataTypes/String.h"
+#include "Engine/Renderer/RenderingContext.h"
 #include "MenuBar.h"
 
 namespace highlo
@@ -102,6 +103,8 @@ namespace highlo
 		HLAPI virtual void *GetNativeHandle() = 0;
 		HLAPI virtual void *GetNativeContext() = 0;
 		HLAPI virtual void *GetNativeCursor() = 0;
+
+		HLAPI virtual Ref<RenderingContext> GetContext() = 0;
 
 		HLAPI static Window &Get();
 		HLAPI static UniqueRef<Window> Create(const WindowData &properties = WindowData());

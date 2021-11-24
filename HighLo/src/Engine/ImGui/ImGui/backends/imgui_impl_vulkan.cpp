@@ -58,7 +58,6 @@
 #include "HighLoPch.h"
 #include "imgui_impl_vulkan.h"
 
-#if 0
 #include <stdio.h>
 
 // Reusable buffers used for rendering 1 current in-flight frame, for ImGui_ImplVulkan_RenderDrawData()
@@ -1720,4 +1719,3 @@ void ImGui_ImplVulkan_ShutdownPlatformInterface()
     ImGui::DestroyPlatformWindows();
 }
 
-#endif

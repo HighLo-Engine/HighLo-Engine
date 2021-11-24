@@ -19,7 +19,19 @@ namespace highlo
 	{
 	public:
 
+		VulkanShader(const ShaderSource &source, const BufferLayout &layout);
+		virtual ~VulkanShader();
 
+		virtual void Bind() const override;
+		virtual void Unbind() override;
+
+		virtual HLRendererID GetRendererID() override { return m_RendererID; }
+		virtual const HLString &GetName() const override { return m_Name; }
+
+	private:
+
+		HLString m_Name;
+		HLRendererID m_RendererID = 0;
 	};
 }
 

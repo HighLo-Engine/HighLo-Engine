@@ -7,10 +7,6 @@
 
 namespace highlo::utils
 {
-	void DumpGPUInfos()
-	{
-		// TODO
-	}
 }
 
 #endif // HIGHLO_API_VULKAN

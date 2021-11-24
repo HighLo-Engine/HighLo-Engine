@@ -7,7 +7,21 @@
 
 namespace highlo
 {
+	VulkanShader::VulkanShader(const ShaderSource &source, const BufferLayout &layout)
+	{
+	}
 
+	VulkanShader::~VulkanShader()
+	{
+	}
+
+	void VulkanShader::Bind() const
+	{
+	}
+
+	void VulkanShader::Unbind()
+	{
+	}
 }
 
 #endif // HIGHLO_API_VULKAN

@@ -266,6 +266,11 @@ namespace highlo
 	{
 		return s_RenderingAPI->CreateEnvironment(path);
 	}
+
+	Ref<RenderingContext> Renderer::GetContext()
+	{
+		return HLApplication::Get().GetWindow().GetContext();
+	}
 	
 	RenderCommandQueue &Renderer::GetRenderCommandQueue()
 	{

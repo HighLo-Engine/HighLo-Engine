@@ -5,10 +5,13 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/Opengl/OpenGLVertexBuffer.h"
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11VertexBuffer.h"
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+// TODO
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanVertexBuffer.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {
@@ -18,6 +21,10 @@ namespace highlo
 		return Ref<OpenGLVertexBuffer>::Create(vertices, usage);
 	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexBuffer>::Create(vertices, usage);
+	#elif HIGHLO_API_DX12
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanVertexBuffer>::Create(vertices, usage);
 	#else
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
@@ -29,6 +36,10 @@ namespace highlo
 		return Ref<OpenGLVertexBuffer>::Create(data, size, usage);
 	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexBuffer>::Create(data, size, usage);
+	#elif HIGHLO_API_DX12
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanVertexBuffer>::Create(data, size, usage);
 	#else
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
@@ -40,8 +51,13 @@ namespace highlo
 		return Ref<OpenGLVertexBuffer>::Create(size, usage);
 	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexBuffer>::Create(size, usage);
+	#elif HIGHLO_API_DX12
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanVertexBuffer>::Create(size, usage);
 	#else
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
 }
+

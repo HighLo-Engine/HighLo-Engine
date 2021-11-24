@@ -5,33 +5,59 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLIndexBuffer.h"
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11IndexBuffer.h"
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+// TODO
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanIndexBuffer.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {
-#ifdef HIGHLO_API_OPENGL
-	Ref<IndexBuffer> IndexBuffer::Create(std::vector<int32>& indices)
+	Ref<IndexBuffer> IndexBuffer::Create(std::vector<int32> &indices)
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLIndexBuffer>::Create(indices);
+	#elif HIGHLO_API_DX11
+		return nullptr;
+	#elif HIGHLO_API_DX12
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanIndexBuffer>::Create(indices);
+	#else
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
 
 	Ref<IndexBuffer> IndexBuffer::Create(void *data, uint32 size)
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLIndexBuffer>::Create(data, size);
+	#elif HIGHLO_API_DX11
+		return nullptr;
+	#elif HIGHLO_API_DX12
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanIndexBuffer>::Create(data, size);
+	#else
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
-	
+
 	Ref<IndexBuffer> IndexBuffer::Create(uint32 size)
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLIndexBuffer>::Create(size);
+	#elif HIGHLO_API_DX11
+		return nullptr;
+	#elif HIGHLO_API_DX12
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanIndexBuffer>::Create(size);
+	#else
+		return nullptr;
+	#endif
 	}
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
-	Ref<IndexBuffer> IndexBuffer::Create(std::vector<int32>& indices)
-	{
-		return Ref<DX11IndexBuffer>::Create(indices);
-	}
-#endif // HIGHLO_API_DX11
 }
+

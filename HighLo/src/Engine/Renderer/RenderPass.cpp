@@ -5,6 +5,10 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLRenderPass.h"
+#elif HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanRenderPass.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -13,6 +17,18 @@ namespace highlo
 	{
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLRenderPass>::Create(spec);
+	#elif HIGHLO_API_DX11
+		HL_ASSERT(false);
+		return nullptr;
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanRenderPass>::Create(spec);
+	#else
+		HL_ASSERT(false);
+		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
 }
+

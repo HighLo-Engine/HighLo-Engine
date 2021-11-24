@@ -5,23 +5,32 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLFramebuffer.h"
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Framebuffer.h"
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+// TODO
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanFramebuffer.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {
 	Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification &spec)
-		{
-		#ifdef HIGHLO_API_OPENGL
+	{
+	#ifdef HIGHLO_API_OPENGL
 			return Ref<OpenGLFramebuffer>::Create(spec);
-		#elif HIGHLO_API_DX11
-			return Ref<DX11Framebuffer>::Create(spec);
-		#else
-			return nullptr;
-		#endif
-		}
+	#elif HIGHLO_API_DX11
+		return Ref<DX11Framebuffer>::Create(spec);
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanFramebuffer>::Create(spec);
+	#else
+		HL_ASSERT(false);
+		return nullptr;
+	#endif
+	}
 
 	FramebufferPool *FramebufferPool::s_Instance = new FramebufferPool;
 
@@ -29,19 +38,20 @@ namespace highlo
 		: m_MaxFramebufferCount(maxFbs) {}
 
 	FramebufferPool::~FramebufferPool()
-		{
+	{
 		m_Pool.clear();
 		m_Pool.shrink_to_fit();
-		}
+	}
 
 	WeakRef<Framebuffer> FramebufferPool::AllocateBuffer()
-		{
+	{
 		return WeakRef<Framebuffer>();
-		}
+	}
 
 	void FramebufferPool::Add(const Ref<Framebuffer> &framebuffer)
-		{
+	{
 		if (m_MaxFramebufferCount > m_Pool.size())
 			m_Pool.push_back(framebuffer);
-		}
 	}
+}
+

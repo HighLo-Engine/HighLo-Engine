@@ -24,3 +24,4 @@ namespace highlo
 		WIREFRAME_COLOR_BUFFER = 8,
 	};
 }
+

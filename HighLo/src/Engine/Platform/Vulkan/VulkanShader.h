@@ -9,7 +9,7 @@
 
 #include "Vulkan.h"
 
-#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 
 #ifdef HIGHLO_API_VULKAN
 

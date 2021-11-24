@@ -8,7 +8,7 @@
 #pragma once
 
 #include "ShaderSource.h"
-#include "BufferLayout.h"
+#include "Engine/Renderer/BufferLayout.h"
 #include "Shader.h"
 #include "Engine/Core/FileSystemPath.h"
 

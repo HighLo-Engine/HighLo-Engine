@@ -5,10 +5,10 @@
 
 #include "Engine/Core/FileSystem.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 #include <spirv_glsl.hpp>
 #include <spirv-tools/libspirv.h>
-
-#ifdef HIGHLO_API_VULKAN
 
 #define SHADER_LOG_PREFIX "Shader>       "
 

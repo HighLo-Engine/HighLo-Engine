@@ -10,7 +10,7 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include "Vulkan.h"
-#include "Engine/Renderer/ShaderCompiler.h"
+#include "Engine/Renderer/Shaders/ShaderCompiler.h"
 
 namespace highlo
 {

@@ -8,7 +8,7 @@
 //
 
 #pragma once
-#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Core/Defines/BaseTypes.h"
 
 #ifdef HIGHLO_API_OPENGL

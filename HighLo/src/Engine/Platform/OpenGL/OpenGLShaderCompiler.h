@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/ShaderCompiler.h"
+#include "Engine/Renderer/Shaders/ShaderCompiler.h"
 
 #ifdef HIGHLO_API_OPENGL
 

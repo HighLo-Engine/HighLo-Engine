@@ -3,7 +3,7 @@
 #include "HighLoPch.h"
 #include "Skybox.h"
 
-#include "Engine/Renderer/MeshFactory.h"
+#include "Engine/Factories/MeshFactory.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CoreRenderer.h"
 

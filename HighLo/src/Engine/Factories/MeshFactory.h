@@ -6,7 +6,8 @@
 //
 
 #pragma once
-#include "Model.h"
+
+#include "Engine/Renderer/Model.h"
 
 namespace highlo
 {

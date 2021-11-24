@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Vulkan.h"
-#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/Shaders/UniformBuffer.h"
 
 #ifdef HIGHLO_API_VULKAN
 

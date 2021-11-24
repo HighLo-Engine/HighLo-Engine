@@ -4,7 +4,7 @@
 #include "CoreRenderer.h"
 
 #include "Renderer.h"
-#include "MeshFactory.h"
+#include "Engine/Factories/MeshFactory.h"
 
 namespace highlo
 {

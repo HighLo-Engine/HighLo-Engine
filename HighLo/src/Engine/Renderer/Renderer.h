@@ -16,7 +16,7 @@
 #include "SceneRenderer.h"
 #include "Texture.h"
 #include "Environment.h"
-#include "ShaderLibrary.h"
+#include "Shaders/ShaderLibrary.h"
 #include "RendererCapabilities.h"
 #include "RenderPass.h"
 #include "Model.h"

@@ -63,6 +63,7 @@ namespace highlo
 		bool IsFocused() override;
 
 		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
+		virtual Ref<SwapChain> GetSwapChain() override { return m_SwapChain; }
 
 	private:
 
@@ -77,6 +78,7 @@ namespace highlo
 
 		Ref<MenuBar> m_MenuBar = nullptr;
 		Ref<RenderingContext> m_Context;
+		Ref<SwapChain> m_SwapChain;
 
 		GLFWwindow *m_NativeHandle = nullptr;
 		GLFWcursor *m_NativeCursor = nullptr;

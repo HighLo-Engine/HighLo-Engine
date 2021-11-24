@@ -10,6 +10,7 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
+#define DEFAULT_FENCE_TIMEOUT 100000000000
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Core/Timer.h"
@@ -83,8 +84,8 @@ namespace highlo::utils
 
 #define VK_CHECK_RESULT(x)\
 {\
-	VkResult result = (x);\
-	::highlo::utils::CheckResult(result);\
+	VkResult r = (x);\
+	::highlo::utils::CheckResult(r);\
 }
 
 #endif // HIGHLO_API_VULKAN

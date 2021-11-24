@@ -14,7 +14,7 @@
 
 namespace highlo
 {
-	struct OpenGLCompileData
+	struct VulkanCompileData
 	{
 		uint32 ShaderID = 0;
 		uint32 VertexShaderID = 0;
@@ -25,7 +25,7 @@ namespace highlo
 		uint32 ComputeShaderID = 0;
 	};
 
-	static OpenGLCompileData s_VulkanCompiledData;
+	static VulkanCompileData s_VulkanCompiledData;
 
 	VulkanShaderCompiler::VulkanShaderCompiler(const FileSystemPath &filePath, const BufferLayout &layout)
 	{

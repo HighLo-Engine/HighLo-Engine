@@ -1,3 +1,5 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "VulkanAllocator.h"
 
@@ -31,7 +33,7 @@ namespace highlo
         VmaAllocatorCreateInfo allocatorInfo = {};
         allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_2;
         allocatorInfo.physicalDevice = device->GetPhysicalDevice()->GetNativePhysicalDevice();
-        allocatorInfo.device = device->GetNativePhysicalDevice();
+        allocatorInfo.device = device->GetNativeDevice();
         allocatorInfo.instance = VulkanContext::GetInstance();
 
         vmaCreateAllocator(&allocatorInfo, &s_AllocationData->Allocator);

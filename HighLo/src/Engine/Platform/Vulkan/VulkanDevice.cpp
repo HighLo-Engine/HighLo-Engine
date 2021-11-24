@@ -1,7 +1,7 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "VulkanDevice.h"
-
-#define DEFAULT_FENCE_TIMEOUT 100000000000
 
 #ifdef HIGHLO_API_VULKAN
 

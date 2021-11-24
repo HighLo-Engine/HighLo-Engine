@@ -5,23 +5,30 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLVertexArray.h"
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11VertexArray.h"
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanVertexArray.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {
-#ifdef HIGHLO_API_OPENGL
 	Ref<VertexArray> VertexArray::Create()
 	{
+	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLVertexArray>::Create();
-	}
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
-	Ref<VertexArray> VertexArray::Create()
-	{
+	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexArray>::Create();
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanVertexArray>::Create();
+	#else
+		HL_ASSERT(false);
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
 	}
-#endif // HIGHLO_API_DX11
 }
+

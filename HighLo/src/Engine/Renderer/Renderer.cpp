@@ -7,19 +7,23 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLRenderingAPI.h"
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11RenderingAPI.h"
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanRenderingAPI.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {
 #ifdef HIGHLO_API_OPENGL
 	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new OpenGLRenderingAPI());
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new DX11RenderingAPI());
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+#elif HIGHLO_API_VULKAN
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new VulkanRenderingAPI());
+#endif // HIGHLO_API_OPENGL
 
 	struct RendererData
 	{
@@ -35,6 +39,7 @@ namespace highlo
 
 	static RendererData *s_MainRendererData = nullptr;
 	static RenderCommandQueue *s_CommandQueue = nullptr;
+	static RenderCommandQueue s_ResourceFreeQueue[3];
 
 	void Renderer::ClearScreenColor(const glm::vec4& color)
 	{
@@ -123,14 +128,15 @@ namespace highlo
 
 		WaitAndRender();
 
-		CoreRenderer::Init();
+		// CoreRenderer should be removed later, it will be replaced with a scene rendering system
+	//	CoreRenderer::Init();
 		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
-		CoreRenderer::Shutdown();
+	//	CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();
 		UI::ShutdownImGui();
 
@@ -270,6 +276,17 @@ namespace highlo
 	Ref<RenderingContext> Renderer::GetContext()
 	{
 		return HLApplication::Get().GetWindow().GetContext();
+	}
+
+	uint32 Renderer::GetCurrentFrameIndex()
+	{
+		return HLApplication::Get().GetWindow().GetSwapChain()->GetCurrentBufferIndex();
+	}
+
+	RenderCommandQueue &Renderer::GetRenderResourceReleaseQueue(uint32 index)
+	{
+		HL_ASSERT(index < 3);
+		return s_ResourceFreeQueue[index];
 	}
 	
 	RenderCommandQueue &Renderer::GetRenderCommandQueue()

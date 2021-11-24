@@ -13,7 +13,10 @@ project "HighLo"
     files
     { 
         "src/**.h",
-        "src/**.cpp"
+        "src/**.cpp",
+		
+		"%{IncludeDir.vulkan_memory_alloc}/**.h",
+		"%{IncludeDir.vulkan_memory_alloc}/**.cpp",
     }
 
     includedirs
@@ -36,7 +39,6 @@ project "HighLo"
 		"%{IncludeDir.gtest}",
 		"%{IncludeDir.gmock}",
 		"%{IncludeDir.vulkan}",
-		"%{IncludeDir.vulkan_memory_alloc}",
     }
 
     links
@@ -86,8 +88,8 @@ project "HighLo"
         defines
         {
             "HL_PLATFORM_WINDOWS",
-			--"HIGHLO_API_VULKAN",
-			"HIGHLO_API_OPENGL",
+			"HIGHLO_API_VULKAN",
+			--"HIGHLO_API_OPENGL",
 			--"HIGHLO_API_DX11",
 			--"HIGHLO_API_DX12",
 			"HIGHLO_API_GLFW"	

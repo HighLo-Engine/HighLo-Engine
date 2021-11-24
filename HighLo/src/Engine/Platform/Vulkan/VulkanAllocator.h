@@ -1,9 +1,16 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2021-11-24) initial release
+//
+
 #pragma once
 
 #include "Vulkan.h"
 #include "VulkanDevice.h"
 
-#include <vk_mem_alloc.h>
+#include <../vendor/VulkanMemoryAllocator/vk_mem_alloc.h>
 
 #ifdef HIGHLO_API_VULKAN
 

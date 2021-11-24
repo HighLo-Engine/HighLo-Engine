@@ -1,20 +1,17 @@
 // Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
-#include "SwapChain.h"
+#include "ImGuiRenderer.h"
 
-#ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/OpenGLSwapChain.h"
-#elif HIGHLO_API_VULKAN
-#include "Engine/Platform/Vulkan/VulkanSwapChain.h"
-#endif// HIGHLO_API_OPENGL
+#include "Engine/Platform/OpenGL/OpenGLImGuiRenderer.h"
+#include "Engine/Platform/Vulkan/VulkanImGuiRenderer.h"
 
 namespace highlo
 {
-	Ref<SwapChain> SwapChain::Create()
+	Ref<ImGuiRenderer> ImGuiRenderer::Create()
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLSwapChain>::Create();
+		return Ref<OpenGLImGuiRenderer>::Create();
 	#elif HIGHLO_API_DX11
 		HL_ASSERT(false);
 		return nullptr;
@@ -22,7 +19,10 @@ namespace highlo
 		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanSwapChain>::Create();
+		return Ref<VulkanImGuiRenderer>::Create();
+	#else
+		HL_ASSERT(false);
+		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
 }

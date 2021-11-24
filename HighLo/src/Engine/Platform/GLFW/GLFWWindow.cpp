@@ -5,17 +5,18 @@
 
 #ifdef HIGHLO_API_GLFW
 
-#ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/OpenGLContext.h"
-#elif HIGHLO_API_DX11
+#ifdef HIGHLO_API_DX11
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include "Engine/Platform/DX11/DX11Context.h"
 #include <GLFW/glfw3native.h>
-#endif // HIGHLO_API_OPENGL
+#endif // HIGHLO_API_DX11
 
 #include <stb_image.h>
 #include "Engine/Events/Events.h"
 #include "Engine/ImGui/ImGui.h"
+#include "Engine/Core/Input.h"
+
+// TEMP
+#include "Engine/Platform/Vulkan/VulkanContext.h"
 
 namespace highlo
 {
@@ -37,6 +38,7 @@ namespace highlo
 	{
 		glfwDestroyWindow(m_NativeHandle);
 		glfwTerminate();
+		s_GLFWInitialized = false;
 	}
 
 	void GLFWWindow::SetEventCallback(const EventCallbackFn &callback)
@@ -52,7 +54,10 @@ namespace highlo
 	void GLFWWindow::Update()
 	{
 		glfwPollEvents();
-		m_Context->SwapBuffers();
+		Input::Update();
+		
+		// Flushes the window buffer
+		m_SwapChain->Present();
 	}
 
 	void GLFWWindow::SetWindowIcon(const HLString &path, bool flip)
@@ -197,6 +202,8 @@ namespace highlo
 
 	void GLFWWindow::Init()
 		{
+		uint32 width, height;
+		
 		if (!s_GLFWInitialized)
 		{
 			glfwInit();
@@ -208,11 +215,40 @@ namespace highlo
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	#endif
 
-		m_NativeHandle = glfwCreateWindow((int32)m_Properties.Width, (int32)m_Properties.Height, m_Properties.Title, nullptr, nullptr);
+	#ifdef HIGHLO_API_VULKAN
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	#endif // HIGHLO_API_VULKAN
+
+		if (m_Properties.Fullscreen)
+		{
+			GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
+			const GLFWvidmode *videoMode = glfwGetVideoMode(primaryMonitor);
+			m_NativeHandle = glfwCreateWindow(videoMode->width, videoMode->height, *m_Properties.Title, primaryMonitor, nullptr);
+		}
+		else
+		{
+			m_NativeHandle = glfwCreateWindow((int32) m_Properties.Width, (int32) m_Properties.Height, *m_Properties.Title, nullptr, nullptr);
+		}
+		
 		glfwSetCursor(m_NativeHandle, m_NativeCursor);
 
 		m_Context = RenderingContext::Create((void*)m_NativeHandle);
 		m_Context->Init();
+
+		m_SwapChain = SwapChain::Create();
+		m_SwapChain->Init(m_Context);
+		m_SwapChain->InitSurface((void*)m_NativeHandle);
+
+		width = m_Properties.Width;
+		height = m_Properties.Height;
+		m_SwapChain->Create(&width, &height, m_Properties.VSync);
+
+		if (width != m_Properties.Width || height != m_Properties.Height)
+		{
+			// Trigger WindowResizeEvent, if swapchain changed the width or the height
+			WindowResizeEvent e(width, height);
+			m_Properties.EventCallback(e);
+		}
 
 		glfwSetWindowUserPointer(m_NativeHandle, &m_Properties);
 		m_Context->SetSwapInterval(false);
@@ -332,3 +368,4 @@ namespace highlo
 }
 
 #endif // HIGHLO_API_GLFW
+

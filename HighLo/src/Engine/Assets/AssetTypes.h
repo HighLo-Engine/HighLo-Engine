@@ -23,13 +23,14 @@ namespace highlo
 		None = 0,
 		Scene = 1,
 		Mesh = 2,
-		Material = 3,
-		Texture = 4,
-		EnvMap = 5,
-		Prefab = 6,
-		Font = 7,
+		StaticMesh = 3,
+		Material = 4,
+		Texture = 5,
+		EnvMap = 6,
+		Prefab = 7,
+		Font = 8,
 
-		MeshAsset = 8,
+		MeshAsset = 9,
 	};
 
 	namespace utils

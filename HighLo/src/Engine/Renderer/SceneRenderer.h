@@ -12,6 +12,7 @@
 #include "Engine/Scene/Scene.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Renderer/RenderPass.h"
+#include "Engine/Renderer/VertexArray.h"
 
 namespace highlo
 {
@@ -76,6 +77,7 @@ namespace highlo
 		// Grid
 		Ref<VertexArray> m_GridVertexArray;
 		Ref<Shader> m_GridShader;
+		Ref<Material> m_GridMaterial;
 		Ref<Material> m_WireframeMaterial;
 		Ref<Material> m_OutlineMaterial, m_OutlineAnimMaterial;
 		Ref<Material> m_ColliderMaterial;

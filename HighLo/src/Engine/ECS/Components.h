@@ -9,7 +9,8 @@
 
 #pragma once
 
-#include "Engine/Renderer/Model.h"
+#include "Engine/Renderer/Meshes/DynamicModel.h"
+#include "Engine/Renderer/Meshes/StaticModel.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Core/UUID.h"
 
@@ -32,9 +33,9 @@ namespace highlo
 
 	struct RenderComponent
 	{
-		Ref<Model> MainModel;
-		Ref<Model> ModelLOD1;
-		Ref<Model> ModelLOD2;
+		Ref<StaticModel> MainModel;
+		Ref<StaticModel> ModelLOD1;
+		Ref<StaticModel> ModelLOD2;
 		bool UseLOD = false;
 		int32 LodLevel = 0;
 		bool Enabled = true;
@@ -55,9 +56,9 @@ namespace highlo
 		Ref<Texture2D> Texture;
 	};
 
-	struct ModelComponent
+	struct DynamicModelComponent
 	{
-		Ref<Model> Model;
+		Ref<DynamicModel> Model;
 		bool IsFractured = false;
 	};
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Mesh.h"
+#include "Engine/Renderer/Meshes/StaticModel.h"
 #include "Material.h"
 #include "Engine/Camera/ICamera.h"
 
@@ -28,7 +28,7 @@ namespace highlo
 	private:
 		Ref<Texture3D> m_Texture;
 		Ref<Shader> m_Shader;
-		Ref<Mesh> m_Mesh;
+		Ref<StaticModel> m_Mesh;
 
 	private:
 		struct VS_SceneData

@@ -100,27 +100,24 @@ namespace highlo
 		
 		Renderer::Submit([=]()
 		{
-			BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
-			BufferLayout animatedShaderLayout = BufferLayout::GetAnimatedShaderLayout();
-
 			// Load 3D Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl", staticShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl", animatedShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", BufferLayout::GetSkyboxLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl", BufferLayout::GetGridLayout());
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
 			// Load 2D Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", BufferLayout::GetTextureLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", BufferLayout::GetLineLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", BufferLayout::GetCircleLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl", BufferLayout::GetTextLayout());
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl");
 
 			// Load Compute Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl", BufferLayout::Empty);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty);
+			Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl");
+			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl");
 		});
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
@@ -181,10 +178,12 @@ namespace highlo
 		s_MainRendererData->ActiveRenderPass = nullptr;
 	}
 
+	/*
 	void Renderer::DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color)
 	{
 		DrawAABB(model->BoundingBox, transform, color);
 	}
+	*/
 
 	void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
 	{

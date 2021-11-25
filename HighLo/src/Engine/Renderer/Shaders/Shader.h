@@ -9,10 +9,9 @@
 
 #include <map>
 
-#include "Engine/Renderer/BufferLayout.h"
-#include "UniformBuffer.h"
-#include "ShaderSource.h"
-#include "Engine/Core/DataTypes/String.h"
+#include "Engine/Core/FileSystemPath.h"
+#include "ShaderUniform.h"
+#include "ShaderBuffers.h"
 
 namespace highlo
 {
@@ -20,24 +19,23 @@ namespace highlo
 	{
 	public:
 
+		using ShaderReloadedCallback = std::function<void()>;
+
+		HLAPI virtual void Reload(bool forceCompile = false) = 0;
+		HLAPI virtual uint64 GetHash() const = 0;
+
 		HLAPI virtual void Bind() const = 0;
 		HLAPI virtual void Unbind() = 0;
-		HLAPI virtual HLRendererID GetRendererID() = 0;
+
+		HLAPI virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) = 0;
 		HLAPI virtual const HLString &GetName() const = 0;
+		HLAPI virtual HLRendererID GetRendererID() const = 0;
 
-		HLAPI Ref<UniformBuffer> GetBuffer(const HLString &name);
-		HLAPI void AddBuffer(const HLString &name, Ref<UniformBuffer> buffer);
+		HLAPI virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const = 0;
+		HLAPI virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const = 0;
 
-		HLAPI static Ref<UniformBuffer> &GetVSSceneUniformBuffer() { return m_VS_SceneBuffer; }
-
-		HLAPI static Ref<Shader> Create(const ShaderSource &source, const BufferLayout &layout);
-
-	private:
-
-		std::map<HLString, Ref<UniformBuffer>> m_BufferMap;
-
-		static void CreateVSSceneBuffer();
-		static Ref<UniformBuffer> m_VS_SceneBuffer;
+		HLAPI static Ref<Shader> Create(const FileSystemPath &filePath, bool forceCompile = false);
+		HLAPI static Ref<Shader> CreateFromString(const HLString &source);
 	};
 }
 

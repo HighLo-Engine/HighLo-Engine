@@ -128,12 +128,6 @@ namespace highlo
 		s_2DData->QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_2DData->QuadVertexPositions[3] = {  0.5f, -0.5f, 0.0f, 1.0f };
 
-		static auto cameraBuffer = UniformBuffer::Create(
-			"Camera",
-			{ UniformVariable("u_ViewProjection", sizeof(glm::mat4)) },
-			UniformBufferParentShader::VERTEX_SHADER,
-			(uint32) HL_UB_SLOT::VS_CAMERA_BUFFER);
-
 		std::vector<int32> quadIndices;
 		uint32 offset = 0;
 		for (uint32 i = 0; i < s_2DData->MaxIndices; ++i)
@@ -154,6 +148,8 @@ namespace highlo
 		{
 			lineIndices.push_back(i);
 		}
+
+		/*
 
 		// Textures/Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
@@ -186,8 +182,10 @@ namespace highlo
 		s_2DData->TextShader = Renderer::GetShaderLibrary()->Get("Renderer2DText");
 		s_2DData->TextShader->AddBuffer("CameraBuffer", cameraBuffer);
 		s_2DData->TextVertexArray = VertexArray::Create();
-		s_2DData->TextMaterial = Material::Create();
+		s_2DData->TextMaterial = Material::Create(s_2DData->TextShader);
 		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
+
+		*/
 
 		std::vector<int32> textIndices;
 		offset = 0;
@@ -238,6 +236,7 @@ namespace highlo
 		s_2DData->CameraProjection = proj;
 		s_2DData->DepthTest = depthTest;
 
+		/*
 		s_2DData->TextureShader->Bind();
 		Ref<UniformBuffer> buffer = s_2DData->TextureShader->GetBuffer("CameraBuffer");
 		buffer->SetBufferValue(&s_2DData->CameraProjection);
@@ -257,6 +256,7 @@ namespace highlo
 		Ref<UniformBuffer> textBuffer = s_2DData->TextShader->GetBuffer("CameraBuffer");
 		textBuffer->SetBufferValue(&s_2DData->CameraProjection);
 		textBuffer->UploadToShader();
+		*/
 
 		StartBatch();
 	}

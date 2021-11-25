@@ -19,7 +19,6 @@
 #include "Shaders/ShaderLibrary.h"
 #include "RendererCapabilities.h"
 #include "RenderPass.h"
-#include "Model.h"
 #include "Engine/Math/AABB.h"
 #include "RenderCommandQueue.h"
 #include "CommandBuffer.h"
@@ -95,7 +94,7 @@ namespace highlo
 		HLAPI static void BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear = true);
 		HLAPI static void EndRenderPass();
 
-		HLAPI static void DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+	//	HLAPI static void DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 		HLAPI static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 
 		HLAPI static Ref<Texture3D> GetBlackCubeTexture();

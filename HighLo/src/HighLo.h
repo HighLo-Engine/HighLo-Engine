@@ -58,7 +58,6 @@
 #include "Engine/Renderer/RenderingContext.h"
 #include "Engine/Renderer/IndexBuffer.h"
 #include "Engine/Renderer/VertexBuffer.h"
-#include "Engine/Renderer/VertexData.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Renderer/RenderPass.h"
@@ -70,8 +69,8 @@
 #include "Engine/Renderer/Shaders/Shader.h"
 #include "Engine/Renderer/Shaders/ShaderLibrary.h"
 #include "Engine/Renderer/Shaders/UniformBuffer.h"
-#include "Engine/Renderer/Shaders/UniformBufferSlotMappings.h"
-#include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/Meshes/StaticModel.h"
+#include "Engine/Renderer/Meshes/DynamicModel.h"
 #include "Engine/Factories/MeshFactory.h"
 #include "Engine/Renderer/Material.h"
 #include "Engine/Renderer/MaterialTable.h"
@@ -131,7 +130,7 @@
 #include "Engine/Scene/Project.h"
 #include "Engine/Scene/UserSettings.h"
 
-#include "Engine/Loaders/AssetLoader.h"
+#include "Engine/Loaders/MeshLoader.h"
 
 #include "Engine/Encryption/Base64.h"
 #include "Engine/Encryption/Encryptor.h"

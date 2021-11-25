@@ -30,8 +30,8 @@ namespace highlo
 
 	void Scene::Init()
 	{
-		auto skyboxShader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
-		m_SkyboxMaterial = Material::Create();
+		m_SkyboxShader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
+		m_SkyboxMaterial = Material::Create(m_SkyboxShader);
 		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
 	}
 	

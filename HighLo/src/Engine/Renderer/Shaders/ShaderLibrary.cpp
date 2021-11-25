@@ -3,8 +3,6 @@
 #include "HighLoPch.h"
 #include "ShaderLibrary.h"
 
-#include "ShaderCompiler.h"
-
 namespace highlo
 {
 	ShaderLibrary::ShaderLibrary() {}
@@ -23,13 +21,9 @@ namespace highlo
 		m_Shaders[name] = shader;
 	}
 
-	void ShaderLibrary::Load(const FileSystemPath &filePath, BufferLayout &layout)
-	{
-		Ref<ShaderCompiler> compiler = ShaderCompiler::Create(filePath, layout);
-		compiler->Compile();
-		compiler->Link();
-		
-		Ref<Shader> shader = compiler->GetCompiledShader();
+	void ShaderLibrary::Load(const FileSystemPath &filePath, bool forceCompile)
+	{		
+		Ref<Shader> shader = Shader::Create(filePath, forceCompile);
 		if (!shader)
 		{
 			HL_CORE_ERROR("Failed to load shader into shaderlibrary!");
@@ -39,13 +33,9 @@ namespace highlo
 		Add(shader);
 	}
 	
-	void ShaderLibrary::Load(const HLString &name, const FileSystemPath &filePath, BufferLayout &layout)
+	void ShaderLibrary::Load(const HLString &name, const FileSystemPath &filePath, bool forceCompile)
 	{
-		Ref<ShaderCompiler> compiler = ShaderCompiler::Create(filePath, layout);
-		compiler->Compile();
-		compiler->Link();
-		
-		Ref<Shader> shader = compiler->GetCompiledShader();
+		Ref<Shader> shader = Shader::Create(filePath, forceCompile);
 		if (!shader)
 		{
 			HL_CORE_ERROR("Failed to load shader into shaderlibrary!");

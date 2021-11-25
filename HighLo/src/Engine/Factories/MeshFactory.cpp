@@ -3,15 +3,17 @@
 #include "HighLoPch.h"
 #include "MeshFactory.h"
 
+#include "Engine/Assets/AssetManager.h"
+
 namespace highlo
 {
-	Ref<Mesh> MeshFactory::CreateCube(const glm::vec3 &size)
+	AssetHandle MeshFactory::CreateCube(const glm::vec3 &size)
 	{
 		std::vector<Vertex> vertices;
 		vertices.resize(8);
 
-		std::vector<int32> indices;
-		indices.resize(36);
+		std::vector<VertexIndex> indices;
+		indices.resize(12);
 
 		// Generate Vertices
 		vertices[0].Position = { -size.x / 2.0f, -size.y / 2.0f,  size.z / 2.0f };
@@ -34,68 +36,31 @@ namespace highlo
 		vertices[7].Normal = { -1.0f,  1.0f, -1.0f };
 
 		// Generate indices
-		indices[ 0] = 0;
-		indices[ 1] = 1;
-		indices[ 2] = 2;
-		indices[ 3] = 2;
-		indices[ 4] = 3;
-		indices[ 5] = 0;
+		indices[ 0] = { 0, 1, 2 };
+		indices[ 1] = { 2, 3, 0 };
+		indices[ 2] = { 1, 5, 6 };
+		indices[ 3] = { 6, 2, 1 };
+		indices[ 4] = { 7, 6, 5 };
+		indices[ 5] = { 5, 4, 7 };
+		indices[ 6] = { 4, 0, 3 };
+		indices[ 7] = { 3, 7, 4 };
+		indices[ 8] = { 4, 5, 1 };
+		indices[ 9] = { 1, 0, 4 };
+		indices[10] = { 3, 2, 6 };
+		indices[11] = { 6, 7, 3 };
 
-		indices[ 6] = 1;
-		indices[ 7] = 5;
-		indices[ 8] = 6;
-		indices[ 9] = 6;
-		indices[10] = 2;
-		indices[11] = 1;
+		AABB boundingBox = AABB(glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), glm::vec3(size.x / 2, size.y / 2, size.z / 2));
 
-		indices[12] = 7;
-		indices[13] = 6;
-		indices[14] = 5;
-		indices[15] = 5;
-		indices[16] = 4;
-		indices[17] = 7;
-
-		indices[18] = 4;
-		indices[19] = 0;
-		indices[20] = 3;
-		indices[21] = 3;
-		indices[22] = 7;
-		indices[23] = 4;
-
-		indices[24] = 4;
-		indices[25] = 5;
-		indices[26] = 1;
-		indices[27] = 1;
-		indices[28] = 0;
-		indices[29] = 4;
-
-		indices[30] = 3;
-		indices[31] = 2;
-		indices[32] = 6;
-		indices[33] = 6;
-		indices[34] = 7;
-		indices[35] = 3;
-
-		MeshData data;
-		data.Vertices = vertices;
-		data.Indices = indices;
-
-		return Mesh::Create(data);
+		AssetHandle handle = AssetManager::Get()->CreateMemoryOnlyAsset<MeshFile>(vertices, indices, boundingBox);
+		Ref<MeshFile> result = AssetManager::Get()->GetAsset<MeshFile>(handle);
+		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
 	}
 
-	Model MeshFactory::CreateCubeModel(const glm::vec3 &size)
-	{
-		Model model = Model({ CreateCube(size) });
-		model.BoundingBox = AABB(glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), glm::vec3(size.x / 2, size.y / 2, size.z / 2));
-		return model;
-	}
-
-	Ref<Mesh> MeshFactory::CreateSphere(float radius)
+	AssetHandle MeshFactory::CreateSphere(float radius)
 	{
 		const float PI = HL_PI;
 		float sectorCount = 36;
 		float stackCount = 18;
-		MeshData data;
 
 		float x, y, z, xy;                              // vertex position
 		float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
@@ -104,6 +69,9 @@ namespace highlo
 		float sectorStep = 2.0f * PI / sectorCount;
 		float stackStep = PI / stackCount;
 		float sectorAngle, stackAngle;
+
+		std::vector<Vertex> vertices;
+		std::vector<VertexIndex> indices;
 
 		for (int32 i = 0; i <= stackCount; ++i)
 		{
@@ -137,10 +105,10 @@ namespace highlo
 				// vertex tex coord (s, t) range between [0, 1]
 				s = (float)j / sectorCount;
 				t = (float)i / stackCount;
-				vertex.UV.x = s;
-				vertex.UV.y = t;
+				vertex.TexCoord.x = s;
+				vertex.TexCoord.y = t;
 
-				data.Vertices.push_back(vertex);
+				vertices.push_back(vertex);
 			}
 		}
 
@@ -154,30 +122,37 @@ namespace highlo
 			{
 				// 2 triangles per sector excluding first and last stacks
 				// k1 => k2 => k1+1
+
 				if (i != 0)
 				{
-					data.Indices.push_back(k1);
-					data.Indices.push_back(k2);
-					data.Indices.push_back(k1 + 1);
+					VertexIndex index;
+					index.P1 = k1;
+					index.P2 = k2;
+					index.P3 = k1 + 1;
+					indices.push_back(index);
 				}
 
 				// k1+1 => k2 => k2+1
 				if (i != (stackCount - 1))
 				{
-					data.Indices.push_back(k1 + 1);
-					data.Indices.push_back(k2);
-					data.Indices.push_back(k2 + 1);
+					VertexIndex index;
+					index.P1 = k1 + 1;
+					index.P2 = k2;
+					index.P3 = k2 + 1;
+					indices.push_back(index);
 				}
 			}
 		}
 
-		return Mesh::Create(data);
+		AssetHandle handle = AssetManager::Get()->CreateMemoryOnlyAsset<MeshFile>(vertices, indices, glm::mat4(1.0f));
+		Ref<MeshFile> result = AssetManager::Get()->GetAsset<MeshFile>(handle);
+		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
 	}
 
-	Ref<Mesh> MeshFactory::CreateCapsule(float radius, float height)
+	AssetHandle MeshFactory::CreateCapsule(float radius, float height)
 	{
 		std::vector<Vertex> vertices;
-		std::vector<int32> indices;
+		std::vector<VertexIndex> indices;
 
 		constexpr int32 segments = 36;
 		constexpr int32 pointCount = segments + 1;
@@ -233,24 +208,24 @@ namespace highlo
 		}
 
 		// Generate indices
-		for (int32 y = 0; y < segments + 1; y++)
+		for (int32 r = 0; r < segments + 1; r++)
 		{
-			for (int32 x = 0; x < segments; x++)
+			for (int32 s = 0; s < segments; s++)
 			{
-				indices.push_back(((y + 0) * (segments + 1)) + x + 0);
-				indices.push_back(((y + 1) * (segments + 1)) + x + 0);
-				indices.push_back(((y + 1) * (segments + 1)) + x + 1);
+				VertexIndex &index1 = indices.emplace_back();
+				index1.P1 = (uint32_t) (r * segments + s + 1);
+				index1.P2 = (uint32_t) (r * segments + s + 0);
+				index1.P3 = (uint32_t) ((r + 1) * segments + s + 1);
 
-				indices.push_back(((y + 0) * (segments + 1)) + x + 1);
-				indices.push_back(((y + 0) * (segments + 1)) + x + 0);
-				indices.push_back(((y + 1) * (segments + 1)) + x + 1);
+				VertexIndex &index2 = indices.emplace_back();
+				index2.P1 = (uint32_t) ((r + 1) * segments + s + 0);
+				index2.P2 = (uint32_t) ((r + 1) * segments + s + 1);
+				index2.P3 = (uint32_t) (r * segments + s);
 			}
 		}
 
-		MeshData data;
-		data.Vertices = vertices;
-		data.Indices = indices;
-
-		return Mesh::Create(data);
+		AssetHandle handle = AssetManager::Get()->CreateMemoryOnlyAsset<MeshFile>(vertices, indices, glm::mat4(1.0f));
+		Ref<MeshFile> result = AssetManager::Get()->GetAsset<MeshFile>(handle);
+		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
 	}
 }

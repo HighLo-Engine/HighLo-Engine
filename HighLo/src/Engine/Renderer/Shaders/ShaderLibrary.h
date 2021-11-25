@@ -21,8 +21,8 @@ namespace highlo
 
 		HLAPI void Add(const Ref<Shader> &shader);
 		HLAPI void Add(const HLString &name, const Ref<Shader> &shader);
-		HLAPI void Load(const FileSystemPath &filePath, BufferLayout &layout = BufferLayout::Empty);
-		HLAPI void Load(const HLString &name, const FileSystemPath &filePath, BufferLayout &layout = BufferLayout::Empty);
+		HLAPI void Load(const FileSystemPath &filePath, bool forceCompile = false);
+		HLAPI void Load(const HLString &name, const FileSystemPath &filePath, bool forceCompile = false);
 		
 		HLAPI const Ref<Shader> &Get(const HLString &name);
 

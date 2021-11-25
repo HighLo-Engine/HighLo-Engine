@@ -202,17 +202,9 @@ namespace highlo
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
 			return Renderer::GetEmptyEnvironment();
 
-		Ref<Shader> equirectangularConversionShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCubeMap");
-		Ref<Shader> envFilteringShader = Renderer::GetShaderLibrary()->Get("EnvironmentMipFilter");
-		Ref<Shader> envIrradianceShader = Renderer::GetShaderLibrary()->Get("EnvironmentIrradiance");
-
-		static auto environmentBuffer = UniformBuffer::Create(
-			"EnvironmentBuffer",
-			{ UniformVariable("Roughness", sizeof(float)) },
-			UniformBufferParentShader::COMPUTE_SHADER,
-			(uint32)HL_UB_SLOT::ENVIRONMENT_DATA_BUFFER);
-
-		envFilteringShader->AddBuffer("EnvironmentBuffer", environmentBuffer);
+		Ref<OpenGLShader> equirectangularConversionShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCubeMap").As<OpenGLShader>();
+		Ref<OpenGLShader> envFilteringShader = Renderer::GetShaderLibrary()->Get("EnvironmentMipFilter").As<OpenGLShader>();
+		Ref<OpenGLShader> envIrradianceShader = Renderer::GetShaderLibrary()->Get("EnvironmentIrradiance").As<OpenGLShader>();
 
 		Ref<Texture3D> envUnfiltered = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
 		Ref<Texture3D> envFiltered = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
@@ -249,10 +241,10 @@ namespace highlo
 				glBindImageTexture(0, envFiltered->GetRendererID(), level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
 				// Upload Roughness to Shader
-				Ref<UniformBuffer> buffer = envFilteringShader->GetBuffer("EnvironmentBuffer");
 				float value = (float)level * deltaRoughness;
-				buffer->SetBufferValue(&value);
-				buffer->UploadToShader();
+				const GLint roughnessShaderLocation = glGetUniformLocation(envFilteringShader->GetRendererID(), "u_Uniforms.Roughness");
+				HL_ASSERT(roughnessShaderLocation != -1);
+				glUniform1f(roughnessShaderLocation, value);
 
 				const GLuint numGroups = glm::max(1u, size / 32);
 				glDispatchCompute(numGroups, numGroups, 6);

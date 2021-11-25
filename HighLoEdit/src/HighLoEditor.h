@@ -48,6 +48,7 @@ class HighLoEditor : public HLApplication
 		{
 			float Distance = 0.0f;
 			Mesh *Mesh = nullptr;
+			uint32 MeshIndex = 0;
 			Entity Entity;
 		};
 

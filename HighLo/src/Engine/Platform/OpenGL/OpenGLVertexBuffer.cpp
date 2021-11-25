@@ -29,20 +29,6 @@ namespace highlo
 		}
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<Vertex> &vertices, VertexBufferUsage usage)
-		: m_Usage(usage)
-	{
-		m_Size = (uint32)(vertices.size() * sizeof(Vertex));
-		m_LocalData = Allocator::Copy(&vertices[0], m_Size);
-
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.m_Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
-		});
-	}
-
 	OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32 size, VertexBufferUsage usage)
 		: m_Usage(usage)
 	{
@@ -93,18 +79,6 @@ namespace highlo
 		Renderer::Submit([]()
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		});
-	}
-
-	void OpenGLVertexBuffer::UpdateContents(std::vector<Vertex> &vertices, uint32 offset)
-	{
-		m_Size = ((uint32)vertices.size()) * sizeof(Vertex);
-		m_LocalData = Allocator::Copy(&vertices[0], m_Size);
-
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance, offset]()
-		{
-			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.m_Data);
 		});
 	}
 	

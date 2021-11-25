@@ -284,13 +284,13 @@ void HighLoEditor::SelectEntity(Entity entity)
 		return;
 
 	SelectedMesh selection;
-	if (entity.HasComponent<ModelComponent>())
+	if (entity.HasComponent<DynamicModelComponent>())
 	{
-		auto meshComp = entity.GetComponent<ModelComponent>();
-		/*if (meshComp.Model && meshComp.Model->Type == AssetType::Mesh)
+		auto meshComp = entity.GetComponent<DynamicModelComponent>();
+		if (meshComp->Model && meshComp->Model->GetAssetType() == AssetType::Mesh)
 		{
-			selection.Mesh = &meshComp.Mesh->GetSubmeshes()[0];
-		}*/
+			selection.MeshIndex = meshComp->Model->GetSubmeshIndices()[0];
+		}
 	}
 
 	selection.Entity = entity;

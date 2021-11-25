@@ -70,6 +70,7 @@ namespace highlo
 
 	static AssetMetaData s_NullMetaData;
 	std::unordered_map<AssetHandle, Ref<Asset>> AssetManager::s_LoadedAssets;
+	std::unordered_map<AssetHandle, Ref<Asset>> AssetManager::s_MemoryAssets;
 
 	void AssetManager::Init()
 	{
@@ -83,6 +84,7 @@ namespace highlo
 
 		s_AssetRegistry.Clear();
 		s_LoadedAssets.clear();
+		s_MemoryAssets.clear();
 	}
 
 	void AssetManager::OnEvent(Event &e)

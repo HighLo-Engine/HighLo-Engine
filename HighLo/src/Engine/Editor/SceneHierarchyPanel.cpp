@@ -156,9 +156,9 @@ namespace highlo
 		*/
 
 		// TODO: move this to another function and checks are missing (asset functions are not implemented yet)
-		const bool missingMesh = entity.HasComponent<ModelComponent>();
-		if (missingMesh)
-			ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_ERROR_COLOR);
+	//	const bool missingMesh = entity.HasComponent<StaticModelComponent>();
+	//	if (missingMesh)
+	//		ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_ERROR_COLOR);
 
 		const bool opened = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity.GetUUID(), flags, *name);
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_None) && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
@@ -168,8 +168,8 @@ namespace highlo
 				m_SelectionChangedCallback(m_SelectedEntity);
 		}
 
-		if (missingMesh)
-			ImGui::PopStyleColor();
+	//	if (missingMesh)
+	//		ImGui::PopStyleColor();
 
 		// Delete Entity
 		bool entityDeleted = false;

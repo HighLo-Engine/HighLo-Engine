@@ -73,35 +73,14 @@ namespace highlo
 	void SceneRenderer::InitGrid()
 	{
 		m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
+		m_GridMaterial = Material::Create(m_GridShader);
 		float gridScale = 16.025f;
 		float gridSize = 0.025f;
 
-		static Ref<UniformBuffer> gridDataBuffer = UniformBuffer::Create(
-			"GridSettings",
-			{
-				UniformVariable("u_Scale", sizeof(float)),
-				UniformVariable("u_Size", sizeof(float)),
-			},
-			UniformBufferParentShader::PIXEL_SHADER,
-			(uint32)HL_UB_SLOT::GRID_BUFFER);
+		m_GridMaterial->Set("u_Scale", gridScale);
+		m_GridMaterial->Set("u_Size", gridSize);
 
-		static Ref<UniformBuffer> cameraGridBuffer = UniformBuffer::Create(
-			"Camera",
-			{
-				UniformVariable("u_ViewProjectionMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_ViewInverseViewProjectionMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_ProjectionMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_ViewMatrix", sizeof(glm::mat4)),
-			},
-			UniformBufferParentShader::VERTEX_SHADER,
-			(uint32)HL_UB_SLOT::VS_CAMERA_BUFFER);
-
-		gridDataBuffer->SetVariableValue("u_Scale", &gridScale);
-		gridDataBuffer->SetVariableValue("u_Size", &gridSize);
-		gridDataBuffer->UploadToShader();
-
-		m_GridShader->AddBuffer("GridSettings", gridDataBuffer);
-		m_GridShader->AddBuffer("CameraBuffer", cameraGridBuffer);
+		
 	}
 
 	void SceneRenderer::InitSkybox()

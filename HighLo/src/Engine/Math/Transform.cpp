@@ -9,6 +9,17 @@ namespace highlo
 {
 	Transform Transform::OriginTransform = Transform::FromPosition({ 0, 0, 0 });
 
+	Transform::Transform(const glm::mat4 &transform)
+	{
+		m_Transform = transform;
+
+		glm::vec3 translation, rotation, scale;
+		highlo::Decompose(transform, translation, scale, rotation);
+		m_Position = translation;
+		m_Scale = scale;
+		m_Rotation = rotation;
+	}
+
 	Transform &Transform::Translate(const glm::vec3 &translation)
 	{
 		m_Position += translation;

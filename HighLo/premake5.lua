@@ -27,8 +27,6 @@ project "HighLo"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.assimp}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.SPIRV_Cross}",
-		"%{IncludeDir.shaderc}",
 		"%{IncludeDir.openssl}",
 		"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.msdfgen}",

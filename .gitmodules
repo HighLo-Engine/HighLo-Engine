@@ -14,18 +14,6 @@
 	path = HighLo/vendor/spdlog
 	url = https://github.com/HighLo-Engine/spdlog
 	ignore = dirty
-[submodule "HighLo/vendor/SPIRV-Cross"]
-	path = HighLo/vendor/SPIRV-Cross
-	url = https://github.com/HighLo-Engine/SPIRV-Cross
-	ignore = dirty
-[submodule "HighLo/vendor/glslang"]
-	path = HighLo/vendor/glslang
-	url = https://github.com/HighLo-Engine/glslang
-	ignore = dirty
-[submodule "HighLo/vendor/shaderc"]
-	path = HighLo/vendor/shaderc
-	url = https://github.com/HighLo-Engine/shaderc
-	ignore = dirty
 [submodule "HighLo/vendor/openssl"]
 	path = HighLo/vendor/openssl
 	url = https://github.com/HighLo-Engine/openssl

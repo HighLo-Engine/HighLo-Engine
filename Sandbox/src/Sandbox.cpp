@@ -1,6 +1,6 @@
 #include "Sandbox.h"
 
-// This Sandbox application will render anything,
+// This Sandbox application will render nothing,
 // because the underlying API is currently under heavy development!
 
 void Sandbox::OnInitialize()
@@ -15,7 +15,7 @@ void Sandbox::OnInitialize()
 	//m_Scene->m_Camera = Ref<FreeFlyCamera>::Create();
 
 	auto house_tex = Texture2D::LoadFromFile("assets/textures/WoodenCabin.jpg");
-
+	/*
 	Ref<Model> house = AssetLoader::LoadStaticModel("assets/models/WoodenCabin.obj");
 	house->GetMesh(0)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
 	house->GetMesh(1)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
@@ -27,7 +27,7 @@ void Sandbox::OnInitialize()
 	Ref<Model> houseLod2 = AssetLoader::LoadStaticModel("assets/models/WoodenCabinLOD2.obj");
 	houseLod2->GetMesh(0)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
 	houseLod2->GetMesh(1)->SetTexture(HL_MATERIAL_TEXTURE_ALBEDO, house_tex);
-
+	
 	for (int32 i = -20; i < 20; i++)
 	{
 		for (int32 j = -20; j < 20; j++)
@@ -44,6 +44,7 @@ void Sandbox::OnInitialize()
 		//	m_Scene->AddEntity(entity);
 		}
 	}
+	*/
 
 	m_RenderSystemRef = GetECSSystemManager().GetSystem("RenderSystem").As<RenderSystem>();
 	//UI::ShouldDisplayDebugInformation(true);

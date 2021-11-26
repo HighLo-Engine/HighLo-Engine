@@ -2,7 +2,7 @@ project "HighLo"
     kind "StaticLib"
     language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
@@ -39,6 +39,7 @@ project "HighLo"
 		"%{IncludeDir.gtest}",
 		"%{IncludeDir.gmock}",
 		"%{IncludeDir.vulkan}",
+		"%{IncludeDir.vulkan_local}",
     }
 
     links
@@ -48,24 +49,6 @@ project "HighLo"
 		"msdf-atlas-gen",
         "%{LibDir.assimp}",
 		
-		"%{LibDir.shaderc}",
-		"%{LibDir.shaderc_util}",
-		"%{LibDir.SPIRV_Cross_c}",
-		"%{LibDir.SPIRV_Cross_core}",
-		"%{LibDir.SPIRV_Cross_cpp}",
-		"%{LibDir.SPIRV_Cross_glsl}",
-		"%{LibDir.SPIRV_Cross_hlsl}",
-		"%{LibDir.SPIRV_Cross_msl}",
-		"%{LibDir.SPIRV_Cross_reflect}",
-		"%{LibDir.SPIRV_Cross_util}",
-		"%{LibDir.glslang}",
-		"%{LibDir.glslang_MachineIndependent}",
-		"%{LibDir.glslang_SPIRV}",
-		"%{LibDir.glslang_OGLCompiler}",
-		"%{LibDir.glslang_OSDependent}",
-		"%{LibDir.glslang_GenericCodeGen}",
-		"%{LibDir.SPIRV_Tools}",
-		"%{LibDir.SPIRV_Tools_opt}",
 		"%{LibDir.openssl_libssl}",
 		"%{LibDir.openssl_libcrypto}",
 		"%{LibDir.vulkan_sdk}",
@@ -138,6 +121,13 @@ project "HighLo"
 			"%{LibDir.gtest_main_debug}",
 			"%{LibDir.gmock_debug}",
 			"%{LibDir.gmock_main_debug}",
+			
+			"%{LibDir.shaderc_debug}",
+			"%{LibDir.shaderc_util_debug}",
+			
+			"%{LibDir.SPIRV_Cross_Debug}",
+			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
+			"%{LibDir.SPIRV_Tools_Debug}",
 		}
 
     filter "configurations:Release"
@@ -151,6 +141,13 @@ project "HighLo"
 			"%{LibDir.gtest_main_release}",
 			"%{LibDir.gmock_release}",
 			"%{LibDir.gmock_main_release}",
+			
+			
+			"%{LibDir.shaderc_release}",
+			"%{LibDir.shaderc_util_release}",
+			
+			"%{LibDir.SPIRV_Cross_Release}",
+			"%{LibDir.SPIRV_Cross_GLSL_Release}",
 		}
 		
 		

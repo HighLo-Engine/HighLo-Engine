@@ -2,7 +2,7 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 	entrypoint "mainCRTStartup"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")

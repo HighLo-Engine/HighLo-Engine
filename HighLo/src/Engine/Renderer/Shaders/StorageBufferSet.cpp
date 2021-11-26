@@ -24,8 +24,8 @@ namespace highlo
 	Ref<StorageBuffer> StorageBufferSet::GetStorage(uint32 binding, uint32 set, uint32 frame)
 	{
 		HL_ASSERT(m_StorageBuffers.find(frame) != m_StorageBuffers.end());
-		HL_ASSERT(m_StorageBuffers.at(frame).find(set) != m_StorageBuffers.at(frame).end());
-		HL_ASSERT(m_StorageBuffers.at(frame).at(set).find(binding) != m_StorageBuffers.at(frame).at(set).end());
+		HL_ASSERT(m_StorageBuffers..at(frame).find(set) != m_StorageBuffers.at(frame).end());
+		HL_ASSERT(m_StorageBuffers..at(frame).at(set).find(binding) != m_StorageBuffers.at(frame).at(set).end());
 
 		return m_StorageBuffers.at(frame).at(set).at(binding);
 	}

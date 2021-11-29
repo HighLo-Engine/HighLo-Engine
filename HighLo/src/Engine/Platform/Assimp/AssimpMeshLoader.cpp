@@ -60,8 +60,8 @@ namespace highlo
 		m_Scene = scene;
 		m_IsAnimated = scene->mAnimations != nullptr;
 		m_InverseTransform = glm::inverse(utils::Mat4FromAssimp(scene->mRootNode->mTransformation));
-		m_TicksPerSecond = scene->mAnimations[0]->mTicksPerSecond;
-		m_AnimationDuration = scene->mAnimations[0]->mDuration;
+		m_TicksPerSecond = (float)scene->mAnimations[0]->mTicksPerSecond;
+		m_AnimationDuration = (float)scene->mAnimations[0]->mDuration;
 
 		m_BoundingBox.Min = { FLT_MAX, FLT_MAX, FLT_MAX };
 		m_BoundingBox.Max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };

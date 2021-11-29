@@ -129,7 +129,7 @@ namespace highlo
 	{
 	}
 
-	Ref<Texture3D> &VulkanMaterial::GetTexture3D(const HLString &name)
+	Ref<Texture3D> VulkanMaterial::GetTexture3D(const HLString &name)
 	{
 	}
 

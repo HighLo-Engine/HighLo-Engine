@@ -64,7 +64,7 @@ namespace highlo
 		HLAPI virtual glm::mat4 &GetMatrix4(const HLString &name) = 0;
 
 		HLAPI virtual Ref<Texture2D> &GetTexture2D(const HLString &name) = 0;
-		HLAPI virtual Ref<Texture3D> &GetTexture3D(const HLString &name) = 0;
+		HLAPI virtual Ref<Texture3D> GetTexture3D(const HLString &name) = 0;
 
 		HLAPI virtual Ref<Texture2D> TryGetTexture2D(const HLString &name) = 0;
 		HLAPI virtual Ref<Texture3D> TryGetTexture3D(const HLString &name) = 0;

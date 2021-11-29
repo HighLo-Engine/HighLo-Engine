@@ -209,7 +209,7 @@ namespace highlo
 		return m_Texture2Ds[slot];
 	}
 	
-	Ref<Texture3D> &OpenGLMaterial::GetTexture3D(const HLString &name)
+	Ref<Texture3D> OpenGLMaterial::GetTexture3D(const HLString &name)
 	{
 		return TryGetResource<Texture3D>(name);
 	}

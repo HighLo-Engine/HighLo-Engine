@@ -23,7 +23,9 @@ IncludeDir["vulkan_memory_alloc"] 	 = "%{wks.location}/HighLo/vendor/VulkanMemor
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"
 LibDir["openssl_libssl"]             = "%{wks.location}/HighLo/vendor/openssl/lib/libssl.lib"
+LibDir["openssl_libssl_static"]      = "%{wks.location}/HighLo/vendor/openssl/lib/libssl_static.lib"
 LibDir["openssl_libcrypto"]          = "%{wks.location}/HighLo/vendor/openssl/lib/libcrypto.lib"
+LibDir["openssl_libcrypto_static"]   = "%{wks.location}/HighLo/vendor/openssl/lib/libcrypto_static.lib"
 
 LibDir["gtest_debug"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Debug/gtestd.lib"
 LibDir["gtest_main_debug"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Debug/gtest_maind.lib"

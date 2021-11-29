@@ -110,8 +110,12 @@ project "HighLo"
         }
 
     filter "configurations:Debug"
-        defines "HL_DEBUG"
         symbols "On"
+
+		defines
+		{
+			"HL_DEBUG"
+		}
 		
 		links
 		{
@@ -129,9 +133,13 @@ project "HighLo"
 		}
 
     filter "configurations:Release"
-        defines "HL_RELEASE"
         optimize "On"
-
+		
+		defines
+		{
+			"HL_RELEASE",
+			"NDEBUG",
+		}
 		
 		links
 		{

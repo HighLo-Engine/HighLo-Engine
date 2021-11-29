@@ -98,27 +98,24 @@ namespace highlo
 
 		// Define Shader layouts
 		
-		Renderer::Submit([=]()
-		{
-			// Load 3D Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
+		// Load 3D Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
-			// Load 2D Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl");
+		// Load 2D Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl");
 
-			// Load Compute Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl");
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl");
-		});
+		// Load Compute Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl");
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();

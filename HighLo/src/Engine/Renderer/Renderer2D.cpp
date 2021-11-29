@@ -206,8 +206,8 @@ namespace highlo
 		textVertexBuffer->SetLayout(BufferLayout::GetTextLayout());
 		Ref<IndexBuffer> textIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
 
-		s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
-		s_2DData->TextVertexArray->SetIndexBuffer(textIndexBuffer);
+	//	s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
+	//	s_2DData->TextVertexArray->SetIndexBuffer(textIndexBuffer);
 
 		/*
 		s_2DData->CircleVertexArray = VertexArray::Create();

@@ -127,9 +127,15 @@ project "HighLo"
 			"%{LibDir.shaderc_debug}",
 			"%{LibDir.shaderc_util_debug}",
 			
+			"%{LibDir.SPIRV_Debug}",
 			"%{LibDir.SPIRV_Cross_Debug}",
 			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
+			"%{LibDir.SPIRV_Cross_util_Debug}",
+			"%{LibDir.SPIRV_Cross_cpp_Debug}",
+			"%{LibDir.SPIRV_Cross_reflect_Debug}",
 			"%{LibDir.SPIRV_Tools_Debug}",
+			"%{LibDir.SpvRemapper_Debug}",
+			"%{LibDir.glsl_Debug}",
 		}
 
     filter "configurations:Release"
@@ -152,8 +158,14 @@ project "HighLo"
 			"%{LibDir.shaderc_release}",
 			"%{LibDir.shaderc_util_release}",
 			
+			"%{LibDir.SPIRV_Release}",
 			"%{LibDir.SPIRV_Cross_Release}",
 			"%{LibDir.SPIRV_Cross_GLSL_Release}",
+			"%{LibDir.SPIRV_Cross_util_Release}",
+			"%{LibDir.SPIRV_Cross_cpp_Release}",
+			"%{LibDir.SPIRV_Cross_reflect_Release}",
+			"%{LibDir.SpvRemapper_Release}",
+			"%{LibDir.glsl_Release}",
 		}
 		
 		

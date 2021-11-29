@@ -80,6 +80,11 @@ namespace highlo
 			FILE *f;
 
 			fopen_s(&f, *path.String(), "rb");
+			if (!f)
+			{
+				HL_CORE_ERROR("Unable to open file {0}", *path.String());
+				return outputBinary;
+			}
 
 			// Get file size
 			fseek(f, 0, SEEK_END);
@@ -97,6 +102,12 @@ namespace highlo
 		{
 			FILE *f;
 			fopen_s(&f, *path.String(), "wb");
+			if (!f)
+			{
+				HL_CORE_ERROR("Unable to open file {0}", *path.String());
+				return;
+			}
+
 			fwrite(outputBinary.data(), sizeof(uint32), outputBinary.size(), f);
 			fclose(f);
 		}

@@ -64,12 +64,14 @@ namespace highlo
 			if (m_File.IsFile)
 			{
 				m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
-				m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath);
+				m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
+				m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
 			}
 			else
 			{
 				m_File.Extension = "folder";
 				m_File.Name = ExtractFolderNameFromPath(m_File.FullPath);
+				m_File.FileName = m_File.Name;
 
 			}
 		}
@@ -142,13 +144,15 @@ namespace highlo
 
 			if (file.IsFile)
 			{
-				file.Extension = ExtractFileExtensionFromPath(file.FullPath);
+				file.Extension = ExtractFileExtensionFromPath(file.FullPath, true);
 				file.Name = ExtractFileNameFromPath(file.FullPath);
+				file.FileName = ExtractFileNameFromPath(file.FullPath, true);
 			}
 			else
 			{
 				file.Extension = "folder";
 				file.Name = ExtractFolderNameFromPath(file.FullPath);
+				file.FileName = file.Name;
 			}
 
 			result.push_back(file);
@@ -183,6 +187,11 @@ namespace highlo
 	}
 
 	const HLString &FileSystemPath::Filename() const
+	{
+		return m_File.FileName;
+	}
+
+	const HLString &FileSystemPath::Name() const
 	{
 		return m_File.Name;
 	}
@@ -320,7 +329,7 @@ namespace highlo
 		return *this;
 	}
 
-	HLString FileSystemPath::ExtractFileNameFromPath(const HLString &path)
+	HLString FileSystemPath::ExtractFileNameFromPath(const HLString &path, bool excludeExtension)
 	{
 		HLString result;
 		int32 pos = path.FirstIndexOf('/');
@@ -331,6 +340,14 @@ namespace highlo
 			result = path.Substr(pos + 1);
 			pos = path.FirstIndexOf('/', i);
 			++i;
+		}
+
+		if (excludeExtension)
+		{
+			if (result.Contains("."))
+			{
+				result = result.Substr(0, result.IndexOf("."));
+			}
 		}
 
 		return result;
@@ -352,7 +369,9 @@ namespace highlo
 		if (!result.Contains("."))
 			return "-1";
 
-		if (!excludeDot)
+		if (excludeDot)
+			result = result.Substr(result.IndexOf(".") + 1);
+		else
 			result = result.Substr(result.IndexOf("."));
 
 		return result;

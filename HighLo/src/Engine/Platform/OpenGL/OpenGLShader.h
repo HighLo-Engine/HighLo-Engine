@@ -71,7 +71,6 @@ namespace highlo
 	private:
 
 		void Load(const HLString &source, bool forceCompile);
-		void Compile(const std::vector<uint32> &vertexBinary, const std::vector<uint32> &fragmentBinary);
 		void Reflect(std::vector<uint32> &data);
 
 		void CompileOrGetVulkanBinary(std::unordered_map<uint32, std::vector<uint32>> &outputBinary, bool forceCompile = false);

@@ -23,12 +23,13 @@ namespace highlo
 {
 	struct File
 	{
-		HLString Name;
-		HLString Extension;
-		HLString FullPath;
-		int64 Size = 0;
-		bool ExistsOnHardDrive = false;
-		bool IsFile = false;
+		HLString FileName;					// Represents the real filename without any file extension
+		HLString Name;						// Represents the filename with the file extension
+		HLString Extension;					// Represents the file extension
+		HLString FullPath;					// Represents the full path name (absolute path)
+		int64 Size = 0;						// Represents the file size
+		bool ExistsOnHardDrive = false;		// Represents, whether the file exists on the hard drive
+		bool IsFile = false;				// Represents, whether the file is a file or a folder
 
 		HLAPI File() = default;
 
@@ -74,6 +75,7 @@ namespace highlo
 		HLAPI int64 Size() const;
 		HLAPI const HLString &Absolute() const;
 		HLAPI const HLString &Filename() const;
+		HLAPI const HLString &Name() const;
 		HLAPI const HLString &Extension() const;
 
 		HLAPI bool IsFile() const;
@@ -112,7 +114,7 @@ namespace highlo
 		HLAPI FileSystemPath &operator+=(const char *path);
 		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const char *path);
 
-		HLAPI static HLString ExtractFileNameFromPath(const HLString &path);
+		HLAPI static HLString ExtractFileNameFromPath(const HLString &path, bool excludeExtension = false);
 		HLAPI static HLString ExtractFileExtensionFromPath(const HLString &path, bool excludeDot = false);
 		HLAPI static HLString ExtractFolderNameFromPath(const HLString &path);
 

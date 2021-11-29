@@ -19,7 +19,7 @@ namespace highlo
 	{
 		static FileSystemPath GetCacheDirectory()
 		{
-			return "assets/cache/shaders/openGL/";
+			return "assets/cache/shaders/OpenGL/";
 		}
 
 		static const char *GLShaderStageCachedOpenGLFileExtension(uint32 stage)
@@ -124,6 +124,7 @@ namespace highlo
 					if (type.vecsize == 2)				return ShaderUniformType::IVec2;
 					if (type.vecsize == 3)				return ShaderUniformType::IVec3;
 					if (type.vecsize == 4)				return ShaderUniformType::IVec4;
+					break;
 				}
 
 				case spirv_cross::SPIRType::Float:
@@ -136,6 +137,7 @@ namespace highlo
 					if (type.vecsize == 2)				return ShaderUniformType::Vec2;
 					if (type.vecsize == 3)				return ShaderUniformType::Vec3;
 					if (type.vecsize == 4)				return ShaderUniformType::Vec4;
+					break;
 				}
 			}
 
@@ -162,6 +164,7 @@ namespace highlo
 
 	void OpenGLShader::Reload(bool forceCompile)
 	{
+		HL_CORE_TRACE("Reloading shader {0}...", **m_AssetPath);
 		HLString source = ReadShaderFromFile(m_AssetPath);
 		Load(source, forceCompile);
 	}
@@ -406,16 +409,20 @@ namespace highlo
 	{
 		if (FileSystem::Get()->FileExists(m_AssetPath))
 		{
-			// TODO: Load Shader
+			m_ShaderSources = PreProcess(source);
+
+			Ref<OpenGLShader> instance = this;
+			Renderer::Submit([instance, forceCompile]() mutable
+			{
+				std::unordered_map<uint32, std::vector<uint32>> shaderData;
+				instance->CompileOrGetVulkanBinary(shaderData, forceCompile);
+				instance->CompileOrGetOpenGLBinary(shaderData, forceCompile);
+			});
 		}
 		else
 		{
 			HL_CORE_WARN("Shader {0} not found!", *m_AssetPath.String());
 		}
-	}
-	
-	void OpenGLShader::Compile(const std::vector<uint32> &vertexBinary, const std::vector<uint32> &fragmentBinary)
-	{
 	}
 	
 	void OpenGLShader::Reflect(std::vector<uint32> &data)

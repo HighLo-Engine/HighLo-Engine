@@ -99,18 +99,18 @@ namespace highlo
 		// Define Shader layouts
 		
 		// Load 3D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
 		// Load 2D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl");
 
 		// Load Compute Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl");

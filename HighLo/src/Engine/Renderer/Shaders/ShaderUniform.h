@@ -6,7 +6,11 @@ namespace highlo
 	{
 		None = 0,
 		Vertex = 1,
-		Pixel = 2
+		Pixel = 2,
+		Compute = 3,
+		Geometry = 4,
+		TessControl = 5,
+		TessEvalulation = 6,
 	};
 
 	class ShaderResourceDeclaration

@@ -26,9 +26,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:		return ".cached_opengl.vert";
-				case GL_FRAGMENT_SHADER:	return ".cached_opengl.frag";
-				case GL_COMPUTE_SHADER:		return ".cached_opengl.comp";
+				case GL_VERTEX_SHADER:			return ".cached_opengl.vert";
+				case GL_FRAGMENT_SHADER:		return ".cached_opengl.frag";
+				case GL_COMPUTE_SHADER:			return ".cached_opengl.comp";
+				case GL_TESS_CONTROL_SHADER:	return ".cached_opengl.tesscon";
+				case GL_TESS_EVALUATION_SHADER:	return ".cached_opengl.tesseval";
+				case GL_GEOMETRY_SHADER:		return ".cached_opengl.geo";
 			}
 
 			HL_ASSERT(false);
@@ -39,9 +42,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:		return ".cached_vulkan.vert";
-				case GL_FRAGMENT_SHADER:	return ".cached_vulkan.frag";
-				case GL_COMPUTE_SHADER:		return ".cached_vulkan.comp";
+				case GL_VERTEX_SHADER:			return ".cached_vulkan.vert";
+				case GL_FRAGMENT_SHADER:		return ".cached_vulkan.frag";
+				case GL_COMPUTE_SHADER:			return ".cached_vulkan.comp";
+				case GL_TESS_CONTROL_SHADER:	return ".cached_vulkan.tesscon";
+				case GL_TESS_EVALUATION_SHADER: return ".cached_vulkan.tesseval";
+				case GL_GEOMETRY_SHADER:		return ".cached_vulkan.geo";
 			}
 
 			HL_ASSERT(false);
@@ -55,6 +61,9 @@ namespace highlo
 				case GL_VERTEX_SHADER:		return "Vertex";
 				case GL_FRAGMENT_SHADER:	return "Pixel";
 				case GL_COMPUTE_SHADER:		return "Compute";
+				case GL_TESS_CONTROL_SHADER: return "TessControl";
+				case GL_TESS_EVALUATION_SHADER: return "TessEvalulation";
+				case GL_GEOMETRY_SHADER: return "Geometry";
 			}
 
 			HL_ASSERT(false);
@@ -72,44 +81,6 @@ namespace highlo
 
 			HL_ASSERT(false);
 			return (shaderc_shader_kind)0;
-		}
-
-		static std::vector<uint32> ReadFromCacheFile(const FileSystemPath &path)
-		{
-			std::vector<uint32> outputBinary;
-			FILE *f;
-
-			fopen_s(&f, *path.String(), "rb");
-			if (!f)
-			{
-				HL_CORE_ERROR("Unable to open file {0}", *path.String());
-				return outputBinary;
-			}
-
-			// Get file size
-			fseek(f, 0, SEEK_END);
-			uint64 size = ftell(f);
-			fseek(f, 0, SEEK_SET);
-
-			outputBinary = std::vector<uint32>(size / sizeof(uint32));
-			fread(outputBinary.data(), sizeof(uint32), outputBinary.size(), f);
-
-			fclose(f);
-			return outputBinary;
-		}
-
-		static void WriteIntoCacheFile(const FileSystemPath &path, std::vector<uint32> &outputBinary)
-		{
-			FILE *f;
-			fopen_s(&f, *path.String(), "wb");
-			if (!f)
-			{
-				HL_CORE_ERROR("Unable to open file {0}", *path.String());
-				return;
-			}
-
-			fwrite(outputBinary.data(), sizeof(uint32), outputBinary.size(), f);
-			fclose(f);
 		}
 
 		static ShaderUniformType SpirvTypeToShaderUniformType(spirv_cross::SPIRType type)
@@ -150,7 +121,8 @@ namespace highlo
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
-		Reload(forceCompile);
+		HLString source = FileSystem::Get()->ReadTextFile(filePath);
+		Load(source, forceCompile);
 	}
 
 	OpenGLShader::OpenGLShader(const HLString &source)
@@ -165,7 +137,7 @@ namespace highlo
 	void OpenGLShader::Reload(bool forceCompile)
 	{
 		HL_CORE_TRACE("Reloading shader {0}...", **m_AssetPath);
-		HLString source = ReadShaderFromFile(m_AssetPath);
+		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 	}
 
@@ -411,13 +383,9 @@ namespace highlo
 		{
 			m_ShaderSources = PreProcess(source);
 
-			Ref<OpenGLShader> instance = this;
-			Renderer::Submit([instance, forceCompile]() mutable
-			{
-				std::unordered_map<uint32, std::vector<uint32>> shaderData;
-				instance->CompileOrGetVulkanBinary(shaderData, forceCompile);
-				instance->CompileOrGetOpenGLBinary(shaderData, forceCompile);
-			});
+			std::unordered_map<uint32, std::vector<uint32>> shaderData;
+			CompileOrGetVulkanBinary(shaderData, forceCompile);
+			CompileOrGetOpenGLBinary(shaderData, forceCompile);
 		}
 		else
 		{
@@ -545,18 +513,30 @@ namespace highlo
 	{
 		FileSystemPath cacheDirectory = utils::GetCacheDirectory();
 
-		for (auto [stage, source] : m_ShaderSources)
+		for (auto &[stage, source] : m_ShaderSources)
 		{
 			const char *extension = utils::GLShaderStageCachedVulkanFileExtension(stage);
-			FileSystemPath p = m_AssetPath;
 
 			if (!forceCompile)
 			{
-				FileSystemPath path = cacheDirectory / (p.Filename() + extension);
-				outputBinary[stage] = utils::ReadFromCacheFile(path);
+				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + extension);
+
+				FILE *f;
+				fopen_s(&f, *path.String(), "rb");
+				if (f)
+				{
+					// Get File Size
+					fseek(f, 0, SEEK_END);
+					uint64 size = ftell(f);
+					fseek(f, 0, SEEK_SET);
+
+					outputBinary[stage] = std::vector<uint32>(size / sizeof(uint32));
+					fread(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
+					fclose(f);
+				}
 			}
 
-			if (outputBinary[stage].size() == 0)
+			if (outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty())
 			{
 				shaderc::Compiler compiler;
 				shaderc::CompileOptions options;
@@ -583,9 +563,19 @@ namespace highlo
 				}
 
 				// Cache compiled shader
-				FileSystemPath assetPath = m_AssetPath;
-				FileSystemPath path = cacheDirectory / (assetPath.Filename() + extension);
-				utils::WriteIntoCacheFile(path, outputBinary[stage]);
+				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + extension);
+
+				FILE *f;
+				fopen_s(&f, *path.String(), "wb");
+				if (f)
+				{
+					fwrite(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
+					fclose(f);
+				}
+				else
+				{
+					HL_CORE_ERROR("Could not write into cache path {0}", *path.String());
+				}
 			}
 		}
 	}
@@ -607,6 +597,9 @@ namespace highlo
 		std::vector<std::vector<uint32>> shaderData;
 		for (auto [stage, binary] : vulkanBinaries)
 		{
+			if (binary.size() == 0)
+				continue;
+
 			shaderc::Compiler compiler;
 			shaderc::CompileOptions options;
 			options.SetTargetEnvironment(shaderc_target_env_opengl_compat, shaderc_env_version_opengl_4_5);
@@ -620,7 +613,23 @@ namespace highlo
 
 			if (!forceCompile)
 			{
-				shaderStageData = utils::ReadFromCacheFile(path);
+				FILE *f;
+				fopen_s(&f, *path.String(), "rb");
+				if (f)
+				{
+					// Get File size
+					fseek(f, 0, SEEK_END);
+					uint64 size = ftell(f);
+					fseek(f, 0, SEEK_SET);
+
+					shaderStageData = std::vector<uint32>(size / sizeof(uint32));
+					fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+					fclose(f);
+				}
+				else
+				{
+					HL_CORE_WARN("Could not load Shader from cached binary ({0}), going to compile it from source...", *path.String());
+				}
 			}
 
 			if (!shaderStageData.size())
@@ -641,7 +650,18 @@ namespace highlo
 				}
 
 				shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
-				utils::WriteIntoCacheFile(path, shaderStageData);
+
+				FILE *f;
+				fopen_s(&f, *path.String(), "wb");
+				if (f)
+				{
+					fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+					fclose(f);
+				}
+				else
+				{
+					HL_CORE_ERROR("Could not write Shader into cache file: {0}", *path.String());
+				}
 			}
 
 			GLuint shaderId = glCreateShader(stage);
@@ -652,7 +672,6 @@ namespace highlo
 		}
 
 		// Link shader program
-
 		glLinkProgram(program);
 
 		int32 isLinked = 0;
@@ -662,7 +681,7 @@ namespace highlo
 			int32 maxLength = 0;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
-			std::vector<char> infoLog(maxLength);
+			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 			HL_CORE_ERROR("Shader Linking failed ({0}):\n{1}", **m_AssetPath, &infoLog[0]);
 
@@ -670,7 +689,7 @@ namespace highlo
 			for (auto id : shaderRendererIds)
 				glDeleteShader(id);
 		}
-
+		
 		for (auto id : shaderRendererIds)
 			glDetachShader(program, id);
 
@@ -693,11 +712,6 @@ namespace highlo
 		{
 			Reflect(shaderStageData);
 		}
-	}
-	
-	HLString OpenGLShader::ReadShaderFromFile(const FileSystemPath &filePath) const
-	{
-		return FileSystem::Get()->ReadTextFile(filePath);
 	}
 	
 	std::unordered_map<GLenum, HLString> OpenGLShader::PreProcess(const HLString &source)
@@ -745,6 +759,15 @@ namespace highlo
 		result[GL_GEOMETRY_SHADER] = HLString(temp[GL_GEOMETRY_SHADER].str().c_str());
 		result[GL_FRAGMENT_SHADER] = HLString(temp[GL_FRAGMENT_SHADER].str().c_str());
 		result[GL_COMPUTE_SHADER] = HLString(temp[GL_COMPUTE_SHADER].str().c_str());
+
+		// Replace \r\n with \n
+		result[GL_VERTEX_SHADER] = result[GL_VERTEX_SHADER].Replace("\r\n", "\n");
+		result[GL_TESS_CONTROL_SHADER] = result[GL_TESS_CONTROL_SHADER].Replace("\r\n", "\n");
+		result[GL_TESS_EVALUATION_SHADER] = result[GL_TESS_EVALUATION_SHADER].Replace("\r\n", "\n");
+		result[GL_GEOMETRY_SHADER] = result[GL_GEOMETRY_SHADER].Replace("\r\n", "\n");
+		result[GL_FRAGMENT_SHADER] = result[GL_FRAGMENT_SHADER].Replace("\r\n", "\n");
+		result[GL_COMPUTE_SHADER] = result[GL_COMPUTE_SHADER].Replace("\r\n", "\n");
+
 		return result;
 	}
 	

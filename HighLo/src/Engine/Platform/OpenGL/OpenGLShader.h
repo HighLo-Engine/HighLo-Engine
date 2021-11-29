@@ -76,7 +76,6 @@ namespace highlo
 		void CompileOrGetVulkanBinary(std::unordered_map<uint32, std::vector<uint32>> &outputBinary, bool forceCompile = false);
 		void CompileOrGetOpenGLBinary(const std::unordered_map<uint32, std::vector<uint32>> &, bool forceCompile = false);
 
-		HLString ReadShaderFromFile(const FileSystemPath &filepath) const;
 		std::unordered_map<GLenum, HLString> PreProcess(const HLString &source);
 
 		void ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler);

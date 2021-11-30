@@ -107,15 +107,15 @@ namespace highlo
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
 		// Load 2D Shaders
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DLine.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DCircle.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DText.glsl");
 
 		// Load Compute Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EquirectangularToCubeMap.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentMipFilter.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();

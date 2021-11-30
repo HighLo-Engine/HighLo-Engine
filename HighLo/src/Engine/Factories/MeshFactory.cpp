@@ -229,3 +229,4 @@ namespace highlo
 		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
 	}
 }
+

@@ -72,10 +72,10 @@ namespace highlo
 	
 	void SceneRenderer::InitGrid()
 	{
-		m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
-		m_GridMaterial = Material::Create(m_GridShader);
-		float gridScale = 16.025f;
-		float gridSize = 0.025f;
+	//	m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
+	//	m_GridMaterial = Material::Create(m_GridShader);
+	//	float gridScale = 16.025f;
+	//	float gridSize = 0.025f;
 
 	//	m_GridMaterial->Set("u_Scale", gridScale);
 	//	m_GridMaterial->Set("u_Size", gridSize);

@@ -666,7 +666,7 @@ namespace highlo
 
 			GLuint shaderId = glCreateShader(stage);
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), (uint32)(shaderStageData.size() * sizeof(uint32)));
-			glSpecializeShader(program, "main", 0, nullptr, nullptr);
+			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderId);
 			shaderRendererIds.push_back(shaderId);
 		}

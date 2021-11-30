@@ -1,16 +1,22 @@
+# First import that checks for other required packages
+import CheckPythonVersion
+
+# Make sure everything we need is installed
+CheckPythonVersion.ValidatePackages()
+
+# The rest of the imports
 import os
 import subprocess
-import CheckPythonVersion
 import Vulkan
 import platform
 
 print('Your detected System is: ' + platform.system())
 
-# Make sure everything we need is installed
-CheckPythonVersion.ValidatePackages()
-
 # Change from Scripts directory to root
-os.chdir('../')
+
+# Make sure we are in the root directory
+if 'scripts' in os.getcwd():
+    os.chdir('../')
 
 if (not Vulkan.CheckVulkanSDK()):
     print("Vulkan SDK not installed.")
@@ -23,6 +29,7 @@ subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
 
 print("Running premake...")
 
+# Enter the scripts directory
 os.chdir('scripts/')
 
 if (platform.system() == 'Windows'):

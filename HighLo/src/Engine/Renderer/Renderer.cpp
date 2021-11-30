@@ -103,8 +103,8 @@ namespace highlo
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
 		// Load 2D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");

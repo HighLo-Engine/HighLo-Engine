@@ -546,7 +546,15 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 
 		case MENU_ITEM_NEW_SCENE:
 		{
-			HL_INFO("Open New Scene dialog...");
+			HL_INFO("Create a new scene");
+			auto newScene = Scene::CreateEmpty();
+			m_AllScenes.push_back(newScene);
+
+			// Update the editor scene
+			m_EditorScene = newScene;
+
+			// Update the current scene
+			m_CurrentScene = m_EditorScene;
 			break;
 		}
 

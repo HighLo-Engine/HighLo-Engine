@@ -48,6 +48,8 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const SceneRendererCamera &camera)
 	{
+		Renderer::ClearScreenBuffers();
+		Renderer::ClearScreenColor({0.2f, 0.5f, 0.3f, 1.0f});
 	}
 
 	void SceneRenderer::EndScene()

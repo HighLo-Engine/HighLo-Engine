@@ -58,10 +58,10 @@ namespace highlo
 	#endif // HIGHLO_API_OPENGL
 	}
 
-	Ref<Texture2D> Texture2D::Create(TextureFormat format, uint32 width, uint32 height)
+	Ref<Texture2D> Texture2D::Create(TextureFormat format, uint32 width, uint32 height, bool waitUntilRenderQueueSubmission)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLTexture2D>::Create(format, width, height);
+		return Ref<OpenGLTexture2D>::Create(format, width, height, waitUntilRenderQueueSubmission);
 	#elif HIGHLO_API_DX11
 		return nullptr;
 	#elif HIGHLO_API_DX12

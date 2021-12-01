@@ -36,7 +36,6 @@ namespace highlo
 
 		HLString Name = "";
 		TextureShaderLocation ShaderLocation = TextureShaderLocation::PIXEL_SHADER;
-		HLRendererID RendererID = 0;
 
 		HLAPI virtual ~Texture() {}
 		HLAPI virtual uint32 GetDimensions() const = 0;
@@ -70,6 +69,9 @@ namespace highlo
 
 		HLAPI inline bool operator==(const Texture &other) const { return RendererID == other.RendererID; }
 		HLAPI inline bool operator!=(const Texture &other) const { return !(*this == other); }
+
+	protected:
+		HLRendererID RendererID = 0;
 	};
 
 	class Texture2D : public Texture
@@ -82,7 +84,7 @@ namespace highlo
 		HLAPI static Ref<Texture2D> LoadFromFile(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = false);
 		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
-		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height);
+		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height, bool waitUntilRenderQueueSubmission = true);
 		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 
 		HLAPI virtual HLRendererID GetSamplerRendererID() const = 0;

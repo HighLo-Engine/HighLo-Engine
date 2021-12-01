@@ -289,7 +289,7 @@ namespace highlo
 		});
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height)
+	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, bool waitUntilRenderQueueSubmission)
 	{
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
 		m_Buffer.Allocate(width * height * 4);
@@ -304,19 +304,40 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		Ref<OpenGLTexture2D> instance = this;
-		Renderer::Submit([instance]() mutable
+		if (waitUntilRenderQueueSubmission)
 		{
-			glCreateTextures(GL_TEXTURE_2D, 1, &instance->RendererID);
-			glBindTexture(GL_TEXTURE_2D, instance->RendererID);
+			Ref<OpenGLTexture2D> instance = this;
+			Renderer::Submit([instance]() mutable
+			{
+				glCreateTextures(GL_TEXTURE_2D, 1, &instance->RendererID);
+				glBindTexture(GL_TEXTURE_2D, instance->RendererID);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(instance->m_Specification.Properties.SamplerWrap));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(instance->m_Specification.Properties.SamplerWrap));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(instance->m_Specification.Properties.SamplerFilter, false));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(instance->m_Specification.Properties.SamplerFilter, false));
+				auto openglFormat = utils::OpenGLTextureFormat(instance->m_Specification.Format);
+				glTexImage2D(GL_TEXTURE_2D, 0, instance->m_InternalFormat, instance->m_Specification.Width, instance->m_Specification.Height, 0, openglFormat, (openglFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
+
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(instance->m_Specification.Properties.SamplerWrap));
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(instance->m_Specification.Properties.SamplerWrap));
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(instance->m_Specification.Properties.SamplerFilter, false));
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(instance->m_Specification.Properties.SamplerFilter, false));
+
+				glBindTexture(GL_TEXTURE_2D, 0);
+			});
+		}
+		else
+		{
+			glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+			glBindTexture(GL_TEXTURE_2D, RendererID);
+
+			auto openglFormat = utils::OpenGLTextureFormat(m_Specification.Format);
+			glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, openglFormat, (openglFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
 
 			glBindTexture(GL_TEXTURE_2D, 0);
-		});
+		}
 	}
 	
 	OpenGLTexture2D::~OpenGLTexture2D()

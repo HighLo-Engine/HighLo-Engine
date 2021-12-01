@@ -27,7 +27,7 @@ namespace highlo
 		OpenGLTexture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		OpenGLTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
-		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
+		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, bool waitUntilRenderQueueSubmission = true);
 		~OpenGLTexture2D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; };

@@ -129,7 +129,11 @@ class HighLoEditor : public HLApplication
 		glm::mat4 *m_CurrentlySelectedTransform = nullptr;
 		glm::vec2 m_ViewportBounds[2];
 
+		// Main displayable scenes
 		Ref<Scene> m_RuntimeScene, m_EditorScene, m_SimulationScene, m_CurrentScene;
+
+		// List of all scene references
+		std::vector<Ref<Scene>> m_AllScenes;
 
 		// Editor Panels
 		Ref<SceneRenderer> m_ViewportRenderer;

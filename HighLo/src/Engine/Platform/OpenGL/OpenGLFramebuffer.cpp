@@ -76,8 +76,7 @@ namespace highlo
 			}
 			else
 			{
-				texture = Texture2D::Create(format, width, height);
-				texture->Invalidate();
+				texture = Texture2D::Create(format, width, height, false);
 			}
 
 			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
@@ -86,7 +85,7 @@ namespace highlo
 			return texture;
 		}
 
-		static Ref<Texture> AttachDepthTexture(int32 samples, TextureFormat format, uint32 width, uint32 height)
+		static Ref<Texture> CreateAndAttachDepthTexture(int32 samples, TextureFormat format, uint32 width, uint32 height)
 		{
 			bool multisampled = samples > 1;
 			Ref<Texture> texture;
@@ -96,8 +95,7 @@ namespace highlo
 			}
 			else
 			{
-				texture = Texture2D::Create(format, width, height);
-				texture->Invalidate();
+				texture = Texture2D::Create(format, width, height, false);
 			}
 
 			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
@@ -192,7 +190,7 @@ namespace highlo
 			}
 
 			if (instance->m_DepthAttachmentFormat != TextureFormat::None)
-				instance->m_DepthAttachment = utils::AttachDepthTexture(instance->m_Specification.Samples, instance->m_DepthAttachmentFormat, instance->m_Specification.Width, instance->m_Specification.Height);
+				instance->m_DepthAttachment = utils::CreateAndAttachDepthTexture(instance->m_Specification.Samples, instance->m_DepthAttachmentFormat, instance->m_Specification.Width, instance->m_Specification.Height);
 
 			if (instance->m_ColorAttachments.size() > 1)
 			{
@@ -205,8 +203,8 @@ namespace highlo
 				// Draw only depth-pass
 				glDrawBuffer(GL_NONE);
 			}
-
-		//	HL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
+			
+			HL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		});
 	}

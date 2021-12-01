@@ -607,8 +607,7 @@ namespace highlo
 			spirv_cross::CompilerGLSL glsl(binary);
 			ParseConstantBuffers(glsl);
 
-			FileSystemPath assetDir = m_AssetPath;
-			FileSystemPath path = cacheDirectory / (assetDir.String() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
+			FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
 			std::vector<uint32> &shaderStageData = shaderData.emplace_back();
 
 			if (!forceCompile)

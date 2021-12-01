@@ -251,16 +251,14 @@ namespace highlo
 	int32 OpenGLFramebuffer::ReadPixel(uint32 attachmentIndex, int32 x, int32 y)
 	{
 		HL_ASSERT(attachmentIndex < m_ColorAttachments.size());
-		int32 pixelData;
-
-		Renderer::Submit([attachmentIndex, x, y, pixelData]() mutable
-		{
-			glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
-			glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
-		});
-
+		int32 pixelData = -1;
+		
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		
 		return pixelData;
 	}
 }
 
 #endif // HIGHLO_API_OPENGL
+

@@ -33,7 +33,6 @@ project "HighLoTest"
 	
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/libssl-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/assets/editorconfig.ini %{wks.location}tests/bin/" .. outputdir .. "/HighLoTest/editorconfig.ini*"),
@@ -75,6 +74,12 @@ project "HighLoTest"
 			"%{LibDir.gmock_debug}",
 			"%{LibDir.gmock_main_debug}",
 		}
+		
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
 
     filter "configurations:Release"
         defines "HL_RELEASE"
@@ -88,4 +93,7 @@ project "HighLoTest"
 			"%{LibDir.gmock_main_release}",
 		}
 		
-		
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}

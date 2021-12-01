@@ -35,6 +35,7 @@ namespace highlo
 		virtual void *GetMenuHandle() const override { return (void*)m_NativeHandle; }
 
 		virtual std::vector<Ref<MenuItem>> &GetMenuItems() override { return m_MenuItems; }
+		virtual Ref<MenuItem> GetMenuItemWithID(int32 id) override;
 		virtual const std::vector<Ref<MenuItem>> &GetMenuItems() const override { return m_MenuItems; }
 
 		virtual HLString &GetName() override { return m_Name; }

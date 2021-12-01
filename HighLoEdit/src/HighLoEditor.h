@@ -25,6 +25,8 @@ class HighLoEditor : public HLApplication
 		virtual void OnUIRender(Timestep ts) override;
 		virtual void OnResize(uint32 width, uint32 height) override;
 
+		void UpdateUIFlags();
+
 		void SelectEntity(Entity entity);
 
 		void UpdateWindowTitle(const HLString &sceneName);
@@ -134,4 +136,7 @@ class HighLoEditor : public HLApplication
 		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
+
+		// File Menu Panels
+		Ref<FileMenu> m_WindowMenu = nullptr;
 	};

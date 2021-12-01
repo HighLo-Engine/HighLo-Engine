@@ -136,8 +136,8 @@ void HighLoEditor::OnInitialize()
 	rendererMenu->AddSeparator();
 	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
-	windowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu = FileMenu::Create("Window");
+	m_WindowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
@@ -147,7 +147,7 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar->AddMenu(editMenu);
 	m_MenuBar->AddMenu(gameObjectMenu);
 	m_MenuBar->AddMenu(rendererMenu);
-	m_MenuBar->AddMenu(windowMenu);
+	m_MenuBar->AddMenu(m_WindowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
 }
@@ -160,6 +160,8 @@ void HighLoEditor::OnUpdate(Timestep ts)
 	// TODO: For some reason this crashes right away
 	/*else if (m_SceneState != SceneState::Simulate)
 		OnSceneStop();*/
+
+	UpdateUIFlags();
 
 	switch (m_SceneState)
 	{
@@ -198,6 +200,13 @@ void HighLoEditor::OnUpdate(Timestep ts)
 	}
 
 	AssetEditorPanel::OnUpdate(ts);
+}
+
+void HighLoEditor::UpdateUIFlags()
+{
+	// Make sure the "Show Console" window always
+	// reflects the current opened state of the log tab.
+	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
 }
 
 void HighLoEditor::OnShutdown()
@@ -610,7 +619,6 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 		case MENU_ITEM_WINDOW_EDITOR_CONSOLE:
 		{
 			m_ShowConsolePanel = !m_ShowConsolePanel;
-			item->IsSelected = !item->IsSelected;
 			break;
 		}
 	}

@@ -32,6 +32,7 @@ namespace highlo
 		HLAPI virtual const HLString &GetName() const = 0;
 
 		HLAPI virtual std::vector<Ref<MenuItem>> &GetMenuItems() = 0;
+		HLAPI virtual Ref<MenuItem> GetMenuItemWithID(int32 id) = 0;
 		HLAPI virtual const std::vector<Ref<MenuItem>> &GetMenuItems() const = 0;
 
 		HLAPI virtual bool EnableMenuItem(int32 id, bool bEnabled) = 0;

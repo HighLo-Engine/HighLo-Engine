@@ -48,8 +48,10 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const SceneRendererCamera &camera)
 	{
+		m_CompositeRenderPass->GetSpcification().Framebuffer->Bind();
 		Renderer::ClearScreenBuffers();
-		Renderer::ClearScreenColor({0.2f, 0.5f, 0.3f, 1.0f});
+		Renderer::ClearScreenColor({0.0f, 0.0f, 0.0f, 0.0f});
+		m_CompositeRenderPass->GetSpcification().Framebuffer->Unbind();
 	}
 
 	void SceneRenderer::EndScene()
@@ -94,7 +96,7 @@ namespace highlo
 		framebufferSpec.DebugName = "SceneComposite";
 		framebufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
-		
+
 		if (m_Specification.SwapChain)
 			framebufferSpec.Attachments = { TextureFormat::RGBA };
 		else

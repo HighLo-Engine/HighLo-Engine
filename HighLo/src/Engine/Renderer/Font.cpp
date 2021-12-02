@@ -10,6 +10,7 @@
 #define HL_FONT_LCG_MULTIPLIER 6364136223846793005ull
 #define HL_FONT_LCG_INCREMENT 1442695040888963407ull
 #define HL_FONT_THREADS 8
+#define FONT_LOG_PREFIX "Font>         "
 
 namespace highlo
 {
@@ -159,7 +160,7 @@ namespace highlo
 		utils::FontHolder font;
 		if (!font.Load(*fontInput.FontFileName))
 		{
-			HL_CORE_ERROR("Can not load Font {0}", *fontInput.FontFileName);
+			HL_CORE_ERROR(FONT_LOG_PREFIX "[-] Can not load Font {0} [-]", *fontInput.FontFileName);
 			return;
 		}
 
@@ -188,12 +189,12 @@ namespace highlo
 		}
 
 		HL_ASSERT(glyphsLoaded >= 0);
-		HL_CORE_INFO("Font>         [+] Loaded {0} [+]", *path.RelativePath().String());
-		HL_CORE_INFO("Loaded Font Geometry of {0} out of {1} glyphs.", glyphsLoaded, (int32)charset.size());
+		HL_CORE_INFO(FONT_LOG_PREFIX "[+] Loaded {0} [+]", *path.RelativePath().String());
+		HL_CORE_INFO(FONT_LOG_PREFIX "[=] Loaded Font Geometry of {0} out of {1} glyphs. [=]", glyphsLoaded, (int32)charset.size());
 
 		// Check if any glyphs are missing
 		if (glyphsLoaded < (int32)charset.size())
-			HL_CORE_WARN("Missing {0} of {1} {2}", (int32)charset.size() - glyphsLoaded, (int32)charset.size(), fontInput.GlyphIdentifier == msdf_atlas::GlyphIdentifierType::UNICODE_CODEPOINT ? "codepoints" : "glyphs");
+			HL_CORE_WARN(FONT_LOG_PREFIX "[-] Missing {0} of {1} {2} [-]", (int32)charset.size() - glyphsLoaded, (int32)charset.size(), fontInput.GlyphIdentifier == msdf_atlas::GlyphIdentifierType::UNICODE_CODEPOINT ? "codepoints" : "glyphs");
 	
 		if (fontInput.FontName)
 		{
@@ -227,7 +228,7 @@ namespace highlo
 			}
 			else if (remaining > 0)
 			{
-				HL_CORE_ERROR("Error: Could not fit {0} out of {1} glyphs into the texture atlas.", remaining, (int32)m_MSDFData->Glyphs.size());
+				HL_CORE_ERROR(FONT_LOG_PREFIX "[-] Error: Could not fit {0} out of {1} glyphs into the texture atlas. [-]", remaining, (int32)m_MSDFData->Glyphs.size());
 				HL_ASSERT(false);
 			}
 		}
@@ -238,10 +239,10 @@ namespace highlo
 		config.PxRange = atlasPacker.getPixelRange();
 
 		if (!fixedScale)
-			HL_CORE_INFO("Glyph size: {0} pixels/EM", config.EmSize);
+			HL_CORE_INFO(FONT_LOG_PREFIX "[=] Glyph size: {0} pixels/EM [=]", config.EmSize);
 
 		if (!fixedDimensions)
-			HL_CORE_INFO("Atlas Dimensions: {0}x{1}", config.Width, config.Height);
+			HL_CORE_INFO(FONT_LOG_PREFIX "[=] Atlas Dimensions: {0}x{1} [=]", config.Width, config.Height);
 
 		// Edge Coloring
 

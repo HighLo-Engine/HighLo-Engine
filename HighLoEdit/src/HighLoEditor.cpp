@@ -3,6 +3,8 @@
 #include "HighLoEditor.h"
 #include "Core/MenuItems.h"
 
+#define EDITOR_LOG_PREFIX "HighloEdit>   "
+
 namespace editorutils
 {
 	static int32 ConvertToImGuizmoType(HighLoEditor::GizmoType type)
@@ -29,7 +31,7 @@ HighLoEditor::HighLoEditor(const ApplicationSettings &settings, const HLString &
 	FileSystemPath roamingPath = FileSystem::Get()->GetPersistentStoragePath();
 	m_RoamingPath = roamingPath / "HighLo";
 
-	HL_CORE_TRACE("Registering folder in roaming folder: {0}", **m_RoamingPath);
+	HL_CORE_INFO(EDITOR_LOG_PREFIX "[+] Registering folder in roaming folder: {0} [+]", **m_RoamingPath);
 	if (!FileSystem::Get()->FolderExists(m_RoamingPath))
 	{
 		FileSystem::Get()->CreateFolder(m_RoamingPath);
@@ -156,10 +158,6 @@ void HighLoEditor::OnUpdate(Timestep ts)
 {
 	if (m_SceneState == SceneState::Edit)
 		OnScenePlay();
-
-	// TODO: For some reason this crashes right away
-	/*else if (m_SceneState != SceneState::Simulate)
-		OnSceneStop();*/
 
 	UpdateUIFlags();
 

@@ -4,6 +4,7 @@
 #include "Scene.h"
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 
 #include "Engine/ECS/Prefab.h"
@@ -35,15 +36,29 @@ namespace highlo
 	//	m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
 	}
 	
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::UpdateScene(Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
 	}
-	
-	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
+
+	void Scene::OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera &overlayCamera)
 	{
 		HL_PROFILE_FUNCTION();
 
+		renderer->BeginScene(overlayCamera);
+
+		Renderer::Submit([&]() {
+			Renderer2D::BeginScene(overlayCamera.GetProjection());
+			Renderer2D::DrawQuad(Transform::FromPosition({0, 0, 0}), glm::vec4(1, 1, 1, 1));
+			Renderer2D::EndScene();
+		});
+
+		renderer->EndScene();
+	}
+
+	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
+	{
+		HL_PROFILE_FUNCTION();
 	}
 	
 	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)

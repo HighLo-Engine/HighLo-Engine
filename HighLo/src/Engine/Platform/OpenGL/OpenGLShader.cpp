@@ -149,19 +149,12 @@ namespace highlo
 
 	void OpenGLShader::Bind() const
 	{
-		Ref<const OpenGLShader> instance = this;
-		Renderer::Submit([instance]()
-		{
-			glUseProgram(instance->m_RendererID);
-		});
+		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind()
 	{
-		Renderer::Submit([]()
-		{
-			glUseProgram(0);
-		});
+		glUseProgram(0);
 	}
 
 	void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
@@ -245,122 +238,86 @@ namespace highlo
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, float value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform1f(location, value);
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform1f(location, value);
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, int32 value)
 	{
-		Renderer::Submit([=]()
-		 {
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform1i(location, value);
-		 });
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform1i(location, value);
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec2 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform2i(location, value.x, value.y);
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform2i(location, value.x, value.y);
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec3 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform3i(location, value.x, value.y, value.z);
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform3i(location, value.x, value.y, value.z);
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec4 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform4i(location, value.x, value.y, value.z, value.w);
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform4i(location, value.x, value.y, value.z, value.w);
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, uint32 value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform1ui(location, value);
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform1ui(location, value);
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec2 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform2fv(location, 1, glm::value_ptr(value));
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform2fv(location, 1, glm::value_ptr(value));
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec3 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform2fv(location, 1, glm::value_ptr(value));
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform2fv(location, 1, glm::value_ptr(value));
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec4 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform4fv(location, 1, glm::value_ptr(value));
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniform4fv(location, 1, glm::value_ptr(value));
 	}
 
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat2 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat3 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat4 &value)
 	{
-		Renderer::Submit([=]()
-		{
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
-		});
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
 	const ShaderResourceDeclaration *OpenGLShader::GetShaderResource(const HLString &name)

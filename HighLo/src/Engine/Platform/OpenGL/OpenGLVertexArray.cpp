@@ -45,61 +45,25 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		GLuint rendererID = m_ID;
-		Renderer::Submit([rendererID]()
-		{
-			glDeleteVertexArrays(1, &rendererID);
-		});
+		glDeleteVertexArrays(1, &m_ID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		Ref<const OpenGLVertexArray> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glBindVertexArray(instance->m_ID);
-
-			for (const Ref<VertexBuffer> &vbo : instance->m_VertexBuffers)
-			{
-				vbo->Bind();
-
-				uint32 attribIndex = 0;
-				const auto &layout = vbo->GetLayout();
-				for (const auto &element : layout)
-				{
-					glEnableVertexAttribArray(attribIndex);
-					glVertexAttribPointer(attribIndex,
-										  element.GetComponentCount(),
-										  utils::ShaderDataTypeToOpenGLBaseType(element.Type),
-										  element.Normalized,
-										  layout.GetStride(),
-										  (const void*)(intptr_t)element.Offset);
-					++attribIndex;
-				}
-			}
-		});
+		glBindVertexArray(m_ID);
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
-		Renderer::Submit([]()
-		{
-			glBindVertexArray(0);
-		});
+		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::Invalidate()
 	{
-		Ref<OpenGLVertexArray> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			auto &vaID = instance->m_ID;
+		if (m_ID)
+			glDeleteVertexArrays(1, &m_ID);
 
-			if (vaID)
-				glDeleteVertexArrays(1, &vaID);
-
-			glGenVertexArrays(1, &vaID);
-		});
+		glGenVertexArrays(1, &m_ID);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
@@ -110,11 +74,29 @@ namespace highlo
 			return;
 		}
 
+		vertexBuffer->Bind();
+
+		uint32 attribIndex = 0;
+		const auto& layout = vertexBuffer->GetLayout();
+		for (const auto& element : layout)
+		{
+			glEnableVertexAttribArray(attribIndex);
+			glVertexAttribPointer(attribIndex,
+				element.GetComponentCount(),
+				utils::ShaderDataTypeToOpenGLBaseType(element.Type),
+				element.Normalized,
+				layout.GetStride(),
+				(const void*)(intptr_t)element.Offset);
+			++attribIndex;
+		}
+
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
 	{
+		indexBuffer->Bind();
+
 		m_IndexBuffer = indexBuffer;
 	}
 

@@ -35,12 +35,10 @@ namespace highlo
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.m_Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
-		});
+		glCreateBuffers(1, &m_ID);
+		Bind();
+
+		glNamedBufferData(m_ID, m_Size, m_LocalData.m_Data, utils::ConvertUsageToOpenGL(m_Usage));
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage)
@@ -48,50 +46,35 @@ namespace highlo
 	{
 		m_Size = size;
 
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, nullptr, utils::ConvertUsageToOpenGL(instance->m_Usage));
-		});
+		glCreateBuffers(1, &m_ID);
+		Bind();
+		
+		glNamedBufferData(m_ID, m_Size, nullptr, utils::ConvertUsageToOpenGL(m_Usage));
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
-		GLuint rendererID = m_ID;
-		Renderer::Submit([rendererID]()
-		{
-			glDeleteBuffers(1, &rendererID);
-		});
+		glDeleteBuffers(1, &m_ID);
 	}
 
 	void OpenGLVertexBuffer::Bind() const
 	{
-		Ref<const OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]()
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, instance->m_ID);
-		});
+		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 	}
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
-		Renderer::Submit([]()
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		});
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	
 	void OpenGLVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
 	{
+		Bind();
+
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance, offset]()
-		{
-			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.m_Data);
-		});
+		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.m_Data);
 	}
 }
 

@@ -54,6 +54,7 @@ void HighLoEditor::OnInitialize()
 	uint32 height = GetWindow().GetHeight();
 
 	m_EditorCamera = EditorCamera(glm::perspectiveFov(glm::radians(45.0f), (float)width, (float)height, 0.1f, 1000.0f));
+	m_OverlayCamera.SetOrthographic((float)width, (float)height, 10.0f, -1.0f, 1.0f);
 
 	// Project
 	Ref<Project> project = Ref<Project>::Create();
@@ -169,13 +170,15 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			m_EditorCamera.SetActive(m_AllowViewportCameraEvents);
 			m_EditorCamera.Update();
 			UI::SetMouseEnabled(true);
+			m_EditorScene->UpdateScene(ts);
 			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
+			m_EditorScene->OnUpdateOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
 			break;
 		}
 
 		case SceneState::Play:
 		{
-			m_RuntimeScene->OnUpdate(ts);
+			m_RuntimeScene->UpdateScene(ts);
 			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
 		}
@@ -192,7 +195,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		case SceneState::Simulate:
 		{
 			m_EditorCamera.Update();
-			m_SimulationScene->OnUpdate(ts);
+			m_SimulationScene->UpdateScene(ts);
 			m_SimulationScene->OnSimulate(m_ViewportRenderer, ts, m_EditorCamera);
 			break;
 		}

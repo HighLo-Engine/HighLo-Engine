@@ -2,6 +2,7 @@
 
 #include "HighLoPch.h"
 #include "SceneRenderer.h"
+#include "Renderer2D.h"
 
 #include "Engine/Renderer/Renderer.h"
 
@@ -40,32 +41,21 @@ namespace highlo
 		m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor = color;
 	}
 
-	void SceneRenderer::BeginScene(const EditorCamera &camera)
+	void SceneRenderer::BeginScene(const Camera &camera)
 	{
-		SceneRendererCamera renderCamera;
-		renderCamera.Camera = camera;
-		renderCamera.ViewMatrix = camera.GetViewMatrix();
-		renderCamera.Near = camera.GetPerspectiveNearPlane();
-		renderCamera.Far = camera.GetPerspectiveFarPlane();
-		renderCamera.Fov = camera.GetPerspectiveFOV();
-		BeginScene(renderCamera);
-	}
-
-	void SceneRenderer::BeginScene(const SceneRendererCamera &camera)
-	{
-		m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
-
 		Renderer::Submit([this]() {
+			m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
+
 			Renderer::ClearScreenColor(m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
 			Renderer::ClearScreenBuffers();
 		});
-
-		m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
 	}
 
 	void SceneRenderer::EndScene()
 	{
-
+		Renderer::Submit([this]() {
+			m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
+		});
 	}
 
 	SceneRendererOptions &SceneRenderer::GetOptions()

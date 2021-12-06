@@ -16,35 +16,23 @@ namespace highlo
 	{
 		m_LocalStorage = new uint8[size];
 
-		Ref<OpenGLUniformBuffer> instance = this;
-		Renderer::Submit([instance, size, binding]() mutable
-		{
-			glCreateBuffers(1, &instance->m_RendererID);
-			glNamedBufferData(instance->m_RendererID, size, nullptr, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_UNIFORM_BUFFER, binding, instance->m_RendererID);
-		});
+		glCreateBuffers(1, &m_RendererID);
+		glNamedBufferData(m_RendererID, size, nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
 	}
 
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
 	{
 		delete[] m_LocalStorage;
 
-		HLRendererID rendererID = m_RendererID;
-		Renderer::Submit([rendererID]()
-		{
-			glDeleteBuffers(1, &rendererID);
-		});
+		glDeleteBuffers(1, &m_RendererID);
 	}
 
 	void OpenGLUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
 		memcpy(m_LocalStorage, data, size);
 
-		Ref<OpenGLUniformBuffer> instance = this;
-		Renderer::Submit([instance, offset, size]()
-		{
-			glNamedBufferSubData(instance->m_RendererID, offset, size, instance->m_LocalStorage);
-		});
+		glNamedBufferSubData(m_RendererID, offset, size, m_LocalStorage);
 	}
 }
 

@@ -36,6 +36,10 @@ After that you will be able to select the "HighLoTest" project as the starting p
 
 You can always create pull requests but keep in mind that the engine is in active development right now.
 
+# Our working method
+
+We use the feature-branch working method. This means that new features are being implemented in their own branches. If the development of the feature is finished, the branch gets merged into the master branch.
+
 # Screenshots
 
 ![HighLo-Engine](/Screenshots/HighLo-Screenshot-1.png?raw=true "HighLo-Engine-1")

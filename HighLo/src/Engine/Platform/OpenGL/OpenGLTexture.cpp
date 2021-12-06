@@ -26,7 +26,8 @@ namespace highlo
 		if (!data)
 		{
 			stbi_image_free(data);
-			HL_CORE_ERROR("{0}[-] Failed to load Texture2D: {1} [-]", TEXTURE2D_LOG_PREFIX, *filePath.String());
+			HL_CORE_ERROR("{0}[-] Failed to load Texture2D: {1} (Error: {2}) [-]", TEXTURE2D_LOG_PREFIX, *filePath.String(), stbi_failure_reason());
+			return;
 		}
 
 		Name = FileSystemPath::ExtractFileNameFromPath(filePath.String());

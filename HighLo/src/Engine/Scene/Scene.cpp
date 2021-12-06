@@ -50,6 +50,7 @@ namespace highlo
 		Renderer::Submit([&]() {
 			Renderer2D::BeginScene(overlayCamera.GetProjection());
 			Renderer2D::DrawQuad(Transform::FromPosition({0, 0, 0}), glm::vec4(1, 1, 1, 1));
+			//Renderer2D::DrawText("Hello World!", { 0, 0, 0 }, 200.0f, { 1, 1, 1, 1 });
 			Renderer2D::EndScene();
 		});
 

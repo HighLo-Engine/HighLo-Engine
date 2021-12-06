@@ -57,7 +57,7 @@ namespace highlo
 			m_File.IsFile = !std::filesystem::is_directory(m_Handle);
 			m_File.Size = Size();
 			m_File.FullPath = std::filesystem::absolute(m_Handle).string();
-
+			
 			if (m_File.FullPath.Contains('\\'))
 				m_File.FullPath = m_File.FullPath.Replace("\\", "/");
 

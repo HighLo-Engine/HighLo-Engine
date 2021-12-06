@@ -151,16 +151,7 @@ namespace highlo
 			lineIndices.push_back(i);
 		}
 
-		// Textures/Quads
-		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
-
-		s_2DData->QuadVertexArray = VertexArray::Create();
-		Ref<VertexBuffer> quadVbo = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
-		quadVbo->SetLayout(BufferLayout::GetTextureLayout());
-		s_2DData->QuadVertexArray->AddVertexBuffer(quadVbo);
-		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
 		/*
-
 		// Textures/Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
 		s_2DData->TextureShader->AddBuffer("CameraBuffer", cameraBuffer);
@@ -194,7 +185,6 @@ namespace highlo
 		s_2DData->TextVertexArray = VertexArray::Create();
 		s_2DData->TextMaterial = Material::Create(s_2DData->TextShader);
 		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
-
 		*/
 
 		std::vector<int32> textIndices;
@@ -227,27 +217,34 @@ namespace highlo
 		s_2DData->CircleVertexArray->SetIndexBuffer(IndexBuffer::Create());
 		*/
 
-		// VAO
+		// Quads
+		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
+
 		s_2DData->QuadVertexArray = VertexArray::Create();
 		s_2DData->QuadVertexArray->Bind();
-
-		/*
-		BufferLayout bl = {
-			{ "in_Position", ShaderDataType::Float3 },
-		};
-		*/
-
-		BufferLayout bl = BufferLayout::GetTextureLayout();
-
-		auto vb = VertexBuffer::Create(s_2DData->MaxVertices);
-		vb->SetLayout(bl);
-
+	
+		auto vb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
+		vb->SetLayout(BufferLayout::GetTextureLayout());
 		s_2DData->QuadVertexArray->AddVertexBuffer(vb);
-
-		auto ib = IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices);
-		s_2DData->QuadVertexArray->SetIndexBuffer(ib);
-
+	
+		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
 		s_2DData->QuadVertexArray->Unbind();
+
+		// Circles
+		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices];
+
+		s_2DData->CircleVertexArray = VertexArray::Create();
+		s_2DData->CircleVertexArray->Bind();
+
+		auto circlesVb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
+		circlesVb->SetLayout(BufferLayout::GetCircleLayout());
+		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
+
+
+
+		s_2DData->CircleVertexArray->Unbind();
+
+		// Lines
 	}
 
 	void Renderer2D::Shutdown()

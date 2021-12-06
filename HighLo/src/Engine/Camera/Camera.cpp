@@ -28,7 +28,7 @@ namespace highlo
 		m_OrthographicSize = size;
 		m_OrthographicNear = nearClip;
 		m_OrthographicFar = farClip;
-		SetProjectionInternal(width, height);
+		SetProjectionInternal((uint32)width, (uint32)height);
 	}
 
 	void Camera::SetOrthographic(float size, float nearClip, float farClip)

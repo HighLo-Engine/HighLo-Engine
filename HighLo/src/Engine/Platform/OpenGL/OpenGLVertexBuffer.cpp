@@ -30,9 +30,8 @@ namespace highlo
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32 size, VertexBufferUsage usage)
-		: m_Usage(usage)
+		: m_Usage(usage), m_Size(size)
 	{
-		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
 		glCreateBuffers(1, &m_ID);
@@ -42,10 +41,8 @@ namespace highlo
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage)
-		: m_Usage(usage)
+		: m_Usage(usage), m_Size(size)
 	{
-		m_Size = size;
-
 		glCreateBuffers(1, &m_ID);
 		Bind();
 		

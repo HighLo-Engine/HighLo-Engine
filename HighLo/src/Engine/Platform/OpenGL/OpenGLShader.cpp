@@ -504,7 +504,7 @@ namespace highlo
 				cacheHasChanged = ShaderCache::HasChanged(path, m_ShaderSources[stage]);
 			}
 
-			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()) || cacheHasChanged)
+			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()) ) //|| cacheHasChanged)
 			{
 				shaderc::Compiler compiler;
 				shaderc::CompileOptions options;

@@ -17,8 +17,6 @@
 
 namespace highlo
 {
-	Ref<VertexArray> s_VA;
-
 	struct QuadVertex
 	{
 		glm::vec3 Position;
@@ -229,30 +227,27 @@ namespace highlo
 		s_2DData->CircleVertexArray->SetIndexBuffer(IndexBuffer::Create());
 		*/
 
-		float vertices[] = {
-			 0.5f,  0.5f, 0.0f,  // top right
-			 0.5f, -0.5f, 0.0f,  // bottom right
-			-0.5f, -0.5f, 0.0f,  // bottom left
-			-0.5f,  0.5f, 0.0f   // top left 
-		};
-
 		// VAO
-		s_VA = VertexArray::Create();
-		s_VA->Bind();
+		s_2DData->QuadVertexArray = VertexArray::Create();
+		s_2DData->QuadVertexArray->Bind();
 
+		/*
 		BufferLayout bl = {
 			{ "in_Position", ShaderDataType::Float3 },
 		};
+		*/
 
-		auto vb = VertexBuffer::Create(&vertices[0], 12 * sizeof(float));
+		BufferLayout bl = BufferLayout::GetTextureLayout();
+
+		auto vb = VertexBuffer::Create(s_2DData->MaxVertices);
 		vb->SetLayout(bl);
 
-		s_VA->AddVertexBuffer(vb);
+		s_2DData->QuadVertexArray->AddVertexBuffer(vb);
 
 		auto ib = IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices);
-		s_VA->SetIndexBuffer(ib);
+		s_2DData->QuadVertexArray->SetIndexBuffer(ib);
 
-		s_VA->Unbind();
+		s_2DData->QuadVertexArray->Unbind();
 	}
 
 	void Renderer2D::Shutdown()
@@ -328,7 +323,8 @@ namespace highlo
 			s_2DData->QuadVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);*/
 
-			s_VA->Bind();
+			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
+			s_2DData->QuadVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
 

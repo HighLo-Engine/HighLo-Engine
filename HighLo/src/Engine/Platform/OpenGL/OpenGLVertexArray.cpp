@@ -27,8 +27,8 @@ namespace highlo
 				case ShaderDataType::Int2:     return GL_INT;
 				case ShaderDataType::Int3:     return GL_INT;
 
-					// OpenGL has problems with uploading Int4s on the GPU unless
-					// they are defined as GL_FLOAT.
+				// OpenGL has problems with uploading Int4s on the GPU unless
+				// they are defined as GL_FLOAT.
 				case ShaderDataType::Int4:     return GL_FLOAT;
 
 				case ShaderDataType::Bool:     return GL_BOOL;

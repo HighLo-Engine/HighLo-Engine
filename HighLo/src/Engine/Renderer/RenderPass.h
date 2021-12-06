@@ -23,8 +23,8 @@ namespace highlo
 
 		HLAPI virtual ~RenderPass() = default;
 
-		HLAPI virtual RenderPassSpecification &GetSpcification() = 0;
-		HLAPI virtual const RenderPassSpecification &GetSpcification() const = 0;
+		HLAPI virtual RenderPassSpecification &GetSpecification() = 0;
+		HLAPI virtual const RenderPassSpecification &GetSpecification() const = 0;
 
 		HLAPI static Ref<RenderPass> Create(const RenderPassSpecification &spec);
 	};

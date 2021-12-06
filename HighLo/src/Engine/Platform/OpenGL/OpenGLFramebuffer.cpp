@@ -153,10 +153,10 @@ namespace highlo
 
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
-		Ref<OpenGLFramebuffer> instance = this;
-		Renderer::Submit([instance]()
+		auto rendererID = m_RendererID;
+		Renderer::Submit([rendererID]()
 		{
-			glDeleteFramebuffers(1, &instance->m_RendererID);
+			glDeleteFramebuffers(1, &rendererID);
 		});
 	}
 

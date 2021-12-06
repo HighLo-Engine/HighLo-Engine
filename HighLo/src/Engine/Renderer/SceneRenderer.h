@@ -45,6 +45,7 @@ namespace highlo
 
 		HLAPI void SetScene(Ref<Scene> scene);
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
+		HLAPI void SetClearColor(const glm::vec4 &color);
 		HLAPI void SetLineWidth(float width) { m_LineWidth = width; }
 
 		HLAPI void BeginScene(const EditorCamera &camera);

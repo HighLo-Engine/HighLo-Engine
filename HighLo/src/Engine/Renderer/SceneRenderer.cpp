@@ -35,6 +35,11 @@ namespace highlo
 		m_ViewportHeight = height;
 	}
 
+	void SceneRenderer::SetClearColor(const glm::vec4 &color)
+	{
+		m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor = color;
+	}
+
 	void SceneRenderer::BeginScene(const EditorCamera &camera)
 	{
 		SceneRendererCamera renderCamera;
@@ -48,8 +53,14 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const SceneRendererCamera &camera)
 	{
-		Renderer::ClearScreenBuffers();
-		Renderer::ClearScreenColor({0.2f, 0.5f, 0.3f, 1.0f});
+		m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
+
+		Renderer::Submit([this]() {
+			Renderer::ClearScreenColor(m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
+			Renderer::ClearScreenBuffers();
+		});
+
+		m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
 	}
 
 	void SceneRenderer::EndScene()
@@ -69,7 +80,7 @@ namespace highlo
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
 	{
-		return m_CompositeRenderPass->GetSpcification().Framebuffer->GetImage();
+		return m_CompositeRenderPass->GetSpecification().Framebuffer->GetImage();
 	}
 	
 	void SceneRenderer::InitGrid()

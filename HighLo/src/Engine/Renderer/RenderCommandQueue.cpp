@@ -35,7 +35,6 @@ namespace highlo
 	void RenderCommandQueue::Execute()
 	{
 		Byte *buffer = m_CommandBuffer;
-
 		for (uint32 i = 0; i < m_CommandCount; ++i)
 		{
 			RenderCommandFn function = *(RenderCommandFn*)buffer;

@@ -86,6 +86,7 @@ class HighLoEditor : public HLApplication
 		void DeleteEntity(Entity entity);
 
 	private:
+		glm::vec4 m_ClearColor = { 0.4f, 0.5f, 0.4f, 1 };
 
 		HLString m_ProjectPath;
 		FileSystemPath m_RoamingPath;

@@ -159,10 +159,10 @@ namespace highlo
 		HL_ASSERT(renderPass, "Renderpass can not be null!");
 		s_MainRendererData->ActiveRenderPass = renderPass;
 
-		renderPass->GetSpcification().Framebuffer->Bind();
+		renderPass->GetSpecification().Framebuffer->Bind();
 		if (clear)
 		{
-			const glm::vec4 &clearColor = renderPass->GetSpcification().Framebuffer->GetSpecification().ClearColor;
+			const glm::vec4 &clearColor = renderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
 			s_RenderingAPI->ClearScreenBuffers();
 			s_RenderingAPI->ClearScreenColor(clearColor);
 		}
@@ -171,7 +171,7 @@ namespace highlo
 	void Renderer::EndRenderPass()
 	{
 		HL_ASSERT(s_MainRendererData->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
-		s_MainRendererData->ActiveRenderPass->GetSpcification().Framebuffer->Unbind();
+		s_MainRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
 		s_MainRendererData->ActiveRenderPass = nullptr;
 	}
 

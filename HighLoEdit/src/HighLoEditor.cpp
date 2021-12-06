@@ -154,9 +154,6 @@ void HighLoEditor::OnInitialize()
 
 void HighLoEditor::OnUpdate(Timestep ts)
 {
-	if (m_SceneState == SceneState::Edit)
-		OnScenePlay();
-
 	// TODO: For some reason this crashes right away
 	/*else if (m_SceneState != SceneState::Simulate)
 		OnSceneStop();*/
@@ -254,6 +251,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	m_ViewportRenderer->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+	m_ViewportRenderer->SetClearColor(m_ClearColor);
 	m_EditorScene->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 
 	if (m_RuntimeScene)
@@ -264,7 +262,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	// Render viewport image
 	UI::Image(m_ViewportRenderer->GetFinalRenderTexture(), viewportSize, { 0, 1 }, { 1, 0 });
-
 	UI::EndViewport();
 
 	m_AssetBrowserPanel->OnUIRender();

@@ -26,14 +26,6 @@ namespace highlo
 		bool SwapChain = false; // where should we render? screen or framebuffer?
 	};
 
-	struct SceneRendererCamera
-	{
-		Camera Camera;
-		glm::mat4 ViewMatrix;
-		float Near, Far;
-		float Fov;
-	};
-
 	class SceneRenderer : public IsSharedReference
 	{
 	public:
@@ -48,8 +40,7 @@ namespace highlo
 		HLAPI void SetClearColor(const glm::vec4 &color);
 		HLAPI void SetLineWidth(float width) { m_LineWidth = width; }
 
-		HLAPI void BeginScene(const EditorCamera &camera);
-		HLAPI void BeginScene(const SceneRendererCamera &camera);
+		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
 		HLAPI SceneRendererOptions &GetOptions();
@@ -86,7 +77,7 @@ namespace highlo
 		// Scene information
 		struct SceneInfo
 		{
-			SceneRendererCamera SceneCamera;
+			Camera SceneCamera;
 
 			Ref<Environment> SceneEnvironment;
 			float SkyboxLod = 0.0f;

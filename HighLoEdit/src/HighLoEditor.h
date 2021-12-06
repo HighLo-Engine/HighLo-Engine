@@ -95,6 +95,7 @@ class HighLoEditor : public HLApplication
 		HLString m_LastSceneFilePath;
 		GizmoType m_GizmoType = GizmoType::None;
 		EditorCamera m_EditorCamera;
+		Camera m_OverlayCamera;
 
 		float m_EnvironmentMapRotation = 0.0f;
 		float m_SnapValue = 0.5f;

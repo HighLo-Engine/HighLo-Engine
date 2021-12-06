@@ -24,6 +24,7 @@ namespace highlo
 		HLAPI virtual ~Camera() = default;
 
 		HLAPI void SetPerspective(float verticalFOV = 45.0f, float nearClip = 0.01f, float farClip = 10000.0f);
+		HLAPI void SetOrthographic(float width, float height, float size, float nearClip = -1.0f, float farClip = 1.0f);
 		HLAPI void SetOrthographic(float size = 10.0f, float nearClip = -1.0f, float farClip = 1.0f);
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
 

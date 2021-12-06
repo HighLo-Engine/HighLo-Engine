@@ -5,7 +5,6 @@
 
 #include "OpenGLShader.h"
 #include "OpenGLTexture.h"
-#include "Engine/Renderer/Renderer.h"
 
 namespace highlo
 {
@@ -357,12 +356,9 @@ namespace highlo
 			auto &texture = m_Textures[i];
 			if (texture)
 			{
-				Renderer::Submit([i, texture]()
-				{
-					HL_ASSERT(texture->GetType() == TextureType::Texture3D);
-					Ref<OpenGLTexture3D> glTexture = texture.As<OpenGLTexture3D>();
-					glBindTextureUnit(i, glTexture->GetRendererID());
-				});
+				HL_ASSERT(texture->GetType() == TextureType::Texture3D);
+				Ref<OpenGLTexture3D> glTexture = texture.As<OpenGLTexture3D>();
+				glBindTextureUnit(i, glTexture->GetRendererID());
 			}
 		}
 
@@ -372,11 +368,8 @@ namespace highlo
 			{
 				uint32 textureSlot = slot;
 				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-				Renderer::Submit([textureSlot, glTexture]
-				{
-					glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
-					glBindTextureUnit(textureSlot, glTexture->GetRendererID());
-				});
+				glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
+				glBindTextureUnit(textureSlot, glTexture->GetRendererID());
 			}
 		}
 	}

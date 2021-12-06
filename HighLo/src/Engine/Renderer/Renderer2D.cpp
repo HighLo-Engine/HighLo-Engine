@@ -13,8 +13,12 @@
 
 #include "Engine/Utils/StringUtils.h"
 
+#include <glad/glad.h>
+
 namespace highlo
 {
+	Ref<VertexArray> s_VA;
+
 	struct QuadVertex
 	{
 		glm::vec3 Position;
@@ -149,6 +153,14 @@ namespace highlo
 			lineIndices.push_back(i);
 		}
 
+		// Textures/Quads
+		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
+
+		s_2DData->QuadVertexArray = VertexArray::Create();
+		Ref<VertexBuffer> quadVbo = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
+		quadVbo->SetLayout(BufferLayout::GetTextureLayout());
+		s_2DData->QuadVertexArray->AddVertexBuffer(quadVbo);
+		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
 		/*
 
 		// Textures/Quads
@@ -216,6 +228,31 @@ namespace highlo
 		s_2DData->CircleVertexArray->AddVertexBuffer(circleVbo);
 		s_2DData->CircleVertexArray->SetIndexBuffer(IndexBuffer::Create());
 		*/
+
+		float vertices[] = {
+			 0.5f,  0.5f, 0.0f,  // top right
+			 0.5f, -0.5f, 0.0f,  // bottom right
+			-0.5f, -0.5f, 0.0f,  // bottom left
+			-0.5f,  0.5f, 0.0f   // top left 
+		};
+
+		// VAO
+		s_VA = VertexArray::Create();
+		s_VA->Bind();
+
+		BufferLayout bl = {
+			{ "in_Position", ShaderDataType::Float3 },
+		};
+
+		auto vb = VertexBuffer::Create(&vertices[0], 12 * sizeof(float));
+		vb->SetLayout(bl);
+
+		s_VA->AddVertexBuffer(vb);
+
+		auto ib = IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices);
+		s_VA->SetIndexBuffer(ib);
+
+		s_VA->Unbind();
 	}
 
 	void Renderer2D::Shutdown()
@@ -282,15 +319,16 @@ namespace highlo
 	#pragma warning(pop)
 		if (dataSize)
 		{
-			s_2DData->TextureShader->Bind();
-			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
+			//s_2DData->TextureShader->Bind();
+			/*s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
 			
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 				s_2DData->TextureSlots[i]->Bind(i);
 
-			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->QuadVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->QuadVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);*/
+
+			s_VA->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
 
@@ -303,8 +341,6 @@ namespace highlo
 			s_2DData->LineShader->Bind();
 			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
 
-			s_2DData->LineVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->LineVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->LineVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, false);
 		}
@@ -318,8 +354,6 @@ namespace highlo
 			s_2DData->CircleShader->Bind();
 			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
 
-			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->CircleVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->CircleVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
@@ -336,8 +370,6 @@ namespace highlo
 			for (uint32 i = 0; i < s_2DData->FontTextureSlotIndex; ++i)
 				s_2DData->FontTextureSlots[i]->Bind(i);
 
-			s_2DData->TextVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->TextVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->TextVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}

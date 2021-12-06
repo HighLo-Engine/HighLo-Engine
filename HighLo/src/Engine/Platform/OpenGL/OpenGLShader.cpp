@@ -14,6 +14,7 @@
 namespace highlo
 {
 #define PRINT_SHADERS 1
+#define GL_SHADER_LOG_PREFIX "Shader>       "
 
 	namespace utils
 	{
@@ -234,13 +235,11 @@ namespace highlo
 	void OpenGLShader::ResizeStorageBuffer(uint32 bindingPoint, uint32 newSize)
 	{
 		ShaderStorageBuffer &buffer = s_StorageBuffers.at(bindingPoint);
-		
-		// No Resize needed
 		if (newSize == buffer.Size)
 			return;
 
 		buffer.Size = newSize;
-		HL_CORE_TRACE("Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
+		HL_CORE_INFO("Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
 		glNamedBufferData(buffer.RendererID, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 	}
 	
@@ -381,6 +380,7 @@ namespace highlo
 	{
 		if (FileSystem::Get()->FileExists(m_AssetPath))
 		{
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
 			m_ShaderSources = PreProcess(source);
 
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
@@ -389,7 +389,7 @@ namespace highlo
 		}
 		else
 		{
-			HL_CORE_WARN("Shader {0} not found!", *m_AssetPath.String());
+			HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Shader {0} not found! [-]", **m_AssetPath);
 		}
 	}
 	
@@ -420,7 +420,7 @@ namespace highlo
 				glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 				glBindBufferBase(GL_UNIFORM_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
-				HL_CORE_TRACE("Created Uniform Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Created Uniform Buffer at binding point {0} with name '{1}' and a size of {2} [+]", buffer.BindingPoint, *buffer.Name, buffer.Size);
 				glBindBuffer(GL_UNIFORM_BUFFER, 0);
 			}
 			else
@@ -440,7 +440,7 @@ namespace highlo
 					glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 					glBindBufferBase(GL_UNIFORM_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
-					HL_CORE_TRACE("Resized Uniform Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] Resized Uniform Buffer at binding point {0} with name '{1}' and a size of {2} [=]", buffer.BindingPoint, *buffer.Name, buffer.Size);
 					glBindBuffer(GL_UNIFORM_BUFFER, 0);
 				}
 			}
@@ -466,7 +466,7 @@ namespace highlo
 				glBufferData(GL_SHADER_STORAGE_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
-				HL_CORE_TRACE("Created Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Created Storage Buffer at binding point {0} with name '{1}' and a size of {2} [+]", buffer.BindingPoint, *buffer.Name, buffer.Size);
 				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 			}
 			else
@@ -486,7 +486,7 @@ namespace highlo
 					glBufferData(GL_SHADER_STORAGE_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
-					HL_CORE_TRACE("Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2} [=]", buffer.BindingPoint, *buffer.Name, buffer.Size);
 					glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 				}
 			}
@@ -555,7 +555,7 @@ namespace highlo
 
 					if (result.GetCompilationStatus() != shaderc_compilation_status_success)
 					{
-						HL_CORE_ERROR("{0}", result.GetErrorMessage().c_str());
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
 						HL_ASSERT(false);
 					}
 
@@ -574,7 +574,7 @@ namespace highlo
 				}
 				else
 				{
-					HL_CORE_ERROR("Could not write into cache path {0}", *path.String());
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write into cache path {0} [-]", *path.String());
 				}
 			}
 		}
@@ -627,7 +627,7 @@ namespace highlo
 				}
 				else
 				{
-					HL_CORE_WARN("Could not load Shader from cached binary ({0}), going to compile it from source...", *path.String());
+					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not load Shader from cached binary ({0}), going to compile it from source... [-]", *path.String());
 				}
 			}
 
@@ -636,15 +636,15 @@ namespace highlo
 				HLString source = glsl.compile();
 
 			#if PRINT_SHADERS
-				printf("===========================================================================\n");
-				printf("%s Shader: \n%s\n", utils::GLShaderTypeToString(stage), *source);
-				printf("===========================================================================\n");
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] {0} Shader: [=] \n{1}\n", utils::GLShaderTypeToString(stage), *source);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
 			#endif // PRINT_SHADERS
 
 				shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*source, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
 				if (result.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
-					HL_CORE_ERROR("{0}", result.GetErrorMessage().c_str());
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
 					HL_ASSERT(false);
 				}
 
@@ -659,7 +659,7 @@ namespace highlo
 				}
 				else
 				{
-					HL_CORE_ERROR("Could not write Shader into cache file: {0}", *path.String());
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
 				}
 			}
 
@@ -682,7 +682,7 @@ namespace highlo
 
 			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-			HL_CORE_ERROR("Shader Linking failed ({0}):\n{1}", **m_AssetPath, &infoLog[0]);
+			HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
 			glDeleteProgram(program);
 			for (auto id : shaderRendererIds)
@@ -700,7 +700,7 @@ namespace highlo
 				int32 location = glGetUniformLocation(m_RendererID, *name);
 				if (location == -1)
 				{
-					HL_CORE_WARN("{0}: Could not find Uniform location", *name);
+					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] {0}: Could not find Uniform location [-]", *name);
 				}
 
 				m_UniformLocations[name] = location;
@@ -787,19 +787,19 @@ namespace highlo
 
 			uint32 location = compiler.get_decoration(resource.id, spv::DecorationLocation);
 			const int32 memberCount = (int32)(bufferType.member_types.size());
-			auto &[Name, Size, Uniforms] = m_Buffers[bufferName];
-			Name = bufferName;
-			Size = bufferSize - m_ConstantBufferOffset;
+			auto &[name, size, uniforms] = m_Buffers[bufferName];
+			name = bufferName;
+			size = bufferSize - m_ConstantBufferOffset;
 
 			for (int32 i = 0; i < memberCount; ++i)
 			{
 				const auto &type = compiler.get_type(bufferType.member_types[i]);
 				const HLString &memberName = compiler.get_member_name(bufferType.self, i);
-				const uint32 size = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
+				const uint32 structMemberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
 				const uint32 offset = compiler.type_struct_member_offset(bufferType, i) - m_ConstantBufferOffset;
 
 				HLString uniformName = fmt::format("{}.{}", *bufferName, *memberName);
-				Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);
+				uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), structMemberSize, offset);
 			}
 
 			m_ConstantBufferOffset += bufferSize;
@@ -810,7 +810,7 @@ namespace highlo
 	{
 		int32 result = glGetUniformLocation(m_RendererID, *name);
 		if (result == -1)
-			HL_CORE_WARN("Could not find uniform location {0}", *name);
+			HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not find uniform location {0} [-]", *name);
 
 		return result;
 	}
@@ -826,6 +826,18 @@ namespace highlo
 
 		if (typeToCheck == "compute")
 			return GL_COMPUTE_SHADER;
+
+		if (typeToCheck == "geometry")
+			return GL_GEOMETRY_SHADER;
+
+		if (typeToCheck == "tesscontrol" || typeToCheck == "tesselationcontrol")
+			return GL_TESS_CONTROL_SHADER;
+
+		if (typeToCheck == "tesseval"
+		 || typeToCheck == "tesselationeval"
+		 || typeToCheck == "tessevaluation"
+		 || typeToCheck == "tesselationevaluation")
+			return GL_TESS_EVALUATION_SHADER;
 
 		return GL_NONE;
 	}

@@ -32,7 +32,6 @@ project "Sandbox"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libssl-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assets")
@@ -51,7 +50,19 @@ project "Sandbox"
         defines "HL_DEBUG"
         symbols "On"
 
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
     filter "configurations:Release"
         defines "HL_RELEASE"
         optimize "On"
 
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+		
+	

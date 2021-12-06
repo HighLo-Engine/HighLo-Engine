@@ -32,12 +32,11 @@ project "HighLoEdit"
 	
 	postbuildcommands
 	{
-("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libcrypto-3-x64.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libssl-3-x64.dll*"),
 		
 		("{COPY} %{wks.location}HighLo/assets/editorconfig.ini %{cfg.targetdir}"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets"),
-		("{COPY} %{wks.location}HighLoEdit/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets")
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets")
 	}
 
     filter "system:windows"

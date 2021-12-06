@@ -62,8 +62,8 @@ namespace highlo
 		HLAPI uint64 Hash() const;
 
 		HLAPI bool IsEmpty() const;
-		HLAPI bool HasRootPath() const;
-		HLAPI bool HasParentPath() const;
+		HLAPI bool IsRootPath() const;
+		HLAPI bool IsParentPath() const;
 
 		HLAPI bool IsAbsolute() const;
 		HLAPI bool IsRelative() const;
@@ -122,7 +122,10 @@ namespace highlo
 
 	private:
 
+		void UpdateAbsolutePath();
+
 		HLString m_CurrentPath;
+		HLString m_CurrentAbsolutePath;
 		File m_File;
 		std::filesystem::path m_Handle;
 	};

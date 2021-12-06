@@ -17,12 +17,12 @@
 namespace highlo
 {
 #ifdef HIGHLO_API_OPENGL
-	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new OpenGLRenderingAPI());
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<OpenGLRenderingAPI>::Create();
 #elif HIGHLO_API_DX11
-	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new DX11RenderingAPI());
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<DX11RenderingAPI>::Create();
 #elif HIGHLO_API_DX12
 #elif HIGHLO_API_VULKAN
-	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new VulkanRenderingAPI());
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<VulkanRenderingAPI>::Create();
 #endif // HIGHLO_API_OPENGL
 
 	struct RendererData

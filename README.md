@@ -17,7 +17,7 @@ cd HighLo-Engine
 python3 scripts/GenerateEngine.py
 ```
 
-# Current Feature branch
+# Current feature branch
 
 vulkan
 

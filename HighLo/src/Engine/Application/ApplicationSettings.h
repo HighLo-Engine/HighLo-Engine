@@ -67,10 +67,10 @@ namespace highlo
 		uint64 MainThreadID;
 
 		/// <summary>
-		/// Determines the path to the cache shader config.
-		/// The Cache Shader config stores all shader hashes for later comparison
+		/// Determines the path to the cache config.
+		/// The Cache config stores all hashes for later comparison
 		/// </summary>
-		FileSystemPath ShaderRegistryPath = "assets/shaders/cache/registry.cache";
+		FileSystemPath CacheRegistryPath = "assets/cache.registry";
 	};
 }
 

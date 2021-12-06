@@ -8,6 +8,7 @@
 #include "Engine/Core/Service.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Renderer/FontManager.h"
+#include "Engine/Renderer/Shaders/ShaderCache.h"
 #include "Engine/Math/Math.h"
 
 #include "Engine/ImGui/ImGui.h"
@@ -45,6 +46,9 @@ namespace highlo
 
 		m_Window = Window::Create(data);
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+
+		// Read the json registry with previous shader cache data
+		ShaderCache::Init();
 
 		// Init Renderer
 		Renderer::Init(m_Window.Get());
@@ -90,6 +94,9 @@ namespace highlo
 		m_Window = Window::Create(data);
 		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 
+		// Read the json registry with previous shader cache data
+		ShaderCache::Init();
+
 		// Init Renderer
 		Renderer::Init(m_Window.Get());
 		Renderer::WaitAndRender();
@@ -115,8 +122,11 @@ namespace highlo
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
 		FontManager::Get()->Shutdown();
-		Renderer::Shutdown();
 
+		// Save the current shader cache state into the json registry
+		ShaderCache::Shutdown();
+
+		Renderer::Shutdown();
 		Logger::Shutdown();
 	}
 

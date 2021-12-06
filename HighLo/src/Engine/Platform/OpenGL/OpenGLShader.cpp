@@ -7,6 +7,7 @@
 
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/Shaders/ShaderCache.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <shaderc/shaderc.hpp>
@@ -75,9 +76,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:    return shaderc_vertex_shader;
-				case GL_FRAGMENT_SHADER:  return shaderc_fragment_shader;
-				case GL_COMPUTE_SHADER:   return shaderc_compute_shader;
+				case GL_VERTEX_SHADER:			return shaderc_vertex_shader;
+				case GL_FRAGMENT_SHADER:		return shaderc_fragment_shader;
+				case GL_COMPUTE_SHADER:			return shaderc_compute_shader;
+				case GL_TESS_CONTROL_SHADER:	return shaderc_tess_control_shader;
+				case GL_TESS_EVALUATION_SHADER:	return shaderc_tess_evaluation_shader;
+				case GL_GEOMETRY_SHADER:		return shaderc_geometry_shader;
 			}
 
 			HL_ASSERT(false);
@@ -516,6 +520,10 @@ namespace highlo
 		for (auto &[stage, source] : m_ShaderSources)
 		{
 			const char *extension = utils::GLShaderStageCachedVulkanFileExtension(stage);
+			bool cacheHasChanged = true;
+
+			if (m_ShaderSources[stage].IsEmpty())
+				continue;
 
 			if (!forceCompile)
 			{
@@ -534,9 +542,12 @@ namespace highlo
 					fread(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
 					fclose(f);
 				}
+
+				// Check, if Shadersource has been changed since last compilation
+				cacheHasChanged = ShaderCache::HasChanged(path, m_ShaderSources[stage]);
 			}
 
-			if (outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty())
+			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()) || cacheHasChanged)
 			{
 				shaderc::Compiler compiler;
 				shaderc::CompileOptions options;

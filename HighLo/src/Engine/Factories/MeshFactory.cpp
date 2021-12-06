@@ -213,14 +213,14 @@ namespace highlo
 			for (int32 s = 0; s < segments; s++)
 			{
 				VertexIndex &index1 = indices.emplace_back();
-				index1.P1 = (uint32_t) (r * segments + s + 1);
-				index1.P2 = (uint32_t) (r * segments + s + 0);
-				index1.P3 = (uint32_t) ((r + 1) * segments + s + 1);
+				index1.P1 = (uint32) (r * segments + s + 1);
+				index1.P2 = (uint32) (r * segments + s + 0);
+				index1.P3 = (uint32) ((r + 1) * segments + s + 1);
 
 				VertexIndex &index2 = indices.emplace_back();
-				index2.P1 = (uint32_t) ((r + 1) * segments + s + 0);
-				index2.P2 = (uint32_t) ((r + 1) * segments + s + 1);
-				index2.P3 = (uint32_t) (r * segments + s);
+				index2.P1 = (uint32) ((r + 1) * segments + s + 0);
+				index2.P2 = (uint32) ((r + 1) * segments + s + 1);
+				index2.P3 = (uint32) (r * segments + s);
 			}
 		}
 

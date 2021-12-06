@@ -73,14 +73,14 @@ namespace highlo
 		instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		instanceCreateInfo.pNext = nullptr;// &features;
 		instanceCreateInfo.pApplicationInfo = &appInfo;
-		instanceCreateInfo.enabledExtensionCount = (uint32_t) instanceExtensions.size();
+		instanceCreateInfo.enabledExtensionCount = (uint32) instanceExtensions.size();
 		instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.data();
 
 		if (s_EnableDebugExtensions)
 		{
 			const char *validationLayerName = "VK_LAYER_KHRONOS_validation";
 			// Check if this layer is available at instance level
-			uint32_t instanceLayerCount;
+			uint32 instanceLayerCount;
 			vkEnumerateInstanceLayerProperties(&instanceLayerCount, nullptr);
 			std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerCount);
 			vkEnumerateInstanceLayerProperties(&instanceLayerCount, instanceLayerProperties.data());

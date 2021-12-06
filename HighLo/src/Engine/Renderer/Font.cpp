@@ -115,7 +115,7 @@ namespace highlo
 	Font::Font(const FileSystemPath &path)
 		: m_FilePath(path), m_MSDFData(new MSDFData())
 	{
-		static const uint32_t charsetImGuiRanges[] =
+		static const uint32 charsetImGuiRanges[] =
 		{
 			0x0020, 0x00FF, // Basic Latin + Latin Supplement
 			0x0400, 0x052F, // Cyrillic + Cyrillic Supplement

@@ -592,22 +592,24 @@ namespace highlo
 		{
 			// @See https://stackoverflow.com/a/32413923/12873837
 
-			StringType *newString = new char[m_Size + 512];
+			StringType *newString = new StringType[m_Size + 512];
 			StringType *strValuePointer = &newString[0];
 			const StringType *tmp = m_Data;
-			const StringType *p;
 			uint32 findLength = find.Length();
 			uint32 replaceLength = replaceValue.Length();
 			uint32 occurencesReplaced = 0;
-			uint32 newBufferLength = 0;
+
+			newString[strlen(newString)] = '\0';
 
 			while (true)
 			{
-				p = strstr(tmp, find);
+				const StringType *p = strstr(tmp, find);
+			//	std::cout << "Found substring: " << p << std::endl;
 
 				// walked past last occurrence of needle; copy remaining part
 				if (!p)
 				{
+				//	std::cout << "last part: " << tmp << std::endl;
 					strcpy(strValuePointer, tmp);
 					break;
 				}
@@ -629,8 +631,8 @@ namespace highlo
 			}
 
 			delete[] m_Data;
-			m_Data = newString;
 			m_Size = (uint32)strlen(newString);
+			m_Data = newString;
 
 			return *this;
 		}

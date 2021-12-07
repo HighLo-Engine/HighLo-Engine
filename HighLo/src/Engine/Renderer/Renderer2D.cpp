@@ -151,6 +151,8 @@ namespace highlo
 			lineIndices.push_back(i);
 		}
 
+		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
+
 		/*
 		// Textures/Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
@@ -240,8 +242,6 @@ namespace highlo
 		circlesVb->SetLayout(BufferLayout::GetCircleLayout());
 		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
 
-
-
 		s_2DData->CircleVertexArray->Unbind();
 
 		// Lines
@@ -311,16 +311,12 @@ namespace highlo
 	#pragma warning(pop)
 		if (dataSize)
 		{
-			//s_2DData->TextureShader->Bind();
-			/*s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
-			
+			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
+
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 				s_2DData->TextureSlots[i]->Bind(i);
 
-			s_2DData->QuadVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);*/
-
-			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
+			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}

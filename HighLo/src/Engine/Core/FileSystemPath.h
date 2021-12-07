@@ -73,7 +73,7 @@ namespace highlo
 
 		HLAPI bool Exists() const;
 		HLAPI int64 Size() const;
-		HLAPI const HLString &Absolute() const;
+		HLAPI HLString Absolute() const;
 		HLAPI const HLString &Filename() const;
 		HLAPI const HLString &Name() const;
 		HLAPI const HLString &Extension() const;

@@ -68,6 +68,9 @@ namespace highlo
 	{
 		Bind();
 
+		// Free existing memory
+		m_LocalData.Release();
+
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 

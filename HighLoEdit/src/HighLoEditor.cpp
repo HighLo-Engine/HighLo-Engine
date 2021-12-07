@@ -230,7 +230,10 @@ void HighLoEditor::OnEvent(Event &e)
 	if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 	{
 		if (m_ViewportPanelMouseOver)
+		{
 			m_EditorCamera.OnEvent(e);
+			m_OverlayCamera.OnEvent(e);
+		}
 
 		m_EditorScene->OnEvent(e);
 	}

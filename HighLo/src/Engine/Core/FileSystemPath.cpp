@@ -187,7 +187,7 @@ namespace highlo
 		return FileSystem::Get()->GetFileSize(*this);
 	}
 
-	const HLString &FileSystemPath::Absolute() const
+	HLString FileSystemPath::Absolute() const
 	{
 		return m_File.FullPath;
 	}

@@ -22,7 +22,12 @@ namespace highlo
 		int32 width, height, channels;
 		stbi_set_flip_vertically_on_load(flipOnLoad);
 
-		HL_CORE_ERROR("{0}", *filePath.Absolute());
+		if (*filePath.Absolute() == nullptr)
+		{
+			HL_CORE_ERROR("{0}[-] Failed to load Texture2D: {1} [-]", TEXTURE2D_LOG_PREFIX, *filePath.String());
+			return;
+		}
+
 		stbi_uc *data = stbi_load(*filePath.Absolute(), &width, &height, &channels, STBI_rgb_alpha);
 		if (!data)
 		{

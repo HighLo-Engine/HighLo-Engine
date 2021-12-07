@@ -590,57 +590,48 @@ namespace highlo
 
 		HLAPI HLStringBase &Replace(const HLStringBase &find, const HLStringBase &replaceValue, uint32 occurencesToReplace = 0)
 		{
-			uint32 occurences = 0;
-			uint32 offset = 0;
+			// @See https://stackoverflow.com/a/32413923/12873837
 
-			while (Contains(find, offset))
+			StringType *newString = new char[m_Size + 512];
+			StringType *strValuePointer = &newString[0];
+			const StringType *tmp = m_Data;
+			const StringType *p;
+			uint32 findLength = find.Length();
+			uint32 replaceLength = replaceValue.Length();
+			uint32 occurencesReplaced = 0;
+			uint32 newBufferLength = 0;
+
+			while (true)
 			{
-				++occurences;
-				offset = IndexOf(find, offset) + find.Length();
+				p = strstr(tmp, find);
 
-				if (occurencesToReplace && occurences == occurencesToReplace)
+				// walked past last occurrence of needle; copy remaining part
+				if (!p)
+				{
+					strcpy(strValuePointer, tmp);
+					break;
+				}
+
+				// copy part before needle
+				memcpy(strValuePointer, tmp, p - tmp);
+				strValuePointer += p - tmp;
+
+				// copy replacement string
+				memcpy(strValuePointer, replaceValue, replaceLength);
+				strValuePointer += replaceLength;
+
+				// adjust pointers, move on
+				tmp = p + findLength;
+
+				++occurencesReplaced;
+				if (occurencesToReplace && occurencesReplaced >= occurencesToReplace)
 					break;
 			}
 
-			if (!occurences)
-				return *this;
-
-			uint32 *occurence_indices = new uint32[occurences];
-			offset = 0;
-			for (uint32 i = 0; i < occurences; ++i)
-			{
-				occurence_indices[i] = IndexOf(find, offset);
-				offset = occurence_indices[i] + find.Length();
-			}
-
-			uint32 new_size = m_Size + ((replaceValue.Length() - find.Length()) * occurences);
-			StringType *new_data = new StringType[new_size + 1];
-			new_data[new_size] = '\0';
-
-			uint32 occurence_idx = 0;
-			for (uint32 dataIdx = 0, NewDataIdx = 0; dataIdx < m_Size;)
-			{
-				if (dataIdx != occurence_indices[occurence_idx])
-				{
-					new_data[NewDataIdx] = m_Data[dataIdx];
-					++NewDataIdx;
-					++dataIdx;
-				}
-				else
-				{
-					memcpy(new_data + NewDataIdx, replaceValue.m_Data, replaceValue.Length());
-					NewDataIdx += replaceValue.Length();
-					dataIdx += find.Length();
-					++occurence_idx;
-				}
-			}
-
-			if (m_Data)
-				delete[] m_Data;
-
-			m_Data = new_data;
-			m_Size = new_size;
-			delete[] occurence_indices;
+			delete[] p;
+			delete[] m_Data;
+			m_Data = newString;
+			m_Size = (uint32)strlen(newString);
 
 			return *this;
 		}

@@ -22,6 +22,7 @@ namespace highlo
 		int32 width, height, channels;
 		stbi_set_flip_vertically_on_load(flipOnLoad);
 
+		HL_CORE_ERROR("{0}", *filePath.Absolute());
 		stbi_uc *data = stbi_load(*filePath.Absolute(), &width, &height, &channels, STBI_rgb_alpha);
 		if (!data)
 		{

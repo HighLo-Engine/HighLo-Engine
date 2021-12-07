@@ -461,8 +461,7 @@ namespace highlo
 	
 	std::ostream &operator<<(std::ostream &stream, const FileSystemPath &other)
 	{
-		stream << other.Filename();
-		return stream;
+		return stream << other.Filename();
 	}
 }
 

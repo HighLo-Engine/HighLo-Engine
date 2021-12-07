@@ -628,7 +628,6 @@ namespace highlo
 					break;
 			}
 
-			delete[] p;
 			delete[] m_Data;
 			m_Data = newString;
 			m_Size = (uint32)strlen(newString);

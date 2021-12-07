@@ -34,6 +34,7 @@ namespace highlo
 
 	void ShaderCache::Serialize(const std::map<HLString, uint64> &shaderCache)
 	{
+		/*
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
@@ -52,10 +53,12 @@ namespace highlo
 
 		writer->Write("shaderCache", dataToStore);
 		writer->WriteOut();
+		*/
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
+		/*
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
@@ -73,6 +76,7 @@ namespace highlo
 				shaderCache[path] = hash;
 			}
 		}
+		*/
 	}
 }
 

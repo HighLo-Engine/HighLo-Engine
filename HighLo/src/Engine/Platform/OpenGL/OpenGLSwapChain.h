@@ -36,7 +36,7 @@ namespace highlo
 		virtual uint32 GetImageCount() const override { HL_ASSERT(false, "Not supported in OpenGL"); return -1; }
 		virtual uint32 GetWidth() const override { return m_Width; }
 		virtual uint32 GetHeight() const override { return m_Height; }
-		virtual uint32 GetCurrentBufferIndex() const override { HL_ASSERT(false, "Not supported in OpenGL");  return -1; }
+		virtual uint32 GetCurrentBufferIndex() const override { return 0; } // hard coded to 0 because OpenGL does not use multiple buffers
 	
 	private:
 

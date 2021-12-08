@@ -12,6 +12,8 @@
 #include "FontData.h"
 
 #include "Engine/Utils/StringUtils.h"
+#include "Engine/Renderer/Shaders/UniformBufferSet.h"
+#include "Engine/Renderer/Material.h"
 
 #include <glad/glad.h>
 
@@ -57,6 +59,11 @@ namespace highlo
 		float TexIndex;
 	};
 
+	struct UniformBufferCamera
+	{
+		glm::mat4 ViewProjection;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32 MaxQuads = 20000;
@@ -72,6 +79,7 @@ namespace highlo
 
 		// Quads
 		Ref<Shader> TextureShader;
+		Ref<Material> TextureMaterial;
 		Ref<VertexArray> QuadVertexArray;
 		uint32 QuadIndexCount = 0;
 		QuadVertex *QuadVertexBufferBase = nullptr;
@@ -111,6 +119,7 @@ namespace highlo
 
 		bool DepthTest = true;
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
+		Ref<UniformBufferSet> UniformBufferSet;
 	};
 
 	static Renderer2DData *s_2DData;
@@ -220,6 +229,8 @@ namespace highlo
 		*/
 
 		// Quads
+		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
+		s_2DData->TextureMaterial = Material::Create(s_2DData->TextureShader, "TextureMaterial");
 		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
 
 		s_2DData->QuadVertexArray = VertexArray::Create();
@@ -245,6 +256,12 @@ namespace highlo
 		s_2DData->CircleVertexArray->Unbind();
 
 		// Lines
+
+
+		// Uniform Buffer
+		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
+		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
+		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -264,6 +281,14 @@ namespace highlo
 
 		s_2DData->CameraProjection = proj;
 		s_2DData->DepthTest = depthTest;
+
+		s_2DData->TextureShader->Bind();
+
+		Renderer::Submit([uniformBufferSet = s_2DData->UniformBufferSet, proj]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			uniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
+		});
 
 		/*
 		s_2DData->TextureShader->Bind();
@@ -315,6 +340,14 @@ namespace highlo
 
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 				s_2DData->TextureSlots[i]->Bind(i);
+
+		//	for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
+		//	{
+		//		if (s_2DData->TextureSlots[i])
+		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->TextureSlots[i]);
+		//		else
+		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->WhiteTexture);
+		//	}
 
 			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->Bind();

@@ -40,7 +40,7 @@ namespace highlo
 		HLAPI void UpdateScene(Timestep ts);
 
 		// Renders the static overlay that gets rendered on top of the scene (optional).
-		HLAPI void OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera& overlayCamera);
+		HLAPI void OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera &overlayCamera);
 
 		// Renders the scene at actual runtime of the game.
 		HLAPI void OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts);

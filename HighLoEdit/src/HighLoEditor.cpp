@@ -157,10 +157,6 @@ void HighLoEditor::OnInitialize()
 
 void HighLoEditor::OnUpdate(Timestep ts)
 {
-	// TODO: For some reason this crashes right away
-	/*else if (m_SceneState != SceneState::Simulate)
-		OnSceneStop();*/
-
 	UpdateUIFlags();
 
 	switch (m_SceneState)

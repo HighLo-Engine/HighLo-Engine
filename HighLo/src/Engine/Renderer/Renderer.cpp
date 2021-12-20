@@ -41,7 +41,7 @@ namespace highlo
 	static RenderCommandQueue *s_CommandQueue = nullptr;
 	static RenderCommandQueue s_ResourceFreeQueue[3];
 
-	void Renderer::ClearScreenColor(const glm::vec4& color)
+	void Renderer::ClearScreenColor(const glm::vec4 &color)
 	{
 		s_RenderingAPI->ClearScreenColor(color);
 	}

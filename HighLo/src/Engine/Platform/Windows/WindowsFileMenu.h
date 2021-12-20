@@ -44,7 +44,7 @@ namespace highlo
 	private:
 
 		HLString m_Name = "DefaultMenuTitle";
-		HMENU m_NativeHandle;
+		HMENU m_NativeHandle = nullptr;
 		std::vector<Ref<MenuItem>> m_MenuItems;
 	};
 }

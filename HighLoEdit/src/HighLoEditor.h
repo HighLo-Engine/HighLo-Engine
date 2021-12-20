@@ -146,3 +146,4 @@ class HighLoEditor : public HLApplication
 		// File Menu Panels
 		Ref<FileMenu> m_WindowMenu = nullptr;
 	};
+

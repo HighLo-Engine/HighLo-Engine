@@ -69,10 +69,6 @@ project "HighLo"
         defines
         {
             "HL_PLATFORM_WINDOWS",
-			--"HIGHLO_API_VULKAN",
-			"HIGHLO_API_OPENGL",
-			--"HIGHLO_API_DX11",
-			--"HIGHLO_API_DX12",
 			"HIGHLO_API_GLFW"	
         }
 
@@ -94,7 +90,6 @@ project "HighLo"
         defines
         {
             "HL_PLATFORM_MAC",
-			"HIGHLO_API_OPENGL",
 			"HIGHLO_API_GLFW"	
         }
 
@@ -105,16 +100,16 @@ project "HighLo"
 		defines
         {
             "HL_PLATFORM_LINUX",
-			"HIGHLO_API_OPENGL",
 			"HIGHLO_API_GLFW"	
         }
 
-    filter "configurations:Debug"
+    filter "configurations:Debug-OpenGL"
         symbols "On"
 
 		defines
 		{
-			"HL_DEBUG"
+			"HL_DEBUG",
+			"HIGHLO_API_OPENGL"
 		}
 		
 		links
@@ -139,13 +134,14 @@ project "HighLo"
 			"%{LibDir.SpvRemapper_Debug}",
 		}
 
-    filter "configurations:Release"
+    filter "configurations:Release-OpenGL"
         optimize "On"
 		
 		defines
 		{
 			"HL_RELEASE",
 			"NDEBUG",
+			"HIGHLO_API_OPENGL"
 		}
 		
 		links
@@ -170,4 +166,192 @@ project "HighLo"
 			"%{LibDir.SpvRemapper_Release}",
 		}
 		
+	filter "configurations:Debug-Vulkan"
+        symbols "On"
+
+		defines
+		{
+			"HL_DEBUG",
+			"HIGHLO_API_VULKAN"
+		}
 		
+		links
+		{
+			"%{LibDir.gtest_debug}",
+			"%{LibDir.gtest_main_debug}",
+			"%{LibDir.gmock_debug}",
+			"%{LibDir.gmock_main_debug}",
+			
+			"%{LibDir.shaderc_debug}",
+			"%{LibDir.shaderc_util_debug}",
+			"%{LibDir.glsl_Debug}",
+
+			"%{LibDir.SPIRV_Debug}",
+			"%{LibDir.SPIRV_Cross_Debug}",
+			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
+			"%{LibDir.SPIRV_Tools_Debug}",
+
+			"%{LibDir.SPIRV_Cross_util_Debug}",
+			"%{LibDir.SPIRV_Cross_cpp_Debug}",
+			"%{LibDir.SPIRV_Cross_reflect_Debug}",
+			"%{LibDir.SpvRemapper_Debug}",
+		}
+
+	filter "configurations:Release-Vulkan"
+        optimize "On"
+		
+		defines
+		{
+			"HL_RELEASE",
+			"NDEBUG",
+			"HIGHLO_API_VULKAN"
+		}
+		
+		links
+		{
+			"%{LibDir.gtest_release}",
+			"%{LibDir.gtest_main_release}",
+			"%{LibDir.gmock_release}",
+			"%{LibDir.gmock_main_release}",
+			
+			
+			"%{LibDir.shaderc_release}",
+			"%{LibDir.shaderc_util_release}",
+			"%{LibDir.glsl_Release}",
+			
+			"%{LibDir.SPIRV_Release}",
+			"%{LibDir.SPIRV_Cross_Release}",
+			"%{LibDir.SPIRV_Cross_GLSL_Release}",
+			
+			"%{LibDir.SPIRV_Cross_util_Release}",
+			"%{LibDir.SPIRV_Cross_cpp_Release}",
+			"%{LibDir.SPIRV_Cross_reflect_Release}",
+			"%{LibDir.SpvRemapper_Release}",
+		}
+
+	filter "configurations:Debug-DX11"
+        symbols "On"
+
+		defines
+		{
+			"HL_DEBUG",
+			"HIGHLO_API_DX11"
+		}
+		
+		links
+		{
+			"%{LibDir.gtest_debug}",
+			"%{LibDir.gtest_main_debug}",
+			"%{LibDir.gmock_debug}",
+			"%{LibDir.gmock_main_debug}",
+			
+			"%{LibDir.shaderc_debug}",
+			"%{LibDir.shaderc_util_debug}",
+			"%{LibDir.glsl_Debug}",
+
+			"%{LibDir.SPIRV_Debug}",
+			"%{LibDir.SPIRV_Cross_Debug}",
+			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
+			"%{LibDir.SPIRV_Tools_Debug}",
+
+			"%{LibDir.SPIRV_Cross_util_Debug}",
+			"%{LibDir.SPIRV_Cross_cpp_Debug}",
+			"%{LibDir.SPIRV_Cross_reflect_Debug}",
+			"%{LibDir.SpvRemapper_Debug}",
+		}
+
+	filter "configurations:Release-DX11"
+        optimize "On"
+		
+		defines
+		{
+			"HL_RELEASE",
+			"NDEBUG",
+			"HIGHLO_API_DX11"
+		}
+		
+		links
+		{
+			"%{LibDir.gtest_release}",
+			"%{LibDir.gtest_main_release}",
+			"%{LibDir.gmock_release}",
+			"%{LibDir.gmock_main_release}",
+			
+			
+			"%{LibDir.shaderc_release}",
+			"%{LibDir.shaderc_util_release}",
+			"%{LibDir.glsl_Release}",
+			
+			"%{LibDir.SPIRV_Release}",
+			"%{LibDir.SPIRV_Cross_Release}",
+			"%{LibDir.SPIRV_Cross_GLSL_Release}",
+			
+			"%{LibDir.SPIRV_Cross_util_Release}",
+			"%{LibDir.SPIRV_Cross_cpp_Release}",
+			"%{LibDir.SPIRV_Cross_reflect_Release}",
+			"%{LibDir.SpvRemapper_Release}",
+		}
+
+	filter "configurations:Debug-DX12"
+        symbols "On"
+
+		defines
+		{
+			"HL_DEBUG",
+			"HIGHLO_API_DX12"
+		}
+		
+		links
+		{
+			"%{LibDir.gtest_debug}",
+			"%{LibDir.gtest_main_debug}",
+			"%{LibDir.gmock_debug}",
+			"%{LibDir.gmock_main_debug}",
+			
+			"%{LibDir.shaderc_debug}",
+			"%{LibDir.shaderc_util_debug}",
+			"%{LibDir.glsl_Debug}",
+
+			"%{LibDir.SPIRV_Debug}",
+			"%{LibDir.SPIRV_Cross_Debug}",
+			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
+			"%{LibDir.SPIRV_Tools_Debug}",
+
+			"%{LibDir.SPIRV_Cross_util_Debug}",
+			"%{LibDir.SPIRV_Cross_cpp_Debug}",
+			"%{LibDir.SPIRV_Cross_reflect_Debug}",
+			"%{LibDir.SpvRemapper_Debug}",
+		}
+
+	filter "configurations:Release-DX12"
+        optimize "On"
+		
+		defines
+		{
+			"HL_RELEASE",
+			"NDEBUG",
+			"HIGHLO_API_DX12"
+		}
+		
+		links
+		{
+			"%{LibDir.gtest_release}",
+			"%{LibDir.gtest_main_release}",
+			"%{LibDir.gmock_release}",
+			"%{LibDir.gmock_main_release}",
+			
+			
+			"%{LibDir.shaderc_release}",
+			"%{LibDir.shaderc_util_release}",
+			"%{LibDir.glsl_Release}",
+			
+			"%{LibDir.SPIRV_Release}",
+			"%{LibDir.SPIRV_Cross_Release}",
+			"%{LibDir.SPIRV_Cross_GLSL_Release}",
+			
+			"%{LibDir.SPIRV_Cross_util_Release}",
+			"%{LibDir.SPIRV_Cross_cpp_Release}",
+			"%{LibDir.SPIRV_Cross_reflect_Release}",
+			"%{LibDir.SpvRemapper_Release}",
+		}
+

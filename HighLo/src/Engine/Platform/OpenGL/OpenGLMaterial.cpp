@@ -18,6 +18,16 @@ namespace highlo
 		m_Flags |= (uint32)MaterialFlag::Blend;
 	}
 	
+	OpenGLMaterial::OpenGLMaterial(const Ref<Material> &other, const HLString &name)
+	{
+		m_Name = name;
+		m_Shader = other->GetShader();
+		m_Shader->AddShaderReloadedCallback(std::bind(&OpenGLMaterial::OnShaderReloaded, this));
+
+		m_Flags |= (uint32)MaterialFlag::DepthTest;
+		m_Flags |= (uint32)MaterialFlag::Blend;
+	}
+
 	OpenGLMaterial::~OpenGLMaterial()
 	{
 	}

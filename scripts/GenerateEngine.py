@@ -24,8 +24,9 @@ if (not Vulkan.CheckVulkanSDK()):
 if (not Vulkan.CheckVulkanSDKDebugLibs()):
     print("Vulkan SDK debug libs not found.")
 
-subprocess.call(["git", "lfs", "pull"])
-subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
+# TODO: This should only be executed if user did a fresh clone
+# subprocess.call(["git", "lfs", "pull"])
+# subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
 
 print("Running premake...")
 

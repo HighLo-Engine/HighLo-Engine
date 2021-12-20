@@ -73,7 +73,7 @@ namespace highlo
 		HLAPI virtual bool GetFlag(MaterialFlag flag) const = 0;
 		HLAPI virtual void SetFlag(MaterialFlag flag, bool value = true) = 0;
 
-		HLAPI virtual Ref<Shader> GetShader() = 0;
+		HLAPI virtual Ref<Shader> GetShader() const = 0;
 		HLAPI virtual const HLString &GetName() const = 0;
 
 		HLAPI static Ref<Material> Create(const Ref<Shader> &shader, const HLString &name = "");

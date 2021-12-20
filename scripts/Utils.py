@@ -11,9 +11,12 @@ def DownloadFile(url, filepath):
         headers = {'User-Agent': ua.chrome}
         
         print('Waiting for response...')
-        response = requests.get(url, headers=headers, stream=True)
-        total = response.headers.get('content-length')
-        print('Downloading...')
+        try:
+            response = requests.get(url, headers=headers, stream=True)
+            total = response.headers.get('content-length')
+            print('Downloading...')
+        except:
+            pass
         
         if total is None:
             file.write(response.content)

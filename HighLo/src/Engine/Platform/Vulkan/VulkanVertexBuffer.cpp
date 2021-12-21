@@ -171,10 +171,6 @@ namespace highlo
 		m_Layout = layout;
 	}
 	
-	void VulkanVertexBuffer::UpdateContents(std::vector<Vertex> &vertices, uint32 offset)
-	{
-	}
-	
 	void VulkanVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
 	{
 	}

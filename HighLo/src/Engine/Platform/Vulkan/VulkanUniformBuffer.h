@@ -18,10 +18,15 @@ namespace highlo
 	{
 	public:
 
-		VulkanUniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot = 0);
+		VulkanUniformBuffer(uint32 size, uint32 binding);
 		virtual ~VulkanUniformBuffer();
 
-		virtual void UploadToShader(uint32 offset = 0) override;
+		virtual void SetData(const void *data, uint32 size, uint32 offset = 0) override;
+		virtual uint32 GetBinding() const override { return m_Binding; }
+
+	private:
+
+		uint32 m_Size = 0, m_Binding = 0;
 	};
 }
 

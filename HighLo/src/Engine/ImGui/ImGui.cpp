@@ -132,20 +132,19 @@ namespace highlo::UI
 		ImGuiIO &io = ImGui::GetIO();
 		io.IniFilename = "editorconfig.ini"; // rename imgui.ini to editorconfig to hide the usage from imgui
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard controls
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepage controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;     // Enable Multi-Viewport / Platform Windows
 		io.ConfigViewportsNoAutoMerge = true;
 		io.ConfigViewportsNoTaskBarIcon = true;
 
-		io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f);
-		//io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Bold.ttf", 18.0f);
-
-		// Add FontAwesome 5
 		ImFontConfig iconsConfig;
 		iconsConfig.MergeMode = true;
 		iconsConfig.PixelSnapH = true;
+
+		io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesDefault());
 		io.Fonts->AddFontFromFileTTF("assets/fonts/FontAwesome/fa-solid-900.ttf", 16.0f, &iconsConfig, s_FontAwesomeIconsRanges);
+		io.Fonts->Build();
 
 		// Internal method used to override ImGui's theme colors with our own
 		if (windowStyle == ImGuiWindowStyle::Dark)
@@ -169,11 +168,6 @@ namespace highlo::UI
 		{
 			style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, style.Colors[ImGuiCol_WindowBg].w);
 		}
-
-	#ifdef OLD
-		// TODO: Create DX11 ImGuiRenderer and paste this into Init(Window*)
-		ImGui_ImplDX11_Init(DX11Resources::s_Device.Get(), DX11Resources::s_DeviceContext.Get());
-	#endif // OLD
 
 		s_ImGuiRenderer->Init(window);
 		Widgets::Init();

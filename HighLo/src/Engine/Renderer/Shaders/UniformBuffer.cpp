@@ -5,6 +5,7 @@
 
 #include "Engine/Platform/OpenGL/OpenGLUniformBuffer.h"
 #include "Engine/Platform/DX11/DX11UniformBuffer.h"
+#include "Engine/Platform/Vulkan/VulkanUniformBuffer.h"
 
 namespace highlo
 {
@@ -18,8 +19,7 @@ namespace highlo
 		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<VulkanUniformBuffer>::Create(size, binding);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

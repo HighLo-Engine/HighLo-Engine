@@ -31,7 +31,6 @@ namespace highlo
 		virtual const BufferLayout &GetLayout() const override;
 		virtual void SetLayout(const BufferLayout &layout) override;
 
-		virtual void UpdateContents(std::vector<Vertex> &vertices, uint32 offset = 0) override;
 		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) override;
 
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }

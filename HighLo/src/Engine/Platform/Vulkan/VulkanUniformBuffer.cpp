@@ -7,16 +7,16 @@
 
 namespace highlo
 {
-	VulkanUniformBuffer::VulkanUniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot)
-		: UniformBuffer(name, layout, parent, slot)
+	VulkanUniformBuffer::VulkanUniformBuffer(uint32 size, uint32 binding)
+		: m_Size(size), m_Binding(binding)
 	{
 	}
 
 	VulkanUniformBuffer::~VulkanUniformBuffer()
 	{
 	}
-
-	void VulkanUniformBuffer::UploadToShader(uint32 offset)
+	
+	void VulkanUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
 	}
 }

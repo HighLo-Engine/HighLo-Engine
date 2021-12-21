@@ -254,6 +254,11 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
+	if (viewportSize.x < 0.0f)
+		viewportSize.x = (float)GetWindow().GetWidth();
+	if (viewportSize.y < 0.0f)
+		viewportSize.y = (float)GetWindow().GetHeight();
+
 	m_ViewportRenderer->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 	m_ViewportRenderer->SetClearColor(m_ClearColor);
 	m_EditorScene->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);

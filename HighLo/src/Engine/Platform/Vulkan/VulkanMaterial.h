@@ -62,14 +62,14 @@ namespace highlo
 		virtual bool GetFlag(MaterialFlag flag) const override;
 		virtual void SetFlag(MaterialFlag flag, bool value = true) override;
 
-		virtual Ref<Shader> GetShader() override { return m_Shader; }
+		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }
 
 	private:
 
 		Ref<Shader> m_Shader;
 		HLString m_Name;
-		uint32 m_MaterialFlags = 0;
+		uint32 m_Flags = 0;
 
 		Allocator m_LocalData;
 

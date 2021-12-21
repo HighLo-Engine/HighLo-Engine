@@ -14,78 +14,42 @@
 
 namespace highlo
 {
-	class DX11VertexShader
-	{
-	public:
-		DX11VertexShader(const HLString& src);
-		void CreateInputLayout(D3D11_INPUT_ELEMENT_DESC* layout_description, UINT element_count);
-
-		inline ID3D11VertexShader* GetShader() { return m_Shader.Get(); }
-		inline ID3D10Blob* GetBuffer() { return m_ShaderBuffer.Get(); }
-		inline ID3D11InputLayout* GetInputLayout() { return m_InputLayout.Get(); }
-
-	private:
-		ComPtr<ID3D11VertexShader>	m_Shader = nullptr;
-		ComPtr<ID3D10Blob>			m_ShaderBuffer = nullptr;
-		ComPtr<ID3D11InputLayout>	m_InputLayout = nullptr;
-	};
-
-	class DX11HullShader
-	{
-	public:
-		DX11HullShader(const HLString& src);
-
-		inline ID3D11HullShader* GetShader() { return m_Shader.Get(); }
-		inline ID3D10Blob* GetBuffer() { return m_ShaderBuffer.Get(); }
-
-	private:
-		ComPtr<ID3D11HullShader>	m_Shader = nullptr;
-		ComPtr<ID3D10Blob>			m_ShaderBuffer = nullptr;
-	};
-
-	class DX11DomainShader
-	{
-	public:
-		DX11DomainShader(const HLString& src);
-
-		inline ID3D11DomainShader* GetShader() { return m_Shader.Get(); }
-		inline ID3D10Blob* GetBuffer() { return m_ShaderBuffer.Get(); }
-
-	private:
-		ComPtr<ID3D11DomainShader>	m_Shader = nullptr;
-		ComPtr<ID3D10Blob>			m_ShaderBuffer = nullptr;
-	};
-
-	class DX11PixelShader
-	{
-	public:
-		DX11PixelShader(const HLString& src);
-
-		inline ID3D11PixelShader* GetShader() { return m_Shader.Get(); }
-		inline ID3D10Blob* GetBuffer() { return m_ShaderBuffer.Get(); }
-
-	private:
-		ComPtr<ID3D11PixelShader>	m_Shader = nullptr;
-		ComPtr<ID3D10Blob>			m_ShaderBuffer = nullptr;
-	};
-
 	class DX11Shader : public Shader
 	{
 	public:
-		DX11Shader(const ShaderSource& source, const BufferLayout& layout);
-		void CreateInputLayout(D3D11_INPUT_ELEMENT_DESC* layout_description, UINT element_count);
 
-		inline DX11VertexShader* GetVertexShader() { return m_VertexShader.get(); }
-		inline DX11PixelShader* GetPixelShader() { return m_PixelShader.get(); }
+		DX11Shader(const FileSystemPath &filePath, bool forceCompile = false);
+		DX11Shader(const HLString &source);
+		virtual ~DX11Shader();
+
+		virtual void Reload(bool forceCompile = false) override;
+		virtual uint64 GetHash() const override { return m_AssetPath.Hash(); }
 
 		virtual void Bind() const override;
-		virtual HLRendererID GetRendererID() override;
+		virtual void Unbind() override;
 
-	protected:
-		std::unique_ptr<DX11VertexShader>	m_VertexShader;
-		std::unique_ptr<DX11HullShader>		m_HullShader = nullptr;		// optional
-		std::unique_ptr<DX11DomainShader>	m_DomainShader = nullptr;	// optional
-		std::unique_ptr<DX11PixelShader>	m_PixelShader;
+		virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) override;
+		virtual const HLString &GetName() const override { return m_Name; }
+		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
+
+		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
+		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
+
+	private:
+
+		HLString m_Name;
+		HLRendererID m_RendererID = 0;
+		bool m_Loaded = false;
+		bool m_IsCompute = false;
+		FileSystemPath m_AssetPath;
+
+		inline static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
+		inline static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
+
+		std::unordered_map<uint32, HLString> m_ShaderSources;
+		std::unordered_map<HLString, ShaderBuffer> m_Buffers;
+		std::unordered_map<HLString, ShaderResourceDeclaration> m_Resources;
+		std::vector<ShaderReloadedCallback> m_ReloadedCallbacks;
 	};
 }
 

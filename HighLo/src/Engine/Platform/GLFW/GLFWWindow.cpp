@@ -232,7 +232,7 @@ namespace highlo
 		
 		glfwSetCursor(m_NativeHandle, m_NativeCursor);
 
-		m_Context = RenderingContext::Create((void*)m_NativeHandle);
+		m_Context = RenderingContext::Create((void*)m_NativeHandle, m_Properties);
 		m_Context->Init();
 
 		m_SwapChain = SwapChain::Create();

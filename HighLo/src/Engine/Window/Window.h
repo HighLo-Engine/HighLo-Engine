@@ -107,6 +107,7 @@ namespace highlo
 
 		HLAPI virtual Ref<RenderingContext> GetContext() = 0;
 		HLAPI virtual Ref<SwapChain> GetSwapChain() = 0;
+		HLAPI virtual const WindowData &GetProperties() const = 0;
 
 		HLAPI static Window &Get();
 		HLAPI static UniqueRef<Window> Create(const WindowData &properties = WindowData());

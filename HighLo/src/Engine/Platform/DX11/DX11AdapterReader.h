@@ -18,16 +18,21 @@ namespace highlo
 	class AdapterData
 	{
 	public:
-		AdapterData(IDXGIAdapter* adapter);
-		IDXGIAdapter* m_Adapter;
+		
+		AdapterData(IDXGIAdapter *adapter);
+
+		IDXGIAdapter *m_Adapter;
 		DXGI_ADAPTER_DESC m_Description;
 	};
 
 	class AdapterReader
 	{
 	public:
+		
 		static std::vector<AdapterData> GetAdapters();
+
 	private:
+		
 		static std::vector<AdapterData> m_Adapters;
 	};
 }

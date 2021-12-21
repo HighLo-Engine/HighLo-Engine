@@ -5,6 +5,7 @@
 
 #include "Engine/Platform/OpenGL/OpenGLImGuiRenderer.h"
 #include "Engine/Platform/Vulkan/VulkanImGuiRenderer.h"
+#include "Engine/Platform/DX11/DX11ImGuiRenderer.h"
 
 namespace highlo
 {
@@ -13,8 +14,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLImGuiRenderer>::Create();
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11ImGuiRenderer>::Create();
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

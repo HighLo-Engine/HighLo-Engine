@@ -18,7 +18,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture2D>::Create(filePath, format, flipOnLoad);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture2D>::Create(filePath, format, flipOnLoad);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
@@ -33,7 +33,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture2D>::Create(rgb, format);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture2D>::Create(rgb, format);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
@@ -48,7 +48,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture2D>::Create(rgb, width, height, format);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture2D>::Create(rgb, width, height, format);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
@@ -63,7 +63,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture2D>::Create(format, width, height);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture2D>::Create(format, width, height);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
@@ -78,7 +78,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture2D>::Create(format, width, height, data, props);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture2D>::Create(format, width, height, data, props);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
@@ -95,7 +95,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture3D>::Create(filepaths, flipOnLoad);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture3D>::Create(filepaths, flipOnLoad);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
@@ -110,7 +110,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture3D>::Create(format, width, height, data);
 	#elif HIGHLO_API_DX11
-		return nullptr;
+		return Ref<DX11Texture3D>::Create(format, width, height, data);
 	#elif HIGHLO_API_DX12
 		return nullptr;
 	#elif HIGHLO_API_VULKAN

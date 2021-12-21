@@ -9,17 +9,17 @@
 
 namespace highlo
 {
-	Ref<RenderingContext> RenderingContext::Create(void *handle)
+	Ref<RenderingContext> RenderingContext::Create(void *handle, WindowData &data)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLContext>::Create(handle);
+		return Ref<OpenGLContext>::Create(handle, data);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11Context>::Create(handle);
+		return Ref<DX11Context>::Create(handle, data);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanContext>::Create(handle);
+		return Ref<VulkanContext>::Create(handle, data);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

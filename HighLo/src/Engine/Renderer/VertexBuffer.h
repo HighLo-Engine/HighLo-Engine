@@ -22,20 +22,22 @@ namespace highlo
 	class VertexBuffer : public IsSharedReference
 	{
 	public:
-		virtual ~VertexBuffer() = default;
+		
+		HLAPI virtual ~VertexBuffer() = default;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
+		HLAPI virtual void Bind() const = 0;
+		HLAPI virtual void Unbind() const = 0;
 
-		virtual const BufferLayout &GetLayout() const = 0;
-		virtual void SetLayout(const BufferLayout &layout) = 0;
+		HLAPI virtual const BufferLayout &GetLayout() const = 0;
+		HLAPI virtual void SetLayout(const BufferLayout &layout) = 0;
 
-		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
+		HLAPI virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
 
-		virtual HLRendererID GetRendererID() = 0;
-		virtual VertexBufferUsage GetUsage() = 0;
+		HLAPI virtual HLRendererID GetRendererID() = 0;
+		HLAPI virtual VertexBufferUsage GetUsage() = 0;
 
-		static Ref<VertexBuffer> Create(void *data, uint32 size, VertexBufferUsage usage = VertexBufferUsage::Static);
-		static Ref<VertexBuffer> Create(uint32 size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
+		HLAPI static Ref<VertexBuffer> Create(void *data, uint32 size, VertexBufferUsage usage = VertexBufferUsage::Static);
+		HLAPI static Ref<VertexBuffer> Create(uint32 size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 	};
 }
+

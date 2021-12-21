@@ -5,6 +5,8 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLSwapChain.h"
+#elif HIGHLO_API_DX11
+#include "Engine/Platform/DX11/DX11SwapChain.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanSwapChain.h"
 #endif// HIGHLO_API_OPENGL
@@ -16,8 +18,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLSwapChain>::Create();
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11SwapChain>::Create();
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

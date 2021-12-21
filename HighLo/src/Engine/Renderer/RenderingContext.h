@@ -11,6 +11,8 @@
 
 namespace highlo
 {
+	struct WindowData;
+
 	class RenderingContext : public IsSharedReference
 	{
 	public:
@@ -24,7 +26,7 @@ namespace highlo
 
 		HLAPI virtual void *GetCurrentContext() = 0;
 
-		HLAPI static Ref<RenderingContext> Create(void *handle);
+		HLAPI static Ref<RenderingContext> Create(void *handle, WindowData &data);
 	};
 }
 

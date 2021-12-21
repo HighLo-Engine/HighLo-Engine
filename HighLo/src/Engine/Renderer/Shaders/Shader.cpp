@@ -21,8 +21,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLShader>::Create(filePath, forceCompile);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11Shader>::Create(filePath, forceCompile);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;
@@ -39,8 +38,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLShader>::Create(source);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11Shader>::Create(source);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

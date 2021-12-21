@@ -12,7 +12,7 @@
 
 namespace highlo
 {
-	OpenGLContext::OpenGLContext(void* handle)
+	OpenGLContext::OpenGLContext(void* handle, WindowData &data)
 	{
 		m_OpenGLWindowHandle = handle;
 	}

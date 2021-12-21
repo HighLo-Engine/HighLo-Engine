@@ -9,6 +9,7 @@
 
 #ifdef HIGHLO_API_GLFW
 
+#define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
 
 #include "Engine/Window/Window.h"
@@ -31,7 +32,7 @@ namespace highlo
 		virtual uint32 GetWidth() override { return m_Properties.Width; }
 		virtual uint32 GetHeight() override { return m_Properties.Height; }
 		virtual void *GetNativeHandle() override { return (void*)m_NativeHandle; }
-		virtual void *GetNativeContext() override { return (void*) m_Context->GetCurrentContext(); }
+		virtual void *GetNativeContext() override { return (void*)m_Context->GetCurrentContext(); }
 		virtual void *GetNativeCursor() override { return (void*)m_NativeCursor; }
 
 		virtual void SetWindowIcon(const HLString &path, bool flip = false) override;
@@ -61,6 +62,8 @@ namespace highlo
 		virtual bool HasMenuBar() override { return m_MenuBar != nullptr; }
 		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
+
+		virtual const WindowData &GetProperties() const override { return m_Properties; }
 
 		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
 		virtual Ref<SwapChain> GetSwapChain() override { return m_SwapChain; }

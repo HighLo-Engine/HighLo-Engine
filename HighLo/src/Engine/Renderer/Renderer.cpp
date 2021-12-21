@@ -7,19 +7,23 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLRenderingAPI.h"
-#endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11RenderingAPI.h"
-#endif // HIGHLO_API_DX11
+#elif HIGHLO_API_DX12
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanRenderingAPI.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {
 #ifdef HIGHLO_API_OPENGL
-	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new OpenGLRenderingAPI());
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<OpenGLRenderingAPI>::Create();
+#elif HIGHLO_API_DX11
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<DX11RenderingAPI>::Create();
+#elif HIGHLO_API_DX12
+#elif HIGHLO_API_VULKAN
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<VulkanRenderingAPI>::Create();
 #endif // HIGHLO_API_OPENGL
-#ifdef HIGHLO_API_DX11
-	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<RenderingAPI>(new DX11RenderingAPI());
-#endif // HIGHLO_API_DX11
 
 	struct RendererData
 	{
@@ -35,8 +39,9 @@ namespace highlo
 
 	static RendererData *s_MainRendererData = nullptr;
 	static RenderCommandQueue *s_CommandQueue = nullptr;
+	static RenderCommandQueue s_ResourceFreeQueue[3];
 
-	void Renderer::ClearScreenColor(const glm::vec4& color)
+	void Renderer::ClearScreenColor(const glm::vec4 &color)
 	{
 		s_RenderingAPI->ClearScreenColor(color);
 	}
@@ -93,44 +98,39 @@ namespace highlo
 
 		// Define Shader layouts
 		
-		Renderer::Submit([=]()
-		{
-			BufferLayout staticShaderLayout = BufferLayout::GetStaticShaderLayout();
-			BufferLayout animatedShaderLayout = BufferLayout::GetAnimatedShaderLayout();
+		// Load 3D Shaders
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
-			// Load 3D Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl", staticShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl", animatedShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl", staticShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl", animatedShaderLayout);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/SkyboxShader.glsl", BufferLayout::GetSkyboxLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl", BufferLayout::GetGridLayout());
+		// Load 2D Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DLine.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DCircle.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DText.glsl");
 
-			// Load 2D Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DQuad.glsl", BufferLayout::GetTextureLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DLine.glsl", BufferLayout::GetLineLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DCircle.glsl", BufferLayout::GetCircleLayout());
-			Renderer::GetShaderLibrary()->Load("assets/shaders/Renderer2DText.glsl", BufferLayout::GetTextLayout());
-
-			// Load Compute Shaders
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EquirectangularToCubeMap.glsl", BufferLayout::Empty);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentMipFilter.glsl", BufferLayout::Empty);
-			Renderer::GetShaderLibrary()->Load("assets/shaders/EnvironmentIrradiance.glsl", BufferLayout::Empty);
-		});
+		// Load Compute Shaders
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EquirectangularToCubeMap.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentMipFilter.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();
 
 		WaitAndRender();
 
-		CoreRenderer::Init();
+		// CoreRenderer should be removed later, it will be replaced with a scene rendering system
+	//	CoreRenderer::Init();
 		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
-		CoreRenderer::Shutdown();
+	//	CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();
 		UI::ShutdownImGui();
 
@@ -159,10 +159,10 @@ namespace highlo
 		HL_ASSERT(renderPass, "Renderpass can not be null!");
 		s_MainRendererData->ActiveRenderPass = renderPass;
 
-		renderPass->GetSpcification().Framebuffer->Bind();
+		renderPass->GetSpecification().Framebuffer->Bind();
 		if (clear)
 		{
-			const glm::vec4 &clearColor = renderPass->GetSpcification().Framebuffer->GetSpecification().ClearColor;
+			const glm::vec4 &clearColor = renderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
 			s_RenderingAPI->ClearScreenBuffers();
 			s_RenderingAPI->ClearScreenColor(clearColor);
 		}
@@ -171,14 +171,16 @@ namespace highlo
 	void Renderer::EndRenderPass()
 	{
 		HL_ASSERT(s_MainRendererData->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
-		s_MainRendererData->ActiveRenderPass->GetSpcification().Framebuffer->Unbind();
+		s_MainRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
 		s_MainRendererData->ActiveRenderPass = nullptr;
 	}
 
+	/*
 	void Renderer::DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color)
 	{
 		DrawAABB(model->BoundingBox, transform, color);
 	}
+	*/
 
 	void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
 	{
@@ -270,6 +272,17 @@ namespace highlo
 	Ref<RenderingContext> Renderer::GetContext()
 	{
 		return HLApplication::Get().GetWindow().GetContext();
+	}
+
+	uint32 Renderer::GetCurrentFrameIndex()
+	{
+		return HLApplication::Get().GetWindow().GetSwapChain()->GetCurrentBufferIndex();
+	}
+
+	RenderCommandQueue &Renderer::GetRenderResourceReleaseQueue(uint32 index)
+	{
+		HL_ASSERT(index < 3);
+		return s_ResourceFreeQueue[index];
 	}
 	
 	RenderCommandQueue &Renderer::GetRenderCommandQueue()

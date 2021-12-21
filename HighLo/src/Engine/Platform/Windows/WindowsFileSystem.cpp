@@ -145,7 +145,7 @@ namespace highlo
         FileSystemWatcher::Get()->DisableWatchUntilNextAction();
         HLString newFilePath;
 
-        if (path.HasParentPath())
+        if (path.IsParentPath())
             newFilePath = path.ParentPath().String() + "/" + newName.String();
         else
             newFilePath = newName.String();

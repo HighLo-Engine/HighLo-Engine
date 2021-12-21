@@ -33,12 +33,25 @@ namespace highlo
 		HLAPI Scene(const HLString &name = "Scene1", bool isEditorScene = false, bool constructScene = true);
 		HLAPI ~Scene();
 
+		// Initializes the scene.
 		HLAPI void Init();
 
-		HLAPI void OnUpdate(Timestep ts);
+		// Updates the entities and other properties of the scene.
+		HLAPI void UpdateScene(Timestep ts);
+
+		// Renders the static overlay that gets rendered on top of the scene (optional).
+		HLAPI void OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera &overlayCamera);
+
+		// Renders the scene at actual runtime of the game.
 		HLAPI void OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts);
+
+		// Renders the scene in the editor viewport.
 		HLAPI void OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera);
+
+		// Renders the scene in the physics simulation.
 		HLAPI void OnSimulate(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera);
+
+		// Handles engine and game events.
 		HLAPI void OnEvent(Event &e);
 
 		// Runtime

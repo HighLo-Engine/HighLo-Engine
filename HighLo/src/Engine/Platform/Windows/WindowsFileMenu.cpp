@@ -79,6 +79,15 @@ namespace highlo
 		item->SubmenuItems = other->GetMenuItems();
 		m_MenuItems.push_back(item);
 	}
+
+	Ref<MenuItem> WindowsFileMenu::GetMenuItemWithID(int32 id)
+	{
+		for (auto& item : m_MenuItems)
+			if (item->ID == id)
+				return item;
+
+		return nullptr;
+	}
 	
 	void WindowsFileMenu::AddSeparator()
 	{

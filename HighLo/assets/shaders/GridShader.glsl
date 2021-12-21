@@ -2,56 +2,38 @@
 #version 450 core
 
 layout(location = 0) in vec3 a_Position;
-layout(location = 1) in vec2 a_TexCoord;
+layout(location = 1) in vec4 a_Row1;
+layout(location = 2) in vec4 a_Row2;
+layout(location = 3) in vec4 a_Row3;
 
-layout(std140, binding = 3) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
 	mat4 u_ViewProjection;
-	mat4 u_ViewInverseViewProjection;
-	mat4 u_Projection;
-	mat4 u_ViewMatrix;
 };
-
-layout(location = 0) out vec2 v_TexCoord;
 
 void main()
 {
-	v_TexCoord = a_TexCoord;
-	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+	mat4 transform = mat4(
+		vec4(a_Row1.x, a_Row2.x, a_Row3.x, 0.0),
+		vec4(a_Row1.y, a_Row2.y, a_Row3.y, 0.0),
+		vec4(a_Row1.z, a_Row2.z, a_Row3.z, 0.0),
+		vec4(a_Row1.w, a_Row2.w, a_Row3.w, 1.0));
+
+	gl_Position = u_ViewProjection * transform * vec4(a_Position, 1.0);
 }
 
 #shader pixel
 #version 450 core
 
-layout(location = 0) out vec4 Color;
-layout(location = 1) out vec4 Padding0;
-layout(location = 2) out vec4 Padding1;
+layout(location = 0) out vec4 out_Color;
 
-layout(std140, binding = 5) uniform Settings
+layout(push_constant) uniform Material
 {
-	layout(offset = 64) float u_Scale;
-	float u_Size;
-};
-
-layout(location = 0) in vec2 v_TexCoord;
-
-float grid(vec2 st, float resolution)
-{
-	vec2 grid = fract(st);
-	return step(resolution, grid.x) * step(resolution, grid.y);
-}
+	layout(offset = 64) vec4 Color;
+} u_MaterialUniforms;
 
 void main()
 {
-	Padding0 = vec4(0.0);
-	Padding1 = vec4(0.0);
-
-	float x = grid(v_TexCoord * u_Scale, u_Size);
-	Color = vec4(vec3(0.2), 0.5) * (1.0 - x);
-
-	// TODO: measure if this downs our performance -> not every fragment can be assumed to exist with this, so there will be skipped pixels
-	// @see: https://stackoverflow.com/a/8509158/12873837
-	if (Color.a == 0.0)
-		discard;
+	out_Color = u_MaterialUniforms.Color;
 }
 

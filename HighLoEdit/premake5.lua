@@ -2,7 +2,7 @@ project "HighLoEdit"
     kind "ConsoleApp"
     language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 	entrypoint "mainCRTStartup"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -32,12 +32,11 @@ project "HighLoEdit"
 	
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libssl-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/assets/editorconfig.ini %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/editorconfig.ini*"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets"),
-		("{COPY} %{wks.location}HighLoEdit/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets")
+		
+		("{COPY} %{wks.location}HighLo/assets/editorconfig.ini %{cfg.targetdir}"),
+		("{COPY} %{wks.location}HighLo/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets")
 	}
 
     filter "system:windows"
@@ -65,16 +64,80 @@ project "HighLoEdit"
 			"HL_PLATFORM_MACOS"
 		}
 
-    filter "configurations:Debug"
+    filter "configurations:Debug-OpenGL"
         defines "HL_DEBUG"
         symbols "On"
 		
 		postbuildcommands
 		{
-			'{COPY} "../HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
-    filter "configurations:Release"
+	filter "configurations:Debug-Vulkan"
+        defines "HL_DEBUG"
+        symbols "On"
+		
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+	filter "configurations:Debug-DX11"
+        defines "HL_DEBUG"
+        symbols "On"
+		
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+	filter "configurations:Debug-DX12"
+        defines "HL_DEBUG"
+        symbols "On"
+		
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+    filter "configurations:Release-OpenGL"
         defines "HL_RELEASE"
         optimize "On"
 
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+		
+	filter "configurations:Release-Vulkan"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+
+	filter "configurations:Release-DX11"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+
+	filter "configurations:Release-DX12"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+
+	

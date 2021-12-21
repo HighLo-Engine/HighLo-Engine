@@ -13,6 +13,7 @@
 #include "Engine/Core/UniqueReference.h"
 #include "Engine/Core/DataTypes/String.h"
 #include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Renderer/SwapChain.h"
 #include "MenuBar.h"
 
 namespace highlo
@@ -105,6 +106,7 @@ namespace highlo
 		HLAPI virtual void *GetNativeCursor() = 0;
 
 		HLAPI virtual Ref<RenderingContext> GetContext() = 0;
+		HLAPI virtual Ref<SwapChain> GetSwapChain() = 0;
 
 		HLAPI static Window &Get();
 		HLAPI static UniqueRef<Window> Create(const WindowData &properties = WindowData());

@@ -22,6 +22,15 @@ namespace highlo
 		SetProjectionInternal(HLApplication::Get().GetWindow().GetWidth(), HLApplication::Get().GetWindow().GetHeight());
 	}
 
+	void Camera::SetOrthographic(float width, float height, float size, float nearClip, float farClip)
+	{
+		m_ProjectionType = ProjectionType::Orthographic;
+		m_OrthographicSize = size;
+		m_OrthographicNear = nearClip;
+		m_OrthographicFar = farClip;
+		SetProjectionInternal((uint32)width, (uint32)height);
+	}
+
 	void Camera::SetOrthographic(float size, float nearClip, float farClip)
 	{
 		m_ProjectionType = ProjectionType::Orthographic;

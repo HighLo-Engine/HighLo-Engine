@@ -10,7 +10,7 @@ namespace highlo
 	{
 	}
 	
-	MaterialTable::MaterialTable(Ref<MaterialTable> &other)
+	MaterialTable::MaterialTable(const Ref<MaterialTable> &other)
 		: m_MaterialCount(other->m_MaterialCount)
 	{
 		const auto &materials = other->GetMaterials();
@@ -20,7 +20,7 @@ namespace highlo
 		}
 	}
 	
-	void MaterialTable::SetMaterial(uint32 index, Ref<Material> &material)
+	void MaterialTable::SetMaterial(uint32 index, const Ref<Material> &material)
 	{
 		m_Materials[index] = material;
 		if (index >= m_MaterialCount)
@@ -45,4 +45,10 @@ namespace highlo
 	{
 		m_Materials.clear();
 	}
+
+	Ref<MaterialTable> MaterialTable::Create(uint32 materialCount)
+	{
+		return Ref<MaterialTable>::Create(materialCount);
+	}
 }
+

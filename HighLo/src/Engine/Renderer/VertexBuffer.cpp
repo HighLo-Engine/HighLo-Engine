@@ -15,21 +15,6 @@
 
 namespace highlo
 {
-	Ref<VertexBuffer> VertexBuffer::Create(std::vector<Vertex> &vertices, VertexBufferUsage usage)
-	{
-	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLVertexBuffer>::Create(vertices, usage);
-	#elif HIGHLO_API_DX11
-		return Ref<DX11VertexBuffer>::Create(vertices, usage);
-	#elif HIGHLO_API_DX12
-		return nullptr;
-	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanVertexBuffer>::Create(vertices, usage);
-	#else
-		return nullptr;
-	#endif // HIGHLO_API_OPENGL
-	}
-
 	Ref<VertexBuffer> VertexBuffer::Create(void *data, uint32 size, VertexBufferUsage usage)
 	{
 	#ifdef HIGHLO_API_OPENGL

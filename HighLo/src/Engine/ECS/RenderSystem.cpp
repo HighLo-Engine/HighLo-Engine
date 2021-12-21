@@ -10,6 +10,8 @@ namespace highlo
 {
 	void RenderSystem::OnUpdate(Timestep ts, ECS_Registry &registry)
 	{
+		// TODO: Needs refactor
+	#if 0
 		FrameEntitiesRendered = 0;
 		FrameMeshesRendered = 0;
 		FrameTrianglesRendered = 0;
@@ -48,5 +50,7 @@ namespace highlo
 
 			FrameEntitiesRendered++;
 		});
+	#endif
 	}
 }
+

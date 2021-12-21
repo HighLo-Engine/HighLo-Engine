@@ -46,13 +46,19 @@ namespace highlo
 		HL_ASSERT(glfwVulkanSupported(), "Vulkan must be supported by GLFW!");
 	#endif // HIGHLO_API_GLFW
 
+		std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
 		VkApplicationInfo appInfo = {};
+		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+		VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT };
+		VkValidationFeaturesEXT features = {};
+		VkInstanceCreateInfo instanceCreateInfo = {};
+		VkPhysicalDeviceFeatures enabledFeatures;
+
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		appInfo.pApplicationName = "HighLo";
 		appInfo.pEngineName = "HighLo";
 		appInfo.apiVersion = VK_API_VERSION_1_2;
 
-		std::vector<const char *> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
 		if (s_EnableDebugExtensions)
 		{
 			instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -60,24 +66,21 @@ namespace highlo
 			instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 		}
 
-		VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT };
-		VkValidationFeaturesEXT features = {};
 		features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
 		features.enabledValidationFeatureCount = 1;
 		features.pEnabledValidationFeatures = enables;
 
-		VkInstanceCreateInfo instanceCreateInfo = {};
 		instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		instanceCreateInfo.pNext = nullptr;// &features;
 		instanceCreateInfo.pApplicationInfo = &appInfo;
-		instanceCreateInfo.enabledExtensionCount = (uint32_t) instanceExtensions.size();
+		instanceCreateInfo.enabledExtensionCount = (uint32) instanceExtensions.size();
 		instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.data();
 
 		if (s_EnableDebugExtensions)
 		{
 			const char *validationLayerName = "VK_LAYER_KHRONOS_validation";
 			// Check if this layer is available at instance level
-			uint32_t instanceLayerCount;
+			uint32 instanceLayerCount;
 			vkEnumerateInstanceLayerProperties(&instanceLayerCount, nullptr);
 			std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerCount);
 			vkEnumerateInstanceLayerProperties(&instanceLayerCount, instanceLayerProperties.data());
@@ -122,7 +125,6 @@ namespace highlo
 
 		m_PhysicalDevice = VulkanPhysicalDevice::Select();
 
-		VkPhysicalDeviceFeatures enabledFeatures;
 		memset(&enabledFeatures, 0, sizeof(VkPhysicalDeviceFeatures));
 		enabledFeatures.samplerAnisotropy = true;
 		enabledFeatures.wideLines = true;
@@ -133,9 +135,8 @@ namespace highlo
 		VulkanAllocator::Init(m_Device);
 
 		// Pipeline Cache
-		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-		VK_CHECK_RESULT(vkCreatePipelineCache(m_Device->GetNativePhysicalDevice(), &pipelineCacheCreateInfo, nullptr, &m_PipelineCache));
+		VK_CHECK_RESULT(vkCreatePipelineCache(m_Device->GetNativeDevice(), &pipelineCacheCreateInfo, nullptr, &m_PipelineCache));
 	}
 	
 	void VulkanContext::SwapBuffers()

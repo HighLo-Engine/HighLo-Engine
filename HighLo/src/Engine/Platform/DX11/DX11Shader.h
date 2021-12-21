@@ -6,7 +6,7 @@
 //
 
 #pragma once
-#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Shaders/Shader.h"
 
 #ifdef HIGHLO_API_DX11
 

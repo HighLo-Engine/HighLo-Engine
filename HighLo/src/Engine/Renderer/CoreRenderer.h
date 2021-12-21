@@ -8,6 +8,8 @@
 
 #pragma once
 
+#if 0
+
 #include "Material.h"
 #include "Mesh.h"
 #include "Light.h"
@@ -72,3 +74,5 @@ namespace highlo
 		static Ref<Mesh>	 s_CapsuleMesh;
 	};
 }
+
+#endif

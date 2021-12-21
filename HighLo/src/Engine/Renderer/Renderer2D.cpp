@@ -6,12 +6,16 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-#include "Shader.h"
+#include "Shaders/Shader.h"
 #include "Renderer.h"
 #include "Framebuffer.h"
 #include "FontData.h"
 
 #include "Engine/Utils/StringUtils.h"
+#include "Engine/Renderer/Shaders/UniformBufferSet.h"
+#include "Engine/Renderer/Material.h"
+
+#include <glad/glad.h>
 
 namespace highlo
 {
@@ -55,6 +59,11 @@ namespace highlo
 		float TexIndex;
 	};
 
+	struct UniformBufferCamera
+	{
+		glm::mat4 ViewProjection;
+	};
+
 	struct Renderer2DData
 	{
 		static const uint32 MaxQuads = 20000;
@@ -70,6 +79,7 @@ namespace highlo
 
 		// Quads
 		Ref<Shader> TextureShader;
+		Ref<Material> TextureMaterial;
 		Ref<VertexArray> QuadVertexArray;
 		uint32 QuadIndexCount = 0;
 		QuadVertex *QuadVertexBufferBase = nullptr;
@@ -109,6 +119,7 @@ namespace highlo
 
 		bool DepthTest = true;
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
+		Ref<UniformBufferSet> UniformBufferSet;
 	};
 
 	static Renderer2DData *s_2DData;
@@ -127,12 +138,6 @@ namespace highlo
 		s_2DData->QuadVertexPositions[1] = { -0.5f,  0.5f, 0.0f, 1.0f };
 		s_2DData->QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_2DData->QuadVertexPositions[3] = {  0.5f, -0.5f, 0.0f, 1.0f };
-
-		static auto cameraBuffer = UniformBuffer::Create(
-			"Camera",
-			{ UniformVariable("u_ViewProjection", sizeof(glm::mat4)) },
-			UniformBufferParentShader::VERTEX_SHADER,
-			(uint32) HL_UB_SLOT::VS_CAMERA_BUFFER);
 
 		std::vector<int32> quadIndices;
 		uint32 offset = 0;
@@ -155,6 +160,9 @@ namespace highlo
 			lineIndices.push_back(i);
 		}
 
+		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
+
+		/*
 		// Textures/Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
 		s_2DData->TextureShader->AddBuffer("CameraBuffer", cameraBuffer);
@@ -186,8 +194,9 @@ namespace highlo
 		s_2DData->TextShader = Renderer::GetShaderLibrary()->Get("Renderer2DText");
 		s_2DData->TextShader->AddBuffer("CameraBuffer", cameraBuffer);
 		s_2DData->TextVertexArray = VertexArray::Create();
-		s_2DData->TextMaterial = Material::Create();
+		s_2DData->TextMaterial = Material::Create(s_2DData->TextShader);
 		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
+		*/
 
 		std::vector<int32> textIndices;
 		offset = 0;
@@ -208,8 +217,8 @@ namespace highlo
 		textVertexBuffer->SetLayout(BufferLayout::GetTextLayout());
 		Ref<IndexBuffer> textIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
 
-		s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
-		s_2DData->TextVertexArray->SetIndexBuffer(textIndexBuffer);
+	//	s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
+	//	s_2DData->TextVertexArray->SetIndexBuffer(textIndexBuffer);
 
 		/*
 		s_2DData->CircleVertexArray = VertexArray::Create();
@@ -218,6 +227,41 @@ namespace highlo
 		s_2DData->CircleVertexArray->AddVertexBuffer(circleVbo);
 		s_2DData->CircleVertexArray->SetIndexBuffer(IndexBuffer::Create());
 		*/
+
+		// Quads
+		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
+		s_2DData->TextureMaterial = Material::Create(s_2DData->TextureShader, "TextureMaterial");
+		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
+
+		s_2DData->QuadVertexArray = VertexArray::Create();
+		s_2DData->QuadVertexArray->Bind();
+	
+		auto vb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
+		vb->SetLayout(BufferLayout::GetTextureLayout());
+		s_2DData->QuadVertexArray->AddVertexBuffer(vb);
+	
+		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
+		s_2DData->QuadVertexArray->Unbind();
+
+		// Circles
+		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices];
+
+		s_2DData->CircleVertexArray = VertexArray::Create();
+		s_2DData->CircleVertexArray->Bind();
+
+		auto circlesVb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
+		circlesVb->SetLayout(BufferLayout::GetCircleLayout());
+		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
+
+		s_2DData->CircleVertexArray->Unbind();
+
+		// Lines
+
+
+		// Uniform Buffer
+		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
+		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
+		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -239,6 +283,15 @@ namespace highlo
 		s_2DData->DepthTest = depthTest;
 
 		s_2DData->TextureShader->Bind();
+
+		Renderer::Submit([uniformBufferSet = s_2DData->UniformBufferSet, proj]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			uniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
+		});
+
+		/*
+		s_2DData->TextureShader->Bind();
 		Ref<UniformBuffer> buffer = s_2DData->TextureShader->GetBuffer("CameraBuffer");
 		buffer->SetBufferValue(&s_2DData->CameraProjection);
 		buffer->UploadToShader();
@@ -257,6 +310,7 @@ namespace highlo
 		Ref<UniformBuffer> textBuffer = s_2DData->TextShader->GetBuffer("CameraBuffer");
 		textBuffer->SetBufferValue(&s_2DData->CameraProjection);
 		textBuffer->UploadToShader();
+		*/
 
 		StartBatch();
 	}
@@ -282,14 +336,20 @@ namespace highlo
 	#pragma warning(pop)
 		if (dataSize)
 		{
-			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
-			
+
 			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
 				s_2DData->TextureSlots[i]->Bind(i);
 
-			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->QuadVertexArray->GetIndexBuffer()->Bind();
+		//	for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
+		//	{
+		//		if (s_2DData->TextureSlots[i])
+		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->TextureSlots[i]);
+		//		else
+		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->WhiteTexture);
+		//	}
+
+			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
@@ -303,8 +363,6 @@ namespace highlo
 			s_2DData->LineShader->Bind();
 			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
 
-			s_2DData->LineVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->LineVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->LineVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, false);
 		}
@@ -318,8 +376,6 @@ namespace highlo
 			s_2DData->CircleShader->Bind();
 			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
 
-			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->CircleVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->CircleVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
@@ -336,8 +392,6 @@ namespace highlo
 			for (uint32 i = 0; i < s_2DData->FontTextureSlotIndex; ++i)
 				s_2DData->FontTextureSlots[i]->Bind(i);
 
-			s_2DData->TextVertexArray->GetVertexBuffers()[0]->Bind();
-			s_2DData->TextVertexArray->GetIndexBuffer()->Bind();
 			s_2DData->TextVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}

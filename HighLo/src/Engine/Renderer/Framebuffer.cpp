@@ -15,6 +15,8 @@
 
 namespace highlo
 {
+	FramebufferPool *FramebufferPool::s_Instance = new FramebufferPool();
+
 	Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification &spec)
 	{
 	#ifdef HIGHLO_API_OPENGL
@@ -31,8 +33,6 @@ namespace highlo
 		return nullptr;
 	#endif
 	}
-
-	FramebufferPool *FramebufferPool::s_Instance = new FramebufferPool;
 
 	FramebufferPool::FramebufferPool(uint32 maxFbs)
 		: m_MaxFramebufferCount(maxFbs) {}

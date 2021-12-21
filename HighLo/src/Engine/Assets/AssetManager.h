@@ -13,7 +13,7 @@
 #include "Asset.h"
 #include "Engine/Core/FileSystemPath.h"
 #include "Engine/Events/Events.h"
-#include "Engine/Loaders/AssetLoader.h"
+#include "Engine/Loaders/MeshLoader.h"
 
 namespace highlo
 {
@@ -74,6 +74,18 @@ namespace highlo
 
 		HLAPI AssetHandle ImportAsset(const FileSystemPath &path);
 		HLAPI bool ReloadAsset(AssetHandle handle);
+
+		template<typename T, typename... Args>
+		HLAPI AssetHandle CreateMemoryOnlyAsset(Args&& ...args)
+		{
+			static_assert(std::is_base_of<Asset, T>::value, "CreateMemoryOnlyAsset only works for types derived from Asset");
+
+			Ref<T> asset = Ref<T>::Create(std::forward<Args>(args)...);
+			asset->Handle = AssetHandle();
+
+			s_MemoryAssets[asset->Handle] = asset;
+			return asset->Handle;
+		}
 
 		template<typename T, typename... Args>
 		HLAPI Ref<T> CreateAsset(const HLString &fileName, const HLString &dirPath, Args&&... args)
@@ -180,6 +192,7 @@ namespace highlo
 	private:
 
 		static std::unordered_map<AssetHandle, Ref<Asset>> s_LoadedAssets;
+		static std::unordered_map<AssetHandle, Ref<Asset>> s_MemoryAssets;
 		inline static AssetRegistry s_AssetRegistry;
 
 	private:

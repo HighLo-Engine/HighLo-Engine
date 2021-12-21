@@ -6,7 +6,8 @@
 //
 
 #pragma once
-#include "Engine/Renderer/UniformBuffer.h"
+
+#include "Engine/Renderer/Shaders/UniformBuffer.h"
 
 #ifdef HIGHLO_API_DX11
 
@@ -27,3 +28,4 @@ namespace highlo
 }
 
 #endif
+

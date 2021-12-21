@@ -6,7 +6,8 @@
 //
 
 #pragma once
-#include "Engine/Renderer/UniformBuffer.h"
+
+#include "Engine/Renderer/Shaders/UniformBuffer.h"
 
 #ifdef HIGHLO_API_OPENGL
 
@@ -15,14 +16,19 @@ namespace highlo
 	class OpenGLUniformBuffer : public UniformBuffer
 	{
 	public:
-		OpenGLUniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot = 0);
-		~OpenGLUniformBuffer();
 
-		virtual void UploadToShader(uint32 offset = 0) override;
+		OpenGLUniformBuffer(uint32 size, uint32 binding);
+		virtual ~OpenGLUniformBuffer();
+
+		virtual void SetData(const void *data, uint32 size, uint32 offset = 0) override;
+		virtual uint32 GetBinding() const override { return m_Binding; }
 
 	private:
 
-		HLRendererID m_ID = 0;
+		HLRendererID m_RendererID = 0;
+		uint32 m_Size = 0;
+		uint32 m_Binding = 0;
+		uint8 *m_LocalStorage = nullptr;
 	};
 }
 

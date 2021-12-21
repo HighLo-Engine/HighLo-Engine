@@ -16,13 +16,13 @@ namespace highlo
 	public:
 
 		HLAPI MaterialTable(uint32 materialCount = 1);
-		HLAPI MaterialTable(Ref<MaterialTable> &other);
+		HLAPI MaterialTable(const Ref<MaterialTable> &other);
 		HLAPI ~MaterialTable() = default;
 
 		HLAPI bool HasMaterial(uint32 index) const { return m_Materials.find(index) != m_Materials.end(); }
 		
 		// TODO: Change Ref<Material> to be a Asset material when we have assets
-		HLAPI void SetMaterial(uint32 index, Ref<Material> &material);
+		HLAPI void SetMaterial(uint32 index, const Ref<Material> &material);
 		HLAPI void ClearMaterial(uint32 index);
 		HLAPI Ref<Material> GetMaterial(uint32 index) const;
 		HLAPI void Clear();
@@ -32,6 +32,8 @@ namespace highlo
 
 		HLAPI uint32 GetMaterialCount() const { return m_MaterialCount; }
 		HLAPI void SetMaterialCount(uint32 materialCount) { m_MaterialCount = materialCount; }
+
+		HLAPI static Ref<MaterialTable> Create(uint32 materialCount = 1);
 
 	private:
 

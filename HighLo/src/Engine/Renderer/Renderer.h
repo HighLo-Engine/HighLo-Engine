@@ -16,10 +16,9 @@
 #include "SceneRenderer.h"
 #include "Texture.h"
 #include "Environment.h"
-#include "ShaderLibrary.h"
+#include "Shaders/ShaderLibrary.h"
 #include "RendererCapabilities.h"
 #include "RenderPass.h"
-#include "Model.h"
 #include "Engine/Math/AABB.h"
 #include "RenderCommandQueue.h"
 #include "CommandBuffer.h"
@@ -32,6 +31,7 @@ namespace highlo
 	struct RendererConfig
 	{
 		bool ComputeEnvironmentMaps = true;
+		uint32 FramesInFlight = 3;
 	};
 
 	class Renderer
@@ -71,12 +71,30 @@ namespace highlo
 			new (storageBuffer) T(std::forward<T>(func));
 		}
 
+		template<typename T>
+		HLAPI static void SubmitWithoutResources(T &&func)
+		{
+			auto renderCmd = [](void *ptr)
+			{
+				auto pFunc = (T*)ptr;
+				(*pFunc)();
+				pFunc->~T();
+			};
+
+			Submit([renderCmd, func]()
+			{
+				const uint32 index = Renderer::GetCurrentFrameIndex();
+				auto storageBuffer = GetRenderResourceReleaseQueue(index).Allocate(renderCmd, sizeof(func));
+				new (storageBuffer) T(std::forward<T>((T&&)func));
+			});
+		}
+
 		HLAPI static void WaitAndRender();
 
 		HLAPI static void BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear = true);
 		HLAPI static void EndRenderPass();
 
-		HLAPI static void DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+	//	HLAPI static void DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 		HLAPI static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 
 		HLAPI static Ref<Texture3D> GetBlackCubeTexture();
@@ -92,13 +110,13 @@ namespace highlo
 
 		HLAPI static Ref<RenderingContext> GetContext();
 
-	private:
+		HLAPI static uint32 GetCurrentFrameIndex();
+		HLAPI static RenderCommandQueue &GetRenderResourceReleaseQueue(uint32 index);
+		HLAPI static RenderCommandQueue &GetRenderCommandQueue();
 
-		static RenderCommandQueue &GetRenderCommandQueue();
+	private:
 
 		static UniqueRef<RenderingAPI> s_RenderingAPI;
-
-	private:
 
 		friend class CoreRenderer;
 		friend class Renderer2D;

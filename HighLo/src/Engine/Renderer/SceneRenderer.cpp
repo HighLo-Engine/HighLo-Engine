@@ -2,6 +2,7 @@
 
 #include "HighLoPch.h"
 #include "SceneRenderer.h"
+#include "Renderer2D.h"
 
 #include "Engine/Renderer/Renderer.h"
 
@@ -35,24 +36,26 @@ namespace highlo
 		m_ViewportHeight = height;
 	}
 
-	void SceneRenderer::BeginScene(const EditorCamera &camera)
+	void SceneRenderer::SetClearColor(const glm::vec4 &color)
 	{
-		SceneRendererCamera renderCamera;
-		renderCamera.Camera = camera;
-		renderCamera.ViewMatrix = camera.GetViewMatrix();
-		renderCamera.Near = camera.GetPerspectiveNearPlane();
-		renderCamera.Far = camera.GetPerspectiveFarPlane();
-		renderCamera.Fov = camera.GetPerspectiveFOV();
-		BeginScene(renderCamera);
+		m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor = color;
 	}
 
-	void SceneRenderer::BeginScene(const SceneRendererCamera &camera)
+	void SceneRenderer::BeginScene(const Camera &camera)
 	{
+		Renderer::Submit([this]() {
+			m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
+
+			Renderer::ClearScreenColor(m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
+			Renderer::ClearScreenBuffers();
+		});
 	}
 
 	void SceneRenderer::EndScene()
 	{
-
+		Renderer::Submit([this]() {
+			m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
+		});
 	}
 
 	SceneRendererOptions &SceneRenderer::GetOptions()
@@ -67,41 +70,18 @@ namespace highlo
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
 	{
-		return m_CompositeRenderPass->GetSpcification().Framebuffer->GetImage();
+		return m_CompositeRenderPass->GetSpecification().Framebuffer->GetImage();
 	}
 	
 	void SceneRenderer::InitGrid()
 	{
-		m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
-		float gridScale = 16.025f;
-		float gridSize = 0.025f;
+	//	m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
+	//	m_GridMaterial = Material::Create(m_GridShader);
+	//	float gridScale = 16.025f;
+	//	float gridSize = 0.025f;
 
-		static Ref<UniformBuffer> gridDataBuffer = UniformBuffer::Create(
-			"GridSettings",
-			{
-				UniformVariable("u_Scale", sizeof(float)),
-				UniformVariable("u_Size", sizeof(float)),
-			},
-			UniformBufferParentShader::PIXEL_SHADER,
-			(uint32)HL_UB_SLOT::GRID_BUFFER);
-
-		static Ref<UniformBuffer> cameraGridBuffer = UniformBuffer::Create(
-			"Camera",
-			{
-				UniformVariable("u_ViewProjectionMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_ViewInverseViewProjectionMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_ProjectionMatrix", sizeof(glm::mat4)),
-				UniformVariable("u_ViewMatrix", sizeof(glm::mat4)),
-			},
-			UniformBufferParentShader::VERTEX_SHADER,
-			(uint32)HL_UB_SLOT::VS_CAMERA_BUFFER);
-
-		gridDataBuffer->SetVariableValue("u_Scale", &gridScale);
-		gridDataBuffer->SetVariableValue("u_Size", &gridSize);
-		gridDataBuffer->UploadToShader();
-
-		m_GridShader->AddBuffer("GridSettings", gridDataBuffer);
-		m_GridShader->AddBuffer("CameraBuffer", cameraGridBuffer);
+	//	m_GridMaterial->Set("u_Scale", gridScale);
+	//	m_GridMaterial->Set("u_Size", gridSize);
 	}
 
 	void SceneRenderer::InitSkybox()
@@ -115,7 +95,7 @@ namespace highlo
 		framebufferSpec.DebugName = "SceneComposite";
 		framebufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
-		
+
 		if (m_Specification.SwapChain)
 			framebufferSpec.Attachments = { TextureFormat::RGBA };
 		else

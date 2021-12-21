@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Engine/Core/Core.h"
-#include "VertexData.h"
 #include "BufferLayout.h"
 
 namespace highlo
@@ -31,13 +30,11 @@ namespace highlo
 		virtual const BufferLayout &GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout &layout) = 0;
 
-		virtual void UpdateContents(std::vector<Vertex> &vertices, uint32 offset = 0) = 0;
 		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
 
 		virtual HLRendererID GetRendererID() = 0;
 		virtual VertexBufferUsage GetUsage() = 0;
 
-		static Ref<VertexBuffer> Create(std::vector<Vertex> &vertices, VertexBufferUsage usage = VertexBufferUsage::Static);
 		static Ref<VertexBuffer> Create(void *data, uint32 size, VertexBufferUsage usage = VertexBufferUsage::Static);
 		static Ref<VertexBuffer> Create(uint32 size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 	};

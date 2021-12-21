@@ -36,8 +36,8 @@ namespace highlo
 	public:
 
 		// Disable copy and move constructors
-		Profiler(const Profiler&) = delete;
-		Profiler(const Profiler&&) = delete;
+		HL_NON_COPYABLE(Profiler);
+		HL_NON_MOVABLE(Profiler);
 
 		HLAPI void BeginSession(const HLString &name, const HLString &filePath = "results.json")
 		{
@@ -128,3 +128,4 @@ namespace highlo
 		ProfilerSession *m_CurrentSession;
 	};
 }
+

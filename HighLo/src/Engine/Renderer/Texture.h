@@ -36,7 +36,6 @@ namespace highlo
 
 		HLString Name = "";
 		TextureShaderLocation ShaderLocation = TextureShaderLocation::PIXEL_SHADER;
-		HLRendererID RendererID = 0;
 
 		HLAPI virtual ~Texture() {}
 		HLAPI virtual uint32 GetDimensions() const = 0;
@@ -70,6 +69,9 @@ namespace highlo
 
 		HLAPI inline bool operator==(const Texture &other) const { return RendererID == other.RendererID; }
 		HLAPI inline bool operator!=(const Texture &other) const { return !(*this == other); }
+
+	protected:
+		HLRendererID RendererID = 0;
 	};
 
 	class Texture2D : public Texture

@@ -3,6 +3,8 @@
 #include "HighLoEditor.h"
 #include "Core/MenuItems.h"
 
+#define EDITOR_LOG_PREFIX "HighloEdit>   "
+
 namespace editorutils
 {
 	static int32 ConvertToImGuizmoType(HighLoEditor::GizmoType type)
@@ -29,7 +31,7 @@ HighLoEditor::HighLoEditor(const ApplicationSettings &settings, const HLString &
 	FileSystemPath roamingPath = FileSystem::Get()->GetPersistentStoragePath();
 	m_RoamingPath = roamingPath / "HighLo";
 
-	HL_CORE_TRACE("Registering folder in roaming folder: {0}", **m_RoamingPath);
+	HL_CORE_INFO(EDITOR_LOG_PREFIX "[+] Registering folder in roaming folder: {0} [+]", **m_RoamingPath);
 	if (!FileSystem::Get()->FolderExists(m_RoamingPath))
 	{
 		FileSystem::Get()->CreateFolder(m_RoamingPath);
@@ -52,6 +54,7 @@ void HighLoEditor::OnInitialize()
 	uint32 height = GetWindow().GetHeight();
 
 	m_EditorCamera = EditorCamera(glm::perspectiveFov(glm::radians(45.0f), (float)width, (float)height, 0.1f, 1000.0f));
+	m_OverlayCamera.SetOrthographic((float)width, (float)height, 10.0f, -1.0f, 1.0f);
 
 	// Project
 	Ref<Project> project = Ref<Project>::Create();
@@ -136,8 +139,8 @@ void HighLoEditor::OnInitialize()
 	rendererMenu->AddSeparator();
 	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> windowMenu = FileMenu::Create("Window");
-	windowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu = FileMenu::Create("Window");
+	m_WindowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
@@ -147,19 +150,14 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar->AddMenu(editMenu);
 	m_MenuBar->AddMenu(gameObjectMenu);
 	m_MenuBar->AddMenu(rendererMenu);
-	m_MenuBar->AddMenu(windowMenu);
+	m_MenuBar->AddMenu(m_WindowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
 {
-	if (m_SceneState == SceneState::Edit)
-		OnScenePlay();
-
-	// TODO: For some reason this crashes right away
-	/*else if (m_SceneState != SceneState::Simulate)
-		OnSceneStop();*/
+	UpdateUIFlags();
 
 	switch (m_SceneState)
 	{
@@ -168,13 +166,15 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			m_EditorCamera.SetActive(m_AllowViewportCameraEvents);
 			m_EditorCamera.Update();
 			UI::SetMouseEnabled(true);
+			m_EditorScene->UpdateScene(ts);
 			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
+			m_EditorScene->OnUpdateOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
 			break;
 		}
 
 		case SceneState::Play:
 		{
-			m_RuntimeScene->OnUpdate(ts);
+			m_RuntimeScene->UpdateScene(ts);
 			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
 		}
@@ -191,13 +191,20 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		case SceneState::Simulate:
 		{
 			m_EditorCamera.Update();
-			m_SimulationScene->OnUpdate(ts);
+			m_SimulationScene->UpdateScene(ts);
 			m_SimulationScene->OnSimulate(m_ViewportRenderer, ts, m_EditorCamera);
 			break;
 		}
 	}
 
 	AssetEditorPanel::OnUpdate(ts);
+}
+
+void HighLoEditor::UpdateUIFlags()
+{
+	// Make sure the "Show Console" window always
+	// reflects the current opened state of the log tab.
+	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
 }
 
 void HighLoEditor::OnShutdown()
@@ -219,7 +226,10 @@ void HighLoEditor::OnEvent(Event &e)
 	if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 	{
 		if (m_ViewportPanelMouseOver)
+		{
 			m_EditorCamera.OnEvent(e);
+			m_OverlayCamera.OnEvent(e);
+		}
 
 		m_EditorScene->OnEvent(e);
 	}
@@ -245,6 +255,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	m_ViewportRenderer->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
+	m_ViewportRenderer->SetClearColor(m_ClearColor);
 	m_EditorScene->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 
 	if (m_RuntimeScene)
@@ -255,7 +266,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	// Render viewport image
 	UI::Image(m_ViewportRenderer->GetFinalRenderTexture(), viewportSize, { 0, 1 }, { 1, 0 });
-
 	UI::EndViewport();
 
 	m_AssetBrowserPanel->OnUIRender();
@@ -284,13 +294,13 @@ void HighLoEditor::SelectEntity(Entity entity)
 		return;
 
 	SelectedMesh selection;
-	if (entity.HasComponent<ModelComponent>())
+	if (entity.HasComponent<DynamicModelComponent>())
 	{
-		auto meshComp = entity.GetComponent<ModelComponent>();
-		/*if (meshComp.Model && meshComp.Model->Type == AssetType::Mesh)
+		auto meshComp = entity.GetComponent<DynamicModelComponent>();
+		if (meshComp->Model && meshComp->Model->GetAssetType() == AssetType::Mesh)
 		{
-			selection.Mesh = &meshComp.Mesh->GetSubmeshes()[0];
-		}*/
+			selection.MeshIndex = meshComp->Model->GetSubmeshIndices()[0];
+		}
 	}
 
 	selection.Entity = entity;
@@ -537,7 +547,15 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 
 		case MENU_ITEM_NEW_SCENE:
 		{
-			HL_INFO("Open New Scene dialog...");
+			HL_INFO("Create a new scene");
+			auto newScene = Scene::CreateEmpty();
+			m_AllScenes.push_back(newScene);
+
+			// Update the editor scene
+			m_EditorScene = newScene;
+
+			// Update the current scene
+			m_CurrentScene = m_EditorScene;
 			break;
 		}
 
@@ -610,7 +628,6 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 		case MENU_ITEM_WINDOW_EDITOR_CONSOLE:
 		{
 			m_ShowConsolePanel = !m_ShowConsolePanel;
-			item->IsSelected = !item->IsSelected;
 			break;
 		}
 	}

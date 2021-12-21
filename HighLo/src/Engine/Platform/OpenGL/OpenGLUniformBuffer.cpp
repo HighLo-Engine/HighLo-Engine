@@ -11,38 +11,28 @@
 
 namespace highlo
 {
-	OpenGLUniformBuffer::OpenGLUniformBuffer(const HLString &name, const std::vector<UniformVariable> &layout, UniformBufferParentShader parent, uint32 slot)
-		: UniformBuffer(name, layout, parent, slot)
+	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32 size, uint32 binding)
+		: m_Size(size), m_Binding(binding)
 	{
-		Ref<OpenGLUniformBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glBindBuffer(GL_UNIFORM_BUFFER, instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, nullptr, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_UNIFORM_BUFFER, instance->BindingSlot, instance->m_ID);
-			glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		});
+		m_LocalStorage = new uint8[size];
+
+		glCreateBuffers(1, &m_RendererID);
+		glNamedBufferData(m_RendererID, size, nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
 	}
 
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
 	{
-		GLuint rendererID = m_ID;
-		Renderer::Submit([rendererID]()
-		{
-			glDeleteBuffers(1, &rendererID);
-		});
+		delete[] m_LocalStorage;
+
+		glDeleteBuffers(1, &m_RendererID);
 	}
 
-	void OpenGLUniformBuffer::UploadToShader(uint32 offset)
+	void OpenGLUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
-		Ref<OpenGLUniformBuffer> instance = this;
-		Renderer::Submit([instance, offset]()
-		{
-			glBindBuffer(GL_UNIFORM_BUFFER, instance->m_ID);
-			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_Data);
-			glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		});
+		memcpy(m_LocalStorage, data, size);
+
+		glNamedBufferSubData(m_RendererID, offset, size, m_LocalStorage);
 	}
 }
 

@@ -2,7 +2,7 @@ project "PBRSceneDemo"
     kind "ConsoleApp"
     language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 	entrypoint "mainCRTStartup"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -46,11 +46,34 @@ project "PBRSceneDemo"
             "HL_PLATFORM_WINDOWS"
         }
 
-    filter "configurations:Debug"
+    filter "configurations:Debug-OpenGL"
         defines "HL_DEBUG"
         symbols "On"
 
-    filter "configurations:Release"
+    filter "configurations:Debug-Vulkan"
+        defines "HL_DEBUG"
+        symbols "On"
+
+    filter "configurations:Debug-DX11"
+        defines "HL_DEBUG"
+        symbols "On"
+
+    filter "configurations:Debug-DX12"
+        defines "HL_DEBUG"
+        symbols "On"
+
+    filter "configurations:Release-OpenGL"
         defines "HL_RELEASE"
         optimize "On"
 
+    filter "configurations:Release-Vulkan"
+        defines "HL_RELEASE"
+        optimize "On"
+
+    filter "configurations:Release-DX11"
+        defines "HL_RELEASE"
+        optimize "On"
+
+    filter "configurations:Release-DX12"
+        defines "HL_RELEASE"
+        optimize "On"

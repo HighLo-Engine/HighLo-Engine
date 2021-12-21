@@ -6,19 +6,7 @@
 #include "Engine/Application/Application.h"
 #include "ImGuizmo.h"
 
-#ifdef HIGHLO_API_OPENGL
-#include "Engine/ImGui/ImGui/backends/imgui_impl_opengl3.h"
-#include "Engine/Platform/OpenGL/OpenGLTexture.h"
-#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplOpenGL3_##fn
-#elif HIGHLO_API_DX11
-#include "Engine/ImGui/ImGui/backends/imgui_impl_dx11.h"
-#include "Engine/Platform/DX11/DX11Resources.h"
-#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplDX11_##fn
-#elif HIGHLO_API_VULKAN
-#include "Engine/ImGui/ImGui/backends/imgui_impl_vulkan.h"
-#include "Engine/Platform/Vulkan/VulkanTexture.h"
-#define IMGUI_RENDER_API_IMPL_FN_NAME(fn) ImGui_ImplVulkan_##fn
-#endif // HIGHLO_API_OPENGL
+#include "ImGuiRenderer.h"
 
 #ifdef HIGHLO_API_GLFW
 	#include <GLFW/glfw3.h>
@@ -130,6 +118,8 @@ namespace highlo::UI
 	static ImGuiContext *s_ImGuiContext = nullptr;
 	static const ImWchar s_FontAwesomeIconsRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
+	static Ref<ImGuiRenderer> s_ImGuiRenderer = ImGuiRenderer::Create();
+
 	void InitImGui(Window *window, ImGuiWindowStyle windowStyle)
 	{
 		IMGUI_CHECKVERSION();
@@ -180,36 +170,26 @@ namespace highlo::UI
 			style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, style.Colors[ImGuiCol_WindowBg].w);
 		}
 
-	#ifdef HIGHLO_API_GLFW
-		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->GetNativeHandle(), true);
-	#else
-		ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
-	#endif // HIGHLO_API_DX11
-
-	#ifdef HIGHLO_API_OPENGL
-		ImGui_ImplOpenGL3_Init("#version 410");
-	#endif // HIGHLO_API_OPENGL
-
-	#ifdef HIGHLO_API_DX11
+	#ifdef OLD
+		// TODO: Create DX11 ImGuiRenderer and paste this into Init(Window*)
 		ImGui_ImplDX11_Init(DX11Resources::s_Device.Get(), DX11Resources::s_DeviceContext.Get());
-	#endif // HIGHLO_API_DX11
+	#endif // OLD
 
+		s_ImGuiRenderer->Init(window);
 		Widgets::Init();
 	}
 
 	void ShutdownImGui()
 	{
 		Widgets::Shutdown();
-
-		IMGUI_RENDER_API_IMPL_FN_NAME(Shutdown)();
-		IMGUI_WINDOW_IMPL_FN_NAME(Shutdown)();
+		s_ImGuiRenderer->Shutdown();
 		ImGui::DestroyContext();
 	}
 
 	void BeginScene()
 	{
-		IMGUI_RENDER_API_IMPL_FN_NAME(NewFrame)();
-		IMGUI_WINDOW_IMPL_FN_NAME(NewFrame)();
+		s_ImGuiRenderer->NewFrame();
+
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();
 
@@ -222,12 +202,8 @@ namespace highlo::UI
 		ImGuiIO &io = ImGui::GetIO();
 		io.DisplaySize = ImVec2((float)HLApplication::Get().GetWindow().GetWidth(), (float)HLApplication::Get().GetWindow().GetHeight());
 
-		ImGui::Render();
-	#ifdef HIGHLO_API_VULKAN
-		IMGUI_RENDER_API_IMPL_FN_NAME(RenderDrawData)(ImGui::GetDrawData(), );
-	#else
-		IMGUI_RENDER_API_IMPL_FN_NAME(RenderDrawData)(ImGui::GetDrawData());
-	#endif // HIGHLO_API_VULKAN
+		s_ImGuiRenderer->Render();
+		s_ImGuiRenderer->RenderDrawData();
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
@@ -1731,9 +1707,7 @@ namespace highlo::UI
 
 	ImTextureID GetTextureID(const Ref<Texture2D> &texture)
 	{
-	#ifdef HIGHLO_API_OPENGL
 		return (ImTextureID)(size_t)texture->GetRendererID();
-	#endif // HIGHLO_API_OPENGL
 	}
 
 	void Image(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)

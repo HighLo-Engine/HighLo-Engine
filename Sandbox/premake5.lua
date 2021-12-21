@@ -2,7 +2,7 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 	entrypoint "mainCRTStartup"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -32,7 +32,6 @@ project "Sandbox"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assimp-vc142-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libssl-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/assets")
@@ -47,11 +46,80 @@ project "Sandbox"
             "HL_PLATFORM_WINDOWS"
         }
 
-    filter "configurations:Debug"
+    filter "configurations:Debug-OpenGL"
         defines "HL_DEBUG"
         symbols "On"
 
-    filter "configurations:Release"
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+    filter "configurations:Debug-Vulkan"
+        defines "HL_DEBUG"
+        symbols "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+    filter "configurations:Debug-DX11"
+        defines "HL_DEBUG"
+        symbols "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+    filter "configurations:Debug-DX12"
+        defines "HL_DEBUG"
+        symbols "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
+    filter "configurations:Release-OpenGL"
         defines "HL_RELEASE"
         optimize "On"
 
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+		
+    filter "configurations:Release-Vulkan"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+
+    filter "configurations:Release-DX11"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+
+    filter "configurations:Release-DX12"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+
+        

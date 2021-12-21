@@ -3,12 +3,14 @@
 #include "HighLoPch.h"
 #include "Skybox.h"
 
-#include "Engine/Renderer/MeshFactory.h"
+#include "Engine/Factories/MeshFactory.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/CoreRenderer.h"
 
 namespace highlo
 {
+	// TODO: Needs Refactor
+
 	static constexpr uint32 SKYBOX_SIZE = 2048;
 
 	Ref<Skybox> Skybox::Create()
@@ -18,9 +20,8 @@ namespace highlo
 	
 	Skybox::Skybox()
 	{
-		m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
+	//	m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
 		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
-		m_Shader->AddBuffer("VS_SceneBuffer", Shader::GetVSSceneUniformBuffer());
 	}
 
 	void Skybox::Render(ICamera &camera)
@@ -36,10 +37,5 @@ namespace highlo
 
 		m_SceneData.m_ProjectionMatrix = camera.GetProjection();
 		m_SceneData.m_ViewMatrix = camera.GetViewMatrix();
-
-		m_Shader->GetVSSceneUniformBuffer()->SetBufferValue(&m_SceneData);
-		m_Shader->GetVSSceneUniformBuffer()->UploadToShader();
-
-		CoreRenderer::DrawRawMeshData(m_Mesh);
 	}
 }

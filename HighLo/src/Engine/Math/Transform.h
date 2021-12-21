@@ -24,6 +24,7 @@ namespace highlo
 		static Transform OriginTransform;
 
 		HLAPI Transform() = default;
+		HLAPI Transform(const glm::mat4 &transform);
 
 		HLAPI Transform &Translate(const glm::vec3 &translation);
 		HLAPI Transform &Scale(const glm::vec3 &scale);

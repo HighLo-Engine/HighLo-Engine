@@ -36,10 +36,10 @@ namespace highlo
 					return GL_RGBA;
 				
 				case TextureFormat::Depth:
-					return GL_DEPTH24_STENCIL8;
+					return GL_DEPTH_STENCIL;
 
 				case TextureFormat::DEPTH32F:
-					return GL_DEPTH_COMPONENT32F;
+					return GL_DEPTH_STENCIL;
 
 				case TextureFormat::RED_INTEGER:
 					return GL_RED_INTEGER;

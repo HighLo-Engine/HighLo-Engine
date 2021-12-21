@@ -12,6 +12,7 @@
 #include "Engine/Scene/Scene.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Renderer/RenderPass.h"
+#include "Engine/Renderer/VertexArray.h"
 
 namespace highlo
 {
@@ -25,14 +26,6 @@ namespace highlo
 		bool SwapChain = false; // where should we render? screen or framebuffer?
 	};
 
-	struct SceneRendererCamera
-	{
-		Camera Camera;
-		glm::mat4 ViewMatrix;
-		float Near, Far;
-		float Fov;
-	};
-
 	class SceneRenderer : public IsSharedReference
 	{
 	public:
@@ -44,10 +37,10 @@ namespace highlo
 
 		HLAPI void SetScene(Ref<Scene> scene);
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
+		HLAPI void SetClearColor(const glm::vec4 &color);
 		HLAPI void SetLineWidth(float width) { m_LineWidth = width; }
 
-		HLAPI void BeginScene(const EditorCamera &camera);
-		HLAPI void BeginScene(const SceneRendererCamera &camera);
+		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
 		HLAPI SceneRendererOptions &GetOptions();
@@ -76,6 +69,7 @@ namespace highlo
 		// Grid
 		Ref<VertexArray> m_GridVertexArray;
 		Ref<Shader> m_GridShader;
+		Ref<Material> m_GridMaterial;
 		Ref<Material> m_WireframeMaterial;
 		Ref<Material> m_OutlineMaterial, m_OutlineAnimMaterial;
 		Ref<Material> m_ColliderMaterial;
@@ -83,7 +77,7 @@ namespace highlo
 		// Scene information
 		struct SceneInfo
 		{
-			SceneRendererCamera SceneCamera;
+			Camera SceneCamera;
 
 			Ref<Environment> SceneEnvironment;
 			float SkyboxLod = 0.0f;

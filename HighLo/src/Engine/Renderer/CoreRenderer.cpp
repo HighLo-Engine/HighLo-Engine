@@ -1,10 +1,13 @@
 // Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
 
+
 #include "HighLoPch.h"
 #include "CoreRenderer.h"
 
 #include "Renderer.h"
-#include "MeshFactory.h"
+#include "Engine/Factories/MeshFactory.h"
+
+#if 0
 
 namespace highlo
 {
@@ -216,3 +219,6 @@ namespace highlo
 		RenderVertexArray(mesh->GetVertexArray());
 	}
 }
+
+#endif
+

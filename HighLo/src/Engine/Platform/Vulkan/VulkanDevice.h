@@ -1,3 +1,10 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2021-11-24) initial release
+//
+
 #pragma once
 
 #include "Vulkan.h"
@@ -26,7 +33,7 @@ namespace highlo
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);
 
 		const Ref<VulkanPhysicalDevice> &GetPhysicalDevice() const { return m_PhysicalDevice; }
-		VkDevice GetNativePhysicalDevice() const { return m_LogicalDevice; }
+		VkDevice GetNativeDevice() const { return m_LogicalDevice; }
 
 	private:
 

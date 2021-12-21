@@ -384,6 +384,9 @@ TEST(TEST_CATEGORY, ReplaceAllStrings)
 
 	HLString result = str.Replace("hello", "HELLO", 3);
 
+	std::cout << *result << std::endl;
+	std::cout << *expected << std::endl;
+
 	EXPECT_EQ(StringEquals(expected, result), true);
 }
 

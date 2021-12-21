@@ -4,6 +4,7 @@
 #include "Scene.h"
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 
 #include "Engine/ECS/Prefab.h"
@@ -30,20 +31,35 @@ namespace highlo
 
 	void Scene::Init()
 	{
-		auto skyboxShader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
-		m_SkyboxMaterial = Material::Create();
-		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
+	//	m_SkyboxShader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
+	//	m_SkyboxMaterial = Material::Create(m_SkyboxShader);
+	//	m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
 	}
 	
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::UpdateScene(Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
 	}
-	
-	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
+
+	void Scene::OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera &overlayCamera)
 	{
 		HL_PROFILE_FUNCTION();
 
+		renderer->BeginScene(overlayCamera);
+
+		Renderer::Submit([&]() {
+			Renderer2D::BeginScene(overlayCamera.GetProjection());
+			Renderer2D::DrawQuad(Transform::FromPosition({-0.25f, 0, 0}), glm::vec4(0.941f, 0.502f, 0.502f, 1.0f));
+			Renderer2D::DrawQuad(Transform::FromPosition({0, -0.25f, -0.9f}), glm::vec4(0.641f, 0.502f, 0.902f, 1.0f));
+			Renderer2D::EndScene();
+		});
+
+		renderer->EndScene();
+	}
+
+	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
+	{
+		HL_PROFILE_FUNCTION();
 	}
 	
 	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)

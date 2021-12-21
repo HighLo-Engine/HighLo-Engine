@@ -25,6 +25,8 @@ class HighLoEditor : public HLApplication
 		virtual void OnUIRender(Timestep ts) override;
 		virtual void OnResize(uint32 width, uint32 height) override;
 
+		void UpdateUIFlags();
+
 		void SelectEntity(Entity entity);
 
 		void UpdateWindowTitle(const HLString &sceneName);
@@ -48,6 +50,7 @@ class HighLoEditor : public HLApplication
 		{
 			float Distance = 0.0f;
 			Mesh *Mesh = nullptr;
+			uint32 MeshIndex = 0;
 			Entity Entity;
 		};
 
@@ -83,6 +86,7 @@ class HighLoEditor : public HLApplication
 		void DeleteEntity(Entity entity);
 
 	private:
+		glm::vec4 m_ClearColor = { 0.4f, 0.5f, 0.4f, 1 };
 
 		HLString m_ProjectPath;
 		FileSystemPath m_RoamingPath;
@@ -91,6 +95,7 @@ class HighLoEditor : public HLApplication
 		HLString m_LastSceneFilePath;
 		GizmoType m_GizmoType = GizmoType::None;
 		EditorCamera m_EditorCamera;
+		Camera m_OverlayCamera;
 
 		float m_EnvironmentMapRotation = 0.0f;
 		float m_SnapValue = 0.5f;
@@ -126,11 +131,19 @@ class HighLoEditor : public HLApplication
 		glm::mat4 *m_CurrentlySelectedTransform = nullptr;
 		glm::vec2 m_ViewportBounds[2];
 
+		// Main displayable scenes
 		Ref<Scene> m_RuntimeScene, m_EditorScene, m_SimulationScene, m_CurrentScene;
+
+		// List of all scene references
+		std::vector<Ref<Scene>> m_AllScenes;
 
 		// Editor Panels
 		Ref<SceneRenderer> m_ViewportRenderer;
 		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
+
+		// File Menu Panels
+		Ref<FileMenu> m_WindowMenu = nullptr;
 	};
+

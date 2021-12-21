@@ -29,95 +29,52 @@ namespace highlo
 		}
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<Vertex> &vertices, VertexBufferUsage usage)
-		: m_Usage(usage)
-	{
-		m_Size = (uint32)(vertices.size() * sizeof(Vertex));
-		m_LocalData = Allocator::Copy(&vertices[0], m_Size);
-
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.m_Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
-		});
-	}
-
 	OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32 size, VertexBufferUsage usage)
-		: m_Usage(usage)
+		: m_Usage(usage), m_Size(size)
 	{
-		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.m_Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
-		});
+		glCreateBuffers(1, &m_ID);
+		Bind();
+
+		glNamedBufferData(m_ID, m_Size, m_LocalData.m_Data, utils::ConvertUsageToOpenGL(m_Usage));
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage)
-		: m_Usage(usage)
+		: m_Usage(usage), m_Size(size)
 	{
-		m_Size = size;
-
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
-		{
-			glCreateBuffers(1, &instance->m_ID);
-			glNamedBufferData(instance->m_ID, instance->m_Size, nullptr, utils::ConvertUsageToOpenGL(instance->m_Usage));
-		});
+		glCreateBuffers(1, &m_ID);
+		Bind();
+		
+		glNamedBufferData(m_ID, m_Size, nullptr, utils::ConvertUsageToOpenGL(m_Usage));
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
-		GLuint rendererID = m_ID;
-		Renderer::Submit([rendererID]()
-		{
-			glDeleteBuffers(1, &rendererID);
-		});
+		glDeleteBuffers(1, &m_ID);
 	}
 
 	void OpenGLVertexBuffer::Bind() const
 	{
-		Ref<const OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]()
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, instance->m_ID);
-		});
+		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 	}
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
-		Renderer::Submit([]()
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		});
-	}
-
-	void OpenGLVertexBuffer::UpdateContents(std::vector<Vertex> &vertices, uint32 offset)
-	{
-		m_Size = ((uint32)vertices.size()) * sizeof(Vertex);
-		m_LocalData = Allocator::Copy(&vertices[0], m_Size);
-
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance, offset]()
-		{
-			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.m_Data);
-		});
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	
 	void OpenGLVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
 	{
+		Bind();
+
+		// Free existing memory
+		m_LocalData.Release();
+
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance, offset]()
-		{
-			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.m_Data);
-		});
+		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.m_Data);
 	}
 }
 

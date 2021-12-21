@@ -10,6 +10,8 @@
 
 #include "HighLoPch.h"
 
+#include "Engine/Core/FileSystemPath.h"
+
 namespace highlo
 {
 	struct ApplicationSettings
@@ -63,6 +65,12 @@ namespace highlo
 		/// Determines the Main Thread ID of the main thread
 		/// </summary>
 		uint64 MainThreadID;
+
+		/// <summary>
+		/// Determines the path to the cache config.
+		/// The Cache config stores all hashes for later comparison
+		/// </summary>
+		FileSystemPath CacheRegistryPath = "assets/cache.registry";
 	};
 }
 

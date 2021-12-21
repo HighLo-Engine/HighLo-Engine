@@ -11,9 +11,12 @@ def DownloadFile(url, filepath):
         headers = {'User-Agent': ua.chrome}
         
         print('Waiting for response...')
-        response = requests.get(url, headers=headers, stream=True)
-        total = response.headers.get('content-length')
-        print('Downloading...')
+        try:
+            response = requests.get(url, headers=headers, stream=True)
+            total = response.headers.get('content-length')
+            print('Downloading...')
+        except:
+            pass
         
         if total is None:
             file.write(response.content)
@@ -32,7 +35,7 @@ def DownloadFile(url, filepath):
                 if (avgKBPerSecond > 1024):
                     avgMBPerSecond = avgKBPerSecond / 1024
                     avgSpeedString = '{:.2f} MB/s'.format(avgMBPerSecond)
-                sys.stdout.write('\r[{}{}] {:.2f}% ({})     '.format('█' * done, '.' * (50 - done), percentage, avgSpeedString))
+                sys.stdout.write('\r[{}{}] {:.2f}% ({})     '.format('#' * done, '.' * (50 - done), percentage, avgSpeedString))
                 sys.stdout.flush()
     sys.stdout.write('\n')
 

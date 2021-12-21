@@ -112,3 +112,4 @@ namespace highlo
 #define HL_PROFILE_FUNCTION()
 #endif
 }
+

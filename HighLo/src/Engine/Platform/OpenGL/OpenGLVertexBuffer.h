@@ -18,7 +18,6 @@ namespace highlo
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		OpenGLVertexBuffer(const std::vector<Vertex> &vertices, VertexBufferUsage usage);
 		OpenGLVertexBuffer(void *data, uint32 size, VertexBufferUsage usage);
 		OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage);
 		~OpenGLVertexBuffer();
@@ -29,7 +28,6 @@ namespace highlo
 		virtual const BufferLayout &GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout &layout) override { m_Layout = layout; }
 
-		virtual void UpdateContents(std::vector<Vertex> &vertices, uint32 offset = 0) override;
 		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) override;
 
 		inline virtual HLRendererID GetRendererID() override { return m_ID; }

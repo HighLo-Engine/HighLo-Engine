@@ -6,7 +6,7 @@ include "Dependencies.lua"
 
 workspace "HighLo"
     architecture "x64"
-    configurations { "Debug", "Release" }
+    configurations { "Debug-OpenGL", "Release-OpenGL", "Debug-Vulkan", "Release-Vulkan", "Debug-DX11", "Release-DX11", "Debug-DX12", "Release-DX12" }
     startproject "HighLoEdit"
 
 	solution_items

@@ -9,7 +9,7 @@ namespace highlo
 {
 	std::vector<AdapterData> AdapterReader::m_Adapters;
 
-	AdapterData::AdapterData(IDXGIAdapter* adapter)
+	AdapterData::AdapterData(IDXGIAdapter *adapter)
 	{
 		m_Adapter = adapter;
 		HRESULT result = adapter->GetDesc(&m_Description);
@@ -28,7 +28,7 @@ namespace highlo
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create DXGIFactory");
 
-		IDXGIAdapter* adapter;
+		IDXGIAdapter *adapter;
 		UINT index = 0;
 		while (SUCCEEDED(factory->EnumAdapters(index, &adapter)))
 		{
@@ -39,4 +39,6 @@ namespace highlo
 		return m_Adapters;
 	}
 }
+
 #endif // HIGHLO_API_DX11
+

@@ -4,6 +4,7 @@
 #include "StorageBuffer.h"
 
 #include "Engine/Platform/OpenGL/OpenGLStorageBuffer.h"
+#include "Engine/Platform/DX11/DX11StorageBuffer.h"
 
 namespace highlo
 {
@@ -12,8 +13,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLStorageBuffer>::Create(size, binding);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11StorageBuffer>::Create(size, binding);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

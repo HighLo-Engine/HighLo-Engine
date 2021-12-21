@@ -27,7 +27,7 @@ namespace highlo
 		return VK_FALSE;
 	}
 
-	VulkanContext::VulkanContext(void *handle)
+	VulkanContext::VulkanContext(void *handle, WindowData &data)
 	{
 		m_NativeHandle = handle;
 	}

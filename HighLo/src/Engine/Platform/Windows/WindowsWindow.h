@@ -69,6 +69,8 @@ namespace highlo
 		virtual const Ref<MenuBar> &GetMenuBar() const override { return m_MenuBar; }
 		bool IsFocused() override;
 
+		virtual const WindowData &GetProperties() const override { return m_Properties; }
+
 		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
 
 		// Specific to DX11Window

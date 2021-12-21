@@ -9,7 +9,15 @@
 
 namespace highlo
 {
-	void DX11RenderingAPI::ClearScreenColor(const glm::vec4& color)
+	void DX11RenderingAPI::Init()
+	{
+	}
+
+	void DX11RenderingAPI::Shutdown()
+	{
+	}
+
+	void DX11RenderingAPI::ClearScreenColor(const glm::vec4 &color)
 	{
 		float bgcolor[] = { color.r, color.g, color.b, color.a };
 		DX11Resources::s_DeviceContext->ClearRenderTargetView(DX11Resources::s_RenderTargetView.Get(), bgcolor);
@@ -23,22 +31,38 @@ namespace highlo
 		DX11Resources::s_DeviceContext->OMSetDepthStencilState(DX11Resources::s_DepthStencilState.Get(), 0);
 	}
 
-	void DX11RenderingAPI::DrawIndexed(Ref<VertexArray>& va)
+	void DX11RenderingAPI::DrawIndexed(Ref<VertexArray> &va, PrimitiveType type)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawInstanced(Ref<VertexArray>& va, uint32 count)
+	void DX11RenderingAPI::DrawIndexed(uint32 indexCount, PrimitiveType type, bool depthTest)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		DX11Resources::s_DeviceContext->DrawIndexedInstanced(va->GetIndexBuffer()->GetCount(), count, 0, 0, 0);
+		
+		//																	|	how many instances do we need here? @FlareFlax
+		DX11Resources::s_DeviceContext->DrawIndexedInstanced(indexCount, indexCount, 0, 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray>& va)
+	void DX11RenderingAPI::DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
+	}
+
+	void DX11RenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type)
+	{
+		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST);
+		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
+	}
+
+	void DX11RenderingAPI::BeginFrame()
+	{
+	}
+
+	void DX11RenderingAPI::EndFrame()
+	{
 	}
 
 	void DX11RenderingAPI::SetWireframe(bool wf)
@@ -72,8 +96,25 @@ namespace highlo
 		DX11Resources::s_DeviceContext->RSSetViewports(1, &viewport);
 	}
 
-	Ref<Environment> DX11RenderingAPI::CreateEnvironment(const HLString &path)
+	void DX11RenderingAPI::SetBlendMode(bool bEnabled)
 	{
+	}
+
+	void DX11RenderingAPI::SetMultiSample(bool bEnabled)
+	{
+	}
+
+	void DX11RenderingAPI::SetDepthTest(bool bEnabled)
+	{
+	}
+
+	void DX11RenderingAPI::SetLineThickness(float thickness)
+	{
+	}
+
+	Ref<Environment> DX11RenderingAPI::CreateEnvironment(const HLString &path, uint32 cubemapSize, uint32 irradianceMapSize)
+	{
+		// TODO
 		return Ref<Environment>();
 	}
 }

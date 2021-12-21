@@ -108,7 +108,7 @@ namespace highlo
 			UpdateWindow(hwnd);
 		}
 
-		m_Context = RenderingContext::Create(m_NativeHandle);
+		m_Context = RenderingContext::Create(m_NativeHandle, m_Properties);
 		m_Context->Init();
 	}
 

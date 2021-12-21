@@ -4,6 +4,7 @@
 #include "UniformBuffer.h"
 
 #include "Engine/Platform/OpenGL/OpenGLUniformBuffer.h"
+#include "Engine/Platform/DX11/DX11UniformBuffer.h"
 
 namespace highlo
 {
@@ -12,8 +13,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLUniformBuffer>::Create(size, binding);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11UniformBuffer>::Create(size, binding);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

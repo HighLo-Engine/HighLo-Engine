@@ -16,40 +16,99 @@ namespace highlo
 {
 	class DX11Texture2D : public Texture2D
 	{
-		friend class DX11FrameBuffer;
+	friend class DX11FrameBuffer;
 
 	public:
-		static DX11Texture2D* LoadFromFile(const HLString& filepath, TextureFormat format = TextureFormat::RGBA8, bool flip_on_load = true);
-		static DX11Texture2D* CreateFromColor(const glm::vec3& rgb, TextureFormat format = TextureFormat::RGBA8);
-		static DX11Texture2D* CreateFromColor(const glm::vec3& rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 
-		DX11Texture2D(void* img_data, uint32 width, uint32 height, TextureFormat format);
-		~DX11Texture2D();
+		DX11Texture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = false);
+		DX11Texture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
+		DX11Texture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
+		DX11Texture2D(TextureFormat format, uint32 width, uint32 height);
+		DX11Texture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
+		virtual ~DX11Texture2D();
 
-		virtual uint32 GetWidth() const override { return m_Width; };
-		virtual uint32 GetHeight() const override { return m_Height; };
-		virtual void* GetData() const override;
-
-		// Inherited via Texture
-		virtual void UpdateResourceData() override;
-		virtual void UpdateResourceData(void* data) override;
-		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
-		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
-		virtual uint32 GetMipLevelCount() override;
-		virtual HLRendererID GetRendererID() override;
+		virtual uint32 GetWidth() const override { return m_Specification.Width; }
+		virtual uint32 GetHeight() const override { return m_Specification.Height; }
+		virtual Allocator GetData() override;
 
 		virtual void Bind(uint32 slot) const override;
+		virtual void Unbind(uint32 slot) const override;
+
+		virtual void Release() override;
+		virtual void Invalidate() override;
+		virtual bool IsLoaded() const override { return m_Loaded; }
+
+		virtual void Lock() override;
+		virtual void Unlock() override;
+
+		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
+		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
+		virtual void UpdateResourceData(void *data) override;
+		virtual void UpdateResourceData() override;
+		virtual uint32 GetMipLevelCount() override;
+
+		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
+
+		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
+		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
+
+		// Texture2D specific
+
+		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
+
+		virtual void CreatePerLayerImageViews() override;
+		virtual void CreateSampler(TextureProperties properties) override;
 
 	private:
-		void* m_ImageData = nullptr;
-		uint32 m_Width = 0, m_Height = 0;
-		ComPtr<ID3D11ShaderResourceView> m_ShaderResource;
-		ComPtr<ID3D11Texture2D> m_TextureBuffer;
+
+		Allocator m_Buffer;
+		HLRendererID m_SamplerRendererID = 0;
+		TextureSpecification m_Specification;
+		bool m_Locked = false;
+		bool m_Loaded = false;
+	};
+
+	class DX11Texture3D : public Texture3D
+	{
+	public:
+
+		DX11Texture3D(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
+		DX11Texture3D(const std::vector<HLString> &filepaths, bool flipOnLoad = false);
+		virtual ~DX11Texture3D();
+
+		virtual uint32 GetWidth() const override { return m_Specification.Width; }
+		virtual uint32 GetHeight() const override { return m_Specification.Height; }
+		virtual Allocator GetData() override;
+
+		virtual void Bind(uint32 slot) const override;
+		virtual void Unbind(uint32 slot) const override;
+
+		virtual void Release() override;
+		virtual void Invalidate() override;
+		virtual bool IsLoaded() const override { return m_Loaded; }
+
+		virtual void Lock() override;
+		virtual void Unlock() override;
+
+		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
+		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
+		virtual void UpdateResourceData(void *data) override;
+		virtual void UpdateResourceData() override;
+		virtual uint32 GetMipLevelCount() override;
+
+		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
+
+		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
+		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
 
 	private:
-		// Special constructor that is used only by frame buffers;
-		DX11Texture2D(uint32 width, uint32 height, const ComPtr<ID3D11ShaderResourceView>& SRV, TextureFormat format);
+
+		Allocator m_Buffer;
+		TextureSpecification m_Specification;
+		bool m_Locked = false;
+		bool m_Loaded = false;
 	};
 }
 
 #endif
+

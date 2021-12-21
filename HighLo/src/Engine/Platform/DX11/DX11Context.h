@@ -20,7 +20,8 @@ namespace highlo
 	class DX11Context : public RenderingContext
 	{
 	public:
-		DX11Context(WindowData& window_properties, HWND hwnd);
+
+		DX11Context(void *handle, WindowData &data);
 		virtual ~DX11Context();
 
 		virtual void Init() override;
@@ -28,7 +29,10 @@ namespace highlo
 		virtual void MakeCurrent() override;
 		virtual void SetSwapInterval(bool bEnabled) override;
 
+		virtual void *GetCurrentContext() override { return (void*)m_hwnd; }
+
 	private:
+
 		void InitializeSwapChain();
 		void InitializeRenderTargetView();
 		void InitializeDepthStencilViewAndBuffer();
@@ -41,6 +45,7 @@ namespace highlo
 		void ReleaseAudioEngine();
 
 	private:
+
 		WindowData m_WindowProperties;
 		HWND m_hwnd;
 
@@ -51,7 +56,9 @@ namespace highlo
 		bool							m_VSyncEnabled = false;
 
 	private:
-		std::string m_InitSuccessString = "";
+
+		HLString m_InitSuccessString = "";
 	};
 }
 #endif // HIGHLO_API_DX11
+

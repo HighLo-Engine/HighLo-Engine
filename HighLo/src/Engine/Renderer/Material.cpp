@@ -5,6 +5,7 @@
 
 #include "Engine/Platform/OpenGL/OpenGLMaterial.h"
 #include "Engine/Platform/Vulkan/VulkanMaterial.h"
+#include "Engine/Platform/DX11/DX11Material.h"
 
 namespace highlo
 {
@@ -15,8 +16,7 @@ namespace highlo
 #elif HIGHLO_API_VULKAN
 		return Ref<VulkanMaterial>::Create(shader, name);
 #elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11Material>::Create(shader, name);
 #elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;
@@ -33,8 +33,7 @@ namespace highlo
 #elif HIGHLO_API_VULKAN
 		return Ref<VulkanMaterial>::Create(other, name);
 #elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11Material>::Create(other, name);
 #elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

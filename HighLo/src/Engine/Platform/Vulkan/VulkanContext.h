@@ -22,7 +22,7 @@ namespace highlo
 	{
 	public:
 
-		VulkanContext(void *handle);
+		VulkanContext(void *handle, WindowData &data);
 		virtual ~VulkanContext();
 
 		// Inherited by RenderingContext

@@ -18,12 +18,17 @@ namespace highlo
 	class DX11UniformBuffer : public UniformBuffer
 	{
 	public:
-		DX11UniformBuffer(const HLString& name, const std::vector<UniformVariable>& layout, UniformBufferParentShader parent, uint32 slot = 0);
 
-		virtual void UploadToShader() override;
+		DX11UniformBuffer(uint32 size, uint32 binding);
+		virtual ~DX11UniformBuffer();
+
+		virtual void SetData(const void *data, uint32 size, uint32 offset = 0) override;
+		virtual uint32 GetBinding() const override { return m_Binding; }
 
 	private:
+
 		ComPtr<ID3D11Buffer> m_Buffer;
+		uint32 m_Size = 0, m_Binding = 0;
 	};
 }
 

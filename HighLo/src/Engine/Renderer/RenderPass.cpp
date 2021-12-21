@@ -6,6 +6,7 @@
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLRenderPass.h"
 #elif HIGHLO_API_DX11
+#include "Engine/Platform/DX11/DX11RenderPass.h"
 #elif HIGHLO_API_DX12
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanRenderPass.h"
@@ -18,8 +19,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLRenderPass>::Create(spec);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11RenderPass>::Create(spec);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;

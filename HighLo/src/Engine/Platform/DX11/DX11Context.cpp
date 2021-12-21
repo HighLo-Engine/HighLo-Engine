@@ -6,11 +6,24 @@
 #ifdef HIGHLO_API_DX11
 
 #include "DX11AdapterReader.h"
+#include "Engine/Application/Application.h"
+
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 namespace highlo
 {
-	DX11Context::DX11Context(WindowData& window_properties, HWND hwnd) : m_WindowProperties(window_properties), m_hwnd(hwnd)
+	DX11Context::DX11Context(void *handle, WindowData &data)
 	{
+	#ifdef HIGHLO_API_GLFW
+		m_hwnd = glfwGetWin32Window((GLFWwindow*)handle);
+	#else
+		m_hwnd = (HWND)handle;
+	#endif
+
+		// HLApplication::Get().GetWindow().GetProperties() does not work here because 
+		m_WindowProperties = data;
 	}
 
 	DX11Context::~DX11Context()
@@ -31,12 +44,12 @@ namespace highlo
 		InitializeAudioEngine();
 
 		HL_CORE_INFO("Successfully Initialized DirectX");
-		HL_CORE_INFO(m_InitSuccessString);
+		HL_CORE_INFO(*m_InitSuccessString);
 	}
 
 	void DX11Context::SwapBuffers()
 	{
-		m_SwapChain->Present((int)m_VSyncEnabled, NULL);
+		m_SwapChain->Present((int32)m_VSyncEnabled, NULL);
 	}
 
 	void DX11Context::SetSwapInterval(bool bEnabled)
@@ -59,8 +72,8 @@ namespace highlo
 		ZeroMemory(&swapchaindesc, sizeof(swapchaindesc));
 
 		swapchaindesc.BufferCount = 1;
-		swapchaindesc.BufferDesc.Width = m_WindowProperties.m_Width;
-		swapchaindesc.BufferDesc.Height = m_WindowProperties.m_Height;
+		swapchaindesc.BufferDesc.Width = m_WindowProperties.Width;
+		swapchaindesc.BufferDesc.Height = m_WindowProperties.Height;
 		swapchaindesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapchaindesc.BufferDesc.RefreshRate.Numerator = 144;
 		swapchaindesc.BufferDesc.RefreshRate.Denominator = 1;
@@ -68,7 +81,7 @@ namespace highlo
 		swapchaindesc.OutputWindow = m_hwnd;
 		swapchaindesc.SampleDesc.Count = 1;
 		swapchaindesc.SampleDesc.Quality = 0;
-		swapchaindesc.Windowed = !m_WindowProperties.m_Fullscreen;
+		swapchaindesc.Windowed = !m_WindowProperties.Fullscreen;
 		swapchaindesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		swapchaindesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -76,18 +89,18 @@ namespace highlo
 		if (FAILED(result))
 			HL_CORE_ERROR("Failed to create ID3D11Device and IDXGISwapChain");
 
-		m_SwapChain->SetFullscreenState(m_WindowProperties.m_Fullscreen, NULL);
+		m_SwapChain->SetFullscreenState(m_WindowProperties.Fullscreen, NULL);
 
 		auto adapter_description = adapters[0].m_Description;
 		char adapter_description_str[128];
 		char DefChar = ' ';
 		WideCharToMultiByte(CP_ACP, 0, adapter_description.Description, -1, adapter_description_str, 128, &DefChar, NULL);
 
-		m_InitSuccessString = std::string("\n========= DirectX Info =========\n  "
-			"Renderer: " + std::string(adapter_description_str)) + "\n  "
-			"Shared    System Memory: " + std::to_string(adapter_description.SharedSystemMemory) + " bytes\n  "
-			"Dedicated System Memory: " + std::to_string(adapter_description.DedicatedVideoMemory) + " bytes\n  "
-			"Dedicated Video  Memory: " + std::to_string(adapter_description.DedicatedSystemMemory) + " bytes\n";
+		m_InitSuccessString = "\n========= DirectX Info =========\n";
+		m_InitSuccessString += "Renderer: " + HLString(adapter_description_str) + "\n";
+		m_InitSuccessString += "Shared    System Memory: " + std::to_string(adapter_description.SharedSystemMemory) + " bytes\n";
+		m_InitSuccessString += "Dedicated System Memory: " + std::to_string(adapter_description.DedicatedVideoMemory) + " bytes\n";
+		m_InitSuccessString += "Dedicated Video  Memory: " + std::to_string(adapter_description.DedicatedSystemMemory) + " bytes\n";
 	}
 
 	void DX11Context::InitializeRenderTargetView()
@@ -105,8 +118,8 @@ namespace highlo
 	void DX11Context::InitializeDepthStencilViewAndBuffer()
 	{
 		D3D11_TEXTURE2D_DESC depth_stencil_desc;
-		depth_stencil_desc.Width = m_WindowProperties.m_Width;
-		depth_stencil_desc.Height = m_WindowProperties.m_Height;
+		depth_stencil_desc.Width = m_WindowProperties.Width;
+		depth_stencil_desc.Height = m_WindowProperties.Height;
 		depth_stencil_desc.MipLevels = 1;
 		depth_stencil_desc.ArraySize = 1;
 		depth_stencil_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -150,8 +163,8 @@ namespace highlo
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
 
-		viewport.Width = (FLOAT)m_WindowProperties.m_Width;
-		viewport.Height = (FLOAT)m_WindowProperties.m_Height;
+		viewport.Width = (FLOAT)m_WindowProperties.Width;
+		viewport.Height = (FLOAT)m_WindowProperties.Height;
 
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
@@ -226,4 +239,5 @@ namespace highlo
 			DX11Resources::s_XAudio2MasteringVoice->DestroyVoice();
 	}
 }
+
 #endif // HIGHLO_API_DX11

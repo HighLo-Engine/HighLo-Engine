@@ -147,6 +147,9 @@ namespace highlo
 
 		// TODO
 		// Renderer::OnShaderReloaded(GetHash());
+
+		for (ShaderReloadedCallback callback : m_ReloadedCallbacks)
+			callback();
 	}
 
 	uint64 OpenGLShader::GetHash() const

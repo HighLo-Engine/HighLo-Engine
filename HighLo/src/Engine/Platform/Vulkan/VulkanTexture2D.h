@@ -68,10 +68,13 @@ namespace highlo
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
 
+		void GenerateMips();
+
 		VulkanTextureInfo &GetTextureInfo() { return m_Info; }
 		const VulkanTextureInfo &GetTextureInfo() const { return m_Info; }
 
-		const VkDescriptorImageInfo &GetDescriptor() { return m_DescriptorImageInfo; }
+		const VkDescriptorImageInfo &GetVulkanDescriptorInfo() { return m_DescriptorImageInfo; }
+		VkImageView GetMipImageView(uint32 mip);
 
 		void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices);
 		virtual VkImageView GetLayerImageView(uint32 layer)
@@ -81,6 +84,8 @@ namespace highlo
 		}
 
 	private:
+
+		void UpdateDescriptor();
 
 		Allocator m_Buffer;
 		HLRendererID m_SamplerRendererID = 0;
@@ -92,48 +97,6 @@ namespace highlo
 		VkDescriptorImageInfo m_DescriptorImageInfo = {};
 		std::vector<VkImageView> m_PerLayerImageViews;
 		std::map<uint32, VkImageView> m_MipImageViews;
-	};
-
-	class VulkanTexture3D : public Texture3D
-	{
-	public:
-
-		VulkanTexture3D(const FileSystemPath &filepath, bool flipOnLoad = false);
-		VulkanTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
-		virtual ~VulkanTexture3D();
-
-		virtual uint32 GetWidth() const override { return m_Specification.Width; }
-		virtual uint32 GetHeight() const override { return m_Specification.Height; }
-		virtual Allocator GetData() override;
-
-		void Bind(uint32 slot) const override;
-		void Unbind(uint32 slot) const override;
-
-		virtual void Release() override;
-		virtual void Invalidate() override;
-		virtual bool IsLoaded() const override { return m_Loaded; }
-
-		virtual void Lock() override;
-		virtual void Unlock() override;
-
-		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
-		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
-		virtual void UpdateResourceData(void *data) override;
-		virtual void UpdateResourceData() override;
-		virtual uint32 GetMipLevelCount() override;
-
-		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
-		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
-		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
-
-		// Specific to Texture3D
-
-	private:
-
-		Allocator m_Buffer;
-		TextureSpecification m_Specification;
-		bool m_Locked = false;
-		bool m_Loaded = false;
 	};
 }
 

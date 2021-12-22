@@ -8,7 +8,8 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Texture.h"
 #elif HIGHLO_API_VULKAN
-#include "Engine/Platform/Vulkan/VulkanTexture.h"
+#include "Engine/Platform/Vulkan/VulkanTexture2D.h"
+#include "Engine/Platform/Vulkan/VulkanTexture3D.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo

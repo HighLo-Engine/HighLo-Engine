@@ -478,7 +478,7 @@ namespace highlo
 			std::unordered_map<VkShaderStageFlagBits, std::vector<uint32_t>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile);
 			LoadAndCreateShaders(shaderData);
-			ReflectAllShaderStages(shaderData);
+		//	ReflectAllShaderStages(shaderData);
 			CreateDescriptors();
 		}
 		else
@@ -516,6 +516,8 @@ namespace highlo
 				else if (line.find("geometry") != std::string::npos)
 					type = VK_SHADER_STAGE_GEOMETRY_BIT;
 				else if (line.find("pixel") != std::string::npos)
+					type = VK_SHADER_STAGE_FRAGMENT_BIT;
+				else if (line.find("fragment") != std::string::npos)
 					type = VK_SHADER_STAGE_FRAGMENT_BIT;
 				else if (line.find("compute") != std::string::npos)
 					type = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -585,6 +587,9 @@ namespace highlo
 
 				// Compile shader
 				auto &shaderSource = m_ShaderSource.at(stage);
+				if (shaderSource.IsEmpty())
+					continue;
+
 				shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*shaderSource, utils::VulkanShaderStageToShaderCShaderKind(stage), **m_AssetPath, options);
 				if (result.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
@@ -613,7 +618,8 @@ namespace highlo
 
 		for (auto [stage, data] : shaderData)
 		{
-			HL_ASSERT(data.size());
+			if (!data.size())
+				continue;
 			
 			VkShaderModuleCreateInfo moduleCreateInto = {};
 			moduleCreateInto.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

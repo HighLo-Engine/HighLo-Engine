@@ -13,7 +13,7 @@ namespace highlo
 		HL_ASSERT(false, "Not supported in OpenGL!");
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanCommandBuffer>::Create(debugName, 1);
+		return Ref<VulkanCommandBuffer>::Create(debugName, true);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -26,7 +26,7 @@ namespace highlo
 		HL_ASSERT(false, "Not supported in OpenGL!");
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanCommandBuffer>::Create(debugName, count);
+		return Ref<VulkanCommandBuffer>::Create(count, debugName);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

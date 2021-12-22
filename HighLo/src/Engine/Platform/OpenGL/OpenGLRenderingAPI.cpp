@@ -194,7 +194,7 @@ namespace highlo
 		glLineWidth(thickness);
 	}
 
-	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const HLString &path, uint32 cubemapSize, uint32 irradianceMapSize)
+	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
 			return Renderer::GetEmptyEnvironment();
@@ -207,7 +207,7 @@ namespace highlo
 		Ref<Texture3D> envFiltered = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
 		Ref<Texture3D> irradianceMap = Texture3D::Create(TextureFormat::RGBA32F, irradianceMapSize, irradianceMapSize);
 
-		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(path, TextureFormat::RGBA32F);
+		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(filePath, TextureFormat::RGBA32F);
 		HL_ASSERT(envEquirect->GetFormat() == TextureFormat::RGBA32F, "Texture is not a HDR Texture!");
 
 		equirectangularConversionShader->Bind();

@@ -48,7 +48,7 @@ namespace highlo
 		HLAPI virtual void SetDepthTest(bool bEnabled) = 0;
 		HLAPI virtual void SetLineThickness(float thickness) = 0;
 
-		HLAPI virtual Ref<Environment> CreateEnvironment(const HLString &path, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) = 0;
+		HLAPI virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) = 0;
 	};
 }
 

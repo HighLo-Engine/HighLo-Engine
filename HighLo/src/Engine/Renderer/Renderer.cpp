@@ -264,9 +264,9 @@ namespace highlo
 	#endif // HIGHLO_API_OPENGL
 	}
 
-	Ref<Environment> Renderer::CreateEnvironment(const HLString &path)
+	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath)
 	{
-		return s_RenderingAPI->CreateEnvironment(path);
+		return s_RenderingAPI->CreateEnvironment(filePath);
 	}
 
 	Ref<RenderingContext> Renderer::GetContext()

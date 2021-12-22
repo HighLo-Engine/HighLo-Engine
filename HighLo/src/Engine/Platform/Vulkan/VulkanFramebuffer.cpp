@@ -8,7 +8,7 @@
 
 #include "VulkanSwapChain.h"
 #include "VulkanContext.h"
-#include "VulkanTexture.h"
+#include "VulkanTexture2D.h"
 
 #ifdef HIGHLO_API_VULKAN
 
@@ -47,14 +47,14 @@ namespace highlo
 				}
 				else if (utils::IsDepthFormat(attachmentSpec.Format))
 				{
-					Ref<Texture2D> tex = Texture2D::Create(attachmentSpec.Format, m_Width * m_Specification.Scale, m_Height * m_Specification.Scale);
+					Ref<Texture2D> tex = Texture2D::Create(attachmentSpec.Format, (uint32)(m_Width * m_Specification.Scale), (uint32)(m_Height * m_Specification.Scale));
 					tex->GetSpecification().Usage = TextureUsage::Attachment;
 					tex->GetSpecification().DebugName = fmt::format("{0}-DepthAttachment{1}", m_Specification.DebugName.IsEmpty() ? "Unnamed FB" : m_Specification.DebugName, attachmentIndex);
 					m_DepthTexture = tex;
 				}
 				else
 				{
-					Ref<Texture2D> tex = Texture2D::Create(attachmentSpec.Format, m_Width * m_Specification.Scale, m_Height * m_Specification.Height);
+					Ref<Texture2D> tex = Texture2D::Create(attachmentSpec.Format, (uint32)(m_Width * m_Specification.Scale), (uint32)(m_Height * m_Specification.Scale));
 					tex->GetSpecification().Usage = TextureUsage::Attachment;
 					tex->GetSpecification().DebugName = fmt::format("{0}-ColorAttachment{1}", m_Specification.DebugName.IsEmpty() ? "Unnamed FB" : m_Specification.DebugName, attachmentIndex);
 					m_AttachmentTextures.emplace_back(tex);
@@ -85,8 +85,8 @@ namespace highlo
 		if (!forceRecreate && (m_Width == width && m_Height == height))
 			return;
 
-		m_Width = width * m_Specification.Scale;
-		m_Height = height * m_Specification.Scale;
+		m_Width = (uint32)(width * m_Specification.Scale);
+		m_Height = (uint32)(height * m_Specification.Scale);
 		if (!m_Specification.SwapChainTarget)
 		{
 			Invalidate();

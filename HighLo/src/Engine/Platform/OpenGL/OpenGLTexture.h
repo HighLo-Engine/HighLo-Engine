@@ -73,7 +73,7 @@ namespace highlo
 	{
 	public:
 
-		OpenGLTexture3D(const std::vector<HLString> &filePaths, bool flipOnLoad = false);
+		OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad = false);
 		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
 		virtual ~OpenGLTexture3D();
 

@@ -13,7 +13,7 @@ namespace highlo
 {
 	VulkanIndexBuffer::VulkanIndexBuffer(std::vector<int32> &indices)
 	{
-		m_Size = indices.size() * sizeof(int32);
+		m_Size = (uint32)(indices.size() * sizeof(int32));
 		m_LocalData = Allocator::Copy(indices.data(), m_Size);
 
 		Invalidate();

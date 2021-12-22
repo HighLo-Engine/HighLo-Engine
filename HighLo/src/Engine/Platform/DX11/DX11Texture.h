@@ -72,8 +72,8 @@ namespace highlo
 	{
 	public:
 
+		DX11Texture3D(const FileSystemPath &filepath, bool flipOnLoad = false);
 		DX11Texture3D(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
-		DX11Texture3D(const std::vector<HLString> &filepaths, bool flipOnLoad = false);
 		virtual ~DX11Texture3D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }

@@ -37,6 +37,8 @@ namespace highlo
 
 	private:
 
+		void Invalidate();
+
 		HLRendererID m_RendererID = 0;
 		uint32 m_Size = 0;
 

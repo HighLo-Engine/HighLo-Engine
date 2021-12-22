@@ -465,7 +465,7 @@ namespace highlo
 	//												3D Texture
 	// ====================================================================================================================
 
-	OpenGLTexture3D::OpenGLTexture3D(const std::vector<HLString> &filePaths, bool flipOnLoad)
+	OpenGLTexture3D::OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad)
 	{
 		m_Specification.Format = TextureFormat::RGBA;
 
@@ -475,21 +475,18 @@ namespace highlo
 		stbi_set_flip_vertically_on_load(flipOnLoad);
 
 		int32 width, height, nrComponents;
-		for (uint64 i = 0; i < filePaths.size(); i++)
+		Byte *data = (Byte*)stbi_loadf(*filePath.String(), &width, &height, &nrComponents, 0);
+
+		if (data)
 		{
-			Byte* data = stbi_load(filePaths[i].C_Str(), &width, &height, &nrComponents, 0);
-			if (data)
-			{
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (uint32)i, 0, GL_RGB, (GLsizei)width, (GLsizei)height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-				m_Buffer = Allocator::Copy(data, width * height * 4 * 6);
-				m_Loaded = true;
-				stbi_image_free(data);
-			}
-			else
-			{
-				HL_CORE_ERROR("{0}[-] Failed to load one of the textures in texture3D: {1} [-]", TEXTURE3D_LOG_PREFIX, filePaths[i].C_Str());
-				stbi_image_free(data);
-			}
+			m_Buffer = Allocator::Copy(data, width * height * 4 * sizeof(float));
+			m_Loaded = true;
+			stbi_image_free(data);
+		}
+		else
+		{
+			HL_CORE_ERROR("{0}[-] Failed to load Texture3D: {1} [-]", TEXTURE3D_LOG_PREFIX, *filePath.String());
+			stbi_image_free(data);
 		}
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
@@ -497,8 +494,6 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-
-		HL_CORE_INFO("{0}[+] Loaded 6 textures starting with {1} [+]", TEXTURE3D_LOG_PREFIX, filePaths[0].C_Str());
 	}
 
 	OpenGLTexture3D::OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data)

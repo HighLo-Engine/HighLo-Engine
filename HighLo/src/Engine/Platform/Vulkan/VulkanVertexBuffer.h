@@ -28,10 +28,9 @@ namespace highlo
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual const BufferLayout &GetLayout() const override;
-		virtual void SetLayout(const BufferLayout &layout) override;
+		virtual const BufferLayout &GetLayout() const override { return m_Layout; }
+		virtual void SetLayout(const BufferLayout &layout) override { m_Layout = layout; }
 
-		virtual void UpdateContents(std::vector<Vertex> &vertices, uint32 offset = 0) override;
 		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) override;
 
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }
@@ -40,6 +39,8 @@ namespace highlo
 		VkBuffer GetVulkanBuffer() const { return m_VulkanBuffer; }
 
 	private:
+
+		void Invalidate();
 
 		uint32 m_Size = 0;
 		Allocator m_LocalData;

@@ -165,7 +165,7 @@ namespace highlo
 		return changeMe;
 	}
 	
-	Ref<Texture2D> &DX11Material::GetTexture2D(const HLString &name)
+	Ref<Texture2D> DX11Material::GetTexture2D(const HLString &name)
 	{
 		return Ref<Texture2D>();
 	}

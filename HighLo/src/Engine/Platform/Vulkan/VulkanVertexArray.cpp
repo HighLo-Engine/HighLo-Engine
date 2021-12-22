@@ -29,10 +29,12 @@ namespace highlo
 
 	void VulkanVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
 	{
+		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
 	void VulkanVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
 	{
+		m_IndexBuffer = indexBuffer;
 	}
 }
 

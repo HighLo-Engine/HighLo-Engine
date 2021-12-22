@@ -8,7 +8,8 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Texture.h"
 #elif HIGHLO_API_VULKAN
-
+#include "Engine/Platform/Vulkan/VulkanTexture2D.h"
+#include "Engine/Platform/Vulkan/VulkanTexture3D.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -20,10 +21,12 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(filePath, format, flipOnLoad);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture2D>::Create(filePath, format, flipOnLoad);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
@@ -35,10 +38,12 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(rgb, format);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture2D>::Create(rgb, format);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
@@ -50,10 +55,12 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(rgb, width, height, format);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture2D>::Create(rgb, width, height, format);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
@@ -65,10 +72,12 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(format, width, height);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture2D>::Create(format, width, height);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
@@ -80,27 +89,29 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(format, width, height, data, props);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture2D>::Create(format, width, height, data, props);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
 
-
-
-	Ref<Texture3D> Texture3D::LoadFromFiles(const std::vector<HLString> &filepaths, bool flipOnLoad)
+	Ref<Texture3D> Texture3D::LoadFromFiles(const FileSystemPath &filepath, bool flipOnLoad)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLTexture3D>::Create(filepaths, flipOnLoad);
+		return Ref<OpenGLTexture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11Texture3D>::Create(filepaths, flipOnLoad);
+		return Ref<DX11Texture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture3D>::Create(filepath, flipOnLoad);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
@@ -112,10 +123,12 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture3D>::Create(format, width, height, data);
 	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return nullptr;
+		return Ref<VulkanTexture3D>::Create(format, width, height, data);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}

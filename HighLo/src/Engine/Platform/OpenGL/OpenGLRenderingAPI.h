@@ -40,7 +40,7 @@ namespace highlo
 		virtual void SetDepthTest(bool bEnabled) override;
 		virtual void SetLineThickness(float thickness) override;
 
-		virtual Ref<Environment> CreateEnvironment(const HLString &path, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
+		virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
 	};
 }
 

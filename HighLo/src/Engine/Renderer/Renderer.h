@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Engine/Application/Application.h"
+#include "Engine/Core/FileSystemPath.h"
 #include "Engine/ImGui/ImGui.h"
 #include "RenderingAPI.h"
 #include "CoreRenderer.h"
@@ -32,6 +33,9 @@ namespace highlo
 	{
 		bool ComputeEnvironmentMaps = true;
 		uint32 FramesInFlight = 3;
+
+		uint32 EnvironmentMapResolution = 1024; // TODO: implement this into the CreateEnvironment functions for each rendering api
+		uint32 IrradianceMapComputeSamples = 512;
 	};
 
 	class Renderer
@@ -106,7 +110,7 @@ namespace highlo
 		HLAPI static Ref<Texture2D> &GetBRDFLutTexture();
 		HLAPI static HLString GetCurrentRenderingAPI();
 
-		HLAPI static Ref<Environment> CreateEnvironment(const HLString &path);
+		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
 
 		HLAPI static Ref<RenderingContext> GetContext();
 

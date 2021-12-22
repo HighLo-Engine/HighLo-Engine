@@ -208,32 +208,19 @@ namespace highlo
 		return Get<glm::mat4>(name);
 	}
 	
-	Ref<Texture2D> &OpenGLMaterial::GetTexture2D(const HLString &name)
+	Ref<Texture2D> OpenGLMaterial::GetTexture2D(const HLString &name)
 	{
-		auto decl = FindResourceDeclaration(name);
-		HL_ASSERT(decl);
-
-		uint32 slot = decl->GetRegister();
-		HL_ASSERT(slot < m_Texture2Ds.size());
-		return m_Texture2Ds[slot];
+		return GetResource<Texture2D>(name);
 	}
 	
 	Ref<Texture3D> OpenGLMaterial::GetTexture3D(const HLString &name)
 	{
-		return TryGetResource<Texture3D>(name);
+		return GetResource<Texture3D>(name);
 	}
 	
 	Ref<Texture2D> OpenGLMaterial::TryGetTexture2D(const HLString &name)
 	{
-		auto decl = FindResourceDeclaration(name);
-		if (!decl)
-			return nullptr;
-
-		uint32 slot = decl->GetRegister();
-		if (m_Texture2Ds.find(slot) == m_Texture2Ds.end())
-			return nullptr;
-
-		return m_Texture2Ds[slot];
+		return TryGetResource<Texture2D>(name);
 	}
 	
 	Ref<Texture3D> OpenGLMaterial::TryGetTexture3D(const HLString &name)

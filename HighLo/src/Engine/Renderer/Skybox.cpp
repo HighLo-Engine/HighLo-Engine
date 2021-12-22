@@ -15,7 +15,7 @@ namespace highlo
 
 	Ref<Skybox> Skybox::Create()
 	{
-		return Ref<Skybox>(new Skybox());
+		return Ref<Skybox>::Create();
 	}
 	
 	Skybox::Skybox()

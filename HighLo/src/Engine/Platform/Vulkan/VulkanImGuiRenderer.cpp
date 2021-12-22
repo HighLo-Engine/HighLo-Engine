@@ -99,6 +99,10 @@ namespace highlo
 	void VulkanImGuiRenderer::NewFrame()
 	{
 		ImGui_ImplVulkan_NewFrame();
+
+	#ifdef HIGHLO_API_GLFW
+		ImGui_ImplGlfw_NewFrame();
+	#endif // HIGHLO_API_GLFW
 	}
 
 	void VulkanImGuiRenderer::Render()

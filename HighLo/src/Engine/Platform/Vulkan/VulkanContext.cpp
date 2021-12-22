@@ -21,8 +21,11 @@ static bool s_EnableDebugExtensions = false;
 
 namespace highlo
 {
-	static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugReportCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char *pLayerPrefix, const char *pMessage, void *pUserData)
+	static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugReportCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64 object, uint64 location, int32 messageCode, const char *pLayerPrefix, const char *pMessage, void *pUserData)
 	{
+		if (HLApplication::Get().IsShuttingDown())
+			return VK_FALSE;
+
 		HL_CORE_WARN("VulkanDebugCallback:\n  Object Type: {0}\n  Message: {1}", objectType, pMessage);
 		return VK_FALSE;
 	}

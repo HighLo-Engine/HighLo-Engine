@@ -67,8 +67,6 @@ namespace highlo
 
     void VulkanTexture3D::Release()
     {
-        HL_CORE_TRACE("Destroying VulkanTexture3D");
-
         auto device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
         vkDestroyImageView(device, m_DescriptorImageInfo.imageView, nullptr);
         vkDestroySampler(device, m_DescriptorImageInfo.sampler, nullptr);

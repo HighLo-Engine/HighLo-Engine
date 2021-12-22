@@ -112,7 +112,7 @@ namespace highlo
 	{
 	}
 
-	Ref<Environment> DX11RenderingAPI::CreateEnvironment(const HLString &path, uint32 cubemapSize, uint32 irradianceMapSize)
+	Ref<Environment> DX11RenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
 		// TODO
 		return Ref<Environment>();

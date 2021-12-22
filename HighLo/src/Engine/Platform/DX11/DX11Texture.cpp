@@ -106,7 +106,7 @@ namespace highlo
 	{
 	}
 
-	DX11Texture3D::DX11Texture3D(const std::vector<HLString> &filepaths, bool flipOnLoad)
+	DX11Texture3D::DX11Texture3D(const FileSystemPath &filepath, bool flipOnLoad)
 	{
 	}
 

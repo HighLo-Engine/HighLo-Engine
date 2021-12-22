@@ -18,6 +18,9 @@
 
 namespace highlo
 {
+	// Forward declare
+	class Framebuffer;
+
 	enum class FramebufferBlendMode
 	{
 		None = 0,
@@ -56,12 +59,18 @@ namespace highlo
 		glm::vec4 ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		FramebufferAttachmentSpecification Attachments;
 		uint32 Samples = 1;
+		bool ClearOnLoad = true;
 
 		bool NoResize = false;
 		bool SwapChainTarget = false;
 
 		bool Blend = true;
 		FramebufferBlendMode BlendMode = FramebufferBlendMode::None;
+
+		Ref<Texture2D> ExistingImage;
+		std::vector<uint32_t> ExistingImageLayers;
+		std::map<uint32_t, Ref<Texture2D>> ExistingImages;
+		Ref<Framebuffer> ExistingFramebuffer;
 
 		HLString DebugName;
 	};

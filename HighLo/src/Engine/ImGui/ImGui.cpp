@@ -138,12 +138,15 @@ namespace highlo::UI
 		io.ConfigViewportsNoAutoMerge = true;
 		io.ConfigViewportsNoTaskBarIcon = true;
 
+		io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesDefault());
+
+		// Add FontAwesome 5 Font
 		ImFontConfig iconsConfig;
 		iconsConfig.MergeMode = true;
 		iconsConfig.PixelSnapH = true;
-
-		io.Fonts->AddFontFromFileTTF("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Regular.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesDefault());
 		io.Fonts->AddFontFromFileTTF("assets/fonts/FontAwesome/fa-solid-900.ttf", 16.0f, &iconsConfig, s_FontAwesomeIconsRanges);
+		
+		// Combine both fonts into one font
 		io.Fonts->Build();
 
 		// Internal method used to override ImGui's theme colors with our own

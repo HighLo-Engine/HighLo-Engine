@@ -87,7 +87,7 @@ namespace highlo
 		virtual ~VulkanShader();
 
 		virtual void Reload(bool forceCompile = false) override;
-		virtual uint64 GetHash() const override;
+		virtual uint64 GetHash() const override { return m_AssetPath.Hash(); }
 
 		virtual void Bind() const override;
 		virtual void Unbind() override;
@@ -97,7 +97,7 @@ namespace highlo
 		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
-		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override;
+		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
 
 		// Vulkan-specific
 		const std::vector<VkPipelineShaderStageCreateInfo> &GetPipelineShaderStageCreateInfos() const { return m_PipelineShaderStageCreateInfos; }
@@ -123,7 +123,9 @@ namespace highlo
 
 	private:
 
-		std::unordered_map<VkShaderStageFlagBits, std::string> PreProcess(const HLString &source);
+		void Load(const HLString &source, bool forceCompile);
+
+		std::unordered_map<VkShaderStageFlagBits, HLString> PreProcess(const HLString &source);
 		void CompileOrGetVulkanBinary(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outputBinary, bool forceCompile);
 		void LoadAndCreateShaders(const std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &shaderData);
 		void Reflect(VkShaderStageFlagBits shaderStage, const std::vector<uint32> &shaderData);

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Vulkan.h"
 #include "Engine/Renderer/Material.h"
 #include "Engine/Core/Allocator.h"
 
 #ifdef HIGHLO_API_VULKAN
+
+#include "Vulkan.h"
+#include "VulkanShader.h"
 
 namespace highlo
 {
@@ -58,7 +60,7 @@ namespace highlo
 		virtual Ref<Texture2D> TryGetTexture2D(const HLString &name) override;
 		virtual Ref<Texture3D> TryGetTexture3D(const HLString &name) override;
 
-		virtual uint32 GetFlags() const override;
+		virtual uint32 GetFlags() const override { return m_Flags; }
 		virtual bool GetFlag(MaterialFlag flag) const override;
 		virtual void SetFlag(MaterialFlag flag, bool value = true) override;
 
@@ -67,14 +69,53 @@ namespace highlo
 
 	private:
 
+		enum class PendingDescriptorType
+		{
+			None = 0,
+			Texture2D,
+			Texture3D,
+		};
+
+		struct PendingDescriptor : public IsSharedReference
+		{
+			PendingDescriptorType Type = PendingDescriptorType::None;
+			VkWriteDescriptorSet WriteDescriptorSet;
+			VkDescriptorImageInfo TextureInfo;
+			VkDescriptorImageInfo SubmittedTextureInfo{};
+			Ref<Texture> Texture;
+		};
+
+		struct PendingDescriptorArray : public IsSharedReference
+		{
+			PendingDescriptorType Type = PendingDescriptorType::None;
+			VkWriteDescriptorSet WriteDescriptorSet;
+			VkDescriptorImageInfo TextureInfo;
+			VkDescriptorImageInfo SubmittedTextureInfo{};
+			std::vector<Ref<Texture>> Textures;
+		};
+
+	private:
+
+		std::unordered_map<uint32, Ref<PendingDescriptor>> m_ResidentDescriptors;
+		std::unordered_map<uint32, Ref<PendingDescriptorArray>> m_ResidentDescriptorArrays;
+		std::vector<std::weak_ptr<PendingDescriptor>> m_PendingDescriptors;
+
 		Ref<Shader> m_Shader;
 		HLString m_Name;
 		uint32 m_Flags = 0;
 
-		Allocator m_LocalData;
-
+		Allocator m_UniformStorageBuffer;
 		std::vector<Ref<Texture>> m_Textures;
+		std::vector<std::vector<Ref<Texture>>> m_TextureArrays;
 
+		VulkanShader::ShaderMaterialDescriptorSet m_DescriptorSets[3];
+
+		std::unordered_map<uint32, uint64> m_ImageHashes;
+
+		std::vector<std::vector<VkWriteDescriptorSet>> m_WriteDescriptors;
+		std::vector<bool> m_DirtyDescriptorSets;
+
+		std::unordered_map<HLString, VkDescriptorImageInfo> m_ImageInfos;
 	};
 }
 

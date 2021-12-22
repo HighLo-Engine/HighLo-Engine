@@ -5,6 +5,7 @@
 
 #include "Engine/Platform/OpenGL/OpenGLStorageBuffer.h"
 #include "Engine/Platform/DX11/DX11StorageBuffer.h"
+#include "Engine/Platform/Vulkan/VulkanStorageBuffer.h"
 
 namespace highlo
 {
@@ -18,8 +19,7 @@ namespace highlo
 		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<VulkanStorageBuffer>::Create(size, binding);
 	#endif // HIGHLO_API_OPENGL
 	}
 }

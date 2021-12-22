@@ -26,6 +26,7 @@ namespace highlo
 		DEPTH32F,
 		DEPTH24STENCIL8,
 		RED_INTEGER,
+		RED32F,
 
 		// Default Depth buffer format
 		Depth = DEPTH24STENCIL8
@@ -35,7 +36,8 @@ namespace highlo
 	{
 		None = 0,
 		Texture,
-		Attachment
+		Attachment,
+		Storage
 	};
 
 	enum class TextureWrap
@@ -65,6 +67,9 @@ namespace highlo
 		TextureFilter SamplerFilter = TextureFilter::Linear;
 		bool GenerateMips = true;
 		bool SRGB = false;
+		bool Storage = false;
+
+		HLString DebugName = "";
 	};
 
 	struct TextureSpecification
@@ -72,9 +77,12 @@ namespace highlo
 		TextureFormat Format = TextureFormat::RGBA;
 		TextureUsage Usage = TextureUsage::Texture;
 		TextureProperties Properties = TextureProperties();
-		uint32 Width = 0;
-		uint32 Height = 0;
+		uint32 Width = 1;
+		uint32 Height = 1;
 		uint32 Mips = 1;
 		uint32 Layers = 1;
+		bool Deinterleaved = false;
+
+		HLString DebugName = "";
 	};
 }

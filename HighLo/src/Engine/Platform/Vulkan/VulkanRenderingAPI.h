@@ -40,6 +40,9 @@ namespace highlo
 		virtual void SetLineThickness(float thickness) override;
 
 		virtual Ref<Environment> CreateEnvironment(const HLString &path, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
+
+
+		static VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo);
 	};
 }
 

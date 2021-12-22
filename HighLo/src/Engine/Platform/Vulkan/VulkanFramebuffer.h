@@ -42,6 +42,8 @@ namespace highlo
 		virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
 		virtual const FramebufferSpecification &GetSpecification() const override { return m_Specification; }
 
+		void Invalidate();
+
 	private:
 
 		FramebufferSpecification m_Specification;
@@ -53,6 +55,8 @@ namespace highlo
 
 		VkRenderPass m_RenderPass = nullptr;
 		VkFramebuffer m_Framebuffer = nullptr;
+
+		std::vector<VkClearValue> m_ClearValues;
 
 		std::vector<std::function<void(Ref<Framebuffer>)>> m_ResizeCallbacks;
 	};

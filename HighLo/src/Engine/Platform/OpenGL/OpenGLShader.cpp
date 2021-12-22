@@ -144,6 +144,9 @@ namespace highlo
 		HL_CORE_TRACE("Reloading shader {0}...", **m_AssetPath);
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
+
+		// TODO
+		// Renderer::OnShaderReloaded(GetHash());
 	}
 
 	uint64 OpenGLShader::GetHash() const

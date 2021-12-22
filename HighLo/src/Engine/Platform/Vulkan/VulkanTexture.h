@@ -7,13 +7,24 @@
 
 #pragma once
 
+#include "Engine/Renderer/Texture.h"
+
 #ifdef HIGHLO_API_VULKAN
 
 #include "Vulkan.h"
-#include "Engine/Renderer/Texture.h"
+#include "VulkanAllocator.h"
+#include "VulkanUtils.h"
 
 namespace highlo
 {
+	struct VulkanTextureInfo
+	{
+		VkImage Image = nullptr;
+		VkImageView ImageView = nullptr;
+		VkSampler Sampler = nullptr;
+		VmaAllocation MemoryAlloc = nullptr;
+	};
+
 	class VulkanTexture2D : public Texture2D
 	{
 	public:
@@ -57,6 +68,18 @@ namespace highlo
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
 
+		VulkanTextureInfo &GetTextureInfo() { return m_Info; }
+		const VulkanTextureInfo &GetTextureInfo() const { return m_Info; }
+
+		const VkDescriptorImageInfo &GetDescriptor() { return m_DescriptorImageInfo; }
+
+		void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices);
+		virtual VkImageView GetLayerImageView(uint32 layer)
+		{
+			HL_ASSERT(layer < m_PerLayerImageViews.size());
+			return m_PerLayerImageViews[layer];
+		}
+
 	private:
 
 		Allocator m_Buffer;
@@ -64,13 +87,18 @@ namespace highlo
 		TextureSpecification m_Specification;
 		bool m_Locked = false;
 		bool m_Loaded = false;
+
+		VulkanTextureInfo m_Info;
+		VkDescriptorImageInfo m_DescriptorImageInfo = {};
+		std::vector<VkImageView> m_PerLayerImageViews;
+		std::map<uint32, VkImageView> m_MipImageViews;
 	};
 
 	class VulkanTexture3D : public Texture3D
 	{
 	public:
 
-		VulkanTexture3D(const std::vector<HLString> &filepaths, bool flipOnLoad = false);
+		VulkanTexture3D(const FileSystemPath &filepath, bool flipOnLoad = false);
 		VulkanTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
 		virtual ~VulkanTexture3D();
 

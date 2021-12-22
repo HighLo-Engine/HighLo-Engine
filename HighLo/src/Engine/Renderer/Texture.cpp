@@ -98,17 +98,17 @@ namespace highlo
 	#endif // HIGHLO_API_OPENGL
 	}
 
-	Ref<Texture3D> Texture3D::LoadFromFiles(const std::vector<HLString> &filepaths, bool flipOnLoad)
+	Ref<Texture3D> Texture3D::LoadFromFiles(const FileSystemPath &filepath, bool flipOnLoad)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLTexture3D>::Create(filepaths, flipOnLoad);
+		return Ref<OpenGLTexture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11Texture3D>::Create(filepaths, flipOnLoad);
+		return Ref<DX11Texture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanTexture3D>::Create(filepaths, flipOnLoad);
+		return Ref<VulkanTexture3D>::Create(filepath, flipOnLoad);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

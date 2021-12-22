@@ -36,6 +36,10 @@ namespace highlo
 
 				case TextureFormat::RGBA32F:
 					return 4 * 4;
+
+				case TextureFormat::RED32F:
+					return 4;
+
 			}
 
 			HL_ASSERT(false);
@@ -44,12 +48,24 @@ namespace highlo
 
 		inline uint32 CalculateMipCount(uint32 width, uint32 height)
 		{
-			return (int32)(std::floor(std::log2(glm::min(width, height))) + 1);
+			return (uint32)(std::floor(std::log2(glm::min(width, height))) + 1);
 		}
 
 		inline uint32 GetImageMemorySize(TextureFormat format, uint32 width, uint32 height)
 		{
 			return width * height * GetImageFormatBPP(format);
+		}
+
+		inline bool IsDepthFormat(TextureFormat format)
+		{
+			switch (format)
+			{
+				case TextureFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH32F:
+					return true;
+			}
+
+			return false;
 		}
 	}
 }

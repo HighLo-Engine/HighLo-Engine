@@ -11,9 +11,11 @@
 
 #include <vulkan/vulkan.h>
 
+#include "Engine/Renderer/TextureFormat.h"
+
 namespace highlo::utils
 {
-
+	VkFormat VulkanImageFormat(TextureFormat format);
 }
 
 #endif // HIGHLO_API_VULKAN

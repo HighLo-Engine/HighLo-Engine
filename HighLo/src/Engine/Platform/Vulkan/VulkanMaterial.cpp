@@ -187,11 +187,6 @@ namespace highlo
 		return changeMe;
 	}
 
-	uint32 VulkanMaterial::GetFlags() const
-	{
-		return m_Flags;
-	}
-
 	bool VulkanMaterial::GetFlag(MaterialFlag flag) const
 	{
 		return false;

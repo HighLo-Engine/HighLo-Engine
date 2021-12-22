@@ -59,7 +59,6 @@ namespace highlo
 		virtual uint32 GetWidth() const override { return m_Width; }
 		virtual uint32 GetHeight() const override { return m_Height; }
 		virtual uint32 GetCurrentBufferIndex() const override { return m_CurrentBufferIndex; }
-
 		
 		// Vulkan specific
 		VkRenderPass GetNativeRenderPass() { return m_RenderPass; }

@@ -14,8 +14,8 @@ namespace highlo
 		static const float defaultQueuePriority(0.0f);
 		auto vkInstance = VulkanContext::GetInstance();
 		std::vector<VkPhysicalDevice> physicalDevices;
-		VkPhysicalDevice selectedPhysicalDevice;
-		VkPhysicalDevice fallbackPhysicalDevice;
+		VkPhysicalDevice selectedPhysicalDevice = nullptr;
+		VkPhysicalDevice fallbackPhysicalDevice = nullptr;
 		uint32 gpuCount = 0;
 		uint32 queueFamilyCount = 0;
 		uint32 extCount = 0;

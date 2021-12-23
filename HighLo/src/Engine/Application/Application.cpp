@@ -36,23 +36,30 @@ namespace highlo
 		CreateCacheCos();
 
 		// Init Window
-		WindowData data;
-		data.Title = m_Settings.WindowTitle;
-		data.Width = m_Settings.WindowWidth;
-		data.Height = m_Settings.WindowHeight;
-		data.Fullscreen = m_Settings.Fullscreen;
-		data.Maximized = m_Settings.Maximized;
-		data.VSync = m_Settings.VSync;
+		if (!m_Settings.Headless)
+		{
+			WindowData data;
+			data.Title = m_Settings.WindowTitle;
+			data.Width = m_Settings.WindowWidth;
+			data.Height = m_Settings.WindowHeight;
+			data.Fullscreen = m_Settings.Fullscreen;
+			data.Maximized = m_Settings.Maximized;
+			data.VSync = m_Settings.VSync;
 
-		m_Window = Window::Create(data);
-		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+			m_Window = Window::Create(data);
+			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+		}
 
 		// Read the json registry with previous shader cache data
 		ShaderCache::Init();
 
 		// Init Renderer
-		Renderer::Init(m_Window.Get());
-		Renderer::WaitAndRender();
+		if (!m_Settings.Headless)
+		{
+			Renderer::Init(m_Window.Get());
+			Renderer::WaitAndRender();
+		}
+
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
 		// Init Fonts
@@ -83,23 +90,30 @@ namespace highlo
 		CreateCacheCos();
 
 		// Init Window
-		WindowData data;
-		data.Title = m_Settings.WindowTitle;
-		data.Width = m_Settings.WindowWidth;
-		data.Height = m_Settings.WindowHeight;
-		data.Fullscreen = m_Settings.Fullscreen;
-		data.Maximized = m_Settings.Maximized;
-		data.VSync = m_Settings.VSync;
+		if (!m_Settings.Headless)
+		{
+			WindowData data;
+			data.Title = m_Settings.WindowTitle;
+			data.Width = m_Settings.WindowWidth;
+			data.Height = m_Settings.WindowHeight;
+			data.Fullscreen = m_Settings.Fullscreen;
+			data.Maximized = m_Settings.Maximized;
+			data.VSync = m_Settings.VSync;
 
-		m_Window = Window::Create(data);
-		m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+			m_Window = Window::Create(data);
+			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+		}
 
 		// Read the json registry with previous shader cache data
 		ShaderCache::Init();
 
 		// Init Renderer
-		Renderer::Init(m_Window.Get());
-		Renderer::WaitAndRender();
+		if (!m_Settings.Headless)
+		{
+			Renderer::Init(m_Window.Get());
+			Renderer::WaitAndRender();
+		}
+
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
 		// Init Fonts
@@ -147,7 +161,7 @@ namespace highlo
 				break;
 		#endif
 
-			if (!m_Minimized)
+			if (!m_Minimized && !m_Settings.Headless)
 			{
 				// Update Entities and Client Application
 				m_ECS_SystemManager.Update();
@@ -167,18 +181,21 @@ namespace highlo
 			}
 
 			// Update UI (render this after everything else to render it on top of the actual rendering)
-			UI::BeginScene();
-			if (!m_Minimized)
+			if (!m_Minimized && !m_Settings.Headless)
 			{
+				UI::BeginScene();
+
 				OnUIRender(Time::GetTimestep());
 
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUIRender(Time::GetTimestep());
+
+				UI::EndScene();
 			}
-			UI::EndScene();
 			
 			// Swap Window Buffers (Double buffer)
-			m_Window->Update();
+			if (!m_Settings.Headless)
+				m_Window->Update();
 		}
 
 		OnShutdown();
@@ -223,6 +240,7 @@ namespace highlo
 
 		m_Minimized = false;
 		Renderer::SetViewport(0, 0, width, height);
+		m_Window->GetSwapChain()->OnResize(width, height);
 		
 		OnResize(width, height);
 

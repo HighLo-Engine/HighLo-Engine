@@ -20,6 +20,9 @@
 // Read comments in imgui_impl_vulkan.h.
 
 #pragma once
+
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 #include <vulkan/vulkan.h>
 
@@ -125,3 +128,6 @@ struct ImGui_ImplVulkanH_Window
         ClearEnable = true;
     }
 };
+
+#endif // HIGHLO_API_VULKAN
+

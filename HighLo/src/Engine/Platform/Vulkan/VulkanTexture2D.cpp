@@ -497,7 +497,6 @@ namespace highlo
         if (m_Buffer && m_Specification.Properties.GenerateMips && mipCount > 1)
             GenerateMips();
 
-        m_Buffer.Release();
     }
 
     void VulkanTexture2D::Lock()

@@ -239,7 +239,6 @@ namespace highlo
 		}
 
 		m_Minimized = false;
-		Renderer::SetViewport(0, 0, width, height);
 		m_Window->GetSwapChain()->OnResize(width, height);
 		
 		OnResize(width, height);

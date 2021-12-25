@@ -32,12 +32,16 @@ namespace highlo
 		ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
 	#endif // HIGHLO_API_GLFW
 
-		ImGui_ImplOpenGL3_Init("#version 410");
+		ImGui_ImplOpenGL3_Init("#version 450");
 	}
 
 	void OpenGLImGuiRenderer::Shutdown()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
+
+	#ifdef HIGHLO_API_GLFW
+		ImGui_ImplGlfw_Shutdown();
+	#endif // HIGHLO_API_GLFW
 	}
 
 	void OpenGLImGuiRenderer::NewFrame()

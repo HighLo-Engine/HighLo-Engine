@@ -31,6 +31,9 @@ namespace highlo
 		virtual std::vector<Ref<VertexBuffer>> &GetVertexBuffers() override;
 		virtual Ref<IndexBuffer> &GetIndexBuffer() override;
 
+		virtual VertexArraySpecification &GetSpecification() override { return m_Specification; }
+		virtual const VertexArraySpecification &GetSpecification() const override { return m_Specification; }
+
 	private:
 
 		HLRendererID m_ID;

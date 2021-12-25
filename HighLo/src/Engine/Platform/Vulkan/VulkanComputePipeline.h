@@ -19,6 +19,8 @@ namespace highlo
 		virtual void Begin(Ref<CommandBuffer> renderCommandBuffer = nullptr) override;
 		virtual void End() override;
 
+		virtual void Invalidate() override;
+
 		virtual Ref<Shader> GetShader() override { return m_Shader; }
 
 		// Vulkan specific
@@ -29,7 +31,6 @@ namespace highlo
 		VkCommandBuffer GetActiveCommandBuffer() { return m_ActiveComputeCommandBuffer; }
 
 		void SetPushConstants(const void *data, uint32 size);
-		void CreatePipeline();
 
 	private:
 

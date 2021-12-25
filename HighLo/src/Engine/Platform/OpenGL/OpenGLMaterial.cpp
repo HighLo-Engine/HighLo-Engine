@@ -19,10 +19,11 @@ namespace highlo
 	}
 	
 	OpenGLMaterial::OpenGLMaterial(const Ref<Material> &other, const HLString &name)
+		: m_Name(name), m_Shader(other->GetShader())
 	{
-		m_Name = name;
-		m_Shader = other->GetShader();
 		m_Shader->AddShaderReloadedCallback(std::bind(&OpenGLMaterial::OnShaderReloaded, this));
+		if (name.IsEmpty())
+			m_Name = other->GetShader()->GetName();
 
 		m_Flags |= (uint32)MaterialFlag::DepthTest;
 		m_Flags |= (uint32)MaterialFlag::Blend;
@@ -123,7 +124,7 @@ namespace highlo
 			return;
 		}
 
-		HL_ASSERT(arrayIndex < m_Texture2Ds.size());
+	//	HL_ASSERT(arrayIndex < m_Texture2Ds.size());
 		m_Texture2Ds[arrayIndex] = texture;
 	}
 

@@ -4,16 +4,22 @@
 #include "CommandBuffer.h"
 
 #include "Engine/Platform/Vulkan/VulkanCommandBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLCommandBuffer.h"
 
 namespace highlo
 {
 	Ref<CommandBuffer> CommandBuffer::CreateFromSwapChain(const HLString &debugName)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		HL_ASSERT(false, "Not supported in OpenGL!");
-		return nullptr;
+		return Ref<OpenGLCommandBuffer>::Create(debugName, true);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanCommandBuffer>::Create(debugName, true);
+	#elif HIGHLO_API_DX11
+		HL_ASSERT(false, "Not supported in DX11");
+		return nullptr;
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false, "Not supported in DX12");
+		return nullptr;
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -23,10 +29,15 @@ namespace highlo
 	Ref<CommandBuffer> CommandBuffer::Create(const HLString &debugName, uint32 count)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		HL_ASSERT(false, "Not supported in OpenGL!");
-		return nullptr;
+		return Ref<OpenGLCommandBuffer>::Create(count, debugName);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanCommandBuffer>::Create(count, debugName);
+	#elif HIGHLO_API_DX11
+		HL_ASSERT(false, "Not supported in DX11");
+		return nullptr;
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false, "Not supported in DX12");
+		return nullptr;
 	#else
 		HL_ASSERT(false);
 		return nullptr;

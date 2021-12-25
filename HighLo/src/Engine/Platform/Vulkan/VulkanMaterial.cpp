@@ -14,8 +14,7 @@ namespace highlo
 	{
 		Init();
 
-		// TODO
-		//Renderer::RegisterShaderDependency(shader, this);
+		Renderer::RegisterShaderDependency(shader, this);
 	}
 	
 	VulkanMaterial::VulkanMaterial(const Ref<Material> &other, const HLString &name)
@@ -24,8 +23,7 @@ namespace highlo
 		if (name.IsEmpty())
 			m_Name = other->GetName();
 
-		// TODO
-		//Renderer::RegisterShaderDependency(shader, this);
+		Renderer::RegisterShaderDependency(m_Shader, this);
 
 		auto vulkanMaterial = other.As<VulkanMaterial>();
 		m_UniformStorageBuffer = Allocator::Copy(vulkanMaterial->m_UniformStorageBuffer.m_Data, vulkanMaterial->m_UniformStorageBuffer.m_Size);
@@ -313,6 +311,7 @@ namespace highlo
 						arrayImageInfos.emplace_back(texture->GetVulkanDescriptorInfo());
 					}
 				}
+
 				pd->WriteDescriptorSet.pImageInfo = arrayImageInfos.data();
 				pd->WriteDescriptorSet.descriptorCount = (uint32)arrayImageInfos.size();
 				m_WriteDescriptors[frameIndex].push_back(pd->WriteDescriptorSet);
@@ -328,7 +327,6 @@ namespace highlo
 
 		vkUpdateDescriptorSets(device, (uint32)m_WriteDescriptors[frameIndex].size(), m_WriteDescriptors[frameIndex].data(), 0, nullptr);
 		m_PendingDescriptors.clear();
-
 	}
 
 	VkDescriptorSet VulkanMaterial::GetDescriptorSet(uint32 index) const

@@ -6,6 +6,8 @@
 #include "VulkanContext.h"
 #include "VulkanCommandBuffer.h"
 
+#include "Engine/Renderer/Renderer.h"
+
 namespace highlo
 {
 	static VkFence s_ComputeFence = nullptr;
@@ -13,10 +15,9 @@ namespace highlo
 	VulkanComputePipeline::VulkanComputePipeline(Ref<Shader> computeShader)
 		: m_Shader(computeShader.As<VulkanShader>())
 	{
-		CreatePipeline();
+		Invalidate();
 
-		// TODO
-		//Renderer::RegisterShaderDependency(computeShader, this);
+		Renderer::RegisterShaderDependency(computeShader, this);
 	}
 	
 	VulkanComputePipeline::~VulkanComputePipeline()
@@ -77,6 +78,51 @@ namespace highlo
 
 		m_ActiveComputeCommandBuffer = nullptr;
 	}
+
+	void VulkanComputePipeline::Invalidate()
+	{
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+		auto descriptorSetLayouts = m_Shader->GetAllDescriptorSetLayouts();
+
+		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
+		pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutCreateInfo.setLayoutCount = (uint32)descriptorSetLayouts.size();
+		pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts.data();
+
+		const auto &pushConstantRanges = m_Shader->GetPushConstantRanges();
+		std::vector<VkPushConstantRange> vulkanPushConstantRanges(pushConstantRanges.size());
+		if (pushConstantRanges.size())
+		{
+			// TODO: should come from shader
+			for (uint32 i = 0; i < pushConstantRanges.size(); i++)
+			{
+				const auto &pushConstantRange = pushConstantRanges[i];
+				auto &vulkanPushConstantRange = vulkanPushConstantRanges[i];
+
+				vulkanPushConstantRange.stageFlags = pushConstantRange.ShaderStage;
+				vulkanPushConstantRange.offset = pushConstantRange.Offset;
+				vulkanPushConstantRange.size = pushConstantRange.Size;
+			}
+
+			pipelineLayoutCreateInfo.pushConstantRangeCount = (uint32)vulkanPushConstantRanges.size();
+			pipelineLayoutCreateInfo.pPushConstantRanges = vulkanPushConstantRanges.data();
+		}
+
+		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &m_ComputePipelineLayout));
+
+		VkComputePipelineCreateInfo computePipelineCreateInfo{};
+		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+		computePipelineCreateInfo.layout = m_ComputePipelineLayout;
+		computePipelineCreateInfo.flags = 0;
+		const auto &shaderStages = m_Shader->GetPipelineShaderStageCreateInfos();
+		computePipelineCreateInfo.stage = shaderStages[0];
+
+		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+
+		VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &m_PipelineCache));
+		VK_CHECK_RESULT(vkCreateComputePipelines(device, m_PipelineCache, 1, &computePipelineCreateInfo, nullptr, &m_ComputePipeline));
+	}
 	
 	void VulkanComputePipeline::Dispatch(VkDescriptorSet descriptorSet, uint32 groupCountX, uint32 groupCountY, uint32 groupCountZ)
 	{
@@ -131,51 +177,6 @@ namespace highlo
 	void VulkanComputePipeline::SetPushConstants(const void *data, uint32 size)
 	{
 		vkCmdPushConstants(m_ActiveComputeCommandBuffer, m_ComputePipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, size, data);
-	}
-
-	void VulkanComputePipeline::CreatePipeline()
-	{
-		VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
-		auto descriptorSetLayouts = m_Shader->GetAllDescriptorSetLayouts();
-
-		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
-		pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutCreateInfo.setLayoutCount = (uint32)descriptorSetLayouts.size();
-		pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts.data();
-
-		const auto &pushConstantRanges = m_Shader->GetPushConstantRanges();
-		std::vector<VkPushConstantRange> vulkanPushConstantRanges(pushConstantRanges.size());
-		if (pushConstantRanges.size())
-		{
-			// TODO: should come from shader
-			for (uint32 i = 0; i < pushConstantRanges.size(); i++)
-			{
-				const auto &pushConstantRange = pushConstantRanges[i];
-				auto &vulkanPushConstantRange = vulkanPushConstantRanges[i];
-
-				vulkanPushConstantRange.stageFlags = pushConstantRange.ShaderStage;
-				vulkanPushConstantRange.offset = pushConstantRange.Offset;
-				vulkanPushConstantRange.size = pushConstantRange.Size;
-			}
-
-			pipelineLayoutCreateInfo.pushConstantRangeCount = (uint32)vulkanPushConstantRanges.size();
-			pipelineLayoutCreateInfo.pPushConstantRanges = vulkanPushConstantRanges.data();
-		}
-
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &m_ComputePipelineLayout));
-
-		VkComputePipelineCreateInfo computePipelineCreateInfo{};
-		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		computePipelineCreateInfo.layout = m_ComputePipelineLayout;
-		computePipelineCreateInfo.flags = 0;
-		const auto &shaderStages = m_Shader->GetPipelineShaderStageCreateInfos();
-		computePipelineCreateInfo.stage = shaderStages[0];
-
-		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-
-		VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &m_PipelineCache));
-		VK_CHECK_RESULT(vkCreateComputePipelines(device, m_PipelineCache, 1, &computePipelineCreateInfo, nullptr, &m_ComputePipeline));
 	}
 }
 

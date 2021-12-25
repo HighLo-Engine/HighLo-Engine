@@ -49,6 +49,7 @@ namespace highlo
 		VkFramebuffer GetVulkanFramebuffer() const { return m_Framebuffer; }
 		const std::vector<VkClearValue> &GetVulkanClearValues() const { return m_ClearValues; }
 		uint64 GetColorAttachmentCount() const { return m_Specification.SwapChainTarget ? 1 : m_AttachmentTextures.size(); }
+		bool HasDepthAttachment() const { return (bool)m_DepthTexture; }
 
 	private:
 

@@ -14,6 +14,7 @@
 #include "Engine/Utils/StringUtils.h"
 #include "Engine/Renderer/Shaders/UniformBufferSet.h"
 #include "Engine/Renderer/Material.h"
+#include "Engine/Renderer/CommandBuffer.h"
 
 #include <glad/glad.h>
 
@@ -75,6 +76,7 @@ namespace highlo
 		static const uint32 MaxLineVertices = MaxLines * 2;
 		static const uint32 MaxLineIndices = MaxLines * 6;
 
+		Ref<CommandBuffer> RenderCommandBuffer;
 		Ref<Texture2D> WhiteTexture;
 
 		// Quads
@@ -118,6 +120,7 @@ namespace highlo
 		Ref<RenderPass> RenderPass;
 
 		bool DepthTest = true;
+		bool SwapChainTarget = false;
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
 		Ref<UniformBufferSet> UniformBufferSet;
 	};
@@ -129,6 +132,15 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData = new Renderer2DData();
+
+		if (s_2DData->SwapChainTarget)
+		{
+			s_2DData->RenderCommandBuffer = CommandBuffer::CreateFromSwapChain("Renderer2D");
+		}
+		else
+		{
+			s_2DData->RenderCommandBuffer = CommandBuffer::Create("Renderer2D");
+		}
 
 		// Set all texture slots to 0
 		s_2DData->WhiteTexture = Renderer::GetWhiteTexture();
@@ -351,74 +363,36 @@ namespace highlo
 		if (s_2DData->QuadIndexCount == 0)
 			return;
 
-		// Disable warning "Conversion from __int64 to uint32 - possible loss of data"
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		uint32 dataSize = (uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase;
-	#pragma warning(pop)
+		s_2DData->RenderCommandBuffer->Begin();
+		Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase);
 		if (dataSize)
 		{
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
 
-			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
-				s_2DData->TextureSlots[i]->Bind(i);
+			for (uint32 i = 0; i < s_2DData->TextureSlots.size(); ++i)
+			{
+				if (s_2DData->TextureSlots[i])
+					s_2DData->TextureMaterial->Set("u_Textures", s_2DData->TextureSlots[i], i);
+				else
+					s_2DData->TextureMaterial->Set("u_Textures", s_2DData->WhiteTexture, i);
+			}
 
-		//	for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
-		//	{
-		//		if (s_2DData->TextureSlots[i])
-		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->TextureSlots[i]);
-		//		else
-		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->WhiteTexture);
-		//	}
-
-			s_2DData->TextureShader->Bind();
-			s_2DData->QuadVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
+			Renderer::RenderGeometry(s_2DData->RenderCommandBuffer,
+									 s_2DData->QuadVertexArray, 
+									 s_2DData->UniformBufferSet, 
+									 nullptr, 
+									 s_2DData->TextureMaterial,
+									 s_2DData->QuadVertexArray->GetVertexBuffers()[0], 
+									 s_2DData->QuadVertexArray->GetIndexBuffer(), 
+									 Transform::Identity(),
+									 s_2DData->QuadIndexCount);
 		}
 
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		dataSize = (uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase;
-	#pragma warning(pop)
-		if (dataSize)
-		{
-			s_2DData->LineShader->Bind();
-			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
-
-			s_2DData->LineVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, false);
-		}
-
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		dataSize = (uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase;
-	#pragma warning(pop)
-		if (dataSize)
-		{
-			s_2DData->CircleShader->Bind();
-			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
-
-			s_2DData->CircleVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
-		}
-
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		dataSize = (uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase;
-	#pragma warning(pop)
-		if (dataSize)
-		{
-			s_2DData->TextShader->Bind();
-			s_2DData->TextVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->TextVertexBufferBase, dataSize);
-
-			for (uint32 i = 0; i < s_2DData->FontTextureSlotIndex; ++i)
-				s_2DData->FontTextureSlots[i]->Bind(i);
-
-			s_2DData->TextVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
-		}
-
-		StartBatch();
+		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
+		s_2DData->RenderCommandBuffer->End();
+		s_2DData->RenderCommandBuffer->Submit();
 	}
 
 	void Renderer2D::StartBatch()

@@ -50,6 +50,9 @@ namespace highlo
 		HLAPI virtual std::vector<Ref<VertexBuffer>> &GetVertexBuffers() = 0;
 		HLAPI virtual Ref<IndexBuffer> &GetIndexBuffer() = 0;
 
+		HLAPI virtual VertexArraySpecification &GetSpecification() = 0;
+		HLAPI virtual const VertexArraySpecification &GetSpecification() const = 0;
+
 		HLAPI static Ref<VertexArray> Create(const VertexArraySpecification &spec);
 	};
 }

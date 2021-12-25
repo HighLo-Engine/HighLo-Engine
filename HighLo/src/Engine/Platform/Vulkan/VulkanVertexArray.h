@@ -39,18 +39,21 @@ namespace highlo
 		virtual std::vector<Ref<VertexBuffer>> &GetVertexBuffers() override { return m_VertexBuffers; }
 		virtual Ref<IndexBuffer> &GetIndexBuffer() override { return m_IndexBuffer; }
 
+		virtual VertexArraySpecification &GetSpecification() override { return m_Specification; }
+		virtual const VertexArraySpecification &GetSpecification() const override { return m_Specification; }
+
 		// Vulkan-specific
 
 		VkPipeline GetVulkanPipeline() { return m_Pipeline; }
 		VkPipelineLayout GetVulkanPipelineLayout() { return m_PipelineLayout; }
-		const std::vector<VkDescriptorSet>& GetDescriptorSets() const { return m_DescriptorSets.DescriptorSets; }
+		const std::vector<VkDescriptorSet> &GetDescriptorSets() const { return m_DescriptorSets.DescriptorSets; }
 		VkDescriptorSet GetDescriptorSet(uint32 set = 0)
 		{
 			HL_ASSERT(m_DescriptorSets.DescriptorSets.size() > set);
 			return m_DescriptorSets.DescriptorSets[set];
 		}
 
-		void SetUniformBuffer(Ref<UniformBuffer>& uniformBuffer, uint32 binding, uint32 set = 0);
+		void SetUniformBuffer(Ref<UniformBuffer> &uniformBuffer, uint32 binding, uint32 set = 0);
 
 	private:
 

@@ -8,7 +8,7 @@ layout(location = 3) in float in_TexIndex;
 layout(location = 4) in float in_TilingFactor;
 layout(location = 5) in int in_EntityID;
 
-layout(std140, binding = 3) uniform Camera
+layout(std140, binding = 0) uniform Camera
 {
 	mat4 u_ViewProjection;
 };
@@ -22,7 +22,7 @@ struct VertexOutput
 };
 
 layout(location = 0) out VertexOutput Output;
-layout(location = 4) out flat int v_EntityID;
+layout(location = 5) out flat int v_EntityID;
 
 void main()
 {
@@ -39,8 +39,8 @@ void main()
 #shader pixel
 #version 450 core
 
-layout(location = 0) out vec4 out_Color;
-layout(location = 1) out int ObjectID;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out int o_ObjectID;
 
 struct VertexOutput
 {
@@ -51,25 +51,13 @@ struct VertexOutput
 };
 
 layout(location = 0) in VertexOutput Input;
-layout(location = 4) in flat int v_EntityID;
+layout(location = 5) in flat int v_EntityID;
 
-layout(binding = 0) uniform sampler2D u_Textures[32];
+layout(binding = 1) uniform sampler2D u_Textures[32];
 
 void main()
 {
-	// TODO: make this faster by finding another solution without the if/else
-	// if (Input.TexIndex == 0)
-	// {
-	// 	out_Color = Input.Color;
-	// }
-	// else
-	// {
-	// 	out_Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * Input.Color;
-	// }
-
-	vec4 TextureColor = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor);
-	out_Color = Input.Color * TextureColor;
-
-	ObjectID = v_EntityID;
+	o_Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TilingFactor) * Input.Color;
+	o_ObjectID = v_EntityID;
 }
 

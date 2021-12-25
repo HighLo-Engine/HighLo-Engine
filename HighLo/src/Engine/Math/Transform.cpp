@@ -20,6 +20,16 @@ namespace highlo
 		m_Rotation = rotation;
 	}
 
+	Transform Transform::Identity()
+	{
+		Transform transform;
+		transform.m_Transform = glm::mat4(1.0f);
+		transform.m_Position = { 0.0f, 0.0f, 0.0f };
+		transform.m_Rotation = { 0.0f, 0.0f, 0.0f };
+		transform.m_Scale = { 1.0f, 1.0f, 1.0f };
+		return transform;
+	}
+
 	Transform &Transform::Translate(const glm::vec3 &translation)
 	{
 		m_Position += translation;

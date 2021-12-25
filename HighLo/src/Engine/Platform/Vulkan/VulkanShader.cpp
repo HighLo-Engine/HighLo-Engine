@@ -136,8 +136,7 @@ namespace highlo
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 
-		// TODO
-		// Renderer::OnShaderReloaded(GetHash());
+		Renderer::OnShaderReloaded(GetHash());
 
 		for (ShaderReloadedCallback &callback : m_ReloadedCallbacks)
 			callback();
@@ -185,6 +184,7 @@ namespace highlo
 	{
 		HL_ASSERT(set < m_DescriptorSetLayouts.size());
 		ShaderMaterialDescriptorSet result;
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
 
 		if (m_ShaderDescriptorSets.empty())
 			return result;
@@ -197,8 +197,8 @@ namespace highlo
 		VkDescriptorSet descriptorSet = VulkanRenderingAPI::AllocateDescriptorSet(allocInfo);
 		HL_ASSERT(descriptorSet);
 
-		result.DescriptorSets.push_back(descriptorSet);
 		result.Pool = nullptr;
+		result.DescriptorSets.push_back(descriptorSet);
 		return result;
 	}
 	
@@ -451,7 +451,7 @@ namespace highlo
 	const VkWriteDescriptorSet *VulkanShader::GetDescriptorSet(const HLString &name, uint32 set) const
 	{
 		HL_ASSERT(set < m_ShaderDescriptorSets.size());
-		HL_ASSERT(m_ShaderDescriptorSets[set]);
+	//	HL_ASSERT(m_ShaderDescriptorSets[set]);
 
 		if (m_ShaderDescriptorSets.at(set).WriteDescriptorSets.find(name) == m_ShaderDescriptorSets.at(set).WriteDescriptorSets.end())
 		{
@@ -478,7 +478,7 @@ namespace highlo
 			std::unordered_map<VkShaderStageFlagBits, std::vector<uint32_t>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile);
 			LoadAndCreateShaders(shaderData);
-		//	ReflectAllShaderStages(shaderData);
+			ReflectAllShaderStages(shaderData);
 			CreateDescriptors();
 		}
 		else
@@ -639,6 +639,9 @@ namespace highlo
 	
 	void VulkanShader::Reflect(VkShaderStageFlagBits shaderStage, const std::vector<uint32> &shaderData)
 	{
+		if (!shaderData.size())
+			return;
+			
 		VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
 
 		HL_CORE_TRACE("===========================");
@@ -649,7 +652,8 @@ namespace highlo
 		spirv_cross::Compiler compiler(shaderData);
 		auto resources = compiler.get_shader_resources();
 
-		HL_CORE_TRACE("Uniform Buffers:");
+		uint32 uniformBufferSize = (uint32)resources.uniform_buffers.size();
+		HL_CORE_TRACE("Uniform Buffers: {0}", uniformBufferSize);
 		for (const auto &resource : resources.uniform_buffers)
 		{
 			const auto &name = resource.name;
@@ -686,7 +690,8 @@ namespace highlo
 			HL_CORE_TRACE("-------------------");
 		}
 
-		HL_CORE_TRACE("Storage Buffers:");
+		uint32 storageBufferSize = (uint32)resources.storage_buffers.size();
+		HL_CORE_TRACE("Storage Buffers: {0}", storageBufferSize);
 		for (const auto &resource : resources.storage_buffers)
 		{
 			const auto &name = resource.name;
@@ -723,7 +728,8 @@ namespace highlo
 			HL_CORE_TRACE("-------------------");
 		}
 
-		HL_CORE_TRACE("Push Constant Buffers");
+		uint32 pushConstantBufferSize = (uint32)resources.push_constant_buffers.size();
+		HL_CORE_TRACE("Push Constant Buffers: {0}", pushConstantBufferSize);
 		for (const auto &resource : resources.push_constant_buffers)
 		{
 			const auto &bufferName = resource.name;
@@ -763,7 +769,8 @@ namespace highlo
 			}
 		}
 
-		HL_CORE_TRACE("Sampled Images:");
+		uint32 sampledImagesSize = (uint32)resources.sampled_images.size();
+		HL_CORE_TRACE("Sampled Images: {0}", sampledImagesSize);
 		for (const auto &resource : resources.sampled_images)
 		{
 			const auto &name = resource.name;
@@ -794,7 +801,8 @@ namespace highlo
 			HL_CORE_TRACE("  {0} ({1}, {2})", name.c_str(), descriptorSet, binding);
 		}
 
-		HL_CORE_TRACE("Storage Images:");
+		uint32 storageImagesSize = (uint32)resources.storage_images.size();
+		HL_CORE_TRACE("Storage Images: {0}", storageImagesSize);
 		for (const auto &resource : resources.storage_images)
 		{
 			const auto &name = resource.name;

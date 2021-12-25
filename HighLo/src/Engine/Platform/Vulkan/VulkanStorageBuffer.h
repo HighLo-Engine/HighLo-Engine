@@ -21,6 +21,9 @@ namespace highlo
 
 		virtual uint32 GetBinding() const override { return m_Binding; }
 
+		// Vulkan-specifc
+		const VkDescriptorBufferInfo &GetDescriptorBufferInfo() const { return m_DescriptorInfo; }
+
 	private:
 
 		void Invalidate();

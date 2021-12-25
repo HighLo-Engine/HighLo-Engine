@@ -21,6 +21,9 @@ namespace highlo
 #elif HIGHLO_API_DX11
 	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<DX11RenderingAPI>::Create();
 #elif HIGHLO_API_DX12
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<DX12RenderingAPI>::Create();
+#elif HIGHLO_API_METAL
+	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<MetalRenderingAPI>::Create();
 #elif HIGHLO_API_VULKAN
 	UniqueRef<RenderingAPI> Renderer::s_RenderingAPI = UniqueRef<VulkanRenderingAPI>::Create();
 #endif // HIGHLO_API_OPENGL
@@ -34,52 +37,20 @@ namespace highlo
 		Ref<Texture2D> BRDFLut;
 		Ref<Environment> EmptyEnvironment;
 		Ref<ShaderLibrary> ShaderLib;
-		Ref<RenderPass> ActiveRenderPass;
 	};
+
+	struct ShaderDependencies
+	{
+		std::vector<Ref<ComputePipeline>> ComputePipelines;
+		std::vector<Ref<VertexArray>> VertexArrays;
+		std::vector<Ref<Material>> Materials;
+	};
+
+	static std::unordered_map<uint64, ShaderDependencies> s_ShaderDepedencies;
 
 	static RendererData *s_MainRendererData = nullptr;
 	static RenderCommandQueue *s_CommandQueue = nullptr;
 	static RenderCommandQueue s_ResourceFreeQueue[3];
-
-	void Renderer::ClearScreenColor(const glm::vec4 &color)
-	{
-		s_RenderingAPI->ClearScreenColor(color);
-	}
-
-	void Renderer::ClearScreenBuffers()
-	{
-		s_RenderingAPI->ClearScreenBuffers();
-	}
-
-	void Renderer::SetWireframe(bool wf)
-	{
-		s_RenderingAPI->SetWireframe(wf);
-	}
-
-	void Renderer::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
-	{
-		s_RenderingAPI->SetViewport(x, y, width, height);
-	}
-
-	void Renderer::SetBlendMode(bool bEnabled)
-	{
-		s_RenderingAPI->SetBlendMode(bEnabled);
-	}
-
-	void Renderer::SetMultiSample(bool bEnabled)
-	{
-		s_RenderingAPI->SetMultiSample(bEnabled);
-	}
-
-	void Renderer::SetDepthTest(bool bEnabled)
-	{
-		s_RenderingAPI->SetDepthTest(bEnabled);
-	}
-
-	void Renderer::SetLineThickness(float thickness)
-	{
-		s_RenderingAPI->SetLineThickness(thickness);
-	}
 
 	void Renderer::Init(Window *window)
 	{
@@ -94,7 +65,7 @@ namespace highlo
 		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
 
 		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
-		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
+		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create("", s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BRDFLut);
 
 		// Define Shader layouts
 		
@@ -118,17 +89,15 @@ namespace highlo
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();
 
-		WaitAndRender();
+		// Make sure the queue is empty after the renderer is initialized
+		Renderer::WaitAndRender();
 
-		// CoreRenderer should be removed later, it will be replaced with a scene rendering system
-	//	CoreRenderer::Init();
 		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
-	//	CoreRenderer::Shutdown();
 		s_RenderingAPI->Shutdown();
 		UI::ShutdownImGui();
 
@@ -152,25 +121,183 @@ namespace highlo
 		s_CommandQueue->Execute();
 	}
 
-	void Renderer::BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear)
+	void Renderer::OnShaderReloaded(uint64 hash)
 	{
-		HL_ASSERT(renderPass, "Renderpass can not be null!");
-		s_MainRendererData->ActiveRenderPass = renderPass;
-
-		renderPass->GetSpecification().Framebuffer->Bind();
-		if (clear)
+		if (s_ShaderDepedencies.find(hash) != s_ShaderDepedencies.end())
 		{
-			const glm::vec4 &clearColor = renderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
-			s_RenderingAPI->ClearScreenBuffers();
-			s_RenderingAPI->ClearScreenColor(clearColor);
+			auto &dependencies = s_ShaderDepedencies.at(hash);
+
+			for (auto &va : dependencies.VertexArrays)
+			{
+				va->Invalidate();
+			}
+
+			for (auto &computePipeline : dependencies.ComputePipelines)
+			{
+				computePipeline->Invalidate();
+			}
+
+			for (auto &material : dependencies.Materials)
+			{
+				material->Invalidate();
+			}
 		}
 	}
 
-	void Renderer::EndRenderPass()
+	void Renderer::RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline)
 	{
-		HL_ASSERT(s_MainRendererData->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
-		s_MainRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
-		s_MainRendererData->ActiveRenderPass = nullptr;
+		s_ShaderDepedencies[shader->GetHash()].ComputePipelines.push_back(computePipeline);
+	}
+
+	void Renderer::RegisterShaderDependency(Ref<Shader> shader, Ref<VertexArray> va)
+	{
+		s_ShaderDepedencies[shader->GetHash()].VertexArrays.push_back(va);
+	}
+
+	void Renderer::RegisterShaderDependency(Ref<Shader> shader, Ref<Material> material)
+	{
+		s_ShaderDepedencies[shader->GetHash()].Materials.push_back(material);
+	}
+
+	void Renderer::BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, Ref<RenderPass> &renderPass, bool shouldClear)
+	{
+		HL_ASSERT(renderPass, "Renderpass can not be null!");
+		s_RenderingAPI->BeginRenderPass(renderCommandBuffer, renderPass, shouldClear);
+	}
+
+	void Renderer::EndRenderPass(Ref<CommandBuffer> &renderCommandBuffer)
+	{
+		s_RenderingAPI->EndRenderPass(renderCommandBuffer);
+	}
+
+	void Renderer::RenderDynamicModel(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va,
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<DynamicModel> model, 
+		uint32 submeshIndex, 
+		Ref<MaterialTable> materialTable, 
+		Ref<VertexBuffer> transformBuffer, 
+		uint32 transformOffset, 
+		uint32 instanceCount)
+	{
+		s_RenderingAPI->RenderDynamicModel(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transformBuffer, transformOffset, instanceCount);
+	}
+
+	void Renderer::RenderStaticModel(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<StaticModel> model, 
+		uint32 submeshIndex, 
+		Ref<MaterialTable> materialTable, 
+		const Transform &transform)
+	{
+		s_RenderingAPI->RenderStaticModel(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transform);
+	}
+
+	void Renderer::RenderDynamicModelWithMaterial(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va,
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<DynamicModel> model, 
+		uint32 submeshIndex, 
+		Ref<VertexBuffer> transformBuffer, 
+		uint32 transformOffset, 
+		uint32 instanceCount, 
+		Ref<Material> material, 
+		Allocator additionalUniforms)
+	{
+		s_RenderingAPI->RenderDynamicModelWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformOffset, instanceCount, material, additionalUniforms);
+	}
+
+	void Renderer::RenderStaticModelWithMaterial(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<StaticModel> model, 
+		uint32 submeshIndex, 
+		Ref<MaterialTable> materialTable, 
+		const Transform &transform)
+	{
+		s_RenderingAPI->RenderStaticModelWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transform);
+	}
+
+	void Renderer::RenderQuad(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<Material> material, 
+		const Transform &transform)
+	{
+		s_RenderingAPI->RenderQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, transform);
+	}
+
+	void Renderer::RenderGeometry(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<Material> material, 
+		Ref<VertexBuffer> vertexBuffer, 
+		Ref<IndexBuffer> indexBuffer, 
+		const Transform &transform, 
+		uint32 indexCount)
+	{
+		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, vertexBuffer, indexBuffer, transform, indexCount);
+	}
+
+	void Renderer::SubmitFullscreenQuad(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<Material> material)
+	{
+		s_RenderingAPI->SubmitFullscreenQuad(renderCommandBuffer, va, uniformBufferSet, material);
+	}
+
+	void Renderer::SubmitFullscreenQuad(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<Material> material)
+	{
+		s_RenderingAPI->SubmitFullscreenQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material);
+	}
+
+	void Renderer::SubmitFullscreenQuadWithOverrides(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<VertexArray> va, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<Material> material, 
+		Allocator vertexShaderOverrides, 
+		Allocator fragmentShaderOverrides)
+	{
+		s_RenderingAPI->SubmitFullscreenQuadWithOverrides(renderCommandBuffer, va, uniformBufferSet, material, vertexShaderOverrides, fragmentShaderOverrides);
+	}
+
+	void Renderer::DispatchComputeShader(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<ComputePipeline> computePipeline, 
+		Ref<UniformBufferSet> uniformBufferSet, 
+		Ref<StorageBufferSet> storageBufferSet, 
+		Ref<Material> material, 
+		const glm::ivec3 &groups)
+	{
+		s_RenderingAPI->DispatchComputeShader(renderCommandBuffer, computePipeline, uniformBufferSet, storageBufferSet, material, groups);
+	}
+
+	void Renderer::ClearTexture(
+		Ref<CommandBuffer> renderCommandBuffer, 
+		Ref<Texture2D> texture)
+	{
+		s_RenderingAPI->ClearTexture(renderCommandBuffer, texture);
 	}
 
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()
@@ -228,6 +355,17 @@ namespace highlo
 	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath)
 	{
 		return s_RenderingAPI->CreateEnvironment(filePath);
+	}
+
+	Ref<Texture3D> Renderer::CreatePreethamSky(float turbidity, float azimuth, float inclination)
+	{
+		// TODO
+		return nullptr;
+	}
+
+	void Renderer::SetSceneEnvironment(Ref<SceneRenderer> sceneRenderer, Ref<Environment> environment, Ref<Texture2D> shadow, Ref<Texture2D> linearDepth)
+	{
+		// TODO
 	}
 
 	Ref<RenderingContext> Renderer::GetContext()

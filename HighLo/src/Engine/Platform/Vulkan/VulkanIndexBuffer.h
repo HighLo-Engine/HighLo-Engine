@@ -35,6 +35,9 @@ namespace highlo
 
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }
 
+		// Vulkan-specific
+		VkBuffer GetVulkanBuffer() const { return m_VulkanBuffer; }
+
 	private:
 
 		void Invalidate();

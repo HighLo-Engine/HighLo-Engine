@@ -331,7 +331,7 @@ namespace highlo
 		m_IndexBuffer = indexBuffer;
 	}
 	
-	void VulkanVertexArray::SetUniformBuffer(Ref<UniformBuffer>& uniformBuffer, uint32 binding, uint32 set)
+	void VulkanVertexArray::SetUniformBuffer(Ref<UniformBuffer> &uniformBuffer, uint32 binding, uint32 set)
 	{
 		Ref<VulkanUniformBuffer> vulkanUniformBuffer = uniformBuffer.As<VulkanUniformBuffer>();
 		HL_ASSERT(m_DescriptorSets.DescriptorSets.size() > set);

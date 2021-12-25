@@ -11,6 +11,7 @@
 
 #include "Engine/Application/Application.h"
 #include "Engine/Core/FileSystemPath.h"
+#include "Engine/Core/Allocator.h"
 #include "Engine/ImGui/ImGui.h"
 #include "RenderingAPI.h"
 #include "CoreRenderer.h"
@@ -24,6 +25,10 @@
 #include "RenderCommandQueue.h"
 #include "CommandBuffer.h"
 #include "RenderingContext.h"
+#include "CommandBuffer.h"
+#include "ComputePipeline.h"
+#include "Shaders/UniformBufferSet.h"
+#include "Shaders/StorageBufferSet.h"
 
 namespace highlo
 {
@@ -34,7 +39,7 @@ namespace highlo
 		bool ComputeEnvironmentMaps = true;
 		uint32 FramesInFlight = 3;
 
-		uint32 EnvironmentMapResolution = 1024; // TODO: implement this into the CreateEnvironment functions for each rendering api
+		uint32 EnvironmentMapResolution = 1024; // TODO: implement this into the CreateEnvironment functions for each rendering api, because this should be controlable via the editor
 		uint32 IrradianceMapComputeSamples = 512;
 	};
 
@@ -42,22 +47,112 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static void ClearScreenColor(const glm::vec4 &color);
-		HLAPI static void ClearScreenBuffers();
-
-		HLAPI static void SetWireframe(bool wf);
-		HLAPI static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
-		HLAPI static void SetBlendMode(bool bEnabled);
-		HLAPI static void SetMultiSample(bool bEnabled);
-		HLAPI static void SetDepthTest(bool bEnabled);
-		HLAPI static void SetLineThickness(float thickness);
-
 		HLAPI static void Init(Window *window);
 		HLAPI static void Shutdown();
 
 		HLAPI static void BeginFrame();
 		HLAPI static void EndFrame();
 
+		HLAPI static void BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, Ref<RenderPass> &renderPass, bool shouldClear = false);
+		HLAPI static void EndRenderPass(Ref<CommandBuffer> &renderCommandBuffer);
+
+		HLAPI static void RenderDynamicModel(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materialTable,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformOffset,
+			uint32 instanceCount);
+
+		HLAPI static void RenderStaticModel(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<StaticModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materialTable,
+			const Transform &transform);
+
+		HLAPI static void RenderDynamicModelWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformOffset,
+			uint32 instanceCount,
+			Ref<Material> material,
+			Allocator additionalUniforms = Allocator());
+
+		HLAPI static void RenderStaticModelWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer, 
+			Ref<VertexArray> va, 
+			Ref<UniformBufferSet> uniformBufferSet, 
+			Ref<StorageBufferSet> storageBufferSet, 
+			Ref<StaticModel> model, 
+			uint32 submeshIndex, 
+			Ref<MaterialTable> materialTable, 
+			const Transform &transform);
+
+		HLAPI static void RenderQuad(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			const Transform &transform);
+
+		HLAPI static void RenderGeometry(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			Ref<VertexBuffer> vertexBuffer,
+			Ref<IndexBuffer> indexBuffer,
+			const Transform &transform,
+			uint32 indexCount = 0);
+
+		HLAPI static void SubmitFullscreenQuad(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<Material> material);
+
+		HLAPI static void SubmitFullscreenQuad(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material);
+
+		HLAPI static void SubmitFullscreenQuadWithOverrides(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<Material> material,
+			Allocator vertexShaderOverrides,
+			Allocator fragmentShaderOverrides);
+
+		HLAPI static void DispatchComputeShader(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<ComputePipeline> computePipeline,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			const glm::ivec3 &groups);
+
+		HLAPI static void ClearTexture(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<Texture2D> texture);
+	
 		template<typename T>
 		HLAPI static void Submit(T &&func)
 		{
@@ -95,8 +190,10 @@ namespace highlo
 
 		HLAPI static void WaitAndRender();
 
-		HLAPI static void BeginRenderPass(const Ref<RenderPass> &renderPass, bool clear = true);
-		HLAPI static void EndRenderPass();
+		HLAPI static void OnShaderReloaded(uint64 hash);
+		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);
+		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<VertexArray> va);
+		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<Material> material);
 
 		HLAPI static Ref<Texture3D> GetBlackCubeTexture();
 		HLAPI static Ref<Texture2D> GetWhiteTexture();
@@ -108,6 +205,8 @@ namespace highlo
 		HLAPI static HLString GetCurrentRenderingAPI();
 
 		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
+		HLAPI static Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination);
+		HLAPI static void SetSceneEnvironment(Ref<SceneRenderer> sceneRenderer, Ref<Environment> environment, Ref<Texture2D> shadow, Ref<Texture2D> linearDepth);
 
 		HLAPI static Ref<RenderingContext> GetContext();
 

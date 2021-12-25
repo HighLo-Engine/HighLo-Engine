@@ -19,26 +19,112 @@ namespace highlo
 	friend class Renderer2D;
 
 	public:
+
 		virtual void Init() override;
 		virtual void Shutdown() override;
-
-		virtual void ClearScreenColor(const glm::vec4 &color) override;
-		virtual void ClearScreenBuffers() override;
-
-		virtual void DrawIndexed(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Triangles) override;
-		virtual void DrawIndexed(uint32 indexCount, PrimitiveType type = PrimitiveType::Triangles, bool depthTest = true) override;
-		virtual void DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type = PrimitiveType::Triangles) override;
-		virtual void DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Patch) override;
 
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
 
-		virtual void SetWireframe(bool wf) override;
-		virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
-		virtual void SetBlendMode(bool bEnabled) override;
-		virtual void SetMultiSample(bool bEnabled) override;
-		virtual void SetDepthTest(bool bEnabled) override;
-		virtual void SetLineThickness(float thickness) override;
+		virtual void BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear = false) override;
+		virtual void EndRenderPass(Ref<CommandBuffer> renderCommandBuffer) override;
+
+		virtual void RenderDynamicModel(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materialTable,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformOffset,
+			uint32 instanceCount) override;
+
+		virtual void RenderStaticModel(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<StaticModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materialTable,
+			const Transform &transform) override;
+
+		virtual void RenderDynamicModelWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformOffset,
+			uint32 instanceCount,
+			Ref<Material> material,
+			Allocator additionalUniforms = Allocator()) override;
+
+		virtual void RenderStaticModelWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet, 
+			Ref<StaticModel> model, 
+			uint32 submeshIndex, 
+			Ref<MaterialTable> materialTable, 
+			const Transform &transform) override;
+
+		virtual void RenderQuad(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			const Transform &transform) override;
+
+		virtual void RenderGeometry(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			Ref<VertexBuffer> vertexBuffer,
+			Ref<IndexBuffer> indexBuffer,
+			const Transform &transform,
+			uint32 indexCount = 0) override;
+
+		virtual void SubmitFullscreenQuad(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<Material> material) override;
+
+		virtual void SubmitFullscreenQuad(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material) override;
+
+		virtual void SubmitFullscreenQuadWithOverrides(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<Material> material,
+			Allocator vertexShaderOverrides,
+			Allocator fragmentShaderOverrides) override;
+
+		virtual void DispatchComputeShader(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<ComputePipeline> computePipeline,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			const glm::ivec3 &groups) override;
+
+		virtual void ClearTexture(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<Texture2D> texture) override;
 
 		virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
 	};

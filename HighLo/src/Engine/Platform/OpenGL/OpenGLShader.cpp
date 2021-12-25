@@ -145,8 +145,7 @@ namespace highlo
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 
-		// TODO
-		// Renderer::OnShaderReloaded(GetHash());
+		Renderer::OnShaderReloaded(GetHash());
 
 		for (ShaderReloadedCallback callback : m_ReloadedCallbacks)
 			callback();

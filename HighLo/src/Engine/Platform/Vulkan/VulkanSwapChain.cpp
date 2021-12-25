@@ -465,9 +465,9 @@ namespace highlo
 	{
 		// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
 		VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		VkSubmitInfo submitInfo = {};
 		const auto &config = Renderer::GetConfig();
 
+		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.pWaitDstStageMask = &waitStageMask;
 		submitInfo.pWaitSemaphores = &m_Semaphores.PresentComplete;

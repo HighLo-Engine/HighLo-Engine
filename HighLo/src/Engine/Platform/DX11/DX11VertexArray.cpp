@@ -9,8 +9,12 @@
 
 namespace highlo
 {
-	DX11VertexArray::DX11VertexArray()
+	DX11VertexArray::DX11VertexArray(const VertexArraySpecification& spec)
+		: m_Specification(spec)
 	{
+		HL_ASSERT(spec.Shader);
+		HL_ASSERT(spec.RenderPass);
+		Invalidate();
 	}
 
 	DX11VertexArray::~DX11VertexArray()

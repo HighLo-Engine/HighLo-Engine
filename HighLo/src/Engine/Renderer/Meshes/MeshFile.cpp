@@ -18,7 +18,7 @@ namespace highlo
 		// actual rendering-api specific draw data
 		m_VertexBuffer = m_MeshLoader->GetVertexBuffer();
 		m_IndexBuffer = m_MeshLoader->GetIndexBuffer();
-		m_VertexBufferLayout = m_VertexBuffer->GetLayout();
+		m_VertexBufferLayout = m_MeshLoader->GetLayout();
 
 		// Engine-specific draw data
 		m_StaticVertices = m_MeshLoader->GetStaticVertices();
@@ -52,7 +52,7 @@ namespace highlo
 
 		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) (m_StaticVertices.size() * sizeof(Vertex)));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32) (m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBuffer->SetLayout(BufferLayout::GetStaticShaderLayout());
+		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 	}
 
 	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const AABB &aabb)
@@ -67,7 +67,7 @@ namespace highlo
 
 		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) (m_StaticVertices.size() * sizeof(Vertex)));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32) (m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBuffer->SetLayout(BufferLayout::GetStaticShaderLayout());
+		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 		m_BoundingBox = aabb;
 	}
 
@@ -83,7 +83,7 @@ namespace highlo
 
 		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)(m_StaticVertices.size() * sizeof(Vertex)));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBuffer->SetLayout(BufferLayout::GetStaticShaderLayout());
+		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 
 		// TODO: generate bounding box for submeshes,
 	}
@@ -93,7 +93,7 @@ namespace highlo
 	{
 		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)(m_StaticVertices.size() * sizeof(Vertex)));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBuffer->SetLayout(BufferLayout::GetStaticShaderLayout());
+		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 
 		// TODO: generate bounding box for submeshes,
 	}

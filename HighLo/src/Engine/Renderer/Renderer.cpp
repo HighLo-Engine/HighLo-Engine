@@ -99,10 +99,8 @@ namespace highlo
 		// Define Shader layouts
 		
 		// Load 3D Shaders
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShader.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShader.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultShaderPBR.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/DefaultAnimatedShaderPBR.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 
@@ -173,43 +171,6 @@ namespace highlo
 		HL_ASSERT(s_MainRendererData->ActiveRenderPass, "No active Render pass! Have you called Renderer::EndRenderPass twice?");
 		s_MainRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
 		s_MainRendererData->ActiveRenderPass = nullptr;
-	}
-
-	/*
-	void Renderer::DrawAABB(const Ref<Model> &model, const glm::mat4 &transform, const glm::vec4 &color)
-	{
-		DrawAABB(model->BoundingBox, transform, color);
-	}
-	*/
-
-	void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
-	{
-		glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
-		glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
-
-		glm::vec4 corners[8] =
-		{
-			transform * glm::vec4{ aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
-			transform * glm::vec4{ aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
-			transform * glm::vec4{ aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
-			transform * glm::vec4{ aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
-
-			transform * glm::vec4{ aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
-			transform * glm::vec4{ aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
-			transform * glm::vec4{ aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
-			transform * glm::vec4{ aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
-		};
-
-		/*
-		for (uint32 i = 0; i < 4; ++i)
-			Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
-
-		for (uint32 i = 0; i < 4; ++i)
-			Renderer2D::DrawLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
-
-		for (uint32 i = 0; i < 4; ++i)
-			Renderer2D::DrawLine(corners[i], corners[i + 4], color);
-		*/
 	}
 
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()

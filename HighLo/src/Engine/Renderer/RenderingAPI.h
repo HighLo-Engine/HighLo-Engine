@@ -10,16 +10,19 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Math/Math.h"
 
-#include "VertexArray.h"
 #include "Environment.h"
 
 namespace highlo
 {
+	class VertexArray;
+
 	enum class PrimitiveType
 	{
 		None = 0,
 		Triangles,
+		TriangleStrip,
 		Lines,
+		LineStrip,
 		Patch
 	};
 

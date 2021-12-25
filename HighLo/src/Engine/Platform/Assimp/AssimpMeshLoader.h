@@ -30,6 +30,7 @@ namespace highlo
 		// Draw data
 		const Ref<VertexBuffer> &GetVertexBuffer() const override { return m_VertexBuffer; }
 		const Ref<IndexBuffer> &GetIndexBuffer() const override { return m_IndexBuffer; }
+		virtual const BufferLayout &GetLayout() const override { return m_Layout; }
 
 		// Materials
 		const std::vector<Ref<Material>> &GetMaterials() const override { return m_Materials; }
@@ -90,6 +91,7 @@ namespace highlo
 
 		Ref<VertexBuffer> m_VertexBuffer;
 		Ref<IndexBuffer> m_IndexBuffer;
+		BufferLayout m_Layout;
 
 		// Materials
 		std::vector<Ref<Material>> m_Materials;

@@ -11,6 +11,9 @@
 
 #include "Vulkan.h"
 #include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/Shaders/UniformBuffer.h"
+
+#include "VulkanShader.h"
 
 namespace highlo
 {
@@ -22,7 +25,7 @@ namespace highlo
 	{
 	public:
 
-		VulkanVertexArray();
+		VulkanVertexArray(const VertexArraySpecification& spec);
 		virtual ~VulkanVertexArray();
 
 		virtual void Bind() const override;
@@ -36,10 +39,28 @@ namespace highlo
 		virtual std::vector<Ref<VertexBuffer>> &GetVertexBuffers() override { return m_VertexBuffers; }
 		virtual Ref<IndexBuffer> &GetIndexBuffer() override { return m_IndexBuffer; }
 
+		// Vulkan-specific
+
+		VkPipeline GetVulkanPipeline() { return m_Pipeline; }
+		VkPipelineLayout GetVulkanPipelineLayout() { return m_PipelineLayout; }
+		const std::vector<VkDescriptorSet>& GetDescriptorSets() const { return m_DescriptorSets.DescriptorSets; }
+		VkDescriptorSet GetDescriptorSet(uint32 set = 0)
+		{
+			HL_ASSERT(m_DescriptorSets.DescriptorSets.size() > set);
+			return m_DescriptorSets.DescriptorSets[set];
+		}
+
+		void SetUniformBuffer(Ref<UniformBuffer>& uniformBuffer, uint32 binding, uint32 set = 0);
+
 	private:
 
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 		Ref<IndexBuffer> m_IndexBuffer;
+		VertexArraySpecification m_Specification;
+
+		VkPipelineLayout m_PipelineLayout;
+		VkPipeline m_Pipeline;
+		VulkanShader::ShaderMaterialDescriptorSet m_DescriptorSets;
 	};
 }
 

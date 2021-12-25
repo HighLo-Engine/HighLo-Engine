@@ -27,7 +27,7 @@ namespace highlo
 		VkQueue GetComputeQueue() { return m_ComputeQueue; }
 
 		VkCommandBuffer CreateCommandBuffer(bool begin, bool compute = false);
-		VkCommandBuffer CreateSecondayCommandBuffer();
+		VkCommandBuffer CreateSecondaryCommandBuffer();
 
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer);
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);

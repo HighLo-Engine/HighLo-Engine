@@ -14,17 +14,17 @@
 
 namespace highlo
 {
-	Ref<VertexArray> VertexArray::Create()
+	Ref<VertexArray> VertexArray::Create(const VertexArraySpecification &spec)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLVertexArray>::Create();
+		return Ref<OpenGLVertexArray>::Create(spec);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11VertexArray>::Create();
+		return Ref<DX11VertexArray>::Create(spec);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false);
 		return nullptr;
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanVertexArray>::Create();
+		return Ref<VulkanVertexArray>::Create(spec);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

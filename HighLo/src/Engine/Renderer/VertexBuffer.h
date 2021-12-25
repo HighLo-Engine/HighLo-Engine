@@ -28,9 +28,6 @@ namespace highlo
 		HLAPI virtual void Bind() const = 0;
 		HLAPI virtual void Unbind() const = 0;
 
-		HLAPI virtual const BufferLayout &GetLayout() const = 0;
-		HLAPI virtual void SetLayout(const BufferLayout &layout) = 0;
-
 		HLAPI virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) = 0;
 
 		HLAPI virtual HLRendererID GetRendererID() = 0;

@@ -17,7 +17,7 @@ namespace highlo
 	class OpenGLVertexArray : public VertexArray
 	{
 	public:
-		OpenGLVertexArray();
+		OpenGLVertexArray(const VertexArraySpecification& spec);
 		~OpenGLVertexArray();
 
 		virtual void Bind() const override;
@@ -36,6 +36,7 @@ namespace highlo
 		HLRendererID m_ID;
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 		Ref<IndexBuffer> m_IndexBuffer;
+		VertexArraySpecification m_Specification;
 	};
 }
 

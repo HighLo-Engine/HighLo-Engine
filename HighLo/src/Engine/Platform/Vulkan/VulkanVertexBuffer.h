@@ -28,9 +28,6 @@ namespace highlo
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual const BufferLayout &GetLayout() const override { return m_Layout; }
-		virtual void SetLayout(const BufferLayout &layout) override { m_Layout = layout; }
-
 		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) override;
 
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }
@@ -49,8 +46,6 @@ namespace highlo
 
 		VkBuffer m_VulkanBuffer = nullptr;
 		VmaAllocation m_MemoryAllocation;
-
-		BufferLayout m_Layout;
 	};
 }
 

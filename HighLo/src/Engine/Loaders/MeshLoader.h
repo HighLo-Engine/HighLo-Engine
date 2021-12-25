@@ -23,6 +23,7 @@ namespace highlo
 
 		virtual const Ref<VertexBuffer> &GetVertexBuffer() const = 0;
 		virtual const Ref<IndexBuffer> &GetIndexBuffer() const = 0;
+		virtual const BufferLayout &GetLayout() const = 0;
 
 		// Materials
 		virtual const std::vector<Ref<Material>> &GetMaterials() const = 0;

@@ -38,8 +38,11 @@ namespace highlo
 		}
 	}
 
-	OpenGLVertexArray::OpenGLVertexArray()
+	OpenGLVertexArray::OpenGLVertexArray(const VertexArraySpecification& spec)
+		: m_Specification(spec)
 	{
+		HL_ASSERT(spec.Shader);
+		HL_ASSERT(spec.RenderPass);
 		Invalidate();
 	}
 

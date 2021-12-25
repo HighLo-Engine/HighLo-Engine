@@ -55,9 +55,11 @@ namespace highlo
 	{
 		glfwPollEvents();
 		Input::Update();
-		
-		// Flushes the window buffer
+
 		m_SwapChain->Present();
+
+		// Flushes the window buffer
+		m_Context->SwapBuffers();
 	}
 
 	void GLFWWindow::SetWindowIcon(const HLString &path, bool flip)

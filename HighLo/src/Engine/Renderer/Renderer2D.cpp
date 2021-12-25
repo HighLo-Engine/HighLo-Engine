@@ -198,6 +198,21 @@ namespace highlo
 		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
 		*/
 
+		// Framebuffer and renderpass
+		FramebufferSpecification framebufferSpec;
+		framebufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::Depth };
+		framebufferSpec.Samples = 1;
+		framebufferSpec.ClearOnLoad = false;
+		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+		framebufferSpec.DebugName = "Renderer2D Framebuffer";
+
+		Ref<Framebuffer> framebuffer = Framebuffer::Create(framebufferSpec);
+		
+		RenderPassSpecification renderPassSpec;
+		renderPassSpec.DebugName = "Renderer2D RenderPass";
+		renderPassSpec.Framebuffer = framebuffer;
+		Ref<RenderPass> renderPass = RenderPass::Create(renderPassSpec);
+
 		std::vector<int32> textIndices;
 		offset = 0;
 		for (uint32 i = 0; i < s_2DData->MaxIndices; ++i)
@@ -214,7 +229,6 @@ namespace highlo
 		}
 
 		Ref<VertexBuffer> textVertexBuffer = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(TextVertex));
-		textVertexBuffer->SetLayout(BufferLayout::GetTextLayout());
 		Ref<IndexBuffer> textIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
 
 	//	s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
@@ -233,11 +247,16 @@ namespace highlo
 		s_2DData->TextureMaterial = Material::Create(s_2DData->TextureShader, "TextureMaterial");
 		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
 
-		s_2DData->QuadVertexArray = VertexArray::Create();
+		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
+
+		VertexArraySpecification quadVertexArraySpec;
+		quadVertexArraySpec.Layout = BufferLayout::GetTextureLayout();
+		quadVertexArraySpec.Shader = s_2DData->TextureShader;
+		quadVertexArraySpec.RenderPass = renderPass;
+		s_2DData->QuadVertexArray = VertexArray::Create(quadVertexArraySpec);
 		s_2DData->QuadVertexArray->Bind();
 	
 		auto vb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
-		vb->SetLayout(BufferLayout::GetTextureLayout());
 		s_2DData->QuadVertexArray->AddVertexBuffer(vb);
 	
 		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
@@ -246,11 +265,14 @@ namespace highlo
 		// Circles
 		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices];
 
-		s_2DData->CircleVertexArray = VertexArray::Create();
+		VertexArraySpecification circleVertexArraySpec;
+		circleVertexArraySpec.Layout = BufferLayout::GetCircleLayout();
+		circleVertexArraySpec.Shader = s_2DData->CircleShader;
+		circleVertexArraySpec.RenderPass = renderPass;
+		s_2DData->CircleVertexArray = VertexArray::Create(circleVertexArraySpec);
 		s_2DData->CircleVertexArray->Bind();
 
 		auto circlesVb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
-		circlesVb->SetLayout(BufferLayout::GetCircleLayout());
 		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
 
 		s_2DData->CircleVertexArray->Unbind();

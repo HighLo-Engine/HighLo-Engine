@@ -95,7 +95,7 @@ namespace highlo
         return cmdBuffer;
     }
 
-    VkCommandBuffer VulkanDevice::CreateSecondayCommandBuffer()
+    VkCommandBuffer VulkanDevice::CreateSecondaryCommandBuffer()
     {
         VkCommandBuffer cmdBuffer;
         VkCommandBufferAllocateInfo cmdBufAllocInfo = {};

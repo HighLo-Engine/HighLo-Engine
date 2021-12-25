@@ -408,15 +408,13 @@ namespace highlo
 
 			if (m_IsAnimated)
 			{
-				BufferLayout layout = BufferLayout::GetAnimatedShaderLayout();
+				m_Layout = BufferLayout::GetAnimatedShaderLayout();
 				m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(), (uint32)(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
-				m_VertexBuffer->SetLayout(layout);
 			}
 			else
 			{
-				BufferLayout layout = BufferLayout::GetStaticShaderLayout();
+				m_Layout = BufferLayout::GetStaticShaderLayout();
 				m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)(m_StaticVertices.size() * sizeof(Vertex)));
-				m_VertexBuffer->SetLayout(layout);
 			}
 
 			m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));

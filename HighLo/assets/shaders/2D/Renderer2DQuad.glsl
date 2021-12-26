@@ -13,6 +13,11 @@ layout(std140, binding = 0) uniform Camera
 	mat4 u_ViewProjection;
 };
 
+layout(push_constant) uniform Transform
+{
+	mat4 Transform;
+} u_Renderer;
+
 struct VertexOutput
 {
 	vec4 Color;
@@ -30,8 +35,7 @@ void main()
 	Output.TexCoord = in_TexCoord;
 	Output.TexIndex = in_TexIndex;
 	Output.TilingFactor = in_TilingFactor;
-	//gl_Position = u_ViewProjection * vec4(in_Position, 1.0f);
-	gl_Position = vec4(in_Position, 1.0);
+	gl_Position = u_ViewProjection * u_Renderer.Transform * vec4(in_Position, 1.0f);
 
 	v_EntityID = in_EntityID;
 }

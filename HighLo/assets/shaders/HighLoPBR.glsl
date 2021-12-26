@@ -8,11 +8,6 @@ layout(location = 2) in vec3 a_Normal;
 layout(location = 3) in vec3 a_Tangent;
 layout(location = 4) in vec3 a_Binormal;
 
-// Transfer buffer
-layout(location = 5) in vec4 a_MRow0;
-layout(location = 6) in vec4 a_MRow1;
-layout(location = 7) in vec4 a_MRow2;
-
 layout(std140, binding = 0) uniform Camera
 {
 	mat4 u_ViewProjectionMatrix;
@@ -21,6 +16,16 @@ layout(std140, binding = 0) uniform Camera
 	mat4 u_ViewMatrix;
 };
 
+layout(std140, binding = 1) uniform ShadowData
+{
+	mat4 u_LightMatrix[4];
+};
+
+layout(push_constant) uniform Transform
+{
+	mat4 Transform;
+} u_Renderer;
+
 struct VertexOutput
 {
 	vec3 WorldPosition;
@@ -31,6 +36,8 @@ struct VertexOutput
 	vec3 Binormal;
 
 	mat3 CameraView;
+
+	vec4 ShadowMapCoords[4];
 	vec3 ViewPosition;
 };
 
@@ -38,23 +45,20 @@ layout(location = 0) out VertexOutput Output;
 
 void main()
 {
-	mat4 transform = mat4(
-		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),
-		vec4(a_MRow0.y, a_MRow1.y, a_MRow2.y, 0.0),
-		vec4(a_MRow0.z, a_MRow1.z, a_MRow2.z, 0.0),
-		vec4(a_MRow0.w, a_MRow1.w, a_MRow2.w, 1.0));
-
-	Output.WorldPosition = vec3(transform * vec4(a_Position, 1.0));
-	Output.Normal = mat3(transform) * a_Normal;
-	Output.TexCoord = vec2(a_TexCoord.x, 1.0 - a_TexCoord.y);
-	Output.WorldNormals = mat3(transform) * mat3(a_Tangent, a_Binormal, a_Normal);
-	Output.WorldTransform = mat3(transform);
+	Output.WorldPosition = vec3(u_Renderer.Transform * vec4(a_Position, 1.0));
+	Output.Normal = mat3(u_Renderer.Transform) * a_Normal;
+	Output.WorldNormals = mat3(u_Renderer.Transform) * mat3(a_Tangent, a_Binormal, a_Normal);
+	Output.WorldTransform = mat3(u_Renderer.Transform);
 	Output.Binormal = a_Binormal;
-
 	Output.CameraView = mat3(u_ViewMatrix);
 	Output.ViewPosition = vec3(u_ViewMatrix * vec4(Output.WorldPosition, 1.0));
 
-	gl_Position = u_ViewProjectionMatrix * transform * vec4(a_Position, 1.0);
+	Output.ShadowMapCoords[0] = u_LightMatrix[0] * vec4(Output.WorldPosition, 1.0);
+	Output.ShadowMapCoords[1] = u_LightMatrix[1] * vec4(Output.WorldPosition, 1.0);
+	Output.ShadowMapCoords[2] = u_LightMatrix[2] * vec4(Output.WorldPosition, 1.0);
+	Output.ShadowMapCoords[3] = u_LightMatrix[3] * vec4(Output.WorldPosition, 1.0);
+
+	gl_Position = u_ViewProjectionMatrix * u_Renderer.Transform * vec4(a_Position, 1.0);
 }
 
 #shader fragment
@@ -63,101 +67,7 @@ void main()
 const float PI = 3.141592;
 const float Epsilon = 0.00001;
 const int LightCount = 1;
-
-// Constant normal incidence Fresnel factor for all dielectrics.
-const vec3 Fdielectric = vec3(0.04);
-
-struct PointLight
-{
-	vec3 Position;
-	float Multiplier;
-	vec3 Radiance;
-	float MinRadius;
-	float Radius;
-	float Falloff;
-	float LightSize;
-};
-
-struct DirectionalLight
-{
-	vec3 Direction;
-	vec3 Radiance;
-	float Multiplier;
-};
-
-struct VertexOutput
-{
-	vec3 WorldPosition;
-	vec3 Normal;
-	vec2 TexCoord;
-	mat3 WorldNormals;
-	mat3 WorldTransform;
-	vec3 Binormal;
-
-	mat3 CameraView;
-	vec3 ViewPosition;
-};
-
-layout(location = 0) in VertexOutput Input;
-
-layout(location = 0) out vec4 o_Color;
-layout(location = 1) out vec4 o_ViewNormals;
-layout(location = 2) out vec4 o_ViewPosition;
-
-layout(std140, binding = 2) uniform SceneData
-{
-	DirectionalLight u_DirectionalLight;
-	vec3 u_CameraPositions;
-	float u_EnvironmentMapIntensity;
-};
-
-layout(std140, binding = 4) uniform PointLightData
-{
-	uint u_PointLightsCount;
-	PointLight u_PointLights[1024];
-};
-
-layout(std430, binding = 14) readonly buffer VisibleLightIndicesBuffer
-{
-	int indices[];
-} VisibleLightIndicesBuffer;
-
-// PBR Texture Inputs
-layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
-layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
-layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
-layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
-
-// Environment maps
-layout(set = 1, binding = 9) uniform samplerCube u_EnvironmentRadianceTexture;
-layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentIrradianceTexture;
-
-layout(std140, binding = 17) uniform ScreenData
-{
-	vec2 u_InverseFullResolution;
-	vec2 u_FullResolution;
-};
-
-layout(push_constant) uniform Material
-{
-	vec3 DiffuseColor;
-	float Metalness;
-	float Roughness;
-	float Emission;
-	float EnvironmentMapRotation;
-	bool UseNormalMap;
-} u_MaterialUniforms;
-
-struct PBRParameters
-{
-	vec3 Diffuse;
-	float Roughness;
-	float Metalness;
-
-	vec3 Normal;
-	vec3 View;
-	float NDotV;
-};
+float ShadowFade = 1.0;
 
 const vec2 PoissonDistribution[64] = vec2[](
 	vec2(-0.884081, 0.124488),
@@ -246,17 +156,229 @@ const vec2 poissonDisk[16] = vec2[](
 	);
 
 
+// Constant normal incidence Fresnel factor for all dielectrics.
+const vec3 Fdielectric = vec3(0.04);
+
+struct PointLight
+{
+	vec3 Position;
+	float Multiplier;
+	vec3 Radiance;
+	float MinRadius;
+	float Radius;
+	float Falloff;
+	float LightSize;
+	bool CastsShadows;
+};
+
+struct DirectionalLight
+{
+	vec3 Direction;
+	vec3 Radiance;
+	float Multiplier;
+};
+
+struct VertexOutput
+{
+	vec3 WorldPosition;
+	vec3 Normal;
+	vec2 TexCoord;
+	mat3 WorldNormals;
+	mat3 WorldTransform;
+	vec3 Binormal;
+
+	mat3 CameraView;
+
+	vec4 ShadowMapCoords[4];
+	vec3 ViewPosition;
+};
+
+layout(std140, binding = 3) uniform RendererData
+{
+	uniform vec4 u_CascadeSplits;
+	uniform int u_TilesCountX;
+	uniform bool u_ShowCascades;
+	uniform bool u_SoftShadows;
+	uniform bool u_CascadeFading;
+	uniform bool u_ShowLightComplexity;
+	uniform float u_LightSize;
+	uniform float u_MaxShadowDistance;
+	uniform float u_ShadowFade;
+	uniform float u_CascadeTransitionFade;
+};
+
+layout(std140, binding = 2) uniform SceneData
+{
+	DirectionalLight u_DirectionalLights;
+	vec3 u_CameraPosition;
+	float u_EnvironmentMapIntensity;
+};
+
+layout(std140, binding = 4) uniform PointLightData
+{
+	uint u_PointLightsCount;
+	PointLight u_PointLights[1024];
+};
+
+layout(std430, binding = 14) readonly buffer VisibleLightIndicesBuffer
+{
+	int indices[];
+};
+
+// PBR Texture Inputs
+layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
+layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
+layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
+layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
+
+// Env Map
+layout(set = 1, binding = 9) uniform samplerCube u_EnvironmentRadianceTexture;
+layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentIrradianceTexture;
+layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
+
+// Shadow maps
+layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+layout(set = 1, binding = 16) uniform sampler2D u_LinearDepthTexture;
+
+layout(std140, binding = 17) uniform ScreenData
+{
+	vec2 u_InvFullRes;
+	vec2 u_FullRes;
+};
+
+layout(std140, binding = 18) uniform HBAOData
+{
+	vec4	u_PerspectiveInfo;   // R = (x) * (R - L)/N \\\\\\ G = (y) * (T - B)/N \\\\\\ B =  L/N \\\\\\ A =  B/N
+	vec2    u_InvQuarterResolution;
+	float   u_RadiusToScreen;        // radius
+	float   u_NegInvR2;     // radius * radius
+	float   u_NDotVBias;
+	float   u_AOMultiplier;
+	float   u_PowExponent;
+	bool	u_IsOrtho;
+	vec4    u_Float2Offsets[16];
+	vec4    u_Jitters[16];
+};
+
+layout(push_constant) uniform Material
+{
+	layout(offset = 64) vec3 DiffuseColor;
+	float Metalness;
+	float Roughness;
+	float Emission;
+
+	float EnvMapRotation;
+
+	bool UseNormalMap;
+} u_MaterialUniforms;
+
+struct PBRParameters
+{
+	vec3 Diffuse;
+	float Roughness;
+	float Metalness;
+
+	vec3 Normal;
+	vec3 View;
+	float NdotV;
+};
+
+vec2 SamplePoisson(int index)
+{
+	return PoissonDistribution[index % 64];
+}
+
+float GetShadowBias()
+{
+	const float MINIMUM_SHADOW_BIAS = 0.002;
+	return max(MINIMUM_SHADOW_BIAS * (1.0 - dot(m_Params.Normal, u_DirectionalLights.Direction)), MINIMUM_SHADOW_BIAS);
+}
+
+float SearchRegionRadiusUV(float zWorld)
+{
+	const float light_zNear = 0.0;
+	const float lightRadiusUV = 0.05;
+
+	return lighRadiusUV * (zWorld - light_zNear) / zWorld;
+}
+
+float FindBlockerDistance_DirectionalLight(sampler2DArray shadowMap, uint cascade, vec3 shadowCoords, float uvLightSize)
+{
+	float bias = GetShadowBias();
+
+	int numBlockerSearchSamples = 64;
+	int blockers = 0;
+	float avgBlockerDistance = 0.0f;
+
+	float searchWidth = SearchRegionRadiusUV(shadowCoords.z);
+	for (int i = 0; i < numBlockerSearchSamples; i++)
+	{
+		float z = textureLod(shadowMap, vec3((shadowCoords.xy * 0.5 + 0.5) + SamplePoisson(i) * searchWidth, cascade), 0).r;
+		if (z < (shadowCoords.z - bias))
+		{
+			blockers++;
+			avgBlockerDistance += z;
+		}
+	}
+
+	if (blockers > 0)
+		return avgBlockerDistance / float(blockers);
+
+	return -1;
+}
+
+float PCF_DirectionalLight(sampler2DArray shadowMap, uint cascade, vec3 shadowCoords, float uvRadius)
+{
+	float bias = GetShadowBias();
+	int numPCFSamples = 64;
+
+	float sum = 0;
+	for (int i = 0; i < numPCFSamples; i++)
+	{
+		vec2 offset = SamplePoisson(i) * uvRadius;
+		float z = textureLod(shadowMap, vec3((shadowCoords.xy * 0.5 + 0.5) + offset, cascade), 0).r;
+		sum += step(shadowCoords.z - bias, z);
+	}
+
+	return sum / numPCFSamples;
+}
+
+float HardShadows_DirectionalLight(sampler2DArray shadowMap, uint cascade, vec3 shadowCoords)
+{
+	float bias = GetShadowBias();
+	float shadowMapDepth = texture(shadowMap, vec3(shadowCoords.xy * 0.5 + 0.5, cascade)).x;
+	return step(shadowCoords.z, shadowMapDepth + bias) * ShadowFade;
+}
+
+float PCSS_DirectionalLight(sampler2DArray shadowMap, uint cascade, vec3 shadowCoords, float uvLightSize)
+{
+	float blockerDistance = FindBlockerDistance_DirectionalLight(shadowMap, cascade, shadowCoords, uvLightSize);
+	// Check if we have a occlusion path
+	if (blockerDistance == -1)
+		return 1.0f;
+
+	float penumbraWidth = (shadowCoords.z - blockerDistance) / blockerDistance;
+	float NEAR = 0.01;
+	float uvRadius = penumbraWidth * uvLightSize * NEAR / shadowCoords.z;
+	return PCF_DirectionalLight(shadowMap, cascade, shadowCoords, uvRadius) * ShadowFade;
+}
 
 PBRParameters m_Params;
 
+layout(location = 0) in VertexOutput Input;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out vec4 o_ViewNormals;
+layout(location = 2) out vec4 o_ViewPosition;
+
 void main()
 {
-	m_Params.Diffuse = texture(u_DiffuseTexture, Input.TexCoord).rgb * u_MaterialUniforms.DiffuseColor;
+	o_ViewPosition = vec4(Input.ViewPosition, 1.0);
 	float alpha = texture(u_DiffuseTexture, Input.TexCoord).a;
 
+	m_Params.Diffuse = texture(u_DiffuseTexture, Input.TexCoord).rgb * u_MaterialUniforms.DiffuseColor;
 	m_Params.Metalness = texture(u_MetalnessTexture, Input.TexCoord).r * u_MaterialUniforms.Metalness;
 	m_Params.Roughness = texture(u_RoughnessTexture, Input.TexCoord).r * u_MaterialUniforms.Roughness;
-	m_Params.Roughness = max(m_Params.Roughness, 0.05); // Minimum roughness of 0.05 to keep specular highlight
+	m_Params.Roughness = max(m_Params.Roughness, 0.05); // minimum roughness to keep specular highlights
 	m_Params.Normal = normalize(Input.Normal);
 
 	if (u_MaterialUniforms.UseNormalMap)
@@ -266,8 +388,130 @@ void main()
 	}
 
 	m_Params.View = normalize(u_CameraPosition - Input.WorldPosition);
-	m_Params.NDotV = max(dot(m_Params.Normal, m_Params.View), 0.0);
+	m_Params.NdotV = max(dot(m_Params.Normal, m_Params.View), 0.0);
 
+	// Specular reflection vector
+	vec3 Lr = 2.0 * m_Params.NdotV * m_Params.Normal - m_Params.View;
+	
+	// Fresnel reflectance (use diffuse for metalness)
+	vec3 F0 = mix(Fdielectric, m_Params.Diffuse, m_Params.Metalness);
 
+	uint cascadeIndex = 0;
+	const uint SHADOW_MAP_CASCADE_COUNT = 4;
+
+	for (uint i = 0; i < SHADOW_MAP_CASCADE_COUNT - 1; i++)
+	{
+		if (Input.ViewPosition.z < u_CascadeSplits[i])
+			cascadeIndex = i + 1;
+	}
+
+	float shadowDistance = u_MaxShadowDistance;
+	float transitionDistance = u_ShadowFade;
+	float distance = length(Input.ViewPosition);
+
+	ShadowFade = distance - (shadowDistance - transitionDistance);
+	ShadowFade /= transitionDistance;
+	ShadowFade = clamp(1.0 - ShadowFade, 0.0, 1.0);
+
+	float shadowAmount = 1.0f;
+	bool fadeCascades = u_CascadeFading;
+	if (fadeCascades)
+	{
+		float cascadeTransitionFade = u_CascadeTransitionFade;
+
+		float c0 = smoothstep(u_CascadeSplits[0] + cascadeTransitionFade * 0.5f, u_CascadeSplits[0] - cascadeTransitionFade * 0.5f, Input.ViewPosition.z);
+		float c1 = smoothstep(u_CascadeSplits[1] + cascadeTransitionFade * 0.5f, u_CascadeSplits[1] - cascadeTransitionFade * 0.5f, Input.ViewPosition.z);
+		float c2 = smoothstep(u_CascadeSplits[2] + cascadeTransitionFade * 0.5f, u_CascadeSplits[2] - cascadeTransitionFade * 0.5f, Input.ViewPosition.z);
+
+		if (c0 > 0.0 && c0 < 1.0)
+		{
+			// Sample 0 & 1
+			vec3 shadowMapCoords = (Input.ShadowMapCoords[0].xyz / Input.ShadowMapCoords[0].w);
+			float shadow0 = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, 0, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, 0, shadowMapCoords);
+			shadowMapCoords = (Input.ShadowMapCoords[1].xyz / Input.ShadowMapCoords[1].w);
+			float shadow1 = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, 1, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, 1, shadowMapCoords);
+
+			shadowAmount = mix(shadow0, shadow1, c0);
+		}
+		else if (c1 > 0.0 && c1 < 1.0)
+		{
+			// Sample 1 & 2
+			vec3 shadowMapCoords = (Input.ShadowMapCoords[1].xyz / Input.ShadowMapCoords[1].w);
+			float shadow0 = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, 1, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, 1, shadowMapCoords);
+			shadowMapCoords = (Input.ShadowMapCoords[2].xyz / Input.ShadowMapCoords[2].w);
+			float shadow1 = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, 2, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, 2, shadowMapCoords);
+
+			shadowAmount = mix(shadow0, shadow1, c1);
+		}
+		else if (c2 > 0.0 && c2 < 1.0)
+		{
+			// Sample 2 & 3
+			vec3 shadowMapCoords = (Input.ShadowMapCoords[2].xyz / Input.ShadowMapCoords[2].w);
+			float shadow0 = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, 2, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, 2, shadowMapCoords);
+			shadowMapCoords = (Input.ShadowMapCoords[3].xyz / Input.ShadowMapCoords[3].w);
+			float shadow1 = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, 3, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, 3, shadowMapCoords);
+
+			shadowAmount = mix(shadow0, shadow1, c2);
+		}
+		else
+		{
+			vec3 shadowMapCoords = (Input.ShadowMapCoords[cascadeIndex].xyz / Input.ShadowMapCoords[cascadeIndex].w);
+			shadowAmount = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, cascadeIndex, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, cascadeIndex, shadowMapCoords);
+		}
+	}
+	else
+	{
+		vec3 shadowMapCoords = (Input.ShadowMapCoords[cascadeIndex].xyz / Input.ShadowMapCoords[cascadeIndex].w);
+		shadowAmount = u_SoftShadows ? PCSS_DirectionalLight(u_ShadowMapTexture, cascadeIndex, shadowMapCoords, u_LightSize) : HardShadows_DirectionalLight(u_ShadowMapTexture, cascadeIndex, shadowMapCoords);
+	}
+
+	vec3 lightContribution = CalculateDirLights(F0) * shadowAmount;
+	lightContribution += CalculatePointLights(F0);
+	lightContribution += m_Params.Diffuse * m_MaterialUniforms.Emission;
+
+	vec3 iblContribution = IBL(F0, Lr) * u_EnvironmentMapIntensity;
+
+	o_Color = vec4(iblContribution + lightContribution, 1.0);
+
+	// View Normals for HBAO
+	vec3 hbaoNormal = Input.CameraView * normalize(Input.Normal);
+	hbaoNormal = hbaoNormal * 0.5 + 0.5;
+	hbaoNormal.x = 1.0f - hbaoNormal.x;
+	hbaoNormal.y = 1.0f - hbaoNormal.y;
+	o_ViewNormals = vec4(hbaoNormal, 1.0);
+
+	if (u_ShowLightComplexity)
+	{
+		int pointLightCount = GetPointLightCount();
+		float value = float(pointLightCount);
+		o_Color.rgb = (o_Color.rgb * 0.2) + GetGradient(value);
+	}
+
+	o_Color.a = alpha;
+
+	// If we only want to render shading
+	// o_Color.rgb = vec3(1.0) * shadowAmount + 0.2f;
+
+	if (u_ShowCascades)
+	{
+		switch (cascadeIndex)
+		{
+			case 0:
+				o_Color.rgb *= vec3(1.0f, 0.25f, 0.25f);
+				break;
+
+			case 1:
+				o_Color.rgb *= vec3(0.25f, 1.0f, 0.25f);
+				break;
+
+			case 2:
+				o_Color.rgb *= vec3(0.25f, 0.25f, 1.0f);
+				break;
+
+			case 4:
+				o_Color.rgb *= vec3(1.0f, 1.0f, 0.25f);
+				break;
+		}
+	}
 }
 

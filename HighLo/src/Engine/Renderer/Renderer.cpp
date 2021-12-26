@@ -79,7 +79,7 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DLine.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DCircle.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DText.glsl");
+		//Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DText.glsl");
 
 		// Load Compute Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EquirectangularToCubeMap.glsl");

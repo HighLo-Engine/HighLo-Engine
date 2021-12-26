@@ -247,14 +247,13 @@ namespace highlo
 
 	void VulkanMaterial::UpdateForRendering(const std::vector<std::vector<VkWriteDescriptorSet>> &uniformBufferWriteDescriptors)
 	{
-		auto device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+		auto vulkanDevice = VulkanContext::GetCurrentDevice()->GetNativeDevice();
 		for (auto &&[binding, descriptor] : m_ResidentDescriptors)
 		{
 			if (descriptor->Type == PendingDescriptorType::Texture2D)
 			{
 				Ref<VulkanTexture2D> image = descriptor->TheTexture.As<VulkanTexture2D>();
 				HL_ASSERT(image->GetTextureInfo().ImageView, "ImageView is null");
-
 				if (descriptor->WriteDescriptorSet.pImageInfo && image->GetTextureInfo().ImageView != descriptor->WriteDescriptorSet.pImageInfo->imageView)
 				{
 					m_PendingDescriptors.emplace_back(descriptor);
@@ -311,7 +310,6 @@ namespace highlo
 						arrayImageInfos.emplace_back(texture->GetVulkanDescriptorInfo());
 					}
 				}
-
 				pd->WriteDescriptorSet.pImageInfo = arrayImageInfos.data();
 				pd->WriteDescriptorSet.descriptorCount = (uint32)arrayImageInfos.size();
 				m_WriteDescriptors[frameIndex].push_back(pd->WriteDescriptorSet);
@@ -325,7 +323,7 @@ namespace highlo
 		for (auto &writeDescriptor : m_WriteDescriptors[frameIndex])
 			writeDescriptor.dstSet = descriptorSet.DescriptorSets[0];
 
-		vkUpdateDescriptorSets(device, (uint32)m_WriteDescriptors[frameIndex].size(), m_WriteDescriptors[frameIndex].data(), 0, nullptr);
+		vkUpdateDescriptorSets(vulkanDevice, (uint32)m_WriteDescriptors[frameIndex].size(), m_WriteDescriptors[frameIndex].data(), 0, nullptr);
 		m_PendingDescriptors.clear();
 	}
 

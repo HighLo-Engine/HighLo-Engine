@@ -47,14 +47,15 @@ namespace highlo
 		Renderer::Submit([instance, camera]()
 		{
 			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
-
 		});
 	}
 
 	void SceneRenderer::EndScene()
 	{
-		Renderer::Submit([this]() {
-			m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance]()
+		{
+			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
 		});
 	}
 

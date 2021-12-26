@@ -577,70 +577,72 @@ namespace highlo
 			shaderc::CompileOptions options;
 			options.SetTargetEnvironment(shaderc_target_env_opengl_compat, shaderc_env_version_opengl_4_5);
 
-			spirv_cross::CompilerGLSL glsl(binary);
-			ParseConstantBuffers(glsl);
-
-			FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
-			std::vector<uint32> &shaderStageData = shaderData.emplace_back();
-
-			if (!forceCompile)
 			{
-				FILE *f;
-				fopen_s(&f, *path.String(), "rb");
-				if (f)
-				{
-					// Get File size
-					fseek(f, 0, SEEK_END);
-					uint64 size = ftell(f);
-					fseek(f, 0, SEEK_SET);
+				spirv_cross::CompilerGLSL glsl(binary);
+				ParseConstantBuffers(glsl);
 
-					shaderStageData = std::vector<uint32>(size / sizeof(uint32));
-					fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-					fclose(f);
-				}
-				else
+				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
+				std::vector<uint32> &shaderStageData = shaderData.emplace_back();
+
+				if (!forceCompile)
 				{
-					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not load Shader from cached binary ({0}), going to compile it from source... [-]", *path.String());
+					FILE *f;
+					fopen_s(&f, *path.String(), "rb");
+					if (f)
+					{
+						// Get File size
+						fseek(f, 0, SEEK_END);
+						uint64 size = ftell(f);
+						fseek(f, 0, SEEK_SET);
+
+						shaderStageData = std::vector<uint32>(size / sizeof(uint32));
+						fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+						fclose(f);
+					}
+					else
+					{
+						HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not load Shader from cached binary ({0}), going to compile it from source... [-]", *path.String());
+					}
 				}
+
+				if (!shaderStageData.size())
+				{
+					HLString source = glsl.compile();
+
+				#if PRINT_SHADERS
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] {0} Shader: [=] \n{1}\n", utils::GLShaderTypeToString(stage), *source);
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
+				#endif // PRINT_SHADERS
+
+					shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*source, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
+					if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+					{
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
+						HL_ASSERT(false);
+					}
+
+					shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
+
+					FILE *f;
+					fopen_s(&f, *path.String(), "wb");
+					if (f)
+					{
+						fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+						fclose(f);
+					}
+					else
+					{
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
+					}
+				}
+
+				GLuint shaderId = glCreateShader(stage);
+				glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), (uint32)(shaderStageData.size() * sizeof(uint32)));
+				glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
+				glAttachShader(program, shaderId);
+				shaderRendererIds.push_back(shaderId);
 			}
-
-			if (!shaderStageData.size())
-			{
-				HLString source = glsl.compile();
-
-			#if PRINT_SHADERS
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] {0} Shader: [=] \n{1}\n", utils::GLShaderTypeToString(stage), *source);
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
-			#endif // PRINT_SHADERS
-
-				shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*source, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
-				if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-				{
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
-					HL_ASSERT(false);
-				}
-
-				shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
-
-				FILE *f;
-				fopen_s(&f, *path.String(), "wb");
-				if (f)
-				{
-					fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-					fclose(f);
-				}
-				else
-				{
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
-				}
-			}
-
-			GLuint shaderId = glCreateShader(stage);
-			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), (uint32)(shaderStageData.size() * sizeof(uint32)));
-			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
-			glAttachShader(program, shaderId);
-			shaderRendererIds.push_back(shaderId);
 		}
 
 		// Link shader program
@@ -714,7 +716,7 @@ namespace highlo
 					type = GL_TESS_EVALUATION_SHADER;
 				else if (line.find("geometry") != std::string::npos)
 					type = GL_GEOMETRY_SHADER;
-				else if (line.find("pixel") != std::string::npos)
+				else if (line.find("pixel") != std::string::npos || line.find("fragment") != std::string::npos)
 					type = GL_FRAGMENT_SHADER;
 				else if (line.find("compute") != std::string::npos)
 					type = GL_COMPUTE_SHADER;

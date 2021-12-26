@@ -2,13 +2,12 @@
 
 #include "Engine/Renderer/Material.h"
 #include "Engine/Core/Allocator.h"
+#include "Engine/Renderer/Texture.h"
 
 #ifdef HIGHLO_API_VULKAN
 
 #include "Vulkan.h"
 #include "VulkanShader.h"
-
-#include "Engine/Renderer/Texture.h"
 
 namespace highlo
 {

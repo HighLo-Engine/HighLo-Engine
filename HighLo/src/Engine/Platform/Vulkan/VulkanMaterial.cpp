@@ -3,6 +3,8 @@
 
 #ifdef HIGHLO_API_VULKAN
 
+#include <vulkan/vulkan.h>
+
 #include "VulkanContext.h"
 #include "VulkanTexture2D.h"
 #include "VulkanTexture3D.h"
@@ -72,8 +74,7 @@ namespace highlo
 	
 	void VulkanMaterial::Set(const HLString &name, bool value)
 	{
-		// 4-byte ints = bool
-		Set<int32>(name, value);
+		Set<bool>(name, value);
 	}
 	
 	void VulkanMaterial::Set(const HLString &name, const glm::vec2 &value)
@@ -247,7 +248,7 @@ namespace highlo
 
 	void VulkanMaterial::UpdateForRendering(const std::vector<std::vector<VkWriteDescriptorSet>> &uniformBufferWriteDescriptors)
 	{
-		auto vulkanDevice = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
 		for (auto &&[binding, descriptor] : m_ResidentDescriptors)
 		{
 			if (descriptor->Type == PendingDescriptorType::Texture2D)
@@ -265,7 +266,8 @@ namespace highlo
 		std::vector<VkDescriptorImageInfo> arrayImageInfos;
 
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		if (m_DirtyDescriptorSets[frameIndex] || true)
+		// TODO: This will break if we use the same material in multiple viewports (Maybe we need the Copy function again?)
+		if (m_DirtyDescriptorSets[frameIndex])
 		{
 			m_DirtyDescriptorSets[frameIndex] = false;
 			m_WriteDescriptors[frameIndex].clear();
@@ -292,8 +294,8 @@ namespace highlo
 				}
 				else if (pd->Type == PendingDescriptorType::Texture2D)
 				{
-					Ref<VulkanTexture2D> image = pd->TheTexture.As<VulkanTexture2D>();
-					pd->TextureInfo = image->GetVulkanDescriptorInfo();
+					Ref<VulkanTexture2D> texture = pd->TheTexture.As<VulkanTexture2D>();
+					pd->TextureInfo = texture->GetVulkanDescriptorInfo();
 					pd->WriteDescriptorSet.pImageInfo = &pd->TextureInfo;
 				}
 
@@ -318,12 +320,16 @@ namespace highlo
 		}
 
 		auto vulkanShader = m_Shader.As<VulkanShader>();
-		auto descriptorSet = vulkanShader->AllocateDescriptorSet();
+		VulkanShader::ShaderMaterialDescriptorSet descriptorSet = vulkanShader->AllocateDescriptorSet();
+
 		m_DescriptorSets[frameIndex] = descriptorSet;
 		for (auto &writeDescriptor : m_WriteDescriptors[frameIndex])
 			writeDescriptor.dstSet = descriptorSet.DescriptorSets[0];
 
-		vkUpdateDescriptorSets(vulkanDevice, (uint32)m_WriteDescriptors[frameIndex].size(), m_WriteDescriptors[frameIndex].data(), 0, nullptr);
+		VkWriteDescriptorSet *test = m_WriteDescriptors.at(frameIndex).data();
+		HL_ASSERT(test);
+
+		vkUpdateDescriptorSets(device, (uint32)m_WriteDescriptors.at(frameIndex).size(), m_WriteDescriptors.at(frameIndex).data(), 0, nullptr);
 		m_PendingDescriptors.clear();
 	}
 
@@ -443,8 +449,6 @@ namespace highlo
 			residentDesriptorArray->Textures.resize(arrayIndex + 1);
 
 		residentDesriptorArray->Textures[arrayIndex] = texture;
-
-	//	m_PendingDescriptors.push_back(m_ResidentDescriptors.at(binding));
 		InvalidateDescriptorSets();
 	}
 

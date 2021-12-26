@@ -182,12 +182,6 @@ struct VertexOutput
 	vec3 ViewPosition;
 };
 
-/*layout(std140, binding = 2) uniform Environment
-{
-	Light u_Lights;
-	vec3 u_CameraPosition;
-};*/
-
 layout(std140, binding = 3) uniform SceneData
 {
 	DirectionalLight u_DirectionalLights;
@@ -256,8 +250,10 @@ layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentIrradianceTexture
 layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
 
 // Shadow maps
-layout(binding = 12) uniform sampler2D u_ShadowMapTexture[128];
-layout(binding = 13) uniform sampler2D u_LinearDepthTexture;
+layout(binding = 12) uniform sampler2D u_ShadowMapTexture[32];
+
+// Not used
+// layout(binding = 13) uniform sampler2D u_LinearDepthTexture;
 
 // =================================================================================================================================================
 // =========================================== Base operations (By Disney and Schlick's algorithm) =================================================

@@ -987,8 +987,9 @@ namespace highlo
 
 						VkWriteDescriptorSet writeDescriptorSet = {};
 						writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-						writeDescriptorSet.descriptorCount = 1;
+						writeDescriptorSet.pNext = nullptr;
 						writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+						writeDescriptorSet.descriptorCount = 1;
 						writeDescriptorSet.pBufferInfo = &uniformBuffer->GetDescriptorBufferInfo();
 						writeDescriptorSet.dstBinding = uniformBuffer->GetBinding();
 						writeDescriptors[frame].push_back(writeDescriptorSet);
@@ -1031,6 +1032,7 @@ namespace highlo
 
 						VkWriteDescriptorSet writeDescriptorSet = {};
 						writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+						writeDescriptorSet.pNext = nullptr;
 						writeDescriptorSet.descriptorCount = 1;
 						writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 						writeDescriptorSet.pBufferInfo = &storageBuffer->GetDescriptorBufferInfo();

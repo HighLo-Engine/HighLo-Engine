@@ -70,8 +70,8 @@ namespace highlo
 		// Define Shader layouts
 		
 		// Load 3D Shaders
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
 

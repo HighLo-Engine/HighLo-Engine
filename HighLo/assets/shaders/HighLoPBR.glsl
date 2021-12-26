@@ -1,3 +1,11 @@
+﻿// HighLoPBR Static Shader
+// 
+// References:
+// - Unreal Engine 4 PBR Notes (https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf)
+// - Frostbite's SIGGRAPH paper from 2014 (https://seblagarde.wordpress.com/2015/07/14/siggraph-2014-moving-frostbite-to-physically-based-rendering/)
+// - Michał Siejak's PBR Project (https://github.com/Nadrin)
+// - Sparky Engine (https://github.com/TheCherno/Sparky)
+
 #shader vertex
 #version 450 core
 
@@ -155,7 +163,6 @@ const vec2 poissonDisk[16] = vec2[](
 	vec2(0.14383161, -0.14100790)
 	);
 
-
 // Constant normal incidence Fresnel factor for all dielectrics.
 const vec3 Fdielectric = vec3(0.04);
 
@@ -223,22 +230,7 @@ layout(std140, binding = 4) uniform PointLightData
 layout(std430, binding = 14) readonly buffer VisibleLightIndicesBuffer
 {
 	int indices[];
-};
-
-// PBR Texture Inputs
-layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
-layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
-layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
-layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
-
-// Env Map
-layout(set = 1, binding = 9) uniform samplerCube u_EnvironmentRadianceTexture;
-layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentIrradianceTexture;
-layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
-
-// Shadow maps
-layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
-layout(set = 1, binding = 16) uniform sampler2D u_LinearDepthTexture;
+} m_visibleLightBuffer;
 
 layout(std140, binding = 17) uniform ScreenData
 {
@@ -248,7 +240,7 @@ layout(std140, binding = 17) uniform ScreenData
 
 layout(std140, binding = 18) uniform HBAOData
 {
-	vec4	u_PerspectiveInfo;   // R = (x) * (R - L)/N \\\\\\ G = (y) * (T - B)/N \\\\\\ B =  L/N \\\\\\ A =  B/N
+	vec4	u_PerspectiveInfo;   // R = (x) * (R - L) / N --- G = (y) * (T - B) / N --- B = L/N --- A = B/N
 	vec2    u_InvQuarterResolution;
 	float   u_RadiusToScreen;        // radius
 	float   u_NegInvR2;     // radius * radius
@@ -267,7 +259,7 @@ layout(push_constant) uniform Material
 	float Roughness;
 	float Emission;
 
-	float EnvMapRotation;
+	float EnvironmentMapRotation;
 
 	bool UseNormalMap;
 } u_MaterialUniforms;
@@ -275,13 +267,225 @@ layout(push_constant) uniform Material
 struct PBRParameters
 {
 	vec3 Diffuse;
-	float Roughness;
-	float Metalness;
-
 	vec3 Normal;
 	vec3 View;
+
+	float Roughness;
+	float Metalness;
 	float NdotV;
 };
+
+PBRParameters m_Params;
+
+// PBR Texture Inputs
+layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
+layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
+layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
+layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
+
+// Env Map
+layout(set = 1, binding = 9) uniform samplerCube u_EnvironmentRadianceTexture;
+layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentIrradianceTexture;
+layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
+
+// Shadow maps
+layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+
+// Not used
+// layout(set = 1, binding = 16) uniform sampler2D u_LinearDepthTexture;
+
+layout(location = 0) in VertexOutput Input;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out vec4 o_ViewNormals;
+layout(location = 2) out vec4 o_ViewPosition;
+
+// =================================================================================================================================================
+// =========================================== Base operations (By Disney and Schlick's algorithm) =================================================
+// =================================================================================================================================================
+
+// Normal distribution function, uses Disney's reparametrization of alpha = roughness^2
+float ndfGGX(float cosLh, float roughness)
+{
+	float alpha = roughness * roughness;
+	float alphaSquared = alpha * alpha;
+
+	float denom = (cosLh * cosLh) * (alphaSquared - 1.0) + 1.0;
+	return alphaSquared / (PI * denom * denom);
+}
+
+float gaSchlickG1(float cosTheta, float k)
+{
+	return cosTheta / (cosTheta * (1.0 - k) + k);
+}
+
+float gaSchlickGGX(float cosLi, float NdotV, float roughness)
+{
+	float r = roughness + 1.0;
+	float k = (r * r) / 8.0;
+	return gaSchlickG1(cosLi, k) * gaSchlickG1(NdotV, k);
+}
+
+vec3 fresnelSchlick(vec3 F0, float cosTheta)
+{
+	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+vec3 fresnelSchlickRoughness(vec3 F0, float cosTheta, float roughness)
+{
+	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+// =================================================================================================================================================
+// ====================================================== Light Calculations =======================================================================
+// =================================================================================================================================================
+
+vec3 RotateVectorAboutYAxis(float angle, vec3 axis)
+{
+	// convert angle to radians
+	angle = radians(angle);
+
+	mat3x3 rotationMatrix = {
+		vec3(cos(angle), 0.0, sin(angle)),
+		vec3(0.0, 1.0, 0.0),
+		vec3(-sin(angle), 0.0, cos(angle))
+	};
+
+	return rotationMatrix * axis;
+}
+
+int GetLightBufferIndex(int i)
+{
+	ivec2 tileId = ivec2(gl_FragCoord) / ivec2(16, 16);
+	uint index = tileId.y * u_TilesCountX + tileId.x;
+
+	uint offset = index * 1024;
+	return m_visibleLightBuffer.indices[offset + i];
+}
+
+int GetPointLightCount()
+{
+	int result = 0;
+	for (int i = 0; i < u_PointLightsCount; i++)
+	{
+		int lightIndex = GetLightBufferIndex(i);
+		if (lightIndex == -1)
+			break;
+
+		result++;
+	}
+	
+	return result;
+}
+
+vec3 CalculateDirLights(vec3 F0)
+{
+	vec3 result = vec3(0.0);
+	for (int i = 0; i < LightCount; i++)
+	{
+		vec3 Li = u_DirectionalLights.Direction;
+		vec3 Lradiance = u_DirectionalLights.Radiance * u_DirectionalLights.Multiplier;
+		vec3 Lh = normalize(Li + m_Params.View);
+
+		// Calculate angles between surface normal and various light vectors.
+		float cosLi = max(0.0, dot(m_Params.Normal, Li));
+		float cosLh = max(0.0, dot(m_Params.Normal, Lh));
+
+		vec3 F = fresnelSchlickRoughness(F0, max(0.0, dot(Lh, m_Params.View)), m_Params.Roughness);
+		float D = ndfGGX(cosLh, m_Params.Roughness);
+		float G = gaSchlickGGX(cosLi, m_Params.NdotV, m_Params.Roughness);
+
+		vec3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
+		vec3 diffuseBRDF = kd * m_Params.Diffuse;
+
+		vec3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * m_Params.NdotV);
+		specularBRDF = clamp(specularBRDF, vec3(0.0f), vec3(10.0f));
+		result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+	}
+
+	return result;
+}
+
+vec3 CalculatePointLights(in vec3 F0)
+{
+	vec3 result = vec3(0.0);
+	for (int i = 0; i < u_PointLightsCount; i++)
+	{
+		int lightIndex = GetLightBufferIndex(i);
+		if (lightIndex == -1)
+			break;
+
+		PointLight light = u_PointLights[lightIndex];
+		vec3 Li = normalize(light.Position - Input.WorldPosition);
+		float lightDistance = length(light.Position - Input.WorldPosition);
+		vec3 Lh = normalize(Li + m_Params.View);
+
+		float attenuation = clamp(1.0 - (lightDistance * lightDistance) / (light.Radius * light.Radius), 0.0, 1.0);
+		attenuation *= mix(attenuation, 1.0, light.Falloff);
+
+		vec3 Lradiance = light.Radiance * light.Multiplier * attenuation;
+
+		// Calculate angles between surface normal and various light vectors.
+		float cosLi = max(0.0, dot(m_Params.Normal, Li));
+		float cosLh = max(0.0, dot(m_Params.Normal, Lh));
+
+		vec3 F = fresnelSchlickRoughness(F0, max(0.0, dot(Lh, m_Params.View)), m_Params.Roughness);
+		float D = ndfGGX(cosLh, m_Params.Roughness);
+		float G = gaSchlickGGX(cosLi, m_Params.NdotV, m_Params.Roughness);
+
+		vec3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
+		vec3 diffuseBRDF = kd * m_Params.Diffuse;
+		vec3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * m_Params.NdotV);
+		specularBRDF = clamp(specularBRDF, vec3(0.0f), vec3(10.0f));
+
+		result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+	}
+
+	return result;
+}
+
+vec3 IBL(vec3 F0, vec3 Lr)
+{
+	vec3 irradiance = texture(u_EnvironmentIrradianceTexture, m_Params.Normal).rgb;
+	vec3 F = fresnelSchlickRoughness(F0, m_Params.NdotV, m_Params.Roughness);
+	vec3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
+	vec3 diffuseIBL = m_Params.Diffuse * irradiance;
+
+	int environmentRadianceTextureLevels = textureQueryLevels(u_EnvironmentRadianceTexture);
+	float NoV = clamp(m_Params.NdotV, 0.0, 1.0);
+	vec3 R = 2.0 * dot(m_Params.View, m_Params.Normal) * m_Params.Normal - m_Params.View;
+	vec3 specularIrradiance = textureLod(u_EnvironmentRadianceTexture, RotateVectorAboutYAxis(u_MaterialUniforms.EnvironmentMapRotation, Lr), (m_Params.Roughness) * environmentRadianceTextureLevels).rgb;
+
+	vec2 specularBRDF = texture(u_BRDFLUTTexture, vec2(m_Params.NdotV, 1.0 - m_Params.Roughness)).rg;
+	vec3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
+
+	return kd * diffuseIBL + specularIBL;
+}
+
+// =================================================================================================================================================
+// ============================================================== Shadows ==========================================================================
+// =================================================================================================================================================
+
+vec3 GetGradient(float value)
+{
+	vec3 zero = vec3(0.0, 0.0, 0.0);
+	vec3 white = vec3(0.0, 0.1, 0.9);
+	vec3 red = vec3(0.2, 0.9, 0.4);
+	vec3 blue = vec3(0.8, 0.8, 0.3);
+	vec3 green = vec3(0.9, 0.2, 0.3);
+
+	float step0 = 0.0f;
+	float step1 = 2.0f;
+	float step2 = 4.0f;
+	float step3 = 8.0f;
+	float step4 = 16.0f;
+
+	vec3 color = mix(zero, white, smoothstep(step0, step1, value));
+	color = mix(color, white, smoothstep(step1, step2, value));
+	color = mix(color, red, smoothstep(step1, step2, value));
+	color = mix(color, blue, smoothstep(step2, step3, value));
+	color = mix(color, green, smoothstep(step3, step4, value));
+	return color;
+}
 
 vec2 SamplePoisson(int index)
 {
@@ -299,7 +503,7 @@ float SearchRegionRadiusUV(float zWorld)
 	const float light_zNear = 0.0;
 	const float lightRadiusUV = 0.05;
 
-	return lighRadiusUV * (zWorld - light_zNear) / zWorld;
+	return lightRadiusUV * (zWorld - light_zNear) / zWorld;
 }
 
 float FindBlockerDistance_DirectionalLight(sampler2DArray shadowMap, uint cascade, vec3 shadowCoords, float uvLightSize)
@@ -363,13 +567,6 @@ float PCSS_DirectionalLight(sampler2DArray shadowMap, uint cascade, vec3 shadowC
 	return PCF_DirectionalLight(shadowMap, cascade, shadowCoords, uvRadius) * ShadowFade;
 }
 
-PBRParameters m_Params;
-
-layout(location = 0) in VertexOutput Input;
-layout(location = 0) out vec4 o_Color;
-layout(location = 1) out vec4 o_ViewNormals;
-layout(location = 2) out vec4 o_ViewPosition;
-
 void main()
 {
 	o_ViewPosition = vec4(Input.ViewPosition, 1.0);
@@ -393,7 +590,7 @@ void main()
 	// Specular reflection vector
 	vec3 Lr = 2.0 * m_Params.NdotV * m_Params.Normal - m_Params.View;
 	
-	// Fresnel reflectance (use diffuse for metalness)
+	// Fresnel reflectance
 	vec3 F0 = mix(Fdielectric, m_Params.Diffuse, m_Params.Metalness);
 
 	uint cascadeIndex = 0;
@@ -467,7 +664,7 @@ void main()
 
 	vec3 lightContribution = CalculateDirLights(F0) * shadowAmount;
 	lightContribution += CalculatePointLights(F0);
-	lightContribution += m_Params.Diffuse * m_MaterialUniforms.Emission;
+	lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
 
 	vec3 iblContribution = IBL(F0, Lr) * u_EnvironmentMapIntensity;
 

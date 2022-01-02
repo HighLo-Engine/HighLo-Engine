@@ -324,8 +324,9 @@ namespace highlo
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat4 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
+	//	HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+	//	int32 location = m_UniformLocations.at(fullname);
+		int32 location = GetUniformLocation(fullname);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
@@ -598,6 +599,7 @@ namespace highlo
 						shaderStageData = std::vector<uint32>(size / sizeof(uint32));
 						fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
 						fclose(f);
+						f = nullptr;
 					}
 					else
 					{
@@ -624,24 +626,28 @@ namespace highlo
 
 					shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
 
-					FILE *f;
-					fopen_s(&f, *path.String(), "wb");
-					if (f)
 					{
-						fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-						fclose(f);
-					}
-					else
-					{
-						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
+						FILE *f;
+						fopen_s(&f, *path.String(), "wb");
+						if (f)
+						{
+							fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+							fclose(f);
+							f = nullptr;
+						}
+						else
+						{
+							HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
+						}
 					}
 				}
 
 				GLuint shaderId = glCreateShader(stage);
-				glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), (uint32)(shaderStageData.size() * sizeof(uint32)));
+				glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), uint32(shaderStageData.size() * sizeof(uint32)));
 				glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 				glAttachShader(program, shaderId);
-				shaderRendererIds.push_back(shaderId);
+
+				shaderRendererIds.emplace_back(shaderId);
 			}
 		}
 
@@ -678,6 +684,7 @@ namespace highlo
 					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] {0}: Could not find Uniform location [-]", *name);
 				}
 
+				HL_CORE_TRACE("Registering Uniform {0} at location {1}", *name, location);
 				m_UniformLocations[name] = location;
 			}
 		}

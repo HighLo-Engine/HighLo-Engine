@@ -15,9 +15,6 @@
 #include "Engine/ImGui/ImGui.h"
 #include "Engine/Core/Input.h"
 
-// TEMP
-#include "Engine/Platform/Vulkan/VulkanContext.h"
-
 namespace highlo
 {
 	static bool s_GLFWInitialized = false;
@@ -56,9 +53,7 @@ namespace highlo
 		glfwPollEvents();
 		Input::Update();
 
-		m_SwapChain->Present();
-
-		// Flushes the window buffer
+		// Flushes the window buffer or presents the window for vulkan
 		m_Context->SwapBuffers();
 	}
 

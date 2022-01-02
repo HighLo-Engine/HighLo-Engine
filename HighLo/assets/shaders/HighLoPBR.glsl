@@ -60,6 +60,7 @@ void main()
 	Output.Binormal = a_Binormal;
 	Output.CameraView = mat3(u_ViewMatrix);
 	Output.ViewPosition = vec3(u_ViewMatrix * vec4(Output.WorldPosition, 1.0));
+	Output.TexCoord = vec2(a_TexCoord.x, 1.0 - a_TexCoord.y);
 
 	Output.ShadowMapCoords[0] = u_LightMatrix[0] * vec4(Output.WorldPosition, 1.0);
 	Output.ShadowMapCoords[1] = u_LightMatrix[1] * vec4(Output.WorldPosition, 1.0);
@@ -200,7 +201,7 @@ struct VertexOutput
 	vec3 ViewPosition;
 };
 
-layout(std140, binding = 3) uniform RendererData
+layout(std140, binding = 4) uniform RendererData
 {
 	uniform vec4 u_CascadeSplits;
 	uniform int u_TilesCountX;
@@ -214,14 +215,14 @@ layout(std140, binding = 3) uniform RendererData
 	uniform float u_CascadeTransitionFade;
 };
 
-layout(std140, binding = 2) uniform SceneData
+layout(std140, binding = 3) uniform SceneData
 {
 	DirectionalLight u_DirectionalLights;
 	vec3 u_CameraPosition;
 	float u_EnvironmentMapIntensity;
 };
 
-layout(std140, binding = 4) uniform PointLightData
+layout(std140, binding = 5) uniform PointLightData
 {
 	uint u_PointLightsCount;
 	PointLight u_PointLights[1024];
@@ -278,18 +279,18 @@ struct PBRParameters
 PBRParameters m_Params;
 
 // PBR Texture Inputs
-layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
-layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
-layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
-layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
+layout(set = 0, binding = 6) uniform sampler2D u_DiffuseTexture;
+layout(set = 0, binding = 7) uniform sampler2D u_NormalTexture;
+layout(set = 0, binding = 8) uniform sampler2D u_MetalnessTexture;
+layout(set = 0, binding = 9) uniform sampler2D u_RoughnessTexture;
 
 // Env Map
-layout(set = 1, binding = 9) uniform samplerCube u_EnvironmentRadianceTexture;
-layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentIrradianceTexture;
-layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
+layout(set = 1, binding = 10) uniform samplerCube u_EnvironmentRadianceTexture;
+layout(set = 1, binding = 11) uniform samplerCube u_EnvironmentIrradianceTexture;
+layout(set = 1, binding = 12) uniform sampler2D u_BRDFLUTTexture;
 
 // Shadow maps
-layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+layout(set = 1, binding = 13) uniform sampler2DArray u_ShadowMapTexture;
 
 // Not used
 // layout(set = 1, binding = 16) uniform sampler2D u_LinearDepthTexture;

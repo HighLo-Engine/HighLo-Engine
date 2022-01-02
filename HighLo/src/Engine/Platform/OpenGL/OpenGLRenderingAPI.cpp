@@ -294,6 +294,7 @@ namespace highlo
 		glMaterial->UpdateForRendering();
 
 		auto shader = material->GetShader().As<OpenGLShader>();
+		shader->Bind();
 		shader->SetUniform("u_Renderer.Transform", transform.GetTransform());
 
 		if (material->GetFlag(MaterialFlag::DepthTest))
@@ -306,7 +307,23 @@ namespace highlo
 
 	void OpenGLRenderingAPI::RenderGeometry(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, Ref<VertexBuffer> vertexBuffer, Ref<IndexBuffer> indexBuffer, const Transform &transform, uint32 indexCount)
 	{
-		
+		vertexBuffer->Bind();
+		va->Bind();
+		indexBuffer->Bind();
+
+		Ref<OpenGLMaterial> glMat = material.As<OpenGLMaterial>();
+		glMat->UpdateForRendering();
+
+		Ref<OpenGLShader> shader = material->GetShader().As<OpenGLShader>();
+		shader->Bind();
+		shader->SetUniform("u_Renderer.Transform", transform.GetTransform());
+
+		if (material->GetFlag(MaterialFlag::DepthTest))
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRenderingAPI::SubmitFullscreenQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<Material> material)

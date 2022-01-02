@@ -318,11 +318,8 @@ namespace highlo
 
 		s_2DData->TextureShader->Bind();
 
-		Renderer::Submit([uniformBufferSet = s_2DData->UniformBufferSet, proj]() mutable
-		{
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			uniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
-		});
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
 
 		/*
 		s_2DData->TextureShader->Bind();
@@ -360,11 +357,20 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		if (s_2DData->QuadIndexCount == 0)
-			return;
-
 		s_2DData->RenderCommandBuffer->Begin();
 		Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
+
+		FlushQuads();
+
+		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
+		s_2DData->RenderCommandBuffer->End();
+		s_2DData->RenderCommandBuffer->Submit();
+	}
+
+	void Renderer2D::FlushQuads()
+	{
+		if (s_2DData->QuadIndexCount == 0)
+			return;
 
 		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase);
 		if (dataSize)
@@ -379,20 +385,8 @@ namespace highlo
 					s_2DData->TextureMaterial->Set("u_Textures", s_2DData->WhiteTexture, i);
 			}
 
-			Renderer::RenderGeometry(s_2DData->RenderCommandBuffer,
-									 s_2DData->QuadVertexArray, 
-									 s_2DData->UniformBufferSet, 
-									 nullptr, 
-									 s_2DData->TextureMaterial,
-									 s_2DData->QuadVertexArray->GetVertexBuffers()[0], 
-									 s_2DData->QuadVertexArray->GetIndexBuffer(), 
-									 Transform::Identity(),
-									 s_2DData->QuadIndexCount);
+			Renderer::RenderGeometry(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray, s_2DData->TextureMaterial, Transform::Identity());
 		}
-
-		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
-		s_2DData->RenderCommandBuffer->End();
-		s_2DData->RenderCommandBuffer->Submit();
 	}
 
 	void Renderer2D::StartBatch()

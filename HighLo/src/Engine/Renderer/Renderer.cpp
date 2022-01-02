@@ -67,10 +67,8 @@ namespace highlo
 		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
 		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create("", s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BRDFLut);
 
-		// Define Shader layouts
-		
 		// Load 3D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
@@ -250,6 +248,16 @@ namespace highlo
 		uint32 indexCount)
 	{
 		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, vertexBuffer, indexBuffer, transform, indexCount);
+	}
+
+	void Renderer::RenderGeometry(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const Transform &transform)
+	{
+		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, va->GetVertexBuffers()[0], va->GetIndexBuffer(), transform, va->GetIndexBuffer()->GetCount());
+	}
+
+	void Renderer::RenderGeometry(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<Material> material, const Transform &transform)
+	{
+		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, nullptr, nullptr, material, va->GetVertexBuffers()[0], va->GetIndexBuffer(), transform, va->GetIndexBuffer()->GetCount());
 	}
 
 	void Renderer::SubmitFullscreenQuad(

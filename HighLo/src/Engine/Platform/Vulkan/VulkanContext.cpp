@@ -144,6 +144,7 @@ namespace highlo
 	
 	void VulkanContext::SwapBuffers()
 	{
+		m_SwapChain.Present();
 	}
 	
 	void VulkanContext::MakeCurrent()

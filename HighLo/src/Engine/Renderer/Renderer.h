@@ -120,6 +120,20 @@ namespace highlo
 			const Transform &transform,
 			uint32 indexCount = 0);
 
+		HLAPI static void RenderGeometry(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<Material> material,
+			const Transform &transform);
+
+		HLAPI static void RenderGeometry(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<Material> material,
+			const Transform &transform);
+
 		HLAPI static void SubmitFullscreenQuad(
 			Ref<CommandBuffer> renderCommandBuffer,
 			Ref<VertexArray> va,

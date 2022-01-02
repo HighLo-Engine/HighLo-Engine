@@ -385,7 +385,7 @@ namespace highlo
 					s_2DData->TextureMaterial->Set("u_Textures", s_2DData->WhiteTexture, i);
 			}
 
-			Renderer::RenderGeometry(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray, s_2DData->TextureMaterial, Transform::Identity());
+			Renderer::RenderGeometry(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray, s_2DData->UniformBufferSet, nullptr, s_2DData->TextureMaterial, Transform::Identity());
 		}
 	}
 

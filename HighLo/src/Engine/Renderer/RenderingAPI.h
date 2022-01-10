@@ -10,16 +10,26 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Math/Math.h"
 
-#include "VertexArray.h"
 #include "Environment.h"
+#include "CommandBuffer.h"
+#include "RenderPass.h"
+#include "ComputePipeline.h"
+#include "Engine/Renderer/Shaders/UniformBufferSet.h"
+#include "Engine/Renderer/Shaders/StorageBufferSet.h"
+#include "Engine/Renderer/Meshes/DynamicModel.h"
+#include "Engine/Renderer/Meshes/StaticModel.h"
 
 namespace highlo
 {
+	class VertexArray;
+
 	enum class PrimitiveType
 	{
 		None = 0,
 		Triangles,
+		TriangleStrip,
 		Lines,
+		LineStrip,
 		Patch
 	};
 
@@ -30,16 +40,19 @@ namespace highlo
 		HLAPI virtual void Init() = 0;
 		HLAPI virtual void Shutdown() = 0;
 
+		HLAPI virtual void BeginFrame() = 0;
+		HLAPI virtual void EndFrame() = 0;
+
+		HLAPI virtual void BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear = false) = 0;
+		HLAPI virtual void EndRenderPass(Ref<CommandBuffer> renderCommandBuffer) = 0;
+
 		HLAPI virtual void ClearScreenColor(const glm::vec4 &color) = 0;
 		HLAPI virtual void ClearScreenBuffers() = 0;
 
 		HLAPI virtual void DrawIndexed(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Triangles) = 0;
-		HLAPI virtual void DrawIndexed(uint32 indexCount, PrimitiveType type = PrimitiveType::Triangles, bool depthTest = true) = 0;
+		HLAPI virtual void DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type = PrimitiveType::Triangles, bool depthTest = true, const glm::mat4 &localTransform = glm::mat4(1.0f)) = 0;
 		HLAPI virtual void DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type = PrimitiveType::Triangles) = 0;
 		HLAPI virtual void DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Patch) = 0;
-
-		HLAPI virtual void BeginFrame() = 0;
-		HLAPI virtual void EndFrame() = 0;
 
 		HLAPI virtual void SetWireframe(bool wf) = 0;
 		HLAPI virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;

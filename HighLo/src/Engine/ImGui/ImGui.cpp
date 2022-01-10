@@ -17,6 +17,11 @@
 	#define IMGUI_WINDOW_IMPL_FN_NAME(fn) ImGui_ImplWin32_##fn
 #endif // HIGHLO_API_GLFW
 
+#ifdef HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanTexture2D.h"
+#include "Engine/ImGui/ImGui/backends/imgui_impl_vulkan_with_textures.h"
+#endif // HIGHLO_API_VULKAN
+
 #include "ImGuiWidgets.h"
 
 namespace highlo::UI
@@ -1704,41 +1709,95 @@ namespace highlo::UI
 
 	ImTextureID GetTextureID(const Ref<Texture2D> &texture)
 	{
-		return (ImTextureID)(size_t)texture->GetRendererID();
+#ifdef HIGHLO_API_VULKAN
+		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
+		const VkDescriptorImageInfo &textureInfo = vulkanTexture->GetVulkanDescriptorInfo();
+		if (!textureInfo.imageView)
+			return nullptr;
+
+		return ImGui_ImplVulkan_AddTexture(textureInfo.sampler, textureInfo.imageView, textureInfo.imageLayout);
+#else
+		return (ImTextureID)(uint64)texture->GetRendererID();
+#endif // HIGHLO_API_VULKAN
 	}
 
 	void Image(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
 	{
+#ifdef HIGHLO_API_VULKAN
+		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
+		const auto &textureInfo = vulkanTexture->GetTextureInfo();
+		if (!textureInfo.ImageView)
+			return;
+
+		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetVulkanDescriptorInfo().imageLayout);
+		ImGui::Image(textureId, size, uv0, uv1, tintColor, borderColor);
+#else
 		ImGui::Image(GetTextureID(texture), size, uv0, uv1, tintColor, borderColor);
+#endif // HIGHLO_API_VULKAN	
 	}
 	
 	void Image(const Ref<Texture2D> &texture, uint32 layer, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
 	{
+#ifdef HIGHLO_API_VULKAN
+		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
+		auto &textureInfo = vulkanTexture->GetTextureInfo();
+		textureInfo.ImageView = vulkanTexture->GetLayerImageView(layer);
+		if (!textureInfo.ImageView)
+			return;
+
+		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetVulkanDescriptorInfo().imageLayout);
+		return ImGui::Image(textureId, size, uv0, uv1, tintColor, borderColor);
+#else
 		ImGui::Image(GetTextureID(texture), size, uv0, uv1, tintColor, borderColor);
+#endif // HIGHLO_API_VULKAN
 	}
 	
 	void ImageMip(const Ref<Texture2D> &texture, uint32 mip, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, const ImVec4 &tintColor, const ImVec4 &borderColor)
 	{
-	#ifdef HIGHLO_API_OPENGL
+#ifdef HIGHLO_API_VULKAN
+		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
+		auto &textureInfo = vulkanTexture->GetTextureInfo();
+		textureInfo.ImageView = vulkanTexture->GetMipImageView(mip);
+		if (!textureInfo.ImageView)
+			return;
+
+		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetVulkanDescriptorInfo().imageLayout);
+		return ImGui::Image(textureId, size, uv0, uv1, tintColor, borderColor);
+#else
 		// TODO
-	#endif // HIGHLO_API_OPENGL
+#endif // HIGHLO_API_VULKAN
 	}
 	
 	bool ImageButton(const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, int32 framePadding, const ImVec4 &bgColor, const ImVec4 &tintColor)
 	{
-	#ifdef HIGHLO_API_OPENGL
-		return false;
-	#else
-		return false;
-	#endif // HIGHLO_API_OPENGL
+		return ImageButton("", texture, size, uv0, uv1, framePadding, bgColor, tintColor);
 	}
 	
 	bool ImageButton(const HLString &id, const Ref<Texture2D> &texture, const ImVec2 &size, const ImVec2 &uv0, const ImVec2 &uv1, int32 framePadding, const ImVec4 &bgColor, const ImVec4 &tintColor)
 	{
+#ifdef HIGHLO_API_VULKAN
+		if (!texture)
+			return false;
+
+		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
+
+		const VkDescriptorImageInfo &imageInfo = vulkanTexture->GetVulkanDescriptorInfo();
+		const auto textureId = ImGui_ImplVulkan_AddTexture(imageInfo.sampler, imageInfo.imageView, imageInfo.imageLayout);
+		ImGuiID imguiId = (ImGuiID)((((uint64)imageInfo.imageView) >> 32) ^ (uint32)imageInfo.imageView);
+		if (!id.IsEmpty())
+		{
+			const ImGuiID strID = ImGui::GetID(*id);
+			imguiId = imguiId ^ strID;
+		}
+
+		return ImGui::ImageButtonEx(imguiId, textureId, size, uv0, uv1, ImVec2((float)framePadding, (float)framePadding), bgColor, tintColor);
+
+#else
 		if (!texture)
 			return false;
 
 		return ImGui::ImageButton(GetTextureID(texture), size, uv0, uv1, framePadding, bgColor, tintColor);
+#endif // HIGHLO_API_VULKAN
 	}
 
 	void DrawButtonImage(const Ref<Texture2D> &texture, const Ref<Texture2D> &textureHovered, const Ref<Texture2D> &texturePressed, ImU32 tintNormal, ImU32 tintHovered, ImU32 tintPressed, ImVec2 rectMin, ImVec2 rectMax)

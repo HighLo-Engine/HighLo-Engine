@@ -14,6 +14,8 @@ namespace highlo
 		HLAPI virtual void Begin(Ref<CommandBuffer> renderCommandBuffer = nullptr) = 0;
 		HLAPI virtual void End() = 0;
 
+		HLAPI virtual void Invalidate() = 0;
+
 		HLAPI virtual Ref<Shader> GetShader() = 0;
 
 		HLAPI static Ref<ComputePipeline> Create(Ref<Shader> computeShader);

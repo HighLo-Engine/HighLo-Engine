@@ -43,18 +43,22 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const Camera &camera)
 	{
-		Renderer::Submit([this]() {
-			m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance, camera]()
+		{
+			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
 
-			Renderer::ClearScreenColor(m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
+			Renderer::ClearScreenColor(instance->m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
 			Renderer::ClearScreenBuffers();
 		});
 	}
 
 	void SceneRenderer::EndScene()
 	{
-		Renderer::Submit([this]() {
-			m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance]()
+		{
+			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
 		});
 	}
 
@@ -75,10 +79,10 @@ namespace highlo
 	
 	void SceneRenderer::InitGrid()
 	{
-	//	m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
-	//	m_GridMaterial = Material::Create(m_GridShader);
-	//	float gridScale = 16.025f;
-	//	float gridSize = 0.025f;
+		m_GridShader = Renderer::GetShaderLibrary()->Get("GridShader");
+		m_GridMaterial = Material::Create(m_GridShader, "GridMaterial");
+		float gridScale = 16.025f;
+		float gridSize = 0.025f;
 
 	//	m_GridMaterial->Set("u_Scale", gridScale);
 	//	m_GridMaterial->Set("u_Size", gridSize);

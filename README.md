@@ -5,32 +5,34 @@ The HighLo Engine is a free open source game engine made only by two very passio
 # Getting started
 
 ```sh
-git clone --recursive https://github.com/HighLo-Engine/HighLo-Engine.git
+$ git clone --recursive https://github.com/HighLo-Engine/HighLo-Engine.git/
 ```
 
 ```sh
-cd HighLo-Engine
+$ cd HighLo-Engine
 ```
 
 ```sh
 # Generate the Solution files for windows and mac or the makefiles for linux
-python3 scripts/GenerateEngine.py
+$ python scripts/GenerateEngine.py
 ```
-
-# Current feature branch
-
-vulkan
 
 # Run Unit Tests
 
 To Run the unit tests, you have to build the project from source.
 After that you will be able to select the "HighLoTest" project as the starting project and execute it.
 
-# Build Status
+# Supported platforms
 
 | Linux | Windows | MacOS | Android | IOS | Web |
 |:--------:| :-: | :-: | :-: | :-: | :-: |
 | X    | ✓ | X | X | X | X |
+
+# Supported rendering APIs
+
+| OpenGL | Vulkan | DirectX 11 | DirectX 12 | Metal |
+|:--------:| :-: | :-: | :-: | :-: |
+| ✓    | X | X | X | X |
 
 # Contributing
 

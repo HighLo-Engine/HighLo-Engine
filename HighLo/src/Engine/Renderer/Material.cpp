@@ -3,9 +3,13 @@
 #include "HighLoPch.h"
 #include "Material.h"
 
+#ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLMaterial.h"
+#elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanMaterial.h"
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Material.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {

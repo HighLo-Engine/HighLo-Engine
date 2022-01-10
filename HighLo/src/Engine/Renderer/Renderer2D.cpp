@@ -14,6 +14,7 @@
 #include "Engine/Utils/StringUtils.h"
 #include "Engine/Renderer/Shaders/UniformBufferSet.h"
 #include "Engine/Renderer/Material.h"
+#include "Engine/Renderer/CommandBuffer.h"
 
 #include <glad/glad.h>
 
@@ -69,12 +70,13 @@ namespace highlo
 		static const uint32 MaxQuads = 20000;
 		static const uint32 MaxVertices = MaxQuads * 4;
 		static const uint32 MaxIndices = MaxQuads * 6;
-		static const uint32 MaxTextureSlots = 32; // TODO: THIS is platform dependent, so get it from the RenderingAPI
+		static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
 
 		static const uint32 MaxLines = 10000;
 		static const uint32 MaxLineVertices = MaxLines * 2;
 		static const uint32 MaxLineIndices = MaxLines * 6;
 
+		Ref<CommandBuffer> RenderCommandBuffer;
 		Ref<Texture2D> WhiteTexture;
 
 		// Quads
@@ -118,6 +120,7 @@ namespace highlo
 		Ref<RenderPass> RenderPass;
 
 		bool DepthTest = true;
+		bool SwapChainTarget = false;
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
 		Ref<UniformBufferSet> UniformBufferSet;
 	};
@@ -129,6 +132,15 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData = new Renderer2DData();
+
+		if (s_2DData->SwapChainTarget)
+		{
+			s_2DData->RenderCommandBuffer = CommandBuffer::CreateFromSwapChain("Renderer2D");
+		}
+		else
+		{
+			s_2DData->RenderCommandBuffer = CommandBuffer::Create("Renderer2D");
+		}
 
 		// Set all texture slots to 0
 		s_2DData->WhiteTexture = Renderer::GetWhiteTexture();
@@ -162,41 +174,20 @@ namespace highlo
 
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
 
-		/*
-		// Textures/Quads
-		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
-		s_2DData->TextureShader->AddBuffer("CameraBuffer", cameraBuffer);
-		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
+		// Framebuffer and renderpass
+		FramebufferSpecification framebufferSpec;
+		framebufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::Depth };
+		framebufferSpec.Samples = 1;
+		framebufferSpec.ClearOnLoad = false;
+		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+		framebufferSpec.DebugName = "Renderer2D Framebuffer";
 
-		s_2DData->QuadVertexArray = VertexArray::Create();
-		Ref<VertexBuffer> quadVbo = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
-		quadVbo->SetLayout(BufferLayout::GetTextureLayout());
-		s_2DData->QuadVertexArray->AddVertexBuffer(quadVbo);
-		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
-
-		// Lines
-		s_2DData->LineShader = Renderer::GetShaderLibrary()->Get("Renderer2DLine");
-		s_2DData->LineShader->AddBuffer("CameraBuffer", cameraBuffer);
-		s_2DData->LineVertexBufferBase = new LineVertex[s_2DData->MaxLineVertices];
-
-		s_2DData->LineVertexArray = VertexArray::Create();
-		Ref<VertexBuffer> lineVbo = VertexBuffer::Create(s_2DData->MaxLineVertices * sizeof(LineVertex));
-		lineVbo->SetLayout(BufferLayout::GetLineLayout());
-		s_2DData->LineVertexArray->AddVertexBuffer(lineVbo);
-		s_2DData->LineVertexArray->SetIndexBuffer(IndexBuffer::Create(&lineIndices[0], s_2DData->MaxLineIndices));
-
-		// Circles
-		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
-		s_2DData->CircleShader->AddBuffer("CameraBuffer", cameraBuffer);
-		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices]; // TODO: check maxVertices
-
-		// Text
-		s_2DData->TextShader = Renderer::GetShaderLibrary()->Get("Renderer2DText");
-		s_2DData->TextShader->AddBuffer("CameraBuffer", cameraBuffer);
-		s_2DData->TextVertexArray = VertexArray::Create();
-		s_2DData->TextMaterial = Material::Create(s_2DData->TextShader);
-		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
-		*/
+		Ref<Framebuffer> framebuffer = Framebuffer::Create(framebufferSpec);
+		
+		RenderPassSpecification renderPassSpec;
+		renderPassSpec.DebugName = "Renderer2D RenderPass";
+		renderPassSpec.Framebuffer = framebuffer;
+		Ref<RenderPass> renderPass = RenderPass::Create(renderPassSpec);
 
 		std::vector<int32> textIndices;
 		offset = 0;
@@ -214,30 +205,23 @@ namespace highlo
 		}
 
 		Ref<VertexBuffer> textVertexBuffer = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(TextVertex));
-		textVertexBuffer->SetLayout(BufferLayout::GetTextLayout());
 		Ref<IndexBuffer> textIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
-
-	//	s_2DData->TextVertexArray->AddVertexBuffer(textVertexBuffer);
-	//	s_2DData->TextVertexArray->SetIndexBuffer(textIndexBuffer);
-
-		/*
-		s_2DData->CircleVertexArray = VertexArray::Create();
-		Ref<VertexBuffer> circleVbo = VertexBuffer::Create();
-		circleVbo->SetLayout(BufferLayout::GetCircleLayout());
-		s_2DData->CircleVertexArray->AddVertexBuffer(circleVbo);
-		s_2DData->CircleVertexArray->SetIndexBuffer(IndexBuffer::Create());
-		*/
 
 		// Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
 		s_2DData->TextureMaterial = Material::Create(s_2DData->TextureShader, "TextureMaterial");
 		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
 
-		s_2DData->QuadVertexArray = VertexArray::Create();
+		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
+
+		VertexArraySpecification quadVertexArraySpec;
+		quadVertexArraySpec.Layout = BufferLayout::GetTextureLayout();
+		quadVertexArraySpec.Shader = s_2DData->TextureShader;
+		quadVertexArraySpec.RenderPass = renderPass;
+		s_2DData->QuadVertexArray = VertexArray::Create(quadVertexArraySpec);
 		s_2DData->QuadVertexArray->Bind();
 	
 		auto vb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
-		vb->SetLayout(BufferLayout::GetTextureLayout());
 		s_2DData->QuadVertexArray->AddVertexBuffer(vb);
 	
 		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
@@ -246,11 +230,14 @@ namespace highlo
 		// Circles
 		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices];
 
-		s_2DData->CircleVertexArray = VertexArray::Create();
+		VertexArraySpecification circleVertexArraySpec;
+		circleVertexArraySpec.Layout = BufferLayout::GetCircleLayout();
+		circleVertexArraySpec.Shader = s_2DData->CircleShader;
+		circleVertexArraySpec.RenderPass = renderPass;
+		s_2DData->CircleVertexArray = VertexArray::Create(circleVertexArraySpec);
 		s_2DData->CircleVertexArray->Bind();
 
 		auto circlesVb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
-		circlesVb->SetLayout(BufferLayout::GetCircleLayout());
 		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
 
 		s_2DData->CircleVertexArray->Unbind();
@@ -284,33 +271,9 @@ namespace highlo
 
 		s_2DData->TextureShader->Bind();
 
-		Renderer::Submit([uniformBufferSet = s_2DData->UniformBufferSet, proj]() mutable
-		{
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			uniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
-		});
-
-		/*
-		s_2DData->TextureShader->Bind();
-		Ref<UniformBuffer> buffer = s_2DData->TextureShader->GetBuffer("CameraBuffer");
-		buffer->SetBufferValue(&s_2DData->CameraProjection);
-		buffer->UploadToShader();
-
-		s_2DData->LineShader->Bind();
-		Ref<UniformBuffer> lineBuffer = s_2DData->LineShader->GetBuffer("CameraBuffer");
-		lineBuffer->SetBufferValue(&s_2DData->CameraProjection);
-		lineBuffer->UploadToShader();
-
-		s_2DData->CircleShader->Bind();
-		Ref<UniformBuffer> circleBuffer = s_2DData->CircleShader->GetBuffer("CameraBuffer");
-		circleBuffer->SetBufferValue(&s_2DData->CameraProjection);
-		circleBuffer->UploadToShader();
-
-		s_2DData->TextShader->Bind();
-		Ref<UniformBuffer> textBuffer = s_2DData->TextShader->GetBuffer("CameraBuffer");
-		textBuffer->SetBufferValue(&s_2DData->CameraProjection);
-		textBuffer->UploadToShader();
-		*/
+		// Load Camera Projection into Uniform Buffer block
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
 
 		StartBatch();
 	}
@@ -326,77 +289,42 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
+		s_2DData->RenderCommandBuffer->Begin();
+		Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
+
+		FlushQuads();
+
+		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
+		s_2DData->RenderCommandBuffer->End();
+		s_2DData->RenderCommandBuffer->Submit();
+	}
+
+	void Renderer2D::FlushQuads()
+	{
 		if (s_2DData->QuadIndexCount == 0)
 			return;
 
-		// Disable warning "Conversion from __int64 to uint32 - possible loss of data"
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		uint32 dataSize = (uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase;
-	#pragma warning(pop)
+		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase);
 		if (dataSize)
 		{
 			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
 
-			for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
-				s_2DData->TextureSlots[i]->Bind(i);
+			for (uint32 i = 0; i < s_2DData->TextureSlots.size(); ++i)
+			{
+				if (s_2DData->TextureSlots[i])
+					s_2DData->TextureMaterial->Set("u_Textures", s_2DData->TextureSlots[i], i);
+				else
+					s_2DData->TextureMaterial->Set("u_Textures", s_2DData->WhiteTexture, i);
+			}
 
-		//	for (uint32 i = 0; i < s_2DData->TextureSlotIndex; ++i)
-		//	{
-		//		if (s_2DData->TextureSlots[i])
-		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->TextureSlots[i]);
-		//		else
-		//			s_2DData->TextureMaterial->Set("u_Texture", s_2DData->WhiteTexture);
-		//	}
+			// Bind Camera Uniform Buffer block
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
-
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		dataSize = (uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase;
-	#pragma warning(pop)
-		if (dataSize)
-		{
-			s_2DData->LineShader->Bind();
-			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
-
-			s_2DData->LineVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, PrimitiveType::Lines, false);
-		}
-
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		dataSize = (uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase;
-	#pragma warning(pop)
-		if (dataSize)
-		{
-			s_2DData->CircleShader->Bind();
-			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
-
-			s_2DData->CircleVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
-		}
-
-	#pragma warning(push)
-	#pragma warning(disable : 4244)
-		dataSize = (uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase;
-	#pragma warning(pop)
-		if (dataSize)
-		{
-			s_2DData->TextShader->Bind();
-			s_2DData->TextVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->TextVertexBufferBase, dataSize);
-
-			for (uint32 i = 0; i < s_2DData->FontTextureSlotIndex; ++i)
-				s_2DData->FontTextureSlots[i]->Bind(i);
-
-			s_2DData->TextVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, PrimitiveType::Triangles, s_2DData->DepthTest);
-		}
-
-		StartBatch();
 	}
 
 	void Renderer2D::StartBatch()

@@ -1,7 +1,10 @@
 #include "HighLoPch.h"
 #include "ComputePipeline.h"
 
+#ifdef HIGHLO_API_OPENGL
+#elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanComputePipeline.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {

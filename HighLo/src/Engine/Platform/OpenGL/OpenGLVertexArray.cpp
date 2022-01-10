@@ -38,8 +38,11 @@ namespace highlo
 		}
 	}
 
-	OpenGLVertexArray::OpenGLVertexArray()
+	OpenGLVertexArray::OpenGLVertexArray(const VertexArraySpecification& spec)
+		: m_Specification(spec)
 	{
+		HL_ASSERT(spec.Shader);
+		HL_ASSERT(spec.RenderPass);
 		Invalidate();
 	}
 
@@ -68,7 +71,7 @@ namespace highlo
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
 	{
-		if (vertexBuffer->GetLayout().GetElements().size() < 1)
+		if (m_Specification.Layout.GetElements().size() < 1)
 		{
 			HL_CORE_ERROR("Vertex Buffer has no layout!");
 			return;
@@ -77,7 +80,7 @@ namespace highlo
 		vertexBuffer->Bind();
 
 		uint32 attribIndex = 0;
-		const auto& layout = vertexBuffer->GetLayout();
+		const auto& layout = m_Specification.Layout;
 		for (const auto& element : layout)
 		{
 			glEnableVertexAttribArray(attribIndex);

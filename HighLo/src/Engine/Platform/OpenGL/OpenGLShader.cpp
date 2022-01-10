@@ -92,6 +92,7 @@ namespace highlo
 		{
 			switch (type.basetype)
 			{
+				case spirv_cross::SPIRType::Struct:		return ShaderUniformType::Struct;
 				case spirv_cross::SPIRType::Boolean:	return ShaderUniformType::Bool;
 				case spirv_cross::SPIRType::UInt:		return ShaderUniformType::Uint;
 				case spirv_cross::SPIRType::Int:
@@ -145,8 +146,7 @@ namespace highlo
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 
-		// TODO
-		// Renderer::OnShaderReloaded(GetHash());
+		Renderer::OnShaderReloaded(GetHash());
 
 		for (ShaderReloadedCallback callback : m_ReloadedCallbacks)
 			callback();
@@ -353,6 +353,7 @@ namespace highlo
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile);
 			CompileOrGetOpenGLBinary(shaderData, forceCompile);
+			ReflectAllShaderStages(shaderData);
 		}
 		else
 		{
@@ -360,7 +361,7 @@ namespace highlo
 		}
 	}
 	
-	void OpenGLShader::Reflect(std::vector<uint32> &data)
+	void OpenGLShader::Reflect(GLenum stage, std::vector<uint32> &data)
 	{
 		spirv_cross::Compiler compiler(data);
 		spirv_cross::ShaderResources res = compiler.get_shader_resources();
@@ -475,6 +476,14 @@ namespace highlo
 			glUniform1i(location, binding);
 		}
 	}
+
+	void OpenGLShader::ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData)
+	{
+		for (auto [stage, data] : shaderData)
+		{
+			Reflect(stage, data);
+		}
+	}
 	
 	void OpenGLShader::CompileOrGetVulkanBinary(std::unordered_map<uint32, std::vector<uint32>> &outputBinary, bool forceCompile)
 	{
@@ -578,70 +587,77 @@ namespace highlo
 			shaderc::CompileOptions options;
 			options.SetTargetEnvironment(shaderc_target_env_opengl_compat, shaderc_env_version_opengl_4_5);
 
-			spirv_cross::CompilerGLSL glsl(binary);
-			ParseConstantBuffers(glsl);
-
-			FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
-			std::vector<uint32> &shaderStageData = shaderData.emplace_back();
-
-			if (!forceCompile)
 			{
-				FILE *f;
-				fopen_s(&f, *path.String(), "rb");
-				if (f)
-				{
-					// Get File size
-					fseek(f, 0, SEEK_END);
-					uint64 size = ftell(f);
-					fseek(f, 0, SEEK_SET);
+				spirv_cross::CompilerGLSL glsl(binary);
+				ParseConstantBuffers(glsl);
 
-					shaderStageData = std::vector<uint32>(size / sizeof(uint32));
-					fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-					fclose(f);
-				}
-				else
+				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
+				std::vector<uint32> &shaderStageData = shaderData.emplace_back();
+
+				if (!forceCompile)
 				{
-					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not load Shader from cached binary ({0}), going to compile it from source... [-]", *path.String());
+					FILE *f;
+					fopen_s(&f, *path.String(), "rb");
+					if (f)
+					{
+						// Get File size
+						fseek(f, 0, SEEK_END);
+						uint64 size = ftell(f);
+						fseek(f, 0, SEEK_SET);
+
+						shaderStageData = std::vector<uint32>(size / sizeof(uint32));
+						fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+						fclose(f);
+						f = nullptr;
+					}
+					else
+					{
+						HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not load Shader from cached binary ({0}), going to compile it from source... [-]", *path.String());
+					}
 				}
+
+				if (!shaderStageData.size())
+				{
+					HLString source = glsl.compile();
+
+				#if PRINT_SHADERS
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] {0} Shader: [=] \n{1}\n", utils::GLShaderTypeToString(stage), *source);
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
+				#endif // PRINT_SHADERS
+
+					shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*source, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
+					if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+					{
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
+						HL_ASSERT(false);
+					}
+
+					shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
+
+					{
+						FILE *f;
+						fopen_s(&f, *path.String(), "wb");
+						if (f)
+						{
+							fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
+							fclose(f);
+							f = nullptr;
+						}
+						else
+						{
+							HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
+						}
+					}
+				}
+
+				GLuint shaderId = glCreateShader(stage);
+				glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), uint32(shaderStageData.size() * sizeof(uint32)));
+				glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
+				glAttachShader(program, shaderId);
+
+				shaderRendererIds.emplace_back(shaderId);
 			}
-
-			if (!shaderStageData.size())
-			{
-				HLString source = glsl.compile();
-
-			#if PRINT_SHADERS
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] {0} Shader: [=] \n{1}\n", utils::GLShaderTypeToString(stage), *source);
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
-			#endif // PRINT_SHADERS
-
-				shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*source, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
-				if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-				{
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
-					HL_ASSERT(false);
-				}
-
-				shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
-
-				FILE *f;
-				fopen_s(&f, *path.String(), "wb");
-				if (f)
-				{
-					fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-					fclose(f);
-				}
-				else
-				{
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
-				}
-			}
-
-			GLuint shaderId = glCreateShader(stage);
-			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), (uint32)(shaderStageData.size() * sizeof(uint32)));
-			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
-			glAttachShader(program, shaderId);
-			shaderRendererIds.push_back(shaderId);
 		}
 
 		// Link shader program
@@ -671,19 +687,13 @@ namespace highlo
 		{
 			for (auto &[name, uniform] : buffer.Uniforms)
 			{
-				int32 location = glGetUniformLocation(m_RendererID, *name);
-				if (location == -1)
+				int32 location = GetUniformLocation(name);
+				if (location != -1)
 				{
-					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] {0}: Could not find Uniform location [-]", *name);
+					HL_CORE_INFO("Registering Uniform {0} at location {1}", *name, location);
+					m_UniformLocations[name] = location;
 				}
-
-				m_UniformLocations[name] = location;
 			}
-		}
-
-		for (auto &shaderStageData : shaderData)
-		{
-			Reflect(shaderStageData);
 		}
 	}
 	
@@ -715,7 +725,7 @@ namespace highlo
 					type = GL_TESS_EVALUATION_SHADER;
 				else if (line.find("geometry") != std::string::npos)
 					type = GL_GEOMETRY_SHADER;
-				else if (line.find("pixel") != std::string::npos)
+				else if (line.find("pixel") != std::string::npos || line.find("fragment") != std::string::npos)
 					type = GL_FRAGMENT_SHADER;
 				else if (line.find("compute") != std::string::npos)
 					type = GL_COMPUTE_SHADER;
@@ -746,34 +756,52 @@ namespace highlo
 	
 	void OpenGLShader::ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler)
 	{
+		// Push constant ranges
 		spirv_cross::ShaderResources res = compiler.get_shader_resources();
 		for (const spirv_cross::Resource &resource : res.push_constant_buffers)
 		{
-			const HLString &bufferName = resource.name;
-			auto &bufferType = compiler.get_type(resource.base_type_id);
-			const auto &bufferSize = (uint32)(compiler.get_declared_struct_size(bufferType));
+			const HLString &name = resource.name;
+			auto &type = compiler.get_type(resource.base_type_id);
+			auto bufferSize = (uint32)compiler.get_declared_struct_size(type);
+			uint32 memberCount = (uint32)type.member_types.size();
+			uint32 bufferOffset = 0;
 
-			if (bufferName.IsEmpty() || bufferName == "u_Renderer")
+			if (m_PushConstantRanges.size())
+				bufferOffset = m_PushConstantRanges.back().Offset + m_PushConstantRanges.back().Size;
+
+			auto &pushConstantRange = m_PushConstantRanges.emplace_back();
+			pushConstantRange.Size = bufferSize - bufferOffset;
+			pushConstantRange.Offset = bufferOffset;
+
+			if (name.IsEmpty())
 			{
 				m_ConstantBufferOffset += bufferSize;
 				continue;
 			}
 
-			uint32 location = compiler.get_decoration(resource.id, spv::DecorationLocation);
-			const int32 memberCount = (int32)(bufferType.member_types.size());
-			auto &[name, size, uniforms] = m_Buffers[bufferName];
-			name = bufferName;
-			size = bufferSize - m_ConstantBufferOffset;
+			ShaderBuffer &buffer = m_Buffers[name];
+			buffer.Name = name;
+			buffer.Size = bufferSize - bufferOffset;
 
-			for (int32 i = 0; i < memberCount; ++i)
+			ShaderUniformStruct &shaderStruct = m_ShaderUniformStructs.emplace_back();
+			shaderStruct.Name = name;
+
+			for (uint32 i = 0; i < memberCount; ++i)
 			{
-				const auto &type = compiler.get_type(bufferType.member_types[i]);
-				const HLString &memberName = compiler.get_member_name(bufferType.self, i);
-				const uint32 structMemberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
-				const uint32 offset = compiler.type_struct_member_offset(bufferType, i) - m_ConstantBufferOffset;
+				auto memberType = compiler.get_type(type.member_types[i]);
+				const HLString &memberName = compiler.get_member_name(type.self, i);
+				uint32 size = (uint32)compiler.get_declared_struct_member_size(type, i);
+				uint32 offset = compiler.type_struct_member_offset(type, i) - bufferOffset;
 
-				HLString uniformName = fmt::format("{}.{}", *bufferName, *memberName);
-				uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), structMemberSize, offset);
+				ShaderUniformStructMember &member = shaderStruct.Members.emplace_back();
+				member.Name = memberName;
+				member.Size = size;
+				member.Offset = offset;
+				member.Type = utils::SpirvTypeToShaderUniformType(memberType);
+
+				HLString uniformName = fmt::format("{}.{}", *name, *memberName);
+				HL_CORE_INFO("Registering push_constant with uniform name {0}", *uniformName);
+				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);
 			}
 
 			m_ConstantBufferOffset += bufferSize;

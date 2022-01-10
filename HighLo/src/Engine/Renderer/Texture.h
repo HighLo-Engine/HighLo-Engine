@@ -24,18 +24,11 @@ namespace highlo
 #define HL_TEXTURE_UNIT_DIFFUSE 0
 #define HL_TEXTURE_UNIT_NORMAL	1
 
-	enum class TextureShaderLocation
-	{
-		DOMAIN_SHADER,
-		PIXEL_SHADER
-	};
-
 	class Texture : public Asset
 	{
 	public:
 
 		HLString Name = "";
-		TextureShaderLocation ShaderLocation = TextureShaderLocation::PIXEL_SHADER;
 
 		HLAPI virtual ~Texture() {}
 		HLAPI virtual uint32 GetDimensions() const = 0;
@@ -71,6 +64,7 @@ namespace highlo
 		HLAPI inline bool operator!=(const Texture &other) const { return !(*this == other); }
 
 	protected:
+
 		HLRendererID RendererID = 0;
 	};
 

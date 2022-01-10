@@ -125,8 +125,9 @@ namespace highlo
 		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }
 
+		virtual void UpdateForRendering() override;
+
 		Allocator GetUniformStorageBuffer() { return m_LocalData; }
-		void UpdateForRendering();
 
 	private:
 

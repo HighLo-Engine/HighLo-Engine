@@ -53,9 +53,6 @@ void Sandbox::OnInitialize()
 
 void Sandbox::OnUpdate(Timestep timestep)
 {
-	Renderer::ClearScreenBuffers();
-	Renderer::ClearScreenColor(glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
-
 	//m_Scene->Update(timestep);
 }
 

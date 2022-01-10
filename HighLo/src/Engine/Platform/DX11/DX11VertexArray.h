@@ -20,7 +20,7 @@ namespace highlo
 	{
 	public:
 
-		DX11VertexArray();
+		DX11VertexArray(const VertexArraySpecification& spec);
 		virtual ~DX11VertexArray();
 
 		virtual void Bind() const override;
@@ -38,6 +38,7 @@ namespace highlo
 
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 		Ref<IndexBuffer> m_IndexBuffer;
+		VertexArraySpecification m_Specification;
 	};
 }
 

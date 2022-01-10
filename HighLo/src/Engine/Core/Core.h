@@ -50,9 +50,10 @@ namespace highlo
 
 	struct HLAllocationMetrics
 	{
-		uint32 TotalAllocated = 0;	/**< The total amount of bytes allocated by the program. */
-		uint32 TotalFreed = 0;		/**< The total amount of bytes freed by the program. */
+		uint64 TotalAllocated = 0;	/**< The total amount of bytes allocated by the program. */
+		uint64 TotalFreed = 0;		/**< The total amount of bytes freed by the program. */
 
-		HLAPI inline uint32 CurrentUsage() { return TotalAllocated - TotalFreed; }
+		HLAPI inline uint64 CurrentUsage() { return TotalAllocated - TotalFreed; }
 	};
 }
+

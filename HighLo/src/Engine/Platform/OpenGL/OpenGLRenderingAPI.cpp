@@ -12,6 +12,10 @@
 #include "Engine/Renderer/Renderer.h"
 #include "OpenGLShader.h"
 #include "OpenGLTexture.h"
+#include "OpenGLMaterial.h"
+#include "OpenGLVertexArray.h"
+#include "OpenGLVertexBuffer.h"
+#include "OpenGLIndexBuffer.h"
 
 namespace highlo
 {
@@ -25,8 +29,14 @@ namespace highlo
 				case PrimitiveType::Triangles:
 					return GL_TRIANGLES;
 
+				case PrimitiveType::TriangleStrip:
+					return GL_TRIANGLE_STRIP;
+
 				case PrimitiveType::Lines:
 					return GL_LINES;
+
+				case PrimitiveType::LineStrip:
+					return GL_LINE_STRIP;
 
 				case PrimitiveType::Patch:
 					return GL_PATCHES;
@@ -67,8 +77,27 @@ namespace highlo
 		}
 	}
 
+	struct OpenGLDrawData
+	{
+		Ref<VertexBuffer> FullscreenQuadVertexBuffer;
+		Ref<IndexBuffer> FullscreenQuadIndexBuffer;
+		VertexArraySpecification FullscreenQuadVertexArraySpec;
+
+		Ref<RenderPass> ActiveRenderPass;
+	};
+
+	struct OpenGLQuadVertex
+	{
+		glm::vec3 Position;
+		glm::vec2 TexCoord;
+	};
+
+	static OpenGLDrawData *s_GLDrawData;
+
 	void OpenGLRenderingAPI::Init()
 	{
+		s_GLDrawData = new OpenGLDrawData();
+
 		glDebugMessageCallback(utils::OpenGLLogMessage, nullptr);
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -84,14 +113,15 @@ namespace highlo
 
 		utils::DumpGPUInfos();
 
+		glEnable(GL_DEPTH_TEST);
+
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // for seamless cube maps
 		glFrontFace(GL_CCW);
 
-		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_MULTISAMPLE);
 
+		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_STENCIL_TEST);
 
 		GLenum error = glGetError();
@@ -100,10 +130,59 @@ namespace highlo
 			HL_CORE_ERROR("OpenGL Error: {0}", error);
 			error = glGetError();
 		}
+
+		float x = -1;
+		float y = -1;
+		float width = 2, height = 2;
+
+		OpenGLQuadVertex *data = new OpenGLQuadVertex[4];
+
+		data[0].Position = glm::vec3(x, y, 0.1f);
+		data[0].TexCoord = glm::vec2(0, 0);
+
+		data[1].Position = glm::vec3(x + width, y, 0.1f);
+		data[1].TexCoord = glm::vec2(1, 0);
+
+		data[2].Position = glm::vec3(x + width, y + height, 0.1f);
+		data[2].TexCoord = glm::vec2(1, 1);
+
+		data[3].Position = glm::vec3(x, y + height, 0.1f);
+		data[3].TexCoord = glm::vec2(0, 1);
+
+		s_GLDrawData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(OpenGLQuadVertex));
+		
+		uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
+		s_GLDrawData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32));
 	}
 
 	void OpenGLRenderingAPI::Shutdown()
 	{
+		OpenGLShader::ClearUniformBuffers();
+		delete s_GLDrawData;
+	}
+
+	void OpenGLRenderingAPI::BeginFrame()
+	{
+	}
+
+	void OpenGLRenderingAPI::EndFrame()
+	{
+	}
+
+	void OpenGLRenderingAPI::BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear)
+	{
+	//	HL_ASSERT(!s_GLDrawData->ActiveRenderPass, "Another RenderPass has already been started and not ended!");
+	//	s_GLDrawData->ActiveRenderPass = renderPass;
+	//
+	//	renderPass->GetSpecification().Framebuffer->Bind();
+	}
+
+	void OpenGLRenderingAPI::EndRenderPass(Ref<CommandBuffer> renderCommandBuffer)
+	{
+	//	HL_ASSERT(s_GLDrawData->ActiveRenderPass, "Did you forget to call BeginRenderPass() ?");
+	//
+	//	s_GLDrawData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
+	//	s_GLDrawData->ActiveRenderPass = nullptr;
 	}
 
 	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4 &color)
@@ -121,11 +200,14 @@ namespace highlo
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawIndexed(uint32 indexCount, PrimitiveType type, bool depthTest)
+	void OpenGLRenderingAPI::DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type, bool depthTest, const glm::mat4 &localTransform)
 	{
 		if (!depthTest)
 			SetDepthTest(false);
 
+		material->Set("u_Renderer.Transform", localTransform);
+
+		material->UpdateForRendering();
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
 
 		if (!depthTest)
@@ -136,25 +218,17 @@ namespace highlo
 	{
 		glDrawElementsInstanced(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
 	}
-	
+
 	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type)
 	{
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::BeginFrame()
-	{
-	}
-
-	void OpenGLRenderingAPI::EndFrame()
-	{
-	}
-	
 	void OpenGLRenderingAPI::SetWireframe(bool wf)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, wf ? GL_LINE : GL_FILL);
 	}
-	
+
 	void OpenGLRenderingAPI::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 	{
 		glViewport(x, y, width, height);
@@ -252,7 +326,7 @@ namespace highlo
 		glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		glGenerateTextureMipmap(irradianceMap->GetRendererID());
 
-		return Ref<Environment>::Create(envUnfiltered, envFiltered, irradianceMap, nullptr);
+		return Ref<Environment>::Create(filePath, envUnfiltered, envFiltered, irradianceMap, Renderer::GetBRDFLutTexture());
 	}
 }
 

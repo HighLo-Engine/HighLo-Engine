@@ -18,6 +18,9 @@ namespace highlo
 
 		HLAPI virtual ~UniformBuffer() = default;
 
+		HLAPI virtual void Bind() const = 0;
+		HLAPI virtual void Unbind() const = 0;
+
 		HLAPI virtual void SetData(const void *data, uint32 size, uint32 offset = 0) = 0;
 		HLAPI virtual uint32 GetBinding() const = 0;
 

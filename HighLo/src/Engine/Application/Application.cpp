@@ -25,109 +25,13 @@ namespace highlo
 
 	HLApplication::HLApplication()
 	{
-		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
-		s_Instance = this;
-		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
-
-		Logger::Init();
-
-		// Create cache for sin() and cos()
-		CreateCacheSin();
-		CreateCacheCos();
-
-		// Init Window
-		if (!m_Settings.Headless)
-		{
-			WindowData data;
-			data.Title = m_Settings.WindowTitle;
-			data.Width = m_Settings.WindowWidth;
-			data.Height = m_Settings.WindowHeight;
-			data.Fullscreen = m_Settings.Fullscreen;
-			data.Maximized = m_Settings.Maximized;
-			data.VSync = m_Settings.VSync;
-
-			m_Window = Window::Create(data);
-			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
-		}
-
-		// Read the json registry with previous shader cache data
-		ShaderCache::Init();
-
-		// Init Renderer
-		if (!m_Settings.Headless)
-		{
-			Renderer::Init(m_Window.Get());
-			Renderer::WaitAndRender();
-		}
-
-		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
-
-		// Init Fonts
-		FontManager::Get()->Init();
-
-		m_Encryptor = Ref<Encryptor>::Create();
-		m_Encryptor->Init();
-
-		ThreadRegistry::Get()->Init();
-
-		// Sort all registered services
-		Service::Sort();
-
-		HL_CORE_INFO("Engine Initialized");
+		Init();
 	}
 
 	HLApplication::HLApplication(const ApplicationSettings &settings)
+		: m_Settings(settings)
 	{
-		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
-		s_Instance = this;
-		m_Settings = settings;
-		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
-
-		Logger::Init();
-
-		// Create cache for sin() and cos()
-		CreateCacheSin();
-		CreateCacheCos();
-
-		// Init Window
-		if (!m_Settings.Headless)
-		{
-			WindowData data;
-			data.Title = m_Settings.WindowTitle;
-			data.Width = m_Settings.WindowWidth;
-			data.Height = m_Settings.WindowHeight;
-			data.Fullscreen = m_Settings.Fullscreen;
-			data.Maximized = m_Settings.Maximized;
-			data.VSync = m_Settings.VSync;
-
-			m_Window = Window::Create(data);
-			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
-		}
-
-		// Read the json registry with previous shader cache data
-		ShaderCache::Init();
-
-		// Init Renderer
-		if (!m_Settings.Headless)
-		{
-			Renderer::Init(m_Window.Get());
-			Renderer::WaitAndRender();
-		}
-
-		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
-
-		// Init Fonts
-		FontManager::Get()->Init();
-
-		m_Encryptor = Ref<Encryptor>::Create();
-		m_Encryptor->Init();
-
-		ThreadRegistry::Get()->Init();
-
-		// Sort all registered services
-		Service::Sort();
-
-		HL_CORE_INFO("Engine Initialized");
+		Init();
 	}
 
 	HLApplication::~HLApplication()
@@ -218,6 +122,59 @@ namespace highlo
 	{
 		m_IsShuttingDown = true;
 		m_Running = false;
+	}
+
+	void HLApplication::Init()
+	{
+		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
+		s_Instance = this;
+		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
+
+		Logger::Init();
+
+		// Create cache for sin() and cos()
+		CreateCacheSin();
+		CreateCacheCos();
+
+		// Init Window
+		if (!m_Settings.Headless)
+		{
+			WindowData data;
+			data.Title = m_Settings.WindowTitle;
+			data.Width = m_Settings.WindowWidth;
+			data.Height = m_Settings.WindowHeight;
+			data.Fullscreen = m_Settings.Fullscreen;
+			data.Maximized = m_Settings.Maximized;
+			data.VSync = m_Settings.VSync;
+
+			m_Window = Window::Create(data);
+			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
+		}
+
+		// Read the json registry with previous shader cache data
+		ShaderCache::Init();
+
+		// Init Renderer
+		if (!m_Settings.Headless)
+		{
+			Renderer::Init(m_Window.Get());
+			Renderer::WaitAndRender();
+		}
+
+		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
+
+		// Init Fonts
+		FontManager::Get()->Init();
+
+		m_Encryptor = Ref<Encryptor>::Create();
+		m_Encryptor->Init();
+
+		ThreadRegistry::Get()->Init();
+
+		// Sort all registered services
+		Service::Sort();
+
+		HL_CORE_INFO("Engine Initialized");
 	}
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &e)

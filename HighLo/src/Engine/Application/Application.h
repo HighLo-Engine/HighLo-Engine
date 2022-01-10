@@ -65,6 +65,7 @@ namespace highlo
 		ECS_SystemManager m_ECS_SystemManager;
 		ApplicationLayerStack m_LayerStack;
 
+		void Init();
 		bool OnWindowClose(WindowCloseEvent &event);
 		bool OnWindowReisze(WindowResizeEvent &event);
 		bool OnFileMenuChangedEvent(FileMenuChangedEvent &event);

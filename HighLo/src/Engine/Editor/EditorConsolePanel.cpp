@@ -68,12 +68,18 @@ namespace highlo
 		}
 	}
 
+	bool EditorConsolePanel::HasMessageFilter(ConsoleMessage::LogLevel level) const
+	{
+		return (int16)level & m_MessageFilters;
+	}
+
 	void EditorConsolePanel::RenderMenu()
 	{
 		ImVec4 traceButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Trace) ? HL_EDITOR_CONSOLE_TRACE_COLOR : HL_EDITOR_WHITE_COLOR;
 		ImVec4 infoButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Info) ? HL_EDITOR_CONSOLE_INFO_COLOR : HL_EDITOR_WHITE_COLOR;
 		ImVec4 warningButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Warning) ? HL_EDITOR_CONSOLE_WARNING_COLOR : HL_EDITOR_WHITE_COLOR;
 		ImVec4 errorButtonTint = (m_MessageFilters & (int16)ConsoleMessage::LogLevel::Error) ? HL_EDITOR_CONSOLE_ERROR_COLOR : HL_EDITOR_WHITE_COLOR;
+		ImVec4 greyButtonTint = HL_EDITOR_GREY_COLOR;
 
 		constexpr float buttonOffset = 39;
 		constexpr float rightSideOffset = 15;
@@ -98,25 +104,25 @@ namespace highlo
 		ImGui::Checkbox("##CollapseMessages", &m_CollapseMessages);
 
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 4) - rightSideOffset);
-		if (UI::ImageButton(m_TraceIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), traceButtonTint))
+		if (UI::ImageButton(m_TraceIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), HasMessageFilter(ConsoleMessage::LogLevel::Trace) ? traceButtonTint : greyButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Trace;
 		}
 
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 3) - rightSideOffset);
-		if (UI::ImageButton(m_InfoIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), infoButtonTint))
+		if (UI::ImageButton(m_InfoIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), HasMessageFilter(ConsoleMessage::LogLevel::Info) ? infoButtonTint : greyButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Info;
 		}
 
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 2) - rightSideOffset);
-		if (UI::ImageButton(m_WarningIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), warningButtonTint))
+		if (UI::ImageButton(m_WarningIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), HasMessageFilter(ConsoleMessage::LogLevel::Warning) ? warningButtonTint : greyButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Warning;
 		}
 
 		ImGui::SameLine(ImGui::GetWindowWidth() - (buttonOffset * 1) - rightSideOffset);
-		if (UI::ImageButton(m_ErrorIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), errorButtonTint))
+		if (UI::ImageButton(m_ErrorIcon, ImVec2(24, 24), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), HasMessageFilter(ConsoleMessage::LogLevel::Error) ? errorButtonTint : greyButtonTint))
 		{
 			m_MessageFilters ^= (int16)ConsoleMessage::LogLevel::Error;
 		}

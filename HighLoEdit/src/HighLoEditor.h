@@ -15,7 +15,7 @@ class HighLoEditor : public HLApplication
 	{
 	public:
 
-		HighLoEditor(const ApplicationSettings &settings, const HLString &projectPath);
+		HighLoEditor(const ApplicationSettings &settings);
 		~HighLoEditor();
 
 		virtual void OnInitialize() override;
@@ -102,7 +102,7 @@ class HighLoEditor : public HLApplication
 		float m_RotationSnapValue = 45.0f;
 		float m_LineWidth = 2.0f;
 
-		bool m_AllowViewportCameraEvents = false;
+		bool m_AllowViewportCameraEvents = true;
 		bool m_ViewportPanelMouseOver = false;
 		bool m_ViewportPanelFocused = false;
 		bool m_DrawOnTopBoundingBoxes = false;

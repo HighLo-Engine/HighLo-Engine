@@ -1031,6 +1031,21 @@ namespace highlo
 			return str.Remove(newStr);
 		}
 
+		HLAPI int32 ToInt32() const
+		{
+			return atoi(m_Data);
+		}
+
+		HLAPI uint32 ToUInt32() const
+		{
+			return (uint32)atoi(m_Data);
+		}
+
+		HLAPI bool ToBool() const
+		{
+			return Compare("1") || Compare("true");
+		}
+
 		// TODO
 
 		HLString ToUTF8() const

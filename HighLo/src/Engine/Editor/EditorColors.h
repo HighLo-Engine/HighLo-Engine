@@ -15,6 +15,7 @@
 
 #define HL_EDITOR_WHITE_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 #define HL_EDITOR_BLACK_COLOR ImVec4(0.0f, 0.0f, 0.0f, 1.0f)
+#define HL_EDITOR_GREY_COLOR  ImVec4(0.1f, 0.1f, 0.1f, 1.0f)
 
 // Console Colors
 #define HL_EDITOR_CONSOLE_ERROR_COLOR ImVec4(1.0f, 0.309803922f, 0.309803922f, 1.0f)

@@ -3,9 +3,15 @@
 #include "HighLoPch.h"
 #include "ImGuiRenderer.h"
 
+#ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLImGuiRenderer.h"
+#elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanImGuiRenderer.h"
+#elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11ImGuiRenderer.h"
+#elif HIGHLO_API_DX12
+// TODO
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {

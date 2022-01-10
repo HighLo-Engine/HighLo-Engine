@@ -1,9 +1,11 @@
+// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "DocumentWriter.h"
 
 #include "Engine/Platform/JSON/JsonWriter.h"
 #include "Engine/Platform/XML/XMLWriter.h"
-#include "Engine/Platform/YAML/YAMLReader.h"
+#include "Engine/Platform/YAML/YAMLWriter.h"
 
 namespace highlo
 {

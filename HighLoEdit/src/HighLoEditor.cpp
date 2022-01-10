@@ -21,10 +21,10 @@ namespace editorutils
 	}
 }
 
-HighLoEditor::HighLoEditor(const ApplicationSettings &settings, const HLString &projectPath)
-	: HLApplication(settings), m_ProjectPath(projectPath), m_UserSettings(Ref<UserSettings>::Create())
+HighLoEditor::HighLoEditor(const ApplicationSettings &settings)
+	: HLApplication(settings), m_ProjectPath(settings.ProjectPath.String()), m_UserSettings(Ref<UserSettings>::Create())
 {
-	if (projectPath.IsEmpty())
+	if (m_ProjectPath.IsEmpty())
 		m_ProjectPath = "SandboxProject/Sandbox.hlproj";
 
 	// Register persistent storage
@@ -166,24 +166,34 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			m_EditorCamera.SetActive(m_AllowViewportCameraEvents);
 			m_EditorCamera.Update();
 			UI::SetMouseEnabled(true);
+
+			// Update Scene entities
 			m_EditorScene->UpdateScene(ts);
+
+			// Render scene content
 			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
+
+			// Render overlay
 			m_EditorScene->OnUpdateOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
 			break;
 		}
 
 		case SceneState::Play:
 		{
+			// Update scene entities
 			m_RuntimeScene->UpdateScene(ts);
+
+			// Render scene content
 			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 
 		case SceneState::Pause:
 		{
-			UI::SetMouseEnabled(true);
-
 			m_EditorCamera.Update();
+			UI::SetMouseEnabled(true);
+			
+			// Render last scene content without updating any transforms or attributes
 			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
 			break;
 		}
@@ -191,7 +201,11 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		case SceneState::Simulate:
 		{
 			m_EditorCamera.Update();
+
+			// Render scene content
 			m_SimulationScene->UpdateScene(ts);
+
+			// Run physics simulation
 			m_SimulationScene->OnSimulate(m_ViewportRenderer, ts, m_EditorCamera);
 			break;
 		}

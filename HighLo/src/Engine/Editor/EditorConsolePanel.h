@@ -28,6 +28,7 @@ namespace highlo
 		HLAPI bool IsConsoleCleared() const;
 
 		HLAPI void SetMessageFilter(ConsoleMessage::LogLevel level, bool enabled = true);
+		HLAPI bool HasMessageFilter(ConsoleMessage::LogLevel level) const;
 
 	private:
 

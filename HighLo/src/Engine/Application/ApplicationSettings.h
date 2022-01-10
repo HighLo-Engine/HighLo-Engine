@@ -57,9 +57,14 @@ namespace highlo
 		bool VSync = false;
 
 		/// <summary>
-		/// Determines the rendering api that should be used in the backend to render, if Headless is false
+		/// Determines the rendering api that should be used in the backend to render, if Headless is false.
 		/// </summary>
 		HLString RenderingAPI = "OpenGL";
+
+		/// <summary>
+		/// Determines the window api that should be used to display the window. Valid values are 'GLFW' or 'native'.
+		/// </summary>
+		HLString WindowAPI = "GLFW";
 
 		/// <summary>
 		/// Determines the Main Thread ID of the main thread
@@ -71,6 +76,11 @@ namespace highlo
 		/// The Cache config stores all hashes for later comparison
 		/// </summary>
 		FileSystemPath CacheRegistryPath = "assets/cache.registry";
+
+		/// <summary>
+		/// Determines the path to the startup project for the Editor.
+		/// </summary>
+		FileSystemPath ProjectPath = "";
 	};
 }
 

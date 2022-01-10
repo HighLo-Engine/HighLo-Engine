@@ -3,19 +3,11 @@
 #include <Engine/Core/EntryPoint.h>
 #include "HighLoEditor.h"
 
+#include "Engine/Utils/CommandLineUtils.h"
+
 highlo::HLApplication *highlo::CreateApp(int argc, char *argv[])
 {
-	highlo::HLString projectPath;
-	if (argc > 1)
-		projectPath = argv[1];
-
-	highlo::ApplicationSettings settings;
-	settings.WindowTitle = "";
-	settings.WindowWidth = 1600;
-	settings.WindowHeight = 900;
-	settings.Maximized = true;
-	settings.VSync = true;
-
-	return new HighLoEditor(settings, projectPath);
+	highlo::utils::CommandLineHelper cmdHelper(argc, argv);
+	return new HighLoEditor(cmdHelper.GetAppSettings());
 }
 

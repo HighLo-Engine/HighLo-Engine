@@ -18,6 +18,7 @@ namespace highlo
 		Vec2, Vec3, Vec4,
 		IVec2, IVec3, IVec4,
 		Mat2, Mat3, Mat4,
+		Struct
 	};
 
 	class ShaderUniform

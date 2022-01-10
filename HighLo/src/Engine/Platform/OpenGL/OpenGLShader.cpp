@@ -92,6 +92,7 @@ namespace highlo
 		{
 			switch (type.basetype)
 			{
+				case spirv_cross::SPIRType::Struct:		return ShaderUniformType::Struct;
 				case spirv_cross::SPIRType::Boolean:	return ShaderUniformType::Bool;
 				case spirv_cross::SPIRType::UInt:		return ShaderUniformType::Uint;
 				case spirv_cross::SPIRType::Int:
@@ -324,9 +325,8 @@ namespace highlo
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat4 &value)
 	{
-	//	HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-	//	int32 location = m_UniformLocations.at(fullname);
-		int32 location = GetUniformLocation(fullname);
+		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+		int32 location = m_UniformLocations.at(fullname);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
@@ -353,6 +353,7 @@ namespace highlo
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile);
 			CompileOrGetOpenGLBinary(shaderData, forceCompile);
+			ReflectAllShaderStages(shaderData);
 		}
 		else
 		{
@@ -360,7 +361,7 @@ namespace highlo
 		}
 	}
 	
-	void OpenGLShader::Reflect(std::vector<uint32> &data)
+	void OpenGLShader::Reflect(GLenum stage, std::vector<uint32> &data)
 	{
 		spirv_cross::Compiler compiler(data);
 		spirv_cross::ShaderResources res = compiler.get_shader_resources();
@@ -473,6 +474,14 @@ namespace highlo
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 			glUniform1i(location, binding);
+		}
+	}
+
+	void OpenGLShader::ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData)
+	{
+		for (auto [stage, data] : shaderData)
+		{
+			Reflect(stage, data);
 		}
 	}
 	
@@ -678,20 +687,13 @@ namespace highlo
 		{
 			for (auto &[name, uniform] : buffer.Uniforms)
 			{
-				int32 location = glGetUniformLocation(m_RendererID, *name);
-				if (location == -1)
+				int32 location = GetUniformLocation(name);
+				if (location != -1)
 				{
-					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] {0}: Could not find Uniform location [-]", *name);
+					HL_CORE_INFO("Registering Uniform {0} at location {1}", *name, location);
+					m_UniformLocations[name] = location;
 				}
-
-				HL_CORE_TRACE("Registering Uniform {0} at location {1}", *name, location);
-				m_UniformLocations[name] = location;
 			}
-		}
-
-		for (auto &shaderStageData : shaderData)
-		{
-			Reflect(shaderStageData);
 		}
 	}
 	
@@ -754,34 +756,52 @@ namespace highlo
 	
 	void OpenGLShader::ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler)
 	{
+		// Push constant ranges
 		spirv_cross::ShaderResources res = compiler.get_shader_resources();
 		for (const spirv_cross::Resource &resource : res.push_constant_buffers)
 		{
-			const HLString &bufferName = resource.name;
-			auto &bufferType = compiler.get_type(resource.base_type_id);
-			const auto &bufferSize = (uint32)(compiler.get_declared_struct_size(bufferType));
+			const HLString &name = resource.name;
+			auto &type = compiler.get_type(resource.base_type_id);
+			auto bufferSize = (uint32)compiler.get_declared_struct_size(type);
+			uint32 memberCount = (uint32)type.member_types.size();
+			uint32 bufferOffset = 0;
 
-			if (bufferName.IsEmpty() || bufferName == "u_Renderer")
+			if (m_PushConstantRanges.size())
+				bufferOffset = m_PushConstantRanges.back().Offset + m_PushConstantRanges.back().Size;
+
+			auto &pushConstantRange = m_PushConstantRanges.emplace_back();
+			pushConstantRange.Size = bufferSize - bufferOffset;
+			pushConstantRange.Offset = bufferOffset;
+
+			if (name.IsEmpty())
 			{
 				m_ConstantBufferOffset += bufferSize;
 				continue;
 			}
 
-			uint32 location = compiler.get_decoration(resource.id, spv::DecorationLocation);
-			const int32 memberCount = (int32)(bufferType.member_types.size());
-			auto &[name, size, uniforms] = m_Buffers[bufferName];
-			name = bufferName;
-			size = bufferSize - m_ConstantBufferOffset;
+			ShaderBuffer &buffer = m_Buffers[name];
+			buffer.Name = name;
+			buffer.Size = bufferSize - bufferOffset;
 
-			for (int32 i = 0; i < memberCount; ++i)
+			ShaderUniformStruct &shaderStruct = m_ShaderUniformStructs.emplace_back();
+			shaderStruct.Name = name;
+
+			for (uint32 i = 0; i < memberCount; ++i)
 			{
-				const auto &type = compiler.get_type(bufferType.member_types[i]);
-				const HLString &memberName = compiler.get_member_name(bufferType.self, i);
-				const uint32 structMemberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
-				const uint32 offset = compiler.type_struct_member_offset(bufferType, i) - m_ConstantBufferOffset;
+				auto memberType = compiler.get_type(type.member_types[i]);
+				const HLString &memberName = compiler.get_member_name(type.self, i);
+				uint32 size = (uint32)compiler.get_declared_struct_member_size(type, i);
+				uint32 offset = compiler.type_struct_member_offset(type, i) - bufferOffset;
 
-				HLString uniformName = fmt::format("{}.{}", *bufferName, *memberName);
-				uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), structMemberSize, offset);
+				ShaderUniformStructMember &member = shaderStruct.Members.emplace_back();
+				member.Name = memberName;
+				member.Size = size;
+				member.Offset = offset;
+				member.Type = utils::SpirvTypeToShaderUniformType(memberType);
+
+				HLString uniformName = fmt::format("{}.{}", *name, *memberName);
+				HL_CORE_INFO("Registering push_constant with uniform name {0}", *uniformName);
+				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);
 			}
 
 			m_ConstantBufferOffset += bufferSize;

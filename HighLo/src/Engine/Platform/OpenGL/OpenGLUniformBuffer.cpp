@@ -17,6 +17,7 @@ namespace highlo
 		m_LocalStorage = new uint8[size];
 
 		glCreateBuffers(1, &m_RendererID);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
 		glNamedBufferData(m_RendererID, size, nullptr, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
 	}
@@ -28,10 +29,22 @@ namespace highlo
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
+	void OpenGLUniformBuffer::Bind() const
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		glBindBufferRange(GL_UNIFORM_BUFFER, m_Binding, m_RendererID, 0, m_Size);
+	}
+
+	void OpenGLUniformBuffer::Unbind() const
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
 	void OpenGLUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
 		memcpy(m_LocalStorage, data, size);
 
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
 		glNamedBufferSubData(m_RendererID, offset, size, m_LocalStorage);
 	}
 }

@@ -3,8 +3,11 @@
 #include "HighLoPch.h"
 #include "CommandBuffer.h"
 
-#include "Engine/Platform/Vulkan/VulkanCommandBuffer.h"
+#ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLCommandBuffer.h"
+#elif HIGHLO_API_VULKAN
+#include "Engine/Platform/Vulkan/VulkanCommandBuffer.h"
+#endif // HIGHLO_API_OPENGL
 
 namespace highlo
 {

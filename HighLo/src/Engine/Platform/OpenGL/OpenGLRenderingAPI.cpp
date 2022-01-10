@@ -75,34 +75,6 @@ namespace highlo
 				}
 			}
 		}
-
-		static void Clear(float r, float g, float b, float a)
-		{
-			glClearColor(r, g, b, a);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		}
-
-		static void SetClearColor(float r, float g, float b, float a)
-		{
-			glClearColor(r, g, b, a);
-		}
-
-		static void DrawIndexed(uint32 count, PrimitiveType type, bool depthTest)
-		{
-			if (!depthTest)
-				glDisable(GL_DEPTH_TEST);
-
-			GLenum glPrimitiveType = utils::ConvertToOpenGLPrimitiveType(type);
-			glDrawElements(glPrimitiveType, count, GL_UNSIGNED_INT, nullptr);
-
-			if (!depthTest)
-				glEnable(GL_DEPTH_TEST);
-		}
-
-		static void SetLineThickness(float thickness)
-		{
-			glLineWidth(thickness);
-		}
 	}
 
 	struct OpenGLDrawData
@@ -213,138 +185,87 @@ namespace highlo
 	//	s_GLDrawData->ActiveRenderPass = nullptr;
 	}
 
-	void OpenGLRenderingAPI::RenderDynamicModel(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materialTable, Ref<VertexBuffer> transformBuffer, uint32 transformOffset, uint32 instanceCount)
+	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4 &color)
 	{
+		glClearColor(color.r, color.g, color.b, color.a);
 	}
 
-	void OpenGLRenderingAPI::RenderStaticModel(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materialTable, const Transform &transform)
+	void OpenGLRenderingAPI::ClearScreenBuffers()
 	{
-		Ref<MeshFile> meshAsset = model->Get();
-		Ref<OpenGLVertexBuffer> vbo = meshAsset->GetVertexBuffer().As<OpenGLVertexBuffer>();
-		Ref<OpenGLIndexBuffer> ibo = meshAsset->GetIndexBuffer().As<OpenGLIndexBuffer>();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 
-		vbo->Bind();
-		va->Bind();
-		ibo->Bind();
+	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray> &va, PrimitiveType type)
+	{
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
 
-		auto &materials = model->GetMaterials()->GetMaterials();
-		for (Mesh &submesh : meshAsset->GetSubmeshes())
+	void OpenGLRenderingAPI::DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type, bool depthTest, const glm::mat4 &localTransform)
+	{
+		if (!depthTest)
+			SetDepthTest(false);
+
+		material->Set("u_Renderer.Transform", localTransform);
+
+		material->UpdateForRendering();
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
+
+		if (!depthTest)
+			SetDepthTest(true);
+	}
+
+	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type)
+	{
+		glDrawElementsInstanced(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
+	}
+
+	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type)
+	{
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void OpenGLRenderingAPI::SetWireframe(bool wf)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, wf ? GL_LINE : GL_FILL);
+	}
+
+	void OpenGLRenderingAPI::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
+	{
+		glViewport(x, y, width, height);
+	}
+
+	void OpenGLRenderingAPI::SetBlendMode(bool bEnabled)
+	{
+		if (bEnabled)
 		{
-			auto material = materials[submesh.MaterialIndex].As<OpenGLMaterial>();
-			auto shader = material->GetShader().As<OpenGLShader>();
-			
-			shader->Bind();
-			material->UpdateForRendering();
-
-			auto finalTransform = transform.GetTransform() * submesh.LocalTransform.GetTransform();
-			shader->SetUniform("u_Renderer.Transform", finalTransform);
-
-			if (material->GetFlag(MaterialFlag::DepthTest))
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
-
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32)), submesh.BaseVertex);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
 		}
 	}
 
-	void OpenGLRenderingAPI::RenderDynamicModelWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformOffset, uint32 instanceCount, Ref<Material> material, Allocator additionalUniforms)
+	void OpenGLRenderingAPI::SetMultiSample(bool bEnabled)
 	{
-		// TODO
+		if (bEnabled)
+			glEnable(GL_MULTISAMPLE);
+		else
+			glDisable(GL_MULTISAMPLE);
 	}
 
-	void OpenGLRenderingAPI::RenderStaticModelWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materialTable, const Transform &transform)
+	void OpenGLRenderingAPI::SetDepthTest(bool bEnabled)
 	{
-		Ref<MeshFile> meshAsset = model->Get();
-		Ref<OpenGLVertexBuffer> vbo = meshAsset->GetVertexBuffer().As<OpenGLVertexBuffer>();
-		Ref<OpenGLIndexBuffer> ibo = meshAsset->GetIndexBuffer().As<OpenGLIndexBuffer>();
-
-		vbo->Bind();
-		va->Bind();
-		ibo->Bind();
-
-		auto shader = va->GetSpecification().Shader.As<OpenGLShader>();
-		shader->Bind();
-
-		auto &materials = materialTable->GetMaterials();
-		for (Mesh &submesh : meshAsset->GetSubmeshes())
-		{
-			auto material = materials[submesh.MaterialIndex].As<OpenGLMaterial>();
-			material->UpdateForRendering();
-
-			auto finalTransform = transform.GetTransform() * submesh.LocalTransform.GetTransform();
-			shader->SetUniform("u_Renderer.Transform", finalTransform);
-
-			if (material->GetFlag(MaterialFlag::DepthTest))
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
-
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32)), submesh.BaseVertex);
-		}
-	}
-
-	void OpenGLRenderingAPI::RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const Transform &transform)
-	{
-		s_GLDrawData->FullscreenQuadVertexBuffer->Bind();
-		va->Bind();
-		s_GLDrawData->FullscreenQuadIndexBuffer->Bind();
-
-		Ref<OpenGLMaterial> glMaterial = material.As<OpenGLMaterial>();
-		glMaterial->UpdateForRendering();
-
-		auto shader = material->GetShader().As<OpenGLShader>();
-		shader->Bind();
-		shader->SetUniform("u_Renderer.Transform", transform.GetTransform());
-
-		if (material->GetFlag(MaterialFlag::DepthTest))
+		if (bEnabled)
 			glEnable(GL_DEPTH_TEST);
 		else
 			glDisable(GL_DEPTH_TEST);
-
-		glDrawElements(GL_TRIANGLES, s_GLDrawData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::RenderGeometry(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, Ref<VertexBuffer> vertexBuffer, Ref<IndexBuffer> indexBuffer, const Transform &transform, uint32 indexCount)
+	void OpenGLRenderingAPI::SetLineThickness(float thickness)
 	{
-		vertexBuffer->Bind();
-		va->Bind();
-		indexBuffer->Bind();
-
-		Ref<OpenGLMaterial> glMat = material.As<OpenGLMaterial>();
-		glMat->UpdateForRendering();
-
-		Ref<OpenGLShader> shader = material->GetShader().As<OpenGLShader>();
-		shader->Bind();
-		shader->SetUniform("u_Renderer.Transform", transform.GetTransform());
-
-		if (material->GetFlag(MaterialFlag::DepthTest))
-			glEnable(GL_DEPTH_TEST);
-		else
-			glDisable(GL_DEPTH_TEST);
-
-		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
-	}
-
-	void OpenGLRenderingAPI::SubmitFullscreenQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<Material> material)
-	{
-	}
-
-	void OpenGLRenderingAPI::SubmitFullscreenQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material)
-	{
-	}
-
-	void OpenGLRenderingAPI::SubmitFullscreenQuadWithOverrides(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<Material> material, Allocator vertexShaderOverrides, Allocator fragmentShaderOverrides)
-	{
-	}
-
-	void OpenGLRenderingAPI::DispatchComputeShader(Ref<CommandBuffer> renderCommandBuffer, Ref<ComputePipeline> computePipeline, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::ivec3 &groups)
-	{
-	}
-
-	void OpenGLRenderingAPI::ClearTexture(Ref<CommandBuffer> renderCommandBuffer, Ref<Texture2D> texture)
-	{
-		
+		glLineWidth(thickness);
 	}
 
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)

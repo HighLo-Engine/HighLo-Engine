@@ -47,6 +47,9 @@ namespace highlo
 		Renderer::Submit([instance, camera]()
 		{
 			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
+
+			Renderer::ClearScreenColor(instance->m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
+			Renderer::ClearScreenBuffers();
 		});
 	}
 

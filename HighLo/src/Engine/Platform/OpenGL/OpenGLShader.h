@@ -23,6 +23,28 @@ namespace highlo
 	{
 	public:
 
+		struct PushConstantRange
+		{
+			uint32 Offset = 0;
+			uint32 Size = 0;
+		};
+
+		struct ShaderUniformStructMember
+		{
+			HLString Name;
+			uint32 Size;
+			uint32 Offset;
+			ShaderUniformType Type;
+		};
+
+		struct ShaderUniformStruct
+		{
+			HLString Name;
+			std::vector<ShaderUniformStructMember> Members;
+		};
+
+	public:
+
 		OpenGLShader(const FileSystemPath &filePath, bool forceCompile);
 		OpenGLShader(const HLString &source);
 		~OpenGLShader();
@@ -65,13 +87,16 @@ namespace highlo
 		virtual void SetUniform(const HLString &fullname, const glm::mat4 &value);
 
 		const ShaderResourceDeclaration *GetShaderResource(const HLString &name);
+		std::vector<ShaderUniformStruct> &GetUniformStructs() { return m_ShaderUniformStructs; }
+		const std::vector<ShaderUniformStruct> &GetUniformStructs() const { return m_ShaderUniformStructs; }
 
 		static void ClearUniformBuffers();
 
 	private:
 
 		void Load(const HLString &source, bool forceCompile);
-		void Reflect(std::vector<uint32> &data);
+		void Reflect(GLenum stage, std::vector<uint32> &data);
+		void ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData);
 
 		void CompileOrGetVulkanBinary(std::unordered_map<uint32, std::vector<uint32>> &outputBinary, bool forceCompile = false);
 		void CompileOrGetOpenGLBinary(const std::unordered_map<uint32, std::vector<uint32>> &, bool forceCompile = false);
@@ -125,6 +150,8 @@ namespace highlo
 		std::unordered_map<HLString, ShaderResourceDeclaration> m_Resources;
 		std::unordered_map<HLString, int32> m_UniformLocations;
 		std::vector<ShaderReloadedCallback> m_ReloadedCallbacks;
+		std::vector<PushConstantRange> m_PushConstantRanges;
+		std::vector<ShaderUniformStruct> m_ShaderUniformStructs;
 	};
 }
 

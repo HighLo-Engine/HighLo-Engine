@@ -35,9 +35,8 @@ void main()
 	Output.TexCoord = in_TexCoord;
 	Output.TexIndex = in_TexIndex;
 	Output.TilingFactor = in_TilingFactor;
-	gl_Position = u_ViewProjection * u_Renderer.Transform * vec4(in_Position, 1.0f);
-
 	v_EntityID = in_EntityID;
+	gl_Position = u_ViewProjection * u_Renderer.Transform * vec4(in_Position, 1.0f);
 }
 
 #shader pixel

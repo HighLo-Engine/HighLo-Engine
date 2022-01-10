@@ -56,116 +56,16 @@ namespace highlo
 		HLAPI static void BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, Ref<RenderPass> &renderPass, bool shouldClear = false);
 		HLAPI static void EndRenderPass(Ref<CommandBuffer> &renderCommandBuffer);
 
-		HLAPI static void RenderDynamicModel(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
-			uint32 submeshIndex,
-			Ref<MaterialTable> materialTable,
-			Ref<VertexBuffer> transformBuffer,
-			uint32 transformOffset,
-			uint32 instanceCount);
+		HLAPI static void ClearScreenColor(const glm::vec4 &color);
+		HLAPI static void ClearScreenColor(float r, float g, float b, float a);
+		HLAPI static void ClearScreenBuffers();
 
-		HLAPI static void RenderStaticModel(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<StaticModel> model,
-			uint32 submeshIndex,
-			Ref<MaterialTable> materialTable,
-			const Transform &transform);
-
-		HLAPI static void RenderDynamicModelWithMaterial(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
-			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
-			uint32 transformOffset,
-			uint32 instanceCount,
-			Ref<Material> material,
-			Allocator additionalUniforms = Allocator());
-
-		HLAPI static void RenderStaticModelWithMaterial(
-			Ref<CommandBuffer> renderCommandBuffer, 
-			Ref<VertexArray> va, 
-			Ref<UniformBufferSet> uniformBufferSet, 
-			Ref<StorageBufferSet> storageBufferSet, 
-			Ref<StaticModel> model, 
-			uint32 submeshIndex, 
-			Ref<MaterialTable> materialTable, 
-			const Transform &transform);
-
-		HLAPI static void RenderQuad(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<Material> material,
-			const Transform &transform);
-
-		HLAPI static void RenderGeometry(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<Material> material,
-			Ref<VertexBuffer> vertexBuffer,
-			Ref<IndexBuffer> indexBuffer,
-			const Transform &transform,
-			uint32 indexCount = 0);
-
-		HLAPI static void RenderGeometry(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<Material> material,
-			const Transform &transform);
-
-		HLAPI static void RenderGeometry(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<Material> material,
-			const Transform &transform);
-
-		HLAPI static void SubmitFullscreenQuad(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<Material> material);
-
-		HLAPI static void SubmitFullscreenQuad(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<Material> material);
-
-		HLAPI static void SubmitFullscreenQuadWithOverrides(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<Material> material,
-			Allocator vertexShaderOverrides,
-			Allocator fragmentShaderOverrides);
-
-		HLAPI static void DispatchComputeShader(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<ComputePipeline> computePipeline,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<Material> material,
-			const glm::ivec3 &groups);
-
-		HLAPI static void ClearTexture(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<Texture2D> texture);
+		HLAPI static void SetWireframe(bool wf);
+		HLAPI static void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height);
+		HLAPI static void SetBlendMode(bool bEnabled);
+		HLAPI static void SetMultiSample(bool bEnabled);
+		HLAPI static void SetDepthTest(bool bEnabled);
+		HLAPI static void SetLineThickness(float thickness);
 	
 		template<typename T>
 		HLAPI static void Submit(T &&func)

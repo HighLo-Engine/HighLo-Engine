@@ -168,144 +168,49 @@ namespace highlo
 		s_RenderingAPI->EndRenderPass(renderCommandBuffer);
 	}
 
-	void Renderer::RenderDynamicModel(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
-		uint32 submeshIndex, 
-		Ref<MaterialTable> materialTable, 
-		Ref<VertexBuffer> transformBuffer, 
-		uint32 transformOffset, 
-		uint32 instanceCount)
+	void Renderer::ClearScreenColor(const glm::vec4 &color)
 	{
-		s_RenderingAPI->RenderDynamicModel(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transformBuffer, transformOffset, instanceCount);
+		s_RenderingAPI->ClearScreenColor(color);
 	}
 
-	void Renderer::RenderStaticModel(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
-		uint32 submeshIndex, 
-		Ref<MaterialTable> materialTable, 
-		const Transform &transform)
+	void Renderer::ClearScreenColor(float r, float g, float b, float a)
 	{
-		s_RenderingAPI->RenderStaticModel(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transform);
+		s_RenderingAPI->ClearScreenColor({ r, g, b, a });
 	}
 
-	void Renderer::RenderDynamicModelWithMaterial(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
-		uint32 submeshIndex, 
-		Ref<VertexBuffer> transformBuffer, 
-		uint32 transformOffset, 
-		uint32 instanceCount, 
-		Ref<Material> material, 
-		Allocator additionalUniforms)
+	void Renderer::ClearScreenBuffers()
 	{
-		s_RenderingAPI->RenderDynamicModelWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformOffset, instanceCount, material, additionalUniforms);
+		s_RenderingAPI->ClearScreenBuffers();
 	}
 
-	void Renderer::RenderStaticModelWithMaterial(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
-		uint32 submeshIndex, 
-		Ref<MaterialTable> materialTable, 
-		const Transform &transform)
+	void Renderer::SetWireframe(bool wf)
 	{
-		s_RenderingAPI->RenderStaticModelWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transform);
+		s_RenderingAPI->SetWireframe(wf);
 	}
 
-	void Renderer::RenderQuad(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<Material> material, 
-		const Transform &transform)
+	void Renderer::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 	{
-		s_RenderingAPI->RenderQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, transform);
+		s_RenderingAPI->SetViewport(x, y, width, height);
 	}
 
-	void Renderer::RenderGeometry(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<Material> material, 
-		Ref<VertexBuffer> vertexBuffer, 
-		Ref<IndexBuffer> indexBuffer, 
-		const Transform &transform, 
-		uint32 indexCount)
+	void Renderer::SetBlendMode(bool bEnabled)
 	{
-		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, vertexBuffer, indexBuffer, transform, indexCount);
+		s_RenderingAPI->SetBlendMode(bEnabled);
 	}
 
-	void Renderer::RenderGeometry(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const Transform &transform)
+	void Renderer::SetMultiSample(bool bEnabled)
 	{
-		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, va->GetVertexBuffers()[0], va->GetIndexBuffer(), transform, va->GetIndexBuffer()->GetCount());
+		s_RenderingAPI->SetMultiSample(bEnabled);
 	}
 
-	void Renderer::RenderGeometry(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<Material> material, const Transform &transform)
+	void Renderer::SetDepthTest(bool bEnabled)
 	{
-		s_RenderingAPI->RenderGeometry(renderCommandBuffer, va, nullptr, nullptr, material, va->GetVertexBuffers()[0], va->GetIndexBuffer(), transform, va->GetIndexBuffer()->GetCount());
+		s_RenderingAPI->SetDepthTest(bEnabled);
 	}
 
-	void Renderer::SubmitFullscreenQuad(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<Material> material)
+	void Renderer::SetLineThickness(float thickness)
 	{
-		s_RenderingAPI->SubmitFullscreenQuad(renderCommandBuffer, va, uniformBufferSet, material);
-	}
-
-	void Renderer::SubmitFullscreenQuad(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<Material> material)
-	{
-		s_RenderingAPI->SubmitFullscreenQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material);
-	}
-
-	void Renderer::SubmitFullscreenQuadWithOverrides(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<Material> material, 
-		Allocator vertexShaderOverrides, 
-		Allocator fragmentShaderOverrides)
-	{
-		s_RenderingAPI->SubmitFullscreenQuadWithOverrides(renderCommandBuffer, va, uniformBufferSet, material, vertexShaderOverrides, fragmentShaderOverrides);
-	}
-
-	void Renderer::DispatchComputeShader(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<ComputePipeline> computePipeline, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<Material> material, 
-		const glm::ivec3 &groups)
-	{
-		s_RenderingAPI->DispatchComputeShader(renderCommandBuffer, computePipeline, uniformBufferSet, storageBufferSet, material, groups);
-	}
-
-	void Renderer::ClearTexture(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<Texture2D> texture)
-	{
-		s_RenderingAPI->ClearTexture(renderCommandBuffer, texture);
+		s_RenderingAPI->SetLineThickness(thickness);
 	}
 
 	Ref<Texture3D> Renderer::GetBlackCubeTexture()

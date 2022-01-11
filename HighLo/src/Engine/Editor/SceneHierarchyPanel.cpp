@@ -113,7 +113,7 @@ namespace highlo
 				ImGui::EndDragDropTarget();
 			}
 
-			if (ImGui::BeginPopupContextWindow(0, 1, false))
+			if (ImGui::BeginPopupContextWindow("#sceneHierarchyRightClick", ImGuiMouseButton_Right, true))
 			{
 				if (ImGui::BeginMenu(ICON_FA_PLUS " New"))
 				{

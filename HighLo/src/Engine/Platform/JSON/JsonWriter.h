@@ -132,7 +132,6 @@ namespace highlo
 
 		rapidjson::Document m_Document;
 		FileSystemPath m_FilePath;
-		char m_StreamData[0xFFFF];
 
 		std::pair<rapidjson::Value, rapidjson::Value> m_TempBuffer;	// last current appended member
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBuffers; // only for arrays

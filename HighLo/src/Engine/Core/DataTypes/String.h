@@ -65,6 +65,8 @@ namespace highlo
 	using HLString16 = HLStringBase<char16_t>;
 	using HLString32 = HLStringBase<char32_t>;
 
+	#define HASH_LENGTH 20
+
 	template<typename StringType>
 	class HLStringBase
 	{
@@ -684,16 +686,14 @@ namespace highlo
 
 		HLAPI uint64 Hash() const
 		{
-			/*
-			uint64 hash = 0;
-			
-			for (uint32 i = 0; i < m_Size; ++i)
-				hash = (hash << 6) ^ (hash >> 26) ^ m_Data[i];
-			
-			return hash;
-			*/
+			uint32 i;
+			uint64 hash = 2166136261UL;
+			unsigned char *p = (unsigned char*)m_Data;
 
-			return (*(uint64*)m_Data) >> 2;
+			for (i = 0; i < m_Size; i++)
+				hash = (hash ^ p[i]) * 16777619;
+
+			return hash;
 		}
 
 		HLAPI bool IsEmpty() const

@@ -472,4 +472,9 @@ namespace highlo
 		// The Result is in the lower part of the SSE Register
 		return _mm_cvtss_f32(sumReg);
 	}
+	
+	uint32 GetDigitCountOf(uint32 number)
+	{
+		return (uint32)log10(number) + 1;
+	}
 }

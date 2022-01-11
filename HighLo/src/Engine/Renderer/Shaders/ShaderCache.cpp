@@ -36,49 +36,29 @@ namespace highlo
 
 	void ShaderCache::Serialize(const std::map<HLString, uint64> &shaderCache)
 	{
-		/*
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
-		std::vector<DocumentEntry> dataToStore;
+		writer->BeginArray();
 		for (auto &[filePath, hash] : shaderCache)
 		{
-			DocumentEntry entry;
-			entry.Key = filePath;
-			entry.Value = new void*[1];
-			entry.Value[0] = &((uint64)hash);
-			entry.ElementSize = sizeof(uint64);
-			entry.ElementCount = 1;
-			entry.Type = "uint64";
-			dataToStore.push_back(entry);
+			writer->BeginObject();
+			writer->Write(filePath, hash);
+			writer->EndObject();
 		}
+		writer->EndArray();
 
-		writer->Write("shaderCache", dataToStore);
-		writer->WriteOut();
-		*/
+		bool success = writer->WriteOut();
+		HL_CORE_TRACE("Written: {0}", success);
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
-		/*
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
+		reader->ReadContents();
 
-		std::vector<DocumentEntry> result = reader->GetAll();
-
-		for (uint32 i = 0; i < result.size(); ++i)
-		{
-			DocumentEntry entry = result[i];
-
-			if (entry.Type == "uint64")
-			{
-				HLString path = entry.Key;
-				uint64 hash = (uint64)entry.Value[0];
-
-				shaderCache[path] = hash;
-			}
-		}
-		*/
+		reader->ReadUint64ArrayMap("", m_Cache);
 	}
 }
 

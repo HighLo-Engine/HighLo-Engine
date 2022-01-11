@@ -49,16 +49,15 @@ namespace highlo
 		writer->EndArray();
 
 		bool success = writer->WriteOut();
-		HL_CORE_TRACE("Written: {0}", success);
+		HL_ASSERT(success);
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-		reader->ReadContents();
-
-		reader->ReadUint64ArrayMap("", m_Cache);
+		bool success = reader->ReadContents();
+		success = reader->ReadUint64ArrayMap("", m_Cache);
 	}
 }
 

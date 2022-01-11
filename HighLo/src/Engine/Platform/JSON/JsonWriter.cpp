@@ -4,6 +4,7 @@
 #include "JsonWriter.h"
 
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Utils/LoaderUtils.h"
 
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/stringbuffer.h>
@@ -15,9 +16,28 @@
 
 namespace highlo
 {
-	JSONWriter::JSONWriter(const FileSystemPath &filePath)
+	namespace utils
 	{
-		m_FilePath = filePath;
+		std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
+		{
+			std::pair<rapidjson::Value, rapidjson::Value> result;
+			rapidjson::Value keyType(rapidjson::kStringType);
+			keyType.SetString("type", document.GetAllocator());
+
+			rapidjson::Value valType(rapidjson::kStringType);
+
+			HLString typeStr = utils::DocumentDataTypeToString(type);
+			valType.SetString(*typeStr, typeStr.Length(), document.GetAllocator());
+
+			result.first = keyType;
+			result.second = valType;
+			return result;
+		}
+	}
+
+	JSONWriter::JSONWriter(const FileSystemPath &filePath)
+		: m_FilePath(filePath)
+	{
 	}
 	
 	JSONWriter::~JSONWriter()
@@ -35,33 +55,45 @@ namespace highlo
 		{
 			m_ShouldWriteIntoArray = false;
 
-			if (m_ObjectWasUsed)
+			if (key.IsEmpty())
 			{
-				m_ObjectWasUsed = false;
-
-				m_Document.SetObject();
-				rapidjson::Value array(rapidjson::kArrayType);
-
-				for (uint32 i = 0; i < m_TempBuffers.size(); ++i)
+				m_Document.SetArray();
+				for (uint32 i = 0; i < m_TempBufferValues.size(); ++i)
 				{
-					rapidjson::Value v;
-					v.SetObject();
-					v.AddMember(m_TempBuffers[i].first, m_TempBuffers[i].second, m_Document.GetAllocator());
+					rapidjson::Value realValue(rapidjson::kObjectType);
+					realValue.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document.GetAllocator());
+
+					rapidjson::Value keyValue(rapidjson::kStringType);
+					keyValue.SetString("value", m_Document.GetAllocator());
+
+					rapidjson::Value v(rapidjson::kObjectType);
+					v.AddMember(m_TempBufferTypes[i].first, m_TempBufferTypes[i].second, m_Document.GetAllocator());
+					v.AddMember(keyValue, realValue, m_Document.GetAllocator());
+					m_Document.PushBack(v, m_Document.GetAllocator());
+				}
+			}
+			else
+			{
+				rapidjson::Value array(rapidjson::kArrayType);
+				for (uint32 i = 0; i < m_TempBufferValues.size(); ++i)
+				{
+					rapidjson::Value realValue(rapidjson::kObjectType);
+					realValue.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document.GetAllocator());
+
+					rapidjson::Value keyValue(rapidjson::kStringType);
+					keyValue.SetString("value", m_Document.GetAllocator());
+
+					rapidjson::Value v(rapidjson::kObjectType);
+					v.AddMember(m_TempBufferTypes[i].first, m_TempBufferTypes[i].second, m_Document.GetAllocator());
+					v.AddMember(keyValue, realValue, m_Document.GetAllocator());
 					array.PushBack(v, m_Document.GetAllocator());
 				}
 
 				rapidjson::Value arrayKeyName(rapidjson::kStringType);
 				arrayKeyName.SetString(*key, m_Document.GetAllocator());
 
+				m_Document.SetObject();
 				m_Document.AddMember(arrayKeyName, array, m_Document.GetAllocator());
-			}
-			else
-			{
-				m_Document.SetArray();
-				for (uint32 i = 0; i < m_TempBuffers.size(); ++i)
-				{
-					m_Document.PushBack(m_TempBuffers[i].second, m_Document.GetAllocator());
-				}
 			}
 		}
 	}
@@ -69,7 +101,6 @@ namespace highlo
 	void JSONWriter::BeginObject()
 	{
 		m_ShouldWriteIntoObject = true;
-		m_ObjectWasUsed = true;
 	}
 
 	void JSONWriter::EndObject()
@@ -80,2909 +111,1149 @@ namespace highlo
 
 			if (m_ShouldWriteIntoArray)
 			{
-				std::pair<rapidjson::Value, rapidjson::Value> &current = m_TempBuffers.emplace_back();
-				current.first = m_TempBuffer.first;
-				current.second = m_TempBuffer.second;
+				std::pair<rapidjson::Value, rapidjson::Value> &v = m_TempBufferValues.emplace_back();
+				v.first = m_TempBufferValue.first;
+				v.second = m_TempBufferValue.second;
+
+				std::pair<rapidjson::Value, rapidjson::Value> &t = m_TempBufferTypes.emplace_back();
+				t.first = m_TempBufferType.first;
+				t.second = m_TempBufferType.second;
 			}
 			else
 			{
 				m_Document.SetObject();
-				m_Document.AddMember(m_TempBuffer.first, m_TempBuffer.second, m_Document.GetAllocator());
+				m_Document.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
 			}
 		}
 	}
 	
 	bool JSONWriter::Write(const HLString &key, float value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::Float, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetFloat(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetFloat(value);
+			return v;
+		});
 	}
 	
 	bool JSONWriter::Write(const HLString &key, double value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::Double, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetDouble(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetDouble(value);
+			return v;
+		});
 	}
 	
 	bool JSONWriter::Write(const HLString &key, int32 value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::Int32, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetInt(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetInt(value);
+			return v;
+		});
 	}
 	
 	bool JSONWriter::Write(const HLString &key, uint32 value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::UInt32, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetUint(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetUint(value);
+			return v;
+		});
 	}
 	
 	bool JSONWriter::Write(const HLString &key, int64 value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::Int64, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetInt64(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetInt64(value);
+			return v;
+		});
 	}
 	
 	bool JSONWriter::Write(const HLString &key, uint64 value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::UInt64, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetUint64(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetUint64(value);
+			return v;
+		});
 	}
 
 	bool JSONWriter::Write(const HLString &key, bool value)
 	{
-		if (key.IsEmpty())
+		return Write(key, DocumentDataType::Bool, [value]() -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for value {0} [-]", value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetBool(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kObjectType);
+			v.SetBool(value);
+			return v;
+		});
 	}
 	
 	bool JSONWriter::Write(const HLString &key, const HLString &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for String {0} [-]", *value);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kObjectType);
-		valType.SetString(*value, value.Length(), m_Document.GetAllocator());
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<HLString> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value str(rapidjson::kStringType);
-			str.SetString(*value[i], value[i].Length(), m_Document.GetAllocator());
-			valType.PushBack(str, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<int32> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<uint32> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<int64> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<uint64> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<bool> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<float> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-	
-	bool JSONWriter::Write(const HLString &key, std::vector<double> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType = ConvertStdArrToRapidJsonArr(value);
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-	
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec2> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i].x, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].y, m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec3> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i].x, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].y, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].z, m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec4> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i].x, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].y, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].z, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].w, m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat2> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i][0][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][0][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][1], m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat3> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i][0][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][0][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][0][2], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][2], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][2], m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat4> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i][0][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][0][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][0][2], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][0][3], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][2], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][1][3], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][2], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][2][3], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][3][0], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][3][1], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][3][2], m_Document.GetAllocator());
-			v.PushBack<float>(value[i][3][3], m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::quat> &value)
-	{
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-
-		for (uint32 i = 0; i < value.size(); ++i)
-		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[i].w, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].x, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].y, m_Document.GetAllocator());
-			v.PushBack<float>(value[i].z, m_Document.GetAllocator());
-			valType.PushBack(v, m_Document.GetAllocator());
-		}
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kStringType);
+			v.SetString(*value, value.Length(), instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
 
 	bool JSONWriter::Write(const HLString &key, const glm::vec2 &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Vector2 {0}, {1} [-]", value.x, value.y);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value.x, m_Document.GetAllocator());
-		valType.PushBack<float>(value.y, m_Document.GetAllocator());
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
-	
+
 	bool JSONWriter::Write(const HLString &key, const glm::vec3 &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Vector3 {0}, {1}, {2} [-]", value.x, value.y, value.z);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value.x, m_Document.GetAllocator());
-		valType.PushBack<float>(value.y, m_Document.GetAllocator());
-		valType.PushBack<float>(value.z, m_Document.GetAllocator());
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
-	
+
 	bool JSONWriter::Write(const HLString &key, const glm::vec4 &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Vector4 {0}, {1}, {2}, {3} [-]", value.x, value.y, value.y, value.z);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value.x, m_Document.GetAllocator());
-		valType.PushBack<float>(value.y, m_Document.GetAllocator());
-		valType.PushBack<float>(value.z, m_Document.GetAllocator());
-		valType.PushBack<float>(value.w, m_Document.GetAllocator());
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.w, instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
-	
+
 	bool JSONWriter::Write(const HLString &key, const glm::mat2 &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Matrix2 [-]");
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value[0][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[0][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][1], m_Document.GetAllocator());
-		
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
-	
+
 	bool JSONWriter::Write(const HLString &key, const glm::mat3 &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Matrix3 [-]");
-			return false;
-		}
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][2], instance->m_Document.GetAllocator());
 
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
+			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][2], instance->m_Document.GetAllocator());
 
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value[0][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[0][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[0][2], m_Document.GetAllocator());
-
-		valType.PushBack<float>(value[1][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][2], m_Document.GetAllocator());
-
-		valType.PushBack<float>(value[2][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[2][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[2][2], m_Document.GetAllocator());
-		
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-		
-		return true;
+			v.PushBack<float>(value[2][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][2], instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
-	
+
 	bool JSONWriter::Write(const HLString &key, const glm::mat4 &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Matrix4 [-]");
-			return false;
-		}
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][3], instance->m_Document.GetAllocator());
 
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
+			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][3], instance->m_Document.GetAllocator());
 
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value[0][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[0][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[0][2], m_Document.GetAllocator());
-		valType.PushBack<float>(value[0][3], m_Document.GetAllocator());
+			v.PushBack<float>(value[2][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][3], instance->m_Document.GetAllocator());
 
-		valType.PushBack<float>(value[1][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][2], m_Document.GetAllocator());
-		valType.PushBack<float>(value[1][3], m_Document.GetAllocator());
-
-		valType.PushBack<float>(value[2][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[2][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[2][2], m_Document.GetAllocator());
-		valType.PushBack<float>(value[2][3], m_Document.GetAllocator());
-
-		valType.PushBack<float>(value[3][0], m_Document.GetAllocator());
-		valType.PushBack<float>(value[3][1], m_Document.GetAllocator());
-		valType.PushBack<float>(value[3][2], m_Document.GetAllocator());
-		valType.PushBack<float>(value[3][3], m_Document.GetAllocator());
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			v.PushBack<float>(value[3][0], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[3][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[3][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[3][3], instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
-	
+
 	bool JSONWriter::Write(const HLString &key, const glm::quat &value)
 	{
-		if (key.IsEmpty())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key for Quaternion {0}, {1}, {2}, {3} [-]", value.w, value.x, value.y, value.z);
-			return false;
-		}
-
-		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
-
-		rapidjson::Value valType(rapidjson::kArrayType);
-		valType.PushBack<float>(value.w, m_Document.GetAllocator());
-		valType.PushBack<float>(value.x, m_Document.GetAllocator());
-		valType.PushBack<float>(value.y, m_Document.GetAllocator());
-		valType.PushBack<float>(value.z, m_Document.GetAllocator());
-
-		if (!AddIntoStructure(keyType, valType))
-		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, valType, m_Document.GetAllocator());
-		}
-
-		return true;
+			rapidjson::Value v(rapidjson::kArrayType);
+			v.PushBack<float>(value.w, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
+			return v;
+		});
 	}
 
-	bool JSONWriter::ReadStringArray(const HLString &key, std::vector<HLString> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<HLString> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
 		{
-			HL_ASSERT(m_Document.IsObject());
-			rapidjson::GenericObject obj = m_Document.GetObject();
-
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsString())
-				{
-					HLString k = currentObj->name.GetString();
-					HLString v = currentObj->value.GetString();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, *v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-string!");
-					return false;
-				}
+				rapidjson::Value str(rapidjson::kStringType);
+				str.SetString(*value[i], value[i].Length(), instance->m_Document.GetAllocator());
+				v.PushBack(str, instance->m_Document.GetAllocator());
 			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsString())
-			{
-				HLString k = currentObj->name.GetString();
-				HLString v = currentObj->value.GetString();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, *v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-string!");
-				return false;
-			}
-		}
-
-		return true;
+			return v;
+		});
 	}
 
-	bool JSONWriter::ReadInt32Array(const HLString &key, std::vector<int32> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<int32> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int32, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsInt())
-				{
-					HLString k = currentObj->name.GetString();
-					int32 v = currentObj->value.IsInt();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-int32!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsInt())
-			{
-				HLString k = currentObj->name.GetString();
-				int32 v = currentObj->value.GetInt();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-int32!");
-				return false;
-			}
-		}
-
-		return true;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 
-	bool JSONWriter::ReadUInt32Array(const HLString &key, std::vector<uint32> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<uint32> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt32, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsUint())
-				{
-					HLString k = currentObj->name.GetString();
-					uint32 v = currentObj->value.GetUint();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-uint32!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsUint())
-			{
-				HLString k = currentObj->name.GetString();
-				uint32 v = currentObj->value.GetUint();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-uint32!");
-				return false;
-			}
-		}
-
-		return true;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 
-	bool JSONWriter::ReadInt64Array(const HLString &key, std::vector<int64> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<int64> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int64, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsInt64())
-				{
-					HLString k = currentObj->name.GetString();
-					int64 v = currentObj->value.GetInt64();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-int64!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsInt64())
-			{
-				HLString k = currentObj->name.GetString();
-				int64 v = currentObj->value.GetInt64();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-int64!");
-				return false;
-			}
-		}
-
-		return true;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 
-	bool JSONWriter::ReadUInt64Array(const HLString &key, std::vector<uint64> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<uint64> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt64, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsUint64())
-				{
-					HLString k = currentObj->name.GetString();
-					uint64 v = currentObj->value.GetUint64();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-uint64!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsUint64())
-			{
-				HLString k = currentObj->name.GetString();
-				uint64 v = currentObj->value.GetUint64();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-uint64!");
-				return false;
-			}
-		}
-
-		return true;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 
-	bool JSONWriter::ReadBoolArray(const HLString &key, std::vector<bool> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<bool> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Bool, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsBool())
-				{
-					HLString k = currentObj->name.GetString();
-					bool v = currentObj->value.GetBool();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-bool!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsBool())
-			{
-				HLString k = currentObj->name.GetString();
-				bool v = currentObj->value.GetBool();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-bool!");
-				return false;
-			}
-		}
-
-		return true;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 
-	bool JSONWriter::ReadFloatArray(const HLString &key, std::vector<float> &value)
+	bool JSONWriter::Write(const HLString &key, std::vector<float> &value)
 	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Float, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsFloat())
-				{
-					HLString k = currentObj->name.GetString();
-					float v = currentObj->value.GetFloat();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-float!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsFloat())
-			{
-				HLString k = currentObj->name.GetString();
-				float v = currentObj->value.GetFloat();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-float!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadDoubleArray(const HLString &key, std::vector<double> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsDouble())
-				{
-					HLString k = currentObj->name.GetString();
-					double v = currentObj->value.GetDouble();
-					value.push_back(v);
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-double!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsDouble())
-			{
-				HLString k = currentObj->name.GetString();
-				double v = currentObj->value.GetDouble();
-				value.push_back(v);
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-double!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadVec2Array(const HLString &key, std::vector<glm::vec2> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-					glm::vec2 v;
-					v.x = values[0].GetFloat();
-					v.y = values[1].GetFloat();
-					value.push_back(v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-vec2!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-				glm::vec2 v;
-				v.x = values[0].GetFloat();
-				v.y = values[1].GetFloat();
-				value.push_back(v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-vec2!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadVec3Array(const HLString &key, std::vector<glm::vec3> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-					glm::vec3 v;
-					v.x = values[0].GetFloat();
-					v.y = values[1].GetFloat();
-					v.z = values[2].GetFloat();
-					value.push_back(v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-vec3!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-				glm::vec3 v;
-				v.x = values[0].GetFloat();
-				v.y = values[1].GetFloat();
-				v.z = values[2].GetFloat();
-				value.push_back(v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-vec3!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadVec4Array(const HLString &key, std::vector<glm::vec4> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-					glm::vec4 v;
-					v.x = values[0].GetFloat();
-					v.y = values[1].GetFloat();
-					v.z = values[2].GetFloat();
-					v.w = values[3].GetFloat();
-					value.push_back(v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-vec4!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-				glm::vec4 v;
-				v.x = values[0].GetFloat();
-				v.y = values[1].GetFloat();
-				v.z = values[2].GetFloat();
-				v.w = values[3].GetFloat();
-				value.push_back(v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-vec4!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadMat2Array(const HLString &key, std::vector<glm::mat2> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-					glm::mat2 m;
-					m[0][0] = values[0].GetFloat();
-					m[0][1] = values[1].GetFloat();
-					m[1][0] = values[2].GetFloat();
-					m[1][1] = values[3].GetFloat();
-					value.push_back(m);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-mat2!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-				glm::mat2 m;
-				m[0][0] = values[0].GetFloat();
-				m[0][1] = values[1].GetFloat();
-				m[1][0] = values[3].GetFloat();
-				m[1][1] = values[4].GetFloat();
-				value.push_back(m);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-mat2!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadMat3Array(const HLString &key, std::vector<glm::mat3> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::mat3 m;
-					m[0][0] = values[0].GetFloat();
-					m[0][1] = values[1].GetFloat();
-					m[0][2] = values[2].GetFloat();
-
-					m[1][0] = values[3].GetFloat();
-					m[1][1] = values[4].GetFloat();
-					m[1][2] = values[5].GetFloat();
-
-					m[2][0] = values[6].GetFloat();
-					m[2][1] = values[7].GetFloat();
-					m[2][2] = values[8].GetFloat();
-					value.push_back(m);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-mat3!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::mat3 m;
-				m[0][0] = values[0].GetFloat();
-				m[0][1] = values[1].GetFloat();
-				m[0][2] = values[2].GetFloat();
-
-				m[1][0] = values[3].GetFloat();
-				m[1][1] = values[4].GetFloat();
-				m[1][2] = values[5].GetFloat();
-
-				m[2][0] = values[6].GetFloat();
-				m[2][1] = values[7].GetFloat();
-				m[2][2] = values[8].GetFloat();
-				value.push_back(m);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-mat3!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadMat4Array(const HLString &key, std::vector<glm::mat4> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::mat4 m;
-					m[0][0] = values[0].GetFloat();
-					m[0][1] = values[1].GetFloat();
-					m[0][2] = values[2].GetFloat();
-					m[0][3] = values[3].GetFloat();
-
-					m[1][0] = values[4].GetFloat();
-					m[1][1] = values[5].GetFloat();
-					m[1][2] = values[6].GetFloat();
-					m[1][3] = values[7].GetFloat();
-
-					m[2][0] = values[8].GetFloat();
-					m[2][1] = values[9].GetFloat();
-					m[2][2] = values[10].GetFloat();
-					m[2][3] = values[11].GetFloat();
-
-					m[3][0] = values[12].GetFloat();
-					m[3][1] = values[13].GetFloat();
-					m[3][2] = values[14].GetFloat();
-					m[3][3] = values[15].GetFloat();
-					value.push_back(m);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-mat4!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::mat4 m;
-				m[0][0] = values[0].GetFloat();
-				m[0][1] = values[1].GetFloat();
-				m[0][2] = values[2].GetFloat();
-				m[0][3] = values[3].GetFloat();
-
-				m[1][0] = values[4].GetFloat();
-				m[1][1] = values[5].GetFloat();
-				m[1][2] = values[6].GetFloat();
-				m[1][3] = values[7].GetFloat();
-
-				m[2][0] = values[8].GetFloat();
-				m[2][1] = values[9].GetFloat();
-				m[2][2] = values[10].GetFloat();
-				m[2][3] = values[11].GetFloat();
-
-				m[3][0] = values[12].GetFloat();
-				m[3][1] = values[13].GetFloat();
-				m[3][2] = values[14].GetFloat();
-				m[3][3] = values[15].GetFloat();
-				value.push_back(m);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-mat4!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadQuatArray(const HLString &key, std::vector<glm::quat> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-					glm::quat q;
-					q.w = values[0].GetFloat();
-					q.x = values[1].GetFloat();
-					q.y = values[2].GetFloat();
-					q.z = values[3].GetFloat();
-					value.push_back(q);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-quat!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-				glm::quat q;
-				q.w = values[0].GetFloat();
-				q.x = values[1].GetFloat();
-				q.y = values[2].GetFloat();
-				q.z = values[3].GetFloat();
-				value.push_back(q);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-quat!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsString())
-				{
-					HLString k = currentObj->name.GetString();
-					HLString v = currentObj->value.GetString();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-string!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsString())
-			{
-				HLString k = currentObj->name.GetString();
-				HLString v = currentObj->value.GetString();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-string!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsInt())
-				{
-					HLString k = currentObj->name.GetString();
-					int32 v = currentObj->value.GetInt();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-int32!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsInt())
-			{
-				HLString k = currentObj->name.GetString();
-				int32 v = currentObj->value.GetInt();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-int32!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsUint())
-				{
-					HLString k = currentObj->name.GetString();
-					uint32 v = currentObj->value.GetUint();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-uint32!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsUint())
-			{
-				HLString k = currentObj->name.GetString();
-				uint32 v = currentObj->value.GetUint();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-uint32!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsInt64())
-				{
-					HLString k = currentObj->name.GetString();
-					int64 v = currentObj->value.GetInt64();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-in64!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsInt64())
-			{
-				HLString k = currentObj->name.GetString();
-				int64 v = currentObj->value.GetInt64();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-int64!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsUint64())
-				{
-					HLString k = currentObj->name.GetString();
-					uint64 v = currentObj->value.GetUint64();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-uint64!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsUint64())
-			{
-				HLString k = currentObj->name.GetString();
-				uint64 v = currentObj->value.GetUint64();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-uint64!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsBool())
-				{
-					HLString k = currentObj->name.GetString();
-					bool v = currentObj->value.GetBool();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-bool!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsBool())
-			{
-				HLString k = currentObj->name.GetString();
-				bool v = currentObj->value.GetBool();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-bool!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsFloat())
-				{
-					HLString k = currentObj->name.GetString();
-					float v = currentObj->value.GetFloat();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-float!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsFloat())
-			{
-				HLString k = currentObj->name.GetString();
-				float v = currentObj->value.GetFloat();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-float!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsDouble())
-				{
-					HLString k = currentObj->name.GetString();
-					double v = currentObj->value.GetDouble();
-
-					value.insert({ k, v });
-					HL_CORE_TRACE("{0}={1}", *k, v);
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-double!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsDouble())
-			{
-				HLString k = currentObj->name.GetString();
-				double v = currentObj->value.GetDouble();
-
-				value.insert({ k, v });
-				HL_CORE_TRACE("{0}={1}", *k, v);
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-double!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadVec2ArrayMap(const HLString &key, std::map<HLString, glm::vec2> &value)
-	{
-		if (!m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::vec2 v;
-					v.x = values[0].GetFloat();
-					v.y = values[1].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-vec2!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::vec2 v;
-				v.x = values[0].GetFloat();
-				v.y = values[1].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-vec2!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadVec3ArrayMap(const HLString &key, std::map<HLString, glm::vec3> &value)
-	{
-		if (!m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::vec3 v;
-					v.x = values[0].GetFloat();
-					v.y = values[1].GetFloat();
-					v.z = values[2].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-vec3!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::vec3 v;
-				v.x = values[0].GetFloat();
-				v.y = values[1].GetFloat();
-				v.z = values[2].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-vec3!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadVec4ArrayMap(const HLString &key, std::map<HLString, glm::vec4> &value)
-	{
-		if (m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::vec4 v;
-					v.x = values[0].GetFloat();
-					v.y = values[1].GetFloat();
-					v.z = values[2].GetFloat();
-					v.w = values[3].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-vec4!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::vec4 v;
-				v.x = values[0].GetFloat();
-				v.y = values[1].GetFloat();
-				v.z = values[2].GetFloat();
-				v.w = values[3].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-vec4");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadMat2ArrayMap(const HLString &key, std::map<HLString, glm::mat2> &value)
-	{
-		if (!m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::mat2 v;
-					v[0][0] = values[0].GetFloat();
-					v[0][1] = values[1].GetFloat();
-					v[1][0] = values[2].GetFloat();
-					v[1][1] = values[3].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-mat2!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::mat2 v;
-				v[0][0] = values[0].GetFloat();
-				v[0][1] = values[1].GetFloat();
-				v[1][0] = values[2].GetFloat();
-				v[1][1] = values[3].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-mat2!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadMat3ArrayMap(const HLString &key, std::map<HLString, glm::mat3> &value)
-	{
-		if (!m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::mat3 v;
-					v[0][0] = values[0].GetFloat();
-					v[0][1] = values[1].GetFloat();
-					v[0][2] = values[2].GetFloat();
-
-					v[1][0] = values[3].GetFloat();
-					v[1][1] = values[4].GetFloat();
-					v[1][2] = values[5].GetFloat();
-
-					v[2][0] = values[6].GetFloat();
-					v[2][1] = values[7].GetFloat();
-					v[2][2] = values[8].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-mat3!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::mat3 v;
-				v[0][0] = values[0].GetFloat();
-				v[0][1] = values[1].GetFloat();
-				v[0][2] = values[2].GetFloat();
-
-				v[1][0] = values[3].GetFloat();
-				v[1][1] = values[4].GetFloat();
-				v[1][2] = values[5].GetFloat();
-
-				v[2][0] = values[6].GetFloat();
-				v[2][1] = values[7].GetFloat();
-				v[2][2] = values[8].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-mat3!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &value)
-	{
-		if (!m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::mat4 v;
-					v[0][0] = values[0].GetFloat();
-					v[0][1] = values[1].GetFloat();
-					v[0][2] = values[2].GetFloat();
-					v[0][3] = values[3].GetFloat();
-
-					v[1][0] = values[4].GetFloat();
-					v[1][1] = values[5].GetFloat();
-					v[1][2] = values[6].GetFloat();
-					v[1][3] = values[7].GetFloat();
-
-					v[2][0] = values[8].GetFloat();
-					v[2][1] = values[9].GetFloat();
-					v[2][2] = values[10].GetFloat();
-					v[2][3] = values[11].GetFloat();
-
-					v[3][0] = values[12].GetFloat();
-					v[3][1] = values[13].GetFloat();
-					v[3][2] = values[14].GetFloat();
-					v[3][3] = values[15].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-mat4!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::mat4 v;
-				v[0][0] = values[0].GetFloat();
-				v[0][1] = values[1].GetFloat();
-				v[0][2] = values[2].GetFloat();
-				v[0][3] = values[3].GetFloat();
-
-				v[1][0] = values[4].GetFloat();
-				v[1][1] = values[5].GetFloat();
-				v[1][2] = values[6].GetFloat();
-				v[1][3] = values[7].GetFloat();
-
-				v[2][0] = values[8].GetFloat();
-				v[2][1] = values[9].GetFloat();
-				v[2][2] = values[10].GetFloat();
-				v[2][3] = values[11].GetFloat();
-
-				v[3][0] = values[12].GetFloat();
-				v[3][1] = values[13].GetFloat();
-				v[3][2] = values[14].GetFloat();
-				v[3][3] = values[15].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-mat4!");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool JSONWriter::ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &value)
-	{
-		if (!m_Document.IsNull())
-			return false;
-
-		if (!m_Document.IsArray())
-		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
-			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-			if (it == obj.MemberEnd())
-				return false;
-
-			if (!it->value.IsArray())
-				return false;
-
-			rapidjson::GenericArray arr = it->value.GetArray();
-			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
-			{
-				rapidjson::GenericMemberIterator currentObj = arrIt->GetObject().begin();
-				if (currentObj->value.IsArray())
-				{
-					HLString k = currentObj->name.GetString();
-					rapidjson::GenericArray values = currentObj->value.GetArray();
-
-					glm::quat v;
-					v.w = values[0].GetFloat();
-					v.x = values[1].GetFloat();
-					v.y = values[2].GetFloat();
-					v.z = values[3].GetFloat();
-					value.insert({ k, v });
-				}
-				else
-				{
-					HL_CORE_ERROR("Error: Parsed a non-quat!");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		rapidjson::GenericArray arr = m_Document.GetArray();
-		for (auto it = arr.Begin(); it != arr.End(); ++it)
-		{
-			rapidjson::GenericMemberIterator currentObj = it->GetObject().begin();
-			if (currentObj->value.IsArray())
-			{
-				HLString k = currentObj->name.GetString();
-				rapidjson::GenericArray values = currentObj->value.GetArray();
-
-				glm::quat v;
-				v.w = values[0].GetFloat();
-				v.x = values[1].GetFloat();
-				v.y = values[2].GetFloat();
-				v.z = values[3].GetFloat();
-				value.insert({ k, v });
-			}
-			else
-			{
-				HL_CORE_ERROR("Error: Parsed a non-quat!");
-				return false;
-			}
-		}
-
-		return true;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 	
-	bool JSONWriter::ReadFloat(const HLString &key, float *value)
+	bool JSONWriter::Write(const HLString &key, std::vector<double> &value)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsFloat())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Double, [instance, value]() mutable -> rapidjson::Value
 		{
-			*value = it->value.GetFloat();
-			return true;
-		}
-
-		return false;
+			return instance->ConvertStdArrToRapidJsonArr(value);
+		});
 	}
 	
-	bool JSONWriter::ReadDouble(const HLString &key, double *value)
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec2> &value)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsDouble())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
-			*value = it->value.GetDouble();
-			return true;
-		}
-
-		return false;
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
 	}
 
-	bool JSONWriter::ReadInt32(const HLString &key, int32 *value)
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec3> &value)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsInt())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
-			*value = it->value.GetInt();
-			return true;
-		}
-
-		return false;
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
 	}
 
-	bool JSONWriter::ReadUInt32(const HLString &key, uint32 *value)
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec4> &value)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsUint())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
-			*value = it->value.GetUint();
-			return true;
-		}
-
-		return false;
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].w, instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
 	}
 
-	bool JSONWriter::ReadInt64(const HLString &key, int64 *value)
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat2> &value)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsInt64())
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
-			*value = it->value.GetInt64();
-			return true;
-		}
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
+	}
 
-		return false;
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat3> &value)
+	{
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][2], instance->m_Document.GetAllocator());
+
+				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][2], instance->m_Document.GetAllocator());
+				
+				entry.PushBack<float>(value[i][2][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][2], instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
+	}
+
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat4> &value)
+	{
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][2], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][3], instance->m_Document.GetAllocator());
+
+				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][2], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][3], instance->m_Document.GetAllocator());
+
+				entry.PushBack<float>(value[i][2][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][2], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][3], instance->m_Document.GetAllocator());
+
+				entry.PushBack<float>(value[i][3][0], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][3][1], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][3][2], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][3][3], instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
+	}
+
+	bool JSONWriter::Write(const HLString &key, std::vector<glm::quat> &value)
+	{
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value v(rapidjson::kArrayType);
+			for (uint32 i = 0; i < value.size(); ++i)
+			{
+				rapidjson::Value entry(rapidjson::kArrayType);
+				entry.PushBack<float>(value[i].w, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
+				v.PushBack(entry, instance->m_Document.GetAllocator());
+			}
+			return v;
+		});
+	}
+
+	bool JSONWriter::ReadStringArray(const HLString &key, std::vector<HLString> &result)
+	{
+		return ReadArray(key, DocumentDataType::String, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsString())
+				return false;
+
+			HLString str = value.GetString();
+			result.push_back(str);
+			HL_CORE_TRACE("{0}", *str);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadInt32Array(const HLString &key, std::vector<int32> &result)
+	{
+		return ReadArray(key, DocumentDataType::Int32, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsInt())
+				return false;
+
+			int32 v = value.GetInt();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadUInt32Array(const HLString &key, std::vector<uint32> &result)
+	{
+		return ReadArray(key, DocumentDataType::UInt32, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsUint())
+				return false;
+
+			uint32 v = value.GetUint();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadInt64Array(const HLString &key, std::vector<int64> &result)
+	{
+		return ReadArray(key, DocumentDataType::Int64, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsInt64())
+				return false;
+
+			int64 v = value.GetInt64();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadUInt64Array(const HLString &key, std::vector<uint64> &result)
+	{
+		return ReadArray(key, DocumentDataType::UInt64, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsUint64())
+				return false;
+
+			uint64 v = value.GetUint64();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadBoolArray(const HLString &key, std::vector<bool> &result)
+	{
+		return ReadArray(key, DocumentDataType::Bool, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsBool())
+				return false;
+
+			bool v = value.GetBool();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadFloatArray(const HLString &key, std::vector<float> &result)
+	{
+		return ReadArray(key, DocumentDataType::Float, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsFloat())
+				return false;
+
+			float v = value.GetFloat();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadDoubleArray(const HLString &key, std::vector<double> &result)
+	{
+		return ReadArray(key, DocumentDataType::Double, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsDouble())
+				return false;
+
+			double v = value.GetDouble();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}", v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadVec2Array(const HLString &key, std::vector<glm::vec2> &result)
+	{
+		return ReadArray(key, DocumentDataType::Vec2, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::vec2 v;
+			v.x = arr[0].GetFloat();
+			v.y = arr[1].GetFloat();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}, {1}", v.x, v.y);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadVec3Array(const HLString &key, std::vector<glm::vec3> &result)
+	{
+		return ReadArray(key, DocumentDataType::Vec3, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::vec3 v;
+			v.x = arr[0].GetFloat();
+			v.y = arr[1].GetFloat();
+			v.z = arr[2].GetFloat();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}, {1}, {2}", v.x, v.y, v.z);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadVec4Array(const HLString &key, std::vector<glm::vec4> &result)
+	{
+		return ReadArray(key, DocumentDataType::Vec4, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::vec4 v;
+			v.x = arr[0].GetFloat();
+			v.y = arr[1].GetFloat();
+			v.z = arr[2].GetFloat();
+			v.w = arr[3].GetFloat();
+			result.push_back(v);
+			HL_CORE_TRACE("{0}, {1}, {2}, {3}", v.x, v.y, v.z, v.w);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadMat2Array(const HLString &key, std::vector<glm::mat2> &result)
+	{
+		return ReadArray(key, DocumentDataType::Mat2, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::mat2 v;
+			v[0][0] = arr[0].GetFloat();
+			v[0][1] = arr[1].GetFloat();
+
+			v[1][0] = arr[2].GetFloat();
+			v[1][1] = arr[3].GetFloat();
+			result.push_back(v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadMat3Array(const HLString &key, std::vector<glm::mat3> &result)
+	{
+		return ReadArray(key, DocumentDataType::Mat3, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::mat3 v;
+			v[0][0] = arr[0].GetFloat();
+			v[0][1] = arr[1].GetFloat();
+			v[0][2] = arr[2].GetFloat();
+
+			v[1][0] = arr[3].GetFloat();
+			v[1][1] = arr[4].GetFloat();
+			v[1][2] = arr[5].GetFloat();
+
+			v[2][0] = arr[6].GetFloat();
+			v[2][1] = arr[7].GetFloat();
+			v[2][2] = arr[8].GetFloat();
+			result.push_back(v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadMat4Array(const HLString &key, std::vector<glm::mat4> &result)
+	{
+		return ReadArray(key, DocumentDataType::Mat4, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::mat4 v;
+			v[0][0] = arr[0].GetFloat();
+			v[0][1] = arr[1].GetFloat();
+			v[0][2] = arr[2].GetFloat();
+			v[0][3] = arr[3].GetFloat();
+
+			v[1][0] = arr[4].GetFloat();
+			v[1][1] = arr[5].GetFloat();
+			v[1][2] = arr[6].GetFloat();
+			v[1][3] = arr[7].GetFloat();
+
+			v[2][0] = arr[8].GetFloat();
+			v[2][1] = arr[9].GetFloat();
+			v[2][2] = arr[10].GetFloat();
+			v[2][3] = arr[11].GetFloat();
+
+			v[3][0] = arr[12].GetFloat();
+			v[3][1] = arr[13].GetFloat();
+			v[3][2] = arr[14].GetFloat();
+			v[3][3] = arr[15].GetFloat();
+			result.push_back(v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadQuatArray(const HLString &key, std::vector<glm::quat> &result)
+	{
+		return ReadArray(key, DocumentDataType::Quat, [result](rapidjson::Value &value) mutable -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
+			glm::quat v;
+			v.w = arr[0].GetFloat();
+			v.x = arr[1].GetFloat();
+			v.y = arr[2].GetFloat();
+			v.z = arr[3].GetFloat();
+			result.push_back(v);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::String, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsString())
+				return false;
+
+			HLString value = v.GetString();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, *value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Int32, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsInt())
+				return false;
+
+			int32 value = v.GetInt();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::UInt32, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsUint())
+				return false;
+
+			uint32 value = v.GetUint();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Int64, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsInt64())
+				return false;
+
+			int64 value = v.GetInt64();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::UInt64, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsUint64())
+				return false;
+
+			uint64 value = v.GetUint64();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Bool, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsBool())
+				return false;
+
+			bool value = v.GetBool();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Float, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsFloat())
+				return false;
+
+			float value = v.GetFloat();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Double, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsDouble())
+				return false;
+
+			double value = v.GetDouble();
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadVec2ArrayMap(const HLString &key, std::map<HLString, glm::vec2> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec2, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::vec2 value;
+			value.x = values[0].GetFloat();
+			value.y = values[1].GetFloat();
+
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}, {2}", *keyValue, value.x, value.y);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadVec3ArrayMap(const HLString &key, std::map<HLString, glm::vec3> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec3, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::vec3 value;
+			value.x = values[0].GetFloat();
+			value.y = values[1].GetFloat();
+			value.z = values[2].GetFloat();
+
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}, {2}, {3}", *keyValue, value.x, value.y, value.z);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadVec4ArrayMap(const HLString &key, std::map<HLString, glm::vec4> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec4, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::vec4 value;
+			value.x = values[0].GetFloat();
+			value.y = values[1].GetFloat();
+			value.z = values[2].GetFloat();
+			value.w = values[3].GetFloat();
+
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}, {2}, {3}, {4}", *keyValue, value.x, value.y, value.z, value.w);
+
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadMat2ArrayMap(const HLString &key, std::map<HLString, glm::mat2> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Mat2, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::mat2 value;
+			value[0][0] = values[0].GetFloat();
+			value[0][1] = values[1].GetFloat();
+
+			value[1][0] = values[2].GetFloat();
+			value[1][1] = values[3].GetFloat();
+
+			result.insert({ keyValue, value });
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadMat3ArrayMap(const HLString &key, std::map<HLString, glm::mat3> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Mat3, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::mat3 value;
+			value[0][0] = values[0].GetFloat();
+			value[0][1] = values[1].GetFloat();
+			value[0][2] = values[2].GetFloat();
+
+			value[1][0] = values[3].GetFloat();
+			value[1][1] = values[4].GetFloat();
+			value[1][2] = values[5].GetFloat();
+
+			value[2][0] = values[6].GetFloat();
+			value[2][1] = values[7].GetFloat();
+			value[2][2] = values[8].GetFloat();
+
+			result.insert({ keyValue, value });
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Mat4, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::mat4 value;
+			value[0][0] = values[0].GetFloat();
+			value[0][1] = values[1].GetFloat();
+			value[0][2] = values[2].GetFloat();
+			value[0][3] = values[3].GetFloat();
+
+			value[1][0] = values[4].GetFloat();
+			value[1][1] = values[5].GetFloat();
+			value[1][2] = values[6].GetFloat();
+			value[1][3] = values[7].GetFloat();
+
+			value[2][0] = values[8].GetFloat();
+			value[2][1] = values[9].GetFloat();
+			value[2][2] = values[10].GetFloat();
+			value[2][3] = values[11].GetFloat();
+
+			value[3][0] = values[12].GetFloat();
+			value[3][1] = values[13].GetFloat();
+			value[3][2] = values[14].GetFloat();
+			value[3][3] = values[15].GetFloat();
+
+			result.insert({ keyValue, value });
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Quat, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		{
+			if (!v.IsArray())
+				return false;
+
+			rapidjson::GenericArray values = v.GetArray();
+			glm::quat value;
+			value.w = values[0].GetFloat();
+			value.x = values[1].GetFloat();
+			value.y = values[2].GetFloat();
+			value.z = values[3].GetFloat();
+
+			result.insert({ keyValue, value });
+			HL_CORE_TRACE("{0}={1}, {2}, {3}, {4}", *keyValue, value.w, value.x, value.y, value.z);
+			return true;
+		});
 	}
 	
-	bool JSONWriter::ReadUInt64(const HLString &key, uint64 *value)
+	bool JSONWriter::ReadFloat(const HLString &key, float *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsUint64())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			*value = it->value.GetUint64();
+			if (!value.IsFloat())
+				return false;
+
+			*result = value.GetFloat();
 			return true;
-		}
-
-		return false;
-	}
-
-	bool JSONWriter::ReadBool(const HLString &key, bool *value)
-	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsBool())
-		{
-			*value = it->value.GetBool();
-			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadString(const HLString &key, HLString *value)
+	bool JSONWriter::ReadDouble(const HLString &key, double *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsString())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			*value = it->value.GetString();
-			return true;
-		}
+			if (!value.IsDouble())
+				return false;
 
-		return false;
+			*result = value.GetDouble();
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadInt32(const HLString &key, int32 *result)
+	{
+		return Read(key, [result](rapidjson::Value &value) -> bool
+		{
+			if (!value.IsInt())
+				return false;
+
+			*result = value.GetInt();
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadUInt32(const HLString &key, uint32 *result)
+	{
+		return Read(key, [result](rapidjson::Value &value) -> bool
+		{
+			if (!value.IsUint())
+				return false;
+
+			*result = value.GetUint();
+			return true;
+		});
+	}
+
+	bool JSONWriter::ReadInt64(const HLString &key, int64 *result)
+	{
+		return Read(key, [result](rapidjson::Value &value) -> bool
+		{
+			if (!value.IsInt64())
+				return false;
+
+			*result = value.GetInt64();
+			return true;
+		});
 	}
 	
-	bool JSONWriter::ReadVector2(const HLString &key, glm::vec2 *value)
+	bool JSONWriter::ReadUInt64(const HLString &key, uint64 *result)
+	{
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-		if (!m_Document.IsObject())
-			return false;
+			if (!value.IsUint64())
+				return false;
 
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
+			*result = value.IsUint64();
+			return true;
+		});
+	}
 
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+	bool JSONWriter::ReadBool(const HLString &key, bool *result)
+	{
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsBool())
+				return false;
+
+			*result = value.GetBool();
+			return true;
+		});
+	}
+	
+	bool JSONWriter::ReadString(const HLString &key, HLString *result)
+	{
+		return Read(key, [result](rapidjson::Value &value) -> bool
+		{
+			if (!value.IsString())
+				return false;
+
+			*result = value.GetString();
+			return true;
+		});
+	}
+	
+	bool JSONWriter::ReadVector2(const HLString &key, glm::vec2 *result)
+		{
+		return Read(key, [result](rapidjson::Value &value) -> bool
+		{
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			if (!arr[0].IsFloat() || !arr[1].IsFloat())
 				return false;
 
 			float x = arr[0].GetFloat();
 			float y = arr[1].GetFloat();
-			*value = { x, y };
-
+			*result = { x, y };
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadVector3(const HLString &key, glm::vec3 *value)
+	bool JSONWriter::ReadVector3(const HLString &key, glm::vec3 *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat())
 				return false;
 
 			float x = arr[0].GetFloat();
 			float y = arr[1].GetFloat();
 			float z = arr[2].GetFloat();
-			*value = { x, y, z };
+			*result = { x, y, z };
 
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadVector4(const HLString &key, glm::vec4 *value)
+	bool JSONWriter::ReadVector4(const HLString &key, glm::vec4 *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat() || !arr[3].IsFloat())
 				return false;
 
@@ -2990,56 +1261,39 @@ namespace highlo
 			float y = arr[1].GetFloat();
 			float z = arr[2].GetFloat();
 			float w = arr[3].GetFloat();
-			*value = { x, y, z, w };
+			*result = { x, y, z, w };
 
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadMatrix2(const HLString &key, glm::mat2 *value)
+	bool JSONWriter::ReadMatrix2(const HLString &key, glm::mat2 *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			glm::mat2 m;
 			m[0][0] = arr[0].GetFloat();
 			m[0][1] = arr[1].GetFloat();
+
 			m[1][0] = arr[2].GetFloat();
 			m[1][1] = arr[3].GetFloat();
-			*value = m;
+			*result = m;
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadMatrix3(const HLString &key, glm::mat3 *value)
+	bool JSONWriter::ReadMatrix3(const HLString &key, glm::mat3 *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			glm::mat3 m;
 			m[0][0] = arr[0].GetFloat();
 			m[0][1] = arr[1].GetFloat();
@@ -3052,28 +1306,19 @@ namespace highlo
 			m[2][0] = arr[6].GetFloat();
 			m[2][1] = arr[7].GetFloat();
 			m[2][2] = arr[8].GetFloat();
-			*value = m;
+			*result = m;
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadMatrix4(const HLString &key, glm::mat4 *value)
+	bool JSONWriter::ReadMatrix4(const HLString &key, glm::mat4 *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			glm::mat4 m;
 			m[0][0] = arr[0].GetFloat();
 			m[0][1] = arr[1].GetFloat();
@@ -3094,28 +1339,19 @@ namespace highlo
 			m[3][1] = arr[13].GetFloat();
 			m[3][2] = arr[14].GetFloat();
 			m[3][3] = arr[15].GetFloat();
-			*value = m;
+			*result = m;
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
-	bool JSONWriter::ReadQuaternion(const HLString &key, glm::quat *value)
+	bool JSONWriter::ReadQuaternion(const HLString &key, glm::quat *result)
 	{
-		if (!m_Document.IsObject())
-			return false;
-
-		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
-
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		if (it->value.IsArray())
+		return Read(key, [result](rapidjson::Value &value) -> bool
 		{
-			rapidjson::GenericArray arr = it->value.GetArray();
+			if (!value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = value.GetArray();
 			if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat() || !arr[3].IsFloat())
 				return false;
 
@@ -3123,12 +1359,10 @@ namespace highlo
 			float x = arr[1].GetFloat();
 			float y = arr[2].GetFloat();
 			float z = arr[3].GetFloat();
-			*value = { w, x, y, z };
+			*result = { w, x, y, z };
 
 			return true;
-		}
-
-		return false;
+		});
 	}
 	
 	bool JSONWriter::HasKey(const HLString &key) const
@@ -3185,25 +1419,251 @@ namespace highlo
 		return buffer.GetString();
 	}
 
-	bool JSONWriter::AddIntoStructure(rapidjson::Value &keyType, rapidjson::Value &valType)
+	bool JSONWriter::AddIntoStructure(rapidjson::Value &keyType, rapidjson::Value &valType, DocumentDataType type)
 	{
 		bool result = false;
+
+		auto &[typeKey, typeVal] = utils::ConvertDocumentTypeToRenderableFormat(m_Document, type);
 
 		if (m_ShouldWriteIntoArray || m_ShouldWriteIntoObject)
 		{
 			result = true;
-			m_TempBuffer.first = keyType;
-			m_TempBuffer.second = valType;
+			m_TempBufferValue.first = keyType;
+			m_TempBufferValue.second = valType;
+			m_TempBufferType.first = typeKey;
+			m_TempBufferType.second = typeVal;
 
 			if (m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
 			{
-				std::pair<rapidjson::Value, rapidjson::Value> &t = m_TempBuffers.emplace_back();
-				t.first = keyType;
-				t.second = valType;
+				std::pair<rapidjson::Value, rapidjson::Value> &v = m_TempBufferValues.emplace_back();
+				v.first = keyType;
+				v.second = valType;
+
+				std::pair<rapidjson::Value, rapidjson::Value> &t = m_TempBufferTypes.emplace_back();
+				t.first = typeKey;
+				t.second = typeVal;
 			}
 		}
 
 		return result;
+	}
+	
+	bool JSONWriter::Write(const HLString &key, DocumentDataType type, const std::function<rapidjson::Value()> &insertFunc)
+	{
+		if (key.IsEmpty())
+		{
+			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] You have to specify a key! {0} [-]");
+			return false;
+		}
+
+		rapidjson::Value keyType(rapidjson::kStringType);
+		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
+
+		rapidjson::Value value = insertFunc();
+		if (!AddIntoStructure(keyType, value, type))
+		{
+			m_Document.SetObject();
+			m_Document.AddMember(keyType, value, m_Document.GetAllocator());
+		}
+
+		return true;
+	}
+
+	bool JSONWriter::Read(const HLString &key, const std::function<bool(rapidjson::Value&)> &insertFunc)
+	{
+		if (!m_Document.IsObject())
+			return false;
+
+		auto &obj = m_Document.GetObject();
+		HL_ASSERT(obj.HasMember(*key));
+
+		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
+		if (it == obj.MemberEnd())
+			return false;
+
+		return insertFunc(it->value);
+	}
+
+	bool JSONWriter::ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc)
+	{
+		if (m_Document.IsNull())
+			return false;
+
+		HLString correctDataType = utils::DocumentDataTypeToString(type);
+
+		if (!m_Document.IsArray())
+		{
+			rapidjson::GenericObject obj = m_Document.GetObject();
+			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
+			if (it == obj.MemberEnd())
+				return false;
+
+			if (!it->value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = it->value.GetArray();
+			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
+			{
+				rapidjson::GenericObject currentObj = arrIt->GetObject();
+				HL_ASSERT(currentObj.HasMember("type"));
+				HL_ASSERT(currentObj.HasMember("value"));
+
+				// Get the data type
+				rapidjson::GenericMemberIterator currentDataType = currentObj.FindMember("type");
+				if (currentDataType->value.IsString())
+				{
+					HLString type = currentDataType->value.GetString();
+					if (type != correctDataType)
+					{
+						HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+						return false;
+					}
+				}
+
+				// Get the actual value
+				rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
+				bool result = insertFunc(currentValue->value);
+				if (!result)
+				{
+					HL_CORE_ERROR("Error: User defined function returned false!");
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		rapidjson::GenericArray arr = m_Document.GetArray();
+		for (auto it = arr.Begin(); it != arr.End(); ++it)
+		{
+			rapidjson::GenericObject currentObj = it->GetObject();
+
+			// Get the data type
+			rapidjson::GenericMemberIterator currentDataType = currentObj.FindMember("type");
+			if (currentDataType == currentObj.MemberEnd())
+			{
+				HL_CORE_ERROR("Error: Required field type");
+				return false;
+			}
+
+			if (currentDataType->value.IsString())
+			{
+				HLString type = currentDataType->value.GetString();
+				if (type != correctDataType)
+				{
+					HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+					return false;
+				}
+			}
+
+			// Get the actual value
+			rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
+			if (currentValue == currentObj.MemberEnd())
+			{
+				HL_CORE_ERROR("Error: Required field value");
+				return false;
+			}
+
+			bool result = insertFunc(currentValue->value);
+			if (!result)
+			{
+				HL_CORE_ERROR("Error: User defined function returned false!");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool JSONWriter::ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString, rapidjson::Value &)> &insertFunc)
+	{
+		if (m_Document.IsNull())
+			return false;
+
+		HLString correctDataType = utils::DocumentDataTypeToString(type);
+
+		if (!m_Document.IsArray())
+		{
+			rapidjson::GenericObject obj = m_Document.GetObject();
+			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
+			if (it == obj.MemberEnd())
+				return false;
+
+			if (!it->value.IsArray())
+				return false;
+
+			rapidjson::GenericArray arr = it->value.GetArray();
+			for (auto arrIt = arr.Begin(); arrIt != arr.End(); ++arrIt)
+			{
+				rapidjson::GenericObject currentObj = arrIt->GetObject();
+				HL_ASSERT(currentObj.HasMember("type"));
+				HL_ASSERT(currentObj.HasMember("value"));
+
+				// Get the data type
+				rapidjson::GenericMemberIterator currentDataType = currentObj.FindMember("type");
+				if (currentDataType->value.IsString())
+				{
+					HLString type = currentDataType->value.GetString();
+					if (type != correctDataType)
+					{
+						HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+						return false;
+					}
+				}
+
+				// Get the actual value
+				rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
+				bool result = insertFunc(currentValue->name.GetString(), currentValue->value);
+				if (!result)
+				{
+					HL_CORE_ERROR("Error: User defined function returned false!");
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		rapidjson::GenericArray arr = m_Document.GetArray();
+		for (auto it = arr.Begin(); it != arr.End(); ++it)
+		{
+			rapidjson::GenericObject currentObj = it->GetObject();
+
+			// Get the data type
+			rapidjson::GenericMemberIterator currentDataType = currentObj.FindMember("type");
+			if (currentDataType == currentObj.MemberEnd())
+			{
+				HL_CORE_ERROR("Error: Required field type");
+				return false;
+			}
+
+			if (currentDataType->value.IsString())
+			{
+				HLString type = currentDataType->value.GetString();
+				if (type != correctDataType)
+				{
+					HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+					return false;
+				}
+			}
+
+			// Get the actual value
+			rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
+			if (currentValue == currentObj.MemberEnd())
+			{
+				HL_CORE_ERROR("Error: Required field value");
+				return false;
+			}
+
+			bool result = insertFunc(currentValue->name.GetString(), currentValue->value);
+			if (!result)
+			{
+				HL_CORE_ERROR("Error: User defined function returned false!");
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
 

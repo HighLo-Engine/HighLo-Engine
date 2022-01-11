@@ -5,6 +5,112 @@
 //     - 1.0 (2022-01-10) initial release
 //
 
+/**
+ * Usage:
+ * 
+ * // *Write into file examples*
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("test.json", DocumentType::Json); // valid options for DocumentType are: Json, Yaml, XML
+ * 
+ * // Write an array into file
+ * writer->BeginArray();
+ * for (uint32 i = 0; i < arr.size(); ++i)
+ * {
+ *   writer->BeginObject();
+ *   writer->Write(<key>, <value>);
+ *   writer->EndObject();
+ * }
+ * writer->EndArray();
+ * 
+ * // If the array itself should have a key name as well, you can provide it in the EndArray function as a optional parameter
+ * // for example following code:
+ * std::vector<uint32> arr;
+ * arr.push_back(42);
+ * arr.push_back(10);
+ * 
+ * writer->BeginArray();
+ * for (uint32 i = 0; i < arr.size(); ++i)
+ * {
+ *   writer->BeginObject();
+ *   writer->Write("object" + i, arr[i]);
+ *   writer->EndObject();
+ * }
+ * writer->EndArray("testArray");
+ * 
+ * // Would produce this json example:
+ * {
+ *   "testArray":
+ *   [
+ *     {
+ *     "object0": 42
+ *     },
+ *     {
+ *     "object1": 10
+ *     },
+ *   ]
+ * }
+ * 
+ * // Write a single object into file
+ * writer->BeginObject();
+ * writer->Write(<key>, <value>);
+ * writer->EndObject();
+ * 
+ * // All code above just puts the data into the internal storage,
+ * // with WriteOut you can actually write the content of the internal structure into a given file
+ * writer->WriteOut();
+ * 
+ * 
+ * 
+ * // *Read from file examples*
+ * Ref<DocumentWriter> reader = DocumentWriter::Create("test.json", DocumentType::Json);
+ * 
+ * // Reads the content from the actual file into the internal structure
+ * reader->ReadContents();
+ * 
+ * // The rest is very specific to your previous write process, but if you want to retrieve a array structure with it's keys you can do:
+ * std::map<HLString, uint32> values;
+ * reader->ReadUInt32ArrayMap("", values);
+ * 
+ * // Or if you just need the values without the keys
+ * std::vector<uint32> values;
+ * reader->ReadUInt32Array("", values);
+ * 
+ * // you can specify a specific subobjects from which you want to retrieve the array, let's say for example we have the json file:
+ * {
+ *   "someKey": "someValue",
+ *   "someArray": [
+ *     {
+ *       "test": 124
+ *     },
+ *     {
+ *       "anotherTest": 42
+ *     }
+ *   ]
+ * }
+ * 
+ * // And if you now want to retrieve the array "someArray" you would want to do something like:
+ * std::vector<uint32> values;
+ * reader->ReadUInt32Array("someArray", values);
+ * // or if you need the "test" key from inside the array as well
+ * std::map<HLString, uint32> values;
+ * reader->ReadUInt32ArrayMap("someArray", values);
+ * 
+ * 
+ * 
+ * // If you just wrote a single object into the file in the previous step, you can do:
+ * uint32 value;
+ * reader->ReadUInt32("someKey", &value);
+ * 
+ * // This would work for example with this json:
+ * {
+ *   "someKey": 42
+ * }
+ * 
+ * // value from line 100 would now then be 42.
+ * 
+ * // If you don't wish to export into a file, but instead get the formatted value as a string you can just retrieve the string from the class as well with:
+ * HLString content = reader->GetContent();
+ */
+
 #pragma once
 
 #include "DocumentType.h"

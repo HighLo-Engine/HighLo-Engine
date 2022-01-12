@@ -16,7 +16,7 @@ project "HighLo"
         "src/**.cpp",
 		
 		"%{IncludeDir.vulkan_memory_alloc}/**.h",
-		"%{IncludeDir.vulkan_memory_alloc}/**.cpp",
+		"%{IncludeDir.vulkan_memory_alloc}/**.cpp"
     }
 
     includedirs
@@ -32,12 +32,12 @@ project "HighLo"
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.rapidXML}",
 		"%{IncludeDir.rapidJSON}",
-		"%{IncludeDir.yamlCpp}",
 		"%{IncludeDir.IconFontCppHeaders}",
 		"%{IncludeDir.gtest}",
 		"%{IncludeDir.gmock}",
 		"%{IncludeDir.vulkan}",
 		"%{IncludeDir.vulkan_local}",
+		"%{IncludeDir.yamlCpp}",
     }
 
     links
@@ -51,7 +51,6 @@ project "HighLo"
 		"%{LibDir.openssl_libcrypto}",
 		"%{LibDir.vulkan_sdk}",
 		"%{LibDir.vulkan_sdk_utils}",
-
     }
 
     defines
@@ -132,6 +131,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Debug}",
 			"%{LibDir.SPIRV_Cross_reflect_Debug}",
 			"%{LibDir.SpvRemapper_Debug}",
+			"%{LibDir.yamlCpp_debug}",
 		}
 
     filter "configurations:Release-OpenGL"
@@ -164,6 +164,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Release}",
 			"%{LibDir.SPIRV_Cross_reflect_Release}",
 			"%{LibDir.SpvRemapper_Release}",
+			"%{LibDir.yamlCpp}",
 		}
 		
 	filter "configurations:Debug-Vulkan"
@@ -195,6 +196,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Debug}",
 			"%{LibDir.SPIRV_Cross_reflect_Debug}",
 			"%{LibDir.SpvRemapper_Debug}",
+			"%{LibDir.yamlCpp_debug}",
 		}
 
 	filter "configurations:Release-Vulkan"
@@ -227,6 +229,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Release}",
 			"%{LibDir.SPIRV_Cross_reflect_Release}",
 			"%{LibDir.SpvRemapper_Release}",
+			"%{LibDir.yamlCpp}",
 		}
 
 	filter "configurations:Debug-DX11"
@@ -258,6 +261,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Debug}",
 			"%{LibDir.SPIRV_Cross_reflect_Debug}",
 			"%{LibDir.SpvRemapper_Debug}",
+			"%{LibDir.yamlCpp_debug}",
 		}
 
 	filter "configurations:Release-DX11"
@@ -290,6 +294,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Release}",
 			"%{LibDir.SPIRV_Cross_reflect_Release}",
 			"%{LibDir.SpvRemapper_Release}",
+			"%{LibDir.yamlCpp}",
 		}
 
 	filter "configurations:Debug-DX12"
@@ -321,6 +326,7 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Debug}",
 			"%{LibDir.SPIRV_Cross_reflect_Debug}",
 			"%{LibDir.SpvRemapper_Debug}",
+			"%{LibDir.yamlCpp_debug}",
 		}
 
 	filter "configurations:Release-DX12"
@@ -353,5 +359,6 @@ project "HighLo"
 			"%{LibDir.SPIRV_Cross_cpp_Release}",
 			"%{LibDir.SPIRV_Cross_reflect_Release}",
 			"%{LibDir.SpvRemapper_Release}",
+			"%{LibDir.yamlCpp}",
 		}
 

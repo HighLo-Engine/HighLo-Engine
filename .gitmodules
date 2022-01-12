@@ -22,10 +22,6 @@
 	path = HighLo/vendor/RapidJSON
 	url = https://github.com/HighLo-Engine/rapidjson
 	ignore = dirty
-[submodule "HighLo/vendor/yaml-cpp"]
-	path = HighLo/vendor/yaml-cpp
-	url = https://github.com/HighLo-Engine/yaml-cpp
-	ignore = dirty
 [submodule "HighLo/vendor/IconFontCppHeaders"]
 	path = HighLo/vendor/IconFontCppHeaders
 	url = https://github.com/HighLo-Engine/IconFontCppHeaders
@@ -37,4 +33,8 @@
 [submodule "HighLo/vendor/msdf-atlas-gen"]
 	path = HighLo/vendor/msdf-atlas-gen
 	url = https://github.com/HighLo-Engine/msdf-atlas-gen
+	ignore = dirty
+[submodule "HighLo/vendor/yaml-cpp"]
+	path = HighLo/vendor/yaml-cpp
+	url = https://github.com/HighLo-Engine/yaml-cpp
 	ignore = dirty

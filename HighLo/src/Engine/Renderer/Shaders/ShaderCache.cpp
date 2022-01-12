@@ -43,7 +43,7 @@ namespace highlo
 		for (auto &[filePath, hash] : shaderCache)
 		{
 			writer->BeginObject();
-			writer->Write(filePath, hash);
+			writer->WriteUInt64(filePath, hash);
 			writer->EndObject();
 		}
 		writer->EndArray();

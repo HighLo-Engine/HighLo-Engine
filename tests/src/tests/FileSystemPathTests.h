@@ -47,8 +47,7 @@ TEST(TEST_CATEGORY, SwapPaths)
 TEST(TEST_CATEGORY, HashPath)
 {
 	FileSystemPath path("premake5.lua");
-	uint64 expectedHash = 961899880712330396;
-
+	uint64 expectedHash = 5126544290880117183;
 	EXPECT_EQ(path.Hash(), expectedHash);
 }
 

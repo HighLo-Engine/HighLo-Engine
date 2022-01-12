@@ -18,7 +18,7 @@ namespace highlo
 	{
 	}
 
-	void YAMLWriter::EndArray(const HLString &key)
+	void YAMLWriter::EndArray(const HLString &key, bool rawData)
 	{
 	}
 
@@ -26,7 +26,7 @@ namespace highlo
 	{
 	}
 
-	void YAMLWriter::EndObject()
+	void YAMLWriter::EndObject(bool rawData)
 	{
 	}
 

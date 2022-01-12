@@ -21,10 +21,10 @@ namespace highlo
 		virtual ~JSONWriter();
 
 		virtual void BeginArray() override;
-		virtual void EndArray(const HLString &key = "") override;
+		virtual void EndArray(const HLString &key = "", bool rawData = false) override;
 
 		virtual void BeginObject() override;
-		virtual void EndObject() override;
+		virtual void EndObject(bool rawData = false) override;
 
 		virtual bool WriteFloat(const HLString &key, float value) override;
 		virtual bool WriteDouble(const HLString &key, double value) override;

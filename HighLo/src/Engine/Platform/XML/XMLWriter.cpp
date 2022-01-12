@@ -19,7 +19,7 @@ namespace highlo
 	{
 	}
 
-	void XMLWriter::EndArray(const HLString &key)
+	void XMLWriter::EndArray(const HLString &key, bool rawData)
 	{
 	}
 
@@ -27,7 +27,7 @@ namespace highlo
 	{
 	}
 
-	void XMLWriter::EndObject()
+	void XMLWriter::EndObject(bool rawData)
 	{
 	}
 

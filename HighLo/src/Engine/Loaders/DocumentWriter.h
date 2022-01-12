@@ -139,10 +139,10 @@ namespace highlo
 		HLAPI virtual ~DocumentWriter() {}
 
 		HLAPI virtual void BeginArray() = 0;
-		HLAPI virtual void EndArray(const HLString &key = "") = 0;
+		HLAPI virtual void EndArray(const HLString &key = "", bool rawData = false) = 0;
 
 		HLAPI virtual void BeginObject() = 0;
-		HLAPI virtual void EndObject() = 0;
+		HLAPI virtual void EndObject(bool rawData = false) = 0;
 
 		HLAPI virtual bool WriteFloat(const HLString &key, float value) = 0;
 		HLAPI virtual bool WriteDouble(const HLString &key, double value) = 0;

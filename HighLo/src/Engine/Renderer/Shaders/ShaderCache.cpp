@@ -8,26 +8,26 @@
 
 namespace highlo
 {
-	std::map<HLString, uint64> ShaderCache::m_Cache;
+	static std::map<HLString, uint64> s_ShaderCache;
 
 	void ShaderCache::Init()
 	{
-		Deserialize(m_Cache);
+		Deserialize(s_ShaderCache);
 	}
 	
 	void ShaderCache::Shutdown()
 	{
-		Serialize(m_Cache);
+		Serialize(s_ShaderCache);
 	}
 
 	bool ShaderCache::HasChanged(const FileSystemPath &filePath, const HLString &source)
 	{
-		HLString shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath.String();
-
 		uint64 hash = source.Hash();
-		if (m_Cache.find(filePath.String()) == m_Cache.end() || m_Cache.at(filePath.String()) != hash)
+		std::cout << "ShaderHash for " << **filePath << ": " << hash << std::endl;
+
+		if (s_ShaderCache.find(filePath.String()) == s_ShaderCache.end() || s_ShaderCache.at(filePath.String()) != hash)
 		{
-			m_Cache[filePath.String()] = hash;
+			s_ShaderCache[filePath.String()] = hash;
 			return true;
 		}
 
@@ -36,49 +36,28 @@ namespace highlo
 
 	void ShaderCache::Serialize(const std::map<HLString, uint64> &shaderCache)
 	{
-		/*
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
-		std::vector<DocumentEntry> dataToStore;
+		writer->BeginArray();
 		for (auto &[filePath, hash] : shaderCache)
 		{
-			DocumentEntry entry;
-			entry.Key = filePath;
-			entry.Value = new void*[1];
-			entry.Value[0] = &((uint64)hash);
-			entry.ElementSize = sizeof(uint64);
-			entry.ElementCount = 1;
-			entry.Type = "uint64";
-			dataToStore.push_back(entry);
+			writer->BeginObject();
+			writer->Write(filePath, hash);
+			writer->EndObject();
 		}
+		writer->EndArray();
 
-		writer->Write("shaderCache", dataToStore);
-		writer->WriteOut();
-		*/
+		bool success = writer->WriteOut();
+		HL_ASSERT(success);
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
-		/*
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-
-		std::vector<DocumentEntry> result = reader->GetAll();
-
-		for (uint32 i = 0; i < result.size(); ++i)
-		{
-			DocumentEntry entry = result[i];
-
-			if (entry.Type == "uint64")
-			{
-				HLString path = entry.Key;
-				uint64 hash = (uint64)entry.Value[0];
-
-				shaderCache[path] = hash;
-			}
-		}
-		*/
+		bool success = reader->ReadContents();
+		success = reader->ReadUint64ArrayMap("", shaderCache);
 	}
 }
 

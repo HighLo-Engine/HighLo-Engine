@@ -266,6 +266,19 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_ViewportPanelMouseOver = ImGui::IsWindowHovered();
 	m_ViewportPanelFocused = ImGui::IsWindowFocused();
 
+	if (ImGui::BeginPopupContextWindow("#viewportRightClick", ImGuiMouseButton_Right, false))
+	{
+		// TODO
+		if (ImGui::BeginMenu(ICON_FA_PLUS " New"))
+		{
+
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndPopup();
+	}
+
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	if (viewportSize.x < 0.0f)
@@ -305,6 +318,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 void HighLoEditor::OnResize(uint32 width, uint32 height)
 {
+	m_OverlayCamera.OnWindowResize(width, height);
+	m_EditorCamera.OnWindowResize(width, height);
 }
 
 void HighLoEditor::SelectEntity(Entity entity)

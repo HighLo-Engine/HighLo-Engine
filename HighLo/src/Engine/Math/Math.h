@@ -70,4 +70,6 @@ namespace highlo
 	HLAPI float DistanceSquaredSSE(const glm::vec3 &a, const glm::vec3 &b);
 	HLAPI bool	CompareVectorsSSE(const glm::vec3 &a, const glm::vec3 &b);
 	HLAPI float	DotProductSSE(const glm::vec3 &a, const glm::vec3 &b);
+
+	HLAPI uint32 GetDigitCountOf(uint32 number);
 }

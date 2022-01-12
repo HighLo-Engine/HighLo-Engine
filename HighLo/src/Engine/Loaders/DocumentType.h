@@ -16,5 +16,18 @@ namespace highlo
 		XML,
 		Yaml
 	};
+
+	enum class DocumentDataType
+	{
+		None = 0,
+		Int32, UInt32,
+		Int64, UInt64,
+		Float, Double,
+		Vec2, Vec3, Vec4,
+		Mat2, Mat3, Mat4,
+		Bool,
+		Quat,
+		String
+	};
 }
 

@@ -421,7 +421,7 @@ namespace highlo
 		return false;
 	}
 
-	HLString XMLWriter::GetContent() const
+	HLString XMLWriter::GetContent(bool prettify) const
 	{
 		return HLString();
 	}

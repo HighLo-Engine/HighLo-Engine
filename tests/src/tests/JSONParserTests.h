@@ -19,13 +19,11 @@ using namespace highlo;
 
 TEST(TEST_CATEGORY, JSONParser_String)
 {
-	HLString expected = "{\"test\": \"Hello World!\"}";
+	HLString expected = "{\"test\":\"Hello World!\"}";
 
 	Ref<DocumentWriter> writer = DocumentWriter::Create("", DocumentType::Json);
 	writer->WriteString("test", "Hello World!");
 	HLString content = writer->GetContent();
-	std::cout << *content << std::endl;
-
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 

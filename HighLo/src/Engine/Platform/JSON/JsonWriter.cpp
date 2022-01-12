@@ -1374,7 +1374,7 @@ namespace highlo
 	{
 		// Write content into file
 		HL_CORE_INFO(JSON_LOG_PREFIX "[+] Writing file {0} [+]", **m_FilePath);
-		HLString content = GetContent();
+		HLString content = GetContent(true);
 
 		FILE *file = fopen(**m_FilePath, "w");
 		if (!file)
@@ -1411,11 +1411,21 @@ namespace highlo
 		return false;
 	}
 	
-	HLString JSONWriter::GetContent() const
+	HLString JSONWriter::GetContent(bool prettify) const
 	{
 		rapidjson::StringBuffer buffer;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-		m_Document.Accept(writer);
+
+		if (prettify)
+		{
+			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+			m_Document.Accept(writer);
+		}
+		else
+		{
+			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+			m_Document.Accept(writer);
+		}
+
 		return buffer.GetString();
 	}
 

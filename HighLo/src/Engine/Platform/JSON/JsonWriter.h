@@ -112,7 +112,7 @@ namespace highlo
 		virtual bool HasKey(const HLString &key) const override;
 		virtual bool WriteOut() const override;
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
-		virtual HLString GetContent() const override;
+		virtual HLString GetContent(bool prettify = false) const override;
 
 	private:
 

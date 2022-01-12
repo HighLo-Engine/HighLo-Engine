@@ -424,7 +424,7 @@ namespace highlo
 		return true;
 	}
 
-	HLString YAMLWriter::GetContent() const
+	HLString YAMLWriter::GetContent(bool prettify) const
 	{
 		return HLString();
 	}

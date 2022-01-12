@@ -381,11 +381,7 @@ TEST(TEST_CATEGORY, ReplaceAllStrings)
 {
 	HLString str = "hello world! hello world! hello world!";
 	HLString expected = "HELLO world! HELLO world! HELLO world!";
-
-	HLString result = str.Replace("hello", "HELLO", 3);
-
-	std::cout << *result << std::endl;
-	std::cout << *expected << std::endl;
+	HLString result = str.Replace("hello", "HELLO");
 
 	EXPECT_EQ(StringEquals(expected, result), true);
 }
@@ -576,7 +572,7 @@ TEST(TEST_CATEGORY, BoolFalseToString)
 TEST(TEST_CATEGORY, HashString)
 {
 	HLString str = "Hello World!";
-	EXPECT_EQ(str.Hash(), 2005729231029082450);
+	EXPECT_EQ(str.Hash(), 10459095042125088882);
 }
 
 TEST(TEST_CATEGORY, HashStrings)

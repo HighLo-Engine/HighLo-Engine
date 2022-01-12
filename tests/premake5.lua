@@ -23,7 +23,7 @@ project "HighLoTest"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.IconFontCppHeaders}",
 		"%{IncludeDir.gtest}",
-		"%{IncludeDir.gmock}"
+		"%{IncludeDir.gmock}",
     }
 
     links

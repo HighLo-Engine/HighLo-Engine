@@ -22,7 +22,7 @@ project "Sandbox"
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.HighLo_Unit}",
-		"%{IncludeDir.IconFontCppHeaders}"
+		"%{IncludeDir.IconFontCppHeaders}",
     }
 
     links

@@ -417,7 +417,11 @@ namespace highlo
 
 	bool YAMLWriter::ReadContents(const FileSystemPath &filePath)
 	{
-		return false;
+		if (!filePath.String().IsEmpty())
+			m_FilePath = filePath;
+
+		m_Document = YAML::LoadFile(**m_FilePath);
+		return true;
 	}
 
 	HLString YAMLWriter::GetContent() const

@@ -116,6 +116,7 @@ namespace highlo
 	private:
 
 		FileSystemPath m_FilePath;
+		YAML::Node m_Document;
 	};
 }
 

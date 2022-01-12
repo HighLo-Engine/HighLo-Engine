@@ -24,8 +24,6 @@ namespace highlo
 
 		static void Serialize(const std::map<HLString, uint64> &shaderCache);
 		static void Deserialize(std::map<HLString, uint64> &shaderCache);
-
-		static std::map<HLString, uint64> m_Cache;
 	};
 }
 

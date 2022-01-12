@@ -127,7 +127,7 @@ namespace highlo
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
-		HLString source = FileSystem::Get()->ReadTextFile(filePath);
+		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 	}
 
@@ -349,10 +349,14 @@ namespace highlo
 		{
 			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
 			m_ShaderSources = PreProcess(source);
+			bool cacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
+
+			HL_CORE_TRACE("Force compile: {0}", forceCompile);
+			HL_CORE_TRACE("Shader Cache: {0}", cacheHasChanged);
 
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
-			CompileOrGetVulkanBinary(shaderData, forceCompile);
-			CompileOrGetOpenGLBinary(shaderData, forceCompile);
+			CompileOrGetVulkanBinary(shaderData, forceCompile || cacheHasChanged);
+			CompileOrGetOpenGLBinary(shaderData, forceCompile || cacheHasChanged);
 			ReflectAllShaderStages(shaderData);
 		}
 		else
@@ -382,7 +386,7 @@ namespace highlo
 				buffer.Name = resource.name;
 				buffer.BindingPoint = bindingPoint;
 				buffer.Size = bufferSize;
-					
+				
 				glCreateBuffers(1, &buffer.RendererID);
 				glBindBuffer(GL_UNIFORM_BUFFER, buffer.RendererID);
 				glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
@@ -492,7 +496,6 @@ namespace highlo
 		for (auto &[stage, source] : m_ShaderSources)
 		{
 			const char *extension = utils::GLShaderStageCachedVulkanFileExtension(stage);
-			bool cacheHasChanged = true;
 
 			if (m_ShaderSources[stage].IsEmpty())
 				continue;
@@ -514,12 +517,9 @@ namespace highlo
 					fread(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
 					fclose(f);
 				}
-
-				// Check, if Shadersource has been changed since last compilation
-				cacheHasChanged = ShaderCache::HasChanged(path, m_ShaderSources[stage]);
 			}
 
-			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()) ) //|| cacheHasChanged)
+			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()))
 			{
 				shaderc::Compiler compiler;
 				shaderc::CompileOptions options;

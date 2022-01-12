@@ -558,7 +558,7 @@ namespace highlo
 
 	bool JSONWriter::ReadStringArray(const HLString &key, std::vector<HLString> &result)
 	{
-		return ReadArray(key, DocumentDataType::String, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::String, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsString())
 				return false;
@@ -573,7 +573,7 @@ namespace highlo
 
 	bool JSONWriter::ReadInt32Array(const HLString &key, std::vector<int32> &result)
 	{
-		return ReadArray(key, DocumentDataType::Int32, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Int32, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsInt())
 				return false;
@@ -588,7 +588,7 @@ namespace highlo
 
 	bool JSONWriter::ReadUInt32Array(const HLString &key, std::vector<uint32> &result)
 	{
-		return ReadArray(key, DocumentDataType::UInt32, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::UInt32, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsUint())
 				return false;
@@ -603,7 +603,7 @@ namespace highlo
 
 	bool JSONWriter::ReadInt64Array(const HLString &key, std::vector<int64> &result)
 	{
-		return ReadArray(key, DocumentDataType::Int64, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Int64, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsInt64())
 				return false;
@@ -618,7 +618,7 @@ namespace highlo
 
 	bool JSONWriter::ReadUInt64Array(const HLString &key, std::vector<uint64> &result)
 	{
-		return ReadArray(key, DocumentDataType::UInt64, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::UInt64, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsUint64())
 				return false;
@@ -633,7 +633,7 @@ namespace highlo
 
 	bool JSONWriter::ReadBoolArray(const HLString &key, std::vector<bool> &result)
 	{
-		return ReadArray(key, DocumentDataType::Bool, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Bool, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsBool())
 				return false;
@@ -648,7 +648,7 @@ namespace highlo
 
 	bool JSONWriter::ReadFloatArray(const HLString &key, std::vector<float> &result)
 	{
-		return ReadArray(key, DocumentDataType::Float, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Float, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsFloat())
 				return false;
@@ -663,7 +663,7 @@ namespace highlo
 
 	bool JSONWriter::ReadDoubleArray(const HLString &key, std::vector<double> &result)
 	{
-		return ReadArray(key, DocumentDataType::Double, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Double, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsDouble())
 				return false;
@@ -678,7 +678,7 @@ namespace highlo
 
 	bool JSONWriter::ReadVec2Array(const HLString &key, std::vector<glm::vec2> &result)
 	{
-		return ReadArray(key, DocumentDataType::Vec2, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Vec2, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -696,7 +696,7 @@ namespace highlo
 
 	bool JSONWriter::ReadVec3Array(const HLString &key, std::vector<glm::vec3> &result)
 	{
-		return ReadArray(key, DocumentDataType::Vec3, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Vec3, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -715,7 +715,7 @@ namespace highlo
 
 	bool JSONWriter::ReadVec4Array(const HLString &key, std::vector<glm::vec4> &result)
 	{
-		return ReadArray(key, DocumentDataType::Vec4, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Vec4, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -735,7 +735,7 @@ namespace highlo
 
 	bool JSONWriter::ReadMat2Array(const HLString &key, std::vector<glm::mat2> &result)
 	{
-		return ReadArray(key, DocumentDataType::Mat2, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Mat2, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -755,7 +755,7 @@ namespace highlo
 
 	bool JSONWriter::ReadMat3Array(const HLString &key, std::vector<glm::mat3> &result)
 	{
-		return ReadArray(key, DocumentDataType::Mat3, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Mat3, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -781,7 +781,7 @@ namespace highlo
 
 	bool JSONWriter::ReadMat4Array(const HLString &key, std::vector<glm::mat4> &result)
 	{
-		return ReadArray(key, DocumentDataType::Mat4, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Mat4, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -815,7 +815,7 @@ namespace highlo
 
 	bool JSONWriter::ReadQuatArray(const HLString &key, std::vector<glm::quat> &result)
 	{
-		return ReadArray(key, DocumentDataType::Quat, [result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Quat, [&result](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -834,7 +834,7 @@ namespace highlo
 
 	bool JSONWriter::ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::String, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::String, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsString())
 				return false;
@@ -849,7 +849,7 @@ namespace highlo
 
 	bool JSONWriter::ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Int32, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Int32, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsInt())
 				return false;
@@ -864,7 +864,7 @@ namespace highlo
 
 	bool JSONWriter::ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::UInt32, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::UInt32, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsUint())
 				return false;
@@ -879,7 +879,7 @@ namespace highlo
 
 	bool JSONWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Int64, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Int64, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsInt64())
 				return false;
@@ -894,7 +894,7 @@ namespace highlo
 
 	bool JSONWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::UInt64, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::UInt64, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsUint64())
 				return false;
@@ -909,7 +909,7 @@ namespace highlo
 
 	bool JSONWriter::ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Bool, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Bool, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsBool())
 				return false;
@@ -924,7 +924,7 @@ namespace highlo
 
 	bool JSONWriter::ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Float, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Float, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsFloat())
 				return false;
@@ -939,7 +939,7 @@ namespace highlo
 
 	bool JSONWriter::ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Double, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Double, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsDouble())
 				return false;
@@ -954,7 +954,7 @@ namespace highlo
 
 	bool JSONWriter::ReadVec2ArrayMap(const HLString &key, std::map<HLString, glm::vec2> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Vec2, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Vec2, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;
@@ -973,7 +973,7 @@ namespace highlo
 
 	bool JSONWriter::ReadVec3ArrayMap(const HLString &key, std::map<HLString, glm::vec3> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Vec3, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Vec3, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;
@@ -993,7 +993,7 @@ namespace highlo
 
 	bool JSONWriter::ReadVec4ArrayMap(const HLString &key, std::map<HLString, glm::vec4> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Vec4, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Vec4, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;
@@ -1014,7 +1014,7 @@ namespace highlo
 
 	bool JSONWriter::ReadMat2ArrayMap(const HLString &key, std::map<HLString, glm::mat2> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Mat2, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Mat2, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;
@@ -1034,7 +1034,7 @@ namespace highlo
 
 	bool JSONWriter::ReadMat3ArrayMap(const HLString &key, std::map<HLString, glm::mat3> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Mat3, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Mat3, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;
@@ -1060,7 +1060,7 @@ namespace highlo
 
 	bool JSONWriter::ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Mat4, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Mat4, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;
@@ -1094,7 +1094,7 @@ namespace highlo
 
 	bool JSONWriter::ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Quat, [result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
+		return ReadArrayMap(key, DocumentDataType::Quat, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
 			if (!v.IsArray())
 				return false;

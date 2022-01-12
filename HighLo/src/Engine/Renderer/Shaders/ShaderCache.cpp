@@ -8,26 +8,26 @@
 
 namespace highlo
 {
-	std::map<HLString, uint64> ShaderCache::m_Cache;
+	static std::map<HLString, uint64> s_ShaderCache;
 
 	void ShaderCache::Init()
 	{
-		Deserialize(m_Cache);
+		Deserialize(s_ShaderCache);
 	}
 	
 	void ShaderCache::Shutdown()
 	{
-		Serialize(m_Cache);
+		Serialize(s_ShaderCache);
 	}
 
 	bool ShaderCache::HasChanged(const FileSystemPath &filePath, const HLString &source)
 	{
-		HLString shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath.String();
-
 		uint64 hash = source.Hash();
-		if (m_Cache.find(filePath.String()) == m_Cache.end() || m_Cache.at(filePath.String()) != hash)
+		std::cout << "ShaderHash for " << **filePath << ": " << hash << std::endl;
+
+		if (s_ShaderCache.find(filePath.String()) == s_ShaderCache.end() || s_ShaderCache.at(filePath.String()) != hash)
 		{
-			m_Cache[filePath.String()] = hash;
+			s_ShaderCache[filePath.String()] = hash;
 			return true;
 		}
 
@@ -57,7 +57,7 @@ namespace highlo
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 		bool success = reader->ReadContents();
-		success = reader->ReadUint64ArrayMap("", m_Cache);
+		success = reader->ReadUint64ArrayMap("", shaderCache);
 	}
 }
 

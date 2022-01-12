@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.8 (2022-01-12) Added DocumentWriter
 //     - 1.7 (2021-11-18) Removed HighLo-Unit
 //     - 1.6 (2021-11-01) Added Threading headers
 //     - 1.5 (2021-10-23) Added Atomic and Service
@@ -131,6 +132,7 @@
 #include "Engine/Scene/UserSettings.h"
 
 #include "Engine/Loaders/MeshLoader.h"
+#include "Engine/Loaders/DocumentWriter.h"
 
 #include "Engine/Encryption/Base64.h"
 #include "Engine/Encryption/Encryptor.h"

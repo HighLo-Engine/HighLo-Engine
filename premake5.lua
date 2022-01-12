@@ -29,7 +29,6 @@ workspace "HighLo"
 		include "HighLo/vendor/msdf-atlas-gen"
 		include "HighLo/vendor/RapidXML"
 		include "HighLo/vendor/RapidJSON"
-		include "HighLo/vendor/yaml-cpp"
 		include "HighLo/vendor/IconFontCppHeaders"
 		include "HighLo/vendor/googletest"
 		

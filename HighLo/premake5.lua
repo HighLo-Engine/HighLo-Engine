@@ -17,6 +17,10 @@ project "HighLo"
 		
 		"%{IncludeDir.vulkan_memory_alloc}/**.h",
 		"%{IncludeDir.vulkan_memory_alloc}/**.cpp",
+		
+		"%{prj.name}/vendor/yaml-cpp/include/**.h",
+		"%{prj.name}/vendor/yaml-cpp/src/**.h",
+		"%{prj.name}/vendor/yaml-cpp/src/**.cpp"
     }
 
     includedirs
@@ -32,12 +36,12 @@ project "HighLo"
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.rapidXML}",
 		"%{IncludeDir.rapidJSON}",
-		"%{IncludeDir.yamlCpp}",
 		"%{IncludeDir.IconFontCppHeaders}",
 		"%{IncludeDir.gtest}",
 		"%{IncludeDir.gmock}",
 		"%{IncludeDir.vulkan}",
 		"%{IncludeDir.vulkan_local}",
+		"%{IncludeDir.yamlCpp}",
     }
 
     links
@@ -61,6 +65,9 @@ project "HighLo"
 		"HIGHLO_LIBRARY_EXPORT",
 		"HIGHLO_ENABLE_PROFILER",
 	}
+	
+	filter "files:HighLo/vendor/yaml-cpp/src/**.cpp"
+   	flags { "NoPCH" }
 
     filter "system:windows"
         systemversion "latest"

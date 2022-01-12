@@ -15,6 +15,7 @@
 #include "tests/BinarySearchTreeTests.h"
 #include "tests/FileSystemTests.h"
 #include "tests/FileSystemPathTests.h"
+#include "tests/JSONParserTests.h"
 
 int main(int argc, char *argv[])
 {

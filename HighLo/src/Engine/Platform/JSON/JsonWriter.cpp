@@ -127,7 +127,7 @@ namespace highlo
 		}
 	}
 	
-	bool JSONWriter::Write(const HLString &key, float value)
+	bool JSONWriter::WriteFloat(const HLString &key, float value)
 	{
 		return Write(key, DocumentDataType::Float, [value]() -> rapidjson::Value
 		{
@@ -137,7 +137,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, double value)
+	bool JSONWriter::WriteDouble(const HLString &key, double value)
 	{
 		return Write(key, DocumentDataType::Double, [value]() -> rapidjson::Value
 		{
@@ -147,7 +147,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, int32 value)
+	bool JSONWriter::WriteInt32(const HLString &key, int32 value)
 	{
 		return Write(key, DocumentDataType::Int32, [value]() -> rapidjson::Value
 		{
@@ -157,7 +157,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, uint32 value)
+	bool JSONWriter::WriteUInt32(const HLString &key, uint32 value)
 	{
 		return Write(key, DocumentDataType::UInt32, [value]() -> rapidjson::Value
 		{
@@ -167,7 +167,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, int64 value)
+	bool JSONWriter::WriteInt64(const HLString &key, int64 value)
 	{
 		return Write(key, DocumentDataType::Int64, [value]() -> rapidjson::Value
 		{
@@ -177,7 +177,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, uint64 value)
+	bool JSONWriter::WriteUInt64(const HLString &key, uint64 value)
 	{
 		return Write(key, DocumentDataType::UInt64, [value]() -> rapidjson::Value
 		{
@@ -187,7 +187,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, bool value)
+	bool JSONWriter::WriteBool(const HLString &key, bool value)
 	{
 		return Write(key, DocumentDataType::Bool, [value]() -> rapidjson::Value
 		{
@@ -197,7 +197,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, const HLString &value)
+	bool JSONWriter::WriteString(const HLString &key, const HLString &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
@@ -208,7 +208,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::vec2 &value)
+	bool JSONWriter::WriteVec2(const HLString &key, const glm::vec2 &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
@@ -220,7 +220,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::vec3 &value)
+	bool JSONWriter::WriteVec3(const HLString &key, const glm::vec3 &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
@@ -233,7 +233,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::vec4 &value)
+	bool JSONWriter::WriteVec4(const HLString &key, const glm::vec4 &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
@@ -247,7 +247,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::mat2 &value)
+	bool JSONWriter::WriteMat2(const HLString &key, const glm::mat2 &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
@@ -261,7 +261,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::mat3 &value)
+	bool JSONWriter::WriteMat3(const HLString &key, const glm::mat3 &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
@@ -282,7 +282,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::mat4 &value)
+	bool JSONWriter::WriteMat4(const HLString &key, const glm::mat4 &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
@@ -311,7 +311,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, const glm::quat &value)
+	bool JSONWriter::WriteQuaternion(const HLString &key, const glm::quat &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
@@ -325,7 +325,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<HLString> &value)
+	bool JSONWriter::WriteStringArray(const HLString &key, std::vector<HLString> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
@@ -341,7 +341,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<int32> &value)
+	bool JSONWriter::WriteInt32Array(const HLString &key, std::vector<int32> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int32, [instance, value]() mutable -> rapidjson::Value
@@ -350,7 +350,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<uint32> &value)
+	bool JSONWriter::WriteUInt32Array(const HLString &key, std::vector<uint32> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt32, [instance, value]() mutable -> rapidjson::Value
@@ -359,7 +359,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<int64> &value)
+	bool JSONWriter::WriteInt64Array(const HLString &key, std::vector<int64> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int64, [instance, value]() mutable -> rapidjson::Value
@@ -368,7 +368,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<uint64> &value)
+	bool JSONWriter::WriteUInt64Array(const HLString &key, std::vector<uint64> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt64, [instance, value]() mutable -> rapidjson::Value
@@ -377,7 +377,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<bool> &value)
+	bool JSONWriter::WriteBoolArray(const HLString &key, std::vector<bool> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Bool, [instance, value]() mutable -> rapidjson::Value
@@ -386,7 +386,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<float> &value)
+	bool JSONWriter::WriteFloatArray(const HLString &key, std::vector<float> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Float, [instance, value]() mutable -> rapidjson::Value
@@ -395,7 +395,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, std::vector<double> &value)
+	bool JSONWriter::WriteDoubleArray(const HLString &key, std::vector<double> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Double, [instance, value]() mutable -> rapidjson::Value
@@ -404,7 +404,7 @@ namespace highlo
 		});
 	}
 	
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec2> &value)
+	bool JSONWriter::WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
@@ -421,7 +421,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec3> &value)
+	bool JSONWriter::WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
@@ -439,7 +439,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::vec4> &value)
+	bool JSONWriter::WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
@@ -458,7 +458,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat2> &value)
+	bool JSONWriter::WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
@@ -477,7 +477,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat3> &value)
+	bool JSONWriter::WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
@@ -503,7 +503,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::mat4> &value)
+	bool JSONWriter::WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
@@ -537,7 +537,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::Write(const HLString &key, std::vector<glm::quat> &value)
+	bool JSONWriter::WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value

@@ -12,11 +12,15 @@
  * Ref<DocumentWriter> writer = DocumentWriter::Create("test.json", DocumentType::Json); // valid options for DocumentType are: Json, Yaml, XML
  * 
  * // Write an array into file
+ * std::vector<uint32> arr;
+ * arr.push_back(42);
+ * arr.push_back(10);
+ * 
  * writer->BeginArray();
  * for (uint32 i = 0; i < arr.size(); ++i)
  * {
  *   writer->BeginObject();
- *   writer->Write(<key>, <value>);
+ *   writer->WriteUInt32("object" + i, arr[i]);
  *   writer->EndObject();
  * }
  * writer->EndArray();
@@ -31,7 +35,7 @@
  * for (uint32 i = 0; i < arr.size(); ++i)
  * {
  *   writer->BeginObject();
- *   writer->Write("object" + i, arr[i]);
+ *   writer->WriteUInt32("object" + i, arr[i]);
  *   writer->EndObject();
  * }
  * writer->EndArray("testArray");
@@ -50,8 +54,9 @@
  * }
  * 
  * // Write a single object into file
+ * uint32 value = 10;
  * writer->BeginObject();
- * writer->Write(<key>, <value>);
+ * writer->WriteUInt32("test", value);
  * writer->EndObject();
  * 
  * // All code above just puts the data into the internal storage,
@@ -139,38 +144,38 @@ namespace highlo
 		HLAPI virtual void BeginObject() = 0;
 		HLAPI virtual void EndObject() = 0;
 
-		HLAPI virtual bool Write(const HLString &key, float value) = 0;
-		HLAPI virtual bool Write(const HLString &key, double value) = 0;
-		HLAPI virtual bool Write(const HLString &key, int32 value) = 0;
-		HLAPI virtual bool Write(const HLString &key, uint32 value) = 0;
-		HLAPI virtual bool Write(const HLString &key, int64 value) = 0;
-		HLAPI virtual bool Write(const HLString &key, uint64 value) = 0;
-		HLAPI virtual bool Write(const HLString &key, bool value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const HLString &value) = 0;
+		HLAPI virtual bool WriteFloat(const HLString &key, float value) = 0;
+		HLAPI virtual bool WriteDouble(const HLString &key, double value) = 0;
+		HLAPI virtual bool WriteInt32(const HLString &key, int32 value) = 0;
+		HLAPI virtual bool WriteUInt32(const HLString &key, uint32 value) = 0;
+		HLAPI virtual bool WriteInt64(const HLString &key, int64 value) = 0;
+		HLAPI virtual bool WriteUInt64(const HLString &key, uint64 value) = 0;
+		HLAPI virtual bool WriteBool(const HLString &key, bool value) = 0;
+		HLAPI virtual bool WriteString(const HLString &key, const HLString &value) = 0;
 
-		HLAPI virtual bool Write(const HLString &key, std::vector<HLString> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<int32> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<uint32> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<int64> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<uint64> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<bool> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<float> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<double> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::vec2> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::vec3> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::vec4> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::mat2> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::mat3> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::mat4> &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, std::vector<glm::quat> &value) = 0;
+		HLAPI virtual bool WriteVec2(const HLString &key, const glm::vec2 &value) = 0;
+		HLAPI virtual bool WriteVec3(const HLString &key, const glm::vec3 &value) = 0;
+		HLAPI virtual bool WriteVec4(const HLString &key, const glm::vec4 &value) = 0;
+		HLAPI virtual bool WriteMat2(const HLString &key, const glm::mat2 &value) = 0;
+		HLAPI virtual bool WriteMat3(const HLString &key, const glm::mat3 &value) = 0;
+		HLAPI virtual bool WriteMat4(const HLString &key, const glm::mat4 &value) = 0;
+		HLAPI virtual bool WriteQuaternion(const HLString &key, const glm::quat &value) = 0;
 
-		HLAPI virtual bool Write(const HLString &key, const glm::vec2 &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const glm::vec3 &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const glm::vec4 &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const glm::mat2 &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const glm::mat3 &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const glm::mat4 &value) = 0;
-		HLAPI virtual bool Write(const HLString &key, const glm::quat &value) = 0;
+		HLAPI virtual bool WriteStringArray(const HLString &key, std::vector<HLString> &value) = 0;
+		HLAPI virtual bool WriteInt32Array(const HLString &key, std::vector<int32> &value) = 0;
+		HLAPI virtual bool WriteUInt32Array(const HLString &key, std::vector<uint32> &value) = 0;
+		HLAPI virtual bool WriteInt64Array(const HLString &key, std::vector<int64> &value) = 0;
+		HLAPI virtual bool WriteUInt64Array(const HLString &key, std::vector<uint64> &value) = 0;
+		HLAPI virtual bool WriteBoolArray(const HLString &key, std::vector<bool> &value) = 0;
+		HLAPI virtual bool WriteFloatArray(const HLString &key, std::vector<float> &value) = 0;
+		HLAPI virtual bool WriteDoubleArray(const HLString &key, std::vector<double> &value) = 0;
+		HLAPI virtual bool WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value) = 0;
+		HLAPI virtual bool WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value) = 0;
+		HLAPI virtual bool WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value) = 0;
+		HLAPI virtual bool WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value) = 0;
+		HLAPI virtual bool WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value) = 0;
+		HLAPI virtual bool WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value) = 0;
+		HLAPI virtual bool WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value) = 0;
 
 		HLAPI virtual bool ReadStringArray(const HLString &key, std::vector<HLString> &value) = 0;
 		HLAPI virtual bool ReadInt32Array(const HLString &key, std::vector<int32> &value) = 0;

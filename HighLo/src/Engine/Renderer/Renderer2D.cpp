@@ -16,20 +16,8 @@
 #include "Engine/Renderer/Material.h"
 #include "Engine/Renderer/CommandBuffer.h"
 
-#include <codecvt>
-
 namespace highlo
 {
-	namespace utils
-	{
-		static HLString32 ToUTF32(const HLString &str)
-		{
-			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-			std::u32string result = conv.from_bytes(*str);
-			return HLString32(result.c_str(), result.length());
-		}
-	}
-
 	struct QuadVertex
 	{
 		glm::vec3 Position;

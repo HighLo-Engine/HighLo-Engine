@@ -123,6 +123,7 @@ namespace highlo
 		bool SwapChainTarget = false;
 		glm::mat4 CameraProjection = glm::mat4(1.0f);
 		Ref<UniformBufferSet> UniformBufferSet;
+		Renderer2DStats Statistics;
 	};
 
 	static Renderer2DData *s_2DData;
@@ -303,6 +304,7 @@ namespace highlo
 		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
 
 		StartBatch();
+		ResetStatistics();
 	}
 
 	void Renderer2D::EndScene()
@@ -354,6 +356,7 @@ namespace highlo
 			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+			s_2DData->Statistics.DrawCalls++;
 		}
 	}
 
@@ -373,6 +376,7 @@ namespace highlo
 			s_2DData->CircleShader->Bind();
 			s_2DData->CircleVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, s_2DData->CircleMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+			s_2DData->Statistics.DrawCalls++;
 		}
 	}
 
@@ -392,6 +396,7 @@ namespace highlo
 			s_2DData->LineShader->Bind();
 			s_2DData->LineVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, s_2DData->LineMaterial, s_2DData->UniformBufferSet, PrimitiveType::Lines, s_2DData->DepthTest);
+			s_2DData->Statistics.DrawCalls++;
 		}
 	}
 
@@ -419,6 +424,7 @@ namespace highlo
 			s_2DData->TextShader->Bind();
 			s_2DData->TextVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+			s_2DData->Statistics.DrawCalls++;
 		}
 	}
 
@@ -456,18 +462,18 @@ namespace highlo
 		StartBatch();
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color)
+	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color, int32 entityId)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, color);
+		DrawQuad({ position.x, position.y, 0.0f }, size, color, entityId);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color)
+	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color, int32 entityId)
 	{
 		Transform transform = Transform::FromPosition(position).Scale({ size.x, size.y, 1.0f });
-		DrawQuad(transform, color);
+		DrawQuad(transform, color, entityId);
 	}
 
-	void Renderer2D::DrawQuad(const Transform &transform, const glm::vec4 &color)
+	void Renderer2D::DrawQuad(const Transform &transform, const glm::vec4 &color, int32 entityId)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -486,25 +492,26 @@ namespace highlo
 			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-			s_2DData->QuadVertexBufferPtr->EntityID = 0;
+			s_2DData->QuadVertexBufferPtr->EntityID = entityId;
 			s_2DData->QuadVertexBufferPtr++;
 		}
 
 		s_2DData->QuadIndexCount += 6;
+		s_2DData->Statistics.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
+	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor, entityId);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
+	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
 		Transform transform = Transform::FromPosition(position).Scale({ size.x, size.y, 1.0f });
-		DrawQuad(transform, texture, tilingFactor, tintColor);
+		DrawQuad(transform, texture, tilingFactor, tintColor, entityId);
 	}
 	
-	void Renderer2D::DrawQuad(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
+	void Renderer2D::DrawQuad(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -538,42 +545,44 @@ namespace highlo
 			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_2DData->QuadVertexBufferPtr->TilingFactor = tilingFactor;
-			s_2DData->QuadVertexBufferPtr->EntityID = 0;
+			s_2DData->QuadVertexBufferPtr->EntityID = entityId;
 			s_2DData->QuadVertexBufferPtr++;
 		}
 
 		s_2DData->QuadIndexCount += 6;
+		s_2DData->Statistics.QuadCount++;
 	}
 
-	void Renderer2D::DrawLine(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color)
+	void Renderer2D::DrawLine(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color, int32 entityId)
 	{
-		DrawLine({ p1.x, p1.y, 0.0f }, { p2.x, p2.y, 0.0f }, color);
+		DrawLine({ p1.x, p1.y, 0.0f }, { p2.x, p2.y, 0.0f }, color, entityId);
 	}
 
-	void Renderer2D::DrawLine(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color)
+	void Renderer2D::DrawLine(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color, int32 entityId)
 	{
 		if (s_2DData->LineIndexCount >= Renderer2DData::MaxLineIndices)
 			Flush();
 
 		s_2DData->LineVertexBufferPtr->Position = p1;
 		s_2DData->LineVertexBufferPtr->Color = color;
-		s_2DData->LineVertexBufferPtr->EntityID = 0;
+		s_2DData->LineVertexBufferPtr->EntityID = entityId;
 		s_2DData->LineVertexBufferPtr++;
 
 		s_2DData->LineVertexBufferPtr->Position = p2;
 		s_2DData->LineVertexBufferPtr->Color = color;
-		s_2DData->LineVertexBufferPtr->EntityID = 0;
+		s_2DData->LineVertexBufferPtr->EntityID = entityId;
 		s_2DData->LineVertexBufferPtr++;
 
 		s_2DData->LineIndexCount += 2;
+		s_2DData->Statistics.LineCount++;
 	}
 
-	void Renderer2D::FillCircle(const glm::vec2 &position, float radius, float thickness, const glm::vec4 &color)
+	void Renderer2D::FillCircle(const glm::vec2 &position, float radius, float thickness, const glm::vec4 &color, int32 entityId)
 	{
-		FillCircle({ position.x, position.y, 0.0f }, radius, thickness, color);
+		FillCircle({ position.x, position.y, 0.0f }, radius, thickness, color, entityId);
 	}
 
-	void Renderer2D::FillCircle(const glm::vec3 &position, float radius, float thickness, const glm::vec4 &color)
+	void Renderer2D::FillCircle(const glm::vec3 &position, float radius, float thickness, const glm::vec4 &color, int32 entityId)
 	{
 		if (s_2DData->CircleIndexCount >= Renderer2DData::MaxIndices)
 			Flush();
@@ -587,19 +596,20 @@ namespace highlo
 			s_2DData->CircleVertexBufferPtr->Thickness = thickness;
 			s_2DData->CircleVertexBufferPtr->LocalPosition = s_2DData->QuadVertexPositions[i] * 2.0f;
 			s_2DData->CircleVertexBufferPtr->Color = color;
-			s_2DData->CircleVertexBufferPtr->EntityID = 0;
+			s_2DData->CircleVertexBufferPtr->EntityID = entityId;
 			s_2DData->CircleVertexBufferPtr++;
 		}
 
 		s_2DData->CircleIndexCount += 6;
+		s_2DData->Statistics.CircleCount++;
 	}
 
-	void Renderer2D::FillCircle(const Transform &transform, float radius, float thickness, const glm::vec4 &color)
+	void Renderer2D::FillCircle(const Transform &transform, float radius, float thickness, const glm::vec4 &color, int32 entityId)
 	{
-		FillCircle(transform.GetPosition(), radius, thickness, color);
+		FillCircle(transform.GetPosition(), radius, thickness, color, entityId);
 	}
 
-	void Renderer2D::DrawCircle(const Transform &transform, float radius, const glm::vec4 &color)
+	void Renderer2D::DrawCircle(const Transform &transform, float radius, const glm::vec4 &color, int32 entityId)
 	{
 		glm::mat4 localTransform = glm::translate(glm::mat4(1.0f), transform.GetPosition())
 			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().x, { 1.0f, 0.0f, 0.0f })
@@ -618,8 +628,10 @@ namespace highlo
 
 			glm::vec3 p0 = localTransform * startPos;
 			glm::vec3 p1 = localTransform * endPos;
-			DrawLine(p0, p1, color);
+			DrawLine(p0, p1, color, entityId);
 		}
+
+		s_2DData->Statistics.CircleCount++;
 	}
 
 	void Renderer2D::DrawText(const HLString &text, const glm::vec3 &position, float maxWidth, const glm::vec4 &color)
@@ -792,6 +804,18 @@ namespace highlo
 				x += fsScale * advance + kerningOffset;
 			}
 		}
+
+		s_2DData->Statistics.TextCount++;
+	}
+
+	Renderer2DStats Renderer2D::GetStatistics()
+	{
+		return s_2DData->Statistics;
+	}
+
+	void Renderer2D::ResetStatistics()
+	{
+		memset(&s_2DData->Statistics, 0, sizeof(Renderer2DStats));
 	}
 
 

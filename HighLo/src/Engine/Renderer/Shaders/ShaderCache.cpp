@@ -23,7 +23,6 @@ namespace highlo
 	bool ShaderCache::HasChanged(const FileSystemPath &filePath, const HLString &source)
 	{
 		uint64 hash = source.Hash();
-		std::cout << "ShaderHash for " << **filePath << ": " << hash << std::endl;
 
 		if (s_ShaderCache.find(filePath.String()) == s_ShaderCache.end() || s_ShaderCache.at(filePath.String()) != hash)
 		{

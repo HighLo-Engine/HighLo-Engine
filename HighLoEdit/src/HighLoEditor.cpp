@@ -370,7 +370,7 @@ void HighLoEditor::OpenScene(FileMenu *menu, MenuItem *item)
 	HL_TRACE("TEST OPEN");
 	Ref<FileDialogue> fd = FileDialogue::Create();
 	FileDialogueFilter filter;
-	filter.AddFilter("High-Lo Scene file", "*.hl");
+	filter.AddFilter("HighLo Scene file", "*.hl");
 	fd->SetFilter(filter);
 	HLString result = fd->SelectFile();
 

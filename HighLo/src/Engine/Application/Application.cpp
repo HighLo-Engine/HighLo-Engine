@@ -136,6 +136,9 @@ namespace highlo
 		CreateCacheSin();
 		CreateCacheCos();
 
+		// Read the json registry with previous shader cache data
+		ShaderCache::Init();
+
 		// Init Window
 		if (!m_Settings.Headless)
 		{
@@ -150,9 +153,6 @@ namespace highlo
 			m_Window = Window::Create(data);
 			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
 		}
-
-		// Read the json registry with previous shader cache data
-		ShaderCache::Init();
 
 		// Init Renderer
 		if (!m_Settings.Headless)

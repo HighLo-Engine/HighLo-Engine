@@ -15,6 +15,7 @@
 namespace highlo
 {
 #define PRINT_SHADERS 1
+#define PRINT_DEBUG_OUTPUTS 1
 #define GL_SHADER_LOG_PREFIX "Shader>       "
 
 	namespace utils
@@ -60,12 +61,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:		return "Vertex";
-				case GL_FRAGMENT_SHADER:	return "Pixel";
-				case GL_COMPUTE_SHADER:		return "Compute";
-				case GL_TESS_CONTROL_SHADER: return "TessControl";
+				case GL_VERTEX_SHADER:			return "Vertex";
+				case GL_FRAGMENT_SHADER:		return "Pixel";
+				case GL_COMPUTE_SHADER:			return "Compute";
+				case GL_TESS_CONTROL_SHADER:	return "TessControl";
 				case GL_TESS_EVALUATION_SHADER: return "TessEvalulation";
-				case GL_GEOMETRY_SHADER: return "Geometry";
+				case GL_GEOMETRY_SHADER:		return "Geometry";
 			}
 
 			HL_ASSERT(false);
@@ -242,8 +243,11 @@ namespace highlo
 			return;
 
 		buffer.Size = newSize;
-		HL_CORE_INFO("Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
 		glNamedBufferData(buffer.RendererID, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_INFO("Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
+	#endif // PRINT_DEBUG_OUTPUTS
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, float value)
@@ -351,9 +355,6 @@ namespace highlo
 			m_ShaderSources = PreProcess(source);
 			bool cacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
 
-			HL_CORE_TRACE("Force compile: {0}", forceCompile);
-			HL_CORE_TRACE("Shader Cache: {0}", cacheHasChanged);
-
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile || cacheHasChanged);
 			CompileOrGetOpenGLBinary(shaderData, forceCompile || cacheHasChanged);
@@ -392,7 +393,9 @@ namespace highlo
 				glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 				glBindBufferBase(GL_UNIFORM_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
+			#if PRINT_DEBUG_OUTPUTS
 				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Created Uniform Buffer at binding point {0} with name '{1}' and a size of {2} [+]", buffer.BindingPoint, *buffer.Name, buffer.Size);
+			#endif // PRINT_DEBUG_OUTPUTS
 				glBindBuffer(GL_UNIFORM_BUFFER, 0);
 			}
 			else
@@ -412,7 +415,9 @@ namespace highlo
 					glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 					glBindBufferBase(GL_UNIFORM_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
+				#if PRINT_DEBUG_OUTPUTS
 					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] Resized Uniform Buffer at binding point {0} with name '{1}' and a size of {2} [=]", buffer.BindingPoint, *buffer.Name, buffer.Size);
+				#endif // PRINT_DEBUG_OUTPUTS
 					glBindBuffer(GL_UNIFORM_BUFFER, 0);
 				}
 			}
@@ -438,7 +443,10 @@ namespace highlo
 				glBufferData(GL_SHADER_STORAGE_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
+			#if PRINT_DEBUG_OUTPUTS
 				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Created Storage Buffer at binding point {0} with name '{1}' and a size of {2} [+]", buffer.BindingPoint, *buffer.Name, buffer.Size);
+			#endif // PRINT_DEBUG_OUTPUTS
+
 				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 			}
 			else
@@ -458,7 +466,10 @@ namespace highlo
 					glBufferData(GL_SHADER_STORAGE_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
 					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, buffer.BindingPoint, buffer.RendererID);
 
+				#if PRINT_DEBUG_OUTPUTS
 					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2} [=]", buffer.BindingPoint, *buffer.Name, buffer.Size);
+				#endif // PRINT_DEBUG_OUTPUTS
+
 					glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 				}
 			}
@@ -690,7 +701,10 @@ namespace highlo
 				int32 location = GetUniformLocation(name);
 				if (location != -1)
 				{
+				#if PRINT_DEBUG_OUTPUTS
 					HL_CORE_INFO("Registering Uniform {0} at location {1}", *name, location);
+				#endif // PRINT_DEBUG_OUTPUTS
+
 					m_UniformLocations[name] = location;
 				}
 			}
@@ -800,7 +814,11 @@ namespace highlo
 				member.Type = utils::SpirvTypeToShaderUniformType(memberType);
 
 				HLString uniformName = fmt::format("{}.{}", *name, *memberName);
+
+			#if PRINT_DEBUG_OUTPUTS
 				HL_CORE_INFO("Registering push_constant with uniform name {0}", *uniformName);
+			#endif // PRINT_DEBUG_OUTPUTS
+
 				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);
 			}
 

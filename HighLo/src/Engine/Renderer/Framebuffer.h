@@ -68,8 +68,8 @@ namespace highlo
 		FramebufferBlendMode BlendMode = FramebufferBlendMode::None;
 
 		Ref<Texture2D> ExistingImage;
-		std::vector<uint32_t> ExistingImageLayers;
-		std::map<uint32_t, Ref<Texture2D>> ExistingImages;
+		std::vector<uint32> ExistingImageLayers;
+		std::map<uint32, Ref<Texture2D>> ExistingImages;
 		Ref<Framebuffer> ExistingFramebuffer;
 
 		HLString DebugName;

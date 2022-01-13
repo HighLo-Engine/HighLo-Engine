@@ -118,6 +118,10 @@ namespace highlo
 
 		FileSystemPath m_FilePath;
 		YAML::Node m_Document;
+		YAML::Emitter m_Emitter;
+
+		bool m_ShouldWriteIntoArray = false;
+		bool m_ShouldWriteIntoObject = false;
 	};
 }
 

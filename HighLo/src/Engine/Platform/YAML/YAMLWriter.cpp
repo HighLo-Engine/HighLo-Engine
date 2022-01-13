@@ -3,8 +3,160 @@
 #include "HighLoPch.h"
 #include "YAMLWriter.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+#include <glm/glm.hpp>
+
+#include "Engine/Assets/Asset.h"
+
+namespace YAML
+{
+	template<>
+	struct convert<glm::vec2>
+	{
+		static Node encode(const glm::vec2 &v)
+		{
+			Node node;
+			node.push_back(v.x);
+			node.push_back(v.y);
+			return node;
+		}
+
+		static bool decode(const Node &node, glm::vec2 &v)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			v.x = node[0].as<float>();
+			v.y = node[1].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::vec3>
+	{
+		static Node encode(const glm::vec3 &v)
+		{
+			Node node;
+			node.push_back(v.x);
+			node.push_back(v.y);
+			node.push_back(v.z);
+			return node;
+		}
+
+		static bool decode(const Node &node, glm::vec3 &v)
+		{
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			v.x = node[0].as<float>();
+			v.y = node[1].as<float>();
+			v.z = node[2].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::vec4>
+	{
+		static Node encode(const glm::vec4 &v)
+		{
+			Node node;
+			node.push_back(v.x);
+			node.push_back(v.y);
+			node.push_back(v.z);
+			node.push_back(v.w);
+			return node;
+		}
+
+		static bool decode(const Node &node, glm::vec4 &v)
+		{
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			v.x = node[0].as<float>();
+			v.y = node[1].as<float>();
+			v.z = node[2].as<float>();
+			v.w = node[3].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::quat>
+	{
+		static Node encode(const glm::quat &q)
+		{
+			Node node;
+			node.push_back(q.w);
+			node.push_back(q.x);
+			node.push_back(q.y);
+			node.push_back(q.z);
+			return node;
+		}
+
+		static bool decode(const Node &node, glm::quat &q)
+		{
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			q.w = node[0].as<float>();
+			q.x = node[1].as<float>();
+			q.y = node[2].as<float>();
+			q.z = node[3].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<highlo::AssetHandle>
+	{
+		static Node encode(const highlo::AssetHandle &handle)
+		{
+			Node node;
+			node.push_back((uint64)handle);
+			return node;
+		}
+
+		static bool decode(const Node &node, highlo::AssetHandle &handle)
+		{
+			handle = node.as<uint64>();
+			return true;
+		}
+	};
+}
+
 namespace highlo
 {
+	inline YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec2 &v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
+
+	inline YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec3 &v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+		return out;
+	}
+
+	inline YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+		return out;
+	}
+
+	inline YAML::Emitter &operator<<(YAML::Emitter &out, const glm::quat &q)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << q.w << q.x << q.y << q.z << YAML::EndSeq;
+		return out;
+	}
+
 	YAMLWriter::YAMLWriter(const FileSystemPath &filePath)
 		: m_FilePath(filePath)
 	{
@@ -16,18 +168,32 @@ namespace highlo
 
 	void YAMLWriter::BeginArray()
 	{
+		m_ShouldWriteIntoArray = true;
 	}
 
 	void YAMLWriter::EndArray(const HLString &key, bool rawData)
 	{
+		if (m_ShouldWriteIntoArray)
+		{
+			m_ShouldWriteIntoArray = false;
+
+
+		}
 	}
 
 	void YAMLWriter::BeginObject()
 	{
+		m_ShouldWriteIntoObject = true;
 	}
 
 	void YAMLWriter::EndObject(bool rawData)
 	{
+		if (m_ShouldWriteIntoObject)
+		{
+			m_ShouldWriteIntoObject = false;
+
+
+		}
 	}
 
 	bool YAMLWriter::WriteFloat(const HLString &key, float value)
@@ -412,7 +578,20 @@ namespace highlo
 
 	bool YAMLWriter::WriteOut() const
 	{
-		return false;
+		// Write content into file
+		HL_CORE_INFO("[+] Writing file {0} [+]", **m_FilePath);
+		HLString content = GetContent(true);
+
+		FILE *file = fopen(**m_FilePath, "w");
+		if (!file)
+		{
+			HL_CORE_ERROR("[-] Could not open file {0} [-]", **m_FilePath);
+			return false;
+		}
+
+		fwrite(*content, sizeof(char), content.Length(), file);
+		fclose(file);
+		return true;
 	}
 
 	bool YAMLWriter::ReadContents(const FileSystemPath &filePath)
@@ -426,7 +605,7 @@ namespace highlo
 
 	HLString YAMLWriter::GetContent(bool prettify) const
 	{
-		return HLString();
+		return m_Emitter.c_str();
 	}
 }
 

@@ -270,7 +270,7 @@ namespace highlo
 
 		// Load Texture Atlas
 
-		Ref<Texture2D> texture;
+		Ref<Texture2D> texture = nullptr;
 		switch (config.ImageType)
 		{
 			case msdf_atlas::ImageType::MSDF:
@@ -299,8 +299,7 @@ namespace highlo
 
 	Font::~Font()
 	{
-		if (m_MSDFData)
-			delete m_MSDFData;
+		delete m_MSDFData;
 	}
 
 	Ref<Font> Font::Create(const FileSystemPath &path)

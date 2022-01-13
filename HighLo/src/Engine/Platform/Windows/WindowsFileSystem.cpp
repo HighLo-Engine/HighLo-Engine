@@ -49,11 +49,6 @@ namespace highlo
             return "";
         }
 
-        static LPWSTR CreateErrorMessageAsString(DWORD errorCode)
-        {
-            
-        }
-
         static FileSystemPath GetFolderById(const KNOWNFOLDERID &id)
         {
             PWSTR filePath;
@@ -173,7 +168,9 @@ namespace highlo
         if (!result)
             delete[] buffer;
 
-        *outSize = size;
+        if (outSize)
+            *outSize = size;
+        
         return result ? buffer : nullptr;
     }
 

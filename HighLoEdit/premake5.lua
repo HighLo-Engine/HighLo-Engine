@@ -35,8 +35,14 @@ project "HighLoEdit"
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libssl-3-x64.dll*"),
 		
+		-- copy all contents of the asset folder but the cache.registry file (if you copy the file everytime you build the current cache registry will be overriden which will cause a false recompilation of all shaders) --
 		("{COPY} %{wks.location}HighLo/assets/editorconfig.ini %{cfg.targetdir}"),
-		("{COPY} %{wks.location}HighLo/assets %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets")
+		("{COPY} %{wks.location}HighLo/assets/cache %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets/cache"),
+		("{COPY} %{wks.location}HighLo/assets/fonts %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets/fonts"),
+		("{COPY} %{wks.location}HighLo/assets/models %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets/models"),
+		("{COPY} %{wks.location}HighLo/assets/Resources %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets/Resources"),
+		("{COPY} %{wks.location}HighLo/assets/shaders %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets/shaders"),
+		("{COPY} %{wks.location}HighLo/assets/textures %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/assets/textures")
 	}
 
     filter "system:windows"

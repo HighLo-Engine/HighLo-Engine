@@ -47,8 +47,11 @@ namespace highlo
 		HLAPI static void DrawLine(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color);
 		HLAPI static void DrawLine(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color);
 
-		HLAPI static void DrawCircle(const glm::vec2 &p1, float radius, const glm::vec4 &color);
-		HLAPI static void DrawCircle(const glm::vec3 &p1, float radius, const glm::vec4 &color);
+		HLAPI static void FillCircle(const glm::vec2 &position, float radius, float thickness, const glm::vec4 &color);
+		HLAPI static void FillCircle(const glm::vec3 &position, float radius, float thickness, const glm::vec4 &color);
+		HLAPI static void FillCircle(const Transform &transform, float radius, float thickness, const glm::vec4 &color);
+
+		HLAPI static void DrawCircle(const Transform &transform, float radius, const glm::vec4 &color);
 
 		HLAPI static void DrawText(const HLString &text, const glm::vec3 &position, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
 		HLAPI static void DrawText(const HLString &text, const Ref<Font> &font, const glm::vec3 &position, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
@@ -57,6 +60,9 @@ namespace highlo
 	private:
 
 		static void FlushQuads();
+		static void FlushCircles();
+		static void FlushLines();
+		static void FlushText();
 	};
 }
 

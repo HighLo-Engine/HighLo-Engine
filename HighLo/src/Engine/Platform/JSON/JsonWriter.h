@@ -159,12 +159,13 @@ namespace highlo
 		rapidjson::Document m_Document;
 		FileSystemPath m_FilePath;
 
+		bool m_ShouldWriteIntoArray = false;
+		bool m_ShouldWriteIntoObject = false;
+
 		std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferValue; // last current appended member
 		std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferType;	// last current appended member type
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBufferValues; // all values
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBufferTypes; // all value types
-		bool m_ShouldWriteIntoArray = false;
-		bool m_ShouldWriteIntoObject = false;
 	};
 }
 

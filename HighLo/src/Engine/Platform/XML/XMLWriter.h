@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Loaders/DocumentWriter.h"
+#include "XMLHelper.h"
 
 #include <rapidxml/rapidxml.hpp>
 
@@ -116,7 +117,25 @@ namespace highlo
 
 	private:
 
+		bool AddIntoStructure(rapidxml::xml_node<> *key, rapidxml::xml_node<> *value, DocumentDataType type);
+
+		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc);
+		rapidxml::xml_node<> *GetKeyAsNode(const HLString &key);
+
+		bool Read(const HLString &key, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString, rapidxml::xml_node<>*)> &insertFunc);
+
 		FileSystemPath m_FilePath;
+		rapidxml::xml_document<> m_Document;
+		rapidxml::xml_node<> *m_RootNode = nullptr;
+
+		std::vector<std::pair<rapidxml::xml_node<>*, rapidxml::xml_node<>*>> m_TempBuffers;
+		std::pair<rapidxml::xml_node<>*, rapidxml::xml_node<>*> m_TempBuffer;
+
+		bool m_ShouldWriteIntoArray = false;
+		bool m_ShouldWriteIntoObject = false;
 	};
 }
 

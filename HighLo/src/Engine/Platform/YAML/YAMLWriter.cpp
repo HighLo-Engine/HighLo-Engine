@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "Engine/Assets/Asset.h"
+#include "Engine/Core/FileSystem.h"
 
 namespace YAML
 {
@@ -599,8 +600,20 @@ namespace highlo
 		if (!filePath.String().IsEmpty())
 			m_FilePath = filePath;
 
-		m_Document = YAML::LoadFile(**m_FilePath);
-		return true;
+		if (FileSystem::Get()->FileExists(m_FilePath))
+		{
+			HLString content = FileSystem::Get()->ReadTextFile(m_FilePath);
+			if (content.IsEmpty())
+				return false;
+
+			m_Document = YAML::Load(*content);
+		}
+		else
+		{
+			HL_CORE_ERROR("[-] Error: File {0} not found! [-]", **m_FilePath);
+		}
+
+		return false;
 	}
 
 	HLString YAMLWriter::GetContent(bool prettify) const

@@ -51,6 +51,10 @@ namespace highlo
 			Renderer2D::BeginScene(overlayCamera.GetProjection());
 			Renderer2D::DrawQuad(Transform::FromPosition({ -0.25f, 0.0f, 0.0f }), glm::vec4(0.941f, 0.502f, 0.502f, 1.0f));
 			Renderer2D::DrawQuad(Transform::FromPosition({ 0.0f, -0.25f, -0.9f }), glm::vec4(0.641f, 0.502f, 0.902f, 1.0f));
+			Renderer2D::FillCircle(Transform::FromPosition({ 6.0f, 0.25f, 0.0f }), 1.0f, 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+			Renderer2D::DrawCircle(Transform::FromPosition({ -6.0f, 0.25f, 0.0f }), 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+		//	Renderer2D::DrawLine({ 0.0f, 0.0f }, { 6.0f, 6.0f }, glm::vec4(0.2f, 0.3f, 9.0f, 1.0f));
+			Renderer2D::DrawText("Hello World!", { 0.0f, 3.0f, 0.0f }, 200.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
 			Renderer2D::EndScene();
 		});
 
@@ -115,7 +119,23 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		// TODO
+		// TODO: Make something like this possible
+		/*
+		auto &view = m_Registry.View<IDComponent>();
+		for (Entity &entity : view)
+		{
+			auto &idComponent = m_Registry.Get<IDComponent>(entity);
+			if (idComponent.ID == id)
+				return entity;
+		}
+		*/
+
+		m_Registry.ForEach<IDComponent>([id, sceneID = m_SceneID](UUID uuid, TransformComponent &transform, IDComponent component)
+		{
+			if (id == uuid)
+				return Entity(sceneID, uuid);
+		});
+
 		return Entity{};
 	}
 	

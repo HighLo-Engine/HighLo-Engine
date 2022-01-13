@@ -87,6 +87,7 @@ namespace highlo
 
 		HLAPI AssetHandle GetID() const { return m_ID; }
 		HLAPI bool IsSelected() const { return m_IsSelected; }
+		HLAPI bool IsRenaming() const { return m_IsRenaming; }
 		HLAPI ItemType GetType() const { return m_Type; }
 		HLAPI const HLString &GetName() const { return m_Name; }
 		HLAPI const Ref<Texture2D> &GetIcon() const { return m_Icon; }

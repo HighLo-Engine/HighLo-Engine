@@ -666,9 +666,17 @@ namespace highlo
 			if (result.IsSet(AssetBrowserAction::ShowInExplorer))
 			{
 				if (item->GetType() == AssetBrowserBaseItem::ItemType::Directory)
-					FileSystem::Get()->OpenInExplorer(m_Project->GetAssetDirectory() / m_CurrentDirectory->FilePath / item->GetName());
+				{
+					FileSystemPath p = m_CurrentDirectory->FilePath / item->GetName();
+					HL_CORE_TRACE("Opening directory path {0} in explorer", **p);
+					FileSystem::Get()->OpenInExplorer(p);
+				}
 				else
-					FileSystem::Get()->OpenInExplorer(AssetManager::Get()->GetFileSystemPath(AssetManager::Get()->GetMetaData(item->GetID())));
+				{
+					FileSystemPath p = AssetManager::Get()->GetFileSystemPath(AssetManager::Get()->GetMetaData(item->GetID()));
+					HL_CORE_TRACE("Opening asset path {0} in explorer", **p);
+					FileSystem::Get()->OpenInExplorer(p);
+				}
 			}
 
 			if (result.IsSet(AssetBrowserAction::OpenExternal))
@@ -861,7 +869,7 @@ namespace highlo
 		{
 			item->SetSelected(false);
 
-			if (item->m_IsRenaming)
+			if (item->IsRenaming())
 				item->StopRenaming();
 		}
 

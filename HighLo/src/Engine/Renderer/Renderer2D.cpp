@@ -16,10 +16,20 @@
 #include "Engine/Renderer/Material.h"
 #include "Engine/Renderer/CommandBuffer.h"
 
-#include <glad/glad.h>
+#include <codecvt>
 
 namespace highlo
 {
+	namespace utils
+	{
+		static HLString32 ToUTF32(const HLString &str)
+		{
+			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+			std::u32string result = conv.from_bytes(*str);
+			return HLString32(result.c_str(), result.length());
+		}
+	}
+
 	struct QuadVertex
 	{
 		glm::vec3 Position;
@@ -81,8 +91,8 @@ namespace highlo
 
 		// Quads
 		Ref<Shader> TextureShader;
-		Ref<Material> TextureMaterial;
 		Ref<VertexArray> QuadVertexArray;
+		Ref<Material> TextureMaterial;
 		uint32 QuadIndexCount = 0;
 		QuadVertex *QuadVertexBufferBase = nullptr;
 		QuadVertex *QuadVertexBufferPtr = nullptr;
@@ -90,6 +100,7 @@ namespace highlo
 		// Lines
 		Ref<Shader> LineShader;
 		Ref<VertexArray> LineVertexArray;
+		Ref<Material> LineMaterial;
 		LineVertex *LineVertexBufferBase = nullptr;
 		LineVertex *LineVertexBufferPtr = nullptr;
 		uint32 LineIndexCount = 0;
@@ -97,6 +108,7 @@ namespace highlo
 		// Circles
 		Ref<Shader> CircleShader;
 		Ref<VertexArray> CircleVertexArray;
+		Ref<Material> CircleMaterial;
 		CircleVertex *CircleVertexBufferBase = nullptr;
 		CircleVertex *CircleVertexBufferPtr = nullptr;
 		uint32 CircleIndexCount = 0;
@@ -172,8 +184,6 @@ namespace highlo
 			lineIndices.push_back(i);
 		}
 
-		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
-
 		// Framebuffer and renderpass
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::Depth };
@@ -204,15 +214,10 @@ namespace highlo
 			offset += 4;
 		}
 
-		Ref<VertexBuffer> textVertexBuffer = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(TextVertex));
-		Ref<IndexBuffer> textIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
-
 		// Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
 		s_2DData->TextureMaterial = Material::Create(s_2DData->TextureShader, "TextureMaterial");
 		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
-
-		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
 
 		VertexArraySpecification quadVertexArraySpec;
 		quadVertexArraySpec.Layout = BufferLayout::GetTextureLayout();
@@ -228,6 +233,8 @@ namespace highlo
 		s_2DData->QuadVertexArray->Unbind();
 
 		// Circles
+		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
+		s_2DData->CircleMaterial = Material::Create(s_2DData->CircleShader, "CircleMaterial");
 		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices];
 
 		VertexArraySpecification circleVertexArraySpec;
@@ -239,11 +246,42 @@ namespace highlo
 
 		auto circlesVb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
 		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
-
+		s_2DData->CircleVertexArray->SetIndexBuffer(s_2DData->QuadVertexArray->GetIndexBuffer());
 		s_2DData->CircleVertexArray->Unbind();
 
 		// Lines
+		s_2DData->LineShader = Renderer::GetShaderLibrary()->Get("Renderer2DLine");
+		s_2DData->LineMaterial = Material::Create(s_2DData->LineShader, "LineMaterial");
+		s_2DData->LineVertexBufferBase = new LineVertex[s_2DData->MaxLines];
 
+		VertexArraySpecification lineVertexArraySpec;
+		lineVertexArraySpec.Layout = BufferLayout::GetLineLayout();
+		lineVertexArraySpec.Shader = s_2DData->LineShader;
+		lineVertexArraySpec.RenderPass = renderPass;
+		s_2DData->LineVertexArray = VertexArray::Create(lineVertexArraySpec);
+		s_2DData->LineVertexArray->Bind();
+
+		auto linesVb = VertexBuffer::Create(s_2DData->MaxLineVertices * sizeof(LineVertex));
+		s_2DData->LineVertexArray->AddVertexBuffer(linesVb);
+		s_2DData->LineVertexArray->SetIndexBuffer(IndexBuffer::Create(&lineIndices[0], s_2DData->MaxLineIndices));
+		s_2DData->LineVertexArray->Unbind();
+
+		// Text
+		s_2DData->TextShader = Renderer::GetShaderLibrary()->Get("Renderer2DText");
+		s_2DData->TextMaterial = Material::Create(s_2DData->TextShader, "TextMaterial");
+		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
+
+		VertexArraySpecification textVertexArraySpec;
+		textVertexArraySpec.Layout = BufferLayout::GetTextLayout();
+		textVertexArraySpec.Shader = s_2DData->TextShader;
+		textVertexArraySpec.RenderPass = renderPass;
+		s_2DData->TextVertexArray = VertexArray::Create(textVertexArraySpec);
+		s_2DData->TextVertexArray->Bind();
+
+		auto textVb = VertexBuffer::Create(s_2DData->MaxQuads * sizeof(TextVertex));
+		s_2DData->TextVertexArray->AddVertexBuffer(textVb);
+		s_2DData->TextVertexArray->SetIndexBuffer(IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices));
+		s_2DData->TextVertexArray->Unbind();
 
 		// Uniform Buffer
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
@@ -258,6 +296,7 @@ namespace highlo
 		delete[] s_2DData->QuadVertexBufferBase;
 		delete[] s_2DData->LineVertexBufferBase;
 		delete[] s_2DData->CircleVertexBufferBase;
+		delete[] s_2DData->TextVertexBufferBase;
 
 		delete s_2DData;
 	}
@@ -293,6 +332,9 @@ namespace highlo
 		Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
 
 		FlushQuads();
+		FlushCircles();
+		FlushLines();
+		FlushText();
 
 		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
 		s_2DData->RenderCommandBuffer->End();
@@ -324,6 +366,71 @@ namespace highlo
 			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+		}
+	}
+
+	void Renderer2D::FlushCircles()
+	{
+		if (s_2DData->CircleIndexCount == 0)
+			return;
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase);
+		if (dataSize)
+		{
+			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
+
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+
+			s_2DData->CircleShader->Bind();
+			s_2DData->CircleVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, s_2DData->CircleMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+		}
+	}
+
+	void Renderer2D::FlushLines()
+	{
+		if (s_2DData->LineIndexCount == 0)
+			return;
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase);
+		if (dataSize)
+		{
+			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
+
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+
+			s_2DData->LineShader->Bind();
+			s_2DData->LineVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, s_2DData->LineMaterial, s_2DData->UniformBufferSet, PrimitiveType::Lines, s_2DData->DepthTest);
+		}
+	}
+
+	void Renderer2D::FlushText()
+	{
+		if (s_2DData->TextIndexCount == 0)
+			return;
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase);
+		if (dataSize)
+		{
+			s_2DData->TextVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->TextVertexBufferBase, dataSize);
+
+			for (uint32 i = 0; i < s_2DData->FontTextureSlots.size(); ++i)
+			{
+				if (s_2DData->FontTextureSlots[i])
+					s_2DData->TextMaterial->Set("u_FontAtlases", s_2DData->FontTextureSlots[i], i);
+				else
+					s_2DData->TextMaterial->Set("u_FontAtlases", s_2DData->WhiteTexture, i);
+			}
+
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+
+			s_2DData->TextShader->Bind();
+			s_2DData->TextVertexArray->Bind();
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 		}
 	}
 
@@ -457,6 +564,9 @@ namespace highlo
 
 	void Renderer2D::DrawLine(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color)
 	{
+		if (s_2DData->LineIndexCount >= Renderer2DData::MaxLineIndices)
+			Flush();
+
 		s_2DData->LineVertexBufferPtr->Position = p1;
 		s_2DData->LineVertexBufferPtr->Color = color;
 		s_2DData->LineVertexBufferPtr->EntityID = 0;
@@ -470,16 +580,58 @@ namespace highlo
 		s_2DData->LineIndexCount += 2;
 	}
 
-	void Renderer2D::DrawCircle(const glm::vec2 &p1, float radius, const glm::vec4 &color)
+	void Renderer2D::FillCircle(const glm::vec2 &position, float radius, float thickness, const glm::vec4 &color)
 	{
-		DrawCircle({ p1.x, p1.y, 0.0f }, radius, color);
+		FillCircle({ position.x, position.y, 0.0f }, radius, thickness, color);
 	}
 
-	void Renderer2D::DrawCircle(const glm::vec3 &p1, float radius, const glm::vec4 &color)
+	void Renderer2D::FillCircle(const glm::vec3 &position, float radius, float thickness, const glm::vec4 &color)
 	{
+		if (s_2DData->CircleIndexCount >= Renderer2DData::MaxIndices)
+			Flush();
 
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { radius * 2.0f, radius * 2.0f, 1.0f });
 
-		s_2DData->CircleIndexCount++;
+		for (int32 i = 0; i < 4; ++i)
+		{
+			s_2DData->CircleVertexBufferPtr->WorldPosition = transform * s_2DData->QuadVertexPositions[i];
+			s_2DData->CircleVertexBufferPtr->Thickness = thickness;
+			s_2DData->CircleVertexBufferPtr->LocalPosition = s_2DData->QuadVertexPositions[i] * 2.0f;
+			s_2DData->CircleVertexBufferPtr->Color = color;
+			s_2DData->CircleVertexBufferPtr->EntityID = 0;
+			s_2DData->CircleVertexBufferPtr++;
+		}
+
+		s_2DData->CircleIndexCount += 6;
+	}
+
+	void Renderer2D::FillCircle(const Transform &transform, float radius, float thickness, const glm::vec4 &color)
+	{
+		FillCircle(transform.GetPosition(), radius, thickness, color);
+	}
+
+	void Renderer2D::DrawCircle(const Transform &transform, float radius, const glm::vec4 &color)
+	{
+		glm::mat4 localTransform = glm::translate(glm::mat4(1.0f), transform.GetPosition())
+			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().x, { 1.0f, 0.0f, 0.0f })
+			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().y, { 0.0f, 1.0f, 0.0f })
+			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().z, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), glm::vec3(radius));
+
+		uint32 segments = 32;
+		for (uint32 i = 0; i < segments; ++i)
+		{
+			float angle = 2.0f * glm::pi<float>() * (float)i / segments;
+			glm::vec4 startPos = { glm::cos(angle), glm::sin(angle), 0.0f, 1.0f };
+
+			angle = 2.0f * glm::pi<float>() * (float)((i + 1) % segments) / segments;
+			glm::vec4 endPos = { glm::cos(angle), glm::sin(angle), 0.0f, 1.0f };
+
+			glm::vec3 p0 = localTransform * startPos;
+			glm::vec3 p1 = localTransform * endPos;
+			DrawLine(p0, p1, color);
+		}
 	}
 
 	void Renderer2D::DrawText(const HLString &text, const glm::vec3 &position, float maxWidth, const glm::vec4 &color)
@@ -498,7 +650,7 @@ namespace highlo
 			return;
 
 		float textureIndex = 0.0f;
-		HLString32 utf32Text = (HLString32)"Hello World!";
+		HLString32 utf32Text = utils::ToUTF32(text);
 
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);
@@ -535,7 +687,7 @@ namespace highlo
 				if (ch == '\n')
 				{
 					x = 0.0;
-					y = fsScale * metrics.lineHeight + lineHeightOffset;
+					y -= fsScale * metrics.lineHeight + lineHeightOffset;
 					continue;
 				}
 

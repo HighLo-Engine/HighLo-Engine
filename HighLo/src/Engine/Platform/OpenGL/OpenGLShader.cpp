@@ -14,7 +14,7 @@
 
 namespace highlo
 {
-#define PRINT_SHADERS 1
+#define PRINT_SHADERS 0
 #define GL_SHADER_LOG_PREFIX "Shader>       "
 
 	namespace utils
@@ -60,12 +60,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:		return "Vertex";
-				case GL_FRAGMENT_SHADER:	return "Pixel";
-				case GL_COMPUTE_SHADER:		return "Compute";
-				case GL_TESS_CONTROL_SHADER: return "TessControl";
+				case GL_VERTEX_SHADER:			return "Vertex";
+				case GL_FRAGMENT_SHADER:		return "Pixel";
+				case GL_COMPUTE_SHADER:			return "Compute";
+				case GL_TESS_CONTROL_SHADER:	return "TessControl";
 				case GL_TESS_EVALUATION_SHADER: return "TessEvalulation";
-				case GL_GEOMETRY_SHADER: return "Geometry";
+				case GL_GEOMETRY_SHADER:		return "Geometry";
 			}
 
 			HL_ASSERT(false);

@@ -31,14 +31,14 @@ namespace highlo
 		{
 			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
 			std::u32string result = conv.from_bytes(*str);
-			return HLString32(result.c_str(), result.length());
+			return HLString32(result.c_str(), (uint32)result.length());
 		}
 
 		static HLString16 ToUTF16(const HLString &str)
 		{
 			std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> conv;
 			std::u16string result = conv.from_bytes(*str);
-			return HLString16(result.c_str(), result.length());
+			return HLString16(result.c_str(), (uint32)result.length());
 		}
 
 		static HLString ToUTF8(const HLString32 &str)

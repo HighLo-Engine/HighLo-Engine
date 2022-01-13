@@ -9,6 +9,7 @@ namespace highlo
 	{
 		// Load Default fonts
 		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf"));
+		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf"));
 	}
 	
 	void FontManager::Shutdown()

@@ -130,12 +130,6 @@ namespace highlo
 		}
 		*/
 
-		m_Registry.ForEach<IDComponent>([id, sceneID = m_SceneID](UUID uuid, TransformComponent &transform, IDComponent component)
-		{
-			if (id == uuid)
-				return Entity(sceneID, uuid);
-		});
-
 		return Entity{};
 	}
 	

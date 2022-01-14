@@ -21,16 +21,6 @@ namespace highlo
 			return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		}
 
-		static void CreateTextures(bool multisampled, HLRendererID *outID, uint32 count)
-		{
-			glCreateTextures(TextureTarget(multisampled), count, outID);
-		}
-
-		static void BindTexture(bool multisampled, HLRendererID id)
-		{
-			glBindTexture(TextureTarget(multisampled), id);
-		}
-
 		static GLenum DataType(GLenum format)
 		{
 			switch (format)
@@ -66,42 +56,57 @@ namespace highlo
 			return 0;
 		}
 
-		static Ref<Texture> CreateAndAttachColorAttachment(int32 samples, TextureFormat format, uint32 width, uint32 height, int32 index)
+		static Ref<Texture> CreateTexture(int32 samples, TextureFormat format, uint32 width, uint32 height, int32 index)
 		{
 			bool multisampled = samples > 1;
-			Ref<Texture> texture;
-			if (multisampled)
-			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLTextureInternalFormat(format), width, height, GL_FALSE);
-			}
-			else
-			{
-				texture = Texture2D::Create(format, width, height);
-			}
-
+			Ref<Texture> texture = Texture2D::Create(format, width, height);
 			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
+
+			glBindTexture(utils::TextureTarget(multisampled), glTexture->GetRendererID());
 			glTexture->CreateSampler(TextureProperties());
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), glTexture->GetRendererID(), 0);
 			return texture;
 		}
 
-		static Ref<Texture> CreateAndAttachDepthTexture(int32 samples, TextureFormat format, uint32 width, uint32 height)
+		static void AttachColorAttachment(HLRendererID id, int32 samples, GLenum internalFormat, GLenum format, uint32 width, uint32 height, int32 index)
 		{
 			bool multisampled = samples > 1;
-			Ref<Texture> texture;
 			if (multisampled)
 			{
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, OpenGLTextureInternalFormat(format), width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_FALSE);
 			}
 			else
 			{
-				texture = Texture2D::Create(format, width, height);
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			}
 
-			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-			glTexture->CreateSampler(TextureProperties());
-			glFramebufferTexture2D(GL_FRAMEBUFFER, utils::DepthAttachmentType(format), TextureTarget(multisampled), glTexture->GetRendererID(), 0);
-			return texture;
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, utils::TextureTarget(multisampled), id, 0);
+		}
+
+		static void AttachDepthAttachment(HLRendererID id, int32 samples, GLenum format, GLenum attachmentType, uint32 width, uint32 height)
+		{
+			bool multisampled = samples > 1;
+			if (multisampled)
+			{
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+			}
+			else
+			{
+				glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			}
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, utils::TextureTarget(multisampled), id, 0);
 		}
 
 		static bool IsDepthFormat(TextureFormat format)
@@ -167,11 +172,20 @@ namespace highlo
 		if (m_RendererID)
 		{
 			glDeleteFramebuffers(1, &m_RendererID);
+			for (uint32 i = 0; i < m_ColorAttachments.size(); ++i)
+			{
+				m_ColorAttachments[i]->Release();
+				m_ColorAttachments[i] = nullptr;
+			}
+
 			m_ColorAttachments.clear();
+			m_DepthAttachment->Release();
+			m_DepthAttachment = nullptr;
 		}
 
 		glGenFramebuffers(1, &m_RendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		bool multisampled = m_Specification.Samples > 1;
 
 		if (m_ColorAttachmentFormats.size())
 		{
@@ -179,11 +193,32 @@ namespace highlo
 
 			// Create color attachments
 			for (size_t i = 0; i < m_ColorAttachments.size(); i++)
-				m_ColorAttachments[i] = utils::CreateAndAttachColorAttachment(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Specification.Width, m_Specification.Height, int32(i));
+			{
+				m_ColorAttachments[i] = utils::CreateTexture(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Specification.Width, m_Specification.Height, int32(i));
+				switch (m_ColorAttachmentFormats[i])
+				{
+					case TextureFormat::RGBA:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RED_INTEGER:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+				}
+			}
 		}
 
 		if (m_DepthAttachmentFormat != TextureFormat::None)
-			m_DepthAttachment = utils::CreateAndAttachDepthTexture(m_Specification.Samples, m_DepthAttachmentFormat, m_Specification.Width, m_Specification.Height);
+		{
+			m_DepthAttachment = utils::CreateTexture(m_Specification.Samples, m_DepthAttachmentFormat, m_Specification.Width, m_Specification.Height, 0);
+			glBindTexture(utils::TextureTarget(multisampled), m_DepthAttachment->GetRendererID());
+			switch (m_DepthAttachmentFormat)
+			{
+				case TextureFormat::DEPTH24STENCIL8:
+					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					break;
+			}
+		}
 
 		if (m_ColorAttachments.size() > 1)
 		{

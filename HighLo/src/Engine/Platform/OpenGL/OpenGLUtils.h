@@ -74,6 +74,9 @@ namespace highlo
 
 				case TextureFormat::DEPTH32F:
 					return GL_DEPTH_COMPONENT32F;
+
+				case TextureFormat::RED_INTEGER:
+					return GL_R32I;
 			}
 
 			HL_ASSERT(false);

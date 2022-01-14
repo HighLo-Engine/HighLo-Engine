@@ -279,7 +279,7 @@ namespace highlo
 	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height)
 	{
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
-		m_Buffer.Allocate(width * height * 4);
+		m_Buffer.Allocate(width * height * 4); // * 4 channels (RGBA)
 		m_DataFormat = GL_RGBA;
 
 		m_Specification.Width = width;

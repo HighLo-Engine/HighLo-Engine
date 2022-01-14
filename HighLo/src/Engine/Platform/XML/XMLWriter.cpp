@@ -7,6 +7,8 @@
 #include "Engine/Application/Application.h"
 #include "Engine/Utils/LoaderUtils.h"
 
+#define XML_LOG_PREFIX "XMLWriter>    "
+
 namespace highlo
 {
 	XMLWriter::XMLWriter(const FileSystemPath &filePath)
@@ -703,13 +705,13 @@ namespace highlo
 	bool XMLWriter::WriteOut() const
 	{
 		// Write content into file
-		HL_CORE_INFO("[+] Writing file {0} [+]", **m_FilePath);
+		HL_CORE_INFO(XML_LOG_PREFIX "[+] Writing file {0} [+]", **m_FilePath);
 		HLString content = GetContent(true);
 
 		FILE *file = fopen(**m_FilePath, "w");
 		if (!file)
 		{
-			HL_CORE_ERROR("[-] Could not open file {0} [-]", **m_FilePath);
+			HL_CORE_ERROR(XML_LOG_PREFIX "[-] Could not open file {0} [-]", **m_FilePath);
 			return false;
 		}
 
@@ -738,12 +740,12 @@ namespace highlo
 
 			if (versionStr != HLApplication::Get().GetApplicationSettings().Version)
 			{
-				HL_CORE_WARN("[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
+				HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
 			}
 		}
 		else
 		{
-			HL_CORE_ERROR("[-] Error: File {0} not found! [-]", **m_FilePath);
+			HL_CORE_ERROR(XML_LOG_PREFIX "[-] Error: File {0} not found! [-]", **m_FilePath);
 		}
 
 		return false;
@@ -779,7 +781,7 @@ namespace highlo
 	{
 		if (key.IsEmpty())
 		{
-			HL_CORE_ERROR("[-] You have to specify a key! {0} [-]");
+			HL_CORE_ERROR(XML_LOG_PREFIX "[-] You have to specify a key! {0} [-]");
 			return false;
 		}
 
@@ -789,7 +791,7 @@ namespace highlo
 		if (!AddIntoStructure(keyNode, valueNode, type))
 		{
 			// TODO: Set directly into the document
-			HL_CORE_WARN("[-] MISSING FEATURE: Add node directly into document - user did not use either BeginObject() or BeginArray() [-]");
+			HL_CORE_WARN(XML_LOG_PREFIX "[-] MISSING FEATURE: Add node directly into document - user did not use either BeginObject() or BeginArray() [-]");
 		}
 
 		return true;

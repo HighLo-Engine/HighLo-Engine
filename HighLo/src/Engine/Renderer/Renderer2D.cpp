@@ -290,18 +290,35 @@ namespace highlo
 		delete s_2DData;
 	}
 
-	void Renderer2D::BeginScene(const glm::mat4 &proj, bool depthTest)
+	void Renderer2D::BeginScene(const Camera &camera, bool depthTest)
 	{
 		HL_PROFILE_FUNCTION();
 
-		s_2DData->CameraProjection = proj;
+		s_2DData->CameraProjection = camera.GetProjection();
 		s_2DData->DepthTest = depthTest;
 
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&proj, sizeof(UniformBufferCamera));
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera));
+
+		StartBatch();
+		ResetStatistics();
+	}
+
+	void Renderer2D::BeginScene(const EditorCamera &camera, bool depthTest)
+	{
+		HL_PROFILE_FUNCTION();
+
+		s_2DData->CameraProjection = camera.GetProjection();
+		s_2DData->DepthTest = depthTest;
+
+		s_2DData->TextureShader->Bind();
+
+		// Load Camera Projection into Uniform Buffer block
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera));
 
 		StartBatch();
 		ResetStatistics();
@@ -409,6 +426,7 @@ namespace highlo
 		if (dataSize)
 		{
 			s_2DData->TextVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->TextVertexBufferBase, dataSize);
+			s_2DData->TextShader->Bind();
 
 			for (uint32 i = 0; i < s_2DData->FontTextureSlots.size(); ++i)
 			{
@@ -421,7 +439,6 @@ namespace highlo
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
-			s_2DData->TextShader->Bind();
 			s_2DData->TextVertexArray->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
@@ -670,7 +687,7 @@ namespace highlo
 			s_2DData->FontTextureSlots[s_2DData->FontTextureSlotIndex] = fontAtlas;
 			++s_2DData->FontTextureSlotIndex;
 		}
-
+		
 		auto &fontGeometry = font->GetMSDFData()->FontGeometry;
 		const auto &metrics = fontGeometry.getMetrics();
 		std::vector<int32> nextLines;
@@ -764,36 +781,27 @@ namespace highlo
 				double texelHeight = 1. / fontAtlas->GetHeight();
 				l *= texelWidth, b *= texelHeight, r *= texelWidth, t *= texelHeight;
 
-			#ifdef HL_DEBUG
-				/*
-				ImGui::Begin("Font Debugger");
-				ImGui::Text("Size: %dx%d", fontAtlas->GetWidth(), fontAtlas->GetHeight());
-				UI::Image(fontAtlas, ImVec2((float)fontAtlas->GetWidth(), (float)fontAtlas->GetHeight()), ImVec2(0, 1), ImVec2(1, 0));
-				ImGui::End();
-				*/
-			#endif // HL_DEBUG
-
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pl, pb, 0.0f, 1.0f);
-				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = { l, b };
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pl, pt, 0.0f, 1.0f);
-				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = { l, t };
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pr, pt, 0.0f, 1.0f);
-				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = { r, t };
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(pr, pb, 0.0f, 1.0f);
-				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = { r, b };
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 

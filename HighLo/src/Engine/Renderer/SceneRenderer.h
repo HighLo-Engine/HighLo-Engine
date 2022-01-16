@@ -103,7 +103,7 @@ namespace highlo
 	public:
 
 		HLAPI SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification = SceneRendererSpecification());
-		HLAPI ~SceneRenderer();
+		HLAPI virtual ~SceneRenderer();
 
 		HLAPI void Init();
 

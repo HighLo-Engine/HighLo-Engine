@@ -213,15 +213,15 @@ namespace highlo
 		return true;
 	}
 
-	bool HLApplication::OnFileMenuChangedEvent(FileMenuChangedEvent &event)
+	bool HLApplication::OnFileMenuChangedEvent(FileMenuChangedEvent &e)
 	{
-	//	HL_CORE_TRACE("FileMenu {0} has changed!", event.GetItem()->Name);
+	//	HL_CORE_TRACE("FileMenu {0} has changed!", e.GetItem()->Name);
 		return false;
 	}
 
-	bool HLApplication::OnFileSystemChangedEvent(FileSystemChangedEvent &event)
+	bool HLApplication::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
-		HL_CORE_INFO("{0}", *event.ToString());
+		HL_CORE_INFO("{0}", *e.ToString());
 		return false;
 	}
 

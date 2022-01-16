@@ -477,12 +477,12 @@ namespace highlo
 		return false;
 	}
 
-	bool YAMLWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
+	bool YAMLWriter::ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
 	{
 		return false;
 	}
 
-	bool YAMLWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
+	bool YAMLWriter::ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
 	{
 		return false;
 	}
@@ -619,6 +619,11 @@ namespace highlo
 	HLString YAMLWriter::GetContent(bool prettify) const
 	{
 		return m_Emitter.c_str();
+	}
+
+	void YAMLWriter::SetContent(const HLString &content)
+	{
+		m_Document = YAML::Load(*content);
 	}
 }
 

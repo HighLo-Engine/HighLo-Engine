@@ -23,8 +23,6 @@ namespace highlo
 	class HLApplication
 	{
 	public:
-		HLAPI static HLApplication &Get() { return *s_Instance; }
-		HLAPI Window &GetWindow() { return *m_Window; }
 
 		HLAPI HLApplication();
 		HLAPI HLApplication(const ApplicationSettings &settings);
@@ -51,7 +49,12 @@ namespace highlo
 		HLAPI ECS_SystemManager &GetECSSystemManager() { return m_ECS_SystemManager; }
 		HLAPI Ref<Encryptor> &GetEncryptor() { return m_Encryptor; }
 
+		HLAPI static HLApplication &Get() { return *s_Instance; }
+		HLAPI Window &GetWindow() { return *m_Window; }
+		HLAPI static bool HasStarted() { return (bool)s_Instance; }
+
 	private:
+
 		static HLApplication *s_Instance;
 		ApplicationSettings m_Settings;
 
@@ -66,14 +69,14 @@ namespace highlo
 		ApplicationLayerStack m_LayerStack;
 
 		void Init();
-		bool OnWindowClose(WindowCloseEvent &event);
-		bool OnWindowReisze(WindowResizeEvent &event);
-		bool OnFileMenuChangedEvent(FileMenuChangedEvent &event);
-		bool OnFileSystemChangedEvent(FileSystemChangedEvent &event);
+		bool OnWindowClose(WindowCloseEvent &e);
+		bool OnWindowReisze(WindowResizeEvent &e);
+		bool OnFileMenuChangedEvent(FileMenuChangedEvent &e);
+		bool OnFileSystemChangedEvent(FileSystemChangedEvent &e);
 
 	private:
 
-		void InternalEventHandler(Event &event);
+		void InternalEventHandler(Event &e);
 	};
 
 	// this will be implemented by the client application

@@ -11,6 +11,7 @@
 #include "Engine/Assets/Asset.h"
 #include "Engine/Renderer/Light.h"
 #include "Engine/Renderer/Environment.h"
+#include "Engine/Renderer/Font.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Camera/EditorCamera.h"
 #include "Engine/ECS/Entity.h"
@@ -147,6 +148,9 @@ namespace highlo
 
 		bool m_IsPlaying = false;
 		bool m_ShouldSimulate = false;
+
+		// TEMP
+		Ref<Font> m_Font;
 
 		friend class Entity;
 		friend class SceneRenderer;

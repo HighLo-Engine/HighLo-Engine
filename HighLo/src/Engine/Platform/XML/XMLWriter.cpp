@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "XMLWriter.h"
 
+#include <rapidxml/rapidxml_print.hpp>
+
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Application/Application.h"
 #include "Engine/Utils/LoaderUtils.h"
@@ -31,7 +33,10 @@ namespace highlo
 		{
 			m_ShouldWriteIntoArray = false;
 
-
+			for (uint32 i = 0; i < m_TempBuffers.size(); ++i)
+			{
+				m_Document.append_node(m_TempBuffers[i]);
+			}
 		}
 	}
 
@@ -46,7 +51,14 @@ namespace highlo
 		{
 			m_ShouldWriteIntoObject = false;
 
-
+			if (!m_ShouldWriteIntoArray)
+			{
+				m_Document.append_node(m_TempBuffer);
+			}
+			else
+			{
+				m_TempBuffers.push_back(m_TempBuffer);
+			}
 		}
 	}
 
@@ -562,12 +574,12 @@ namespace highlo
 		return false;
 	}
 
-	bool XMLWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
+	bool XMLWriter::ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
 	{
 		return false;
 	}
 
-	bool XMLWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
+	bool XMLWriter::ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
 	{
 		return false;
 	}
@@ -753,24 +765,39 @@ namespace highlo
 
 	HLString XMLWriter::GetContent(bool prettify) const
 	{
-		return "";
+		std::string str;
+		rapidxml::print(std::back_inserter(str), m_Document);
+		return HLString(str);
 	}
 
-	bool XMLWriter::AddIntoStructure(rapidxml::xml_node<> *key, rapidxml::xml_node<> *value, DocumentDataType type)
+	void XMLWriter::SetContent(const HLString &content)
+	{
+		char *str = (char*)content.C_Str();
+		m_Document.parse<0>(str);
+		m_RootNode = m_Document.first_node("HighLo"); // Our XML format should always have a root node named "HighLo"
+
+		// Check the version string of the root node, that indicates the engine version
+		rapidxml::xml_attribute<> *versionAttr = m_RootNode->first_attribute("version");
+		HLString versionStr = versionAttr->value();
+
+		if (versionStr != HLApplication::Get().GetApplicationSettings().Version)
+		{
+			HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
+		}
+	}
+
+	bool XMLWriter::AddIntoStructure(rapidxml::xml_node<> *value, DocumentDataType type)
 	{
 		bool result = false;
 
 		if (m_ShouldWriteIntoArray || m_ShouldWriteIntoObject)
 		{
 			result = true;
-			m_TempBuffer.first = key;
-			m_TempBuffer.second = value;
+			m_TempBuffer = value;
 
 			if (m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
 			{
-				std::pair<rapidxml::xml_node<>*, rapidxml::xml_node<>*> &v = m_TempBuffers.emplace_back();
-				v.first = key;
-				v.second = value;
+				m_TempBuffers.push_back(value);
 			}
 		}
 
@@ -779,19 +806,17 @@ namespace highlo
 
 	bool XMLWriter::Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc)
 	{
-		if (key.IsEmpty())
-		{
-			HL_CORE_ERROR(XML_LOG_PREFIX "[-] You have to specify a key! {0} [-]");
-			return false;
-		}
-
-		rapidxml::xml_node<> *keyNode = GetKeyAsNode(key);
 		rapidxml::xml_node<> *valueNode = insertFunc();
 
-		if (!AddIntoStructure(keyNode, valueNode, type))
+		if (!key.IsEmpty())
 		{
-			// TODO: Set directly into the document
-			HL_CORE_WARN(XML_LOG_PREFIX "[-] MISSING FEATURE: Add node directly into document - user did not use either BeginObject() or BeginArray() [-]");
+			rapidxml::xml_attribute<> *valueAttribute = m_Document.allocate_attribute("key", *key);
+			valueNode->append_attribute(valueAttribute);
+		}
+
+		if (!AddIntoStructure(valueNode, type))
+		{
+			m_Document.append_node(valueNode);
 		}
 
 		return true;

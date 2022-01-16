@@ -33,10 +33,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_String)
 	HLString expected = "{\"test\":\"Hello World!\"}";
 
 	Writer->BeginObject();
-	Writer->WriteString("test", "Hello World!");
+	bool writeSuccess = Writer->WriteString("test", "Hello World!");
 	Writer->EndObject(true);
-	HLString content = Writer->GetContent();
 
+	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -45,22 +46,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_String_WithTypeCheck)
 	HLString expected = "{\"type\":\"string\",\"value\":{\"test\":\"Hello World!\"}}";
 
 	Writer->BeginObject();
-	Writer->WriteString("test", "Hello World!");
+	bool writeSuccess = Writer->WriteString("test", "Hello World!");
 	Writer->EndObject();
 	HLString content = Writer->GetContent();
 
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Int32)
 {
 	HLString expected = "{\"test\":-10}";
 
 	Writer->BeginObject();
-	Writer->WriteInt32("test", -10);
+	bool writeSuccess = Writer->WriteInt32("test", -10);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -69,22 +73,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_WithTypeCheck)
 	HLString expected = "{\"type\":\"int32\",\"value\":{\"test\":-10}}";
 
 	Writer->BeginObject();
-	Writer->WriteInt32("test", -10);
+	bool writeSuccess = Writer->WriteInt32("test", -10);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32)
 {
 	HLString expected = "{\"test\":42}";
 
 	Writer->BeginObject();
-	Writer->WriteUInt32("test", 42);
+	bool writeSuccess = Writer->WriteUInt32("test", 42);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -93,22 +100,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_WithTypeCheck)
 	HLString expected = "{\"type\":\"uint32\",\"value\":{\"test\":42}}";
 
 	Writer->BeginObject();
-	Writer->WriteUInt32("test", 42);
+	bool writeSuccess = Writer->WriteUInt32("test", 42);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Int64)
 {
 	HLString expected = "{\"test\":42}";
 
 	Writer->BeginObject();
-	Writer->WriteInt64("test", 42);
+	bool writeSuccess = Writer->WriteInt64("test", 42);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -117,22 +127,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_WithTypeCheck)
 	HLString expected = "{\"type\":\"int64\",\"value\":{\"test\":42}}";
 
 	Writer->BeginObject();
-	Writer->WriteInt64("test", 42);
+	bool writeSuccess = Writer->WriteInt64("test", 42);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64)
 {
 	HLString expected = "{\"test\":42}";
 
 	Writer->BeginObject();
-	Writer->WriteUInt64("test", 42);
+	bool writeSuccess = Writer->WriteUInt64("test", 42);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -141,22 +154,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_WithTypeCheck)
 	HLString expected = "{\"type\":\"uint64\",\"value\":{\"test\":42}}";
 
 	Writer->BeginObject();
-	Writer->WriteUInt64("test", 42);
+	bool writeSuccess = Writer->WriteUInt64("test", 42);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Bool)
 {
 	HLString expected = "{\"test\":true}";
 
 	Writer->BeginObject();
-	Writer->WriteBool("test", true);
+	bool writeSuccess = Writer->WriteBool("test", true);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -165,22 +181,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_WithTypeCheck)
 	HLString expected = "{\"type\":\"bool\",\"value\":{\"test\":true}}";
 
 	Writer->BeginObject();
-	Writer->WriteBool("test", true);
+	bool writeSuccess = Writer->WriteBool("test", true);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Float)
 {
 	HLString expected = "{\"test\":20.2}";
 
 	Writer->BeginObject();
-	Writer->WriteFloat("test", 20.2f);
+	bool writeSuccess = Writer->WriteFloat("test", 20.2f);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -189,22 +208,25 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Float_WithTypeCheck)
 	HLString expected = "{\"type\":\"float\",\"value\":{\"test\":20.2}}";
 
 	Writer->BeginObject();
-	Writer->WriteFloat("test", 20.2f);
+	bool writeSuccess = Writer->WriteFloat("test", 20.2f);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Double)
 {
 	HLString expected = "{\"test\":20.2}";
 
 	Writer->BeginObject();
-	Writer->WriteDouble("test", 20.2);
+	bool writeSuccess = Writer->WriteDouble("test", 20.2);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -213,12 +235,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Double_WithTypeCheck)
 	HLString expected = "{\"type\":\"double\",\"value\":{\"test\":20.2}}";
 
 	Writer->BeginObject();
-	Writer->WriteDouble("test", 20.2);
+	bool writeSuccess = Writer->WriteDouble("test", 20.2);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2)
 {
@@ -226,10 +250,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2)
 	glm::vec2 v(20.2f, 10.5f);
 
 	Writer->BeginObject();
-	Writer->WriteVec2("test", v);
+	bool writeSuccess = Writer->WriteVec2("test", v);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -239,12 +264,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_WithTypeCheck)
 	glm::vec2 v(20.2f, 10.5f);
 
 	Writer->BeginObject();
-	Writer->WriteVec2("test", v);
+	bool writeSuccess = Writer->WriteVec2("test", v);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3)
 {
@@ -252,10 +279,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3)
 	glm::vec3 v(20.2f, 10.5f, 23.5f);
 
 	Writer->BeginObject();
-	Writer->WriteVec3("test", v);
+	bool writeSuccess = Writer->WriteVec3("test", v);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -265,12 +293,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_WithTypeCheck)
 	glm::vec3 v(20.2f, 10.5f, 23.5f);
 
 	Writer->BeginObject();
-	Writer->WriteVec3("test", v);
+	bool writeSuccess = Writer->WriteVec3("test", v);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4)
 {
@@ -278,10 +308,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4)
 	glm::vec4 v(20.2f, 10.5f, 23.5f, 11.5f);
 
 	Writer->BeginObject();
-	Writer->WriteVec4("test", v);
+	bool writeSuccess = Writer->WriteVec4("test", v);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -291,12 +322,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_WithTypeCheck)
 	glm::vec4 v(20.2f, 10.5f, 23.5f, 11.5f);
 
 	Writer->BeginObject();
-	Writer->WriteVec4("test", v);
+	bool writeSuccess = Writer->WriteVec4("test", v);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2)
 {
@@ -309,10 +342,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2)
 	m[1][1] = 11.5f;
 
 	Writer->BeginObject();
-	Writer->WriteMat2("test", m);
+	bool writeSuccess = Writer->WriteMat2("test", m);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -327,12 +361,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_WithTypeCheck)
 	m[1][1] = 11.5f;
 
 	Writer->BeginObject();
-	Writer->WriteMat2("test", m);
+	bool writeSuccess = Writer->WriteMat2("test", m);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3)
 {
@@ -352,10 +388,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3)
 	m[2][2] = 42.4f;
 
 	Writer->BeginObject();
-	Writer->WriteMat3("test", m);
+	bool writeSuccess = Writer->WriteMat3("test", m);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -377,12 +414,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_WithTypeCheck)
 	m[2][2] = 42.4f;
 
 	Writer->BeginObject();
-	Writer->WriteMat3("test", m);
+	bool writeSuccess = Writer->WriteMat3("test", m);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4)
 {
@@ -410,10 +449,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4)
 	m[3][3] = 22.5f;
 
 	Writer->BeginObject();
-	Writer->WriteMat4("test", m);
+	bool writeSuccess = Writer->WriteMat4("test", m);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -443,12 +483,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_WithTypeCheck)
 	m[3][3] = 22.5f;
 
 	Writer->BeginObject();
-	Writer->WriteMat4("test", m);
+	bool writeSuccess = Writer->WriteMat4("test", m);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Quaternion)
 {
@@ -456,10 +498,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Quaternion)
 	glm::quat q(20.2f, 10.5f, 23.1f, 11.5f);
 
 	Writer->BeginObject();
-	Writer->WriteQuaternion("test", q);
+	bool writeSuccess = Writer->WriteQuaternion("test", q);
 	Writer->EndObject(true);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -469,10 +512,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Quaternion_WithTypeCheck)
 	glm::quat q(20.2f, 10.5f, 23.1f, 11.5f);
 
 	Writer->BeginObject();
-	Writer->WriteQuaternion("test", q);
+	bool writeSuccess = Writer->WriteQuaternion("test", q);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -492,8 +536,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_String_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteString("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteString("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -513,8 +559,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_String_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteString("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteString("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKey", true);
 
@@ -534,14 +582,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_String_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteString("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteString("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array)
 {
@@ -555,8 +606,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -576,8 +629,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -597,14 +652,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array)
 {
@@ -618,8 +676,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -639,8 +699,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -660,14 +722,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array)
 {
@@ -681,8 +746,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -702,8 +769,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -723,14 +792,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array)
 {
@@ -744,8 +816,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -765,8 +839,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -786,14 +862,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array)
 {
@@ -807,8 +886,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -828,8 +909,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -849,14 +932,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array)
 {
@@ -870,8 +956,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -891,8 +979,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -912,14 +1002,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array)
 {
@@ -933,8 +1026,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -954,8 +1049,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -975,14 +1072,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array)
 {
@@ -996,8 +1096,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1017,8 +1119,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1038,14 +1142,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array)
 {
@@ -1059,8 +1166,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1080,8 +1189,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1101,14 +1212,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array)
 {
@@ -1122,8 +1236,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1143,8 +1259,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1164,14 +1282,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array)
 {
@@ -1185,8 +1306,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1206,8 +1329,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1227,14 +1352,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array)
 {
@@ -1248,8 +1376,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1269,8 +1399,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1290,14 +1422,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array)
 {
@@ -1311,8 +1446,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1332,8 +1469,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1353,14 +1492,17 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array)
 {
@@ -1374,8 +1516,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("", true);
 
@@ -1395,8 +1539,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array_With_Keys)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray("arrayKeys", true);
 
@@ -1416,14 +1562,20 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array_WithTypeCheck)
 	for (uint32 i = 0; i < arr.size(); ++i)
 	{
 		Writer->BeginObject();
-		Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
+		bool writeSuccess = Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
 		Writer->EndObject();
+
+		EXPECT_EQ(writeSuccess, true);
 	}
 	Writer->EndArray();
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
+///
+/// Direct Array Tests
+///
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int32)
 {
@@ -1433,9 +1585,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int32)
 	arr.push_back(10);
 	arr.push_back(-10);
 
-	Writer->WriteInt32Array("test", arr);
+	bool writeSuccess = Writer->WriteInt32Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1448,12 +1601,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int32_WithTypeCheck
 	arr.push_back(-10);
 
 	Writer->BeginObject();
-	Writer->WriteInt32Array("test", arr);
+	bool writeSuccess = Writer->WriteInt32Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt32)
 {
@@ -1463,9 +1618,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt32)
 	arr.push_back(10);
 	arr.push_back(100);
 
-	Writer->WriteUInt32Array("test", arr);
+	bool writeSuccess = Writer->WriteUInt32Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1478,12 +1634,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt32_WithTypeChec
 	arr.push_back(100);
 
 	Writer->BeginObject();
-	Writer->WriteUInt32Array("test", arr);
+	bool writeSuccess = Writer->WriteUInt32Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int64)
 {
@@ -1493,7 +1651,7 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int64)
 	arr.push_back(105);
 	arr.push_back(100);
 
-	Writer->WriteInt64Array("test", arr);
+	bool writeSuccess = Writer->WriteInt64Array("test", arr);
 
 	HLString content = Writer->GetContent();
 	EXPECT_EQ(StringEquals(expected, content), true);
@@ -1508,12 +1666,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int64_WithTypeCheck
 	arr.push_back(100);
 
 	Writer->BeginObject();
-	Writer->WriteInt64Array("test", arr);
+	bool writeSuccess = Writer->WriteInt64Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt64)
 {
@@ -1523,9 +1683,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt64)
 	arr.push_back(105);
 	arr.push_back(100);
 
-	Writer->WriteUInt64Array("test", arr);
+	bool writeSuccess = Writer->WriteUInt64Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1538,12 +1699,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt64_WithTypeChec
 	arr.push_back(100);
 
 	Writer->BeginObject();
-	Writer->WriteUInt64Array("test", arr);
+	bool writeSuccess = Writer->WriteUInt64Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Float)
 {
@@ -1553,9 +1716,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Float)
 	arr.push_back(10.5f);
 	arr.push_back(16.0f);
 
-	Writer->WriteFloatArray("test", arr);
+	bool writeSuccess = Writer->WriteFloatArray("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1568,12 +1732,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Float_WithTypeCheck
 	arr.push_back(16.0f);
 
 	Writer->BeginObject();
-	Writer->WriteFloatArray("test", arr);
+	bool writeSuccess = Writer->WriteFloatArray("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Double)
 {
@@ -1583,9 +1749,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Double)
 	arr.push_back(10.5);
 	arr.push_back(16.6);
 
-	Writer->WriteDoubleArray("test", arr);
+	bool writeSuccess = Writer->WriteDoubleArray("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1598,12 +1765,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Double_WithTypeChec
 	arr.push_back(16.6);
 
 	Writer->BeginObject();
-	Writer->WriteDoubleArray("test", arr);
+	bool writeSuccess = Writer->WriteDoubleArray("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Bool)
 {
@@ -1613,9 +1782,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Bool)
 	arr.push_back(false);
 	arr.push_back(true);
 
-	Writer->WriteBoolArray("test", arr);
+	bool writeSuccess = Writer->WriteBoolArray("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1628,12 +1798,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Bool_WithTypeCheck)
 	arr.push_back(true);
 
 	Writer->BeginObject();
-	Writer->WriteBoolArray("test", arr);
+	bool writeSuccess = Writer->WriteBoolArray("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_String)
 {
@@ -1643,9 +1815,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_String)
 	arr.push_back("world");
 	arr.push_back("!");
 
-	Writer->WriteStringArray("test", arr);
+	bool writeSuccess = Writer->WriteStringArray("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1658,12 +1831,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_String_WithTypeChec
 	arr.push_back("!");
 
 	Writer->BeginObject();
-	Writer->WriteStringArray("test", arr);
+	bool writeSuccess = Writer->WriteStringArray("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec2)
 {
@@ -1673,9 +1848,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec2)
 	arr.push_back({ 2.5f, 1.0f });
 	arr.push_back({ 1.0f, 0.0f });
 
-	Writer->WriteVec2Array("test", arr);
+	bool writeSuccess = Writer->WriteVec2Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1688,12 +1864,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec2_WithTypeCheck)
 	arr.push_back({ 1.0f, 0.0f });
 
 	Writer->BeginObject();
-	Writer->WriteVec2Array("test", arr);
+	bool writeSuccess = Writer->WriteVec2Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec3)
 {
@@ -1703,9 +1881,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec3)
 	arr.push_back({ 2.5f, 1.0f, 5.8f });
 	arr.push_back({ 1.0f, 0.0f, 5.5f });
 
-	Writer->WriteVec3Array("test", arr);
+	bool writeSuccess = Writer->WriteVec3Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1718,12 +1897,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec3_WithTypeCheck)
 	arr.push_back({ 1.0f, 0.0f, 5.5f });
 
 	Writer->BeginObject();
-	Writer->WriteVec3Array("test", arr);
+	bool writeSuccess = Writer->WriteVec3Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec4)
 {
@@ -1733,9 +1914,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec4)
 	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f });
 	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
 
-	Writer->WriteVec4Array("test", arr);
+	bool writeSuccess = Writer->WriteVec4Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1748,12 +1930,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec4_WithTypeCheck)
 	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
 
 	Writer->BeginObject();
-	Writer->WriteVec4Array("test", arr);
+	bool writeSuccess = Writer->WriteVec4Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat2)
 {
@@ -1763,9 +1947,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat2)
 	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f });
 	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
 
-	Writer->WriteMat2Array("test", arr);
+	bool writeSuccess = Writer->WriteMat2Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1778,12 +1963,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat2_WithTypeCheck)
 	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
 
 	Writer->BeginObject();
-	Writer->WriteMat2Array("test", arr);
+	bool writeSuccess = Writer->WriteMat2Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat3)
 {
@@ -1793,9 +1980,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat3)
 	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f, 15.0f, 152.0f, 7451.0f, 175.0f, 1573.03f });
 	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f, 1.20f, 165.0f, 861.0f, 341.0f, 1375.750f });
 
-	Writer->WriteMat3Array("test", arr);
+	bool writeSuccess = Writer->WriteMat3Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1808,12 +1996,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat3_WithTypeCheck)
 	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f, 1.20f, 165.0f, 861.0f, 341.0f, 1375.750f });
 
 	Writer->BeginObject();
-	Writer->WriteMat3Array("test", arr);
+	bool writeSuccess = Writer->WriteMat3Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat4)
 {
@@ -1823,9 +2013,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat4)
 	arr.push_back(glm::mat4(1.0f));
 	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
 
-	Writer->WriteMat4Array("test", arr);
+	bool writeSuccess = Writer->WriteMat4Array("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1838,12 +2029,14 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat4_WithTypeCheck)
 	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
 
 	Writer->BeginObject();
-	Writer->WriteMat4Array("test", arr);
+	bool writeSuccess = Writer->WriteMat4Array("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
+
 
 TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Quat)
 {
@@ -1853,9 +2046,10 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Quat)
 	arr.push_back({ 164.5f, 326.5f, 235.3f, 32.0f });
 	arr.push_back({ 14.5f, 32.5f, 23.53f, 3.20f });
 
-	Writer->WriteQuaternionArray("test", arr);
+	bool writeSuccess = Writer->WriteQuaternionArray("test", arr);
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
@@ -1868,10 +2062,11 @@ TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Quat_WithTypeCheck)
 	arr.push_back({ 14.5f, 32.5f, 23.53f, 3.20f });
 
 	Writer->BeginObject();
-	Writer->WriteQuaternionArray("test", arr);
+	bool writeSuccess = Writer->WriteQuaternionArray("test", arr);
 	Writer->EndObject();
 
 	HLString content = Writer->GetContent();
+	EXPECT_EQ(writeSuccess, true);
 	EXPECT_EQ(StringEquals(expected, content), true);
 }
 

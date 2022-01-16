@@ -8,6 +8,7 @@ project "HighLoTest"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     debugdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+	buildoptions{"/bigobj"}
 
     files
     { 

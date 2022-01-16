@@ -80,8 +80,8 @@ namespace highlo
 		virtual bool ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result) override;
 		virtual bool ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result) override;
 		virtual bool ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result) override;
-		virtual bool Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
-		virtual bool ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
+		virtual bool ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
+		virtual bool ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
 		virtual bool ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result) override;
 		virtual bool ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result) override;
 		virtual bool ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result) override;
@@ -114,10 +114,11 @@ namespace highlo
 		virtual bool WriteOut() const override;
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
 		virtual HLString GetContent(bool prettify = false) const override;
+		virtual void SetContent(const HLString &content) override;
 
 	private:
 
-		bool AddIntoStructure(rapidxml::xml_node<> *key, rapidxml::xml_node<> *value, DocumentDataType type);
+		bool AddIntoStructure(rapidxml::xml_node<> *value, DocumentDataType type);
 
 		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc);
 		rapidxml::xml_node<> *GetKeyAsNode(const HLString &key);
@@ -131,8 +132,8 @@ namespace highlo
 		rapidxml::xml_document<> m_Document;
 		rapidxml::xml_node<> *m_RootNode = nullptr;
 
-		std::vector<std::pair<rapidxml::xml_node<>*, rapidxml::xml_node<>*>> m_TempBuffers;
-		std::pair<rapidxml::xml_node<>*, rapidxml::xml_node<>*> m_TempBuffer;
+		std::vector<rapidxml::xml_node<>*> m_TempBuffers;
+		rapidxml::xml_node<> *m_TempBuffer;
 
 		bool m_ShouldWriteIntoArray = false;
 		bool m_ShouldWriteIntoObject = false;

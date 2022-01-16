@@ -20,7 +20,7 @@ namespace highlo
 		glCreateBuffers(1, &m_ID);
 		Bind();
 
-		glNamedBufferData(m_ID, m_Size, m_LocalData.m_Data, GL_STATIC_DRAW);
+		glNamedBufferData(m_ID, m_Size, m_LocalData.Data, GL_STATIC_DRAW);
 	}
 
 	OpenGLIndexBuffer::OpenGLIndexBuffer(void *data, uint32 size)
@@ -32,7 +32,7 @@ namespace highlo
 		glCreateBuffers(1, &m_ID);
 		Bind();
 
-		glNamedBufferData(m_ID, m_Size, m_LocalData.m_Data, GL_STATIC_DRAW);
+		glNamedBufferData(m_ID, m_Size, m_LocalData.Data, GL_STATIC_DRAW);
 	}
 
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32 size)
@@ -67,7 +67,7 @@ namespace highlo
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.m_Data);
+		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.Data);
 	}
 	
 	void OpenGLIndexBuffer::UpdateContents(std::vector<int32> &indices, uint32 offset)
@@ -76,7 +76,7 @@ namespace highlo
 		m_Size = ((uint32)indices.size()) * sizeof(int32);
 		m_LocalData = Allocator::Copy(&indices[0], m_Size);
 
-		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.m_Data);
+		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.Data);
 	}
 }
 

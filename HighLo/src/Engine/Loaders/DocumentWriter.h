@@ -196,8 +196,8 @@ namespace highlo
 		HLAPI virtual bool ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &value) = 0;
 		HLAPI virtual bool ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &value) = 0;
 		HLAPI virtual bool ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &value) = 0;
-		HLAPI virtual bool Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &value) = 0;
-		HLAPI virtual bool ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &value) = 0;
+		HLAPI virtual bool ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &value) = 0;
+		HLAPI virtual bool ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &value) = 0;
 		HLAPI virtual bool ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &value) = 0;
 		HLAPI virtual bool ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &value) = 0;
 		HLAPI virtual bool ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &value) = 0;
@@ -230,6 +230,7 @@ namespace highlo
 		HLAPI virtual bool WriteOut() const = 0;
 		HLAPI virtual bool ReadContents(const FileSystemPath &filePath = "") = 0;
 		HLAPI virtual HLString GetContent(bool prettify = false) const = 0;
+		HLAPI virtual void SetContent(const HLString &content) = 0;
 
 		HLAPI static Ref<DocumentWriter> Create(const FileSystemPath &filePath, DocumentType type = DocumentType::None);
 	};

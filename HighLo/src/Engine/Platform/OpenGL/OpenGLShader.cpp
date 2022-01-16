@@ -15,14 +15,19 @@
 namespace highlo
 {
 #define PRINT_SHADERS 1
-#define PRINT_DEBUG_OUTPUTS 1
+#define PRINT_DEBUG_OUTPUTS 0
 #define GL_SHADER_LOG_PREFIX "Shader>       "
 
 	namespace utils
 	{
 		static FileSystemPath GetCacheDirectory()
 		{
-			return "assets/cache/shaders/OpenGL/";
+			FileSystemPath path = "assets/cache/shaders/OpenGL/";
+
+			if (!FileSystem::Get()->FolderExists(path))
+				FileSystem::Get()->CreateFolder(path);
+
+			return path;
 		}
 
 		static const char *GLShaderStageCachedOpenGLFileExtension(uint32 stage)

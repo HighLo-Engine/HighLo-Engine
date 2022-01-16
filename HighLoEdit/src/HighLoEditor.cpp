@@ -227,7 +227,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 	int32 mouseY = (int32)my;
 	if (mouseX >= 0 && mouseY >= 0 && mouseX < (int32)viewportSize.x && mouseY < (int32)viewportSize.y)
 	{
-		HL_CORE_ERROR("TEST: PIXEL SELECTED: {0}", m_ViewportRenderer->GetPixel(TextureFormat::RED_INTEGER, mouseX, mouseY));
+	//	HL_CORE_ERROR("TEST: PIXEL SELECTED: {0}", m_ViewportRenderer->GetPixel(TextureFormat::RED_INTEGER, mouseX, mouseY));
 	}
 }
 
@@ -377,7 +377,12 @@ void HighLoEditor::SelectEntity(Entity entity)
 
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 {
-	HLString title = sceneName + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI();
+	HLString mode = "Debug";
+#ifdef HL_RELEASE
+	mode = "Release";
+#endif // HL_RELEASE
+
+	HLString title = sceneName + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI() + " (" + mode + ")";
 	GetWindow().SetTitle(title);
 }
 

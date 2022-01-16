@@ -48,8 +48,8 @@ namespace highlo
 		{
 			{ "a_Position", ShaderDataType::Float3 },
 			{ "a_TexCoord", ShaderDataType::Float2 },
-			{ "a_TexIndex", ShaderDataType::Float },
 			{ "a_Color", ShaderDataType::Float4 },
+			{ "a_TexIndex", ShaderDataType::Float },
 		};
 	}
 
@@ -57,9 +57,11 @@ namespace highlo
 	{
 		return
 		{
-			{ "POSITION", ShaderDataType::Float3 },
-			{ "UV"		, ShaderDataType::Float2 },
-			{ "NORMAL"	, ShaderDataType::Float3 }
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_Normal", ShaderDataType::Float3 },
+			{ "a_Tangent", ShaderDataType::Float3 },
+			{ "a_Binormal", ShaderDataType::Float3 },
 		};
 	}
 
@@ -67,13 +69,13 @@ namespace highlo
 	{
 		return
 		{
-			{ "POSITION", ShaderDataType::Float3 },
-			{ "UV"		, ShaderDataType::Float2 },
-			{ "NORMAL"	, ShaderDataType::Float3 },
-			{ "TANGENT"	, ShaderDataType::Float3 },
-			{ "BINORMAL", ShaderDataType::Float3 },
-			{ "BONE_IDS", ShaderDataType::Int4 },
-			{ "BONE_WEIGHTS", ShaderDataType::Float4 }
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_Normal", ShaderDataType::Float3 },
+			{ "a_Tangent", ShaderDataType::Float3 },
+			{ "a_Binormal", ShaderDataType::Float3 },
+			{ "a_BoneIndices", ShaderDataType::Int4 },
+			{ "a_BoneWeights", ShaderDataType::Float4 },
 		};
 	}
 
@@ -81,7 +83,8 @@ namespace highlo
 	{
 		return
 		{
-			{ "POSITION", ShaderDataType::Float3 }
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
 		};
 	}
 
@@ -89,8 +92,10 @@ namespace highlo
 	{
 		return
 		{
-			{ "in_Position", ShaderDataType::Float3 },
-			{ "in_TexCoord", ShaderDataType::Float2 }
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_Row1", ShaderDataType::Float4 },
+			{ "a_Row2", ShaderDataType::Float4 },
+			{ "a_Row3", ShaderDataType::Float4 },
 		};
 	}
 

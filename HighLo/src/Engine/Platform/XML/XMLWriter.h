@@ -5,6 +5,34 @@
 //     - 1.0 (2022-01-10) initial release
 //
 
+/*
+ * Here we got the following situation:
+ * The XML format from the engine is in general type-safe, meaning the type is always known by the XMLWriter class.
+ * This is done by writing the type name as the node name into the format, however we got one big exception:
+ * 
+ * Matrices, Vectors and Quaternions are assumed to have always a float-datatype, because their node names are already taken by the values's location.
+ * The future will show, if this assumption is true or if their will be a special case, where we would need to store a ivec4 for example to disk in a XML format...
+ * Then the XML formatter would have to be re-visited.
+ * 
+ * Current Vector format: (in this example a 2-dimensional vector)
+ * <vector2 key="someKey">
+ *   <x>20.2</x>
+ *   <y>2242.2</y>
+ * </vector2>
+ * 
+ * The above format assumes that the nodes x, y hold a float value!
+ * 
+ * Current matrix format: (in this example a 2x2 matrix)
+ * <matrix2 key="someKey">
+ *   <m00>434.5</m00>
+ *   <m01>42.5</m01>
+ *   <m10>53.5</m10>
+ *   <m11>76.5</m11>
+ * </matrix2>
+ * 
+ * The node names are corresponding to the matrix position, m00 would be the 0th row and the 0th column, ...
+ */
+
 #pragma once
 
 #include "Engine/Loaders/DocumentWriter.h"

@@ -42,7 +42,7 @@ You can always create pull requests but keep in mind that the engine is in activ
 
 We use the feature-branch working method. This means that new features are being implemented in their own branches. If the development of the feature is finished, the branch gets merged into the master branch.
 
-When the engine get's released, version branches will be created to maintain single versions. The master branch will always contain the latest code.
+When the engine gets released, version branches will be created to maintain single versions. The master branch will always contain the latest code.
 
 # Screenshots
 

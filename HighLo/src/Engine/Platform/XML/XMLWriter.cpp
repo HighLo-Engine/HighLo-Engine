@@ -18,11 +18,14 @@ namespace highlo
 	{
 		m_RootNode = m_Document.allocate_node(rapidxml::node_element, "HighLo");
 	
-		m_EngineVersion = HLApplication::Get().GetApplicationSettings().Version;
-		char *versionStr = utils::PrepareString(m_Document, m_EngineVersion);
+		if (HLApplication::Get().HasStarted())
+		{
+			m_EngineVersion = HLApplication::Get().GetApplicationSettings().Version;
+			char *versionStr = utils::PrepareString(m_Document, m_EngineVersion);
 
-		rapidxml::xml_attribute<> *attribute = m_Document.allocate_attribute("version", versionStr);
-		m_RootNode->append_attribute(attribute);
+			rapidxml::xml_attribute<> *attribute = m_Document.allocate_attribute("version", versionStr);
+			m_RootNode->append_attribute(attribute);
+		}
 	}
 
 	XMLWriter::~XMLWriter()
@@ -60,6 +63,13 @@ namespace highlo
 				arrayNode = m_Document.allocate_node(rapidxml::node_element, "arraymap");
 			else
 				arrayNode = m_Document.allocate_node(rapidxml::node_element, "array");
+
+			if (!key.IsEmpty())
+			{
+				char *keyStr = utils::PrepareString(m_Document, key);
+				rapidxml::xml_attribute<> *keyAttribute = m_Document.allocate_attribute("key", keyStr);
+				arrayNode->append_attribute(keyAttribute);
+			}
 
 			for (uint32 i = 0; i < m_TempBuffers.size(); ++i)
 			{
@@ -264,10 +274,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "string");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "string");
 				char *currentStr = utils::PrepareString(instance->m_Document, value[i]);
 
 				entryNode->value(currentStr);
@@ -283,10 +293,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "int32");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "int32");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -302,10 +312,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "uint32");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "uint32");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -321,10 +331,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "int64");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "int64");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -340,10 +350,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "uint64");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "uint64");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -359,10 +369,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "bool");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "bool");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -378,10 +388,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "float");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "float");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -397,10 +407,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "array");
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "double");
+				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_element, "double");
 				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
 				entryNode->value(currentStr);
@@ -416,7 +426,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::Vec2ToXmlNode(instance->m_Document, value[i]);
@@ -432,7 +442,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::Vec3ToXmlNode(instance->m_Document, value[i]);
@@ -448,7 +458,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::Vec4ToXmlNode(instance->m_Document, value[i]);
@@ -464,7 +474,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::Mat2ToXmlNode(instance->m_Document, value[i]);
@@ -480,7 +490,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::Mat3ToXmlNode(instance->m_Document, value[i]);
@@ -496,7 +506,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::Mat4ToXmlNode(instance->m_Document, value[i]);
@@ -512,7 +522,7 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data);
+			rapidxml::xml_node<> *arrayNode = instance->m_Document.allocate_node(rapidxml::node_element, "array");
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = utils::QuatToXmlNode(instance->m_Document, value[i]);

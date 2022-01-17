@@ -577,7 +577,7 @@ namespace highlo
 		return false;
 	}
 
-	bool YAMLWriter::WriteOut() const
+	bool YAMLWriter::WriteOut()
 	{
 		// Write content into file
 		HL_CORE_INFO("[+] Writing file {0} [+]", **m_FilePath);
@@ -616,7 +616,7 @@ namespace highlo
 		return false;
 	}
 
-	HLString YAMLWriter::GetContent(bool prettify) const
+	HLString YAMLWriter::GetContent(bool prettify)
 	{
 		return m_Emitter.c_str();
 	}

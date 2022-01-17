@@ -111,18 +111,14 @@ namespace highlo
 		virtual bool ReadQuaternion(const HLString &key, glm::quat *result) override;
 
 		virtual bool HasKey(const HLString &key) const override;
-		virtual bool WriteOut() const override;
+		virtual bool WriteOut() override;
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
-		virtual HLString GetContent(bool prettify = false) const override;
+		virtual HLString GetContent(bool prettify = false) override;
 		virtual void SetContent(const HLString &content) override;
 
 	private:
 
-		bool AddIntoStructure(rapidxml::xml_node<> *value, DocumentDataType type);
-
 		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc);
-		rapidxml::xml_node<> *GetKeyAsNode(const HLString &key);
-
 		bool Read(const HLString &key, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
 
 		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
@@ -131,9 +127,10 @@ namespace highlo
 		FileSystemPath m_FilePath;
 		rapidxml::xml_document<> m_Document;
 		rapidxml::xml_node<> *m_RootNode = nullptr;
+		HLString m_EngineVersion;
 
 		std::vector<rapidxml::xml_node<>*> m_TempBuffers;
-		rapidxml::xml_node<> *m_TempBuffer;
+		rapidxml::xml_node<> *m_TempBuffer = nullptr;
 
 		bool m_ShouldWriteIntoArray = false;
 		bool m_ShouldWriteIntoObject = false;

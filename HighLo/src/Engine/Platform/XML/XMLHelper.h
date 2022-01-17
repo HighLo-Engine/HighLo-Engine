@@ -17,15 +17,25 @@
 
 namespace highlo::utils
 {
+	static char *PrepareString(rapidxml::xml_document<> &doc, const HLString &str)
+	{
+		char *result = doc.allocate_string(str.C_Str(), str.Length());
+		result[str.Length()] = '\0';
+		return result;
+	}
+
 	static rapidxml::xml_node<> *Vec2ToXmlNode(rapidxml::xml_document<> &doc, const glm::vec2 &v)
 	{
 		HLString valueXStr = HLString::ToString(v.x);
 		HLString valueYStr = HLString::ToString(v.y);
 
-		rapidxml::xml_node<> *val1 = doc.allocate_node(rapidxml::node_type::node_data, "x", *valueXStr);
-		rapidxml::xml_node<> *val2 = doc.allocate_node(rapidxml::node_type::node_data, "y", *valueYStr);
+		char *x = PrepareString(doc, valueXStr);
+		char *y = PrepareString(doc, valueYStr);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "vector2");
+		rapidxml::xml_node<> *val1 = doc.allocate_node(rapidxml::node_element, "x", x);
+		rapidxml::xml_node<> *val2 = doc.allocate_node(rapidxml::node_element, "y", y);
+
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vector2");
 		node->append_node(val1);
 		node->append_node(val2);
 		return node;
@@ -37,11 +47,15 @@ namespace highlo::utils
 		HLString valueYStr = HLString::ToString(v.y);
 		HLString valueZStr = HLString::ToString(v.z);
 
-		rapidxml::xml_node<> *valueX = doc.allocate_node(rapidxml::node_type::node_data, "x", *valueXStr);
-		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_type::node_data, "y", *valueYStr);
-		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_type::node_data, "z", *valueZStr);
+		char *x = PrepareString(doc, valueXStr);
+		char *y = PrepareString(doc, valueYStr);
+		char *z = PrepareString(doc, valueZStr);
+		
+		rapidxml::xml_node<> *valueX = doc.allocate_node(rapidxml::node_element, "x", x);
+		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_element, "y", y);
+		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_element, "z", z);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "vector3");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vector3");
 		node->append_node(valueX);
 		node->append_node(valueY);
 		node->append_node(valueZ);
@@ -55,12 +69,17 @@ namespace highlo::utils
 		HLString valueZStr = HLString::ToString(v.z);
 		HLString valueWStr = HLString::ToString(v.w);
 
-		rapidxml::xml_node<> *valueX = doc.allocate_node(rapidxml::node_type::node_data, "x", *valueXStr);
-		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_type::node_data, "y", *valueYStr);
-		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_type::node_data, "z", *valueZStr);
-		rapidxml::xml_node<> *valueW = doc.allocate_node(rapidxml::node_type::node_data, "w", *valueWStr);
+		char *x = PrepareString(doc, valueXStr);
+		char *y = PrepareString(doc, valueYStr);
+		char *z = PrepareString(doc, valueZStr);
+		char *w = PrepareString(doc, valueWStr);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "vector4");
+		rapidxml::xml_node<> *valueX = doc.allocate_node(rapidxml::node_element, "x", x);
+		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_element, "y", y);
+		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_element, "z", z);
+		rapidxml::xml_node<> *valueW = doc.allocate_node(rapidxml::node_element, "w", w);
+
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vector4");
 		node->append_node(valueX);
 		node->append_node(valueY);
 		node->append_node(valueZ);
@@ -75,12 +94,17 @@ namespace highlo::utils
 		HLString valueZStr = HLString::ToString(q.z);
 		HLString valueWStr = HLString::ToString(q.w);
 
-		rapidxml::xml_node<> *valueX = doc.allocate_node(rapidxml::node_type::node_data, "x", *valueXStr);
-		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_type::node_data, "y", *valueYStr);
-		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_type::node_data, "z", *valueZStr);
-		rapidxml::xml_node<> *valueW = doc.allocate_node(rapidxml::node_type::node_data, "w", *valueWStr);
+		char *x = PrepareString(doc, valueXStr);
+		char *y = PrepareString(doc, valueYStr);
+		char *z = PrepareString(doc, valueZStr);
+		char *w = PrepareString(doc, valueWStr);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "quaternion");
+		rapidxml::xml_node<> *valueX = doc.allocate_node(rapidxml::node_element, "x", x);
+		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_element, "y", y);
+		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_element, "z", z);
+		rapidxml::xml_node<> *valueW = doc.allocate_node(rapidxml::node_element, "w", w);
+
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "quaternion");
 		node->append_node(valueX);
 		node->append_node(valueY);
 		node->append_node(valueZ);
@@ -95,12 +119,17 @@ namespace highlo::utils
 		HLString valueM10Str = HLString::ToString(m[1][0]);
 		HLString valueM11Str = HLString::ToString(m[1][1]);
 
-		rapidxml::xml_node<> *valueM00 = doc.allocate_node(rapidxml::node_type::node_data, "m00", *valueM00Str);
-		rapidxml::xml_node<> *valueM01 = doc.allocate_node(rapidxml::node_type::node_data, "m01", *valueM01Str);
-		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_type::node_data, "m10", *valueM10Str);
-		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_type::node_data, "m11", *valueM11Str);
+		char *m00 = PrepareString(doc, valueM00Str);
+		char *m01 = PrepareString(doc, valueM01Str);
+		char *m10 = PrepareString(doc, valueM10Str);
+		char *m11 = PrepareString(doc, valueM11Str);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "matrix2");
+		rapidxml::xml_node<> *valueM00 = doc.allocate_node(rapidxml::node_element, "m00", m00);
+		rapidxml::xml_node<> *valueM01 = doc.allocate_node(rapidxml::node_element, "m01", m01);
+		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_element, "m10", m10);
+		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_element, "m11", m11);
+
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "matrix2");
 		node->append_node(valueM00);
 		node->append_node(valueM01);
 		node->append_node(valueM10);
@@ -120,17 +149,29 @@ namespace highlo::utils
 		HLString valueM21Str = HLString::ToString(m[2][1]);
 		HLString valueM22Str = HLString::ToString(m[2][2]);
 
-		rapidxml::xml_node<> *valueM00 = doc.allocate_node(rapidxml::node_type::node_data, "m00", *valueM00Str);
-		rapidxml::xml_node<> *valueM01 = doc.allocate_node(rapidxml::node_type::node_data, "m01", *valueM01Str);
-		rapidxml::xml_node<> *valueM02 = doc.allocate_node(rapidxml::node_type::node_data, "m02", *valueM02Str);
-		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_type::node_data, "m10", *valueM10Str);
-		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_type::node_data, "m11", *valueM11Str);
-		rapidxml::xml_node<> *valueM12 = doc.allocate_node(rapidxml::node_type::node_data, "m12", *valueM12Str);
-		rapidxml::xml_node<> *valueM20 = doc.allocate_node(rapidxml::node_type::node_data, "m20", *valueM20Str);
-		rapidxml::xml_node<> *valueM21 = doc.allocate_node(rapidxml::node_type::node_data, "m21", *valueM21Str);
-		rapidxml::xml_node<> *valueM22 = doc.allocate_node(rapidxml::node_type::node_data, "m22", *valueM22Str);
+		char *m00 = PrepareString(doc, valueM00Str);
+		char *m01 = PrepareString(doc, valueM01Str);
+		char *m02 = PrepareString(doc, valueM02Str);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "matrix3");
+		char *m10 = PrepareString(doc, valueM10Str);
+		char *m11 = PrepareString(doc, valueM11Str);
+		char *m12 = PrepareString(doc, valueM12Str);
+		
+		char *m20 = PrepareString(doc, valueM20Str);
+		char *m21 = PrepareString(doc, valueM21Str);
+		char *m22 = PrepareString(doc, valueM22Str);
+
+		rapidxml::xml_node<> *valueM00 = doc.allocate_node(rapidxml::node_element, "m00", m00);
+		rapidxml::xml_node<> *valueM01 = doc.allocate_node(rapidxml::node_element, "m01", m01);
+		rapidxml::xml_node<> *valueM02 = doc.allocate_node(rapidxml::node_element, "m02", m02);
+		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_element, "m10", m10);
+		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_element, "m11", m11);
+		rapidxml::xml_node<> *valueM12 = doc.allocate_node(rapidxml::node_element, "m12", m12);
+		rapidxml::xml_node<> *valueM20 = doc.allocate_node(rapidxml::node_element, "m20", m20);
+		rapidxml::xml_node<> *valueM21 = doc.allocate_node(rapidxml::node_element, "m21", m21);
+		rapidxml::xml_node<> *valueM22 = doc.allocate_node(rapidxml::node_element, "m22", m22);
+
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "matrix3");
 		node->append_node(valueM00);
 		node->append_node(valueM01);
 		node->append_node(valueM02);
@@ -165,27 +206,47 @@ namespace highlo::utils
 		HLString valueM32Str = HLString::ToString(m[3][2]);
 		HLString valueM33Str = HLString::ToString(m[3][3]);
 
-		rapidxml::xml_node<> *valueM00 = doc.allocate_node(rapidxml::node_type::node_data, "m00", *valueM00Str);
-		rapidxml::xml_node<> *valueM01 = doc.allocate_node(rapidxml::node_type::node_data, "m01", *valueM01Str);
-		rapidxml::xml_node<> *valueM02 = doc.allocate_node(rapidxml::node_type::node_data, "m02", *valueM02Str);
-		rapidxml::xml_node<> *valueM03 = doc.allocate_node(rapidxml::node_type::node_data, "m03", *valueM03Str);
+		char *m00 = PrepareString(doc, valueM00Str);
+		char *m01 = PrepareString(doc, valueM01Str);
+		char *m02 = PrepareString(doc, valueM02Str);
+		char *m03 = PrepareString(doc, valueM03Str);
 
-		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_type::node_data, "m10", *valueM10Str);
-		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_type::node_data, "m11", *valueM11Str);
-		rapidxml::xml_node<> *valueM12 = doc.allocate_node(rapidxml::node_type::node_data, "m12", *valueM12Str);
-		rapidxml::xml_node<> *valueM13 = doc.allocate_node(rapidxml::node_type::node_data, "m13", *valueM13Str);
+		char *m10 = PrepareString(doc, valueM10Str);
+		char *m11 = PrepareString(doc, valueM11Str);
+		char *m12 = PrepareString(doc, valueM12Str);
+		char *m13 = PrepareString(doc, valueM13Str);
 
-		rapidxml::xml_node<> *valueM20 = doc.allocate_node(rapidxml::node_type::node_data, "m20", *valueM20Str);
-		rapidxml::xml_node<> *valueM21 = doc.allocate_node(rapidxml::node_type::node_data, "m21", *valueM21Str);
-		rapidxml::xml_node<> *valueM22 = doc.allocate_node(rapidxml::node_type::node_data, "m22", *valueM22Str);
-		rapidxml::xml_node<> *valueM23 = doc.allocate_node(rapidxml::node_type::node_data, "m23", *valueM23Str);
+		char *m20 = PrepareString(doc, valueM20Str);
+		char *m21 = PrepareString(doc, valueM21Str);
+		char *m22 = PrepareString(doc, valueM22Str);
+		char *m23 = PrepareString(doc, valueM23Str);
 
-		rapidxml::xml_node<> *valueM30 = doc.allocate_node(rapidxml::node_type::node_data, "m30", *valueM30Str);
-		rapidxml::xml_node<> *valueM31 = doc.allocate_node(rapidxml::node_type::node_data, "m31", *valueM31Str);
-		rapidxml::xml_node<> *valueM32 = doc.allocate_node(rapidxml::node_type::node_data, "m32", *valueM32Str);
-		rapidxml::xml_node<> *valueM33 = doc.allocate_node(rapidxml::node_type::node_data, "m33", *valueM33Str);
+		char *m30 = PrepareString(doc, valueM30Str);
+		char *m31 = PrepareString(doc, valueM31Str);
+		char *m32 = PrepareString(doc, valueM32Str);
+		char *m33 = PrepareString(doc, valueM33Str);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_type::node_data, "matrix4");
+		rapidxml::xml_node<> *valueM00 = doc.allocate_node(rapidxml::node_element, "m00", m00);
+		rapidxml::xml_node<> *valueM01 = doc.allocate_node(rapidxml::node_element, "m01", m01);
+		rapidxml::xml_node<> *valueM02 = doc.allocate_node(rapidxml::node_element, "m02", m02);
+		rapidxml::xml_node<> *valueM03 = doc.allocate_node(rapidxml::node_element, "m03", m03);
+
+		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_element, "m10", m10);
+		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_element, "m11", m11);
+		rapidxml::xml_node<> *valueM12 = doc.allocate_node(rapidxml::node_element, "m12", m12);
+		rapidxml::xml_node<> *valueM13 = doc.allocate_node(rapidxml::node_element, "m13", m13);
+
+		rapidxml::xml_node<> *valueM20 = doc.allocate_node(rapidxml::node_element, "m20", m20);
+		rapidxml::xml_node<> *valueM21 = doc.allocate_node(rapidxml::node_element, "m21", m21);
+		rapidxml::xml_node<> *valueM22 = doc.allocate_node(rapidxml::node_element, "m22", m22);
+		rapidxml::xml_node<> *valueM23 = doc.allocate_node(rapidxml::node_element, "m23", m23);
+
+		rapidxml::xml_node<> *valueM30 = doc.allocate_node(rapidxml::node_element, "m30", m30);
+		rapidxml::xml_node<> *valueM31 = doc.allocate_node(rapidxml::node_element, "m31", m31);
+		rapidxml::xml_node<> *valueM32 = doc.allocate_node(rapidxml::node_element, "m32", m32);
+		rapidxml::xml_node<> *valueM33 = doc.allocate_node(rapidxml::node_element, "m33", m33);
+
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "matrix4");
 		node->append_node(valueM00);
 		node->append_node(valueM01);
 		node->append_node(valueM02);

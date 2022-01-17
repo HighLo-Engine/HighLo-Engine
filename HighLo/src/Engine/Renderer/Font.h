@@ -12,7 +12,7 @@
 
 #include "Engine/Assets/Asset.h"
 #include "Engine/Core/FileSystemPath.h"
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Texture2D.h"
 
 namespace highlo
 {

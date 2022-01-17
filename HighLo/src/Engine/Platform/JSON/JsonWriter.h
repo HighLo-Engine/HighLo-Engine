@@ -132,9 +132,9 @@ namespace highlo
 		virtual bool ReadQuaternion(const HLString &key, glm::quat *result) override;
 
 		virtual bool HasKey(const HLString &key) const override;
-		virtual bool WriteOut() const override;
+		virtual bool WriteOut() override;
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
-		virtual HLString GetContent(bool prettify = false) const override;
+		virtual HLString GetContent(bool prettify = false) override;
 		virtual void SetContent(const HLString &content) override;
 
 	private:

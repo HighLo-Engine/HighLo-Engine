@@ -1487,7 +1487,7 @@ namespace highlo
 		return m_Document.HasMember(*key);
 	}
 	
-	bool JSONWriter::WriteOut() const
+	bool JSONWriter::WriteOut()
 	{
 		// Write content into file
 		HL_CORE_INFO(JSON_LOG_PREFIX "[+] Writing file {0} [+]", **m_FilePath);
@@ -1528,7 +1528,7 @@ namespace highlo
 		return false;
 	}
 	
-	HLString JSONWriter::GetContent(bool prettify) const
+	HLString JSONWriter::GetContent(bool prettify)
 	{
 		rapidjson::StringBuffer buffer;
 

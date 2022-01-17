@@ -9,7 +9,7 @@
 
 #include "Engine/Application/Application.h"
 #include "Engine/Renderer/Renderer.h"
-#include "OpenGLTexture.h"
+#include "OpenGLTexture2D.h"
 #include "OpenGLUtils.h"
 
 namespace highlo

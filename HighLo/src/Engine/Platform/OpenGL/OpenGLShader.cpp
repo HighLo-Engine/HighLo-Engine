@@ -14,7 +14,7 @@
 
 namespace highlo
 {
-#define PRINT_SHADERS 1
+#define PRINT_SHADERS 0
 #define PRINT_DEBUG_OUTPUTS 0
 #define GL_SHADER_LOG_PREFIX "Shader>       "
 

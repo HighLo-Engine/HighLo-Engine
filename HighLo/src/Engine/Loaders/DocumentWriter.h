@@ -227,9 +227,9 @@ namespace highlo
 		HLAPI virtual bool ReadQuaternion(const HLString &key, glm::quat *value) = 0;
 
 		HLAPI virtual bool HasKey(const HLString &key) const = 0;
-		HLAPI virtual bool WriteOut() const = 0;
+		HLAPI virtual bool WriteOut() = 0;
 		HLAPI virtual bool ReadContents(const FileSystemPath &filePath = "") = 0;
-		HLAPI virtual HLString GetContent(bool prettify = false) const = 0;
+		HLAPI virtual HLString GetContent(bool prettify = false) = 0;
 		HLAPI virtual void SetContent(const HLString &content) = 0;
 
 		HLAPI static Ref<DocumentWriter> Create(const FileSystemPath &filePath, DocumentType type = DocumentType::None);

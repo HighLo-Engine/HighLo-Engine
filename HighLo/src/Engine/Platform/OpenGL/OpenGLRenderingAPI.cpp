@@ -11,7 +11,8 @@
 
 #include "Engine/Renderer/Renderer.h"
 #include "OpenGLShader.h"
-#include "OpenGLTexture.h"
+#include "OpenGLTexture2D.h"
+#include "OpenGLTexture3D.h"
 #include "OpenGLMaterial.h"
 #include "OpenGLVertexArray.h"
 #include "OpenGLVertexBuffer.h"

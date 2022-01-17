@@ -19,7 +19,7 @@ namespace highlo::utils
 {
 	static char *PrepareString(rapidxml::xml_document<> &doc, const HLString &str)
 	{
-		char *result = doc.allocate_string(str.C_Str(), str.Length());
+		char *result = doc.allocate_string(str.C_Str(), str.Length() + 1);
 		result[str.Length()] = '\0';
 		return result;
 	}

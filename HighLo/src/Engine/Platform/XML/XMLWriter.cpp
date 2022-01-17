@@ -40,10 +40,33 @@ namespace highlo
 		{
 			m_ShouldWriteIntoArray = false;
 
+			// First check if the user likes to use a normal array or a arraymap
+			// the difference is in the reading part, arraymaps return the key as well but arrays only return their value
+
+			bool useArrayMap = false;
+			rapidxml::xml_node<> *arrayNode = nullptr;
+
 			for (uint32 i = 0; i < m_TempBuffers.size(); ++i)
 			{
-				m_RootNode->append_node(m_TempBuffers[i]);
+				rapidxml::xml_attribute<> *keyAttribute = m_TempBuffers[i]->first_attribute("key");
+				if (keyAttribute)
+				{
+					useArrayMap = true;
+					break;
+				}
 			}
+
+			if (useArrayMap)
+				arrayNode = m_Document.allocate_node(rapidxml::node_element, "arraymap");
+			else
+				arrayNode = m_Document.allocate_node(rapidxml::node_element, "array");
+
+			for (uint32 i = 0; i < m_TempBuffers.size(); ++i)
+			{
+				arrayNode->append_node(m_TempBuffers[i]);
+			}
+
+			m_RootNode->append_node(arrayNode);
 		}
 	}
 
@@ -74,12 +97,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Float, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("float");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "float");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -89,12 +110,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Double, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("double");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "double");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -104,12 +123,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Int32, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("int32");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "int32");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -119,12 +136,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::UInt32, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("uint32");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "uint32");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -134,12 +149,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Int64, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("int64");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "int64");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -149,12 +162,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::UInt64, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("uint64");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "uint64");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -164,12 +175,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Bool, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			HLString valueStr = HLString::ToString(value);
-			char *val = utils::PrepareString(instance->m_Document, valueStr);
+			char *valueStr = utils::PrepareString(instance->m_Document, HLString::ToString(value));
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("bool");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "bool");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -179,11 +188,10 @@ namespace highlo
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::String, [value, instance]() mutable -> rapidxml::xml_node<>*
 		{
-			char *val = utils::PrepareString(instance->m_Document, value);
+			char *valueStr = utils::PrepareString(instance->m_Document, value);
 
-			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element);
-			node->name("string");
-			node->value(val);
+			rapidxml::xml_node<> *node = instance->m_Document.allocate_node(rapidxml::node_element, "string");
+			node->value(valueStr);
 			return node;
 		});
 	}
@@ -260,11 +268,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "string");
-				HLString currentStr = value[i];
+				char *currentStr = utils::PrepareString(instance->m_Document, value[i]);
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -281,11 +287,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "int32");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -302,11 +306,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "uint32");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -323,11 +325,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "int64");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -344,11 +344,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "uint64");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -365,11 +363,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "bool");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -386,11 +382,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "float");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -407,11 +401,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidxml::xml_node<> *entryNode = instance->m_Document.allocate_node(rapidxml::node_type::node_data, "double");
-				HLString currentStr = HLString::ToString(value[i]);
+				char *currentStr = utils::PrepareString(instance->m_Document, HLString::ToString(value[i]));
 
-				char *val = utils::PrepareString(instance->m_Document, currentStr);
-
-				entryNode->value(val);
+				entryNode->value(currentStr);
 				arrayNode->append_node(entryNode);
 			}
 
@@ -932,12 +924,19 @@ namespace highlo
 			{
 				// Check the version string of the root node, that indicates the engine version
 				rapidxml::xml_attribute<> *versionAttr = rootNode->first_attribute("version");
-				HLString versionStr = versionAttr->value();
-
-				if (versionStr != m_EngineVersion)
+				if (!versionAttr)
 				{
-					// TODO: if we change the XML structure in the future we can parse old formats here to keep the parser backward compatible
-					HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
+					HL_CORE_ERROR(XML_LOG_PREFIX  "[-] Error: XML format is wrong! Expected version attribute to be present in HighLo node! [-]");
+				}
+				else
+				{
+					HLString versionStr = versionAttr->value();
+
+					if (versionStr != m_EngineVersion)
+					{
+						// TODO: if we change the XML structure in the future we can parse old formats here to keep the parser backward compatible
+						HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
+					}
 				}
 			}
 		}
@@ -980,41 +979,49 @@ namespace highlo
 		{
 			// Check the version string of the root node, that indicates the engine version
 			rapidxml::xml_attribute<> *versionAttr = rootNode->first_attribute("version");
-			HLString versionStr = versionAttr->value();
-
-			if (versionStr != m_EngineVersion)
+			if (!versionAttr)
 			{
-				HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
+				HL_CORE_ERROR(XML_LOG_PREFIX "[-] Error: XML format is wrong! Expected version attribute to be present in HighLo node! [-]");
+			}
+			else
+			{
+				HLString versionStr = versionAttr->value();
+
+				if (versionStr != m_EngineVersion)
+				{
+					HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
+				}
 			}
 		}
 	}
 
 	bool XMLWriter::Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc)
 	{
-		rapidxml::xml_node<> *valueNode = insertFunc();
-		if (!valueNode)
+		rapidxml::xml_node<> *node = insertFunc();
+		if (!node)
+		{
+			HL_CORE_ERROR(XML_LOG_PREFIX "[-] Error: Node could not be created! [-]");
 			return false;
+		}
 
 		if (!key.IsEmpty())
 		{
-			char *val = utils::PrepareString(m_Document, key);
-
-			rapidxml::xml_attribute<> *valueAttribute = m_Document.allocate_attribute("key", val);
-			valueNode->append_attribute(valueAttribute);
+			rapidxml::xml_attribute<> *valueAttribute = m_Document.allocate_attribute("key", utils::PrepareString(m_Document, key));
+			node->append_attribute(valueAttribute);
 		}
 
 		if (m_ShouldWriteIntoArray || m_ShouldWriteIntoObject)
 		{
-			m_TempBuffer = valueNode;
+			m_TempBuffer = node;
 
 			if (m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
 			{
-				m_TempBuffers.push_back(valueNode);
+				m_TempBuffers.push_back(node);
 			}
 		}
 		else
 		{
-			m_RootNode->append_node(valueNode);
+			m_RootNode->append_node(node);
 		}
 
 		return true;

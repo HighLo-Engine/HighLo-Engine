@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Texture2D.h"
 #include "EditorConsole/ConsoleMessage.h"
 
 namespace highlo

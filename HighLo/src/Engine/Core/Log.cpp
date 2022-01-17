@@ -14,7 +14,12 @@ namespace highlo
 
 	void Logger::Init()
 	{
-		bool shouldLogToFile = !HLApplication::Get().GetApplicationSettings().NoLog;
+		bool shouldLogToFile = false;
+		if (HLApplication::HasStarted())
+		{
+			shouldLogToFile = !HLApplication::Get().GetApplicationSettings().NoLog;
+		}
+
 		std::vector<spdlog::sink_ptr> engineSinks;
 		std::vector<spdlog::sink_ptr> appSinks;
 

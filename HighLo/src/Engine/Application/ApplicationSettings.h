@@ -81,6 +81,11 @@ namespace highlo
 		/// Determines the path to the startup project for the Editor.
 		/// </summary>
 		FileSystemPath ProjectPath = "";
+
+		/// <summary>
+		/// Determines the current Version String.
+		/// </summary>
+		HLString Version = "1.0.0";
 	};
 }
 

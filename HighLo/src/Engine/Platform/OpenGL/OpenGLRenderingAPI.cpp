@@ -11,7 +11,8 @@
 
 #include "Engine/Renderer/Renderer.h"
 #include "OpenGLShader.h"
-#include "OpenGLTexture.h"
+#include "OpenGLTexture2D.h"
+#include "OpenGLTexture3D.h"
 #include "OpenGLMaterial.h"
 #include "OpenGLVertexArray.h"
 #include "OpenGLVertexBuffer.h"
@@ -118,8 +119,8 @@ namespace highlo
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // for seamless cube maps
 		glFrontFace(GL_CCW);
 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_STENCIL_TEST);

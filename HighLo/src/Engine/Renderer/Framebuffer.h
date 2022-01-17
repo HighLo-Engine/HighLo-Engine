@@ -14,7 +14,7 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Core/DataTypes/String.h"
 #include "Engine/Renderer/TextureFormat.h"
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Texture2D.h"
 
 namespace highlo
 {

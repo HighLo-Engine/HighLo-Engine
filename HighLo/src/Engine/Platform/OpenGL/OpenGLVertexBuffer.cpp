@@ -37,7 +37,7 @@ namespace highlo
 		glCreateBuffers(1, &m_ID);
 		Bind();
 
-		glNamedBufferData(m_ID, m_Size, m_LocalData.m_Data, utils::ConvertUsageToOpenGL(m_Usage));
+		glNamedBufferData(m_ID, m_Size, m_LocalData.Data, utils::ConvertUsageToOpenGL(m_Usage));
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage)
@@ -74,7 +74,7 @@ namespace highlo
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.m_Data);
+		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.Data);
 	}
 }
 

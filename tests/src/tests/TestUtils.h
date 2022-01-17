@@ -26,39 +26,59 @@ static bool StringEquals(const HLString &str1, const HLString &str2)
 	return CStringEquals(*str1, *str2);
 }
 
-static bool VectorEquals(const std::vector<HLString> &vec1, const std::vector<HLString> &vec2)
+template<typename T>
+static bool VectorEquals(const std::vector<T> &vec1, const std::vector<T> &vec2)
 {
 	if (vec1.size() != vec2.size())
 		return false;
 
-	bool equals = true;
 	for (uint32 i = 0; i < vec1.size(); ++i)
 	{
 		if (vec1[i] != vec2[i])
+			return false;
+	}
+
+	return true;
+}
+
+template<typename T>
+static bool MapEquals(const std::map<HLString, T> &map1, const std::map<HLString, T> &map2)
+{
+	if (map1.size() != map2.size())
+		return false;
+
+	for (auto it_m1 = map1.cbegin(), end_m1 = map1.cend(),
+		 it_m2 = map2.cbegin(), end_m2 = map2.cend();
+		 it_m1 != end_m1 || it_m2 != end_m2;)
+	{
+		if (it_m1 != end_m1 && it_m2 != end_m2)
 		{
-			equals = false;
-			break;
+			if (it_m1->first != it_m2->first)
+				return false;
+
+			if (it_m1->second != it_m2->second)
+				return false;
+
+			++it_m1;
+			++it_m2;
 		}
 	}
 
-	return equals;
+	return true;
 }
 
-static bool ArrayEquals(HLString *arr1, uint32 arr1Size, HLString *arr2, uint32 arr2Size)
+template<typename T>
+static bool ArrayEquals(T *arr1, uint32 arr1Size, T *arr2, uint32 arr2Size)
 {
 	if (arr1Size != arr2Size)
 		return false;
 
-	bool equals = true;
 	for (uint32 i = 0; i < arr1Size; ++i)
 	{
 		if (arr1[i] != arr2[i])
-		{
-			equals = false;
-			break;
-		}
+			return false;
 	}
 
-	return equals;
+	return true;
 }
 

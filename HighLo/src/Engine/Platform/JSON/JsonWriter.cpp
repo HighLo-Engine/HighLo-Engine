@@ -14,6 +14,10 @@
 #undef GetObject
 #define JSON_LOG_PREFIX "JSONWriter>   "
 
+#ifdef HL_DEBUG
+#define JSON_PRINT_DEBUG_OUTPUT 0
+#endif // HL_DEBUG
+
 namespace highlo
 {
 	namespace utils
@@ -604,7 +608,10 @@ namespace highlo
 
 			HLString str = value.GetString();
 			result.push_back(str);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", *str);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -619,7 +626,10 @@ namespace highlo
 
 			int32 v = value.GetInt();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -634,7 +644,10 @@ namespace highlo
 
 			uint32 v = value.GetUint();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -649,7 +662,10 @@ namespace highlo
 
 			int64 v = value.GetInt64();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -664,7 +680,10 @@ namespace highlo
 
 			uint64 v = value.GetUint64();
 			result.push_back(v);
+			
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -679,7 +698,10 @@ namespace highlo
 
 			bool v = value.GetBool();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -694,7 +716,10 @@ namespace highlo
 
 			float v = value.GetFloat();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -709,7 +734,10 @@ namespace highlo
 
 			double v = value.GetDouble();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}", v);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -727,7 +755,10 @@ namespace highlo
 			v.x = arr[0].GetFloat();
 			v.y = arr[1].GetFloat();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}, {1}", v.x, v.y);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -746,7 +777,10 @@ namespace highlo
 			v.y = arr[1].GetFloat();
 			v.z = arr[2].GetFloat();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}, {1}, {2}", v.x, v.y, v.z);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -766,7 +800,10 @@ namespace highlo
 			v.z = arr[2].GetFloat();
 			v.w = arr[3].GetFloat();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}, {1}, {2}, {3}", v.x, v.y, v.z, v.w);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -854,7 +891,7 @@ namespace highlo
 
 	bool JSONWriter::ReadQuatArray(const HLString &key, std::vector<glm::quat> &result)
 	{
-		return ReadArray(key, DocumentDataType::Quat, [&result](rapidjson::Value &value) mutable -> bool
+		return ReadArray(key, DocumentDataType::Quat, [&result, &key](rapidjson::Value &value) mutable -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -866,6 +903,10 @@ namespace highlo
 			v.y = arr[2].GetFloat();
 			v.z = arr[3].GetFloat();
 			result.push_back(v);
+
+		#if JSON_PRINT_DEBUG_OUTPUT
+			HL_CORE_TRACE("{0}={1}, {2}, {3}, {4}", *key, v.w, v.x, v.y, v.z);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -880,7 +921,10 @@ namespace highlo
 
 			HLString value = v.GetString();
 			result.insert({ keyValue, value });
+			
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, *value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -895,7 +939,10 @@ namespace highlo
 
 			int32 value = v.GetInt();
 			result.insert({ keyValue, value });
+			
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -910,13 +957,16 @@ namespace highlo
 
 			uint32 value = v.GetUint();
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
 	}
 
-	bool JSONWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
+	bool JSONWriter::ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
 	{
 		return ReadArrayMap(key, DocumentDataType::Int64, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
@@ -925,13 +975,16 @@ namespace highlo
 
 			int64 value = v.GetInt64();
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
 	}
 
-	bool JSONWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
+	bool JSONWriter::ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
 	{
 		return ReadArrayMap(key, DocumentDataType::UInt64, [&result](HLString &keyValue, rapidjson::Value &v) mutable -> bool
 		{
@@ -940,7 +993,10 @@ namespace highlo
 
 			uint64 value = v.GetUint64();
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -955,7 +1011,10 @@ namespace highlo
 
 			bool value = v.GetBool();
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -970,7 +1029,10 @@ namespace highlo
 
 			float value = v.GetFloat();
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -985,7 +1047,10 @@ namespace highlo
 
 			double value = v.GetDouble();
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}", *keyValue, value);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -1004,7 +1069,10 @@ namespace highlo
 			value.y = values[1].GetFloat();
 
 			result.insert({ keyValue, value });
+			
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}, {2}", *keyValue, value.x, value.y);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -1024,7 +1092,10 @@ namespace highlo
 			value.z = values[2].GetFloat();
 
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}, {2}, {3}", *keyValue, value.x, value.y, value.z);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -1045,7 +1116,10 @@ namespace highlo
 			value.w = values[3].GetFloat();
 
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}, {2}, {3}, {4}", *keyValue, value.x, value.y, value.z, value.w);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
 
 			return true;
 		});
@@ -1146,14 +1220,18 @@ namespace highlo
 			value.z = values[3].GetFloat();
 
 			result.insert({ keyValue, value });
+
+		#if JSON_PRINT_DEBUG_OUTPUT
 			HL_CORE_TRACE("{0}={1}, {2}, {3}, {4}", *keyValue, value.w, value.x, value.y, value.z);
+		#endif // JSON_PRINT_DEBUG_OUTPUT
+
 			return true;
 		});
 	}
 	
 	bool JSONWriter::ReadFloat(const HLString &key, float *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Float, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsFloat())
 				return false;
@@ -1165,7 +1243,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadDouble(const HLString &key, double *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Double, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsDouble())
 				return false;
@@ -1177,7 +1255,7 @@ namespace highlo
 
 	bool JSONWriter::ReadInt32(const HLString &key, int32 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Int32, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsInt())
 				return false;
@@ -1189,7 +1267,7 @@ namespace highlo
 
 	bool JSONWriter::ReadUInt32(const HLString &key, uint32 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::UInt32, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsUint())
 				return false;
@@ -1201,7 +1279,7 @@ namespace highlo
 
 	bool JSONWriter::ReadInt64(const HLString &key, int64 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Int64, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsInt64())
 				return false;
@@ -1213,19 +1291,19 @@ namespace highlo
 	
 	bool JSONWriter::ReadUInt64(const HLString &key, uint64 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::UInt64, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsUint64())
 				return false;
 
-			*result = value.IsUint64();
+			*result = value.GetUint64();
 			return true;
 		});
 	}
 
 	bool JSONWriter::ReadBool(const HLString &key, bool *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Bool, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsBool())
 				return false;
@@ -1237,7 +1315,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadString(const HLString &key, HLString *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::String, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsString())
 				return false;
@@ -1249,7 +1327,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadVector2(const HLString &key, glm::vec2 *result)
 		{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Vec2, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1267,7 +1345,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadVector3(const HLString &key, glm::vec3 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Vec3, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1287,7 +1365,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadVector4(const HLString &key, glm::vec4 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Vec4, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1308,7 +1386,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadMatrix2(const HLString &key, glm::mat2 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Mat2, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1327,7 +1405,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadMatrix3(const HLString &key, glm::mat3 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Mat3, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1352,7 +1430,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadMatrix4(const HLString &key, glm::mat4 *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Mat4, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1385,7 +1463,7 @@ namespace highlo
 	
 	bool JSONWriter::ReadQuaternion(const HLString &key, glm::quat *result)
 	{
-		return Read(key, [result](rapidjson::Value &value) -> bool
+		return Read(key, DocumentDataType::Quat, [result](rapidjson::Value &value) -> bool
 		{
 			if (!value.IsArray())
 				return false;
@@ -1409,7 +1487,7 @@ namespace highlo
 		return m_Document.HasMember(*key);
 	}
 	
-	bool JSONWriter::WriteOut() const
+	bool JSONWriter::WriteOut()
 	{
 		// Write content into file
 		HL_CORE_INFO(JSON_LOG_PREFIX "[+] Writing file {0} [+]", **m_FilePath);
@@ -1450,7 +1528,7 @@ namespace highlo
 		return false;
 	}
 	
-	HLString JSONWriter::GetContent(bool prettify) const
+	HLString JSONWriter::GetContent(bool prettify)
 	{
 		rapidjson::StringBuffer buffer;
 
@@ -1468,6 +1546,11 @@ namespace highlo
 		}
 
 		return buffer.GetString();
+	}
+
+	void JSONWriter::SetContent(const HLString &content)
+	{
+		m_Document.Parse(*content);
 	}
 
 	bool JSONWriter::AddIntoStructure(rapidjson::Value &keyType, rapidjson::Value &valType, DocumentDataType type)
@@ -1520,37 +1603,55 @@ namespace highlo
 		return true;
 	}
 
-	bool JSONWriter::Read(const HLString &key, const std::function<bool(rapidjson::Value&)> &insertFunc)
+	bool JSONWriter::Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc)
 	{
 		if (!m_Document.IsObject())
 			return false;
 
 		auto &obj = m_Document.GetObject();
-		HL_ASSERT(obj.HasMember(*key));
 
-		rapidjson::Value::MemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-			return false;
-
-		/*
-		// Check if the user decided to use a type-safe format
-		if (it->value.IsObject())
+		rapidjson::GenericMemberIterator typeVal = obj.FindMember("type");
+		if (typeVal == obj.MemberEnd())
 		{
-			rapidjson::GenericObject f = it->value.GetObject();
-			if (f.FindMember("type") == f.MemberEnd())
-			{
-				// User decided to go with a type-safe format
+			HL_ASSERT(obj.HasMember(*key));
 
-			}
-			else
-			{
-				// User decided to go with the raw data format
+			rapidjson::Value::MemberIterator it = obj.FindMember(*key);
+			if (it == obj.MemberEnd())
+				return false;
 
-			}
+			if (key == it->name.GetString())
+				return insertFunc(it->value);
+
+			return false;
 		}
-		*/
+		else
+		{
+			// User tries to access a value that is protected by it's type
+			HL_ASSERT(obj.HasMember("type"));
+			HL_ASSERT(obj.HasMember("value"));
 
-		return insertFunc(it->value);
+			HLString currentType = typeVal->value.GetString();
+			HLString realType = utils::DocumentDataTypeToString(type);
+
+			if (currentType != realType)
+			{
+				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Parsing Error: Expected type {0} but got {1} [-]", *realType, *currentType);
+				return false;
+			}
+
+			rapidjson::GenericMemberIterator value = obj.FindMember("value");
+			if (value == obj.MemberEnd())
+				return false;
+
+			rapidjson::GenericMemberIterator valueIterator = value->value.GetObject().begin();
+			if (valueIterator == value->value.MemberEnd())
+				return false;
+
+			if (key == valueIterator->name.GetString())
+				return insertFunc(valueIterator->value);
+
+			return false;
+		}
 	}
 
 	bool JSONWriter::ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc)

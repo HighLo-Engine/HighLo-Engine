@@ -101,8 +101,8 @@ namespace highlo
 		virtual bool ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result) override;
 		virtual bool ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result) override;
 		virtual bool ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result) override;
-		virtual bool Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
-		virtual bool ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
+		virtual bool ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
+		virtual bool ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
 		virtual bool ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result) override;
 		virtual bool ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result) override;
 		virtual bool ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result) override;
@@ -132,9 +132,10 @@ namespace highlo
 		virtual bool ReadQuaternion(const HLString &key, glm::quat *result) override;
 
 		virtual bool HasKey(const HLString &key) const override;
-		virtual bool WriteOut() const override;
+		virtual bool WriteOut() override;
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
-		virtual HLString GetContent(bool prettify = false) const override;
+		virtual HLString GetContent(bool prettify = false) override;
+		virtual void SetContent(const HLString &content) override;
 
 	private:
 
@@ -151,7 +152,7 @@ namespace highlo
 		}
 
 		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidjson::Value()> &insertFunc);
-		bool Read(const HLString &key, const std::function<bool(rapidjson::Value&)> &insertFunc);
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc);
 
 		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc);
 		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString, rapidjson::Value&)> &insertFunc);
@@ -159,12 +160,13 @@ namespace highlo
 		rapidjson::Document m_Document;
 		FileSystemPath m_FilePath;
 
+		bool m_ShouldWriteIntoArray = false;
+		bool m_ShouldWriteIntoObject = false;
+
 		std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferValue; // last current appended member
 		std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferType;	// last current appended member type
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBufferValues; // all values
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBufferTypes; // all value types
-		bool m_ShouldWriteIntoArray = false;
-		bool m_ShouldWriteIntoObject = false;
 	};
 }
 

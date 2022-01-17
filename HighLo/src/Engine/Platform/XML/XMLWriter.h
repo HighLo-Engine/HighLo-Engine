@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Loaders/DocumentWriter.h"
+#include "XMLHelper.h"
 
 #include <rapidxml/rapidxml.hpp>
 
@@ -79,8 +80,8 @@ namespace highlo
 		virtual bool ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result) override;
 		virtual bool ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result) override;
 		virtual bool ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result) override;
-		virtual bool Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
-		virtual bool ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
+		virtual bool ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
+		virtual bool ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
 		virtual bool ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result) override;
 		virtual bool ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result) override;
 		virtual bool ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result) override;
@@ -110,13 +111,31 @@ namespace highlo
 		virtual bool ReadQuaternion(const HLString &key, glm::quat *result) override;
 
 		virtual bool HasKey(const HLString &key) const override;
-		virtual bool WriteOut() const override;
+		virtual bool WriteOut() override;
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
-		virtual HLString GetContent(bool prettify = false) const override;
+		virtual HLString GetContent(bool prettify = false) override;
+		virtual void SetContent(const HLString &content) override;
 
 	private:
 
+		bool HasKeyInternal(rapidxml::xml_node<> *parent, const HLString &key) const;
+
+		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc);
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidxml::xml_node<>*)> &insertFunc);
+
 		FileSystemPath m_FilePath;
+		rapidxml::xml_document<> m_Document;
+		rapidxml::xml_node<> *m_RootNode = nullptr;
+		HLString m_EngineVersion;
+
+		std::vector<rapidxml::xml_node<>*> m_TempBuffers;
+		rapidxml::xml_node<> *m_TempBuffer = nullptr;
+
+		bool m_ShouldWriteIntoArray = false;
+		bool m_ShouldWriteIntoObject = false;
 	};
 }
 

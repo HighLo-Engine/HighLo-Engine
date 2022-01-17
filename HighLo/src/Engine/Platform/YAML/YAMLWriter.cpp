@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "Engine/Assets/Asset.h"
+#include "Engine/Core/FileSystem.h"
 
 namespace YAML
 {
@@ -476,12 +477,12 @@ namespace highlo
 		return false;
 	}
 
-	bool YAMLWriter::Readint64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
+	bool YAMLWriter::ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
 	{
 		return false;
 	}
 
-	bool YAMLWriter::ReadUint64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
+	bool YAMLWriter::ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
 	{
 		return false;
 	}
@@ -576,7 +577,7 @@ namespace highlo
 		return false;
 	}
 
-	bool YAMLWriter::WriteOut() const
+	bool YAMLWriter::WriteOut()
 	{
 		// Write content into file
 		HL_CORE_INFO("[+] Writing file {0} [+]", **m_FilePath);
@@ -599,13 +600,30 @@ namespace highlo
 		if (!filePath.String().IsEmpty())
 			m_FilePath = filePath;
 
-		m_Document = YAML::LoadFile(**m_FilePath);
-		return true;
+		if (FileSystem::Get()->FileExists(m_FilePath))
+		{
+			HLString content = FileSystem::Get()->ReadTextFile(m_FilePath);
+			if (content.IsEmpty())
+				return false;
+
+			m_Document = YAML::Load(*content);
+		}
+		else
+		{
+			HL_CORE_ERROR("[-] Error: File {0} not found! [-]", **m_FilePath);
+		}
+
+		return false;
 	}
 
-	HLString YAMLWriter::GetContent(bool prettify) const
+	HLString YAMLWriter::GetContent(bool prettify)
 	{
 		return m_Emitter.c_str();
+	}
+
+	void YAMLWriter::SetContent(const HLString &content)
+	{
+		m_Document = YAML::Load(*content);
 	}
 }
 

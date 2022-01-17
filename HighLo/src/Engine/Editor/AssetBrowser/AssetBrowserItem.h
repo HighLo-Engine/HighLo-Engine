@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Texture2D.h"
 
 namespace highlo
 {

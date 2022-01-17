@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.4 (2022-01-13) Added LexicalCast function (it can convert any type to any different type)
 //     - 1.3 (2022-01-13) Added String conversion functions
 //     - 1.2 (2021-11-19) Added Compare functions
 //     - 1.1 (2021-09-29) Removed String conversion function because it should be natively now possible with our own String class
@@ -53,6 +54,18 @@ namespace highlo
 			std::wstring_convert<std::codecvt_utf8<int16>, int16> conv;
 			const int16 *p = reinterpret_cast<const int16*>(*str);
 			return conv.to_bytes(p, p + str.Length());
+		}
+
+		template<typename toType, typename fromType>
+		static toType LexicalCast(fromType const &x)
+		{
+			std::stringstream os;
+			toType result;
+
+			os << x;
+			os >> result;
+
+			return result;
 		}
 	}
 }

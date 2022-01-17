@@ -1,7 +1,7 @@
 // Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
-#include "OpenGLTexture.h"
+#include "OpenGLTexture2D.h"
 
 #ifdef HIGHLO_API_OPENGL
 
@@ -13,7 +13,6 @@
 #include "OpenGLUtils.h"
 
 #define TEXTURE2D_LOG_PREFIX "Texture2D>    "
-#define TEXTURE3D_LOG_PREFIX "Texture3D>    "
 
 namespace highlo
 {	
@@ -51,10 +50,10 @@ namespace highlo
 		m_Specification.Usage = TextureUsage::Texture;
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.m_Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -112,10 +111,10 @@ namespace highlo
 		m_DataFormat = GL_RGBA;
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.m_Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -205,10 +204,10 @@ namespace highlo
 		m_DataFormat = GL_RGBA;
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.m_Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -234,10 +233,10 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.m_Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -262,10 +261,10 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.m_Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -279,7 +278,7 @@ namespace highlo
 	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height)
 	{
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
-		m_Buffer.Allocate(width * height * 4);
+		m_Buffer.Allocate(width * height * 4); // * 4 channels (RGBA)
 		m_DataFormat = GL_RGBA;
 
 		m_Specification.Width = width;
@@ -291,7 +290,7 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		auto openglFormat = utils::OpenGLTextureFormat(m_Specification.Format);
@@ -338,12 +337,12 @@ namespace highlo
 		GLenum glType = utils::OpenGLFormatDataType(m_Specification.Format);
 		uint32 mipCount = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glTexStorage2D(RendererID, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
 
 		if (m_Buffer)
 		{
-			glTextureSubImage2D(RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, glFormat, glType, m_Buffer.m_Data);
+			glTextureSubImage2D(RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, glFormat, glType, m_Buffer.Data);
 			glGenerateTextureMipmap(RendererID);
 			m_Loaded = true;
 		}
@@ -357,7 +356,7 @@ namespace highlo
 	void OpenGLTexture2D::Unlock()
 	{
 		m_Locked = false;
-		glTextureSubImage2D(GetRendererID(), 0, 0, 0, m_Specification.Width, m_Specification.Height, utils::OpenGLTextureFormat(m_Specification.Format), GL_UNSIGNED_BYTE, m_Buffer.m_Data);
+		glTextureSubImage2D(GetRendererID(), 0, 0, 0, m_Specification.Width, m_Specification.Height, utils::OpenGLTextureFormat(m_Specification.Format), GL_UNSIGNED_BYTE, m_Buffer.Data);
 	}
 
 	void OpenGLTexture2D::CreatePerLayerImageViews()
@@ -367,7 +366,7 @@ namespace highlo
 
 	void OpenGLTexture2D::CreateSampler(TextureProperties properties)
 	{
-		glCreateSamplers(1, &m_SamplerRendererID);
+		glGenSamplers(1, &m_SamplerRendererID);
 
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, properties.GenerateMips));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));
@@ -378,7 +377,7 @@ namespace highlo
 	
 	void OpenGLTexture2D::UpdateResourceData()
 	{
-		UpdateResourceData(m_Buffer.m_Data);
+		UpdateResourceData(m_Buffer.Data);
 	}
 	
 	void OpenGLTexture2D::UpdateResourceData(void *data)
@@ -393,24 +392,24 @@ namespace highlo
 
 		if (m_Specification.Format == TextureFormat::RGBA8)
 		{
-			((Byte*)m_Buffer.m_Data)[idx]	  = (Byte)rgba.r;
-			((Byte*)m_Buffer.m_Data)[idx + 1] = (Byte)rgba.g;
-			((Byte*)m_Buffer.m_Data)[idx + 2] = (Byte)rgba.b;
-			((Byte*)m_Buffer.m_Data)[idx + 3] = (Byte)rgba.a;
+			((Byte*)m_Buffer.Data)[idx]	  = (Byte)rgba.r;
+			((Byte*)m_Buffer.Data)[idx + 1] = (Byte)rgba.g;
+			((Byte*)m_Buffer.Data)[idx + 2] = (Byte)rgba.b;
+			((Byte*)m_Buffer.Data)[idx + 3] = (Byte)rgba.a;
 		}
 		else if (m_Specification.Format == TextureFormat::RGBA16)
 		{
-			((uint16*)m_Buffer.m_Data)[idx]		= (uint16)rgba.r;
-			((uint16*)m_Buffer.m_Data)[idx + 1] = (uint16)rgba.g;
-			((uint16*)m_Buffer.m_Data)[idx + 2] = (uint16)rgba.b;
-			((uint16*)m_Buffer.m_Data)[idx + 3] = (uint16)rgba.a;
+			((uint16*)m_Buffer.Data)[idx]		= (uint16)rgba.r;
+			((uint16*)m_Buffer.Data)[idx + 1] = (uint16)rgba.g;
+			((uint16*)m_Buffer.Data)[idx + 2] = (uint16)rgba.b;
+			((uint16*)m_Buffer.Data)[idx + 3] = (uint16)rgba.a;
 		}
 		else if (m_Specification.Format == TextureFormat::RGBA32)
 		{
-			((uint32*)m_Buffer.m_Data)[idx] = (uint32)rgba.r;
-			((uint32*)m_Buffer.m_Data)[idx + 1] = (uint32)rgba.g;
-			((uint32*)m_Buffer.m_Data)[idx + 2] = (uint32)rgba.b;
-			((uint32*)m_Buffer.m_Data)[idx + 3] = (uint32)rgba.a;
+			((uint32*)m_Buffer.Data)[idx] = (uint32)rgba.r;
+			((uint32*)m_Buffer.Data)[idx + 1] = (uint32)rgba.g;
+			((uint32*)m_Buffer.Data)[idx + 2] = (uint32)rgba.b;
+			((uint32*)m_Buffer.Data)[idx + 3] = (uint32)rgba.a;
 		}
 	}
 	
@@ -423,24 +422,24 @@ namespace highlo
 
 		if (m_Specification.Format == TextureFormat::RGBA8)
 		{
-			rgba.r = (uint32)(((Byte*)m_Buffer.m_Data)[idx]);
-			rgba.g = (uint32)(((Byte*)m_Buffer.m_Data)[idx + 1]);
-			rgba.b = (uint32)(((Byte*)m_Buffer.m_Data)[idx + 2]);
-			rgba.a = (uint32)(((Byte*)m_Buffer.m_Data)[idx + 3]);
+			rgba.r = (uint32)(((Byte*)m_Buffer.Data)[idx]);
+			rgba.g = (uint32)(((Byte*)m_Buffer.Data)[idx + 1]);
+			rgba.b = (uint32)(((Byte*)m_Buffer.Data)[idx + 2]);
+			rgba.a = (uint32)(((Byte*)m_Buffer.Data)[idx + 3]);
 		}
 		else if (m_Specification.Format == TextureFormat::RGBA16)
 		{
-			rgba.r = (uint32)(((uint16*)m_Buffer.m_Data)[idx]);
-			rgba.g = (uint32)(((uint16*)m_Buffer.m_Data)[idx + 1]);
-			rgba.b = (uint32)(((uint16*)m_Buffer.m_Data)[idx + 2]);
-			rgba.a = (uint32)(((uint16*)m_Buffer.m_Data)[idx + 3]);
+			rgba.r = (uint32)(((uint16*)m_Buffer.Data)[idx]);
+			rgba.g = (uint32)(((uint16*)m_Buffer.Data)[idx + 1]);
+			rgba.b = (uint32)(((uint16*)m_Buffer.Data)[idx + 2]);
+			rgba.a = (uint32)(((uint16*)m_Buffer.Data)[idx + 3]);
 		}
 		else if (m_Specification.Format == TextureFormat::RGBA32)
 		{
-			rgba.r = (uint32)(((uint32*)m_Buffer.m_Data)[idx]);
-			rgba.g = (uint32)(((uint32*)m_Buffer.m_Data)[idx + 1]);
-			rgba.b = (uint32)(((uint32*)m_Buffer.m_Data)[idx + 2]);
-			rgba.a = (uint32)(((uint32*)m_Buffer.m_Data)[idx + 3]);
+			rgba.r = (uint32)(((uint32*)m_Buffer.Data)[idx]);
+			rgba.g = (uint32)(((uint32*)m_Buffer.Data)[idx + 1]);
+			rgba.b = (uint32)(((uint32*)m_Buffer.Data)[idx + 2]);
+			rgba.a = (uint32)(((uint32*)m_Buffer.Data)[idx + 3]);
 		}
 
 		return rgba;
@@ -460,159 +459,7 @@ namespace highlo
 	{
 		glBindTextureUnit(slot, 0);
 	}
-
-	// ====================================================================================================================
-	//												3D Texture
-	// ====================================================================================================================
-
-	OpenGLTexture3D::OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad)
-	{
-		m_Specification.Format = TextureFormat::RGBA;
-
-		glGenTextures(1, &RendererID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
-
-		stbi_set_flip_vertically_on_load(flipOnLoad);
-
-		int32 width, height, nrComponents;
-		Byte *data = (Byte*)stbi_loadf(*filePath.String(), &width, &height, &nrComponents, 0);
-
-		if (data)
-		{
-			m_Buffer = Allocator::Copy(data, width * height * 4 * sizeof(float));
-			m_Loaded = true;
-			stbi_image_free(data);
-		}
-		else
-		{
-			HL_CORE_ERROR("{0}[-] Failed to load Texture3D: {1} [-]", TEXTURE3D_LOG_PREFIX, *filePath.String());
-			stbi_image_free(data);
-		}
-
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-	}
-
-	OpenGLTexture3D::OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data)
-	{
-		m_Specification.Width = width;
-		m_Specification.Height = height;
-		m_Specification.Format = format;
-		m_Loaded = true;
-
-		if (data)
-			m_Buffer = Allocator::Copy(data, width * height * 4 * 6); // Six Layers
-
-		uint32 levels = utils::CalculateMipCount(width, height);
-		
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &RendererID);
-		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
-
-		if (m_Buffer.m_Data)
-			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.m_Data);
-
-		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, levels > 1));
-		glTextureParameteri(RendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-	}
-
-	OpenGLTexture3D::~OpenGLTexture3D()
-	{
-		Release();
-	}
-
-	Allocator OpenGLTexture3D::GetData()
-	{
-		HL_ASSERT(m_Locked, "Texture must be locked!");
-		return m_Buffer;
-	}
-
-	void OpenGLTexture3D::Release()
-	{
-		if (RendererID)
-		{
-			glDeleteTextures(1, &RendererID);
-			RendererID = 0;
-			m_Loaded = false;
-		}
-	}
-
-	void OpenGLTexture3D::Invalidate()
-	{
-		Release();
-
-		uint32 levels = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
-
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &RendererID);
-		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
-
-		if (m_Buffer.m_Data)
-		{
-			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.m_Data);
-			m_Loaded = true;
-		}
-
-		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, levels > 1));
-		glTextureParameteri(RendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
-	}
-
-	void OpenGLTexture3D::Lock()
-	{
-		m_Locked = true;
-	}
-
-	void OpenGLTexture3D::Unlock()
-	{
-		m_Locked = false;
-		glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.m_Data);
-	}
-
-	void OpenGLTexture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
-	{
-		// TODO: Implement
-		HL_ASSERT(false, "Not implemented yet");
-	}
-
-	glm::ivec4 OpenGLTexture3D::ReadPixel(uint32 row, uint32 column)
-	{
-		// TODO: Implement
-		HL_ASSERT(false, "Not implemented yet");
-		return {};
-	}
-
-	void OpenGLTexture3D::UpdateResourceData(void *data)
-	{
-		// TODO: Implement
-		HL_ASSERT(false, "Not implemented yet");
-	}
-
-	void OpenGLTexture3D::UpdateResourceData()
-	{
-		UpdateResourceData(m_Buffer.m_Data);
-	}
-
-	uint32 OpenGLTexture3D::GetMipLevelCount()
-	{
-		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
-	}
-
-	void OpenGLTexture3D::Bind(uint32 slot) const
-	{
-		glBindTextureUnit(slot, RendererID);
-	}
-	
-	void OpenGLTexture3D::Unbind(uint32 slot) const
-	{
-		glBindTextureUnit(slot, 0);
-	}
 }
 
-#endif
+#endif // HIGHLO_API_OPENGL
+

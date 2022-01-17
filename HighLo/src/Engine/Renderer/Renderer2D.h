@@ -15,6 +15,8 @@
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 #include "Texture.h"
 #include "RenderPass.h"
+#include "Engine/Camera/Camera.h"
+#include "Engine/Camera/EditorCamera.h"
 #include "FontManager.h"
 
 // Windows macro
@@ -38,7 +40,8 @@ namespace highlo
 		HLAPI static void Init();
 		HLAPI static void Shutdown();
 
-		HLAPI static void BeginScene(const glm::mat4 &proj, bool depthTest = true);
+		HLAPI static void BeginScene(const Camera &camera, bool depthTest = true);
+		HLAPI static void BeginScene(const EditorCamera &camera, bool depthTest = true);
 		HLAPI static void EndScene();
 		HLAPI static void Flush();
 

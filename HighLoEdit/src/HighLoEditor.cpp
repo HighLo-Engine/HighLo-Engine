@@ -159,6 +159,8 @@ void HighLoEditor::OnUpdate(Timestep ts)
 {
 	UpdateUIFlags();
 
+	m_ViewportRenderer->ClearPixelBuffer(TextureFormat::RED_INTEGER, -1);
+
 	switch (m_SceneState)
 	{
 		case SceneState::Edit:
@@ -212,6 +214,21 @@ void HighLoEditor::OnUpdate(Timestep ts)
 	}
 
 	AssetEditorPanel::OnUpdate(ts);
+
+	// Get current mouse positon and mouse pick on the viewport to detect if the user clicked on one of the rendererd objects
+	auto [mx, my] = ImGui::GetMousePos();
+	mx -= m_ViewportBounds[0].x;
+	my -= m_ViewportBounds[0].y;
+	
+	glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+	my = viewportSize.y - my;
+
+	int32 mouseX = (int32)mx;
+	int32 mouseY = (int32)my;
+	if (mouseX >= 0 && mouseY >= 0 && mouseX < (int32)viewportSize.x && mouseY < (int32)viewportSize.y)
+	{
+	//	HL_CORE_ERROR("TEST: PIXEL SELECTED: {0}", m_ViewportRenderer->GetPixel(TextureFormat::RED_INTEGER, mouseX, mouseY));
+	}
 }
 
 void HighLoEditor::UpdateUIFlags()
@@ -265,6 +282,12 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	m_ViewportPanelMouseOver = ImGui::IsWindowHovered();
 	m_ViewportPanelFocused = ImGui::IsWindowFocused();
+	auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+	auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+	auto viewportOffset = ImGui::GetWindowPos();
+
+	m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+	m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 	if (ImGui::BeginPopupContextWindow("#viewportRightClick", ImGuiMouseButton_Right, false))
 	{
@@ -279,7 +302,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 		ImGui::EndPopup();
 	}
 
-	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	if (viewportSize.x < 0.0f)
 		viewportSize.x = (float)GetWindow().GetWidth();
@@ -355,7 +377,12 @@ void HighLoEditor::SelectEntity(Entity entity)
 
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 {
-	HLString title = sceneName + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI();
+	HLString mode = "Debug";
+#ifdef HL_RELEASE
+	mode = "Release";
+#endif // HL_RELEASE
+
+	HLString title = sceneName + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI() + " (" + mode + ")";
 	GetWindow().SetTitle(title);
 }
 

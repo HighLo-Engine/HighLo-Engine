@@ -4,7 +4,8 @@
 #ifdef HIGHLO_API_OPENGL
 
 #include "OpenGLShader.h"
-#include "OpenGLTexture.h"
+#include "OpenGLTexture2D.h"
+#include "OpenGLTexture3D.h"
 
 namespace highlo
 {

@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2022-01-17) splitted OpenGL Texture implementation into its own file
 //     - 1.2 (2021-09-21) Added Create method that also contains the pixel data
 //     - 1.1 (2021-09-15) Changed Name implementation
 //     - 1.0 (2021-09-14) initial release
@@ -9,7 +10,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Texture2D.h"
 #include "Engine/Core/Allocator.h"
 
 #ifdef HIGHLO_API_OPENGL
@@ -68,47 +69,7 @@ namespace highlo
 		bool m_Locked = false;
 		bool m_Loaded = false;
 	};
-
-	class OpenGLTexture3D : public Texture3D
-	{
-	public:
-
-		OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad = false);
-		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
-		virtual ~OpenGLTexture3D();
-
-		virtual uint32 GetWidth() const override { return m_Specification.Width; }
-		virtual uint32 GetHeight() const override { return m_Specification.Height; }
-		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
-		virtual Allocator GetData() override;
-
-		virtual void Release() override;
-		virtual void Invalidate() override;
-		virtual bool IsLoaded() const override { return m_Loaded; }
-
-		virtual void Lock() override;
-		virtual void Unlock() override;
-
-		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
-		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
-		virtual void UpdateResourceData(void *data) override;
-		virtual void UpdateResourceData() override;
-		virtual uint32 GetMipLevelCount() override;
-
-		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
-		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
-
-		virtual void Bind(uint32 slot) const override;
-		virtual void Unbind(uint32 slot) const override;
-
-	private:
-
-		Allocator m_Buffer;
-		TextureSpecification m_Specification;
-		bool m_Locked = false;
-		bool m_Loaded = false;
-	};
 }
 
-#endif
+#endif // HIGHLO_API_OPENGL
 

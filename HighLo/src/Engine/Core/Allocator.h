@@ -14,14 +14,14 @@ namespace highlo
 {
 	struct Allocator
 	{
-		Byte *m_Data;
-		uint32 m_Size;
+		Byte *Data;
+		uint32 Size;
 
 		HLAPI Allocator();
 		HLAPI Allocator(Byte *data, uint32 size);
 
 		HLAPI static Allocator Copy(const void *data, uint32 size);
-		HLAPI static void *Allocate(uint64 size, uint64 alignment = 16);
+		HLAPI static void *AllocateAligned(uint64 size, uint64 alignment = 16);
 		HLAPI static void Free(void *memory);
 
 		HLAPI void Allocate(uint32 size);
@@ -37,14 +37,14 @@ namespace highlo
 		template<typename T>
 		HLAPI FORCEINLINE T &Read(uint32 offset = 0)
 		{
-			HL_ASSERT(offset < m_Size);
-			return *(T*)(m_Data + offset);
+			HL_ASSERT(offset < Size);
+			return *(T*)(Data + offset);
 		}
 
 		template<typename T>
 		HLAPI FORCEINLINE T *As()
 		{
-			return (T*)m_Data;
+			return (T*)Data;
 		}
 	};
 }

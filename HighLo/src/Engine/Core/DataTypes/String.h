@@ -1014,7 +1014,7 @@ namespace highlo
 		{
 			std::stringstream ss;
 			ss << value;
-			return HLStringBase(ss.str());
+			return HLStringBase(ss.str().c_str());
 		}
 
 		template<typename T>

@@ -17,6 +17,10 @@
 #include "tests/FileSystemPathTests.h"
 #include "tests/JSONWriteParserTests.h"
 #include "tests/JSONReadParserTests.h"
+#include "tests/XMLReadParserTests.h"
+#include "tests/XMLWriteParserTests.h"
+#include "tests/YAMLReadParserTests.h"
+#include "tests/YAMLWriteParserTests.h"
 
 int main(int argc, char *argv[])
 {

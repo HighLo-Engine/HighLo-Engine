@@ -50,7 +50,7 @@ namespace highlo
 		m_Specification.Usage = TextureUsage::Texture;
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
@@ -111,7 +111,7 @@ namespace highlo
 		m_DataFormat = GL_RGBA;
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
@@ -204,7 +204,7 @@ namespace highlo
 		m_DataFormat = GL_RGBA;
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
@@ -233,7 +233,7 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
@@ -261,7 +261,7 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
@@ -290,7 +290,7 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
 		auto openglFormat = utils::OpenGLTextureFormat(m_Specification.Format);
@@ -337,7 +337,7 @@ namespace highlo
 		GLenum glType = utils::OpenGLFormatDataType(m_Specification.Format);
 		uint32 mipCount = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glTexStorage2D(RendererID, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
 
 		if (m_Buffer)
@@ -366,7 +366,7 @@ namespace highlo
 
 	void OpenGLTexture2D::CreateSampler(TextureProperties properties)
 	{
-		glCreateSamplers(1, &m_SamplerRendererID);
+		glGenSamplers(1, &m_SamplerRendererID);
 
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, properties.GenerateMips));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));

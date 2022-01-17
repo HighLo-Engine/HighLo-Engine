@@ -59,7 +59,7 @@ namespace highlo
 
 		uint32 levels = utils::CalculateMipCount(width, height);
 
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
 
 		if (m_Buffer.Data)
@@ -99,7 +99,7 @@ namespace highlo
 
 		uint32 levels = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &RendererID);
+		glGenTextures(1, &RendererID);
 		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
 
 		if (m_Buffer.Data)

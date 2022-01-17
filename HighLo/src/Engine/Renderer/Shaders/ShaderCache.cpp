@@ -59,8 +59,9 @@ namespace highlo
 	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
 	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
-		bool success = reader->ReadContents();
-		success = reader->ReadUInt64ArrayMap("", shaderCache);
+		bool readSuccess = reader->ReadContents();
+		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
+
 	}
 }
 

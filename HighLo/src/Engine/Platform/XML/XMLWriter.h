@@ -118,11 +118,13 @@ namespace highlo
 
 	private:
 
+		bool HasKeyInternal(rapidxml::xml_node<> *parent, const HLString &key) const;
+
 		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<>*()> &insertFunc);
-		bool Read(const HLString &key, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
 
 		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
-		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString, rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidxml::xml_node<>*)> &insertFunc);
 
 		FileSystemPath m_FilePath;
 		rapidxml::xml_document<> m_Document;

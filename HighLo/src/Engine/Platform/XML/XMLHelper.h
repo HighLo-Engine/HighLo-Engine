@@ -35,7 +35,7 @@ namespace highlo::utils
 		rapidxml::xml_node<> *val1 = doc.allocate_node(rapidxml::node_element, "x", x);
 		rapidxml::xml_node<> *val2 = doc.allocate_node(rapidxml::node_element, "y", y);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vector2");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vec2");
 		node->append_node(val1);
 		node->append_node(val2);
 		return node;
@@ -55,7 +55,7 @@ namespace highlo::utils
 		rapidxml::xml_node<> *valueY = doc.allocate_node(rapidxml::node_element, "y", y);
 		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_element, "z", z);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vector3");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vec3");
 		node->append_node(valueX);
 		node->append_node(valueY);
 		node->append_node(valueZ);
@@ -79,7 +79,7 @@ namespace highlo::utils
 		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_element, "z", z);
 		rapidxml::xml_node<> *valueW = doc.allocate_node(rapidxml::node_element, "w", w);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vector4");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "vec4");
 		node->append_node(valueX);
 		node->append_node(valueY);
 		node->append_node(valueZ);
@@ -104,11 +104,11 @@ namespace highlo::utils
 		rapidxml::xml_node<> *valueZ = doc.allocate_node(rapidxml::node_element, "z", z);
 		rapidxml::xml_node<> *valueW = doc.allocate_node(rapidxml::node_element, "w", w);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "quaternion");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "quat");
+		node->append_node(valueW);
 		node->append_node(valueX);
 		node->append_node(valueY);
 		node->append_node(valueZ);
-		node->append_node(valueW);
 		return node;
 	}
 
@@ -129,7 +129,7 @@ namespace highlo::utils
 		rapidxml::xml_node<> *valueM10 = doc.allocate_node(rapidxml::node_element, "m10", m10);
 		rapidxml::xml_node<> *valueM11 = doc.allocate_node(rapidxml::node_element, "m11", m11);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "matrix2");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "mat2");
 		node->append_node(valueM00);
 		node->append_node(valueM01);
 		node->append_node(valueM10);
@@ -171,7 +171,7 @@ namespace highlo::utils
 		rapidxml::xml_node<> *valueM21 = doc.allocate_node(rapidxml::node_element, "m21", m21);
 		rapidxml::xml_node<> *valueM22 = doc.allocate_node(rapidxml::node_element, "m22", m22);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "matrix3");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "mat3");
 		node->append_node(valueM00);
 		node->append_node(valueM01);
 		node->append_node(valueM02);
@@ -246,7 +246,7 @@ namespace highlo::utils
 		rapidxml::xml_node<> *valueM32 = doc.allocate_node(rapidxml::node_element, "m32", m32);
 		rapidxml::xml_node<> *valueM33 = doc.allocate_node(rapidxml::node_element, "m33", m33);
 
-		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "matrix4");
+		rapidxml::xml_node<> *node = doc.allocate_node(rapidxml::node_element, "mat4");
 		node->append_node(valueM00);
 		node->append_node(valueM01);
 		node->append_node(valueM02);
@@ -268,18 +268,27 @@ namespace highlo::utils
 
 	static bool XmlNodeToVec2(const rapidxml::xml_node<> *node, glm::vec2 *outVector)
 	{
-		if (strcmp(node->name(), "vector2") != 0)
+		if (strcmp(node->name(), "vec2") != 0)
+		{
+			HL_CORE_ERROR("Error: wrong input node! expected input node to be named vec2, but got {0}", node->name());
 			return false;
+		}
 
 		if (!outVector)
+		{
+			HL_CORE_ERROR("Error: Result pointer is nullptr!");
 			return false;
+		}
 
 		rapidxml::xml_node<> *xNode = node->first_node();
-		rapidxml::xml_node<> *yNode = node->next_sibling();
+		rapidxml::xml_node<> *yNode = xNode->next_sibling();
 
 		if ((strcmp(xNode->name(), "x") != 0)
 		 || (strcmp(yNode->name(), "y") != 0))
+		{
+			HL_CORE_ERROR("Error: Children nodes are not named x and y!");
 			return false;
+		}
 
 		float x = utils::LexicalCast<float, char*>(xNode->value());
 		float y = utils::LexicalCast<float, char*>(yNode->value());
@@ -289,15 +298,15 @@ namespace highlo::utils
 
 	static bool XmlNodeToVec3(const rapidxml::xml_node<> *node, glm::vec3 *outVector)
 	{
-		if (strcmp(node->name(), "vector3") != 0)
+		if (strcmp(node->name(), "vec3") != 0)
 			return false;
 
 		if (!outVector)
 			return false;
 
 		rapidxml::xml_node<> *xNode = node->first_node();
-		rapidxml::xml_node<> *yNode = node->next_sibling();
-		rapidxml::xml_node<> *zNode = node->next_sibling();
+		rapidxml::xml_node<> *yNode = xNode->next_sibling();
+		rapidxml::xml_node<> *zNode = yNode->next_sibling();
 
 		if ((strcmp(xNode->name(), "x") != 0)
 		 || (strcmp(yNode->name(), "y") != 0)
@@ -313,16 +322,16 @@ namespace highlo::utils
 
 	static bool XmlNodeToVec4(const rapidxml::xml_node<> *node, glm::vec4 *outVector)
 	{
-		if (strcmp(node->name(), "vector4") != 0)
+		if (strcmp(node->name(), "vec4") != 0)
 			return false;
 
 		if (!outVector)
 			return false;
 
 		rapidxml::xml_node<> *xNode = node->first_node();
-		rapidxml::xml_node<> *yNode = node->next_sibling();
-		rapidxml::xml_node<> *zNode = node->next_sibling();
-		rapidxml::xml_node<> *wNode = node->next_sibling();
+		rapidxml::xml_node<> *yNode = xNode->next_sibling();
+		rapidxml::xml_node<> *zNode = yNode->next_sibling();
+		rapidxml::xml_node<> *wNode = zNode->next_sibling();
 
 		if ((strcmp(xNode->name(), "x") != 0)
 		 || (strcmp(yNode->name(), "y") != 0)
@@ -340,16 +349,16 @@ namespace highlo::utils
 
 	static bool XmlNodeToQuat(const rapidxml::xml_node<> *node, glm::quat *outQuat)
 	{
-		if (strcmp(node->name(), "quaternion") != 0)
+		if (strcmp(node->name(), "quat") != 0)
 			return false;
 
 		if (!outQuat)
 			return false;
 
-		rapidxml::xml_node<> *xNode = node->first_node();
-		rapidxml::xml_node<> *yNode = node->next_sibling();
-		rapidxml::xml_node<> *zNode = node->next_sibling();
-		rapidxml::xml_node<> *wNode = node->next_sibling();
+		rapidxml::xml_node<> *wNode = node->first_node();
+		rapidxml::xml_node<> *xNode = wNode->next_sibling();
+		rapidxml::xml_node<> *yNode = xNode->next_sibling();
+		rapidxml::xml_node<> *zNode = yNode->next_sibling();
 
 		if ((strcmp(xNode->name(), "x") != 0)
 		 || (strcmp(yNode->name(), "y") != 0)
@@ -367,16 +376,16 @@ namespace highlo::utils
 
 	static bool XmlNodeToMat2(const rapidxml::xml_node<> *node, glm::mat2 *outMat)
 	{
-		if (strcmp(node->name(), "matrix2") != 0)
+		if (strcmp(node->name(), "mat2") != 0)
 			return false;
 
 		if (!outMat)
 			return false;
 
 		rapidxml::xml_node<> *m00Node = node->first_node();
-		rapidxml::xml_node<> *m01Node = node->next_sibling();
-		rapidxml::xml_node<> *m10Node = node->next_sibling();
-		rapidxml::xml_node<> *m11Node = node->next_sibling();
+		rapidxml::xml_node<> *m01Node = m00Node->next_sibling();
+		rapidxml::xml_node<> *m10Node = m01Node->next_sibling();
+		rapidxml::xml_node<> *m11Node = m10Node->next_sibling();
 
 		if ((strcmp(m00Node->name(), "m00") != 0)
 		 || (strcmp(m01Node->name(), "m01") != 0)
@@ -400,21 +409,21 @@ namespace highlo::utils
 
 	static bool XmlNodeToMat3(const rapidxml::xml_node<> *node, glm::mat3 *outMat)
 	{
-		if (strcmp(node->name(), "matrix3") != 0)
+		if (strcmp(node->name(), "mat3") != 0)
 			return false;
 
 		if (!outMat)
 			return false;
 
 		rapidxml::xml_node<> *m00Node = node->first_node();
-		rapidxml::xml_node<> *m01Node = node->next_sibling();
-		rapidxml::xml_node<> *m02Node = node->next_sibling();
-		rapidxml::xml_node<> *m10Node = node->next_sibling();
-		rapidxml::xml_node<> *m11Node = node->next_sibling();
-		rapidxml::xml_node<> *m12Node = node->next_sibling();
-		rapidxml::xml_node<> *m20Node = node->next_sibling();
-		rapidxml::xml_node<> *m21Node = node->next_sibling();
-		rapidxml::xml_node<> *m22Node = node->next_sibling();
+		rapidxml::xml_node<> *m01Node = m00Node->next_sibling();
+		rapidxml::xml_node<> *m02Node = m01Node->next_sibling();
+		rapidxml::xml_node<> *m10Node = m02Node->next_sibling();
+		rapidxml::xml_node<> *m11Node = m10Node->next_sibling();
+		rapidxml::xml_node<> *m12Node = m11Node->next_sibling();
+		rapidxml::xml_node<> *m20Node = m12Node->next_sibling();
+		rapidxml::xml_node<> *m21Node = m20Node->next_sibling();
+		rapidxml::xml_node<> *m22Node = m21Node->next_sibling();
 
 		if ((strcmp(m00Node->name(), "m00") != 0)
 		 || (strcmp(m01Node->name(), "m01") != 0)
@@ -453,28 +462,28 @@ namespace highlo::utils
 
 	static bool XmlNodeToMat4(const rapidxml::xml_node<> *node, glm::mat4 *outMat)
 	{
-		if (strcmp(node->name(), "matrix4") != 0)
+		if (strcmp(node->name(), "mat4") != 0)
 			return false;
 
 		if (!outMat)
 			return false;
 
 		rapidxml::xml_node<> *m00Node = node->first_node();
-		rapidxml::xml_node<> *m01Node = node->next_sibling();
-		rapidxml::xml_node<> *m02Node = node->next_sibling();
-		rapidxml::xml_node<> *m03Node = node->next_sibling();
-		rapidxml::xml_node<> *m10Node = node->next_sibling();
-		rapidxml::xml_node<> *m11Node = node->next_sibling();
-		rapidxml::xml_node<> *m12Node = node->next_sibling();
-		rapidxml::xml_node<> *m13Node = node->next_sibling();
-		rapidxml::xml_node<> *m20Node = node->next_sibling();
-		rapidxml::xml_node<> *m21Node = node->next_sibling();
-		rapidxml::xml_node<> *m22Node = node->next_sibling();
-		rapidxml::xml_node<> *m23Node = node->next_sibling();
-		rapidxml::xml_node<> *m30Node = node->next_sibling();
-		rapidxml::xml_node<> *m31Node = node->next_sibling();
-		rapidxml::xml_node<> *m32Node = node->next_sibling();
-		rapidxml::xml_node<> *m33Node = node->next_sibling();
+		rapidxml::xml_node<> *m01Node = m00Node->next_sibling();
+		rapidxml::xml_node<> *m02Node = m01Node->next_sibling();
+		rapidxml::xml_node<> *m03Node = m02Node->next_sibling();
+		rapidxml::xml_node<> *m10Node = m03Node->next_sibling();
+		rapidxml::xml_node<> *m11Node = m10Node->next_sibling();
+		rapidxml::xml_node<> *m12Node = m11Node->next_sibling();
+		rapidxml::xml_node<> *m13Node = m12Node->next_sibling();
+		rapidxml::xml_node<> *m20Node = m13Node->next_sibling();
+		rapidxml::xml_node<> *m21Node = m20Node->next_sibling();
+		rapidxml::xml_node<> *m22Node = m21Node->next_sibling();
+		rapidxml::xml_node<> *m23Node = m22Node->next_sibling();
+		rapidxml::xml_node<> *m30Node = m23Node->next_sibling();
+		rapidxml::xml_node<> *m31Node = m30Node->next_sibling();
+		rapidxml::xml_node<> *m32Node = m31Node->next_sibling();
+		rapidxml::xml_node<> *m33Node = m32Node->next_sibling();
 
 		if ((strcmp(m00Node->name(), "m00") != 0)
 		 || (strcmp(m01Node->name(), "m01") != 0)

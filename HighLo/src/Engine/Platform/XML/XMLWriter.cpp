@@ -26,6 +26,10 @@ namespace highlo
 			rapidxml::xml_attribute<> *attribute = m_Document.allocate_attribute("version", versionStr);
 			m_RootNode->append_attribute(attribute);
 		}
+		else
+		{
+			m_EngineVersion = "1.0.0";
+		}
 	}
 
 	XMLWriter::~XMLWriter()
@@ -919,7 +923,7 @@ namespace highlo
 
 	bool XMLWriter::ReadFloat(const HLString &key, float *result)
 	{
-		return Read(key, DocumentDataType::Float, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Float, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -932,7 +936,7 @@ namespace highlo
 
 	bool XMLWriter::ReadDouble(const HLString &key, double *result)
 	{
-		return Read(key, DocumentDataType::Double, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Double, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -945,7 +949,7 @@ namespace highlo
 
 	bool XMLWriter::ReadInt32(const HLString &key, int32 *result)
 	{
-		return Read(key, DocumentDataType::Int32, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Int32, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -958,7 +962,7 @@ namespace highlo
 
 	bool XMLWriter::ReadUInt32(const HLString &key, uint32 *result)
 	{
-		return Read(key, DocumentDataType::UInt32, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::UInt32, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -971,7 +975,7 @@ namespace highlo
 
 	bool XMLWriter::ReadInt64(const HLString &key, int64 *result)
 	{
-		return Read(key, DocumentDataType::Int64, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Int64, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -984,7 +988,7 @@ namespace highlo
 
 	bool XMLWriter::ReadUInt64(const HLString &key, uint64 *result)
 	{
-		return Read(key, DocumentDataType::UInt64, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::UInt64, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -997,7 +1001,7 @@ namespace highlo
 
 	bool XMLWriter::ReadBool(const HLString &key, bool *result)
 	{
-		return Read(key, DocumentDataType::Bool, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Bool, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1010,7 +1014,7 @@ namespace highlo
 
 	bool XMLWriter::ReadString(const HLString &key, HLString *result)
 	{
-		return Read(key, DocumentDataType::String, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::String, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1023,7 +1027,7 @@ namespace highlo
 
 	bool XMLWriter::ReadVector2(const HLString &key, glm::vec2 *result)
 	{
-		return Read(key, DocumentDataType::Vec2, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Vec2, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1042,7 +1046,7 @@ namespace highlo
 
 	bool XMLWriter::ReadVector3(const HLString &key, glm::vec3 *result)
 	{
-		return Read(key, DocumentDataType::Vec3, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Vec3, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1061,7 +1065,7 @@ namespace highlo
 
 	bool XMLWriter::ReadVector4(const HLString &key, glm::vec4 *result)
 	{
-		return Read(key, DocumentDataType::Vec4, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Vec4, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1080,7 +1084,7 @@ namespace highlo
 
 	bool XMLWriter::ReadMatrix2(const HLString &key, glm::mat2 *result)
 	{
-		return Read(key, DocumentDataType::Mat2, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Mat2, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1099,7 +1103,7 @@ namespace highlo
 
 	bool XMLWriter::ReadMatrix3(const HLString &key, glm::mat3 *result)
 	{
-		return Read(key, DocumentDataType::Mat3, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Mat3, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1118,7 +1122,7 @@ namespace highlo
 
 	bool XMLWriter::ReadMatrix4(const HLString &key, glm::mat4 *result)
 	{
-		return Read(key, DocumentDataType::Mat4, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Mat4, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;
@@ -1137,7 +1141,7 @@ namespace highlo
 
 	bool XMLWriter::ReadQuaternion(const HLString &key, glm::quat *result)
 	{
-		return Read(key, DocumentDataType::Quat, [result](rapidxml::xml_node<> *node) mutable -> bool
+		return Read(key, DocumentDataType::Quat, [result](rapidxml::xml_node<> *node) -> bool
 		{
 			if (!result)
 				return false;

@@ -21,10 +21,12 @@ struct YAMLReadParserTests : public testing::Test
 	YAMLReadParserTests()
 	{
 		Reader = DocumentWriter::Create("", DocumentType::Yaml);
+		Logger::Init();
 	}
 
 	virtual ~YAMLReadParserTests()
 	{
+		Logger::Shutdown();
 	}
 };
 

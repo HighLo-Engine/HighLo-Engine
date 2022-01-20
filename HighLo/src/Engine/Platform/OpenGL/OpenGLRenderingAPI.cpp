@@ -78,26 +78,24 @@ namespace highlo
 		}
 	}
 
-	struct OpenGLDrawData
-	{
-		Ref<VertexBuffer> FullscreenQuadVertexBuffer;
-		Ref<IndexBuffer> FullscreenQuadIndexBuffer;
-		VertexArraySpecification FullscreenQuadVertexArraySpec;
-
-		Ref<RenderPass> ActiveRenderPass;
-	};
-
-	struct OpenGLQuadVertex
+	struct GLQuadVertex
 	{
 		glm::vec3 Position;
 		glm::vec2 TexCoord;
 	};
 
-	static OpenGLDrawData *s_GLDrawData;
+	struct GLRendererData
+	{
+		Ref<VertexBuffer> FullscreenQuadVertexBuffer;
+		Ref<IndexBuffer> FullscreenQuadIndexBuffer;
+		Ref<RenderPass> ActiveRenderPass;
+	};
+
+	static GLRendererData *s_GLRendererData;
 
 	void OpenGLRenderingAPI::Init()
 	{
-		s_GLDrawData = new OpenGLDrawData();
+		s_GLRendererData = new GLRendererData();
 
 		glDebugMessageCallback(utils::OpenGLLogMessage, nullptr);
 		glEnable(GL_DEBUG_OUTPUT);
@@ -136,7 +134,7 @@ namespace highlo
 		float y = -1;
 		float width = 2, height = 2;
 
-		OpenGLQuadVertex *data = new OpenGLQuadVertex[4];
+		GLQuadVertex *data = new GLQuadVertex[4];
 
 		data[0].Position = glm::vec3(x, y, 0.1f);
 		data[0].TexCoord = glm::vec2(0, 0);
@@ -150,16 +148,16 @@ namespace highlo
 		data[3].Position = glm::vec3(x, y + height, 0.1f);
 		data[3].TexCoord = glm::vec2(0, 1);
 
-		s_GLDrawData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(OpenGLQuadVertex));
-		
+		s_GLRendererData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(GLQuadVertex));
+
 		uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
-		s_GLDrawData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32));
+		s_GLRendererData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32));
 	}
 
 	void OpenGLRenderingAPI::Shutdown()
 	{
 		OpenGLShader::ClearUniformBuffers();
-		delete s_GLDrawData;
+		delete s_GLRendererData;
 	}
 
 	void OpenGLRenderingAPI::BeginFrame()
@@ -172,18 +170,24 @@ namespace highlo
 
 	void OpenGLRenderingAPI::BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear)
 	{
-	//	HL_ASSERT(!s_GLDrawData->ActiveRenderPass, "Another RenderPass has already been started and not ended!");
-	//	s_GLDrawData->ActiveRenderPass = renderPass;
-	//
-	//	renderPass->GetSpecification().Framebuffer->Bind();
+		HL_ASSERT(!s_GLRendererData->ActiveRenderPass, "Another RenderPass has already been started and not ended!");
+		s_GLRendererData->ActiveRenderPass = renderPass;
+	
+		s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Bind();
+		if (shouldClear)
+		{
+			const glm::vec4 &clearColor = s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
+			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
 	}
 
 	void OpenGLRenderingAPI::EndRenderPass(Ref<CommandBuffer> renderCommandBuffer)
 	{
-	//	HL_ASSERT(s_GLDrawData->ActiveRenderPass, "Did you forget to call BeginRenderPass() ?");
-	//
-	//	s_GLDrawData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
-	//	s_GLDrawData->ActiveRenderPass = nullptr;
+		HL_ASSERT(s_GLRendererData->ActiveRenderPass, "Did you forget to call BeginRenderPass() ?");
+	
+		s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
+		s_GLRendererData->ActiveRenderPass = nullptr;
 	}
 
 	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4 &color)
@@ -223,6 +227,29 @@ namespace highlo
 	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type)
 	{
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void OpenGLRenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
+	{
+		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
+		va->Bind();
+		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
+
+		if (uniformBufferSet)
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			uniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+		}
+
+		material->Set("u_Renderer.Transform", transform);
+		material->UpdateForRendering();
+
+		if (material->GetFlag(MaterialFlag::DepthTest))
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+
+		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRenderingAPI::SetWireframe(bool wf)

@@ -159,8 +159,6 @@ void HighLoEditor::OnUpdate(Timestep ts)
 {
 	UpdateUIFlags();
 
-	m_ViewportRenderer->ClearPixelBuffer(TextureFormat::RED_INTEGER, -1);
-
 	switch (m_SceneState)
 	{
 		case SceneState::Edit:
@@ -229,6 +227,8 @@ void HighLoEditor::OnUpdate(Timestep ts)
 	{
 	//	HL_CORE_ERROR("TEST: PIXEL SELECTED: {0}", m_ViewportRenderer->GetPixel(TextureFormat::RED_INTEGER, mouseX, mouseY));
 	}
+
+	SceneRenderer::WaitForThreads();
 }
 
 void HighLoEditor::UpdateUIFlags()
@@ -289,6 +289,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
 	m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
+	/*
 	if (ImGui::BeginPopupContextWindow("#viewportRightClick", ImGuiMouseButton_Right, false))
 	{
 		// TODO
@@ -301,6 +302,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 		ImGui::EndPopup();
 	}
+	*/
 
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	if (viewportSize.x < 0.0f)
@@ -319,7 +321,9 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_EditorCamera.SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 
 	// Render viewport image
-	UI::Image(m_ViewportRenderer->GetFinalRenderTexture(), viewportSize, { 0, 1 }, { 1, 0 });
+	Ref<Texture2D> viewportImage = m_ViewportRenderer->GetFinalRenderTexture();
+
+	UI::Image(viewportImage, viewportSize, { 0, 1 }, { 1, 0 });
 	UI::EndViewport();
 
 	m_AssetBrowserPanel->OnUIRender();
@@ -330,12 +334,13 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	UI::BeginViewport("Object Properties");
 	UI::EndViewport();
 
-	UI::EndWindow();
-
 	AssetEditorPanel::OnUIRender(timestep);
+	m_ViewportRenderer->OnUIRender();
 
 	// TODO: This breaks
 	//AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
+
+	UI::EndWindow();
 }
 
 void HighLoEditor::OnResize(uint32 width, uint32 height)

@@ -115,9 +115,21 @@ namespace highlo
 		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
+		HLAPI void SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
+		HLAPI void SubmitDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
+
+		HLAPI void SubmitSelectedStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
+
+		HLAPI void SubmitPhysicsDebugStaticModel(Ref<StaticModel> model, const glm::mat4 &transform = glm::mat4(1.0f));
+		HLAPI void SubmitPhysicsDebugDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, const glm::mat4 &transform = glm::mat4(1.0f));
+
 		HLAPI void ClearPixelBuffer(TextureFormat format, int32 value);
 		HLAPI int32 GetPixel(TextureFormat format, int32 x, int32 y) const;
 		HLAPI bool PixelSelected(TextureFormat format, int32 x, int32 y) const;
+
+		HLAPI void ClearPass(Ref<RenderPass> renderPass, bool explicitClear = false);
+		HLAPI void ClearPass();
 
 		HLAPI SceneRendererOptions &GetOptions();
 
@@ -125,13 +137,12 @@ namespace highlo
 		HLAPI Ref<Texture2D> GetFinalRenderTexture();
 
 		HLAPI void OnUIRender();
-		HLAPI void WaitForThreads();
+		HLAPI static void WaitForThreads();
 
 	private:
 
 		void FlushDrawList();
 		void PreRender();
-		void ClearPass();
 		void DeinterleavingPass();
 		void HBAOPass();
 		void ReinterleavingPass();
@@ -146,7 +157,6 @@ namespace highlo
 		void BloomCompute();
 		void CompositePass();
 
-		void ClearPass(Ref<RenderPass> renderPass, bool explicitClear = false);
 		void UpdateStatistics();
 
 		void CalculateCascades(CascadeData *data, const Camera &sceneCamera, const glm::vec3 &lightDir) const;
@@ -181,7 +191,6 @@ namespace highlo
 		float m_LineWidth = 2.0f;
 		bool m_ResourcesCreated = false;
 
-
 		Ref<Scene> m_Scene;
 		SceneRendererSpecification m_Specification;
 		SceneRendererOptions m_RendererOptions;
@@ -214,12 +223,18 @@ namespace highlo
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicColliderDrawList;
 		std::map<MeshKey, TransformMapData> m_MeshTransformMap;
 
+		Ref<VertexBuffer> m_SubmeshTransformBuffer;
+		TransformVertexData *m_TransformVertexData = nullptr;
+
 		// Shadows
-		Ref<Shader> m_ShadowMapShader, m_ShadowMapAnimShader;
 		float m_LightDistance = 0.1f;
 		float m_CascadeSplitLambda = 0.92f;
 		glm::vec4 m_CascadeSplits;
 		float m_CascadeFarPlaneOffset = 50.0f, m_CascadeNearPlaneOffset = -50.0f;
+
+		Ref<VertexArray> m_ShadowPassVertexArrays[4];
+		Ref<Material> m_ShadowPassMaterial;
+		Ref<Shader> m_ShadowMapShader, m_ShadowMapAnimShader;
 
 		bool m_EnableBloom = false;
 		float m_BloomThreshold = 1.5f;
@@ -229,7 +244,10 @@ namespace highlo
 		Ref<Material> m_CompositeMaterial;
 		Ref<Material> m_LightCullingMaterial;
 
-
+		// Geometry
+		Ref<VertexArray> m_GeometryVertexArray;
+		Ref<VertexArray> m_SelectedGeometryVertexArray;
+		Ref<Material> m_SelectedGeometryMaterial;
 
 		// HBAO
 		Ref<Material> m_DeinterleavingMaterial;
@@ -251,6 +269,10 @@ namespace highlo
 		Ref<Material> m_WireframeMaterial;
 		Ref<Material> m_OutlineMaterial, m_OutlineAnimMaterial;
 		Ref<Material> m_ColliderMaterial;
+
+		// Skybox
+		Ref<VertexArray> m_SkyboxVertexArray;
+		Ref<Material> m_SkyboxMaterial;
 
 		// Scene information
 		struct SceneInfo

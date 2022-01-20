@@ -36,9 +36,7 @@ namespace highlo
 	void ShaderCache::Serialize(const std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
-	//	Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
-	//	Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
+		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
 		writer->BeginArray();
 		for (auto &[filePath, hash] : shaderCache)
@@ -56,9 +54,7 @@ namespace highlo
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
-	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
-	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
+		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 		bool readSuccess = reader->ReadContents();
 		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
 

@@ -103,6 +103,7 @@ namespace highlo
 		}
 
 		HLAPI static void WaitAndRender();
+		HLAPI static void RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform = glm::mat4(1.0f));
 
 		HLAPI static void OnShaderReloaded(uint64 hash);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);

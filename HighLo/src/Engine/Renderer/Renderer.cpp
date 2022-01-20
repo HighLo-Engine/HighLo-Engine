@@ -71,7 +71,9 @@ namespace highlo
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/GridShader.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Grid.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/SelectedGeometry.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMap.glsl");
 
 		// Load 2D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");
@@ -117,6 +119,11 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 		s_CommandQueue->Execute();
+	}
+
+	void Renderer::RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
+	{
+		s_RenderingAPI->DrawQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, transform);
 	}
 
 	void Renderer::OnShaderReloaded(uint64 hash)

@@ -506,11 +506,13 @@ namespace highlo
 
 		if (shaderBuffers.size() > 0)
 		{
-			const ShaderBuffer &buffer = (*shaderBuffers.begin()).second;
-			if (buffer.Uniforms.find(name) == buffer.Uniforms.end())
-				return nullptr;
-		
-			return &buffer.Uniforms.at(name);
+			for (const auto &[n, buffer] : shaderBuffers)
+			{
+				if (buffer.Uniforms.find(name) != buffer.Uniforms.end())
+				{
+					return &buffer.Uniforms.at(name);
+				}
+			}
 		}
 
 		return nullptr;

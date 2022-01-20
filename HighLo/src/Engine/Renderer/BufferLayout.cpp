@@ -7,6 +7,18 @@ namespace highlo
 {
 	BufferLayout BufferLayout::Empty = std::initializer_list<BufferElement>();
 
+	BufferLayout BufferLayout::GetShadowMapLayout()
+	{
+		return
+		{
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_Normal", ShaderDataType::Float3 },
+			{ "a_Tangent", ShaderDataType::Float3 },
+			{ "a_Binormal", ShaderDataType::Float3 },
+		};
+	}
+
 	BufferLayout BufferLayout::GetTextureLayout()
 	{
 		return

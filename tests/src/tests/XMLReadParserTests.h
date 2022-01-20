@@ -43,7 +43,7 @@ TEST_F(XMLReadParserTests, XMLParser_Read_String)
 	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(XMLReadParserTests, JSONParser_Read_Int32)
+TEST_F(XMLReadParserTests, XMLParser_Read_Int32)
 {
 	HLString input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><HighLo version=\"1.0.0\"><int32>-10</int32></HighLo>";
 	int32 expected = -10;

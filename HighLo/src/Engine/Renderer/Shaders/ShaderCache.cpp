@@ -37,8 +37,8 @@ namespace highlo
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 	//	Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
-	//	Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
+	//	Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
+		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
 
 		writer->BeginArray();
 		for (auto &[filePath, hash] : shaderCache)
@@ -57,8 +57,8 @@ namespace highlo
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().CacheRegistryPath;
 	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
-	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
+	//	Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
+		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Yaml);
 		bool readSuccess = reader->ReadContents();
 		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
 

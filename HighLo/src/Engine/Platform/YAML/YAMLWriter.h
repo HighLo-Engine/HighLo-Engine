@@ -13,6 +13,12 @@
 
 namespace highlo
 {
+	struct ElementType
+	{
+		YAML::Node Node;
+		DocumentDataType Type;
+	};
+
 	class YAMLWriter : public DocumentWriter
 	{
 	public:
@@ -117,9 +123,22 @@ namespace highlo
 
 	private:
 
+		bool Write(const HLString &key, DocumentDataType type, const std::function<YAML::Node()> &insertFunc);
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(YAML::Node)> &insertFunc);
+
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(YAML::Node&)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, YAML::Node&)> &insertFunc);
+
+	private:
+
 		FileSystemPath m_FilePath;
 		YAML::Node m_Document;
 		YAML::Emitter m_Emitter;
+
+		std::vector<ElementType> m_TempBuffers;
+		std::vector<HLString> m_TempKeys;
+		ElementType m_TempBuffer;
+		HLString m_TempKey;
 
 		bool m_ShouldWriteIntoArray = false;
 		bool m_ShouldWriteIntoObject = false;

@@ -16,6 +16,8 @@
 #include "Engine/ECS/RenderSystem.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Threading/ThreadRegistry.h"
+#include "Engine/Loaders/AssetImporter.h"
+#include "Engine/Assets/AssetManager.h"
 
 namespace highlo
 {
@@ -43,6 +45,9 @@ namespace highlo
 
 		// Save the current shader cache state into the json registry
 		ShaderCache::Shutdown();
+
+		// Save the current assets that are loaded into a cache registry file and delete them
+		AssetImporter::Shutdown();
 
 		Renderer::Shutdown();
 		Logger::Shutdown();
@@ -162,6 +167,8 @@ namespace highlo
 		}
 
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
+
+		AssetImporter::Init();
 
 		// Init Fonts
 		FontManager::Get()->Init();

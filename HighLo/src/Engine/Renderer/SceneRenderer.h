@@ -124,10 +124,6 @@ namespace highlo
 		HLAPI void SubmitPhysicsDebugStaticModel(Ref<StaticModel> model, const glm::mat4 &transform = glm::mat4(1.0f));
 		HLAPI void SubmitPhysicsDebugDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, const glm::mat4 &transform = glm::mat4(1.0f));
 
-		HLAPI void ClearPixelBuffer(TextureFormat format, int32 value);
-		HLAPI int32 GetPixel(TextureFormat format, int32 x, int32 y) const;
-		HLAPI bool PixelSelected(TextureFormat format, int32 x, int32 y) const;
-
 		HLAPI void ClearPass(Ref<RenderPass> renderPass, bool explicitClear = false);
 		HLAPI void ClearPass();
 
@@ -168,7 +164,6 @@ namespace highlo
 		void InitShadowPass();
 		void InitPreDepthPass();
 		void InitGeometryPass();
-		void InitOutlinePass();
 		void InitBloomCompute();
 		void InitDeinterleaving();
 		void InitHBAO();

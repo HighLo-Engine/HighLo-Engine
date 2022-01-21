@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.4 (2022-01-21) Added missing TODOs
 //     - 1.3 (2021-10-04) Refactored initialization to use the FileSystemWatcher instead of FileSystem class
 //     - 1.2 (2021-09-22) Changed AssetManager to be a Singleton class
 //     - 1.1 (2021-09-15) Changed FileExtension implementation
@@ -11,9 +12,12 @@
 #pragma once
 
 #include "Asset.h"
+#include "AssetRegistry.h"
+
 #include "Engine/Core/FileSystemPath.h"
 #include "Engine/Events/Events.h"
 #include "Engine/Loaders/MeshLoader.h"
+#include "Engine/Loaders/AssetImporter.h"
 
 namespace highlo
 {
@@ -26,27 +30,6 @@ namespace highlo
 		HLString TexturePath = "assets/textures/";
 		HLString ShaderPath = "assets/shaders/";
 		HLString ScriptPath = "assets/scripts/";
-	};
-
-	class AssetRegistry
-	{
-	public:
-
-		HLAPI AssetMetaData &operator[](const FileSystemPath &path);
-		HLAPI const AssetMetaData &Get(const FileSystemPath &path) const;
-
-		HLAPI size_t Count() const { return m_AssetRegistry.size(); }
-		HLAPI bool Contains(const FileSystemPath &path) const; 
-		HLAPI size_t Remove(const FileSystemPath &path);
-		HLAPI void Clear();
-
-		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::iterator begin() { return m_AssetRegistry.begin(); }
-		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::iterator end() { return m_AssetRegistry.end(); }
-		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cbegin() { return m_AssetRegistry.begin(); }
-		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cend() { return m_AssetRegistry.end(); }
-
-	private:
-		std::unordered_map<FileSystemPath, AssetMetaData> m_AssetRegistry;
 	};
 
 	class AssetManager : public Singleton<AssetManager>
@@ -81,10 +64,15 @@ namespace highlo
 			static_assert(std::is_base_of<Asset, T>::value, "CreateMemoryOnlyAsset only works for types derived from Asset");
 
 			Ref<T> asset = Ref<T>::Create(std::forward<Args>(args)...);
-			asset->Handle = AssetHandle();
+			asset->Handle = AssetHandle(); // New UUID
 
 			s_MemoryAssets[asset->Handle] = asset;
 			return asset->Handle;
+		}
+
+		HLAPI bool IsMemoryAsset(AssetHandle handle)
+		{
+			return s_MemoryAssets.find(handle) != s_MemoryAssets.end();
 		}
 
 		template<typename T, typename... Args>
@@ -93,8 +81,8 @@ namespace highlo
 			static_assert(std::is_base_of<Asset, T>::value, "Error: Did you forget to derive your class from Asset?");
 
 			AssetMetaData assetInfo;
-			assetInfo.Handle = AssetHandle(); // Create new random assetID
-			if (dirPath.IsEmpty() || dirPath == ".")
+			assetInfo.Handle = AssetHandle(); // New UUID
+			if (dirPath.IsEmpty() || dirPath == "." || dirPath == "..")
 			{
 				assetInfo.FilePath = fileName;
 			}
@@ -138,26 +126,29 @@ namespace highlo
 			Ref<Asset> asset = Ref<T>::Create(std::forward<Args>(args)...);
 			asset->Handle = assetInfo.Handle;
 			s_LoadedAssets[asset->Handle] = asset;
-			// AssetImporter::Serialize(assetInfo, asset);
+			AssetImporter::Serialize(assetInfo, asset);
+
 			return asset;
 		}
 
 		template<typename T>
 		HLAPI Ref<T> GetAsset(AssetHandle handle)
 		{
+			if (IsMemoryAsset(handle))
+				return s_MemoryAssets[handle].As<T>();
+
 			auto &assetInfo = GetMetaData(handle);
+			if (!assetInfo.IsValid())
+				return nullptr;
 
 			Ref<Asset> asset = nullptr;
 			if (!assetInfo.IsDataLoaded)
 			{
-				// TODO
-				/*
 				assetInfo.IsDataLoaded = AssetImporter::TryLoadData(assetInfo, asset);
 				if (!assetInfo.IsDataLoaded)
 					return nullptr;
 
 				s_LoadedAssets[handle] = asset;
-				*/
 			}
 			else
 			{
@@ -168,7 +159,7 @@ namespace highlo
 		}
 
 		template<typename T>
-		HLAPI Ref<T> GetAsset(const HLString &path)
+		HLAPI Ref<T> GetAsset(const FileSystemPath &path)
 		{
 			return GetAsset<T>(GetAssetHandleFromFilePath(path));
 		}
@@ -181,7 +172,7 @@ namespace highlo
 		void LoadAssetRegistry();
 		void WriteRegistryToFile();
 
-		void ProcessDirectory(const HLString &dirPath);
+		void ProcessDirectory(const FileSystemPath &dirPath);
 		void ReloadAllAssets();
 		
 		bool OnFileSystemChangedEvent(FileSystemChangedEvent &e);

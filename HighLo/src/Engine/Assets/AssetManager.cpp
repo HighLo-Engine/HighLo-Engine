@@ -10,67 +10,21 @@
 #include "AssetExtensions.h"
 
 #include "Engine/Scene/Project.h"
+#include "Engine/Loaders/DocumentWriter.h"
+
+#define ASSET_MANAGER_LOG_PREFIX "AManager>     "
 
 namespace highlo
 {
-	// ====================================================================================
-	//                                   AssetRegistry
-	// ====================================================================================
-
-	static FileSystemPath GetKey(const FileSystemPath &path)
-	{
-	// TODO
-	//	auto key = path.RelativePath(Project::GetAssetDirectory());
-	//	if (key.String().IsEmpty())
-	//		key = path.String();
-
-		return path;
-	}
-
-	AssetMetaData &AssetRegistry::operator[](const FileSystemPath &path)
-	{
-		auto key = GetKey(path);
-		HL_CORE_INFO("[AssetManager] Retrieving Asset '{0}' with key '{1}'", **path, **key);
-		HL_ASSERT(m_AssetRegistry.find(key) != m_AssetRegistry.end());
-		HL_ASSERT(!key.String().IsEmpty());
-		return m_AssetRegistry[key];
-	}
-	
-	const AssetMetaData &AssetRegistry::Get(const FileSystemPath &path) const
-	{
-		const auto key = GetKey(path);
-		HL_CORE_INFO("[AssetManager] Retrieving Asset '{0}' with key '{1}'", **path, **key);
-		HL_ASSERT(m_AssetRegistry.find(key) != m_AssetRegistry.end());
-		HL_ASSERT(!key.String().IsEmpty());
-		return m_AssetRegistry.at(key);
-	}
-	
-	bool AssetRegistry::Contains(const FileSystemPath &path) const
-	{
-		auto key = GetKey(path);
-		return m_AssetRegistry.find(key) != m_AssetRegistry.end();
-	}
-	
-	size_t AssetRegistry::Remove(const FileSystemPath &path)
-	{
-		auto key = GetKey(path);
-		HL_CORE_INFO("[AssetManager] Removing Asset '{0}'", **path);
-		return m_AssetRegistry.erase(key);
-	}
-	
-	void AssetRegistry::Clear()
-	{
-		HL_CORE_INFO("[AssetManager] Removing all assets");
-		m_AssetRegistry.clear();
-	}
-
-	// ====================================================================================
-	//                                   AssetManager
-	// ====================================================================================
-
 	static AssetMetaData s_NullMetaData;
 	std::unordered_map<AssetHandle, Ref<Asset>> AssetManager::s_LoadedAssets;
 	std::unordered_map<AssetHandle, Ref<Asset>> AssetManager::s_MemoryAssets;
+
+	struct AssetRegistryEntry
+	{
+		FileSystemPath FilePath;
+		AssetType Type;
+	};
 
 	void AssetManager::Init()
 	{
@@ -106,8 +60,8 @@ namespace highlo
 
 	AssetMetaData &AssetManager::GetMetaData(const FileSystemPath &path)
 	{
-		if (s_AssetRegistry.Contains(path.String()))
-			return s_AssetRegistry[*path];
+		if (s_AssetRegistry.Contains(path))
+			return s_AssetRegistry[path];
 
 		return s_NullMetaData;
 	}
@@ -146,8 +100,22 @@ namespace highlo
 
 	AssetHandle AssetManager::ImportAsset(const FileSystemPath &path)
 	{
-		// TODO
-		return 0;
+		FileSystemPath relativePath = path.RelativePath();
+
+		if (s_AssetRegistry.Contains(relativePath))
+			return s_AssetRegistry[relativePath].Handle;
+
+		AssetType type = GetAssetTypeFromPath(relativePath);
+		if (type == AssetType::None)
+			return 0;
+
+		AssetMetaData assetInfo;
+		assetInfo.Handle = AssetHandle(); // New UUID
+		assetInfo.FilePath = relativePath;
+		assetInfo.Type = type;
+		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
+
+		return assetInfo.Handle;
 	}
 
 	bool AssetManager::ReloadAsset(AssetHandle handle)
@@ -155,59 +123,112 @@ namespace highlo
 		AssetMetaData &assetInfo = GetMetaData(handle);
 		if (!assetInfo.IsDataLoaded)
 		{
-			HL_CORE_WARN("[AssetManager] Trying to load asset '{0}', but it was never loaded before!", *assetInfo.FilePath);
+			HL_CORE_WARN(ASSET_MANAGER_LOG_PREFIX "[-] Trying to load asset '{0}', but it was never loaded before! [-]", *assetInfo.FilePath);
 
 			Ref<Asset> asset;
-			//assetInfo.IsDataLoaded = AssetImporter::TryLoadData(assetInfo, asset);
+			assetInfo.IsDataLoaded = AssetImporter::TryLoadData(assetInfo, asset);
 			return assetInfo.IsDataLoaded;
 		}
 
 		HL_ASSERT(s_LoadedAssets.find(handle) != s_LoadedAssets.end());
 		Ref<Asset> &asset = s_LoadedAssets.at(handle);
-		// TODO
-		//assetInfo.IsDataLoaded = AssetImporter::TryLoadData(assetInfo, asset);
+		assetInfo.IsDataLoaded = AssetImporter::TryLoadData(assetInfo, asset);
 		return assetInfo.IsDataLoaded;
 	}
 
 	bool AssetManager::AssetExists(AssetMetaData &metaData)
 	{
-		// TODO: add root dir to the beginning of the path
-		return FileSystem::Get()->FileExists(metaData.FilePath);
+		return FileSystem::Get()->FileExists(Project::GetActive()->GetAssetDirectory() / metaData.FilePath);
 	}
 
 	void AssetManager::LoadAssetRegistry()
 	{
+		FileSystemPath assetRegistryPath = Project::GetAssetRegistryPath();
+		if (!FileSystem::Get()->FileExists(assetRegistryPath))
+			return;
+
+		Ref<DocumentWriter> reader = DocumentWriter::Create(assetRegistryPath, DocumentType::Json);
+		reader->ReadContents();
+
+		std::vector<HLString> data;
+		reader->ReadStringArray("", data);
+
+		// TODO
+		for (HLString current : data)
+		{
+			HL_CORE_TRACE(ASSET_MANAGER_LOG_PREFIX "[=] {0} [=]", *current);
+		}
 	}
 
 	void AssetManager::WriteRegistryToFile()
 	{
+		FileSystemPath assetRegistryPath = Project::GetAssetRegistryPath();
+		Ref<DocumentWriter> writer = DocumentWriter::Create(assetRegistryPath, DocumentType::Json);
+
+		std::map<UUID, AssetRegistryEntry> sortedAssets;
+		for (auto &[filePath, assetInfo] : s_AssetRegistry)
+		{
+			if (!FileSystem::Get()->FileExists(GetFileSystemPath(assetInfo)))
+				continue;
+
+			FileSystemPath pathToSerialize = assetInfo.FilePath;
+			HLString pathStr = pathToSerialize.String();
+
+			if (pathStr.Contains("\\"))
+			{
+				pathStr = pathStr.Replace("\\", "/");
+			}
+
+			sortedAssets[assetInfo.Handle] = { FileSystemPath(pathStr), assetInfo.Type };
+		}
+
+		HL_CORE_INFO(ASSET_MANAGER_LOG_PREFIX "[+] serializing asset registry with {0} entries [+]", sortedAssets.size());
+
+		// TODO
+		writer->BeginArray();
+		for (auto &[handle, entry] : sortedAssets)
+		{
+			writer->BeginObject();
+			writer->WriteUInt64("Handle", (uint64)handle);
+			writer->WriteString("FilePath", entry.FilePath.String());
+			writer->WriteString("Type", utils::AssetTypeToString(entry.Type));
+			writer->EndObject();
+		}
+		writer->EndArray();
+
+		FileSystemWatcher::Get()->DisableWatchUntilNextAction();
+
+		writer->WriteOut();
 	}
 
-	void AssetManager::ProcessDirectory(const HLString &dirPath)
+	void AssetManager::ProcessDirectory(const FileSystemPath &dirPath)
 	{
+		std::vector<File> fileList = dirPath.GetFileList();
+		for (uint32 i = 0; i < fileList.size(); ++i)
+		{
+			File entry = fileList[i];
+			if (!entry.IsFile)
+			{
+			//	HL_CORE_TRACE(ASSET_MANAGER_LOG_PREFIX "[=] Discovering path {0} [=]", *entry.Name);
+				ProcessDirectory(entry.FullPath);
+			}
+			else
+			{
+			//	HL_CORE_TRACE(ASSET_MANAGER_LOG_PREFIX "[=] Importing asset {0} [=]", *entry.Name);
+				ImportAsset(entry.FullPath);
+			}
+		}
 	}
 
 	void AssetManager::ReloadAllAssets()
 	{
-		// TODO
-	//	ProcessDirectory();
+		ProcessDirectory(Project::GetAssetDirectory());
 		WriteRegistryToFile();
 	}
 
 	bool AssetManager::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
-		HL_CORE_TRACE("OnFileSystemChangedEvent: {0}", e.GetName());
-		// TODO: insert asset directory before this
-		e.FilePath = Project::GetActive()->GetAssetDirectory() / e.FilePath;
-		
-	#ifdef HL_PLATFORM_WINDOWS
-		HLString temp = e.FilePath.String();
-		temp.Replace("\\", "/");
-		e.FilePath = temp;
-	#endif // HL_PLATFORM_WINDOWS
-
-		// TOOD: Remove extension in NewName
-		// e.SetNewName();
+		HL_CORE_TRACE(ASSET_MANAGER_LOG_PREFIX "[+] OnFileSystemChangedEvent: {0} [+]", e.GetName());
 
 		if (!e.IsDirectory)
 		{
@@ -222,8 +243,15 @@ namespace highlo
 					break;
 
 				case FileSystemAction::Modified:
-					// TODO: Reload Data if loaded
+				{
+					AssetHandle handle = GetAssetHandleFromFilePath(e.FilePath);
+					const auto &assetInfo = GetMetaData(handle);
+
+					if (assetInfo.IsValid() && assetInfo.IsDataLoaded)
+						ReloadAsset(handle);
+
 					break;
+				}
 
 				case FileSystemAction::Renamed:
 				{
@@ -236,8 +264,7 @@ namespace highlo
 					}
 					else
 					{
-						// TODO: Get relative path
-						OnAssetRenamed(AssetManager::Get()->GetAssetHandleFromFilePath(/* insert relative path here */ "/" + e.OldName), e.FilePath);
+						OnAssetRenamed(AssetManager::Get()->GetAssetHandleFromFilePath(e.FilePath.ParentPath() / e.OldName), e.FilePath);
 						e.Tracking = true;
 					}
 					break;
@@ -251,10 +278,12 @@ namespace highlo
 	void AssetManager::OnAssetRenamed(AssetHandle handle, const FileSystemPath &newFilePath)
 	{
 		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
-		
-		s_AssetRegistry.Remove(*assetInfo.FilePath);
-		assetInfo.FilePath = newFilePath;
-		s_AssetRegistry[*assetInfo.FilePath] = assetInfo;
+		if (!assetInfo.IsValid())
+			return;
+
+		s_AssetRegistry.Remove(assetInfo.FilePath);
+		assetInfo.FilePath = s_AssetRegistry.GetKey(newFilePath);
+		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
 		
 		AssetManager::Get()->WriteRegistryToFile();
 	}
@@ -262,10 +291,12 @@ namespace highlo
 	void AssetManager::OnAssetMoved(AssetHandle handle, FileSystemPath &destinationFilePath)
 	{
 		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
+		if (!assetInfo.IsValid())
+			return;
 
-		s_AssetRegistry.Remove(*assetInfo.FilePath);
+		s_AssetRegistry.Remove(assetInfo.FilePath);
 		assetInfo.FilePath = destinationFilePath / assetInfo.FilePath;
-		s_AssetRegistry[*assetInfo.FilePath] = assetInfo;
+		s_AssetRegistry[assetInfo.FilePath] = assetInfo;
 
 		AssetManager::Get()->WriteRegistryToFile();
 	}
@@ -273,8 +304,10 @@ namespace highlo
 	void AssetManager::OnAssetDeleted(AssetHandle handle)
 	{
 		AssetMetaData assetInfo = AssetManager::Get()->GetMetaData(handle);
+		if (!assetInfo.IsValid())
+			return;
 
-		s_AssetRegistry.Remove(*assetInfo.FilePath);
+		s_AssetRegistry.Remove(assetInfo.FilePath);
 		s_LoadedAssets.erase(handle);
 
 		AssetManager::Get()->WriteRegistryToFile();

@@ -61,6 +61,8 @@ void HighLoEditor::OnInitialize()
 	// TODO: Deserialize project data here
 	Project::SetActive(project);
 
+	AssetManager::Get()->Init();
+
 	// Editor Panels
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
 	m_ViewportRenderer->SetLineWidth(m_LineWidth);
@@ -243,6 +245,8 @@ void HighLoEditor::OnShutdown()
 	AssetEditorPanel::Shutdown();
 
 	FileSystemWatcher::Get()->Stop();
+
+	AssetManager::Get()->Shutdown();
 }
 
 void HighLoEditor::OnEvent(Event &e)
@@ -357,7 +361,7 @@ void HighLoEditor::SelectEntity(Entity entity)
 	if (entity.HasComponent<DynamicModelComponent>())
 	{
 		auto meshComp = entity.GetComponent<DynamicModelComponent>();
-		if (meshComp->Model && meshComp->Model->GetAssetType() == AssetType::Mesh)
+		if (meshComp->Model && meshComp->Model->GetAssetType() == AssetType::DynamicMesh)
 		{
 			selection.MeshIndex = meshComp->Model->GetSubmeshIndices()[0];
 		}

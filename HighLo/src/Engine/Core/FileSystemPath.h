@@ -85,6 +85,7 @@ namespace highlo
 		HLAPI FileSystemPath RelativePath() const;
 		HLAPI FileSystemPath RelativePath(const FileSystemPath &parentPath) const;
 		HLAPI FileSystemPath ParentPath() const;
+		HLAPI FileSystemPath LexicallyNormal() const;
 
 		HLAPI HLString &String() { return m_CurrentPath; }
 		HLAPI const HLString &String() const { return m_CurrentPath; }

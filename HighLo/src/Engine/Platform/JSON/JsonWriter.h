@@ -162,11 +162,15 @@ namespace highlo
 
 		bool m_ShouldWriteIntoArray = false;
 		bool m_ShouldWriteIntoObject = false;
+		uint32 m_ObjectCount = 0;
 
-		std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferValue; // last current appended member
-		std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferType;	// last current appended member type
+	//	std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferValue; // last current appended member
+	//	std::pair<rapidjson::Value, rapidjson::Value> m_TempBufferType;	// last current appended member type
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBufferValues; // all values
 		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TempBufferTypes; // all value types
+
+		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_FinalBufferValues; // 
+		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_FinalBufferTypes; // 
 	};
 }
 

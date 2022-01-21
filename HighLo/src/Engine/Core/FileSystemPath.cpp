@@ -251,6 +251,11 @@ namespace highlo
 	
 		return *this;
 	}
+
+	FileSystemPath FileSystemPath::LexicallyNormal() const
+	{
+		return m_Handle.lexically_normal().string();
+	}
 	
 	bool FileSystemPath::operator==(const FileSystemPath &other) const
 	{
@@ -421,6 +426,9 @@ namespace highlo
 
 		HLString newPath = "";
 
+		if (lhs.String().IsEmpty())
+			return rhs;
+
 		if (lhs.String().EndsWith('/'))
 			newPath = lhs.String() + rhs.String();
 		else
@@ -436,6 +444,9 @@ namespace highlo
 
 		HLString newPath = "";
 
+		if (lhs.String().IsEmpty())
+			return FileSystemPath(path);
+
 		if (lhs.String().EndsWith('/'))
 			newPath = lhs.String() + path;
 		else
@@ -450,6 +461,9 @@ namespace highlo
 			return lhs;
 
 		HLString newPath = "";
+
+		if (lhs.String().IsEmpty())
+			return FileSystemPath(path);
 
 		if (lhs.String().EndsWith('/'))
 			newPath = lhs.String() + path;

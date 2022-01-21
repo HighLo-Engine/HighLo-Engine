@@ -18,7 +18,7 @@ namespace highlo
 		HLString Name = "Unnamed Project";
 
 		HLString AssetDirectory = "assets/";
-		HLString AssetRegistryPath = "";
+		HLString AssetRegistryPath = "assets/assets.registry";
 
 		HLString MeshPath = "assets/models/";
 		HLString MeshSourcePath = "";

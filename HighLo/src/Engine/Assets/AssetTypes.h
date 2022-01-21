@@ -22,7 +22,7 @@ namespace highlo
 	{
 		None = 0,
 		Scene = 1,
-		Mesh = 2,
+		DynamicMesh = 2,
 		StaticMesh = 3,
 		Material = 4,
 		Texture = 5,
@@ -39,10 +39,13 @@ namespace highlo
 		{
 			if (assetType == "None") return AssetType::None;
 			if (assetType == "Scene") return AssetType::Scene;
-			if (assetType == "Mesh") return AssetType::Mesh;
+			if (assetType == "DynamicMesh") return AssetType::DynamicMesh;
+			if (assetType == "StaticMesh") return AssetType::StaticMesh;
 			if (assetType == "Material") return AssetType::Material;
 			if (assetType == "Texture") return AssetType::Texture;
 			if (assetType == "EnvMap") return AssetType::EnvMap;
+			if (assetType == "Prefab") return AssetType::Prefab;
+			if (assetType == "Font") return AssetType::Font;
 			if (assetType == "MeshAsset") return AssetType::MeshAsset;
 
 			HL_ASSERT(false, "Unknown Asset");
@@ -53,13 +56,16 @@ namespace highlo
 		{
 			switch (assetType)
 			{
-				case AssetType::None:		return "None";
-				case AssetType::Scene:		return "Scene";
-				case AssetType::Mesh:		return "Mesh";
-				case AssetType::Material:	return "Material";
-				case AssetType::Texture:	return "Texture";
-				case AssetType::EnvMap:		return "EnvMap";
-				case AssetType::MeshAsset:	return "MeshAsset";
+				case AssetType::None:		 return "None";
+				case AssetType::Scene:		 return "Scene";
+				case AssetType::DynamicMesh: return "DynamicMesh";
+				case AssetType::StaticMesh:  return "StaticMesh";
+				case AssetType::Material:	 return "Material";
+				case AssetType::Texture:	 return "Texture";
+				case AssetType::EnvMap:		 return "EnvMap";
+				case AssetType::Prefab:		 return "Prefab";
+				case AssetType::Font:		 return "Font";
+				case AssetType::MeshAsset:	 return "MeshAsset";
 			}
 
 			HL_ASSERT(false, "Unknown Asset");

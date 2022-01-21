@@ -10,30 +10,6 @@
 
 namespace highlo
 {
-	namespace utils
-	{
-		static uint32 GetAttachmentIndexFromCompositeFramebuffer(TextureFormat format)
-		{
-			uint32 attachmentIndex = 0;
-			switch (format)
-			{
-			case TextureFormat::RGBA:
-				attachmentIndex = 0;
-				break;
-
-			case TextureFormat::RED_INTEGER:
-				attachmentIndex = 1;
-				break;
-
-			case TextureFormat::Depth:
-				attachmentIndex = 2;
-				break;
-			}
-
-			return attachmentIndex;
-		}
-	}
-
 	// Temp until we can use our own thread implementation
 	static std::vector<std::thread> s_ThreadPool;
 
@@ -65,7 +41,6 @@ namespace highlo
 		InitShadowPass();
 		InitPreDepthPass();
 		InitGeometryPass();
-		InitOutlinePass();
 		InitBloomCompute();
 		InitDeinterleaving();
 		InitHBAO();
@@ -98,7 +73,6 @@ namespace highlo
 
 	void SceneRenderer::SetClearColor(const glm::vec4 &color)
 	{
-		m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor = color;
 	}
 
 	void SceneRenderer::BeginScene(const Camera &camera)
@@ -381,23 +355,6 @@ namespace highlo
 		dc.Model = model;
 		dc.SubmeshIndex = submeshIndex;
 		dc.InstanceCount++;
-	}
-
-	void SceneRenderer::ClearPixelBuffer(TextureFormat format, int32 value)
-	{
-		Ref<Framebuffer> framebuffer = m_CompositeRenderPass->GetSpecification().Framebuffer;
-		framebuffer->ClearAttachment(utils::GetAttachmentIndexFromCompositeFramebuffer(format), value);
-	}
-
-	int32 SceneRenderer::GetPixel(TextureFormat format, int32 x, int32 y) const
-	{
-		Ref<Framebuffer> framebuffer = m_CompositeRenderPass->GetSpecification().Framebuffer;
-		return framebuffer->ReadPixel(utils::GetAttachmentIndexFromCompositeFramebuffer(format), x, y);
-	}
-
-	bool SceneRenderer::PixelSelected(TextureFormat format, int32 x, int32 y) const
-	{
-		return GetPixel(format, x, y) != -1;
 	}
 
 	SceneRendererOptions &SceneRenderer::GetOptions()
@@ -815,10 +772,6 @@ namespace highlo
 		m_SelectedGeometryMaterial = Material::Create(selectedSpec.Shader, "SelectedGeometryMaterial");
 	}
 
-	void SceneRenderer::InitOutlinePass()
-	{
-	}
-
 	void SceneRenderer::InitBloomCompute()
 	{
 	}
@@ -882,7 +835,7 @@ namespace highlo
 	{
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "SceneComposite";
-		framebufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
 
 		if (m_Specification.SwapChain)

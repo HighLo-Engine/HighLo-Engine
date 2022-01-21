@@ -45,7 +45,7 @@ namespace highlo
 		Ref<MaterialTable> GetMaterials() const { return m_Materials; }
 
 		// Inherited via Asset
-		static AssetType GetStaticType() { return AssetType::Mesh; }
+		static AssetType GetStaticType() { return AssetType::DynamicMesh; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 
 	private:

@@ -129,6 +129,7 @@ namespace highlo
 	void JSONWriter::BeginObject()
 	{
 		m_ShouldWriteIntoObject = true;
+		m_ObjectCount = 0;
 	}
 
 	void JSONWriter::EndObject(bool rawData)
@@ -137,41 +138,59 @@ namespace highlo
 		{
 			m_ShouldWriteIntoObject = false;
 
-			if (m_ShouldWriteIntoArray)
+			for (uint32 i = 0; i < m_ObjectCount; ++i)
 			{
-				std::pair<rapidjson::Value, rapidjson::Value> &v = m_TempBufferValues.emplace_back();
-				v.first = m_TempBufferValue.first;
-				v.second = m_TempBufferValue.second;
+				auto &v = m_TempBufferValues[i];
+				auto &t = m_TempBufferTypes[i];
 
-				std::pair<rapidjson::Value, rapidjson::Value> &t = m_TempBufferTypes.emplace_back();
-				t.first = m_TempBufferType.first;
-				t.second = m_TempBufferType.second;
+				
 			}
-			else
-			{
-				m_Document.SetObject();
 
-				if (!rawData)
-				{
-					rapidjson::Value realVal(rapidjson::kObjectType);
-					realVal.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
-
-					rapidjson::Value realValStr(rapidjson::kStringType);
-					realValStr.SetString("value", m_Document.GetAllocator());
-
-					m_Document.AddMember(m_TempBufferType.first, m_TempBufferType.second, m_Document.GetAllocator());
-					m_Document.AddMember(realValStr, realVal, m_Document.GetAllocator());
-				}
-				else
-				{
-					m_Document.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
-				}
-			}
+			
 		}
+
+	//	if (m_ShouldWriteIntoObject)
+	//	{
+	//		m_ShouldWriteIntoObject = false;
+	//
+	//		if (m_ShouldWriteIntoArray)
+	//		{
+	//			std::pair<rapidjson::Value, rapidjson::Value> &v = m_TempBufferValues.emplace_back();
+	//			v.first = m_TempBufferValue.first;
+	//			v.second = m_TempBufferValue.second;
+	//
+	//			std::pair<rapidjson::Value, rapidjson::Value> &t = m_TempBufferTypes.emplace_back();
+	//			t.first = m_TempBufferType.first;
+	//			t.second = m_TempBufferType.second;
+	//		}
+	//		else
+	//		{
+	//			m_Document.SetObject();
+	//
+	//			if (!rawData)
+	//			{
+	//				rapidjson::Value realVal(rapidjson::kObjectType);
+	//				realVal.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
+	//
+	//				rapidjson::Value realValStr(rapidjson::kStringType);
+	//				realValStr.SetString("value", m_Document.GetAllocator());
+	//
+	//				m_Document.AddMember(m_TempBufferType.first, m_TempBufferType.second, m_Document.GetAllocator());
+	//				m_Document.AddMember(realValStr, realVal, m_Document.GetAllocator());
+	//			}
+	//			else
+	//			{
+	//				m_Document.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
+	//			}
+	//		}
+	//	}
 	}
 	
 	bool JSONWriter::WriteFloat(const HLString &key, float value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::Float, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -182,6 +201,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteDouble(const HLString &key, double value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::Double, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -192,6 +214,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteInt32(const HLString &key, int32 value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::Int32, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -202,6 +227,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteUInt32(const HLString &key, uint32 value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::UInt32, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -212,6 +240,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteInt64(const HLString &key, int64 value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::Int64, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -222,6 +253,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteUInt64(const HLString &key, uint64 value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::UInt64, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -232,6 +266,9 @@ namespace highlo
 
 	bool JSONWriter::WriteBool(const HLString &key, bool value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		return Write(key, DocumentDataType::Bool, [value]() -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kObjectType);
@@ -242,6 +279,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteString(const HLString &key, const HLString &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -253,6 +293,9 @@ namespace highlo
 
 	bool JSONWriter::WriteVec2(const HLString &key, const glm::vec2 &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -265,6 +308,9 @@ namespace highlo
 
 	bool JSONWriter::WriteVec3(const HLString &key, const glm::vec3 &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -278,6 +324,9 @@ namespace highlo
 
 	bool JSONWriter::WriteVec4(const HLString &key, const glm::vec4 &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -292,6 +341,9 @@ namespace highlo
 
 	bool JSONWriter::WriteMat2(const HLString &key, const glm::mat2 &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -306,6 +358,9 @@ namespace highlo
 
 	bool JSONWriter::WriteMat3(const HLString &key, const glm::mat3 &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -327,6 +382,9 @@ namespace highlo
 
 	bool JSONWriter::WriteMat4(const HLString &key, const glm::mat4 &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -356,6 +414,9 @@ namespace highlo
 
 	bool JSONWriter::WriteQuaternion(const HLString &key, const glm::quat &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -370,6 +431,9 @@ namespace highlo
 
 	bool JSONWriter::WriteStringArray(const HLString &key, std::vector<HLString> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -386,6 +450,9 @@ namespace highlo
 
 	bool JSONWriter::WriteInt32Array(const HLString &key, std::vector<int32> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int32, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -395,6 +462,9 @@ namespace highlo
 
 	bool JSONWriter::WriteUInt32Array(const HLString &key, std::vector<uint32> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt32, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -404,6 +474,9 @@ namespace highlo
 
 	bool JSONWriter::WriteInt64Array(const HLString &key, std::vector<int64> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int64, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -413,6 +486,9 @@ namespace highlo
 
 	bool JSONWriter::WriteUInt64Array(const HLString &key, std::vector<uint64> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt64, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -422,6 +498,9 @@ namespace highlo
 
 	bool JSONWriter::WriteBoolArray(const HLString &key, std::vector<bool> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Bool, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -431,6 +510,9 @@ namespace highlo
 
 	bool JSONWriter::WriteFloatArray(const HLString &key, std::vector<float> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Float, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -440,6 +522,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteDoubleArray(const HLString &key, std::vector<double> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Double, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -449,6 +534,9 @@ namespace highlo
 	
 	bool JSONWriter::WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -466,6 +554,9 @@ namespace highlo
 
 	bool JSONWriter::WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -484,6 +575,9 @@ namespace highlo
 
 	bool JSONWriter::WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -503,6 +597,9 @@ namespace highlo
 
 	bool JSONWriter::WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -522,6 +619,9 @@ namespace highlo
 
 	bool JSONWriter::WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -548,6 +648,9 @@ namespace highlo
 
 	bool JSONWriter::WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -582,6 +685,9 @@ namespace highlo
 
 	bool JSONWriter::WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value)
 	{
+		if (m_ShouldWriteIntoObject)
+			m_ObjectCount++;
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
 		{
@@ -1562,13 +1668,13 @@ namespace highlo
 		if (m_ShouldWriteIntoArray || m_ShouldWriteIntoObject)
 		{
 			result = true;
-			m_TempBufferValue.first = keyType;
-			m_TempBufferValue.second = valType;
-			m_TempBufferType.first = typeKey;
-			m_TempBufferType.second = typeVal;
+		//	m_TempBufferValue.first = keyType;
+		//	m_TempBufferValue.second = valType;
+		//	m_TempBufferType.first = typeKey;
+		//	m_TempBufferType.second = typeVal;
 
-			if (m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
-			{
+		//	if (m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
+		//	{
 				std::pair<rapidjson::Value, rapidjson::Value> &v = m_TempBufferValues.emplace_back();
 				v.first = keyType;
 				v.second = valType;
@@ -1576,7 +1682,7 @@ namespace highlo
 				std::pair<rapidjson::Value, rapidjson::Value> &t = m_TempBufferTypes.emplace_back();
 				t.first = typeKey;
 				t.second = typeVal;
-			}
+		//	}
 		}
 
 		return result;
@@ -1685,7 +1791,7 @@ namespace highlo
 					bool result = insertFunc(data->value);
 					if (!result)
 					{
-						HL_CORE_ERROR("Error: User defined function returned false!");
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 						return false;
 					}
 				}
@@ -1696,7 +1802,7 @@ namespace highlo
 						HLString type = currentDataType->value.GetString();
 						if (type != correctDataType)
 						{
-							HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+							HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected data type {0} but got {1} [-]", *correctDataType, *type);
 							return false;
 						}
 					}
@@ -1705,14 +1811,14 @@ namespace highlo
 					rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
 					if (currentValue == currentObj.MemberEnd())
 					{
-						HL_CORE_ERROR("Error: required field value!");
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: required field value! [-]");
 						return false;
 					}
 
 					bool result = insertFunc(currentValue->value);
 					if (!result)
 					{
-						HL_CORE_ERROR("Error: User defined function returned false!");
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 						return false;
 					}
 				}
@@ -1735,7 +1841,7 @@ namespace highlo
 				bool result = insertFunc(data->value);
 				if (!result)
 				{
-					HL_CORE_ERROR("Error: User defined function returned false!");
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 					return false;
 				}
 			}
@@ -1746,7 +1852,7 @@ namespace highlo
 					HLString type = currentDataType->value.GetString();
 					if (type != correctDataType)
 					{
-						HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected data type {0} but got {1} [-]", *correctDataType, *type);
 						return false;
 					}
 				}
@@ -1755,14 +1861,14 @@ namespace highlo
 				rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
 				if (currentValue == currentObj.MemberEnd())
 				{
-					HL_CORE_ERROR("Error: Required field value");
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Required field value [-]");
 					return false;
 				}
 
 				bool result = insertFunc(currentValue->value);
 				if (!result)
 				{
-					HL_CORE_ERROR("Error: User defined function returned false!");
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 					return false;
 				}
 			}
@@ -1802,7 +1908,7 @@ namespace highlo
 					bool result = insertFunc(data->name.GetString(), data->value);
 					if (!result)
 					{
-						HL_CORE_ERROR("Error: User defined function returned false!");
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 						return false;
 					}
 				}
@@ -1813,7 +1919,7 @@ namespace highlo
 						HLString type = currentDataType->value.GetString();
 						if (type != correctDataType)
 						{
-							HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+							HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected data type {0} but got {1} [-]", *correctDataType, *type);
 							return false;
 						}
 					}
@@ -1822,14 +1928,14 @@ namespace highlo
 					rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
 					if (currentValue == currentObj.MemberEnd())
 					{
-						HL_CORE_ERROR("Error: Required field value");
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Required field value [-]");
 						return false;
 					}
 
 					bool result = insertFunc(currentValue->name.GetString(), currentValue->value);
 					if (!result)
 					{
-						HL_CORE_ERROR("Error: User defined function returned false!");
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 						return false;
 					}
 				}
@@ -1852,7 +1958,7 @@ namespace highlo
 				bool result = insertFunc(data->name.GetString(), data->value);
 				if (!result)
 				{
-					HL_CORE_ERROR("Error: User defined function returned false!");
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 					return false;
 				}
 			}
@@ -1863,7 +1969,7 @@ namespace highlo
 					HLString type = currentDataType->value.GetString();
 					if (type != correctDataType)
 					{
-						HL_CORE_ERROR("Error: Expected data type {0} but got {1}", *correctDataType, *type);
+						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected data type {0} but got {1} [-]", *correctDataType, *type);
 						return false;
 					}
 				}
@@ -1872,14 +1978,14 @@ namespace highlo
 				rapidjson::GenericMemberIterator currentValue = currentObj.FindMember("value")->value.GetObject().begin();
 				if (currentValue == currentObj.MemberEnd())
 				{
-					HL_CORE_ERROR("Error: Required field value");
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Required field value [-]");
 					return false;
 				}
 
 				bool result = insertFunc(currentValue->name.GetString(), currentValue->value);
 				if (!result)
 				{
-					HL_CORE_ERROR("Error: User defined function returned false!");
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: User defined function returned false! [-]");
 					return false;
 				}
 			}

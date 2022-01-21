@@ -29,6 +29,7 @@ namespace highlo
 		OpenGLTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
+		OpenGLTexture2D(const TextureSpecification &spec);
 		~OpenGLTexture2D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; };

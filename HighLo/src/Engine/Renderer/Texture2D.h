@@ -29,6 +29,7 @@ namespace highlo
 		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height);
 		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
+		HLAPI static Ref<Texture2D> CreateFromSpecification(const TextureSpecification &specification);
 
 		HLAPI virtual HLRendererID GetSamplerRendererID() const = 0;
 

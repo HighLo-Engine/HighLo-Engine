@@ -17,17 +17,17 @@ namespace highlo
 			uint32 attachmentIndex = 0;
 			switch (format)
 			{
-				case TextureFormat::RGBA:
-					attachmentIndex = 0;
-					break;
+			case TextureFormat::RGBA:
+				attachmentIndex = 0;
+				break;
 
-				case TextureFormat::RED_INTEGER:
-					attachmentIndex = 1;
-					break;
+			case TextureFormat::RED_INTEGER:
+				attachmentIndex = 1;
+				break;
 
-				case TextureFormat::Depth:
-					attachmentIndex = 2;
-					break;
+			case TextureFormat::Depth:
+				attachmentIndex = 2;
+				break;
 			}
 
 			return attachmentIndex;
@@ -42,7 +42,7 @@ namespace highlo
 	{
 		Init();
 	}
-	
+
 	SceneRenderer::~SceneRenderer()
 	{
 	}
@@ -103,9 +103,6 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const Camera &camera)
 	{
-		HL_CORE_TRACE("BEGINNING SCENE");
-
-		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]()
 		{
@@ -114,8 +111,8 @@ namespace highlo
 			Renderer::ClearScreenColor(instance->m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
 			Renderer::ClearScreenBuffers();
 		});
-		*/
 
+		/*
 		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
 
 		// Load Camera Projection into Uniform Buffer block
@@ -124,8 +121,9 @@ namespace highlo
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(glm::mat4));
 		});
+		*/
 
-
+		/*
 		const auto &dirLight = m_SceneData.ActiveLight;
 
 		// calculate cascades
@@ -139,6 +137,7 @@ namespace highlo
 		}
 
 		// TODO: Add shadow data structure into uniform buffer struct on CPU side
+		*/
 	}
 
 	void SceneRenderer::EndScene()
@@ -150,20 +149,20 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#else
-		HL_CORE_TRACE("ENDING SCENE");
+		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]() mutable
 		{
 			instance->FlushDrawList();
 		});
+		*/
 	#endif
 
-		/*
+		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]()
 		{
 			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
 		});
-		*/
 	}
 
 	void SceneRenderer::SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
@@ -408,8 +407,7 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-	//	return m_CompositeRenderPass;
-		return m_GeometryVertexArray->GetSpecification().RenderPass;
+		return m_CompositeRenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -529,7 +527,6 @@ namespace highlo
 
 	void SceneRenderer::ShadowMapPass()
 	{
-	//	HL_CORE_TRACE("Rendering ShadowMapPass...");
 	}
 
 	void SceneRenderer::PreDepthPass()
@@ -542,20 +539,19 @@ namespace highlo
 
 	void SceneRenderer::GeometryPass()
 	{
-		HL_CORE_TRACE("Rendering GeometryPass...");
 		// Render selected geometry
 		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
 
 		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-		//	Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+			//	Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
 		}
 
 		for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-		//	Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+			//	Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
 		}
 
 		Renderer::EndRenderPass(m_CommandBuffer);
@@ -575,20 +571,20 @@ namespace highlo
 		for (auto &[mk, dc] : m_StaticDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-		//	Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+			//	Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
 		}
 
 		for (auto &[mk, dc] : m_DynamicDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-		//	Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+			//	Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
 		}
 
 		// Grid
 		if (GetOptions().ShowGrid)
 		{
 			const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
-									  * glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+				* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
 
 			Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
 		}
@@ -707,7 +703,7 @@ namespace highlo
 
 			// Offset to texel space to avoid shimmering (@see https://stackoverflow.com/questions/33499053/cascaded-shadow-map-shimmering)
 			glm::mat4 shadowMatrix = lightOrthoMatrix * lightViewMatrix;
-			float shadowMapRes = 0.0f; // m_ShadowPassPipelines[0]->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->GetWidth();
+			float shadowMapRes = (float)m_ShadowPassVertexArrays[0]->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetWidth();
 			glm::vec4 shadowOrigin = (shadowMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)) * shadowMapRes / 2.0f;
 			glm::vec4 roundedOrigin = glm::round(shadowOrigin);
 			glm::vec4 roundOffset = roundedOrigin - shadowOrigin;
@@ -846,7 +842,7 @@ namespace highlo
 	void SceneRenderer::InitBlurSecondPass()
 	{
 	}
-	
+
 	void SceneRenderer::InitGrid()
 	{
 		m_GridShader = Renderer::GetShaderLibrary()->Get("Grid");
@@ -916,4 +912,3 @@ namespace highlo
 
 
 }
-

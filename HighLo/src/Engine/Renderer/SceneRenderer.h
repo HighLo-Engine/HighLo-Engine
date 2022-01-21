@@ -194,7 +194,7 @@ namespace highlo
 		Ref<Scene> m_Scene;
 		SceneRendererSpecification m_Specification;
 		SceneRendererOptions m_RendererOptions;
-		
+
 		Ref<RenderPass> m_CompositeRenderPass;
 		Ref<RenderPass> m_ExternalCompositeRenderPass;
 
@@ -289,4 +289,3 @@ namespace highlo
 		SceneInfo m_SceneData;
 	};
 }
-

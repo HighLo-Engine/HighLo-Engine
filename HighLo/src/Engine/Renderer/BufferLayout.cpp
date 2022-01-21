@@ -105,9 +105,7 @@ namespace highlo
 		return
 		{
 			{ "a_Position", ShaderDataType::Float3 },
-			{ "a_Row1", ShaderDataType::Float4 },
-			{ "a_Row2", ShaderDataType::Float4 },
-			{ "a_Row3", ShaderDataType::Float4 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
 		};
 	}
 

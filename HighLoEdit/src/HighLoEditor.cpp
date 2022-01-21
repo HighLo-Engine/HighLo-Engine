@@ -322,7 +322,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	// Render viewport image
 	Ref<Texture2D> viewportImage = m_ViewportRenderer->GetFinalRenderTexture();
-
 	UI::Image(viewportImage, viewportSize, { 0, 1 }, { 1, 0 });
 	UI::EndViewport();
 

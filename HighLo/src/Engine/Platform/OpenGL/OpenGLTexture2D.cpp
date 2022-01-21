@@ -293,8 +293,8 @@ namespace highlo
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		auto openglFormat = utils::OpenGLTextureFormat(m_Specification.Format);
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, openglFormat, (openglFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
+		auto glFormat = utils::OpenGLTextureFormat(m_Specification.Format);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, glFormat, (glFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -304,6 +304,26 @@ namespace highlo
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification &spec)
+	{
+		m_Specification = spec;
+		Name = "unknown";
+		m_Loaded = true;
+
+		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_2D, RendererID);
+
+		auto glFormat = utils::OpenGLTextureFormat(m_Specification.Format);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, glFormat, (glFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		Release();

@@ -97,5 +97,22 @@ namespace highlo
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
+
+	Ref<Texture2D> Texture2D::CreateFromSpecification(const TextureSpecification &specification)
+	{
+	#ifdef HIGHLO_API_OPENGL
+		return Ref<OpenGLTexture2D>::Create(specification);
+	#elif HIGHLO_API_DX11
+		return Ref<DX11Texture2D>::Create(specification);
+	#elif HIGHLO_API_DX12
+		HL_ASSERT(false);
+		return nullptr;
+	#elif HIGHLO_API_VULKAN
+		return Ref<VulkanTexture2D>::Create(specification);
+	#else
+		HL_ASSERT(false);
+		return nullptr;
+	#endif // HIGHLO_API_OPENGL
+	}
 }
 

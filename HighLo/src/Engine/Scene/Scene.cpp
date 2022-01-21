@@ -65,6 +65,17 @@ namespace highlo
 	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
+
+		Entity mainCameraEntity = GetMainCameraEntity();
+		if (!mainCameraEntity)
+			return;
+
+		CameraComponent *cameraComp = mainCameraEntity.GetComponent<CameraComponent>();
+		if (!cameraComp->Primary)
+			return;
+
+		renderer->BeginScene(*cameraComp->Camera);
+		renderer->EndScene();
 	}
 	
 	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)

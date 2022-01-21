@@ -336,14 +336,14 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData->RenderCommandBuffer->Begin();
-		Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
+	//	Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
 
 		FlushQuads();
 		FlushCircles();
 		FlushLines();
 		FlushText();
 
-		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
+	//	Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
 		s_2DData->RenderCommandBuffer->End();
 		s_2DData->RenderCommandBuffer->Submit();
 	}

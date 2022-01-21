@@ -197,8 +197,45 @@ namespace highlo
 				m_ColorAttachments[i] = utils::CreateTexture(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Specification.Width, m_Specification.Height, int32(i));
 				switch (m_ColorAttachmentFormats[i])
 				{
+					case TextureFormat::SRGB:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_SRGB8, GL_SRGB, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RGB:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGB8, GL_RGB, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RGBA8:
 					case TextureFormat::RGBA:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RG16F:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RG16F, GL_RG, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RGBA16:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA16, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RGBA16F:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA16F, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RG32F:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RG32F, GL_RG, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RGBA32:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA32I, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RGBA32F:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA32F, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						break;
+
+					case TextureFormat::RED32F:
+						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_R32F, GL_RED, m_Specification.Width, m_Specification.Height, int32(i));
 						break;
 
 					case TextureFormat::RED_INTEGER:

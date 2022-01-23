@@ -26,7 +26,6 @@ namespace highlo
 	public:
 
 		HLAPI bool FileExists(const FileSystemPath &path);
-		HLAPI bool PathExists(const FileSystemPath &path);
 		
 		HLAPI bool RemoveFile(const FileSystemPath &path);
 		HLAPI HLString Rename(const FileSystemPath &path, const FileSystemPath &newName);

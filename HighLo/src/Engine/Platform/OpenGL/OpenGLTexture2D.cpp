@@ -381,7 +381,6 @@ namespace highlo
 
 	void OpenGLTexture2D::CreatePerLayerImageViews()
 	{
-		HL_ASSERT(false, "Unsupported in OpenGL");
 	}
 
 	void OpenGLTexture2D::CreateSampler(TextureProperties properties)

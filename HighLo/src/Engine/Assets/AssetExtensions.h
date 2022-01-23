@@ -34,5 +34,6 @@ namespace highlo
 		{ "jpeg", AssetType::Texture },
 		{ "tiff", AssetType::Texture },
 		{ "hdr", AssetType::EnvMap },
+		{ "ttf", AssetType::Font },
 	};
 }

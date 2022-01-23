@@ -50,32 +50,29 @@ namespace highlo
 		if (m_CurrentPath.Contains('\\'))
 			m_CurrentPath = m_CurrentPath.Replace("\\", "/");
 
-		if (Exists())
+		m_Handle = std::filesystem::path(*m_CurrentPath);
+		m_File.ExistsOnHardDrive = Exists();
+		m_File.IsFile = !std::filesystem::is_directory(m_Handle);
+		m_File.Size = Size();
+		m_File.FullPath = std::filesystem::absolute(m_Handle).string();
+
+		if (m_File.FullPath.Contains('\\'))
+			m_File.FullPath = m_File.FullPath.Replace("\\", "/");
+
+		m_CurrentAbsolutePath = m_File.FullPath;
+
+		if (m_File.IsFile)
 		{
-			m_Handle = std::filesystem::path(*m_CurrentPath);
-			m_File.ExistsOnHardDrive = true;
-			m_File.IsFile = !std::filesystem::is_directory(m_Handle);
-			m_File.Size = Size();
-			m_File.FullPath = std::filesystem::absolute(m_Handle).string();
-			
-			if (m_File.FullPath.Contains('\\'))
-				m_File.FullPath = m_File.FullPath.Replace("\\", "/");
+			m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
+			m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
+			m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
+		}
+		else
+		{
+			m_File.Extension = "folder";
+			m_File.Name = ExtractFolderNameFromPath(m_File.FullPath);
+			m_File.FileName = m_File.Name;
 
-			m_CurrentAbsolutePath = m_File.FullPath;
-
-			if (m_File.IsFile)
-			{
-				m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
-				m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
-				m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
-			}
-			else
-			{
-				m_File.Extension = "folder";
-				m_File.Name = ExtractFolderNameFromPath(m_File.FullPath);
-				m_File.FileName = m_File.Name;
-
-			}
 		}
 	}
 

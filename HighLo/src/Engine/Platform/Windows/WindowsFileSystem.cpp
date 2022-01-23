@@ -82,16 +82,6 @@ namespace highlo
         return (result != INVALID_FILE_ATTRIBUTES && (result & FILE_ATTRIBUTE_DIRECTORY));
     }
 
-    bool FileSystem::PathExists(const FileSystemPath &path)
-    {
-        HLString pathStr = path.String();
-        if (pathStr.IsEmpty())
-            return false;
-
-        DWORD result = GetFileAttributesW(pathStr.W_Str());
-        return (result != INVALID_FILE_ATTRIBUTES && (result & FILE_ATTRIBUTE_DIRECTORY));
-    }
-
     bool FileSystem::RemoveFile(const FileSystemPath &path)
     {
         FileSystemWatcher::Get()->DisableWatchUntilNextAction();

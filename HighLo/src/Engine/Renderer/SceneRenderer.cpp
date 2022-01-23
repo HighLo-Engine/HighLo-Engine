@@ -5,6 +5,7 @@
 #include "Renderer2D.h"
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Threading/Thread.h"
 
 #define USE_MULTI_THREADED_RENDERER 0
 
@@ -36,6 +37,10 @@ namespace highlo
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 
+		const size_t transformBufferCount = 100 * 1024; // 10240 transforms for now
+		m_SubmeshTransformBuffer = VertexBuffer::Create(sizeof(TransformVertexData) * transformBufferCount);
+		m_TransformVertexData = new TransformVertexData[transformBufferCount];
+
 		// yea ... we have a lot of render passes to initialize in the future :)
 		InitLightCullingCompute();
 		InitShadowPass();
@@ -54,9 +59,6 @@ namespace highlo
 		InitGrid();
 		InitSkybox();
 
-		const size_t transformBufferCount = 100 * 1024; // 10240 transforms for now
-		m_SubmeshTransformBuffer = VertexBuffer::Create(sizeof(TransformVertexData) * transformBufferCount);
-		m_TransformVertexData = new TransformVertexData[transformBufferCount];
 		m_ResourcesCreated = true;
 	}
 
@@ -77,6 +79,8 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const Camera &camera)
 	{
+		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
+
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]()
 		{
@@ -87,8 +91,6 @@ namespace highlo
 		});
 
 		/*
-		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
-
 		// Load Camera Projection into Uniform Buffer block
 		Renderer::Submit([viewProj, ub = m_UniformBufferSet]() mutable
 		{
@@ -691,9 +693,9 @@ namespace highlo
 		imageSpec.Width = 4096;
 		imageSpec.Height = 4096;
 		imageSpec.Layers = 4; // because we will use 4 cascades
-	//	Ref<Texture2D> cascadeDepthImage = Texture2D::Create(imageSpec);
-	//	cascadeDepthImage->Invalidate();
-	//	cascadeDepthImage->CreatePerLayerImageViews();
+		Ref<Texture2D> cascadeDepthImage = Texture2D::CreateFromSpecification(imageSpec);
+		cascadeDepthImage->Invalidate();
+		cascadeDepthImage->CreatePerLayerImageViews();
 
 		FramebufferSpecification shadowMapFramebufferSpec;
 		shadowMapFramebufferSpec.DebugName = "ShadowMap";
@@ -702,7 +704,7 @@ namespace highlo
 		shadowMapFramebufferSpec.Attachments = { TextureFormat::DEPTH32F };
 		shadowMapFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 		shadowMapFramebufferSpec.NoResize = true;
-	//	shadowMapFramebufferSpec.ExistingImage = cascadeDepthImage;
+		shadowMapFramebufferSpec.ExistingImage = cascadeDepthImage;
 
 		auto shader = Renderer::GetShaderLibrary()->Get("ShadowMap");
 		VertexArraySpecification spec;
@@ -835,7 +837,7 @@ namespace highlo
 	{
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "SceneComposite";
-		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
 
 		if (m_Specification.SwapChain)
@@ -843,10 +845,8 @@ namespace highlo
 		else
 			framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
 
-		Ref<Framebuffer> framebuffer = Framebuffer::Create(framebufferSpec);
-
 		RenderPassSpecification renderPassSpec;
-		renderPassSpec.Framebuffer = framebuffer;
+		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
 		renderPassSpec.DebugName = "SceneComposite";
 		m_CompositeRenderPass = RenderPass::Create(renderPassSpec);
 	}

@@ -56,7 +56,7 @@ namespace highlo
 		void SortSubDirectories();
 		AssetBrowserItemList Search(const HLString &query, const Ref<DirectoryInfo> &dirInfo);
 
-		void OnFileSystemChangedEvent(FileSystemChangedEvent &e);
+		bool OnFileSystemChangedEvent(FileSystemChangedEvent &e);
 		bool OnKeyPressedEvent(KeyPressedEvent &e);
 
 	private:

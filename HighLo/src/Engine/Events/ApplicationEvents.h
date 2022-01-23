@@ -104,10 +104,10 @@ namespace highlo
 	{
 	public:
 
-		FileSystemAction Action = FileSystemAction::Added;
-		FileSystemPath FilePath = "";
-		HLString OldName = "";
-		HLString NewName = "";
+		FileSystemAction Action = FileSystemAction::None;
+		FileSystemPath FilePath;
+		HLString OldName;
+		HLString NewName;
 		bool IsDirectory = false;
 		bool Tracking = false;
 
@@ -118,7 +118,12 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("FileSystemChangedEvent: ") << OldName << " -> " << NewName;
+			if (!OldName.IsEmpty())
+			{
+				return HLString("FileSystemChangedEvent: ") << OldName << " -> " << NewName;
+			}
+
+			return HLString("FileSystemChangedEvent: ") << NewName;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(FileSystemChanged)
@@ -137,12 +142,17 @@ namespace highlo
 			return HLString("ThreadStarting: " + m_Thread->GetName());
 		}
 
+		HLAPI Thread *GetThread() const
+		{
+			return m_Thread;
+		}
+
 		REGISTER_EVENT_CLASS_TYPE(ThreadStarting)
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
 
 	private:
 
-		Thread *m_Thread;
+		Thread *m_Thread = nullptr;
 	};
 
 	class ThreadEndingEvent : public Event
@@ -157,13 +167,23 @@ namespace highlo
 			return HLString("ThreadEnding: " + m_Thread->GetName() + " with exit code: " + m_ExitCode);
 		}
 
+		HLAPI Thread *GetThread() const
+		{
+			return m_Thread;
+		}
+
+		HLAPI int32 GetExitCode() const
+		{
+			return m_ExitCode;
+		}
+
 		REGISTER_EVENT_CLASS_TYPE(ThreadEnding)
 		REGISTER_EVENT_CLASS_CATEGORY(EventCategoryApplication)
 
 	private:
 
-		int32 m_ExitCode;
-		Thread *m_Thread;
+		int32 m_ExitCode = 0;
+		Thread *m_Thread = nullptr;
 	};
 }
 

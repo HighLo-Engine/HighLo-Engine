@@ -17,7 +17,6 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Threading/ThreadRegistry.h"
 #include "Engine/Loaders/AssetImporter.h"
-#include "Engine/Assets/AssetManager.h"
 
 namespace highlo
 {
@@ -46,7 +45,6 @@ namespace highlo
 		// Save the current shader cache state into the json registry
 		ShaderCache::Shutdown();
 
-		// Save the current assets that are loaded into a cache registry file and delete them
 		AssetImporter::Shutdown();
 
 		Renderer::Shutdown();
@@ -222,13 +220,13 @@ namespace highlo
 
 	bool HLApplication::OnFileMenuChangedEvent(FileMenuChangedEvent &e)
 	{
-	//	HL_CORE_TRACE("FileMenu {0} has changed!", e.GetItem()->Name);
+		HL_CORE_TRACE("FileMenu {0} has changed!", e.GetItem()->Name);
 		return false;
 	}
 
 	bool HLApplication::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
-		HL_CORE_INFO("{0}", *e.ToString());
+		HL_CORE_INFO("[APP] FilSystem changed! {0}", *e.ToString());
 		return false;
 	}
 

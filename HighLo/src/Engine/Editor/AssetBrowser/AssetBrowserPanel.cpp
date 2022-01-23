@@ -250,6 +250,7 @@ namespace highlo
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(HL_BIND_EVENT_FUNCTION(AssetBrowserPanel::OnKeyPressedEvent));
+		dispatcher.Dispatch<FileSystemChangedEvent>(HL_BIND_EVENT_FUNCTION(AssetBrowserPanel::OnFileSystemChangedEvent));
 	}
 	
 	Ref<DirectoryInfo> AssetBrowserPanel::GetDirectory(const FileSystemPath &filePath) const
@@ -949,10 +950,10 @@ namespace highlo
 		return results;
 	}
 	
-	void AssetBrowserPanel::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
+	bool AssetBrowserPanel::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
 	{
-		HL_CORE_INFO("FileSystemChangedEvent: ", *e.ToString());
 		Refresh();
+		return true;
 	}
 	
 	bool AssetBrowserPanel::OnKeyPressedEvent(KeyPressedEvent &e)

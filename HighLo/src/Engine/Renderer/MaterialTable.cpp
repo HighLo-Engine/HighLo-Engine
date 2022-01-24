@@ -20,7 +20,7 @@ namespace highlo
 		}
 	}
 	
-	void MaterialTable::SetMaterial(uint32 index, const Ref<Material> &material)
+	void MaterialTable::SetMaterial(uint32 index, const Ref<MaterialAsset> &material)
 	{
 		m_Materials[index] = material;
 		if (index >= m_MaterialCount)
@@ -35,7 +35,7 @@ namespace highlo
 			m_MaterialCount = index + 1;
 	}
 	
-	Ref<Material> MaterialTable::GetMaterial(uint32 index) const
+	Ref<MaterialAsset> MaterialTable::GetMaterial(uint32 index) const
 	{
 		HL_ASSERT(HasMaterial(index));
 		return m_Materials.at(index);

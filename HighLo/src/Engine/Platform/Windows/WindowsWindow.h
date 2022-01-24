@@ -8,6 +8,8 @@
 #pragma once
 
 #include <Windows.h>
+#include <shobjidl_core.h>
+
 #include "Engine/Window/Window.h"
 #include "Engine/Renderer/RenderingContext.h"
 
@@ -48,6 +50,8 @@ namespace highlo
 
 		virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) override;
 		virtual void SetMenuBar(const Ref<MenuBar> &bar) override;
+		virtual bool SetProgress(WindowProgressState state) override;
+		virtual bool SetProgressValue(uint64 completed, uint64 total) override;
 
 		virtual void SetVSync(bool bEnabled) override;
 		virtual void SetVisible(bool bVisible) override;
@@ -70,7 +74,6 @@ namespace highlo
 		bool IsFocused() override;
 
 		virtual const WindowData &GetProperties() const override { return m_Properties; }
-
 		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
 
 		// Specific to DX11Window
@@ -92,6 +95,7 @@ namespace highlo
 		Ref<RenderingContext> m_Context;
 
 		HWND m_NativeHandle = nullptr;
+		ITaskbarList4 *m_Taskbar;
 		HICON m_WindowIcon = NULL;
 		HCURSOR m_Cursor = NULL;
 		Ref<MenuBar> m_MenuBar = nullptr;

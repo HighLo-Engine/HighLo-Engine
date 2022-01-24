@@ -81,6 +81,7 @@ namespace highlo
 	{
 		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
 
+		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]()
 		{
@@ -89,15 +90,14 @@ namespace highlo
 			Renderer::ClearScreenColor(instance->m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
 			Renderer::ClearScreenBuffers();
 		});
+		*/
 
-		/*
 		// Load Camera Projection into Uniform Buffer block
 		Renderer::Submit([viewProj, ub = m_UniformBufferSet]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(glm::mat4));
 		});
-		*/
 
 		/*
 		const auto &dirLight = m_SceneData.ActiveLight;
@@ -125,20 +125,20 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#else
-		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]() mutable
 		{
 			instance->FlushDrawList();
 		});
-		*/
 	#endif
 
+		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]()
 		{
 			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
 		});
+		*/
 	}
 
 	void SceneRenderer::SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
@@ -150,10 +150,7 @@ namespace highlo
 
 			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-			AssetHandle materialHandle = AssetHandle(); // WILL NOT WORK WITH FINAL MATERIALS DO THE BELOW TODO!
-
-			// TODO: MaterialTable contains normal materials for now but is required to hold AssetMaterials
-		//	AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
+			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
 			MeshKey key = { model->Handle, materialHandle, submeshIndex };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
@@ -188,7 +185,7 @@ namespace highlo
 	{
 		const auto &submeshes = model->Get()->GetSubmeshes();
 		uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-		AssetHandle materialHandle = AssetHandle(); // TODO: Refactor material table to contain AssetMaterials like above...
+		AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
 		MeshKey key = { model->Handle, materialHandle, submeshIndex };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
@@ -227,7 +224,7 @@ namespace highlo
 
 			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-			AssetHandle materialHandle = AssetHandle(); // TODO: Refactor
+			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
 			MeshKey key = { model->Handle, materialHandle, submeshIndex };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
@@ -276,7 +273,7 @@ namespace highlo
 	{
 		const auto &submeshes = model->Get()->GetSubmeshes();
 		uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-		AssetHandle materialHandle = AssetHandle(); // TODO: Refactor
+		AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
 		MeshKey key = { model->Handle, materialHandle, submeshIndex };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
@@ -516,7 +513,7 @@ namespace highlo
 		Renderer::EndRenderPass(m_CommandBuffer);
 
 		// Render normal geometry
-		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass, true);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
 
 		// First render skybox
 	//	m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);

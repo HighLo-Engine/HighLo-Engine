@@ -56,6 +56,7 @@ namespace highlo
 		m_AssetIconMap["jpeg"] = imageTex;
 		m_AssetIconMap["tiff"] = imageTex;
 		m_AssetIconMap["tga"] = imageTex;
+		m_AssetIconMap["hdr"] = Texture2D::LoadFromFile("assets/Resources/icons/hdr-file-format.png");
 		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
 	//	m_AssetIconMap["hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
 	//	m_AssetIconMap["ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/");

@@ -3,71 +3,16 @@
 #include "HighLoPch.h"
 #include "SceneHierarchyPanel.h"
 
+#include "Engine/Assets/AssetManager.h"
 #include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGuiWidgets.h"
 #include "Engine/Application/Application.h"
 #include "EditorColors.h"
 
 namespace highlo
 {
-	template<typename T, typename UIFunc>
-	static void DrawComponent(const HLString &name, Entity entity, UIFunc func, bool canBeRemoved = true)
-	{
-		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed 
-			| ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-
-		if (entity.HasComponent<T>())
-		{
-			ImGui::PushID((void*)typeid(T).hash_code());
-			auto &component = entity.GetComponent<T>();
-			ImVec2 contentRegionAvail = ImGui::GetContentRegionAvail();
-			bool removeComponent = false;
-			bool resetValues = false;
-
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImGui::Separator();
-			bool opened = ImGui::TreeNodeEx("##todoMakeMeARealId", treeNodeFlags, *name);
-			bool rightClicked = ImGui::IsItemClicked(ImGuiMouseButton_Right);
-
-			ImGui::SameLine(contentRegionAvail.x - lineHeight * 0.5f);
-			if (ImGui::Button("+", ImVec2(lineHeight, lineHeight)) || rightClicked)
-			{
-				ImGui::OpenPopup("ComponentSettings");
-			}
-
-			if (ImGui::BeginPopup("ComponentSettings"))
-			{
-				if (ImGui::MenuItem("Reset"))
-					resetValues = true;
-
-				if (canBeRemoved)
-				{
-					if (ImGui::MenuItem("Remove Component"))
-						removeComponent = true;
-				}
-
-				ImGui::EndPopup();
-			}
-
-
-			if (opened)
-			{
-				func(component);
-				ImGui::TreePop();
-			}
-
-			if (removeComponent || resetValues)
-				entity.RemoveComponent<T>();
-
-			if (resetValues)
-				entity.AddComponent<T>();
-
-			ImGui::PopID();
-		}
-	}
-
-	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene> &scene)
-		: m_Context(scene)
+	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene> &scene, bool isWindow)
+		: m_Context(scene), m_IsWindow(isWindow)
 	{
 	}
 
@@ -84,104 +29,322 @@ namespace highlo
 			m_SelectionChangedCallback(entity);
 	}
 
-	void SceneHierarchyPanel::OnUIRender(bool window, bool *pOpen)
+	void SceneHierarchyPanel::OnUIRender(bool *pOpen)
 	{
-		if (window)
+		if (m_IsWindow)
+		{
+			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::Begin("Scene Hierarchy", pOpen);
+		}
 
-		ImRect windowRect = { ImGui::GetWindowContentRegionMin(), ImGui::GetContentRegionMax() };
+		ImRect windowRect = { ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax() };
 
 		if (m_Context)
 		{
-			/*
-			HLApplication::Get().GetECSRegistry().ForEachMultiple<IDComponent, RelationshipComponent>([=](Entity e, TransformComponent &transform, std::vector<void*> components)
 			{
-				if (e.GetParentUUID() == 0)
-					DrawEntityNode(e);
-			});
-			*/
+				const float edgeOffset = 4.0f;
+				static HLString searchedString;
+				UI::ShiftCursorX(edgeOffset * 3.0f);
+				UI::ShiftCursorY(edgeOffset * 2.0f);
+
+				// ===============================================================================================
+				// =========================================  Search bar  ========================================
+				// ===============================================================================================
+
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - edgeOffset * 3.0f);
+			//	UI::Widgets::SearchWidget(searchedString);
+
+				ImGui::Spacing();
+				ImGui::Spacing();
+
+				// ===============================================================================================
+				// =====================================  Entity List  ===========================================
+				// ===============================================================================================
+
+				UI::ScopedStyle cellPadding(ImGuiStyleVar_CellPadding, ImVec2(4.0f, 0.0f));
+
+				const ImU32 colRowAlt = UI::ColorWithMultipliedValue(Colors::Theme::BackgroundDark, 1.3f);
+				UI::ScopedColor tableBGAlt(ImGuiCol_TableRowBgAlt, colRowAlt);
+
+				// Table
+				{
+					UI::ScopedColor tableBg(ImGuiCol_ChildBg, Colors::Theme::BackgroundDark);
+
+					ImGuiTableFlags flags = ImGuiTableFlags_NoPadInnerX
+										  | ImGuiTableFlags_Resizable
+										  | ImGuiTableFlags_Reorderable
+										  | ImGuiTableFlags_ScrollY
+										  | ImGuiTableFlags_RowBg
+										  | ImGuiTableFlags_Sortable;
+
+					const int32 numCols = 3;
+					ImGui::BeginTable(UI::GenerateID(), numCols, flags, ImVec2(ImGui::GetContentRegionAvail()));
+
+					ImGui::TableSetupColumn("Label");
+					ImGui::TableSetupColumn("Type");
+					ImGui::TableSetupColumn("Visibility");
+
+					// Headers
+					{
+						const ImU32 colorActive = UI::ColorWithMultipliedValue(Colors::Theme::GroupHeader, 1.2f);
+						UI::ScopedColorStack headerColors(ImGuiCol_HeaderHovered, colorActive, ImGuiCol_HeaderActive, colorActive);
+						
+						ImGui::TableSetupScrollFreeze(ImGui::TableGetColumnCount(), 1);
+
+						ImGui::TableNextRow(ImGuiTableRowFlags_Headers, 22.0f);
+						for (int32 column = 0; column < ImGui::TableGetColumnCount(); ++column)
+						{
+							ImGui::TableSetColumnIndex(column);
+							const char *columnName = ImGui::TableGetColumnName(column);
+							UI::ScopedID columnId(column);
+
+							UI::ShiftCursor(edgeOffset * 3.0f, edgeOffset * 2.0f);
+							ImGui::TableHeader(columnName);
+							UI::ShiftCursor(-edgeOffset * 3.0f, -edgeOffset * 2.0f);
+						}
+
+						ImGui::SetCursorPosX(ImGui::GetCurrentTable()->OuterRect.Min.x);
+						// TODO: add DrawUnderLine UI function and call here
+					}
+					
+					// List
+					{
+						UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
+						
+						auto view = m_Context->m_Registry.View<IDComponent, RelationshipComponent>();
+						for (UUID entityId : view)
+						{
+
+							Entity e = m_Context->FindEntityByUUID(entityId);
+							if (e.GetParentUUID() == 0)
+								DrawEntityNode(e, searchedString);
+						}
+					}
+
+					if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+					{
+						if (ImGui::BeginMenu("Create"))
+						{
+							if (ImGui::MenuItem("Null Entity"))
+							{
+								auto newEntity = m_Context->CreateEntity("Null Entity");
+								SetSelected(newEntity);
+							}
+
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Directional Light"))
+							{
+
+							}
+
+							if (ImGui::MenuItem("Point Light"))
+							{
+
+							}
+
+							if (ImGui::MenuItem("Sky Light"))
+							{
+
+							}
+
+							ImGui::EndMenu();
+						}
+
+						ImGui::EndPopup();
+					}
+
+					ImGui::EndTable();
+				}
+			}
 
 			if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetCurrentWindow()->ID))
 			{
 				const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("scene_entity_hierarchy", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+
 				if (payload)
 				{
-					Entity &entity = *(Entity*)payload->Data;
-					m_Context->UnparentEntity(entity);
+					Entity &e = *(Entity*)payload->Data;
+					m_Context->UnparentEntity(e);
 				}
 
 				ImGui::EndDragDropTarget();
 			}
-
-			if (ImGui::BeginPopupContextWindow("#sceneHierarchyRightClick", ImGuiMouseButton_Right, true))
-			{
-				if (ImGui::BeginMenu(ICON_FA_PLUS " New"))
-				{
-					if (ImGui::MenuItem(ICON_FA_SQUARE " Null Object"))
-					{
-						auto newEntity = m_Context->CreateEntity("Null Object");
-						SetSelected(newEntity);
-					}
-
-					if (ImGui::MenuItem(ICON_FA_VIDEO " Camera"))
-					{
-						auto newEntity = m_Context->CreateEntity("Camera");
-						newEntity.AddComponent<CameraComponent>();
-						SetSelected(newEntity);
-					}
-
-
-
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndPopup();
-			}
 		}
 
-		if (window)
+		if (m_IsWindow)
 			ImGui::End();
 	}
 
-	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
+	void SceneHierarchyPanel::DrawEntityNode(Entity entity, const HLString &searchFilter)
 	{
-		HLString name = entity.Tag();
+		const char *name = entity.Tag().C_Str();
+		HL_CORE_TRACE("DRAWING ENTITY {0}", name);
 
-		ImGuiTreeNodeFlags flags = (entity == m_SelectedEntity ? ImGuiTreeNodeFlags_Selected : 0)
-			| ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		const bool hasChildMatchingSearch = [&]
+		{
+			if (searchFilter.IsEmpty())
+				return false;
 
-		/*
+			for (auto child : entity.Children())
+			{
+				Entity e = m_Context->FindEntityByUUID(child);
+				if (UI::IsMatchingSearch(e.Tag(), searchFilter))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}();
+
+		if (!UI::IsMatchingSearch(name, searchFilter) && !hasChildMatchingSearch)
+			return;
+
+		const float edgeOffset = 4.0f;
+		const float rowHeight = 21.0f;
+
+		auto *window = ImGui::GetCurrentWindow();
+		window->DC.CurrLineSize.y = rowHeight;
+		ImGui::TableNextRow(0, rowHeight);
+
+		ImGui::TableNextColumn();
+		window->DC.CurrLineTextBaseOffset = 3.0f;
+
+		const ImVec2 rowAreaMin = ImGui::TableGetCellBgRect(ImGui::GetCurrentTable(), 0).Min;
+		const ImVec2 rowAreaMax = {
+			ImGui::TableGetCellBgRect(ImGui::GetCurrentTable(), ImGui::TableGetColumnCount() - 1).Max.x,
+			rowAreaMin.y + rowHeight
+		};
+
+		const bool isSelected = entity == m_SelectedEntity;
+		ImGuiTreeNodeFlags flags = (isSelected ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		if (hasChildMatchingSearch)
+			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+
 		if (entity.Children().empty())
 			flags |= ImGuiTreeNodeFlags_Leaf;
-		*/
 
-		// TODO: move this to another function and checks are missing (asset functions are not implemented yet)
-	//	const bool missingMesh = entity.HasComponent<StaticModelComponent>();
-	//	if (missingMesh)
-	//		ImGui::PushStyleColor(ImGuiCol_Text, HL_EDITOR_ERROR_COLOR);
+		const HLString strId = HLString(name) + HLString::ToString((uint64)entity.GetUUID());
 
-		const bool opened = ImGui::TreeNodeEx((void*)(uint64)(uint32)entity.GetUUID(), flags, *name);
-		if (ImGui::IsItemHovered(ImGuiHoveredFlags_None) && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		ImGui::PushClipRect(rowAreaMin, rowAreaMax, false);
+		bool isRowHovered;
+		bool held;
+		bool isRowClicked = ImGui::ButtonBehavior(ImRect(rowAreaMin, rowAreaMax), ImGui::GetID(strId.C_Str()), &isRowHovered, &held, ImGuiButtonFlags_AllowItemOverlap |ImGuiButtonFlags_PressedOnClickRelease);
+		ImGui::SetItemAllowOverlap();
+		ImGui::PopClipRect();
+
+		const bool isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+
+		// Row coloring
+		auto isAnyDescendantSelected = [&](Entity e, auto isAnyDescendantSelected) -> bool
 		{
-			m_SelectedEntity = entity;
-			if (m_SelectionChangedCallback)
-				m_SelectionChangedCallback(m_SelectedEntity);
+			if (e == m_SelectedEntity)
+				return true;
+
+			if (!e.Children().empty())
+			{
+				for (auto &child : e.Children())
+				{
+					Entity childEntity = m_Context->FindEntityByUUID(child);
+					if (isAnyDescendantSelected(childEntity, isAnyDescendantSelected))
+						return true;
+				}
+			}
+
+			return false;
+		};
+
+		auto fillRowWithColor = [&](const ImColor &color)
+		{
+			for (int32 column = 0; column < ImGui::TableGetColumnCount(); ++column)
+			{
+				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color, column);
+			}
+		};
+
+		if (isSelected)
+		{
+			if (isWindowFocused) // || UI::NavigatedTo())
+			{
+				fillRowWithColor(Colors::Theme::Selection);
+			}
+			else
+			{
+				const ImColor col = UI::ColorWithMultipliedValue(Colors::Theme::Selection, 0.9f);
+				fillRowWithColor(col);
+			}
+		}
+		else if (isRowHovered)
+		{
+			fillRowWithColor(Colors::Theme::GroupHeader);
+		}
+		else if (isAnyDescendantSelected(entity, isAnyDescendantSelected))
+		{
+			fillRowWithColor(Colors::Theme::SelectionMuted);
 		}
 
-	//	if (missingMesh)
-	//		ImGui::PopStyleColor();
 
-		// Delete Entity
+
+		// Text coloring
+		if (isSelected)
+			ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
+
+		bool missingMesh = entity.HasComponent<StaticModelComponent>() 
+			&& AssetManager::Get()->IsAssetHandleValid(entity.GetComponent<StaticModelComponent>()->Model->Handle)
+			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)
+			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)->IsFlagSet(AssetFlag::Missing);
+
+		if (missingMesh)
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4f, 0.3f, 1.0f));
+
+		bool isPrefab = entity.HasComponent<PrefabComponent>();
+		if (isPrefab && !isSelected)
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.32f, 0.7f, 0.87f, 1.0f));
+
+		ImGuiContext &g = *GImGui;
+		auto &style = ImGui::GetStyle();
+		const ImVec2 labelSize = ImGui::CalcTextSize(strId.C_Str(), nullptr, false);
+		const ImVec2 padding = ((flags & ImGuiTreeNodeFlags_FramePadding)) ? style.FramePadding : ImVec2(style.FramePadding.x, ImMin(window->DC.CurrLineTextBaseOffset, style.FramePadding.y));
+		const float textOffsetX = g.FontSize + padding.x * 2.0f;
+		const float textOffsetY = ImMax(padding.y, window->DC.CurrLineTextBaseOffset);
+		const float textWidth = g.FontSize + (labelSize.x > 0.0f ? labelSize.x + padding.x * 2.0f : 0.0f);
+		ImVec2 textPos(window->DC.CursorPos.x + textOffsetX, window->DC.CursorPos.y + textOffsetY);
+
+		const float arrowHitX1 = (textPos.x - textOffsetX) - style.TouchExtraPadding.x;
+		const float arrowHitX2 = (textPos.x - textOffsetX) + (g.FontSize + padding.x * 2.0f) + style.TouchExtraPadding.x;
+		const bool isMouseXOverArrow = (g.IO.MousePos.x >= arrowHitX1 && g.IO.MousePos.y < arrowHitX2);
+		bool prevState = ImGui::TreeNodeBehaviorIsOpen(ImGui::GetID(strId.C_Str()));
+
+		if (isMouseXOverArrow && isRowClicked)
+			ImGui::SetNextItemOpen(!prevState);
+
+		const bool opened = false; // ImGui::TreeNodeWithIcon(nullptr, ImGui::GetID(strId.C_Str()), flags, name, nullptr);
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
-			if (ImGui::MenuItem("Delete"))
-				entityDeleted = true;
+
 
 			ImGui::EndPopup();
 		}
 
-		// Define Drag Drop source
+		if (isRowClicked)
+		{
+			m_SelectedEntity = entity;
+			if (m_SelectionChangedCallback)
+				m_SelectionChangedCallback(m_SelectedEntity);
+
+			ImGui::FocusWindow(ImGui::GetCurrentWindow());
+		}
+
+		if (missingMesh)
+			ImGui::PopStyleColor();
+
+		if (isSelected)
+			ImGui::PopStyleColor();
+
+		// Drag && drop
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 		{
 			ImGui::Text(entity.Tag().C_Str());
@@ -201,16 +364,29 @@ namespace highlo
 			ImGui::EndDragDropTarget();
 		}
 
+		ImGui::TableNextColumn();
+
+		if (isPrefab)
+		{
+			UI::ShiftCursorY(edgeOffset * 3.0f);
+			if (isSelected)
+				ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
+
+			ImGui::TextUnformatted("Prefab");
+			ImGui::PopStyleColor();
+		}
+
+		// Draw all children
 		if (opened)
 		{
-			/*
 			for (auto child : entity.Children())
 			{
-				Entity e = m_Context->FindEntityByUUID(child->ID);
+				Entity e = m_Context->FindEntityByUUID(child);
 				if (e)
-					DrawEntityNode(e);
+					DrawEntityNode(e, searchFilter);
 			}
-			*/
+
+			ImGui::TreePop();
 		}
 
 		if (entityDeleted)
@@ -219,12 +395,9 @@ namespace highlo
 			if (entity == m_SelectedEntity)
 				m_SelectedEntity = {};
 
-			m_EntityDeletedCallback(entity);
+			if (m_EntityDeletedCallback)
+				m_EntityDeletedCallback(entity);
 		}
-	}
-
-	void SceneHierarchyPanel::DrawEntityComponents(Entity entity)
-	{
 	}
 }
 

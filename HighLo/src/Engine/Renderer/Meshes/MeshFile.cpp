@@ -9,7 +9,7 @@ namespace highlo
 {
 	MeshFile::MeshFile(const FileSystemPath &filePath, bool shouldBeAnimated)
 	{
-		m_MeshShader = shouldBeAnimated ? Renderer::GetShaderLibrary()->Get("DefaultAnimatedShaderPBR") : Renderer::GetShaderLibrary()->Get("DefaultShaderPBR");
+		m_MeshShader = shouldBeAnimated ? Renderer::GetShaderLibrary()->Get("HighLoPBRAnimated") : Renderer::GetShaderLibrary()->Get("HighLoPBR");
 		m_MeshLoader = MeshLoader::Create(filePath, m_MeshShader);
 		m_IsAnimated = m_MeshLoader->IsAnimated();
 		m_SubMeshes = m_MeshLoader->GetSubmeshes();
@@ -46,7 +46,9 @@ namespace highlo
 		Mesh submesh;
 		submesh.BaseVertex = 0;
 		submesh.BaseIndex = 0;
-		submesh.IndexCount = (uint32) indices.size() * 3u;
+		submesh.MaterialIndex = 0;
+		submesh.IndexCount = (uint32)indices.size() * 3u;
+		submesh.VertexCount = (uint32)vertices.size();
 		submesh.WorldTransform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
 		m_SubMeshes.push_back(submesh);
 
@@ -61,7 +63,9 @@ namespace highlo
 		Mesh submesh;
 		submesh.BaseVertex = 0;
 		submesh.BaseIndex = 0;
+		submesh.MaterialIndex = 0;
 		submesh.IndexCount = (uint32) indices.size() * 3u;
+		submesh.VertexCount = (uint32)vertices.size();
 		submesh.WorldTransform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
 		m_SubMeshes.push_back(submesh);
 
@@ -77,7 +81,9 @@ namespace highlo
 		Mesh submesh;
 		submesh.BaseVertex = 0;
 		submesh.BaseIndex = 0;
+		submesh.MaterialIndex = 0;
 		submesh.IndexCount = (uint32)indices.size() * 3u;
+		submesh.VertexCount = (uint32)vertices.size();
 		submesh.WorldTransform = transform;
 		m_SubMeshes.push_back(submesh);
 

@@ -77,7 +77,7 @@ namespace highlo
 
 		HLAPI Entity CreateEntity(const HLString &name = "");
 		HLAPI Entity CreateEntityWithUUID(UUID uuid, const HLString &name = "");
-		HLAPI void DestroyEntity(Entity entity);
+		HLAPI void DestroyEntity(Entity entity, bool excludeChildren = false, bool first = true);
 		HLAPI Entity DuplicateEntity(Entity entity);
 
 		HLAPI Entity CreatePrefabEntity(Entity entity, const glm::vec3 *translation = nullptr);
@@ -86,8 +86,7 @@ namespace highlo
 		template<typename T>
 		HLAPI auto GetAllEntitiesWith()
 		{
-			// TODO
-			return nullptr;
+			return m_Registry.View<T>();
 		}
 
 		HLAPI Entity FindEntityByUUID(UUID id);
@@ -98,7 +97,7 @@ namespace highlo
 		HLAPI void ConvertToWorldSpace(Entity entity);
 		HLAPI glm::mat4 GetTransformRelativeToParent(Entity entity);
 		HLAPI glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
-		HLAPI TransformComponent GetWorldSpaceTransform(Entity entity);
+	//	HLAPI Transform GetWorldSpaceTransform(Entity entity);
 
 		HLAPI void ParentEntity(Entity entity, Entity parent);
 		HLAPI void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
@@ -116,6 +115,9 @@ namespace highlo
 		HLAPI const HLString &GetName() const { return m_Name; }
 		HLAPI void SetName(const HLString &name) { m_Name = name; }
 
+		HLAPI ECS_Registry &GetRegistry() { return m_Registry; }
+		HLAPI const ECS_Registry &GetRegistry() const { return m_Registry; }
+
 		// TODO: Only in editor
 		HLAPI void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
@@ -123,7 +125,7 @@ namespace highlo
 
 	private:
 
-		UUID m_SceneID = 0;
+		UUID m_SceneID = UUID();
 		HLString m_Name = "Untitled Scene";
 		HLString m_DebugName;
 		bool m_IsEditorScene = false;
@@ -148,9 +150,6 @@ namespace highlo
 
 		bool m_IsPlaying = false;
 		bool m_ShouldSimulate = false;
-
-		// TEMP
-		Ref<Font> m_Font;
 
 		friend class Entity;
 		friend class SceneRenderer;

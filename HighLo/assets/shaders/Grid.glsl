@@ -26,8 +26,8 @@ void main()
 #version 450 core
 
 layout(location = 0) out vec4 o_Color;
-layout(location = 1) out vec4 o_unused0;
-layout(location = 2) out vec4 o_unused1;
+layout(location = 1) out vec4 o_Unused0;
+layout(location = 2) out vec4 o_Unused1;
 
 layout(location = 0) in vec2 v_TexCoord;
 
@@ -47,10 +47,12 @@ void main()
 {
 	float x = grid(v_TexCoord * u_Settings.Scale, u_Settings.Size);
 	o_Color = vec4(vec3(0.2), 0.5) * (1.0 - x);
-	o_unused0 = vec4(0.0);
-	o_unused1 = vec4(0.0);
+	o_Unused0 = vec4(1.0);
+	o_Unused1 = vec4(1.0);
 
 	if (o_Color.a == 0.0)
-		discard;
+		o_Color = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		o_Color = vec4(1.0);
 }
 

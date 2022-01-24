@@ -17,7 +17,7 @@ namespace highlo
 	public:
 
 		HLAPI SceneHierarchyPanel() = default;
-		HLAPI SceneHierarchyPanel(const Ref<Scene> &scene);
+		HLAPI SceneHierarchyPanel(const Ref<Scene> &scene, bool isWindow);
 
 		HLAPI void SetContext(const Ref<Scene> &scene);
 		HLAPI void SetSelected(Entity entity);
@@ -25,17 +25,15 @@ namespace highlo
 		HLAPI void SetEntityDeletedCallback(const std::function<void(Entity)> &callback) { m_EntityDeletedCallback = callback; }
 		HLAPI void SetInvalidAssetMetaDataCallback(const std::function<void(Entity, AssetHandle)> &callback) { m_InvalidAssetMetaDataCallback = callback; }
 
-		HLAPI void OnUIRender(bool window = true, bool *pOpen = nullptr);
+		HLAPI void OnUIRender(bool *pOpen = nullptr);
 
 	private:
 
-		void DrawEntityNode(Entity entity);
-		void DrawEntityComponents(Entity entity);
-
-	private:
+		void DrawEntityNode(Entity entity, const HLString &searchFilter = "");
 
 		Ref<Scene> m_Context;
 		Entity m_SelectedEntity;
+		bool m_IsWindow = false;
 
 		std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
 		std::function<void(Entity, AssetHandle)> m_InvalidAssetMetaDataCallback;

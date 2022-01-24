@@ -12,7 +12,7 @@ namespace highlo
 		s_RegistryInstance = this;
 	}
 
-	HLAPI ECS_Registry &ECS_Registry::Get()
+	ECS_Registry &ECS_Registry::Get()
 	{
 		return *s_RegistryInstance;
 	}

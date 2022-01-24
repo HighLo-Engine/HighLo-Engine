@@ -68,6 +68,27 @@ TEST_F(ECSTests, ForEachMultipleComponent)
 	EXPECT_EQ(entityCount, 4);
 }
 
+TEST_F(ECSTests, ViewTests)
+{
+	// APPROVED WORKING
+
+	Ref<Scene> demoScene = Scene::CreateEmpty();
+	Entity oneEntity = demoScene->CreateEntity("DemoName");
+	Entity secondEntity = demoScene->CreateEntity("AnotherEntity");
+	Entity thirdEntity = demoScene->CreateEntity("LOL");
+	thirdEntity.AddComponent<SpriteComponent>();
+
+	std::cout << "First Entity ID: " << oneEntity.GetUUID() << std::endl;
+	std::cout << "Second Entity ID: " << secondEntity.GetUUID() << std::endl;
+	std::cout << "Third Entity ID: " << thirdEntity.GetUUID() << std::endl;
+
+	auto view = demoScene->GetRegistry().View<SpriteComponent>();
+	for (auto entityId : view)
+	{
+		std::cout << entityId << std::endl;
+	}
+}
+
 // TODO
 TEST_F(ECSTests, ForEachMultipleComponentWithValueChange)
 {

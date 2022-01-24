@@ -37,7 +37,9 @@ namespace highlo
 	
 	Ref<MaterialAsset> MaterialTable::GetMaterial(uint32 index) const
 	{
-		HL_ASSERT(HasMaterial(index));
+		if (!HasMaterial(index))
+			return nullptr;
+
 		return m_Materials.at(index);
 	}
 	

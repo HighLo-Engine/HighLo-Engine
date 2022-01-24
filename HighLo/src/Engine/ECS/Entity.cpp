@@ -2,6 +2,7 @@
 
 #include "HighLoPch.h"
 #include "Entity.h"
+
 #include "Engine/ECS/Components.h"
 #include "Engine/Scene/Scene.h"
 
@@ -10,23 +11,30 @@ namespace highlo
 	Entity::Entity(UUID sceneID, const HLString &tag)
 		: m_ID(UUID()), m_Tag(tag), m_SceneID(sceneID), m_Initialized(true)
 	{
+		m_Transform = Transform::Identity();
 		m_TransformComponent = ECS_Registry::Get().AddComponent<TransformComponent>(m_ID);
 	}
 
 	Entity::Entity(UUID sceneID, UUID entityID)
 		: m_ID(entityID), m_SceneID(sceneID), m_Tag("Entity"), m_Initialized(true)
 	{
-		m_TransformComponent = ECS_Registry::Get().GetComponent<TransformComponent>(m_ID);
+		m_Transform = Transform::Identity();
+		m_TransformComponent = ECS_Registry::Get().AddComponent<TransformComponent>(m_ID);
 	}
 	
 	Entity::Entity(const Entity &other)
-		: m_ID(other.m_ID), m_Tag(other.m_Tag), m_TransformComponent(other.m_TransformComponent), m_SceneID(other.m_SceneID), m_Initialized(other.m_Initialized)
+		: m_ID(other.m_ID), m_Tag(other.m_Tag), m_Transform(other.m_Transform), m_SceneID(other.m_SceneID), m_Initialized(other.m_Initialized)
 	{
 	}
 	
 	Entity Entity::operator=(const Entity &other)
 	{
-		return Entity(other.m_SceneID, other.m_ID);
+		Entity result(other.m_SceneID, other.m_ID);
+		result.m_Initialized = other.m_Initialized;
+		result.m_Tag = other.m_Tag;
+		result.m_Transform = other.m_Transform;
+		result.m_TransformComponent = other.m_TransformComponent;
+		return result;
 	}
 
 	void Entity::SetParent(Entity other)

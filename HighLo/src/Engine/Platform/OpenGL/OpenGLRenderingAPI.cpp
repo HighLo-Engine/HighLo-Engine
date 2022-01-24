@@ -149,6 +149,7 @@ namespace highlo
 		data[3].TexCoord = glm::vec2(0, 1);
 
 		s_GLRendererData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(GLQuadVertex));
+		delete[] data;
 
 		uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
 		s_GLRendererData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32));
@@ -231,6 +232,9 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
 	{
+		va->SetIndexBuffer(s_GLRendererData->FullscreenQuadIndexBuffer);
+		va->AddVertexBuffer(s_GLRendererData->FullscreenQuadVertexBuffer);
+
 		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
 		va->Bind();
 		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
@@ -238,7 +242,7 @@ namespace highlo
 		if (uniformBufferSet)
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			uniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+			uniformBufferSet->GetUniform(0, 0, frameIndex)->Bind(); // Bind camera buffer
 		}
 
 		material->Set("u_Renderer.Transform", transform);
@@ -250,6 +254,31 @@ namespace highlo
 			glDisable(GL_DEPTH_TEST);
 
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void OpenGLRenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
+		for (uint32 i = 0; i < va->GetVertexBuffers().size(); ++i)
+			va->GetVertexBuffers()[i]->Bind();
+		
+		va->Bind();
+		va->GetIndexBuffer()->Bind();
+
+		auto &submeshes = model->Get()->GetSubmeshes();
+		for (Mesh submesh : submeshes)
+		{
+			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
+
+			material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
+			material->UpdateForRendering();
+
+			if (material->GetFlag(MaterialFlag::DepthTest))
+				glEnable(GL_DEPTH_TEST);
+			else
+				glDisable(GL_DEPTH_TEST);
+
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+		}
 	}
 
 	void OpenGLRenderingAPI::SetWireframe(bool wf)

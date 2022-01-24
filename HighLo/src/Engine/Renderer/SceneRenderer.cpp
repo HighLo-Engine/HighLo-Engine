@@ -14,6 +14,11 @@ namespace highlo
 	// Temp until we can use our own thread implementation
 	static std::vector<std::thread> s_ThreadPool;
 
+	struct UniformBufferCamera
+	{
+		glm::mat4 ViewProjection;
+	};
+
 	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
 		: m_Scene(scene), m_Specification(specification)
 	{
@@ -33,7 +38,7 @@ namespace highlo
 
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		m_UniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		m_UniformBufferSet->CreateUniform(sizeof(glm::mat4), 0); // Camera Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0); // Camera Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 
@@ -79,7 +84,8 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const Camera &camera)
 	{
-		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
+	//	glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
+		glm::mat4 viewProj = glm::mat4(1.0f);
 
 		/*
 		Ref<SceneRenderer> instance = this;
@@ -93,10 +99,10 @@ namespace highlo
 		*/
 
 		// Load Camera Projection into Uniform Buffer block
-		Renderer::Submit([viewProj, ub = m_UniformBufferSet]() mutable
+		Renderer::Submit([&viewProj, &ub = m_UniformBufferSet]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(glm::mat4));
+			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(UniformBufferCamera));
 		});
 
 		/*
@@ -150,7 +156,9 @@ namespace highlo
 
 			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
+
+			// If no asset handle is available, the model probably does not have the needed material
+			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : AssetHandle();
 
 			MeshKey key = { model->Handle, materialHandle, submeshIndex };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
@@ -527,7 +535,7 @@ namespace highlo
 		for (auto &[mk, dc] : m_StaticDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-			//	Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+			Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
 		}
 
 		for (auto &[mk, dc] : m_DynamicDrawList)

@@ -218,18 +218,6 @@ namespace highlo
 		return true;
 	}
 
-	bool HLApplication::OnFileMenuChangedEvent(FileMenuChangedEvent &e)
-	{
-		HL_CORE_TRACE("FileMenu {0} has changed!", e.GetItem()->Name);
-		return false;
-	}
-
-	bool HLApplication::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
-	{
-		HL_CORE_INFO("[APP] FilSystem changed! {0}", *e.ToString());
-		return false;
-	}
-
 	void HLApplication::InternalEventHandler(Event &e)
 	{
 		// Drop certain input events if the window is not in focus
@@ -239,8 +227,6 @@ namespace highlo
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
-		dispatcher.Dispatch<FileMenuChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileMenuChangedEvent));
-		dispatcher.Dispatch<FileSystemChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileSystemChangedEvent));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{

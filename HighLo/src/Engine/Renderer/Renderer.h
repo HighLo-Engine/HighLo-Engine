@@ -105,6 +105,18 @@ namespace highlo
 		HLAPI static void WaitAndRender();
 		HLAPI static void RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform = glm::mat4(1.0f));
 
+		HLAPI static void RenderInstancedStaticMesh(
+			Ref<CommandBuffer> renderCommandBuffer, 
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet, 
+			Ref<StorageBufferSet> storageBufferSet, 
+			Ref<StaticModel> model, 
+			uint32 submeshIndex, 
+			Ref<MaterialTable> materials, 
+			Ref<VertexBuffer> transformBuffer, 
+			uint32 transformBufferOffset, 
+			uint32 instanceCount);
+
 		HLAPI static void OnShaderReloaded(uint64 hash);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<VertexArray> va);

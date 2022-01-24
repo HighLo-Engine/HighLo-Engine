@@ -63,19 +63,21 @@ void HighLoEditor::OnInitialize()
 
 	AssetManager::Get()->Init();
 
+	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
+	m_CurrentScene = m_EditorScene;
+
 	// Editor Panels
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
 	m_ViewportRenderer->SetLineWidth(m_LineWidth);
 
 	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
 
-	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create();
+	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create(m_CurrentScene, true);
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
 	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
 	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
-	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
 
 	AssetEditorPanel::Init();
 
@@ -155,6 +157,11 @@ void HighLoEditor::OnInitialize()
 	m_MenuBar->AddMenu(m_WindowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
+
+	// Temp: Try to create a new asset and submit it for rendering
+	AssetHandle cubeHandle = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+	Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(cubeHandle);
+	m_ViewportRenderer->SubmitStaticModel(model, model->GetMaterials());
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
@@ -358,6 +365,7 @@ void HighLoEditor::SelectEntity(Entity entity)
 		return;
 
 	SelectedMesh selection;
+	/*
 	if (entity.HasComponent<DynamicModelComponent>())
 	{
 		auto meshComp = entity.GetComponent<DynamicModelComponent>();
@@ -366,6 +374,7 @@ void HighLoEditor::SelectEntity(Entity entity)
 			selection.MeshIndex = meshComp->Model->GetSubmeshIndices()[0];
 		}
 	}
+	*/
 
 	selection.Entity = entity;
 	m_SelectionContext.clear();

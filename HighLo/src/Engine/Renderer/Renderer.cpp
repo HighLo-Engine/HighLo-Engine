@@ -126,6 +126,11 @@ namespace highlo
 		s_RenderingAPI->DrawQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, transform);
 	}
 
+	void Renderer::RenderInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
+
+	}
+
 	void Renderer::OnShaderReloaded(uint64 hash)
 	{
 		if (s_ShaderDepedencies.find(hash) != s_ShaderDepedencies.end())

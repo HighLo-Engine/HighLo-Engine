@@ -56,6 +56,11 @@ namespace highlo
 		Ref<Texture2D> Texture;
 	};
 
+	struct StaticModelComponent
+	{
+		Ref<StaticModel> Model;
+	};
+
 	struct DynamicModelComponent
 	{
 		Ref<DynamicModel> Model;

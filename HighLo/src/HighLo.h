@@ -24,6 +24,9 @@
 #include "Engine/Assets/AssetManager.h"
 #include "Engine/Assets/AssetTypes.h"
 
+#include "Engine/Factories/AssetFactory.h"
+#include "Engine/Factories/MeshFactory.h"
+
 #include "Engine/Core/Defines/Defines.h"
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Atomic.h"

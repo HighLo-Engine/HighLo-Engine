@@ -11,6 +11,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Core/DataTypes/String.h"
 #include "ECS_Registry.h"
+#include "Engine/Math/Transform.h"
 
 namespace highlo
 {
@@ -83,6 +84,10 @@ namespace highlo
 		HLString m_Tag;
 		const UUID m_ID;
 		UUID m_SceneID;
+		
+		highlo::Transform m_Transform;
+
+		// TODO: Remove this when ECS System covers only transforms
 		TransformComponent *m_TransformComponent;
 	};
 }

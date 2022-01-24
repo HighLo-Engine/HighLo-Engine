@@ -34,7 +34,6 @@ namespace highlo
 		m_SkyboxShader = Renderer::GetShaderLibrary()->Get("Skybox");
 		m_SkyboxMaterial = Material::Create(m_SkyboxShader);
 		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
-		m_Font = Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf");
 	}
 	
 	void Scene::UpdateScene(Timestep ts)
@@ -55,7 +54,7 @@ namespace highlo
 			Renderer2D::FillCircle(Transform::FromPosition({ 6.0f, 0.25f, 0.0f }), 1.0f, 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 			Renderer2D::DrawCircle(Transform::FromPosition({ -6.0f, 0.25f, 0.0f }), 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 		//	Renderer2D::DrawLine({ 0.0f, 0.0f }, { 6.0f, 6.0f }, glm::vec4(0.2f, 0.3f, 9.0f, 1.0f));
-			Renderer2D::DrawText("Hello World!", m_Font, { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
+			Renderer2D::DrawText("Hello World!", { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
 			Renderer2D::EndScene();
 		});
 
@@ -131,17 +130,14 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		// TODO: Make something like this possible
-		/*
 		auto &view = m_Registry.View<IDComponent>();
-		for (Entity &entity : view)
+		for (UUID entityID : view)
 		{
-			auto &idComponent = m_Registry.Get<IDComponent>(entity);
-			if (idComponent.ID == id)
-				return entity;
+			if (entityID == id && m_EntityIDMap.find(id) != m_EntityIDMap.end())
+				return m_EntityIDMap.at(id);
 		}
-		*/
 
+		HL_CORE_ERROR("Could not find any matching entity!");
 		return Entity{};
 	}
 	
@@ -149,7 +145,18 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		// TODO
+		auto &view = m_Registry.View<IDComponent>();
+		for (UUID entityID : view)
+		{
+			HL_ASSERT(m_EntityIDMap.find(entityID) != m_EntityIDMap.end());
+			Entity e = m_EntityIDMap.at(entityID);
+			if (e.Tag() == tag)
+			{
+				return e;
+			}
+		}
+
+		HL_CORE_ERROR("Could not find any matching entity!");
 		return Entity{};
 	}
 
@@ -157,10 +164,20 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		// TODO
+		auto &view = m_Registry.View<CameraComponent>();
+		for (UUID entityID : view)
+		{
+			HL_ASSERT(m_EntityIDMap.find(entityID) != m_EntityIDMap.end());
+			Entity e = m_EntityIDMap.at(entityID);
+			CameraComponent *c = e.GetComponent<CameraComponent>();
+			if (c->Primary)
+			{
+				return e;
+			}
+		}
 
-
-		return {};
+		HL_CORE_ERROR("Could not find any matching entity!");
+		return Entity{};
 	}
 	
 	void Scene::ConvertToLocalSpace(Entity entity)
@@ -224,7 +241,8 @@ namespace highlo
 		return transform;
 	}
 	
-	TransformComponent Scene::GetWorldSpaceTransform(Entity entity)
+	/*
+	Transform Scene::GetWorldSpaceTransform(Entity entity)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -233,17 +251,15 @@ namespace highlo
 		glm::vec3 rotation;
 		glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
 
-		TransformComponent component;
-		Transform trans;
+		Transform result;
 
 		Decompose(transform, translation, scale, rotation);
-		trans.SetPosition(translation);
-		trans.SetScale(scale);
-		trans.SetRotation(rotation);
-
-		component.Transform = trans;
-		return component;
+		result.SetPosition(translation);
+		result.SetScale(scale);
+		result.SetRotation(rotation);
+		return result;
 	}
+	*/
 	
 	void Scene::ParentEntity(Entity entity, Entity parent)
 	{
@@ -332,10 +348,9 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		auto entity = Entity(m_SceneID, name);
-		auto idComponent = entity.AddComponent<IDComponent>();
+		auto *idComponent = entity.AddComponent<IDComponent>();
 		idComponent->ID = {};
 
-		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<RelationshipComponent>();
 
 		m_EntityIDMap[idComponent->ID] = entity;
@@ -350,7 +365,6 @@ namespace highlo
 		auto idComponent = entity.AddComponent<IDComponent>();
 		idComponent->ID = uuid;
 
-		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<RelationshipComponent>();
 
 		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());
@@ -358,11 +372,33 @@ namespace highlo
 		return entity;
 	}
 	
-	void Scene::DestroyEntity(Entity entity)
+	void Scene::DestroyEntity(Entity entity, bool excludeChildren, bool first)
 	{
 		HL_PROFILE_FUNCTION();
 
+		if (!m_IsEditorScene)
+		{
 
+		}
+
+		if (!excludeChildren)
+		{
+			for (uint64 i = 0; i < entity.Children().size(); ++i)
+			{
+				auto childId = entity.Children()[i];
+				Entity child = FindEntityByUUID(childId);
+				if (child)
+					DestroyEntity(child, excludeChildren, false);
+			}
+		}
+
+		if (first)
+		{
+			if (entity.HasParent())
+				entity.GetParent().RemoveChild(entity);
+		}
+
+		m_Registry.DestroyAllByEntityId(entity.GetUUID());
 	}
 	
 	Entity Scene::DuplicateEntity(Entity entity)

@@ -43,7 +43,6 @@ namespace highlo
 
 			// Add to the list of components
 			m_Components[type].push_back({ entityID, comp });
-
 			auto index = m_Components[type].size() - 1;
 
 			// Register the component into the list specific to
@@ -116,6 +115,10 @@ namespace highlo
 			}
 		}
 
+		HLAPI void DestroyAllByEntityId(UUID entityID)
+		{
+		}
+
 		template <typename T>
 		HLAPI void ForEach(const std::function<void(UUID, TransformComponent&, T&)> &callback)
 		{
@@ -178,11 +181,70 @@ namespace highlo
 			}
 		}
 
+		/// <summary>
+		/// Should return a list of entites with the given component type
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <returns></returns>
+		template<typename... Args>
+		HLAPI std::vector<UUID> View()
+		{
+			std::vector<UUID> result;
+			std::vector<std::type_index> componentTypes;
+			std::vector<UUID> visitedEntities;
+
+			// Create a list of all types
+			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
+
+			for (uint64 i = 0; i < componentTypes.size(); ++i)
+			{
+				// Skip entity if one of the required components is not found
+				if (m_Components.find(componentTypes[i]) == m_Components.end())
+				{
+					continue;
+				}
+
+				/*
+				for (auto &comp : m_Components[componentTypes[i]])
+				{
+					UUID entityID = comp.first;
+					auto it = std::find(visitedEntities.begin(), visitedEntities.end(), entityID);
+					if (it == visitedEntities.end())
+					{
+						visitedEntities.push_back(entityID);
+						result.Add(entityID);
+					}
+				}
+				*/
+
+				for (auto &entity : m_EntityComponents)
+				{
+					UUID entityID = entity.first;
+					auto currentComponents = entity.second;
+
+					for (auto &[componentType, componentIndex] : currentComponents)
+					{
+						if (componentType == componentTypes[i])
+						{
+							auto it = std::find(visitedEntities.begin(), visitedEntities.end(), entityID);
+							if (it == visitedEntities.end())
+							{
+								visitedEntities.push_back(entityID);
+								result.push_back(entityID);
+							}
+						}
+					}
+				}
+			}
+
+			return result;
+		}
+
 	private:
 
-		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;
-		std::unordered_map<UUID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;
-		std::unordered_map<UUID, void*> m_TransformComponents;
+		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;		// Component Type -> { Component ID, Component }
+		std::unordered_map<UUID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;	// EntityID -> [ Component Type, Component index ]
+		std::unordered_map<UUID, void*> m_TransformComponents;											// Component ID, Transform Component
 	};
 }
 

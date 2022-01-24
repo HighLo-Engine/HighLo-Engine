@@ -354,7 +354,8 @@ namespace highlo
 
 	void AssetBrowserDirectory::Delete()
 	{
-		bool deleted = FileSystem::Get()->RemoveFile(Project::GetActive()->GetAssetDirectory() / m_DirectoryInfo->FilePath);
+		FileSystemPath p = m_DirectoryInfo->FilePath;
+		bool deleted = FileSystem::Get()->RemoveFile(p);
 		if (!deleted)
 		{
 			HL_CORE_WARN("Failed to delete folder {0}!", *m_DirectoryInfo->FilePath.String());

@@ -84,20 +84,7 @@ namespace highlo
 
     bool FileSystem::RemoveFile(const FileSystemPath &path)
     {
-        FileSystemWatcher::Get()->DisableWatchUntilNextAction();
-
-        char *fp = (char*)*path.String();
-        fp[strlen(fp)] = '\0';
-        SHFILEOPSTRUCTA file_op;
-        file_op.hwnd = NULL;
-        file_op.wFunc = FO_DELETE;
-        file_op.pFrom = fp;
-        file_op.pTo = "";
-        file_op.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
-        file_op.fAnyOperationsAborted = false;
-        file_op.hNameMappings = 0;
-        file_op.lpszProgressTitle = "";
-        return SHFileOperationA(&file_op) == 0;
+        return ::DeleteFileW(path.String().W_Str());
     }
 
     bool FileSystem::Copy(const FileSystemPath &dest, const FileSystemPath &src, bool overrideIfExist)

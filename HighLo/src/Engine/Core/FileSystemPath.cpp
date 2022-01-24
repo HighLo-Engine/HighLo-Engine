@@ -107,15 +107,15 @@ namespace highlo
 	bool FileSystemPath::IsParentPath() const
 	{
 		uint32 minSlashes = 0;
-		
+		uint32 numSlashes = m_CurrentAbsolutePath.CountOf('/');
+
 		if (IsRootPath())
 			++minSlashes;
 		
-		if (m_CurrentAbsolutePath.EndsWith("/"))
+		if (m_CurrentAbsolutePath.EndsWith('/'))
 			++minSlashes;
 
-		std::cout << "MinSlash: " << minSlashes << std::endl;
-		return minSlashes > 0;
+		return (numSlashes - minSlashes) > 0;
 	}
 
 	bool FileSystemPath::IsAbsolute() const
@@ -240,9 +240,10 @@ namespace highlo
 			HLString result = m_CurrentAbsolutePath;
 			
 			if (result.EndsWith("/"))
-				result = result.Substr(0, result.LastIndexOf("/"));
+				result = result.Substr(0, result.LastIndexOf('/'));
 
-			result = result.Substr(0, result.LastIndexOf("/"));
+			result = result.Substr(0, result.LastIndexOf('/'));
+
 			return FileSystemPath(result);
 		}
 	

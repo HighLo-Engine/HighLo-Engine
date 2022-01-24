@@ -264,7 +264,7 @@ namespace highlo
 	
 	Ref<DirectoryInfo> AssetBrowserPanel::GetDirectory(const FileSystemPath &filePath) const
 	{
-		if (filePath.String() == "" || filePath.String() == "." || filePath.String() == "..")
+		if (filePath.String().IsEmpty() || filePath.String() == "." || filePath.String() == "..")
 		{
 			return m_BaseDirectory;
 		}
@@ -376,7 +376,7 @@ namespace highlo
 		m_Directories.erase(m_Directories.find(dirInfo->Handle));
 		bool result = FileSystem::Get()->RemoveFolder(dirInfo->FilePath);
 		if (!result)
-			HL_CORE_ERROR("Could not delete {0}", *dirInfo->FilePath);
+			HL_CORE_ERROR("Could not delete {0}", **dirInfo->FilePath);
 	}
 	
 	void AssetBrowserPanel::RenderDirectoryHierarchy(Ref<DirectoryInfo> &dirInfo)
@@ -384,7 +384,6 @@ namespace highlo
 		const HLString name = dirInfo->FilePath.Filename();
 		HLString id = HLString::ToString(dirInfo->Handle) + "_TreeNode";
 		
-
 		bool prevState = ImGui::TreeNodeBehaviorIsOpen(ImGui::GetID(*id));
 
 		auto *window = ImGui::GetCurrentWindow();
@@ -816,6 +815,12 @@ namespace highlo
 		if (m_CopiedAssets.Count() == 0)
 			return;
 
+		// TODO:
+		// If a file gets copied more times, it looks like this:
+		// xxx_01_02.xxx
+		// xxx_01_02_03.xxx
+		// so the numbers before still have to be cut off!
+
 		auto GetUniquePath = [](const FileSystemPath &p)
 		{
 			static int32 counter = 0;
@@ -903,6 +908,7 @@ namespace highlo
 					uint32 index = m_CurrentItems.Find(handle);
 					if (index != AssetBrowserItemList::InvalidItem)
 					{
+						HL_CORE_TRACE("Moving to {0}", **target->FilePath);
 						m_CurrentItems[index]->Move(target->FilePath);
 						m_CurrentItems.Erase(handle);
 					}

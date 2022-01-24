@@ -68,7 +68,7 @@ namespace highlo
 
 	FileSystemPath AssetManager::GetFileSystemPath(const AssetMetaData &metaData)
 	{
-		return Project::GetAssetDirectory() / metaData.FilePath;
+		return metaData.FilePath;
 	}
 
 	FileSystemPath AssetManager::GetRelativePath(const FileSystemPath &path)

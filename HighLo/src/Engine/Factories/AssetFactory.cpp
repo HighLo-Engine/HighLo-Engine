@@ -7,20 +7,20 @@ namespace highlo
 {
 	AssetHandle AssetFactory::CreateCube(const glm::vec3 &size)
 	{
-		// TODO
-		return 0;
+		Ref<MeshFile> mesh = MeshFactory::CreateCube(size);
+		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(mesh);
 	}
 	
 	AssetHandle AssetFactory::CreateSphere(float radius)
 	{
-		// TODO
-		return 0;
+		Ref<MeshFile> mesh = MeshFactory::CreateSphere(radius);
+		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(mesh);
 	}
 
 	AssetHandle AssetFactory::CreateCapsule(float radius, float height)
 	{
-		// TODO
-		return 0;
+		Ref<MeshFile> mesh = MeshFactory::CreateCapsule(radius, height);
+		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(mesh);
 	}
 }
 

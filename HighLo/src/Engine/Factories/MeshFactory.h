@@ -16,9 +16,9 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static AssetHandle CreateCube(const glm::vec3 &size);
-		HLAPI static AssetHandle CreateSphere(float radius);
-		HLAPI static AssetHandle CreateCapsule(float radius, float height);
+		HLAPI static Ref<MeshFile> CreateCube(const glm::vec3 &size);
+		HLAPI static Ref<MeshFile> CreateSphere(float radius);
+		HLAPI static Ref<MeshFile> CreateCapsule(float radius, float height);
 	};
 }
 

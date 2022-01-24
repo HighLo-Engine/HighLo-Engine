@@ -9,6 +9,7 @@
 
 #include "MeshFactory.h"
 #include "Engine/Assets/Asset.h"
+#include "Engine/Assets/AssetManager.h"
 
 namespace highlo
 {

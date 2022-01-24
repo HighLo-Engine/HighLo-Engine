@@ -39,6 +39,9 @@ namespace highlo
 	
 	void AssetEditorPanel::OpenEditor(const Ref<Asset> &asset)
 	{
+		if (!asset)
+			return;
+
 		if (s_Editors.find(asset->GetAssetType()) == s_Editors.end())
 			return;
 

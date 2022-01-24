@@ -44,16 +44,22 @@ namespace highlo
 		m_FileIcon = Texture2D::LoadFromFile("assets/Resources/icons/file.png");
 		m_FolderIcon = Texture2D::LoadFromFile("assets/Resources/icons/folder.png");
 
+		Ref<Texture2D> imageTex = Texture2D::LoadFromFile("assets/Resources/icons/file-image-solid.png");
+
 		// Load Asset Icons
-	//	m_AssetIconMap[".fbx"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap[".obj"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap[".wav"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap[".png"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap[".ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap[".ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap[".otf"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/textFile.png");
-	//	m_AssetIconMap[".hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+		m_AssetIconMap["fbx"] = Texture2D::LoadFromFile("assets/Resources/icons/fbx-file-format.png");
+		m_AssetIconMap["obj"] = Texture2D::LoadFromFile("assets/Resources/icons/object-file-format.png");
+		m_AssetIconMap["wav"] = Texture2D::LoadFromFile("assets/Resources/icons/file-audio-solid.png");
+		m_AssetIconMap["otf"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
+		m_AssetIconMap["png"] = imageTex;
+		m_AssetIconMap["jpg"] = imageTex;
+		m_AssetIconMap["jpeg"] = imageTex;
+		m_AssetIconMap["tiff"] = imageTex;
+		m_AssetIconMap["tga"] = imageTex;
+		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
+	//	m_AssetIconMap["hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap["ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/");
+	//	m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/");
 
 		HLString basePath = project->GetAssetDirectory().String();
 		if (basePath.EndsWith('/'))
@@ -192,7 +198,10 @@ namespace highlo
 							ImGui::Separator();
 
 							if (ImGui::MenuItem(ICON_FA_EXTERNAL_LINK_ALT " Show in Explorer"))
-								FileSystem::Get()->OpenInExplorer(Project::GetAssetDirectory() / m_CurrentDirectory->FilePath);
+							{
+								FileSystemPath p = m_CurrentDirectory->FilePath.Absolute();
+								FileSystem::Get()->OpenInExplorer(p);
+							}
 
 							ImGui::EndPopup();
 						}
@@ -285,7 +294,7 @@ namespace highlo
 			dirInfo->FilePath = dirPath.RelativePath();
 
 		std::vector<File> dirList = dirPath.GetFileList();
-		HL_CORE_TRACE("Logged {0} files in directory {1}", dirList.size(), *dirPath.Filename());
+	//	HL_CORE_TRACE("Logged {0} files in directory {1}", dirList.size(), *dirPath.Filename());
 
 		for (uint32 i = 0; i < dirPath.GetFileCount(); ++i)
 		{
@@ -809,13 +818,13 @@ namespace highlo
 
 		auto GetUniquePath = [](const FileSystemPath &p)
 		{
-			int32 counter = 0;
+			static int32 counter = 0;
 
-			auto CheckFileName = [&counter, &p](auto checkFileName) -> FileSystemPath
+			auto CheckFileName = [&p](auto checkFileName) -> FileSystemPath
 			{
 				++counter;
 
-				const HLString CounterAsStr = [&counter]
+				const HLString CounterAsStr = []
 				{
 					if (counter < 10)
 						return "0" + HLString::ToString(counter);
@@ -823,7 +832,7 @@ namespace highlo
 						return HLString::ToString(counter);
 				}();
 
-				HLString basePath = p.Filename() + "_" + CounterAsStr + p.Extension();
+				HLString basePath = p.Filename() + "_" + CounterAsStr + "." + p.Extension();
 				if (FileSystem::Get()->FileExists(basePath))
 					return checkFileName(checkFileName);
 				else
@@ -841,21 +850,24 @@ namespace highlo
 
 			if (item->GetType() == AssetBrowserBaseItem::ItemType::Asset)
 			{
-				originalFilePath /= item.As<AssetBrowserItem>()->GetAssetInfo().FilePath;
-				auto filePath = GetUniquePath(originalFilePath);
+				originalFilePath = item.As<AssetBrowserItem>()->GetAssetInfo().FilePath;
+				uint32 lastSlash = originalFilePath.String().LastIndexOf('/') + 1;
+				FileSystemPath parentPath = FileSystemPath(originalFilePath.String().Substr(0, lastSlash));
+				auto newFileName = GetUniquePath(originalFilePath);
+				auto filePath = parentPath / newFileName;
 				HL_ASSERT(!FileSystem::Get()->FileExists(filePath));
 
-				// TODO
-			//	FileSystem::Get()->Copy(originalFilePath, filePath);
+				HL_CORE_TRACE("Copying asset from {0} to {1}", **originalFilePath, **filePath);
+				FileSystem::Get()->Copy(filePath, originalFilePath);
 			}
 			else
 			{
-				originalFilePath /= item.As<AssetBrowserDirectory>()->GetDirectoryInfo()->FilePath;
+				originalFilePath = item.As<AssetBrowserDirectory>()->GetDirectoryInfo()->FilePath;
 				auto filePath = GetUniquePath(originalFilePath);
-				HL_ASSERT(!FileSystem::Get()->FileExists(filePath));
+				HL_ASSERT(!FileSystem::Get()->FolderExists(filePath));
 
-				// TODO
-			//	FileSystem::Get()->CopyRecursive(originalFilePath, filePath);
+				HL_CORE_TRACE("Copying folder from {0} to {1}", **originalFilePath, **filePath);
+				FileSystem::Get()->CopyRecursive(filePath, originalFilePath);
 			}
 		}
 

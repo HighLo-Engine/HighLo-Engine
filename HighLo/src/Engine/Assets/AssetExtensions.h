@@ -33,6 +33,7 @@ namespace highlo
 		{ "jpg", AssetType::Texture },
 		{ "jpeg", AssetType::Texture },
 		{ "tiff", AssetType::Texture },
+		{ "tga", AssetType::Texture },
 		{ "hdr", AssetType::EnvMap },
 		{ "ttf", AssetType::Font },
 	};

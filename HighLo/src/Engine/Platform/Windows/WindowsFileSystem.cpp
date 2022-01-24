@@ -100,6 +100,28 @@ namespace highlo
         return SHFileOperationA(&file_op) == 0;
     }
 
+    bool FileSystem::Copy(const FileSystemPath &dest, const FileSystemPath &src, bool overrideIfExist)
+    {
+        return ::CopyFileW(src.String().W_Str(), dest.String().W_Str(), !overrideIfExist);
+    }
+
+    bool FileSystem::CopyRecursive(const FileSystemPath &dest, const FileSystemPath &src)
+    {
+        HLString source = src.String();
+        if (!source.EndsWith("/"))
+        {
+            source = source + "\\*";
+        }
+
+        SHFILEOPSTRUCTW s = { 0 };
+        s.wFunc = FO_COPY;
+        s.pTo = dest.String().W_Str();
+        s.pFrom = source.W_Str();
+        s.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
+        int32 result = SHFileOperationW(&s);
+        return result == 0;
+    }
+
     int64 FileSystem::GetFileSize(const FileSystemPath &path)
     {
         HANDLE file = utils::OpenFileInternal(path.String());

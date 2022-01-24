@@ -30,6 +30,8 @@ namespace highlo
 		HLAPI bool RemoveFile(const FileSystemPath &path);
 		HLAPI HLString Rename(const FileSystemPath &path, const FileSystemPath &newName);
 		HLAPI bool Move(const FileSystemPath &filePath, const FileSystemPath &dest);
+		HLAPI bool Copy(const FileSystemPath &dest, const FileSystemPath &src, bool overrideIfExist = false);
+		HLAPI bool CopyRecursive(const FileSystemPath &dest, const FileSystemPath &src);
 		HLAPI int64 GetFileSize(const FileSystemPath &path);
 		
 		HLAPI bool CreateFolder(const FileSystemPath &path);

@@ -130,6 +130,8 @@ namespace highlo
 		HLAPI static RendererCapabilities &GetCapabilities();
 		HLAPI static Ref<Texture2D> &GetBRDFLutTexture();
 		HLAPI static HLString GetCurrentRenderingAPI();
+		HLAPI static void SetLineWidth(float width);
+		HLAPI static float GetCurrentLineWidth();
 
 		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
 		HLAPI static Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination);

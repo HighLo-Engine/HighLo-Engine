@@ -37,6 +37,7 @@ namespace highlo
 		Ref<Texture2D> BRDFLut;
 		Ref<Environment> EmptyEnvironment;
 		Ref<ShaderLibrary> ShaderLib;
+		float LineWidth = 2.0f;
 	};
 
 	struct ShaderDependencies
@@ -128,7 +129,7 @@ namespace highlo
 
 	void Renderer::RenderInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
 	{
-
+		s_RenderingAPI->DrawInstancedStaticMesh(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset, instanceCount);
 	}
 
 	void Renderer::OnShaderReloaded(uint64 hash)
@@ -275,6 +276,16 @@ namespace highlo
 	#else
 		return "Unknown";
 	#endif // HIGHLO_API_OPENGL
+	}
+
+	void Renderer::SetLineWidth(float width)
+	{
+		s_MainRendererData->LineWidth = width;
+	}
+
+	float Renderer::GetCurrentLineWidth()
+	{
+		return s_MainRendererData->LineWidth;
 	}
 
 	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath)

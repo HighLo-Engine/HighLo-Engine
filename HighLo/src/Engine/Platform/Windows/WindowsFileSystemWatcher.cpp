@@ -12,7 +12,7 @@
 
 #include "Engine/Core/FileSystemPath.h"
 
-#define FILESYSTEMWATCHER_LOG_PREFIX "FSWatcher>   "
+#define FILESYSTEMWATCHER_LOG_PREFIX "FSWatcher>    "
 
 namespace highlo
 {

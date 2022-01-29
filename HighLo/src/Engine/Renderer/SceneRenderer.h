@@ -110,7 +110,6 @@ namespace highlo
 		HLAPI void SetScene(Ref<Scene> scene);
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
 		HLAPI void SetClearColor(const glm::vec4 &color);
-		HLAPI void SetLineWidth(float width) { m_LineWidth = width; }
 
 		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
@@ -183,7 +182,6 @@ namespace highlo
 		float m_InvertedViewportWidth = 0.0f, m_InvertedViewportHeight = 0.0f;
 		bool m_NeedsResize = false;
 		bool m_Active = false;
-		float m_LineWidth = 2.0f;
 		bool m_ResourcesCreated = false;
 
 		Ref<Scene> m_Scene;

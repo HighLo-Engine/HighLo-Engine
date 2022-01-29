@@ -69,6 +69,7 @@ namespace highlo
 
 	void SceneRenderer::SetScene(Ref<Scene> scene)
 	{
+		HL_ASSERT(!m_Active, "You can not set a scene while a scene is being rendered!");
 		m_Scene = scene;
 	}
 
@@ -84,8 +85,12 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const Camera &camera)
 	{
-	//	glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
-		glm::mat4 viewProj = glm::mat4(1.0f);
+		HL_ASSERT(m_Scene);
+		HL_ASSERT(!m_Active);
+		m_Active = true;
+
+		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
+	//	glm::mat4 viewProj = glm::mat4(1.0f);
 
 		/*
 		Ref<SceneRenderer> instance = this;
@@ -124,6 +129,9 @@ namespace highlo
 
 	void SceneRenderer::EndScene()
 	{
+		HL_ASSERT(m_Active);
+		m_Active = false;
+
 	#if USE_MULTI_THREADED_RENDERER
 		Ref<SceneRenderer> instance = this;
 		s_ThreadPool.emplace_back([instance]() mutable
@@ -751,7 +759,7 @@ namespace highlo
 
 		VertexArraySpecification spec;
 		spec.DebugName = "PBR-Static";
-		spec.LineWidth = m_LineWidth;
+		spec.LineWidth = Renderer::GetCurrentLineWidth();
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
 		spec.InstanceLayout = {};
 		spec.Shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");

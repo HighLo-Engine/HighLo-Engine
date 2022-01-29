@@ -72,10 +72,14 @@ namespace highlo
 		uint64 MainThreadID;
 
 		/// <summary>
-		/// Determines the path to the cache config.
-		/// The Cache config stores all hashes for later comparison
+		/// Determines the path to the shader cache config.
 		/// </summary>
-		FileSystemPath CacheRegistryPath = "assets/cache.registry";
+		FileSystemPath ShaderRegistryPath = "assets/shaders.registry";
+
+		/// <summary>
+		/// Determines the path to the asset registry. It holds all assets created in the editor.
+		/// </summary>
+		FileSystemPath AssetsRegistryPath = "assets/assets.registry";
 
 		/// <summary>
 		/// Determines the path to the startup project for the Editor.

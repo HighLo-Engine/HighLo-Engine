@@ -112,10 +112,12 @@ namespace highlo
 						UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
 						
 						auto view = m_Context->m_Registry.View<IDComponent, RelationshipComponent>();
+
 						for (UUID entityId : view)
 						{
-
 							Entity e = m_Context->FindEntityByUUID(entityId);
+
+							// If the parent UUID is 0, there is no parent -> this node is a root node
 							if (e.GetParentUUID() == 0)
 								DrawEntityNode(e, searchedString);
 						}

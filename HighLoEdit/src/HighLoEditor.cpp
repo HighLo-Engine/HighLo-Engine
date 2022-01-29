@@ -68,7 +68,6 @@ void HighLoEditor::OnInitialize()
 
 	// Editor Panels
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
-	m_ViewportRenderer->SetLineWidth(m_LineWidth);
 
 	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
 

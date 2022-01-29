@@ -117,6 +117,7 @@ namespace highlo
 
 		HLAPI void DestroyAllByEntityId(UUID entityID)
 		{
+			// TODO
 		}
 
 		template <typename T>
@@ -191,50 +192,29 @@ namespace highlo
 		{
 			std::vector<UUID> result;
 			std::vector<std::type_index> componentTypes;
-			std::vector<UUID> visitedEntities;
 
 			// Create a list of all types
 			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
 
-			for (uint64 i = 0; i < componentTypes.size(); ++i)
+			for (auto &[entityId, component] : m_EntityComponents)
 			{
-				// Skip entity if one of the required components is not found
-				if (m_Components.find(componentTypes[i]) == m_Components.end())
+				bool foundAll = true;
+
+				for (auto &currentComponent : component)
 				{
+					auto &componentType = currentComponent.first;
+					auto it = std::find(componentTypes.begin(), componentTypes.end(), componentType);
+					if (it == componentTypes.end())
+					{
+						foundAll = false;
+						break;
+					}
+				}
+
+				if (!foundAll)
 					continue;
-				}
 
-				/*
-				for (auto &comp : m_Components[componentTypes[i]])
-				{
-					UUID entityID = comp.first;
-					auto it = std::find(visitedEntities.begin(), visitedEntities.end(), entityID);
-					if (it == visitedEntities.end())
-					{
-						visitedEntities.push_back(entityID);
-						result.Add(entityID);
-					}
-				}
-				*/
-
-				for (auto &entity : m_EntityComponents)
-				{
-					UUID entityID = entity.first;
-					auto currentComponents = entity.second;
-
-					for (auto &[componentType, componentIndex] : currentComponents)
-					{
-						if (componentType == componentTypes[i])
-						{
-							auto it = std::find(visitedEntities.begin(), visitedEntities.end(), entityID);
-							if (it == visitedEntities.end())
-							{
-								visitedEntities.push_back(entityID);
-								result.push_back(entityID);
-							}
-						}
-					}
-				}
+				result.push_back(entityId);
 			}
 
 			return result;
@@ -244,7 +224,7 @@ namespace highlo
 
 		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;		// Component Type -> { Component ID, Component }
 		std::unordered_map<UUID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;	// EntityID -> [ Component Type, Component index ]
-		std::unordered_map<UUID, void*> m_TransformComponents;											// Component ID, Transform Component
+		std::unordered_map<UUID, void*> m_TransformComponents;											// EntityID -> Transform Component
 	};
 }
 

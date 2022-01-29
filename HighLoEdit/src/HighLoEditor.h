@@ -114,7 +114,7 @@ class HighLoEditor : public HLApplication
 		bool m_ShowObjectPropertiesPanel = true;
 		bool m_ShowConsolePanel = false;
 		bool m_ShowSelectedWireframe = false;
-		bool m_AssetManagerPanelOpen = true;
+		bool m_AssetManagerPanelOpen = false;
 
 		bool m_UIShowBoundingBoxes = false;
 		bool m_UIShowBoundingBoxesOnTop = false;

@@ -144,6 +144,7 @@ void HighLoEditor::OnInitialize()
 
 	m_WindowMenu = FileMenu::Create("Window");
 	m_WindowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu->AddMenuItem("Asset Manager", "", MENU_ITEM_WINDOW_ASSET_MANAGER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
@@ -244,6 +245,7 @@ void HighLoEditor::UpdateUIFlags()
 	// Make sure the "Show Console" window always
 	// reflects the current opened state of the log tab.
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
+	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ASSET_MANAGER)->IsSelected = m_AssetManagerPanelOpen;
 }
 
 void HighLoEditor::OnShutdown()
@@ -346,8 +348,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	AssetEditorPanel::OnUIRender(timestep);
 	m_ViewportRenderer->OnUIRender();
 
-	// TODO: This breaks
-	//AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
+	AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
 
 	UI::EndWindow();
 }
@@ -705,6 +706,12 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 		case MENU_ITEM_WINDOW_EDITOR_CONSOLE:
 		{
 			m_ShowConsolePanel = !m_ShowConsolePanel;
+			break;
+		}
+
+		case MENU_ITEM_WINDOW_ASSET_MANAGER:
+		{
+			m_AssetManagerPanelOpen = !m_AssetManagerPanelOpen;
 			break;
 		}
 	}

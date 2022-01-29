@@ -315,9 +315,11 @@ namespace highlo
 			static char searchBuffer[256];
 			static float assetManagerColumnWidth = 0.0f;
 			
+			ImGui::Text("Search for any asset: ");
+			ImGui::SameLine();
 			ImGui::InputText("##assetSearch", searchBuffer, 256);
 
-			UI::BeginPropertyGrid();
+			UI::BeginPropertyGrid(2);
 
 			if (assetManagerColumnWidth == 0.0f)
 			{

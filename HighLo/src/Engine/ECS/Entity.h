@@ -28,7 +28,7 @@ namespace highlo
 		HLAPI Entity(UUID sceneID, const HLString &tag = "Entity");
 		HLAPI Entity(UUID sceneID, UUID entityID);
 		HLAPI Entity(const Entity &other);
-		HLAPI Entity operator=(const Entity &other);
+		HLAPI Entity& operator=(const Entity &other);
 
 		template <typename T>
 		HLAPI T *AddComponent()
@@ -82,7 +82,7 @@ namespace highlo
 
 		bool m_Initialized = false;
 		HLString m_Tag;
-		const UUID m_ID;
+		UUID m_ID;
 		UUID m_SceneID;
 		
 		highlo::Transform m_Transform;

@@ -27,14 +27,16 @@ namespace highlo
 	{
 	}
 	
-	Entity Entity::operator=(const Entity &other)
+	Entity& Entity::operator=(const Entity &other)
 	{
-		Entity result(other.m_SceneID, other.m_ID);
-		result.m_Initialized = other.m_Initialized;
-		result.m_Tag = other.m_Tag;
-		result.m_Transform = other.m_Transform;
-		result.m_TransformComponent = other.m_TransformComponent;
-		return result;
+		m_ID					= other.m_ID;
+		m_SceneID				= other.m_SceneID;
+		m_Tag					= other.m_Tag;
+		m_Initialized			= other.m_Initialized;
+		m_Transform				= other.m_Transform;
+		m_TransformComponent	= other.m_TransformComponent;
+
+		return *this;
 	}
 
 	void Entity::SetParent(Entity other)

@@ -198,23 +198,21 @@ namespace highlo
 
 			for (auto &[entityId, component] : m_EntityComponents)
 			{
-				bool foundAll = true;
+				auto neededComponentsCount = componentTypes.size();
+				auto foundComponentsCount = 0;
 
 				for (auto &currentComponent : component)
 				{
 					auto &componentType = currentComponent.first;
 					auto it = std::find(componentTypes.begin(), componentTypes.end(), componentType);
-					if (it == componentTypes.end())
+					if (it != componentTypes.end())
 					{
-						foundAll = false;
-						break;
+						++foundComponentsCount;
 					}
 				}
 
-				if (!foundAll)
-					continue;
-
-				result.push_back(entityId);
+				if (foundComponentsCount == neededComponentsCount)
+					result.push_back(entityId);
 			}
 
 			return result;

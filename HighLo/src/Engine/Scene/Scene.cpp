@@ -349,7 +349,7 @@ namespace highlo
 
 		auto entity = Entity(m_SceneID, name);
 		auto *idComponent = entity.AddComponent<IDComponent>();
-		idComponent->ID = {};
+		idComponent->ID = entity.GetUUID();
 
 		entity.AddComponent<RelationshipComponent>();
 

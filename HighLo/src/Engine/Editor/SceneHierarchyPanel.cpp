@@ -111,11 +111,14 @@ namespace highlo
 					{
 						UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
 						
-						auto view = m_Context->m_Registry.View<IDComponent, RelationshipComponent>();
+						auto& view = m_Context->m_Registry.View<IDComponent, RelationshipComponent>();
 
 						for (UUID entityId : view)
 						{
 							Entity e = m_Context->FindEntityByUUID(entityId);
+
+							if (!e)
+								continue;
 
 							// If the parent UUID is 0, there is no parent -> this node is a root node
 							if (e.GetParentUUID() == 0)
@@ -293,10 +296,11 @@ namespace highlo
 		if (isSelected)
 			ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
 
-		bool missingMesh = entity.HasComponent<StaticModelComponent>() 
+		bool missingMesh = false;
+		/*missingMesh = entity.HasComponent<StaticModelComponent>()
 			&& AssetManager::Get()->IsAssetHandleValid(entity.GetComponent<StaticModelComponent>()->Model->Handle)
 			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)
-			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)->IsFlagSet(AssetFlag::Missing);
+			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)->IsFlagSet(AssetFlag::Missing);*/
 
 		if (missingMesh)
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4f, 0.3f, 1.0f));
@@ -324,12 +328,12 @@ namespace highlo
 
 		const bool opened = false; // ImGui::TreeNodeWithIcon(nullptr, ImGui::GetID(strId.C_Str()), flags, name, nullptr);
 		bool entityDeleted = false;
-		if (ImGui::BeginPopupContextItem())
+		/*if (ImGui::BeginPopupContextItem())
 		{
 
 
 			ImGui::EndPopup();
-		}
+		}*/
 
 		if (isRowClicked)
 		{

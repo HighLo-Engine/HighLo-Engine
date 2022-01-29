@@ -150,14 +150,7 @@ namespace highlo
 		Ref<DocumentWriter> reader = DocumentWriter::Create(assetRegistryPath, DocumentType::Json);
 		reader->ReadContents();
 
-		std::vector<HLString> data;
-		reader->ReadStringArray("", data);
-
 		// TODO
-		for (HLString current : data)
-		{
-			HL_CORE_TRACE(ASSET_MANAGER_LOG_PREFIX "[=] {0} [=]", *current);
-		}
 	}
 
 	void AssetManager::WriteRegistryToFile()
@@ -182,9 +175,10 @@ namespace highlo
 			sortedAssets[assetInfo.Handle] = { FileSystemPath(pathStr), assetInfo.Type };
 		}
 
-		HL_CORE_INFO(ASSET_MANAGER_LOG_PREFIX "[+] serializing asset registry with {0} entries [+]", sortedAssets.size());
+		HL_CORE_INFO(ASSET_MANAGER_LOG_PREFIX "[+] Serializing asset registry with {0} entries [+]", sortedAssets.size());
 
 		// TODO
+		/*
 		writer->BeginArray();
 		for (auto &[handle, entry] : sortedAssets)
 		{
@@ -195,10 +189,7 @@ namespace highlo
 			writer->EndObject();
 		}
 		writer->EndArray();
-
-		FileSystemWatcher::Get()->DisableWatchUntilNextAction();
-
-		writer->WriteOut();
+		*/
 	}
 
 	void AssetManager::ProcessDirectory(const FileSystemPath &dirPath)

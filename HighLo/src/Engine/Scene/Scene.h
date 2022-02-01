@@ -22,11 +22,6 @@ namespace highlo
 	using EntityMap = std::unordered_map<UUID, Entity>;
 	class SceneRenderer;
 
-	struct SceneSpecification
-	{
-
-	};
-
 	class Scene : public Asset
 	{
 	public:
@@ -75,13 +70,13 @@ namespace highlo
 		HLAPI const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
 		HLAPI UUID GetUUID() const { return m_SceneID; }
 
+		HLAPI void AddEntity(Entity &entity);
+		HLAPI void UpdateEntity(Entity &entity);
+		HLAPI void SetEntityTransform(Entity &entity, Transform &transform);
 		HLAPI Entity CreateEntity(const HLString &name = "");
 		HLAPI Entity CreateEntityWithUUID(UUID uuid, const HLString &name = "");
 		HLAPI void DestroyEntity(Entity entity, bool excludeChildren = false, bool first = true);
 		HLAPI Entity DuplicateEntity(Entity entity);
-
-		HLAPI Entity CreatePrefabEntity(Entity entity, const glm::vec3 *translation = nullptr);
-		HLAPI Entity CreatePrefabEntity(Entity entity, Entity parent, const glm::vec3 *translation = nullptr);
 
 		template<typename T>
 		HLAPI auto GetAllEntitiesWith()
@@ -122,6 +117,8 @@ namespace highlo
 		HLAPI void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
 		HLAPI static Ref<Scene> Create(const HLString &name = "Scene1", bool isEditorScene = false, bool constructScene = true);
+
+		HLAPI void CopyAllComponents(Entity &dest, const Entity &src);
 
 	private:
 

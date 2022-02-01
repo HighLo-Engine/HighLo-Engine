@@ -75,6 +75,7 @@ class HighLoEditor : public HLApplication
 
 		void OnSelected(const SelectedMesh &selectionContext);
 		void OnEntityDeleted(Entity e);
+		void OnObjectPropertiesChange(ObjectPropertiesActionType type);
 
 		void OnScenePlay();
 		void OnSceneStop();
@@ -93,7 +94,7 @@ class HighLoEditor : public HLApplication
 		Ref<UserSettings> m_UserSettings;
 
 		HLString m_LastSceneFilePath;
-		GizmoType m_GizmoType = GizmoType::None;
+		int32 m_GizmoType = -1;
 		EditorCamera m_EditorCamera;
 		Camera m_OverlayCamera;
 
@@ -140,6 +141,7 @@ class HighLoEditor : public HLApplication
 		// Editor Panels
 		Ref<SceneRenderer> m_ViewportRenderer;
 		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
+		UniqueRef<ObjectPropertiesPanel> m_ObjectPropertiesPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
 

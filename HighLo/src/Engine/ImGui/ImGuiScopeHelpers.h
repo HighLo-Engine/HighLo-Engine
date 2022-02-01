@@ -166,5 +166,22 @@ namespace highlo::UI
 
 		uint32 m_Count;
 	};
+
+	class ScopedItemFlags
+	{
+	public:
+		
+		HL_NON_COPYABLE(ScopedItemFlags);
+
+		HLAPI ScopedItemFlags(const ImGuiItemFlags flags, const bool enabled = true)
+		{
+			ImGui::PushItemFlag(flags, enabled);
+		}
+
+		HLAPI ~ScopedItemFlags()
+		{
+			ImGui::PopItemFlag();
+		}
+	};
 }
 

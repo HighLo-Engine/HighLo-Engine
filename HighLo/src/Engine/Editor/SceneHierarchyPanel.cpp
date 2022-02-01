@@ -7,18 +7,24 @@
 #include "Engine/ImGui/imgui.h"
 #include "Engine/ImGui/ImGuiWidgets.h"
 #include "Engine/Application/Application.h"
+#include "Engine/Core/Input.h"
+#include "Engine/ECS/Prefab.h"
 #include "EditorColors.h"
+#include "Engine/Factories/AssetFactory.h"
 
 namespace highlo
 {
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene> &scene, bool isWindow)
-		: m_Context(scene), m_IsWindow(isWindow)
+		: m_Scene(scene), m_IsWindow(isWindow)
 	{
+		m_TreeNodeRoot = Texture2D::LoadFromFile("assets/Resources/Icons/treeNode_root.png");
+		m_TreeNodeChildren = Texture2D::LoadFromFile("assets/Resources/Icons/treeNode_with_children.png");
+		m_TreeNodeChildrenOpened = Texture2D::LoadFromFile("assets/Resources/Icons/treeNode_with_children_opened.png");
 	}
 
 	void SceneHierarchyPanel::SetContext(const Ref<Scene> &scene)
 	{
-		m_Context = scene;
+		m_Scene = scene;
 		m_SelectedEntity = {};
 	}
 
@@ -39,11 +45,11 @@ namespace highlo
 
 		ImRect windowRect = { ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax() };
 
-		if (m_Context)
+		if (m_Scene)
 		{
 			{
 				const float edgeOffset = 4.0f;
-				static HLString searchedString;
+				static HLString searchedString = "";
 				UI::ShiftCursorX(edgeOffset * 3.0f);
 				UI::ShiftCursorY(edgeOffset * 2.0f);
 
@@ -52,7 +58,7 @@ namespace highlo
 				// ===============================================================================================
 
 				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - edgeOffset * 3.0f);
-			//	UI::Widgets::SearchWidget(searchedString);
+				UI::Widgets::SearchWidget(searchedString);
 
 				ImGui::Spacing();
 				ImGui::Spacing();
@@ -75,14 +81,20 @@ namespace highlo
 										  | ImGuiTableFlags_Reorderable
 										  | ImGuiTableFlags_ScrollY
 										  | ImGuiTableFlags_RowBg
-										  | ImGuiTableFlags_Sortable;
+										  | ImGuiTableFlags_NoBordersInBody;
 
 					const int32 numCols = 3;
 					ImGui::BeginTable(UI::GenerateID(), numCols, flags, ImVec2(ImGui::GetContentRegionAvail()));
 
-					ImGui::TableSetupColumn("Label");
-					ImGui::TableSetupColumn("Type");
-					ImGui::TableSetupColumn("Visibility");
+					// If the user clicks anywhere on the scene hierarchy window (except on a entity itself), deselect the currently selected entity
+					if (m_SelectedEntity && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+					{
+						SetSelected({});
+					}
+
+					ImGui::TableSetupColumn("", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort); // Label
+					ImGui::TableSetupColumn("", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort); // Visibilty
+					ImGui::TableSetupColumn("", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort); // Materials and other extra settings
 
 					// Headers
 					{
@@ -104,18 +116,18 @@ namespace highlo
 						}
 
 						ImGui::SetCursorPosX(ImGui::GetCurrentTable()->OuterRect.Min.x);
-						// TODO: add DrawUnderLine UI function and call here
+						UI::DrawUnderline(true, 0.0f, 5.0f);
 					}
 					
 					// List
 					{
 						UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
 						
-						auto& view = m_Context->m_Registry.View<IDComponent, RelationshipComponent>();
+						auto& view = m_Scene->m_Registry.View<RelationshipComponent>();
 
 						for (UUID entityId : view)
 						{
-							Entity e = m_Context->FindEntityByUUID(entityId);
+							Entity e = m_Scene->FindEntityByUUID(entityId);
 
 							if (!e)
 								continue;
@@ -130,9 +142,42 @@ namespace highlo
 					{
 						if (ImGui::BeginMenu("Create"))
 						{
-							if (ImGui::MenuItem("Null Entity"))
+							if (ImGui::MenuItem("Null Object"))
 							{
-								auto newEntity = m_Context->CreateEntity("Null Entity");
+								auto newEntity = m_Scene->CreateEntity("Null Object");
+								SetSelected(newEntity);
+							}
+
+							if (ImGui::MenuItem("Camera"))
+							{
+								auto newEntity = m_Scene->CreateEntity("Camera");
+								newEntity.AddComponent<CameraComponent>();
+								SetSelected(newEntity);
+							}
+
+							ImGui::Separator();
+
+							if (ImGui::MenuItem("Cube"))
+							{
+								auto newEntity = m_Scene->CreateEntity("Cube");
+								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+								component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+								SetSelected(newEntity);
+							}
+
+							if (ImGui::MenuItem("Sphere"))
+							{
+								auto newEntity = m_Scene->CreateEntity("Sphere");
+								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+								component->Model = AssetFactory::CreateSphere(4.0f);
+								SetSelected(newEntity);
+							}
+
+							if (ImGui::MenuItem("Capsule"))
+							{
+								auto newEntity = m_Scene->CreateEntity("Capsule");
+								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+								component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
 								SetSelected(newEntity);
 							}
 
@@ -140,17 +185,25 @@ namespace highlo
 
 							if (ImGui::MenuItem("Directional Light"))
 							{
-
+								auto newEntity = m_Scene->CreateEntity("Directional Light");
+								newEntity.AddComponent<DirectionalLightComponent>();
+								newEntity.Transform().FromRotation({ 80.0f, 10.0f, 0.0f });
+								SetSelected(newEntity);
 							}
 
 							if (ImGui::MenuItem("Point Light"))
 							{
-
+								auto newEntity = m_Scene->CreateEntity("Point Light");
+								newEntity.AddComponent<PointLightComponent>();
+								newEntity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
+								SetSelected(newEntity);
 							}
 
 							if (ImGui::MenuItem("Sky Light"))
 							{
-
+								auto newEntity = m_Scene->CreateEntity("Sky Light");
+								newEntity.AddComponent<SkyLightComponent>();
+								SetSelected(newEntity);
 							}
 
 							ImGui::EndMenu();
@@ -158,6 +211,9 @@ namespace highlo
 
 						ImGui::EndPopup();
 					}
+
+					if (ImGui::IsWindowFocused() && (Input::IsKeyPressed(HL_KEY_DELETE) || Input::IsKeyPressed(HL_KEY_BACKSPACE)) && m_SelectedEntity)
+						DeleteEntity(m_SelectedEntity);
 
 					ImGui::EndTable();
 				}
@@ -170,7 +226,7 @@ namespace highlo
 				if (payload)
 				{
 					Entity &e = *(Entity*)payload->Data;
-					m_Context->UnparentEntity(e);
+					m_Scene->UnparentEntity(e);
 				}
 
 				ImGui::EndDragDropTarget();
@@ -184,7 +240,6 @@ namespace highlo
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity, const HLString &searchFilter)
 	{
 		const char *name = entity.Tag().C_Str();
-		HL_CORE_TRACE("DRAWING ENTITY {0}", name);
 
 		const bool hasChildMatchingSearch = [&]
 		{
@@ -193,7 +248,7 @@ namespace highlo
 
 			for (auto child : entity.Children())
 			{
-				Entity e = m_Context->FindEntityByUUID(child);
+				Entity e = m_Scene->FindEntityByUUID(child);
 				if (UI::IsMatchingSearch(e.Tag(), searchFilter))
 				{
 					return true;
@@ -252,7 +307,7 @@ namespace highlo
 			{
 				for (auto &child : e.Children())
 				{
-					Entity childEntity = m_Context->FindEntityByUUID(child);
+					Entity childEntity = m_Scene->FindEntityByUUID(child);
 					if (isAnyDescendantSelected(childEntity, isAnyDescendantSelected))
 						return true;
 				}
@@ -271,7 +326,7 @@ namespace highlo
 
 		if (isSelected)
 		{
-			if (isWindowFocused) // || UI::NavigatedTo())
+			if (isWindowFocused || UI::NavigatedTo())
 			{
 				fillRowWithColor(Colors::Theme::Selection);
 			}
@@ -291,23 +346,11 @@ namespace highlo
 		}
 
 
+		bool isPrefab = entity.HasComponent<PrefabComponent>();
 
 		// Text coloring
 		if (isSelected)
 			ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
-
-		bool missingMesh = false;
-		/*missingMesh = entity.HasComponent<StaticModelComponent>()
-			&& AssetManager::Get()->IsAssetHandleValid(entity.GetComponent<StaticModelComponent>()->Model->Handle)
-			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)
-			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model->Handle)->IsFlagSet(AssetFlag::Missing);*/
-
-		if (missingMesh)
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4f, 0.3f, 1.0f));
-
-		bool isPrefab = entity.HasComponent<PrefabComponent>();
-		if (isPrefab && !isSelected)
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.32f, 0.7f, 0.87f, 1.0f));
 
 		ImGuiContext &g = *GImGui;
 		auto &style = ImGui::GetStyle();
@@ -326,26 +369,46 @@ namespace highlo
 		if (isMouseXOverArrow && isRowClicked)
 			ImGui::SetNextItemOpen(!prevState);
 
-		const bool opened = false; // ImGui::TreeNodeWithIcon(nullptr, ImGui::GetID(strId.C_Str()), flags, name, nullptr);
+		const bool opened = UI::TreeNodeWithIcon(nullptr, ImGui::GetID(strId.C_Str()), flags, name, nullptr);
 		bool entityDeleted = false;
-		/*if (ImGui::BeginPopupContextItem())
+		if (ImGui::BeginPopupContextItem())
 		{
+			{
+				UI::ScopedColor colorText(ImGuiCol_Text, Colors::Theme::Text);
+				UI::ScopedColorStack entitySelection(ImGuiCol_Header, Colors::Theme::GroupHeader, ImGuiCol_HeaderHovered, Colors::Theme::GroupHeader, ImGuiCol_HeaderActive, Colors::Theme::GroupHeader);
 
+				if (ImGui::MenuItem("Duplicate Entity"))
+				{
+					Entity newEntity = m_Scene->DuplicateEntity(m_SelectedEntity);
+					m_Scene->AddEntity(newEntity);
+					SetSelected(newEntity);
+				}
+
+				if (ImGui::MenuItem("Remove Entity"))
+					entityDeleted = true;
+
+				if (isPrefab)
+				{
+					if (ImGui::MenuItem("Update prefab"))
+					{
+						AssetHandle prefabAssetHandle = entity.GetComponent<PrefabComponent>()->PrefabID;
+						Ref<Prefab> prefab = AssetManager::Get()->GetAsset<Prefab>(prefabAssetHandle);
+						if (prefab)
+							prefab->Create(entity);
+						else
+							HL_CORE_ERROR("Error: Prefab has invalid asset handle! {0}", prefabAssetHandle);
+					}
+				}
+			}
 
 			ImGui::EndPopup();
-		}*/
+		}
 
 		if (isRowClicked)
 		{
-			m_SelectedEntity = entity;
-			if (m_SelectionChangedCallback)
-				m_SelectionChangedCallback(m_SelectedEntity);
-
+			SetSelected(entity);
 			ImGui::FocusWindow(ImGui::GetCurrentWindow());
 		}
-
-		if (missingMesh)
-			ImGui::PopStyleColor();
 
 		if (isSelected)
 			ImGui::PopStyleColor();
@@ -364,7 +427,7 @@ namespace highlo
 			if (payload)
 			{
 				Entity &droppedEntity = *(Entity*)payload->Data;
-				m_Context->ParentEntity(droppedEntity, entity);
+				m_Scene->ParentEntity(droppedEntity, entity);
 			}
 
 			ImGui::EndDragDropTarget();
@@ -372,22 +435,32 @@ namespace highlo
 
 		ImGui::TableNextColumn();
 
-		if (isPrefab)
+		if (entity.IsHidden())
 		{
-			UI::ShiftCursorY(edgeOffset * 3.0f);
-			if (isSelected)
-				ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
-
-			ImGui::TextUnformatted("Prefab");
-			ImGui::PopStyleColor();
+			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+			UI::CenteredText(ICON_FA_TIMES);
 		}
+		else
+		{
+			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
+			ImVec2 calculatedSize = UI::CenteredText(ICON_FA_CHECK);
+			ImGui::SameLine();
+			if (ImGui::InvisibleButton("##testMakeVisible", ImVec2(calculatedSize.x, calculatedSize.y)))
+			{
+				HL_CORE_TRACE("TEST: CLICKED INVISIBLE");
+			}
+		}
+
+		ImGui::TableNextColumn();
+
+		UI::DrawText("CHECKED 2");
 
 		// Draw all children
 		if (opened)
 		{
 			for (auto child : entity.Children())
 			{
-				Entity e = m_Context->FindEntityByUUID(child);
+				Entity e = m_Scene->FindEntityByUUID(child);
 				if (e)
 					DrawEntityNode(e, searchFilter);
 			}
@@ -396,13 +469,21 @@ namespace highlo
 		}
 
 		if (entityDeleted)
-		{
-			m_Context->DestroyEntity(entity);
-			if (entity == m_SelectedEntity)
-				m_SelectedEntity = {};
+			DeleteEntity(entity);
+	}
+	
+	void SceneHierarchyPanel::DeleteEntity(Entity entity)
+	{
+		if (m_EntityDeletedCallback)
+			m_EntityDeletedCallback(entity);
 
-			if (m_EntityDeletedCallback)
-				m_EntityDeletedCallback(entity);
+		m_Scene->DestroyEntity(entity);
+		if (entity == m_SelectedEntity)
+		{
+			if (m_SelectionChangedCallback)
+				m_SelectionChangedCallback({});
+
+			m_SelectedEntity = {};
 		}
 	}
 }

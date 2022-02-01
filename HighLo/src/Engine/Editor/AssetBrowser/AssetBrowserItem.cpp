@@ -8,7 +8,6 @@
 #include "Engine/Core/Input.h"
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Scene/Project.h"
-#include "Engine/Editor/AssetEditorPanel.h"
 #include "Engine/Math/Color.h"
 #include "Engine/ImGui/imgui.h"
 #include "Engine/ImGui/ImGuiScopeHelpers.h"
@@ -480,13 +479,13 @@ namespace highlo
 
 	void AssetBrowserItem::Activate(AssetBrowserActionResult &actionResult)
 	{
+		HL_CORE_TRACE("Opening editor window {0}", actionResult.Field);
 		if (m_AssetInfo.Type == AssetType::Scene)
 		{
 			// TODO: Open in viewport
 		}
 		else
 		{
-			AssetEditorPanel::OpenEditor(AssetManager::Get()->GetAsset<Asset>(m_AssetInfo.Handle));
 		}
 	}
 }

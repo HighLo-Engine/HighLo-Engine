@@ -30,12 +30,17 @@ namespace highlo
 	private:
 
 		void DrawEntityNode(Entity entity, const HLString &searchFilter = "");
+		void DeleteEntity(Entity entity);
 
-		Ref<Scene> m_Context;
+		Ref<Scene> m_Scene;
 		Entity m_SelectedEntity;
 		bool m_IsWindow = false;
 
 		std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
 		std::function<void(Entity, AssetHandle)> m_InvalidAssetMetaDataCallback;
+
+		Ref<Texture2D> m_TreeNodeRoot;
+		Ref<Texture2D> m_TreeNodeChildren;
+		Ref<Texture2D> m_TreeNodeChildrenOpened;
 	};
 }

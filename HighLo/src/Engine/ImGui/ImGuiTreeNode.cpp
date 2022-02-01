@@ -66,7 +66,7 @@ namespace highlo::UI
 			if (isOpen && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen))
 				ImGui::TreePushOverrideID(id);
 
-		//	IMGUI_TEST_ENGINE_ITEM_INFO(lastItem.ID, label, lastItem.StatusFlags | (isLeaf ? 0 : ImGuiItemStatusFlags_Openable) | (isOpen ? ImGuiItemStatusFlags_Opened : 0));
+			IMGUI_TEST_ENGINE_ITEM_INFO(lastItem.ID, label, lastItem.StatusFlags | (isLeaf ? 0 : ImGuiItemStatusFlags_Openable) | (isOpen ? ImGuiItemStatusFlags_Opened : 0));
 			return isOpen;
 		}
 
@@ -147,9 +147,7 @@ namespace highlo::UI
 		if (isSelected != wasSelected)
 			lastItem.StatusFlags |= ImGuiItemStatusFlags_ToggledSelection;
 
-
 		// Render
-
 
 		const ImU32 arrowColor = isSelected ? Colors::Theme::BackgroundDark : Colors::Theme::Muted;
 		ImGuiNavHighlightFlags navFlags = ImGuiNavHighlightFlags_TypeThin;
@@ -256,7 +254,7 @@ namespace highlo::UI
 		if (isOpen && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen))
 			ImGui::TreePushOverrideID(id);
 
-	//	IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags | (isLeaf ? 0 : ImGuiItemStatusFlags_Openable) | (isOpen ? ImGuiItemStatusFlags_Opened : 0));
+		IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags | (isLeaf ? 0 : ImGuiItemStatusFlags_Openable) | (isOpen ? ImGuiItemStatusFlags_Opened : 0));
 		return isOpen;
 	}
 	

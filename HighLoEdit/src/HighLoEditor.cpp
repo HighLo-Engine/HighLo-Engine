@@ -19,6 +19,19 @@ namespace editorutils
 
 		return -1;
 	}
+
+	static HighLoEditor::GizmoType ConvertFromImGuizmoType(int32 type)
+	{
+		switch (type)
+		{
+			case -1: return HighLoEditor::GizmoType::None;
+			case 0: return HighLoEditor::GizmoType::Translate;
+			case 1: return HighLoEditor::GizmoType::Rotate;
+			case 2: return HighLoEditor::GizmoType::Scale;
+		}
+
+		return HighLoEditor::GizmoType::None;
+	}
 }
 
 HighLoEditor::HighLoEditor(const ApplicationSettings &settings)
@@ -76,9 +89,10 @@ void HighLoEditor::OnInitialize()
 	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
-	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
+	m_ObjectPropertiesPanel = UniqueRef<ObjectPropertiesPanel>::Create(m_CurrentScene, true);
+	m_ObjectPropertiesPanel->AddActionCallback(std::bind(&HighLoEditor::OnObjectPropertiesChange, this, std::placeholders::_1));
 
-	AssetEditorPanel::Init();
+	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
 
 	GetWindow().Maximize();
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
@@ -220,8 +234,6 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		}
 	}
 
-	AssetEditorPanel::OnUpdate(ts);
-
 	// Get current mouse positon and mouse pick on the viewport to detect if the user clicked on one of the rendererd objects
 	auto [mx, my] = ImGui::GetMousePos();
 	mx -= m_ViewportBounds[0].x;
@@ -250,8 +262,6 @@ void HighLoEditor::UpdateUIFlags()
 
 void HighLoEditor::OnShutdown()
 {
-	AssetEditorPanel::Shutdown();
-
 	FileSystemWatcher::Get()->Stop();
 
 	AssetManager::Get()->Shutdown();
@@ -281,7 +291,6 @@ void HighLoEditor::OnEvent(Event &e)
 		m_RuntimeScene->OnEvent(e);
 	}
 
-	AssetEditorPanel::OnEvent(e);
 	m_AssetBrowserPanel->OnEvent(e);
 }
 
@@ -300,21 +309,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 	m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
 	m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-
-	/*
-	if (ImGui::BeginPopupContextWindow("#viewportRightClick", ImGuiMouseButton_Right, false))
-	{
-		// TODO
-		if (ImGui::BeginMenu(ICON_FA_PLUS " New"))
-		{
-
-
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndPopup();
-	}
-	*/
 
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	if (viewportSize.x < 0.0f)
@@ -335,6 +329,75 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	// Render viewport image
 	Ref<Texture2D> viewportImage = m_ViewportRenderer->GetFinalRenderTexture();
 	UI::Image(viewportImage, viewportSize, { 0, 1 }, { 1, 0 });
+
+	// TODO: Add Guizmo Toolbar to be able to select the current guizmo type
+
+	// Draw gizmo on top of viewport image
+	if (m_GizmoType != -1 && m_SelectionContext.size())
+	{
+		auto &selection = m_SelectionContext[0];
+
+		float width = (float)ImGui::GetWindowWidth();
+		float height = (float)ImGui::GetWindowHeight();
+
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+		bool snap = Input::IsKeyPressed(HL_KEY_LEFT_CONTROL);
+
+		Transform &entityTransform = selection.Entity.Transform();
+		glm::mat4 rawTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(selection.Entity);
+		float snapValue = GetSnapValue();
+		float snapValues[3] = { snapValue, snapValue, snapValue };
+
+		if (m_SelectionMode == SelectionMode::Entity)
+		{
+			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()), glm::value_ptr(m_EditorCamera.GetProjection()), (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(rawTransform), nullptr, snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				Entity parent = m_CurrentScene->FindEntityByUUID(selection.Entity.GetParentUUID());
+				if (parent)
+				{
+					glm::mat4 parentTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(parent);
+					rawTransform = glm::inverse(parentTransform) * rawTransform;
+
+					glm::vec3 translation, rotation, scale;
+					Decompose(rawTransform, translation, scale, rotation);
+
+					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
+					entityTransform.SetPosition(translation);
+					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
+					entityTransform.SetScale(scale);
+					m_CurrentScene->SetEntityTransform(selection.Entity, entityTransform);
+				}
+				else
+				{
+					glm::vec3 translation, rotation, scale;
+					Decompose(rawTransform, translation, scale, rotation);
+
+					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
+					entityTransform.SetPosition(translation);
+					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
+					entityTransform.SetScale(scale);
+					m_CurrentScene->SetEntityTransform(selection.Entity, entityTransform);
+				}
+			}
+		}
+		else
+		{
+			glm::mat4 transformBase = rawTransform * selection.Mesh->LocalTransform.GetTransform();
+			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()), glm::value_ptr(m_EditorCamera.GetProjection()), (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transformBase), nullptr, snap ? snapValues : nullptr);
+
+			Transform newTransform;
+			newTransform.SetTransform(glm::inverse(rawTransform) * transformBase);
+			selection.Mesh->LocalTransform = newTransform;
+			m_CurrentScene->SetEntityTransform(selection.Entity, newTransform);
+		}
+	}
+
+	// TODO: Add Drag- and drop onto viewport
+
 	UI::EndViewport();
 
 	m_AssetBrowserPanel->OnUIRender();
@@ -342,10 +405,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
 
 	// Object Properties Panel
-	UI::BeginViewport("Object Properties");
-	UI::EndViewport();
+	m_ObjectPropertiesPanel->OnUIRender(&m_ShowObjectPropertiesPanel);
 
-	AssetEditorPanel::OnUIRender(timestep);
 	m_ViewportRenderer->OnUIRender();
 
 	AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
@@ -362,34 +423,41 @@ void HighLoEditor::OnResize(uint32 width, uint32 height)
 void HighLoEditor::SelectEntity(Entity entity)
 {
 	if (!entity)
+	{
+		// Invalid entity, de-select everything
+		m_SelectionContext.clear();
+		m_CurrentScene->SetSelectedEntity({});
+		m_ObjectPropertiesPanel->SetSelected({});
 		return;
+	}
 
 	SelectedMesh selection;
-	/*
 	if (entity.HasComponent<DynamicModelComponent>())
 	{
-		auto meshComp = entity.GetComponent<DynamicModelComponent>();
-		if (meshComp->Model && meshComp->Model->GetAssetType() == AssetType::DynamicMesh)
-		{
-			selection.MeshIndex = meshComp->Model->GetSubmeshIndices()[0];
-		}
+		DynamicModelComponent *meshComp = entity.GetComponent<DynamicModelComponent>();
+		Ref<DynamicModel> model = AssetManager::Get()->GetAsset<DynamicModel>(meshComp->Model);
+		if (model && !model->IsFlagSet(AssetFlag::Missing))
+			selection.Mesh = &model->Get()->GetSubmeshes()[0];
+
+		selection.MeshIndex = meshComp->SubmeshIndex;
 	}
-	*/
+	else if (entity.HasComponent<StaticModelComponent>())
+	{
+		StaticModelComponent *meshComp = entity.GetComponent<StaticModelComponent>();
+		Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(meshComp->Model);
+		if (model && !model->IsFlagSet(AssetFlag::Missing))
+			selection.Mesh = &model->Get()->GetSubmeshes()[0];
+
+		selection.MeshIndex = 0;
+	}
 
 	selection.Entity = entity;
 	m_SelectionContext.clear();
 	m_SelectionContext.push_back(selection);
 
-	if (m_SceneState == SceneState::Edit)
-	{
-		m_EditorScene->SetSelectedEntity(entity);
-		m_CurrentScene = m_EditorScene;
-	}
-	else if (m_SceneState == SceneState::Simulate)
-	{
-		m_EditorScene->SetSelectedEntity(entity);
-		m_CurrentScene = m_SimulationScene;
-	}
+	m_EditorScene->SetSelectedEntity(entity);
+	m_ObjectPropertiesPanel->SetSelected(entity);
+	m_CurrentScene = m_EditorScene;
 }
 
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
@@ -472,31 +540,31 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 					break;
 
 				Entity selectedEntity = m_SelectionContext[0].Entity;
-		//		m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
+				m_EditorCamera.Focus(selectedEntity.Transform().GetPosition());
 				break;
 			}
 
 			case HL_KEY_Q:
 			{
-				m_GizmoType = GizmoType::None;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::None);
 				break;
 			}
 
 			case HL_KEY_W:
 			{
-				m_GizmoType = GizmoType::Translate;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::Translate);
 				break;
 			}
 
 			case HL_KEY_E:
 			{
-				m_GizmoType = GizmoType::Rotate;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::Rotate);
 				break;
 			}
 
 			case HL_KEY_R:
 			{
-				m_GizmoType = GizmoType::Scale;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::Scale);
 				break;
 			}
 		}
@@ -663,19 +731,36 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 
 		case MENU_ITEM_ASSET_CREATE_CAMERA:
 		{
-			HL_INFO("Creating Camera...");
+			Entity e = m_CurrentScene->CreateEntity("Camera");
+			e.AddComponent<CameraComponent>();
+			m_CurrentScene->SetSelectedEntity(e);
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_CAPSULE:
 		{
-			HL_INFO("Creating Capsule...");
+			Entity e = m_CurrentScene->CreateEntity("Capsule");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
+			m_CurrentScene->SetSelectedEntity(e);
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_CUBE:
 		{
-			HL_INFO("Creating cube...");
+			Entity e = m_CurrentScene->CreateEntity("Cube");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+			m_CurrentScene->SetSelectedEntity(e);
+			break;
+		}
+
+		case MENU_ITEM_ASSET_CREATE_SPHERE:
+		{
+			Entity e = m_CurrentScene->CreateEntity("Sphere");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			component->Model = AssetFactory::CreateSphere(4.0f);
+			m_CurrentScene->SetSelectedEntity(e);
 			break;
 		}
 
@@ -687,19 +772,14 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 
 		case MENU_ITEM_ASSET_CREATE_FOLDER:
 		{
-			HL_INFO("Creating Folder...");
+			FileSystem::Get()->CreateFolder(Project::GetAssetDirectory() / "New Folder");
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_NULL_OBJECT:
 		{
-			HL_INFO("Creating Null Object...");
-			break;
-		}
-
-		case MENU_ITEM_ASSET_CREATE_SPHERE:
-		{
-			HL_INFO("Creating Sphere");
+			Entity e = m_CurrentScene->CreateEntity("Null Object");
+			m_CurrentScene->SetSelectedEntity(e);
 			break;
 		}
 
@@ -720,6 +800,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 {
 	m_SceneHierarchyPanel->SetSelected(selectionContext.Entity);
+	m_ObjectPropertiesPanel->SetSelected(selectionContext.Entity);
 	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
 }
 
@@ -729,7 +810,12 @@ void HighLoEditor::OnEntityDeleted(Entity e)
 	{
 		m_SelectionContext.clear();
 		m_EditorScene->SetSelectedEntity({});
+		m_ObjectPropertiesPanel->SetSelected({});
 	}
+}
+
+void HighLoEditor::OnObjectPropertiesChange(ObjectPropertiesActionType type)
+{
 }
 
 void HighLoEditor::OnScenePlay()
@@ -794,7 +880,8 @@ void HighLoEditor::OnSceneEndSimulation()
 
 float HighLoEditor::GetSnapValue()
 {
-	switch (m_GizmoType)
+	GizmoType type = editorutils::ConvertFromImGuizmoType(m_GizmoType);
+	switch (type)
 	{
 		case GizmoType::Translate:	return 0.5f;
 		case GizmoType::Rotate:		return 45.0f;

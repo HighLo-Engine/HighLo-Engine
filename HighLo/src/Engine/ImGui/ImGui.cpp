@@ -634,6 +634,25 @@ namespace highlo::UI
 		va_end(args);
 	}
 
+	ImVec2 CenteredText(const HLString &text, bool fullWidth)
+	{
+		float width = -1.0f;
+		float fontSize = ImGui::GetFontSize() * (float)(text.Length() / 2);
+
+		if (fullWidth)
+		{
+			width = ImGui::GetWindowSize().x / 2.0f;
+		}
+		else
+		{
+			width = ImGui::GetContentRegionAvail().x / 2.0f;
+		}
+
+		ImGui::SameLine(width, fontSize + (fontSize / 2));
+		ImGui::Text(*text);
+		return { width, fontSize + (fontSize / 2)};
+	}
+
 	void Separator()
 	{
 		ImGui::Separator();
@@ -654,6 +673,12 @@ namespace highlo::UI
 		return ImGui::GetItemFlags() & ImGuiItemFlags_Disabled;
 	}
 
+	bool NavigatedTo()
+	{
+		ImGuiContext &g = *GImGui;
+		return g.NavJustMovedToId == g.LastItemData.ID;
+	}
+
 	void BeginPropertyGrid(int32 colNum)
 	{
 		PushID();
@@ -664,6 +689,26 @@ namespace highlo::UI
 	{
 		ImGui::Columns(1);
 		PopID();
+	}
+
+	bool PropertyGridHeader(const HLString &name, bool openByDefault)
+	{
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+		if (openByDefault)
+			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+		bool open = false;
+		const float framePaddingX = 6.0f;
+		const float framePaddingY = 6.0f;
+
+		UI::ScopedStyle headerRounding(ImGuiStyleVar_FrameRounding, 0.0f);
+		UI::ScopedStyle headerPaddingHeight(ImGuiStyleVar_FramePadding, ImVec2(framePaddingX, framePaddingY));
+
+		ImGui::PushID(*name);
+		open = ImGui::TreeNodeEx("##noID", flags, name.C_Str());
+		ImGui::PopID();
+
+		return open;
 	}
 
 	bool BeginTreeNode(const HLString &name, bool defaultOpen)
@@ -989,13 +1034,18 @@ namespace highlo::UI
 		ImGui::NextColumn();
 	}
 
-	bool DrawInputText(const HLString &label, HLString &value)
+	bool DrawInputText(const HLString &label, HLString &value, bool fullWidth)
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
-		ImGui::NextColumn();
-		ImGui::PushItemWidth(-1);
+		if (!label.IsEmpty())
+		{
+			ImGui::Text(*label);
+			ImGui::NextColumn();
+		}
+
+		if (fullWidth)
+			ImGui::PushItemWidth(-1);
 
 		char buffer[256];
 		strcpy_s<256>(buffer, *value);
@@ -1017,7 +1067,9 @@ namespace highlo::UI
 		if (IsItemDisabled())
 			ImGui::PopStyleVar();
 
-		ImGui::PopItemWidth();
+		if (fullWidth)
+			ImGui::PopItemWidth();
+
 		ImGui::NextColumn();
 
 		return modified;
@@ -1063,6 +1115,7 @@ namespace highlo::UI
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
+		ImGui::SameLine();
 		if (ImGui::Checkbox(s_ImGuiIDBuffer, &value))
 			modified = true;
 
@@ -1153,6 +1206,7 @@ namespace highlo::UI
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
+		ImGui::SameLine();
 		if (ImGui::DragInt(s_ImGuiIDBuffer, &value))
 			modified = true;
 
@@ -1416,54 +1470,73 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::PushID(*label);
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, columnWidth);
+		UI::PushID();
+		ImGui::TableSetColumnIndex(0);
+		UI::ShiftCursor(17.0f, 7.0f);
+
 		ImGui::Text(*label);
-		ImGui::NextColumn();
+		UI::DrawUnderline(false, 0.0f, 2.0f);
 
-		ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+		ImGui::TableSetColumnIndex(1);
+		UI::ShiftCursor(7.0f, 0.0f);
 
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-
-		if (ImGui::Button("X", buttonSize))
 		{
-			values.x = resetValue;
-			modified = true;
+			const float spacingX = 8.0f;
+			UI::ScopedStyle itemSpacing(ImGuiStyleVar_ItemSpacing, ImVec2{ spacingX, 0.0f });
+			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2{ 0.0f, 2.0f });
+
+			{
+				// Begin XYZ area
+				UI::ScopedColor padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+				UI::ScopedStyle frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+
+				ImGui::BeginChild(ImGui::GetID((label + "fr").C_Str()), ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			}
+			const float framePadding = 2.0f;
+			const float outlineSpacing = 1.0f;
+			const float lineHeight = GImGui->Font->FontSize + framePadding * 2.0f;
+			const ImVec2 buttonSize = { lineHeight + 2.0f, lineHeight };
+			const float inputItemWidth = (ImGui::GetContentRegionAvail().x - spacingX) / 3.0f - buttonSize.x;
+
+			const ImGuiIO &io = ImGui::GetIO();
+			auto boldFont = io.Fonts->Fonts[0];
+
+			auto drawControl = [&](const HLString &label, float &value, const ImVec4 &colourN,
+								   const ImVec4 &colourH,
+								   const ImVec4 &colourP)
+			{
+				{
+					UI::ScopedStyle buttonFrame(ImGuiStyleVar_FramePadding, ImVec2(framePadding, 0.0f));
+					UI::ScopedStyle buttonRounding(ImGuiStyleVar_FrameRounding, 1.0f);
+					UI::ScopedColorStack buttonColours(ImGuiCol_Button, colourN, ImGuiCol_ButtonHovered, colourH, ImGuiCol_ButtonActive, colourP);
+
+					UI::ScopedFont buttonFont(boldFont);
+
+					UI::ShiftCursorY(2.0f);
+					if (ImGui::Button(label.C_Str(), buttonSize))
+					{
+						value = resetValue;
+						modified = true;
+					}
+				}
+
+				ImGui::SameLine(0.0f, outlineSpacing);
+				ImGui::SetNextItemWidth(inputItemWidth);
+				UI::ShiftCursorY(-2.0f);
+				modified |= ImGui::DragFloat(("##" + label).C_Str(), &value, 0.1f, 0.0f, 0.0f, "%.2f");
+
+				if (!UI::IsItemDisabled())
+					UI::DrawItemActivityOutline(2.0f, true, Colors::Theme::Accent);
+			};
+
+			drawControl("X", values.x, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f }, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f }, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+
+			ImGui::SameLine(0.0f, outlineSpacing);
+			drawControl("Y", values.y, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f }, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f }, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+
+			ImGui::EndChild();
 		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		if (ImGui::Button("Y", buttonSize))
-		{
-			values.y = resetValue;
-			modified = true;
-		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "#.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PopStyleVar();
-		ImGui::Columns(1);
-		ImGui::PopID();
+		UI::PopID();
 
 		return modified;
 	}
@@ -1472,68 +1545,76 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::PushID(*label);
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, columnWidth);
+		UI::PushID();
+		ImGui::TableSetColumnIndex(0);
+		UI::ShiftCursor(17.0f, 7.0f);
+
 		ImGui::Text(*label);
-		ImGui::NextColumn();
+		UI::DrawUnderline(false, 0.0f, 2.0f);
 
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+		ImGui::TableSetColumnIndex(1);
+		UI::ShiftCursor(7.0f, 0.0f);
 
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		if (ImGui::Button("X", buttonSize))
 		{
-			values.x = resetValue;
-			modified = true;
+			const float spacingX = 8.0f;
+			UI::ScopedStyle itemSpacing(ImGuiStyleVar_ItemSpacing, ImVec2{ spacingX, 0.0f });
+			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2{ 0.0f, 2.0f });
+
+			{
+				// Begin XYZ area
+				UI::ScopedColor padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+				UI::ScopedStyle frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+
+				ImGui::BeginChild(ImGui::GetID((label + "fr").C_Str()), ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			}
+			const float framePadding = 2.0f;
+			const float outlineSpacing = 1.0f;
+			const float lineHeight = GImGui->Font->FontSize + framePadding * 2.0f;
+			const ImVec2 buttonSize = { lineHeight + 2.0f, lineHeight };
+			const float inputItemWidth = (ImGui::GetContentRegionAvail().x - spacingX) / 3.0f - buttonSize.x;
+
+			const ImGuiIO &io = ImGui::GetIO();
+			auto boldFont = io.Fonts->Fonts[0];
+
+			auto drawControl = [&](const HLString &label, float &value, const ImVec4 &colourN,
+								   const ImVec4 &colourH,
+								   const ImVec4 &colourP)
+			{
+				{
+					UI::ScopedStyle buttonFrame(ImGuiStyleVar_FramePadding, ImVec2(framePadding, 0.0f));
+					UI::ScopedStyle buttonRounding(ImGuiStyleVar_FrameRounding, 1.0f);
+					UI::ScopedColorStack buttonColours(ImGuiCol_Button, colourN, ImGuiCol_ButtonHovered, colourH, ImGuiCol_ButtonActive, colourP);
+
+					UI::ScopedFont buttonFont(boldFont);
+
+					UI::ShiftCursorY(2.0f);
+					if (ImGui::Button(label.C_Str(), buttonSize))
+					{
+						value = resetValue;
+						modified = true;
+					}
+				}
+
+				ImGui::SameLine(0.0f, outlineSpacing);
+				ImGui::SetNextItemWidth(inputItemWidth);
+				UI::ShiftCursorY(-2.0f);
+				modified |= ImGui::DragFloat(("##" + label).C_Str(), &value, 0.1f, 0.0f, 0.0f, "%.2f");
+
+				if (!UI::IsItemDisabled())
+					UI::DrawItemActivityOutline(2.0f, true, Colors::Theme::Accent);
+			};
+
+			drawControl("X", values.x, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f }, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f }, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+
+			ImGui::SameLine(0.0f, outlineSpacing);
+			drawControl("Y", values.y, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f }, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f }, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+
+			ImGui::SameLine(0.0f, outlineSpacing);
+			drawControl("Z", values.z, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f }, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f }, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+
+			ImGui::EndChild();
 		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		if (ImGui::Button("Y", buttonSize))
-		{
-			values.y = resetValue;
-			modified = true;
-		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		if (ImGui::Button("Z", buttonSize))
-		{
-			values.z = resetValue;
-			modified = true;
-		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		ImGui::PopStyleVar();
-		ImGui::Columns(1);
-		ImGui::PopID();
+		UI::PopID();
 
 		return modified;
 	}
@@ -1542,86 +1623,106 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::PushID(*label);
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, columnWidth);
+		UI::PushID();
+		ImGui::TableSetColumnIndex(0);
+		UI::ShiftCursor(17.0f, 7.0f);
+
 		ImGui::Text(*label);
-		ImGui::NextColumn();
+		UI::DrawUnderline(false, 0.0f, 2.0f);
 
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+		ImGui::TableSetColumnIndex(1);
+		UI::ShiftCursor(7.0f, 0.0f);
 
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		if (ImGui::Button("X", buttonSize))
 		{
-			values.x = resetValue;
-			modified = true;
+			const float spacingX = 8.0f;
+			UI::ScopedStyle itemSpacing(ImGuiStyleVar_ItemSpacing, ImVec2{ spacingX, 0.0f });
+			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2{ 0.0f, 2.0f });
+
+			{
+				// Begin XYZ area
+				UI::ScopedColor padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+				UI::ScopedStyle frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+
+				ImGui::BeginChild(ImGui::GetID((label + "fr").C_Str()), ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			}
+			const float framePadding = 2.0f;
+			const float outlineSpacing = 1.0f;
+			const float lineHeight = GImGui->Font->FontSize + framePadding * 2.0f;
+			const ImVec2 buttonSize = { lineHeight + 2.0f, lineHeight };
+			const float inputItemWidth = (ImGui::GetContentRegionAvail().x - spacingX) / 3.0f - buttonSize.x;
+
+			const ImGuiIO &io = ImGui::GetIO();
+			auto boldFont = io.Fonts->Fonts[0];
+
+			auto drawControl = [&](const HLString &label, float &value, const ImVec4 &colourN,
+								   const ImVec4 &colourH,
+								   const ImVec4 &colourP)
+			{
+				{
+					UI::ScopedStyle buttonFrame(ImGuiStyleVar_FramePadding, ImVec2(framePadding, 0.0f));
+					UI::ScopedStyle buttonRounding(ImGuiStyleVar_FrameRounding, 1.0f);
+					UI::ScopedColorStack buttonColours(ImGuiCol_Button, colourN, ImGuiCol_ButtonHovered, colourH, ImGuiCol_ButtonActive, colourP);
+
+					UI::ScopedFont buttonFont(boldFont);
+
+					UI::ShiftCursorY(2.0f);
+					if (ImGui::Button(label.C_Str(), buttonSize))
+					{
+						value = resetValue;
+						modified = true;
+					}
+				}
+
+				ImGui::SameLine(0.0f, outlineSpacing);
+				ImGui::SetNextItemWidth(inputItemWidth);
+				UI::ShiftCursorY(-2.0f);
+				modified |= ImGui::DragFloat(("##" + label).C_Str(), &value, 0.1f, 0.0f, 0.0f, "%.2f");
+
+				if (!UI::IsItemDisabled())
+					UI::DrawItemActivityOutline(2.0f, true, Colors::Theme::Accent);
+			};
+
+			drawControl("X", values.x, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f }, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f }, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+
+			ImGui::SameLine(0.0f, outlineSpacing);
+			drawControl("Y", values.y, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f }, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f }, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+
+			ImGui::SameLine(0.0f, outlineSpacing);
+			drawControl("Z", values.z, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f }, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f }, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+
+			// TODO: edit these colors
+			ImGui::SameLine(0.0f, outlineSpacing);
+			drawControl("W", values.w, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f }, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f }, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+
+			ImGui::EndChild();
 		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		if (ImGui::Button("Y", buttonSize))
-		{
-			values.y = resetValue;
-			modified = true;
-		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		if (ImGui::Button("Z", buttonSize))
-		{
-			values.z = resetValue;
-			modified = true;
-		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		// TODO: edit these colors
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		if (ImGui::Button("W", buttonSize))
-		{
-			values.w = resetValue;
-			modified = true;
-		}
-
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		modified |= ImGui::DragFloat("##W", &values.w, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		ImGui::PopStyleVar();
-		ImGui::Columns(1);
-		ImGui::PopID();
+		UI::PopID();
 
 		return modified;
+	}
+
+	void DrawUnderline(bool fullWidth, float offsetX, float offsetY)
+	{
+		if (fullWidth)
+		{
+			if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr)
+				ImGui::PushColumnsBackground();
+			else if (ImGui::GetCurrentTable() != nullptr)
+				ImGui::TablePushBackgroundChannel();
+		}
+
+		const float width = fullWidth ? ImGui::GetWindowWidth() : ImGui::GetContentRegionAvail().x;
+		const ImVec2 cursor = ImGui::GetCursorScreenPos();
+
+		ImGui::GetWindowDrawList()->AddLine(ImVec2(cursor.x + offsetX, cursor.y + offsetY), ImVec2(cursor.x + width, cursor.y + offsetY), Colors::Theme::BackgroundDark, 1.0f);
+
+		if (fullWidth)
+		{
+			if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr)
+				ImGui::PopColumnsBackground();
+			else if (ImGui::GetCurrentTable() != nullptr)
+				ImGui::TablePopBackgroundChannel();
+		}
 	}
 
 	bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, int32 *selected)
@@ -1666,7 +1767,7 @@ namespace highlo::UI
 		return changed;
 	}
 
-	bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 optionsCount, int32 *selected)
+	bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected)
 	{
 		const char *current = options[*selected].C_Str();
 		bool changed = false;
@@ -1679,9 +1780,10 @@ namespace highlo::UI
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
+		ImGui::SameLine();
 		if (ImGui::BeginCombo(*id, current))
 		{
-			for (int32 i = 0; i < optionsCount; ++i)
+			for (int32 i = 0; i < options.size(); ++i)
 			{
 				const bool isSelected = (current == options[i]);
 				if (ImGui::Selectable(*options[i], isSelected))

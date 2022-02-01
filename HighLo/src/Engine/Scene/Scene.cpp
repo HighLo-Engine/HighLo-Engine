@@ -73,7 +73,7 @@ namespace highlo
 		if (!cameraComp->Primary)
 			return;
 
-		renderer->BeginScene(*cameraComp->Camera);
+		renderer->BeginScene(cameraComp->Camera);
 		renderer->EndScene();
 	}
 	
@@ -128,9 +128,13 @@ namespace highlo
 	
 	Entity Scene::FindEntityByUUID(UUID id)
 	{
-		HL_PROFILE_FUNCTION();
+		if (id == 0)
+		{
+			// TODO: This case is not allowed to ever happen, but currently it happens :(
+			return {};
+		}
 
-		auto &view = m_Registry.View<IDComponent>();
+		auto &view = m_Registry.View<RelationshipComponent>();
 		for (UUID entityID : view)
 		{
 			if (entityID == id && m_EntityIDMap.find(id) != m_EntityIDMap.end())
@@ -143,9 +147,7 @@ namespace highlo
 	
 	Entity Scene::FindEntityByTag(const HLString &tag)
 	{
-		HL_PROFILE_FUNCTION();
-
-		auto &view = m_Registry.View<IDComponent>();
+		auto &view = m_Registry.View<RelationshipComponent>();
 		for (UUID entityID : view)
 		{
 			HL_ASSERT(m_EntityIDMap.find(entityID) != m_EntityIDMap.end());
@@ -278,14 +280,14 @@ namespace highlo
 		}
 		else
 		{
-			Entity prevParent = FindEntityByUUID(entity.GetParentUUID());
-			if (prevParent)
-				UnparentEntity(entity);
+		//	Entity prevParent = FindEntityByUUID(entity.GetParentUUID());
+		//	if (prevParent)
+			UnparentEntity(entity);
 		}
 
 		entity.SetParentUUID(parent.GetUUID());
 		parent.Children().push_back(entity.GetUUID());
-		ConvertToLocalSpace(entity);
+	//	ConvertToLocalSpace(entity);
 	}
 	
 	void Scene::UnparentEntity(Entity entity, bool convertToWorldSpace)
@@ -303,7 +305,6 @@ namespace highlo
 			ConvertToWorldSpace(entity);
 
 		entity.SetParentUUID(0);
-
 	}
 	
 	void Scene::CopyTo(Ref<Scene> &target)
@@ -342,18 +343,47 @@ namespace highlo
 	{
 		return Ref<Scene>::Create(name, isEditorScene, constructScene);
 	}
+
+	void Scene::CopyAllComponents(Entity &dest, const Entity &src)
+	{
+		PrefabComponent *pc = dest.AddOrReplace<PrefabComponent>(src);						// HL_ASSERT(pc, "Prefab Component could not be copied!");
+		SceneComponent *sc = dest.AddOrReplace<SceneComponent>(src);						// HL_ASSERT(sc);
+		CameraComponent *cc = dest.AddOrReplace<CameraComponent>(src);						// HL_ASSERT(cc);
+		SpriteComponent *spriteComponent = dest.AddOrReplace<SpriteComponent>(src);			// HL_ASSERT(spriteComponent);
+		StaticModelComponent *smc = dest.AddOrReplace<StaticModelComponent>(src);			// HL_ASSERT(smc);
+		DynamicModelComponent *dmc = dest.AddOrReplace<DynamicModelComponent>(src);			// HL_ASSERT(dmc);
+		DirectionalLightComponent *dlc = dest.AddOrReplace<DirectionalLightComponent>(src); // HL_ASSERT(dlc);
+		PointLightComponent *plc = dest.AddOrReplace<PointLightComponent>(src);				// HL_ASSERT(plc);
+		SkyLightComponent *slc = dest.AddOrReplace<SkyLightComponent>(src);					// HL_ASSERT(slc);
+		TextComponent *tc = dest.AddOrReplace<TextComponent>(src);							// HL_ASSERT(tc);
+
+	}
 	
+	void Scene::AddEntity(Entity &entity)
+	{
+		m_EntityIDMap[entity.GetUUID()] = entity;
+	}
+
+	void Scene::UpdateEntity(Entity &entity)
+	{
+		m_EntityIDMap[entity.GetUUID()] = entity;
+	}
+
+	void Scene::SetEntityTransform(Entity &entity, Transform &transform)
+	{
+		m_EntityIDMap[entity.GetUUID()].SetTransform(transform);
+	}
+
 	Entity Scene::CreateEntity(const HLString &name)
 	{
 		HL_PROFILE_FUNCTION();
 
 		auto entity = Entity(m_SceneID, name);
-		auto *idComponent = entity.AddComponent<IDComponent>();
-		idComponent->ID = entity.GetUUID();
 
 		entity.AddComponent<RelationshipComponent>();
+		entity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
 
-		m_EntityIDMap[idComponent->ID] = entity;
+		m_EntityIDMap[entity.GetUUID()] = entity;
 		return entity;
 	}
 	
@@ -362,10 +392,9 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		auto entity = Entity(m_SceneID, name);
-		auto idComponent = entity.AddComponent<IDComponent>();
-		idComponent->ID = uuid;
 
 		entity.AddComponent<RelationshipComponent>();
+		entity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
 
 		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());
 		m_EntityIDMap[uuid] = entity;
@@ -406,8 +435,7 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		Entity newEntity = CreateEntity(entity.Tag());
-		
-		// TODO: copy all components
+		CopyAllComponents(newEntity, entity);
 
 		auto childIds = entity.Children();
 		for (auto childId : childIds)
@@ -429,17 +457,5 @@ namespace highlo
 		}
 
 		return newEntity;
-	}
-	
-	Entity Scene::CreatePrefabEntity(Entity entity, const glm::vec3 *translation)
-	{
-		// TODO
-		return entity;
-	}
-	
-	Entity Scene::CreatePrefabEntity(Entity entity, Entity parent, const glm::vec3 *translation)
-	{
-		// TODO
-		return entity;
 	}
 }

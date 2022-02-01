@@ -16,9 +16,16 @@
 
 namespace highlo
 {
-	struct IDComponent
+	struct RelationshipComponent
 	{
-		UUID ID = 0;
+		UUID ParentHandle = 0;
+		std::vector<UUID> Children;
+	};
+
+	struct PrefabComponent
+	{
+		UUID PrefabID = 0;
+		UUID EntityID = 0;
 	};
 
 	struct SceneComponent
@@ -26,26 +33,9 @@ namespace highlo
 		UUID SceneID = 0;
 	};
 
-	struct TransformComponent
-	{
-		Transform Transform;
-	};
-
-	struct RenderComponent
-	{
-		Ref<StaticModel> MainModel;
-		Ref<StaticModel> ModelLOD1;
-		Ref<StaticModel> ModelLOD2;
-		bool UseLOD = false;
-		int32 LodLevel = 0;
-		bool Enabled = true;
-		bool Wireframe = false;
-		bool ResetForNextFrame = false;
-	};
-
 	struct CameraComponent
 	{
-		Ref<Camera> Camera;
+		Camera Camera;
 		bool Primary = true;
 	};
 
@@ -58,25 +48,58 @@ namespace highlo
 
 	struct StaticModelComponent
 	{
-		Ref<StaticModel> Model;
+		UUID Model; // contains the asset ID, which is maintained by the AssetManager
+		Ref<MaterialTable> Materials = MaterialTable::Create();
 	};
 
 	struct DynamicModelComponent
 	{
-		Ref<DynamicModel> Model;
+		UUID Model; // contains the asset ID, which is maintained by the AssetManager
+		uint32 SubmeshIndex = 0;
+		Ref<MaterialTable> Materials = MaterialTable::Create();
 		bool IsFractured = false;
 	};
 
-	struct RelationshipComponent
+	struct DirectionalLightComponent
 	{
-		UUID ParentHandle = 0;
-		std::vector<UUID> Children;
+		glm::vec3 Radiance = { 1.0f, 1.0f, 1.0f };
+		float Intensity = 1.0f;
+		bool CastShadows = true;
+		bool SoftShadows = true;
+		float LightSize = 0.5f;
 	};
 
-	struct PrefabComponent
+	struct PointLightComponent
 	{
-		UUID PrefabID = 0;
-		UUID EntityID = 0;
+		glm::vec3 Radiance = { 1.0f, 1.0f, 1.0f };
+		float Intensity = 1.0f;
+		float Radius = 10.0f;
+		float LightSize = 0.5f;
+		float MinRadius = 1.0f;
+		float MaxRadius = 10.0f;
+		bool CastShadows = true;
+		bool SoftShadows = true;
+		float Falloff = 1.0f;
+	};
+
+	struct SkyLightComponent
+	{
+		AssetHandle SceneEnvironment;
+		float Intensity = 1.0f;
+		float Lod = 0.0f;
+
+		bool DynamicSky = false;
+		glm::vec3 TurbityAzimuthInclination = { 2.0f, 0.0f, 0.0f };
+	};
+
+	struct TextComponent
+	{
+		HLString Text = "Text";
+		AssetHandle FontAsset;
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float LineSpacing = 0.0f;
+		float Kerning = 0.0f;
+		float MaxWidth = 10.0f;
 	};
 
 

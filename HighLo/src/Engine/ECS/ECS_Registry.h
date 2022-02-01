@@ -23,7 +23,7 @@ namespace highlo
 		HLAPI ECS_Registry();
 		HLAPI static ECS_Registry &Get();
 
-		template <typename T>
+		template<typename T>
 		HLAPI const std::vector<T> &GetComponents()
 		{
 			static std::vector<T> s_empty;
@@ -35,7 +35,7 @@ namespace highlo
 			return s_empty;
 		}
 
-		template <typename T>
+		template<typename T>
 		HLAPI T *AddComponent(UUID entityID)
 		{
 			auto comp = std::make_any<T>();
@@ -43,7 +43,7 @@ namespace highlo
 
 			// Add to the list of components
 			m_Components[type].push_back({ entityID, comp });
-			auto index = m_Components[type].size() - 1;
+			uint64 index = m_Components[type].size() - 1;
 
 			// Register the component into the list specific to
 			// the entity for faster access in the future.
@@ -52,14 +52,60 @@ namespace highlo
 			T *component_ptr = std::any_cast<T>(&m_Components[type][index].second);
 
 			// Check if it's a transform component
+			/*
 			static std::type_index transform_type = std::type_index(typeid(TransformComponent));
 			if (type == transform_type)
 				m_TransformComponents[entityID] = static_cast<void*>(component_ptr);
+			*/
 
 			return component_ptr;
 		}
 
-		template <typename T>
+		/*
+		template<typename T>
+		HLAPI T *AddOrReplace(UUID entityID, T *componentToReplace)
+		{
+			auto &type = std::type_index(typeid(T));
+			if (m_Components.find(type) == m_Components.end())
+			{
+				// Component does not exist yet
+				auto comp = std::make_any<T>(*componentToReplace);
+				m_Components[type].push_back({ entityID, comp });
+				uint64 index = m_Components[type].size() - 1;
+
+				m_EntityComponents[entityID].push_back({ type, index });
+
+				T *component_ptr = std::any_cast<T>(&m_Components[type][index].second);
+				return component_ptr;
+			}
+
+			// The component already exists, so replace the value
+			std::vector<std::pair<UUID, std::any>> matchingComponents = m_Components[type];
+			for (uint32 i = 0; i < matchingComponents.size(); ++i)
+			{
+				if (matchingComponents[i].first == entityID)
+				{
+					// We replaced the found entity component
+					m_Components[type][i].second = std::make_any<T>(*componentToReplace);
+					return componentToReplace;
+				}
+			}
+
+			// Nothing was replaced or added
+			return nullptr;
+		}
+		*/
+
+		template<typename T>
+		HLAPI T *AddOrReplace(UUID entityID, T *componentToReplace)
+		{
+			auto &type = std::type_index(typeid(T));
+
+
+			return nullptr;
+		}
+
+		template<typename T>
 		HLAPI T *GetComponent(UUID entityID)
 		{
 			auto &type = std::type_index(typeid(T));
@@ -86,16 +132,25 @@ namespace highlo
 			return nullptr;
 		}
 
-		template <typename T>
+		template<typename T>
 		HLAPI bool HasComponent(UUID entityID)
 		{
+			// check if entity exists
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return false;
 
-			return true;
+			auto &type = std::type_index(typeid(T));
+			auto &componentInfos = m_EntityComponents[entityID];
+			for (auto &it = componentInfos.begin(); it != componentInfos.end(); ++it)
+			{
+				if (it->first == type)
+					return true;
+			}
+
+			return false;
 		}
 
-		template <typename T>
+		template<typename T>
 		HLAPI void RemoveComponent(UUID entityID)
 		{
 			auto &type = std::type_index(typeid(T));
@@ -115,12 +170,25 @@ namespace highlo
 			}
 		}
 
-		HLAPI void DestroyAllByEntityId(UUID entityID)
+		HLAPI void DestroyAllByEntityId(UUID id)
 		{
-			// TODO
+			if (m_EntityComponents.find(id) == m_EntityComponents.end())
+				return; // No entities found to delete
+
+			m_EntityComponents[id].clear();
+			m_EntityComponents[id].shrink_to_fit();
+			m_EntityComponents.erase(id);
+
+			/*
+			if (m_TransformComponents.find(id) == m_TransformComponents.end())
+				return; // No transform for the specific entity was found
+
+			m_TransformComponents.erase(id);
+			*/
 		}
 
-		template <typename T>
+		/*
+		template<typename T>
 		HLAPI void ForEach(const std::function<void(UUID, TransformComponent&, T&)> &callback)
 		{
 			auto &type = std::type_index(typeid(T));
@@ -128,8 +196,19 @@ namespace highlo
 				for (auto &comp : m_Components[type])
 					callback(comp.first, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), *std::any_cast<T>(&comp.second));
 		}
+		*/
 
-		template <typename... Args>
+		template<typename T>
+		HLAPI void ForEach(const std::function<void(UUID, T &)> &callback)
+		{
+			auto &type = std::type_index(typeid(T));
+			if (m_Components.find(type) != m_Components.end())
+				for (auto &comp : m_Components[type])
+					callback(comp.first, *std::any_cast<T>(&comp.second));
+		}
+
+		/*
+		template<typename... Args>
 		HLAPI void ForEachMultiple(const std::function<void(UUID, TransformComponent&, std::vector<void*>&)> &callback)
 		{
 			// Create a list of all types
@@ -181,12 +260,65 @@ namespace highlo
 				}
 			}
 		}
+		*/
+
+		template<typename... Args>
+		HLAPI void ForEachMultiple(const std::function<void(UUID, std::vector<void*>&)> &callback)
+		{
+			// Create a list of all types
+			std::vector<std::type_index> componentTypes;
+			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
+
+			HL_ASSERT(componentTypes.size() > 1, "At least two component types must be specified!");
+
+			auto &firstType = componentTypes[0];
+
+			// Iterate over components of the first specified type
+			if (m_Components.find(firstType) != m_Components.end())
+			{
+				for (auto &comp : m_Components[firstType])
+				{
+					UUID entityID = comp.first;
+					std::vector<void *> components = { &comp.second };
+
+					bool shouldSkipEntity = false;
+
+					// Collect other required components from the found entity
+					for (size_t i = 1; i < componentTypes.size(); ++i)
+					{
+						// Skip entity if one of the required components is not found
+						if (m_Components.find(componentTypes[i]) == m_Components.end())
+						{
+							shouldSkipEntity = true;
+							break;
+						}
+
+						auto componentHandle = GetComponentHandle(entityID, componentTypes[i]);
+
+						// Skip entity if the required component handle is nullptr
+						if (!componentHandle)
+						{
+							shouldSkipEntity = true;
+							break;
+						}
+
+						// If all checks are passed, add the component handle to the list
+						components.push_back(componentHandle);
+					}
+
+					// If entity should be skipped, skip
+					if (shouldSkipEntity)
+						continue;
+
+					callback(entityID, components);
+				}
+			}
+		}
 
 		/// <summary>
-		/// Should return a list of entites with the given component type
+		/// Returns a list of entites with the given template component type.
 		/// </summary>
-		/// <typeparam name="...Args"></typeparam>
-		/// <returns></returns>
+		/// <returns>Returns a list of entites with the given template component type.</returns>
 		template<typename... Args>
 		HLAPI std::vector<UUID> View()
 		{
@@ -222,7 +354,7 @@ namespace highlo
 
 		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;		// Component Type -> { Component ID, Component }
 		std::unordered_map<UUID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;	// EntityID -> [ Component Type, Component index ]
-		std::unordered_map<UUID, void*> m_TransformComponents;											// EntityID -> Transform Component
+	//	std::unordered_map<UUID, void*> m_TransformComponents;											// EntityID -> Transform Component
 	};
 }
 

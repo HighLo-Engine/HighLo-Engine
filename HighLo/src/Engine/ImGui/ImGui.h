@@ -29,6 +29,8 @@
 #include "Engine/Window/Window.h"
 #include "Engine/Window/PopupMenu.h"
 
+#include "ImGuiTreeNode.h"
+
 namespace highlo::UI
 {
 	enum class ImGuiWindowStyle
@@ -71,14 +73,17 @@ namespace highlo::UI
 	HLAPI void SetToolTipV(const char *format, va_list args);
 	HLAPI void SetToolTip(const char *format, ...);
 
+	HLAPI ImVec2 CenteredText(const HLString &text, bool fullWidth = false);
 	HLAPI void Separator();
 
 	HLAPI void PushItemDisabled();
 	HLAPI void PopItemDisabled();
 	HLAPI bool IsItemDisabled();
+	HLAPI bool NavigatedTo();
 
 	HLAPI void BeginPropertyGrid(int32 colNum = 1);
 	HLAPI void EndPropertyGrid();
+	HLAPI bool PropertyGridHeader(const HLString &name, bool openByDefault = true);
 
 	HLAPI bool BeginTreeNode(const HLString &name, bool defaultOpen = true);
 	HLAPI void EndTreeNode();
@@ -137,7 +142,7 @@ namespace highlo::UI
 	// UI Rendering
 	HLAPI void DrawText(const HLString &text);
 	HLAPI void DrawInputText(const HLString &label, const HLString &value);
-	HLAPI bool DrawInputText(const HLString &label, HLString &value);
+	HLAPI bool DrawInputText(const HLString &label, HLString &value, bool fullWidth = false);
 	HLAPI bool DrawInputTextWithLength(const HLString &label, HLString &value, size_t length);
 
 	HLAPI bool DrawCheckbox(const HLString &label, bool &value);
@@ -159,6 +164,8 @@ namespace highlo::UI
 	HLAPI bool DrawVec2(const HLString &label, glm::vec2 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
 	HLAPI bool DrawVec3(const HLString &label, glm::vec3 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
 	HLAPI bool DrawVec4(const HLString &label, glm::vec4 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
+	HLAPI void DrawUnderline(bool fullWidth = false, float offsetX = 0.0f, float offsetY = -1.0f);
 
 	template<typename TEnum, typename TType = int32>
 	HLAPI bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, TEnum &selected)
@@ -204,7 +211,7 @@ namespace highlo::UI
 	}
 
 	HLAPI bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, int32 *selected);
-	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 optionsCount, int32 *selected);
+	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected);
 
 	HLAPI ImTextureID GetTextureID(const Ref<Texture2D> &texture);
 

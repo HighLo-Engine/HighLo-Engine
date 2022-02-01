@@ -35,7 +35,7 @@ namespace highlo
 		HLAPI int64 GetFileSize(const FileSystemPath &path);
 		
 		HLAPI bool CreateFolder(const FileSystemPath &path);
-		HLAPI bool RemoveFolder(const FileSystemPath &path);
+		HLAPI bool RemoveFolder(const FileSystemPath &path, bool forceDelete = false);
 		HLAPI bool FolderExists(const FileSystemPath &path);
 
 		HLAPI FileSystemPath GetPersistentStoragePath();

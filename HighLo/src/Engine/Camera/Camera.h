@@ -46,6 +46,8 @@ namespace highlo
 
 		HLAPI virtual void GetDirectionVectors(glm::vec3 &front, glm::vec3 &up, glm::vec3 &left);
 
+		HLAPI void SetProjectionType(ProjectionType type) { m_ProjectionType = type; }
+		HLAPI ProjectionType GetCurrentProjectionType() const { return m_ProjectionType; }
 		HLAPI bool IsPerspective() const { return m_ProjectionType == ProjectionType::Perspective; }
 		HLAPI bool IsOrthographic() const { return m_ProjectionType == ProjectionType::Orthographic; }
 

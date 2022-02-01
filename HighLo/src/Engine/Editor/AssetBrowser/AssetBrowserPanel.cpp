@@ -374,10 +374,15 @@ namespace highlo
 		dirInfo->SubDirectories.clear();
 		dirInfo->Assets.clear();
 
-		m_Directories.erase(m_Directories.find(dirInfo->Handle));
 		bool result = FileSystem::Get()->RemoveFolder(dirInfo->FilePath);
 		if (!result)
+		{
 			HL_CORE_ERROR("Could not delete {0}", **dirInfo->FilePath);
+			return;
+		}
+
+		// This has to be the last thing to do, otherwise dirInfo will not be usable
+		m_Directories.erase(m_Directories.find(dirInfo->Handle));
 	}
 	
 	void AssetBrowserPanel::RenderDirectoryHierarchy(Ref<DirectoryInfo> &dirInfo)

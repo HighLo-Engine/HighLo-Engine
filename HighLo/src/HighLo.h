@@ -104,9 +104,8 @@
 
 #include "Engine/Editor/EditorColors.h"
 #include "Engine/Editor/SceneHierarchyPanel.h"
+#include "Engine/Editor/ObjectPropertiesPanel.h"
 #include "Engine/Editor/EditorConsolePanel.h"
-#include "Engine/Editor/AssetEditor.h"
-#include "Engine/Editor/AssetEditorPanel.h"
 
 #include "Engine/Editor/AssetBrowser/AssetBrowserItem.h"
 #include "Engine/Editor/AssetBrowser/AssetBrowserItemList.h"

@@ -13,11 +13,15 @@ builds/
 HighLo/vendor/VulkanSDK/
 !vendor/bin/
 
-# Visual Studio files
+# Visual Studio and IntelliJ files
 **.sln
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+.idea/
+
+# java build files and gradle files
+.gradle/
 
 # Others
 *.log

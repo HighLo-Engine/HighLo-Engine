@@ -25,7 +25,7 @@ public class Main
 
         String desiredMode = args[0];
         String desiredRootPath = args[1];
-        String[] excludeDirs = new String[args.length]; // -2 because the first attribute is reserved for the desired mode and the second for the desired root path
+        String[] excludeDirs = new String[args.length - 2]; // -2 because the first attribute is reserved for the desired mode and the second for the desired root path
         int j = 0;
         for (int i = 2; i < args.length; ++i)
         {

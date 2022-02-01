@@ -17,11 +17,14 @@ public class Main
         // - a todo finder, that is really useful for all developers, so that they can easily find a todo in any file without having to manually seach for them
         // - more features are more than welcome by any other developer via pull-request or by a feature request! :)
 
+        if (args.length < 2)
+        {
+            System.err.println("Invalid Argument count! Required to have at least 2 arguments!");
+            return;
+        }
 
-        // String desiredMode = args[0];
-        // String desiredRootPath = args[1];
-        String desiredMode = "todo";
-        String desiredRootPath = "C:/Dev/HighLo-Engine/HighLo-Engine-Rendering/HighLo/src/";
+        String desiredMode = args[0];
+        String desiredRootPath = args[1];
         String[] excludeDirs = new String[args.length]; // -2 because the first attribute is reserved for the desired mode and the second for the desired root path
         int j = 0;
         for (int i = 2; i < args.length; ++i)
@@ -54,6 +57,15 @@ public class Main
         else if (desiredMode.equals("lineCounter") || desiredMode.equals("linecounter") || desiredMode.equals("LINECOUNTER") || desiredMode.equals("line") || desiredMode.equals("LINE"))
         {
             ProjectLineCounter counter = new ProjectLineCounter(desiredRootPath, excludeDirs);
+            counter.iterateAndCount();
+
+            int totalLineCount = counter.getTotalLineCount();
+            int totalFileCount = counter.getTotalFileCount();
+            int totalDirCount = counter.getTotalDirectoyCount();
+
+            System.out.println("Total Lines: " + totalLineCount);
+            System.out.println("Total Files: " + totalFileCount);
+            System.out.println("Total Directories: " + totalDirCount);
         }
     }
 }

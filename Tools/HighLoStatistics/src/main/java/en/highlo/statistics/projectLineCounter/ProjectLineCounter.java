@@ -2,6 +2,8 @@ package en.highlo.statistics.projectLineCounter;
 
 import en.highlo.statistics.utils.RecursiveDirectoryIterator;
 
+import java.io.File;
+
 public class ProjectLineCounter
 {
     private RecursiveDirectoryIterator mIterator;
@@ -44,17 +46,17 @@ public class ProjectLineCounter
         return mDirectoryCount;
     }
 
-    private void onLine(String filePath, String line)
+    private void onLine(File file, String line)
     {
         ++mLineCount;
     }
 
-    private void onFile(String filePath)
+    private void onFile(File file)
     {
         ++mFileCount;
     }
 
-    private void onDirectory(String directoryPath)
+    private void onDirectory(File directory)
     {
         ++mDirectoryCount;
     }

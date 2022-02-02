@@ -23,6 +23,7 @@ namespace highlo
 	{
 		float Padding = 2.0f;
 		float ThumbnailSize = 128.0f;
+		bool ShowAssetType = false;
 	};
 
 	class AssetBrowserPanel
@@ -117,7 +118,6 @@ namespace highlo
 		bool m_UpdateNavigationPath = false;
 		bool m_IsAssetBrowserHovered = false;
 		bool m_IsAssetBrowserFocused = false;
-		bool m_ShowAssetType = false; // TODO: This should be modifieable in settings
 		char m_SearchBuffer[HL_MAX_INPUT_BUFFER_LENGTH];
 	};
 }

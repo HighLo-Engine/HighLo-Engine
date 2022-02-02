@@ -3,6 +3,7 @@ package en.highlo.statistics.todoFinder;
 import en.highlo.statistics.utils.RecursiveDirectoryIterator;
 import en.highlo.statistics.utils.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class TODOFinder
         return result;
     }
 
-    private void onLine(String filePath, String line)
+    private void onLine(File file, String line)
     {
         if (line.contains("TODO: "))
         {
@@ -75,7 +76,7 @@ public class TODOFinder
             for (int i = 0; i < mEntries.size(); ++i)
             {
                 TODOEntry entry = mEntries.get(i);
-                if (entry.FilePath != null && entry.FilePath.equals(filePath))
+                if (entry.FilePath != null && entry.FilePath.equals(file.getAbsolutePath()))
                 {
                     index = i;
 
@@ -96,18 +97,18 @@ public class TODOFinder
             line = line.trim();
 
             mEntries.get(index).ToDoCount = todoCount + 1;
-            mEntries.get(index).FilePath = filePath;
+            mEntries.get(index).FilePath = file.getAbsolutePath();
             mEntries.get(index).ToDoLines.add(line);
         }
     }
 
-    private void onFile(String filePath)
+    private void onFile(File file)
     {
-    //    System.out.println("Discovered file: " + filePath);
+    //    System.out.println("Discovered file: " + file.getAbsolutePath());
     }
 
-    private void onDirectory(String directoryPath)
+    private void onDirectory(File directory)
     {
-    //    System.out.println("Discovered directory: " + directoryPath);
+    //    System.out.println("Discovered directory: " + directory.getAbsolutePath());
     }
 }

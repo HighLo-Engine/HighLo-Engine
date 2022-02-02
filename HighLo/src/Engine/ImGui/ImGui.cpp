@@ -1099,12 +1099,16 @@ namespace highlo::UI
 		return changed;
 	}
 
-	bool DrawCheckbox(const HLString &label, bool &value)
+	bool DrawCheckbox(const HLString &label, bool &value, LabelAlignment alignment)
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
-		ImGui::NextColumn();
+		if (alignment == LabelAlignment::Left)
+		{
+			ImGui::Text(*label);
+			ImGui::NextColumn();
+		}
+
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
@@ -1115,9 +1119,19 @@ namespace highlo::UI
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
-		ImGui::SameLine();
+		if (alignment == LabelAlignment::Left)
+		{
+			ImGui::SameLine();
+		}
+
 		if (ImGui::Checkbox(s_ImGuiIDBuffer, &value))
 			modified = true;
+
+		if (alignment == LabelAlignment::Right)
+		{
+			ImGui::SameLine();
+			ImGui::Text(*label);
+		}
 
 		if (IsItemDisabled())
 			ImGui::PopStyleVar();

@@ -13,7 +13,7 @@ void SettingsPanel::OnUIRender(bool *pOpen)
 	if (!(*pOpen))
 		return;
 
-	ImGui::Begin("Settings", pOpen);
+	ImGui::Begin("Settings", pOpen, ImGuiWindowFlags_NoResize);
 
 	ImVec2 textSize = ImGui::CalcTextSize("Restore default settings");
 	float buttonWidth = textSize.x + 16.0f;
@@ -66,10 +66,8 @@ void SettingsPanel::OnUIRender(bool *pOpen)
 				AssetBrowserPanel::RestoreDefaultSettings();
 			}
 
-			if (UI::DrawFloatSlider("Thumbnail Size", settings.ThumbnailSize, 1.0f, 512.0f))
-			{
-
-			}
+			UI::DrawFloatSlider("Thumbnail Size", settings.ThumbnailSize, 1.0f, 512.0f);
+			UI::DrawCheckbox("Show Asset Type", settings.ShowAssetType, UI::LabelAlignment::Right);
 
 			ImGui::EndTabItem();
 		}

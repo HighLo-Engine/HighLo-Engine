@@ -293,6 +293,7 @@ namespace highlo
 	{
 		s_AssetBrowserSettings->Padding = 2.0f;
 		s_AssetBrowserSettings->ThumbnailSize = 128.0f;
+		s_AssetBrowserSettings->ShowAssetType = false;
 	}
 
 	AssetHandle AssetBrowserPanel::ProcessDirectory(const FileSystemPath &dirPath, const Ref<DirectoryInfo> &parentDirInfo)
@@ -618,28 +619,6 @@ namespace highlo
 			}
 		}
 
-		// ====================================================================================================================================
-		// ==========================================================  Settings button  =======================================================
-		// ====================================================================================================================================
-
-		/*
-		ImGui::Spring();
-
-		if (UI::Widgets::OptionsButton())
-		{
-			ImGui::OpenPopup("AssetBrowserSettings");
-		}
-	//	UI::SetToolTip("Asset Browser Settings");
-
-		if (UI::BeginPopup("AssetBrowserSettings"))
-		{
-			ImGui::SliderFloat("##thumbnailSize", &m_Settings.ThumbnailSize, 96.0f, 512.0f, "%.0f");
-	//		UI::SetToolTip("Thumbnail Size");
-
-			UI::EndPopup();
-		}
-		*/
-
 		ImGui::EndHorizontal();
 		ImGui::EndChild();
 	}
@@ -653,7 +632,7 @@ namespace highlo
 		for (auto &item : m_CurrentItems)
 		{
 			item->OnRenderBegin();
-			AssetBrowserActionResult result = item->OnRender(s_AssetBrowserSettings->ThumbnailSize, m_ShowAssetType);
+			AssetBrowserActionResult result = item->OnRender(s_AssetBrowserSettings->ThumbnailSize, s_AssetBrowserSettings->ShowAssetType);
 
 			if (result.IsSet(AssetBrowserAction::ClearSelections))
 				ClearSelections();

@@ -68,8 +68,8 @@ namespace highlo
 		}
 	}
 
-	template<typename UIFunc>
-	static void DrawTransformComponent(const HLString &name, Entity entity, UIFunc func, const Ref<Texture2D> &settingsIcon)
+	template<typename UIFunction>
+	static void DrawTransformComponent(const HLString &name, Ref<Scene> &scene, Entity entity, UIFunction func, const Ref<Texture2D> &settingsIcon)
 	{
 		ImGui::PushID(HLString("##" + name).C_Str());
 		ImVec2 contentRegion = ImGui::GetContentRegionAvail();
@@ -102,7 +102,10 @@ namespace highlo
 		}
 
 		if (resetValues)
-			entity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
+		{
+			entity.SetTransform(Transform::Identity());
+			scene->SetEntityTransform(entity, Transform::Identity());
+		}
 
 		if (!open)
 			UI::ShiftCursorY(-(ImGui::GetStyle().ItemSpacing.y + 1.0f));
@@ -288,7 +291,7 @@ namespace highlo
 		}
 
 		// Draw Transform
-		DrawTransformComponent("Transform", entity, [&]()
+		DrawTransformComponent("Transform", m_Scene, entity, [&]()
 		{
 			UI::ScopedStyle spacing(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 8.0f));
 			UI::ScopedStyle padding(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));

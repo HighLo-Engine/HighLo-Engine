@@ -57,6 +57,12 @@ namespace highlo
 		bool VSync = false;
 
 		/// <summary>
+		/// Determines, whether to use Dear ImGui as the main UI library. This option overrides every other UI framework,
+		/// including the engine's own UI framwork, but it is only relevant for the Editor build, runtime builds will always use the engine's own UI code.
+		/// </summary>
+		bool EnableDearImGui = true;
+
+		/// <summary>
 		/// Determines the rendering api that should be used in the backend to render, if Headless is false.
 		/// </summary>
 		HLString RenderingAPI = "OpenGL";

@@ -151,10 +151,10 @@ namespace highlo
 				ImGui::Spring();
 
 				const AssetMetaData &metaData = AssetManager::Get()->GetMetaData(m_ID);
-				const HLString &assetType = utils::AssetTypeToString(metaData.Type).ToUpperCase();
+				const HLString &assetType = utils::AssetTypeToString(metaData.Type);
 
 				UI::ScopedColor textColor(ImGuiCol_Text, Colors::Theme::TextDarker);
-				ImGui::TextUnformatted(*assetType);
+				ImGui::TextUnformatted(*assetType.ToUpperCase());
 
 				ImGui::EndHorizontal();
 				ImGui::Spring(-1.0f, edgeOffset);

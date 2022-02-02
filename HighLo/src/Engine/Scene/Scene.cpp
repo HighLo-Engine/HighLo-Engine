@@ -366,6 +366,7 @@ namespace highlo
 
 	void Scene::UpdateEntity(Entity &entity)
 	{
+		HL_ASSERT(m_EntityIDMap.find(entity.GetUUID()) != m_EntityIDMap.end());
 		m_EntityIDMap[entity.GetUUID()] = entity;
 	}
 
@@ -381,7 +382,7 @@ namespace highlo
 		auto entity = Entity(m_SceneID, name);
 
 		entity.AddComponent<RelationshipComponent>();
-		entity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
+		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
 		m_EntityIDMap[entity.GetUUID()] = entity;
 		return entity;
@@ -394,7 +395,7 @@ namespace highlo
 		auto entity = Entity(m_SceneID, name);
 
 		entity.AddComponent<RelationshipComponent>();
-		entity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
+		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
 		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());
 		m_EntityIDMap[uuid] = entity;

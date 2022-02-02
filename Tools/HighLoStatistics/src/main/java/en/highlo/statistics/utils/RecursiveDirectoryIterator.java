@@ -14,9 +14,9 @@ public class RecursiveDirectoryIterator
     private String[] mExcludeDirs;
     private int mIteratedFiles = 0;
 
-    private Consumer<String> mFileCallback = null;
-    private Consumer<String> mDirectoryCallback = null;
-    private BiConsumer<String, String> mLineCallback = null;
+    private Consumer<File> mFileCallback = null;
+    private Consumer<File> mDirectoryCallback = null;
+    private BiConsumer<File, String> mLineCallback = null;
 
     public RecursiveDirectoryIterator(String rootPath, String[] excludeDirs)
     {
@@ -28,17 +28,17 @@ public class RecursiveDirectoryIterator
         iterateRecursiveAndCountFiles(list, new File(rootPath), excludeDirs);
     }
 
-    public void registerFileCallback(Consumer<String> func)
+    public void registerFileCallback(Consumer<File> func)
     {
         mFileCallback = func;
     }
 
-    public void registerDirectoryCallback(Consumer<String> func)
+    public void registerDirectoryCallback(Consumer<File> func)
     {
         mDirectoryCallback = func;
     }
 
-    public void registerLineCallback(BiConsumer<String, String> func)
+    public void registerLineCallback(BiConsumer<File, String> func)
     {
         mLineCallback = func;
     }
@@ -99,7 +99,7 @@ public class RecursiveDirectoryIterator
         {
             if (mFileCallback != null)
             {
-                mFileCallback.accept(dir.getAbsolutePath());
+                mFileCallback.accept(dir);
             }
 
             try
@@ -110,7 +110,7 @@ public class RecursiveDirectoryIterator
                     String line = s.nextLine();
                     if (mLineCallback != null)
                     {
-                        mLineCallback.accept(dir.getAbsolutePath(), line);
+                        mLineCallback.accept(dir, line);
                     }
                 }
 
@@ -143,7 +143,7 @@ public class RecursiveDirectoryIterator
                     {
                         if (file.isDirectory() && mDirectoryCallback != null)
                         {
-                            mDirectoryCallback.accept(file.getAbsolutePath());
+                            mDirectoryCallback.accept(file);
                         }
 
                         iterateRecursive(files, file, excludeDirs);
@@ -154,7 +154,7 @@ public class RecursiveDirectoryIterator
             {
                 if (file.isDirectory() && mDirectoryCallback != null)
                 {
-                    mDirectoryCallback.accept(file.getAbsolutePath());
+                    mDirectoryCallback.accept(file);
                 }
 
                 iterateRecursive(files, file, null);

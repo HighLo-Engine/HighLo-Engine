@@ -40,6 +40,12 @@ namespace highlo::UI
 		Light
 	};
 
+	enum class LabelAlignment
+	{
+		Left = 0,
+		Right
+	};
+
 	HLAPI void InitImGui(Window *window, ImGuiWindowStyle windowStyle);
 	HLAPI void ShutdownImGui();
 
@@ -145,7 +151,7 @@ namespace highlo::UI
 	HLAPI bool DrawInputText(const HLString &label, HLString &value, bool fullWidth = false);
 	HLAPI bool DrawInputTextWithLength(const HLString &label, HLString &value, size_t length);
 
-	HLAPI bool DrawCheckbox(const HLString &label, bool &value);
+	HLAPI bool DrawCheckbox(const HLString &label, bool &value, LabelAlignment alignment = LabelAlignment::Left);
 	HLAPI bool DrawCheckboxGroup(const HLString &label, bool &value);
 	HLAPI bool DrawColorPicker(const HLString &label, glm::vec3 &value);
 	HLAPI bool DrawButton(const HLString &label, const ImVec2 &size = ImVec2(0, 0));

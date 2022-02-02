@@ -90,7 +90,7 @@ void HighLoEditor::OnInitialize()
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
 	m_ObjectPropertiesPanel = UniqueRef<ObjectPropertiesPanel>::Create(m_CurrentScene, true);
-	m_ObjectPropertiesPanel->AddActionCallback(std::bind(&HighLoEditor::OnObjectPropertiesChange, this, std::placeholders::_1));
+	m_ObjectPropertiesPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::OnEntityChanged, this, std::placeholders::_1));
 
 	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
 
@@ -806,7 +806,7 @@ void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
 }
 
-void HighLoEditor::OnEntityDeleted(Entity e)
+void HighLoEditor::OnEntityDeleted(Entity &e)
 {
 	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].Entity == e)
 	{
@@ -816,8 +816,10 @@ void HighLoEditor::OnEntityDeleted(Entity e)
 	}
 }
 
-void HighLoEditor::OnObjectPropertiesChange(ObjectPropertiesActionType type)
+void HighLoEditor::OnEntityChanged(Entity &e)
 {
+	m_EditorScene->SetSelectedEntity(e);
+	m_SceneHierarchyPanel->SetSelected(e);
 }
 
 void HighLoEditor::OnScenePlay()

@@ -190,6 +190,9 @@ namespace highlo
 					entity.SetTag(tag);
 					if (m_ActionCallback)
 						m_ActionCallback(ObjectPropertiesActionType::TagChanged);
+
+					if (m_SelectionChangedCallback)
+						m_SelectionChangedCallback(entity);
 				}
 
 				UI::DrawItemActivityOutline(2.0f, false, Colors::Theme::Accent);
@@ -230,56 +233,56 @@ namespace highlo
 
 			if (UI::BeginPopup("add_comp_popup"))
 			{
-				if (!m_SelectedEntity.HasComponent<CameraComponent>())
+				if (!entity.HasComponent<CameraComponent>())
 				{
 					if (ImGui::MenuItem("Camera"))
 					{
-						m_SelectedEntity.AddComponent<CameraComponent>();
+						entity.AddComponent<CameraComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
 
-				if (!m_SelectedEntity.HasComponent<StaticModelComponent>() && !m_SelectedEntity.HasComponent<DynamicModelComponent>())
+				if (!entity.HasComponent<StaticModelComponent>() && !m_SelectedEntity.HasComponent<DynamicModelComponent>())
 				{
 					if (ImGui::MenuItem("Static Model"))
 					{
-						m_SelectedEntity.AddComponent<StaticModelComponent>();
+						entity.AddComponent<StaticModelComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
 
-				if (!m_SelectedEntity.HasComponent<DynamicModelComponent>() && !m_SelectedEntity.HasComponent<StaticModelComponent>())
+				if (!entity.HasComponent<DynamicModelComponent>() && !m_SelectedEntity.HasComponent<StaticModelComponent>())
 				{
 					if (ImGui::MenuItem("Dynamic Model"))
 					{
-						m_SelectedEntity.AddComponent<DynamicModelComponent>();
+						entity.AddComponent<DynamicModelComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
 
-				if (!m_SelectedEntity.HasComponent<DirectionalLightComponent>())
+				if (!entity.HasComponent<DirectionalLightComponent>())
 				{
 					if (ImGui::MenuItem("Directional Light"))
 					{
-						m_SelectedEntity.AddComponent<DirectionalLightComponent>();
+						entity.AddComponent<DirectionalLightComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
 
-				if (!m_SelectedEntity.HasComponent<PointLightComponent>())
+				if (!entity.HasComponent<PointLightComponent>())
 				{
 					if (ImGui::MenuItem("Point Light"))
 					{
-						m_SelectedEntity.AddComponent<PointLightComponent>();
+						entity.AddComponent<PointLightComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
 
-				if (!m_SelectedEntity.HasComponent<SkyLightComponent>())
+				if (!entity.HasComponent<SkyLightComponent>())
 				{
 					if (ImGui::MenuItem("Sky Light"))
 					{
-						m_SelectedEntity.AddComponent<SkyLightComponent>();
+						entity.AddComponent<SkyLightComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -300,23 +303,34 @@ namespace highlo
 			ImGui::TableSetupColumn("label_col", 0, 100.0f);
 			ImGui::TableSetupColumn("value_col", ImGuiTableColumnFlags_IndentEnable | ImGuiTableColumnFlags_NoClip, ImGui::GetContentRegionAvail().x - 100.0f);
 
-			ImGui::TableNextRow();
-			UI::DrawVec3("Translation", entity.Transform().GetPosition());
+			Transform &entityTransform = entity.Transform();
 
 			ImGui::TableNextRow();
-			glm::vec3 rotation = entity.Transform().GetRotation();
+			bool translationChanged = UI::DrawVec3("Translation", entityTransform.GetPosition());
+
+			ImGui::TableNextRow();
+			glm::vec3 rotation = entityTransform.GetRotation();
 			glm::vec3 degreeRotation = glm::degrees(rotation);
-			UI::DrawVec3("Rotation", degreeRotation);
-			entity.Transform().SetRotation(glm::radians(degreeRotation));
+			bool rotationChanged = UI::DrawVec3("Rotation", degreeRotation);
+			entityTransform.SetRotation(glm::radians(degreeRotation));
 
 			ImGui::TableNextRow();
-			UI::DrawVec3("Scale", entity.Transform().GetScale());
+			bool scaleChanged = UI::DrawVec3("Scale", entityTransform.GetScale());
 
 			ImGui::EndTable();
 
 			UI::ShiftCursorY(-8.0f);
 			UI::DrawUnderline();
 			UI::ShiftCursorY(18.0f);
+
+			if (translationChanged || rotationChanged || scaleChanged)
+			{
+				entity.SetTransform(entityTransform);
+
+				if (m_SelectionChangedCallback)
+					m_SelectionChangedCallback(entity);
+			}
+
 		}, m_SettingsIcon);
 
 		DrawComponent<StaticModelComponent>("Static Model", entity, [](StaticModelComponent &component)

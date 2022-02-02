@@ -76,7 +76,8 @@ class HighLoEditor : public HLApplication
 		void OnFileMenuPressed(FileMenu *menu, MenuItem *item);
 
 		void OnSelected(const SelectedMesh &selectionContext);
-		void OnEntityDeleted(Entity e);
+		void OnEntityDeleted(Entity &e);
+		void OnEntityChanged(Entity &e);
 		void OnObjectPropertiesChange(ObjectPropertiesActionType type);
 
 		void OnScenePlay();

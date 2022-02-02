@@ -61,48 +61,50 @@ namespace highlo
 			return component_ptr;
 		}
 
-		/*
 		template<typename T>
-		HLAPI T *AddOrReplace(UUID entityID, T *componentToReplace)
+		HLAPI T *AddOrReplace(UUID dstEntityId, UUID srcEntityId, T *componentToReplace)
 		{
 			auto &type = std::type_index(typeid(T));
-			if (m_Components.find(type) == m_Components.end())
+			std::vector<std::pair<std::type_index, uint64>> &matchingEntity = m_EntityComponents[srcEntityId];
+
+			// First try to find the requested component in the source entity
+			int32 componentIndex = -1;
+			for (auto &[currentType, index] : matchingEntity)
 			{
-				// Component does not exist yet
-				auto comp = std::make_any<T>(*componentToReplace);
-				m_Components[type].push_back({ entityID, comp });
-				uint64 index = m_Components[type].size() - 1;
+				std::pair<UUID, std::any> &matchingComponent = m_Components[currentType][index];
+				T *component = std::any_cast<T>(&matchingComponent.second);
 
-				m_EntityComponents[entityID].push_back({ type, index });
-
-				T *component_ptr = std::any_cast<T>(&m_Components[type][index].second);
-				return component_ptr;
-			}
-
-			// The component already exists, so replace the value
-			std::vector<std::pair<UUID, std::any>> matchingComponents = m_Components[type];
-			for (uint32 i = 0; i < matchingComponents.size(); ++i)
-			{
-				if (matchingComponents[i].first == entityID)
+				// If component is not NULL, it was casted successfully in the requested type, therefore a item of that type exists
+				if (component)
 				{
-					// We replaced the found entity component
-					m_Components[type][i].second = std::make_any<T>(*componentToReplace);
-					return componentToReplace;
+					componentIndex = (int32)index;
+					break;
 				}
 			}
 
-			// Nothing was replaced or added
-			return nullptr;
-		}
-		*/
+			if (componentIndex != -1)
+			{
+				// The component exists in the source entity, so copy it over into the destination entity
+				std::pair<UUID, std::any> &valueToCopy = m_Components[type][componentIndex];
 
-		template<typename T>
-		HLAPI T *AddOrReplace(UUID entityID, T *componentToReplace)
-		{
-			auto &type = std::type_index(typeid(T));
+				// Make sure we copy the correct component
+				if (valueToCopy.first == srcEntityId)
+				{
+					m_Components[type].push_back({ dstEntityId, valueToCopy.second });
+					uint64 index = m_Components[type].size() - 1;
 
+					m_EntityComponents[dstEntityId].push_back({ type, index });
+					return std::any_cast<T>(&m_Components[type][index].second);
+				}
+			}
 
-			return nullptr;
+			// The component was not found, so add it normally to the destination entity
+			auto componentToInsert = std::make_any<T>(*componentToReplace);
+			m_Components[type].push_back({ dstEntityId, componentToInsert });
+			uint64 index = m_Components[type].size() - 1;
+
+			m_EntityComponents[dstEntityId].push_back({ type, index });
+			return std::any_cast<T>(&m_Components[type][index].second);
 		}
 
 		template<typename T>

@@ -44,7 +44,7 @@ namespace highlo
 				return nullptr;
 
 			T *componentToCopy = srcEntity.GetComponent<T>();
-			return ECS_Registry::Get().AddOrReplace<T>(m_ID, componentToCopy);
+			return ECS_Registry::Get().AddOrReplace<T>(m_ID, srcEntity.GetUUID(), componentToCopy);
 		}
 
 		template<typename T>

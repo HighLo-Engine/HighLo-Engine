@@ -33,6 +33,7 @@ namespace highlo
 		HLAPI void OnUIRender(bool *pOpen = nullptr);
 
 		HLAPI void AddActionCallback(const std::function<void(ObjectPropertiesActionType)> &callback);
+		HLAPI void SetSelectionChangedCallback(const std::function<void(Entity)> &callback) { m_SelectionChangedCallback = callback; }
 
 	private:
 
@@ -43,6 +44,7 @@ namespace highlo
 		Entity m_SelectedEntity;
 
 		std::function<void(ObjectPropertiesActionType)> m_ActionCallback;
+		std::function<void(Entity)> m_SelectionChangedCallback;
 
 		Ref<Texture2D> m_PlusIcon;
 		Ref<Texture2D> m_SettingsIcon;

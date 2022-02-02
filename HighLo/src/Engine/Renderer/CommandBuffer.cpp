@@ -5,6 +5,9 @@
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLCommandBuffer.h"
+#elif HIGHLO_API_DX11
+#include "Engine/Platform/DX11/DX11CommandBuffer.h"
+#elif HIGHLO_API_DX12
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanCommandBuffer.h"
 #endif // HIGHLO_API_OPENGL
@@ -18,8 +21,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanCommandBuffer>::Create(debugName, true);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false, "Not supported in DX11");
-		return nullptr;
+		return Ref<DX11CommandBuffer>::Create(debugName);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false, "Not supported in DX12");
 		return nullptr;
@@ -36,8 +38,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanCommandBuffer>::Create(count, debugName);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false, "Not supported in DX11");
-		return nullptr;
+		return Ref<DX11CommandBuffer>::Create(count, debugName);
 	#elif HIGHLO_API_DX12
 		HL_ASSERT(false, "Not supported in DX12");
 		return nullptr;

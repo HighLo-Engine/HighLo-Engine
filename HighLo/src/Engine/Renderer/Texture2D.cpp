@@ -6,7 +6,7 @@
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLTexture2D.h"
 #elif HIGHLO_API_DX11
-#include "Engine/Platform/DX11/DX11Texture.h"
+#include "Engine/Platform/DX11/DX11Texture2D.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanTexture2D.h"
 #endif // HIGHLO_API_OPENGL

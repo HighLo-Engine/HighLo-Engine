@@ -15,6 +15,9 @@ namespace highlo
 		DX11StorageBuffer(uint32 size, uint32 binding);
 		virtual ~DX11StorageBuffer();
 
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+
 		virtual void SetData(const void *data, uint32 size, uint32 offset = 0) override;
 		virtual void Resize(uint32 size) override;
 

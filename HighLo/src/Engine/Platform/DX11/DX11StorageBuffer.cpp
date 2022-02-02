@@ -13,6 +13,14 @@ namespace highlo
 	{
 	}
 
+	void DX11StorageBuffer::Bind() const
+	{
+	}
+
+	void DX11StorageBuffer::Unbind() const
+	{
+	}
+
 	void DX11StorageBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
 	}

@@ -63,6 +63,8 @@ namespace highlo
 		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }
 
+		virtual void UpdateForRendering() override;
+
 	private:
 
 		HLString m_Name;

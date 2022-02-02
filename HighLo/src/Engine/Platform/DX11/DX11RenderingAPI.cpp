@@ -31,16 +31,24 @@ namespace highlo
 		DX11Resources::s_DeviceContext->OMSetDepthStencilState(DX11Resources::s_DepthStencilState.Get(), 0);
 	}
 
+	void DX11RenderingAPI::BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear)
+	{
+	}
+
+	void DX11RenderingAPI::EndRenderPass(Ref<CommandBuffer> renderCommandBuffer)
+	{
+	}
+
 	void DX11RenderingAPI::DrawIndexed(Ref<VertexArray> &va, PrimitiveType type)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawIndexed(uint32 indexCount, PrimitiveType type, bool depthTest)
+	void DX11RenderingAPI::DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type, bool depthTest, const glm::mat4 &localTransform)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		
+
 		//																	|	how many instances do we need here? @FlareFlax
 		DX11Resources::s_DeviceContext->DrawIndexedInstanced(indexCount, indexCount, 0, 0, 0);
 	}
@@ -55,6 +63,14 @@ namespace highlo
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
+	}
+
+	void DX11RenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
+	{
+	}
+
+	void DX11RenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
 	}
 
 	void DX11RenderingAPI::BeginFrame()

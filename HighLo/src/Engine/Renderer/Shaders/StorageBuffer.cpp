@@ -8,6 +8,7 @@
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanStorageBuffer.h"
 #elif HIGHLO_API_DX11
+#include "Engine/Platform/DX11/DX11StorageBuffer.h"
 #elif HIGHLO_API_DX12
 // TODO
 #include "Engine/Platform/DX11/DX11StorageBuffer.h"

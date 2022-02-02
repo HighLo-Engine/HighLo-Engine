@@ -193,6 +193,10 @@ namespace highlo
 	void DX11Material::SetFlag(MaterialFlag flag, bool value)
 	{
 	}
+	
+	void DX11Material::UpdateForRendering()
+	{
+	}
 }
 
 #endif // HIGHLO_API_DX11

@@ -27,6 +27,14 @@ namespace highlo
 	DX11UniformBuffer::~DX11UniformBuffer()
 	{
 	}
+
+	void DX11UniformBuffer::Bind() const
+	{
+	}
+
+	void DX11UniformBuffer::Unbind() const
+	{
+	}
 	
 	void DX11UniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{

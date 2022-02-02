@@ -11,6 +11,8 @@
 #include <HighLo.h>
 using namespace highlo;
 
+#include "Panels/SettingsPanel.h"
+
 class HighLoEditor : public HLApplication
 	{
 	public:
@@ -87,6 +89,7 @@ class HighLoEditor : public HLApplication
 		void DeleteEntity(Entity entity);
 
 	private:
+
 		glm::vec4 m_ClearColor = { 0.4f, 0.5f, 0.4f, 1 };
 
 		HLString m_ProjectPath;
@@ -109,6 +112,7 @@ class HighLoEditor : public HLApplication
 		bool m_DrawOnTopBoundingBoxes = false;
 		bool m_SceneIsSaved = false;
 
+		bool m_ShowSettingsPanel = false;
 		bool m_ShowAssetsPanel = true;
 		bool m_ShowSceneHierarchyPanel = true;
 		bool m_ShowViewportPanel = true;
@@ -144,8 +148,10 @@ class HighLoEditor : public HLApplication
 		UniqueRef<ObjectPropertiesPanel> m_ObjectPropertiesPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
+		UniqueRef<SettingsPanel> m_SettingsPanel;
 
 		// File Menu Panels
 		Ref<FileMenu> m_WindowMenu = nullptr;
+		Ref<FileMenu> m_FileMenu = nullptr;
 	};
 

@@ -19,11 +19,19 @@
 
 namespace highlo
 {
+	struct AssetBrowserSettings
+	{
+		float Padding = 2.0f;
+		float ThumbnailSize = 128.0f;
+	};
+
 	class AssetBrowserPanel
 	{
 	public:
 
 		HLAPI AssetBrowserPanel(Ref<Project> project);
+		HLAPI virtual ~AssetBrowserPanel();
+
 		HLAPI static AssetBrowserPanel &Get() { return *s_Instance; }
 
 		HLAPI void OnUIRender();
@@ -33,6 +41,8 @@ namespace highlo
 		HLAPI AssetBrowserItemList &GetCurrentItems() { return m_CurrentItems; }
 
 		HLAPI Ref<DirectoryInfo> GetDirectory(const FileSystemPath &filePath) const;
+		HLAPI static AssetBrowserSettings &GetSettings();
+		HLAPI static void RestoreDefaultSettings();
 
 	private:
 

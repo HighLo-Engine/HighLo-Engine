@@ -94,6 +94,8 @@ void HighLoEditor::OnInitialize()
 
 	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
 
+	m_SettingsPanel = UniqueRef<SettingsPanel>::Create();
+
 	GetWindow().Maximize();
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
 	UpdateWindowTitle("Untitled Scene");
@@ -119,19 +121,19 @@ void HighLoEditor::OnInitialize()
 	exportMenu->AddMenuItem("Export .avi", "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
 	exportMenu->AddMenuItem("Export .mov", "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
 
-	Ref<FileMenu> fileMenu = FileMenu::Create("File");
-	fileMenu->AddMenuItem("New Scene", "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddMenuItem("Open Scene...", "Strg+O", MENU_ITEM_OPEN_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Save Scene", "Strg+S", MENU_ITEM_SAVE_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", MENU_ITEM_SAVE_SCENE_AS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Settings", "", MENU_ITEM_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddSeparator();
-	fileMenu->AddSubMenu(importMenu);
-	fileMenu->AddSubMenu(exportMenu);
-	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu = FileMenu::Create("File");
+	m_FileMenu->AddMenuItem("New Scene", "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddMenuItem("Open Scene...", "Strg+O", MENU_ITEM_OPEN_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddMenuItem("Save Scene", "Strg+S", MENU_ITEM_SAVE_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	m_FileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", MENU_ITEM_SAVE_SCENE_AS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddMenuItem("Settings", "", MENU_ITEM_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddSubMenu(importMenu);
+	m_FileMenu->AddSubMenu(exportMenu);
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddMenuItem("Quit", "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> editMenu = FileMenu::Create("Edit");
 	editMenu->AddMenuItem("Undo", "Strg+Z", MENU_ITEM_UNDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
@@ -164,7 +166,7 @@ void HighLoEditor::OnInitialize()
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	helpMenu->AddMenuItem("Documentation", "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	m_MenuBar->AddMenu(fileMenu);
+	m_MenuBar->AddMenu(m_FileMenu);
 	m_MenuBar->AddMenu(editMenu);
 	m_MenuBar->AddMenu(gameObjectMenu);
 	m_MenuBar->AddMenu(rendererMenu);
@@ -258,6 +260,7 @@ void HighLoEditor::UpdateUIFlags()
 	// reflects the current opened state of the log tab.
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ASSET_MANAGER)->IsSelected = m_AssetManagerPanelOpen;
+	m_FileMenu->GetMenuItemWithID(MENU_ITEM_SETTINGS)->IsSelected = m_ShowSettingsPanel;
 }
 
 void HighLoEditor::OnShutdown()
@@ -403,10 +406,9 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_AssetBrowserPanel->OnUIRender();
 	m_SceneHierarchyPanel->OnUIRender();
 	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
-
-	// Object Properties Panel
 	m_ObjectPropertiesPanel->OnUIRender(&m_ShowObjectPropertiesPanel);
-
+	m_SettingsPanel->OnUIRender(&m_ShowSettingsPanel);
+	
 	m_ViewportRenderer->OnUIRender();
 
 	AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
@@ -725,7 +727,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 
 		case MENU_ITEM_SETTINGS:
 		{
-			HL_INFO("Open Settings dialog...");
+			m_ShowSettingsPanel = !m_ShowSettingsPanel;
 			break;
 		}
 

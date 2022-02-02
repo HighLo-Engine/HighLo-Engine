@@ -30,14 +30,14 @@ namespace highlo
 	}
 
 	AssetBrowserPanel *AssetBrowserPanel::s_Instance = nullptr;
-	static float s_Padding = 2.0f;
-	static float s_ThumbnailSize = 128.0f;
+	static AssetBrowserSettings *s_AssetBrowserSettings = nullptr;
 	static std::mutex s_LockMutex;
 
 	AssetBrowserPanel::AssetBrowserPanel(Ref<Project> project)
 		: m_Project(project)
 	{
 		s_Instance = this;
+		s_AssetBrowserSettings = new AssetBrowserSettings();
 
 		// Load Textures
 		m_Shadow = Texture2D::LoadFromFile("assets/Resources/icons/shadow.png");
@@ -73,6 +73,11 @@ namespace highlo
 		ChangeDirectory(m_BaseDirectory);
 
 		memset(m_SearchBuffer, 0, HL_MAX_INPUT_BUFFER_LENGTH);
+	}
+
+	AssetBrowserPanel::~AssetBrowserPanel()
+	{
+		delete s_AssetBrowserSettings;
 	}
 	
 	void AssetBrowserPanel::OnUIRender()
@@ -211,7 +216,7 @@ namespace highlo
 						const float paddingForOutline = 2.0f;
 						const float scrollBarrOffset = 20.0f + ImGui::GetStyle().ScrollbarSize;
 						float panelWidth = ImGui::GetContentRegionAvail().x - scrollBarrOffset;
-						float cellSize = s_ThumbnailSize + s_Padding + paddingForOutline;
+						float cellSize = s_AssetBrowserSettings->ThumbnailSize + s_AssetBrowserSettings->Padding + paddingForOutline;
 						int32 columnCount = (int32)(panelWidth / cellSize);
 						if (columnCount < 1) columnCount = 1;
 
@@ -277,6 +282,17 @@ namespace highlo
 		}
 
 		return nullptr;
+	}
+
+	AssetBrowserSettings &AssetBrowserPanel::GetSettings()
+	{
+		return *s_AssetBrowserSettings;
+	}
+
+	void AssetBrowserPanel::RestoreDefaultSettings()
+	{
+		s_AssetBrowserSettings->Padding = 2.0f;
+		s_AssetBrowserSettings->ThumbnailSize = 128.0f;
 	}
 
 	AssetHandle AssetBrowserPanel::ProcessDirectory(const FileSystemPath &dirPath, const Ref<DirectoryInfo> &parentDirInfo)
@@ -606,6 +622,7 @@ namespace highlo
 		// ==========================================================  Settings button  =======================================================
 		// ====================================================================================================================================
 
+		/*
 		ImGui::Spring();
 
 		if (UI::Widgets::OptionsButton())
@@ -616,11 +633,12 @@ namespace highlo
 
 		if (UI::BeginPopup("AssetBrowserSettings"))
 		{
-			ImGui::SliderFloat("##thumbnailSize", &s_ThumbnailSize, 96.0f, 512.0f, "%.0f");
+			ImGui::SliderFloat("##thumbnailSize", &m_Settings.ThumbnailSize, 96.0f, 512.0f, "%.0f");
 	//		UI::SetToolTip("Thumbnail Size");
 
 			UI::EndPopup();
 		}
+		*/
 
 		ImGui::EndHorizontal();
 		ImGui::EndChild();
@@ -635,7 +653,7 @@ namespace highlo
 		for (auto &item : m_CurrentItems)
 		{
 			item->OnRenderBegin();
-			AssetBrowserActionResult result = item->OnRender(s_ThumbnailSize, m_ShowAssetType);
+			AssetBrowserActionResult result = item->OnRender(s_AssetBrowserSettings->ThumbnailSize, m_ShowAssetType);
 
 			if (result.IsSet(AssetBrowserAction::ClearSelections))
 				ClearSelections();

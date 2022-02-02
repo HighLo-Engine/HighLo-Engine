@@ -10,7 +10,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Context.h"
 #elif HIGHLO_API_DX12
-// TODO
+#include "Engine/Platform/DX12/DX12Context.h"
 #endif // HIGHLO_API_OPENGL
 
 
@@ -23,8 +23,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Context>::Create(handle, data);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Context>::Create(handle, data);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanContext>::Create(handle, data);
 	#else

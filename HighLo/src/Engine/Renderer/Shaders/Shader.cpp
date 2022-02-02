@@ -8,6 +8,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Shader.h"
 #elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12Shader.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanShader.h"
 #endif // HIGHLO_API_OPENGL
@@ -23,8 +24,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Shader>::Create(filePath, forceCompile);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Shader>::Create(filePath, forceCompile);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanShader>::Create(filePath, forceCompile);
 	#else
@@ -40,8 +40,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Shader>::Create(source);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Shader>::Create(source);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanShader>::Create(source);
 	#else

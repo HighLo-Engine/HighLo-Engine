@@ -8,6 +8,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11CommandBuffer.h"
 #elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12CommandBuffer.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanCommandBuffer.h"
 #endif // HIGHLO_API_OPENGL
@@ -21,10 +22,9 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanCommandBuffer>::Create(debugName, true);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11CommandBuffer>::Create(debugName);
+		return Ref<DX11CommandBuffer>::Create(debugName, true);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false, "Not supported in DX12");
-		return nullptr;
+		return Ref<DX12CommandBuffer>::Create(debugName, true);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -40,8 +40,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11CommandBuffer>::Create(count, debugName);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false, "Not supported in DX12");
-		return nullptr;
+		return Ref<DX12CommandBuffer>::Create(count, debugName);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

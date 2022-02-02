@@ -8,7 +8,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Framebuffer.h"
 #elif HIGHLO_API_DX12
-// TODO
+#include "Engine/Platform/DX12/DX12Framebuffer.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanFramebuffer.h"
 #endif // HIGHLO_API_OPENGL
@@ -24,8 +24,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Framebuffer>::Create(spec);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Framebuffer>::Create(spec);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanFramebuffer>::Create(spec);
 	#else

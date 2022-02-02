@@ -8,6 +8,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11RenderPass.h"
 #elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12RenderPass.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanRenderPass.h"
 #endif // HIGHLO_API_OPENGL
@@ -21,8 +22,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11RenderPass>::Create(spec);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12RenderPass>::Create(spec);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanRenderPass>::Create(spec);
 	#else

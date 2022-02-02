@@ -7,6 +7,8 @@
 #include "Engine/Platform/OpenGL/OpenGLTexture2D.h"
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Texture2D.h"
+#elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12Texture2D.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanTexture2D.h"
 #endif // HIGHLO_API_OPENGL
@@ -20,8 +22,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(filePath, format, flipOnLoad);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture2D>::Create(filePath, format, flipOnLoad);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(filePath, format, flipOnLoad);
 	#else
@@ -37,8 +38,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(rgb, format);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture2D>::Create(rgb, format);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(rgb, format);
 	#else
@@ -54,8 +54,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(rgb, width, height, format);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture2D>::Create(rgb, width, height, format);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(rgb, width, height, format);
 	#else
@@ -71,8 +70,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(format, width, height);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture2D>::Create(format, width, height);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(format, width, height);
 	#else
@@ -88,8 +86,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(format, width, height, data, props);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture2D>::Create(format, width, height, data, props);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(format, width, height, data, props);
 	#else
@@ -105,8 +102,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture2D>::Create(specification);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture2D>::Create(specification);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(specification);
 	#else

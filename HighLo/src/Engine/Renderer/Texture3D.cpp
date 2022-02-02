@@ -7,6 +7,8 @@
 #include "Engine/Platform/OpenGL/OpenGLTexture3D.h"
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11Texture3D.h"
+#elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12Texture3D.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanTexture3D.h"
 #endif // HIGHLO_API_OPENGL
@@ -20,8 +22,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture3D>::Create(filepath, flipOnLoad);
 	#else
@@ -37,8 +38,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11Texture3D>::Create(format, width, height, data);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12Texture3D>::Create(format, width, height, data);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture3D>::Create(format, width, height, data);
 	#else

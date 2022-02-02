@@ -10,6 +10,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11RenderingAPI.h"
 #elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12RenderingAPI.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanRenderingAPI.h"
 #endif // HIGHLO_API_OPENGL

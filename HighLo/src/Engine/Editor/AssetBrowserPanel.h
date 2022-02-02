@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "AssetBrowserItem.h"
-#include "AssetBrowserItemList.h"
-#include "SelectionStack.h"
+#include "AssetBrowser/AssetBrowserItem.h"
+#include "AssetBrowser/AssetBrowserItemList.h"
+#include "AssetBrowser/SelectionStack.h"
 
 #include "Engine/Scene/Project.h"
 #include "Engine/Events/Events.h"

@@ -106,11 +106,7 @@
 #include "Engine/Editor/SceneHierarchyPanel.h"
 #include "Engine/Editor/ObjectPropertiesPanel.h"
 #include "Engine/Editor/EditorConsolePanel.h"
-
-#include "Engine/Editor/AssetBrowser/AssetBrowserItem.h"
-#include "Engine/Editor/AssetBrowser/AssetBrowserItemList.h"
-#include "Engine/Editor/AssetBrowser/SelectionStack.h"
-#include "Engine/Editor/AssetBrowser/AssetBrowserPanel.h"
+#include "Engine/Editor/AssetBrowserPanel.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

@@ -3,7 +3,7 @@
 #include "HighLoPch.h"
 #include "AssetBrowserItem.h"
 
-#include "AssetBrowserPanel.h"
+#include "Engine/Editor/AssetBrowserPanel.h"
 #include "Engine/Assets/AssetManager.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/FileSystem.h"

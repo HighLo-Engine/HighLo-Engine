@@ -10,10 +10,12 @@ layout(std140, binding = 0) uniform Camera
 	mat4 u_InverseViewProjection;
 };
 
+/*
 layout(push_constant) uniform Transform
 {
 	mat4 Transform;
 } u_Renderer;
+*/
 
 layout(location = 0) out vec3 v_Position;
 

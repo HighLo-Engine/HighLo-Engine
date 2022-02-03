@@ -90,7 +90,6 @@ namespace highlo
 		m_Active = true;
 
 		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
-	//	glm::mat4 viewProj = glm::mat4(1.0f);
 
 		/*
 		Ref<SceneRenderer> instance = this;
@@ -104,11 +103,16 @@ namespace highlo
 		*/
 
 		// Load Camera Projection into Uniform Buffer block
+		/*
 		Renderer::Submit([&viewProj, &ub = m_UniformBufferSet]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(UniformBufferCamera));
 		});
+		*/
+
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		m_UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(UniformBufferCamera));
 
 		/*
 		const auto &dirLight = m_SceneData.ActiveLight;
@@ -139,11 +143,15 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#else
+		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]() mutable
 		{
 			instance->FlushDrawList();
 		});
+		*/
+
+		FlushDrawList();
 	#endif
 
 		/*
@@ -157,13 +165,11 @@ namespace highlo
 
 	void SceneRenderer::SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
 	{
-		const auto &submeshData = model->Get()->GetSubmeshes();
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
 		{
-			glm::mat4 submeshTransform = transform * submeshData[submeshIndex].LocalTransform.GetTransform();
-
 			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
+			glm::mat4 submeshTransform = transform * submeshes[submeshIndex].LocalTransform.GetTransform();
 
 			// If no asset handle is available, the model probably does not have the needed material
 			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : AssetHandle();
@@ -408,20 +414,20 @@ namespace highlo
 			m_CommandBuffer->Begin();
 
 			// Main Render passes
-			ShadowMapPass();
-			PreDepthPass();
-			LightCullingPass();
+		//	ShadowMapPass();
+		//	PreDepthPass();
+		//	LightCullingPass();
 			GeometryPass();
 
 			// HBAO
-			DeinterleavingPass();
-			HBAOPass();
-			ReinterleavingPass();
-			HBAOBlurPass();
+		//	DeinterleavingPass();
+		//	HBAOPass();
+		//	ReinterleavingPass();
+		//	HBAOBlurPass();
 
 			// Post-processing
-			JumpFloodPass();
-			BloomCompute();
+		//	JumpFloodPass();
+		//	BloomCompute();
 			CompositePass();
 
 			m_CommandBuffer->End();
@@ -574,6 +580,8 @@ namespace highlo
 
 	void SceneRenderer::CompositePass()
 	{
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeRenderPass, true);
+		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::UpdateStatistics()

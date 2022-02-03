@@ -50,9 +50,6 @@ void main()
 	o_Unused0 = vec4(1.0);
 	o_Unused1 = vec4(1.0);
 
-	if (o_Color.a == 0.0)
-		o_Color = vec4(1.0, 0.0, 0.0, 1.0);
-	else
-		o_Color = vec4(1.0);
+	//o_Color = vec4(1.0);
 }
 

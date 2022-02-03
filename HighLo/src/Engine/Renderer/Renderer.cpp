@@ -76,6 +76,7 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Grid.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SelectedGeometry.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMap.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Wireframe.glsl");
 
 		// Load 2D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");

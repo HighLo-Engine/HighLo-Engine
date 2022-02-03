@@ -26,16 +26,16 @@ namespace highlo
 		DWORD threadId;
         s_WatchPath = filePath;
 		s_WatcherThread = CreateThread(NULL, 0, Watch, 0, 0, &threadId);
-		s_Watching = true;
 		HL_ASSERT(s_WatcherThread != NULL);
+		SetThreadDescription(s_WatcherThread, L"HighLoFileSystemWatcher");
+
+		s_Watching = true;
 	}
 
 	void FileSystemWatcher::Stop()
 	{
 		s_Watching = false;
-		DWORD result = WaitForSingleObject(s_WatcherThread, 5000);
-		if (result == WAIT_TIMEOUT)
-			TerminateThread(s_WatcherThread, 0);
+		TerminateThread(s_WatcherThread, 0);
 		CloseHandle(s_WatcherThread);
 	}
 

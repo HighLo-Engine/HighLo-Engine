@@ -350,6 +350,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 		Transform &entityTransform = selection.Entity.Transform();
 		glm::mat4 rawTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(selection.Entity);
+
 		float snapValue = GetSnapValue();
 		float snapValues[3] = { snapValue, snapValue, snapValue };
 
@@ -372,7 +373,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 					entityTransform.SetPosition(translation);
 					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
 					entityTransform.SetScale(scale);
-					m_CurrentScene->SetEntityTransform(selection.Entity, entityTransform);
+					selection.Entity.SetTransform(entityTransform);
 				}
 				else
 				{
@@ -383,7 +384,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 					entityTransform.SetPosition(translation);
 					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
 					entityTransform.SetScale(scale);
-					m_CurrentScene->SetEntityTransform(selection.Entity, entityTransform);
+					selection.Entity.SetTransform(entityTransform);
 				}
 			}
 		}
@@ -395,7 +396,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 			Transform newTransform;
 			newTransform.SetTransform(glm::inverse(rawTransform) * transformBase);
 			selection.Mesh->LocalTransform = newTransform;
-			m_CurrentScene->SetEntityTransform(selection.Entity, newTransform);
+			selection.Entity.SetTransform(entityTransform);
 		}
 	}
 

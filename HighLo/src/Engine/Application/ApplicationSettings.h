@@ -73,6 +73,11 @@ namespace highlo
 		HLString WindowAPI = "GLFW";
 
 		/// <summary>
+		/// Determines the target framerate with which the engine should render.
+		/// </summary>
+		uint32 TargetFramerate = 60;
+
+		/// <summary>
 		/// Determines the Main Thread ID of the main thread
 		/// </summary>
 		uint64 MainThreadID;

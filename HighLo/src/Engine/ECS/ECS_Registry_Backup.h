@@ -2,10 +2,14 @@
 
 //
 // version history:
-//     - 1.0 (2021-09-14) initial release
+//     - 1.0 (2022-02-03) initial release
 //
 
 #pragma once
+
+// THIS FILE IS ONLY MEANT AS A BACKUP
+
+#if 0
 
 #include <any>
 #include <vector>
@@ -49,14 +53,21 @@ namespace highlo
 			// the entity for faster access in the future.
 			m_EntityComponents[entityID].push_back({ type, index });
 
-			return std::any_cast<T>(&m_Components[type][index].second);
+			T *component_ptr = std::any_cast<T>(&m_Components[type][index].second);
+
+			// Check if it's a transform component
+			static std::type_index transform_type = std::type_index(typeid(TransformComponent));
+			if (type == transform_type)
+				m_TransformComponents[entityID] = static_cast<void*>(component_ptr);
+
+			return component_ptr;
 		}
 
 		template<typename T>
-		HLAPI T *AddOrReplace(UUID dstEntityID, UUID srcEntityID, T *componentToReplace)
+		HLAPI T *AddOrReplace(UUID dstEntityId, UUID srcEntityId, T *componentToReplace)
 		{
 			auto &type = std::type_index(typeid(T));
-			std::vector<std::pair<std::type_index, uint64>> &matchingEntity = m_EntityComponents[srcEntityID];
+			std::vector<std::pair<std::type_index, uint64>> &matchingEntity = m_EntityComponents[srcEntityId];
 
 			// First try to find the requested component in the source entity
 			int32 componentIndex = -1;
@@ -79,22 +90,22 @@ namespace highlo
 				std::pair<UUID, std::any> &valueToCopy = m_Components[type][componentIndex];
 
 				// Make sure we copy the correct component
-				if (valueToCopy.first == srcEntityID)
+				if (valueToCopy.first == srcEntityId)
 				{
-					m_Components[type].push_back({ dstEntityID, valueToCopy.second });
+					m_Components[type].push_back({ dstEntityId, valueToCopy.second });
 					uint64 index = m_Components[type].size() - 1;
 
-					m_EntityComponents[dstEntityID].push_back({ type, index });
+					m_EntityComponents[dstEntityId].push_back({ type, index });
 					return std::any_cast<T>(&m_Components[type][index].second);
 				}
 			}
 
 			// The component was not found, so add it normally to the destination entity
 			auto componentToInsert = std::make_any<T>(*componentToReplace);
-			m_Components[type].push_back({ dstEntityID, componentToInsert });
+			m_Components[type].push_back({ dstEntityId, componentToInsert });
 			uint64 index = m_Components[type].size() - 1;
 
-			m_EntityComponents[dstEntityID].push_back({ type, index });
+			m_EntityComponents[dstEntityId].push_back({ type, index });
 			return std::any_cast<T>(&m_Components[type][index].second);
 		}
 
@@ -120,7 +131,7 @@ namespace highlo
 
 			for (auto &comp_info : m_EntityComponents[entityID])
 				if (comp_info.first == type)
-					return reinterpret_cast<void*>(&m_Components[type][comp_info.second].second);
+					return reinterpret_cast<void *>(&m_Components[type][comp_info.second].second);
 
 			return nullptr;
 		}
@@ -171,19 +182,24 @@ namespace highlo
 			m_EntityComponents[id].clear();
 			m_EntityComponents[id].shrink_to_fit();
 			m_EntityComponents.erase(id);
+
+			if (m_TransformComponents.find(id) == m_TransformComponents.end())
+				return; // No transform for the specific entity was found
+
+			m_TransformComponents.erase(id);
 		}
 
 		template<typename T>
-		HLAPI void ForEach(const std::function<void(UUID, T &)> &callback)
+		HLAPI void ForEach(const std::function<void(UUID, TransformComponent&, T&)> &callback)
 		{
 			auto &type = std::type_index(typeid(T));
 			if (m_Components.find(type) != m_Components.end())
 				for (auto &comp : m_Components[type])
-					callback(comp.first, *std::any_cast<T>(&comp.second));
+					callback(comp.first, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), *std::any_cast<T>(&comp.second));
 		}
 
 		template<typename... Args>
-		HLAPI void ForEachMultiple(const std::function<void(UUID, std::vector<void*>&)> &callback)
+		HLAPI void ForEachMultiple(const std::function<void(UUID, TransformComponent&, std::vector<void*>&)> &callback)
 		{
 			// Create a list of all types
 			std::vector<std::type_index> componentTypes;
@@ -199,7 +215,7 @@ namespace highlo
 				for (auto &comp : m_Components[firstType])
 				{
 					UUID entityID = comp.first;
-					std::vector<void *> components = { &comp.second };
+					std::vector<void*> components = { &comp.second };
 
 					bool shouldSkipEntity = false;
 
@@ -230,7 +246,7 @@ namespace highlo
 					if (shouldSkipEntity)
 						continue;
 
-					callback(entityID, components);
+					callback(entityID, *static_cast<TransformComponent*>(m_TransformComponents[comp.first]), components);
 				}
 			}
 		}
@@ -274,6 +290,9 @@ namespace highlo
 
 		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;		// Component Type -> { Component ID, Component }
 		std::unordered_map<UUID, std::vector<std::pair<std::type_index, uint64>>> m_EntityComponents;	// EntityID -> [ Component Type, Component index ]
+		std::unordered_map<UUID, void*> m_TransformComponents;											// EntityID -> Transform Component
 	};
 }
+
+#endif
 

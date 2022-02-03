@@ -232,19 +232,6 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
 	{
-		va->SetIndexBuffer(s_GLRendererData->FullscreenQuadIndexBuffer);
-		va->AddVertexBuffer(s_GLRendererData->FullscreenQuadVertexBuffer);
-
-		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
-		va->Bind();
-		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
-
-		if (uniformBufferSet)
-		{
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			uniformBufferSet->GetUniform(0, 0, frameIndex)->Bind(); // Bind camera buffer
-		}
-
 		material->Set("u_Renderer.Transform", transform);
 		material->UpdateForRendering();
 
@@ -253,6 +240,9 @@ namespace highlo
 		else
 			glDisable(GL_DEPTH_TEST);
 
+		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
+		va->Bind();
+		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 

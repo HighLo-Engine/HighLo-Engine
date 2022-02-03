@@ -75,8 +75,8 @@ namespace highlo
 		HLAPI void SetEntityTransform(Entity &entity, Transform &transform);
 		HLAPI Entity CreateEntity(const HLString &name = "");
 		HLAPI Entity CreateEntityWithUUID(UUID uuid, const HLString &name = "");
-		HLAPI void DestroyEntity(Entity entity, bool excludeChildren = false, bool first = true);
-		HLAPI Entity DuplicateEntity(Entity entity);
+		HLAPI void DestroyEntity(Entity &entity, bool excludeChildren = false, bool first = true);
+		HLAPI Entity DuplicateEntity(Entity &entity);
 
 		template<typename T>
 		HLAPI auto GetAllEntitiesWith()
@@ -88,14 +88,14 @@ namespace highlo
 		HLAPI Entity FindEntityByTag(const HLString &tag);
 		HLAPI Entity GetMainCameraEntity();
 
-		HLAPI void ConvertToLocalSpace(Entity entity);
-		HLAPI void ConvertToWorldSpace(Entity entity);
-		HLAPI glm::mat4 GetTransformRelativeToParent(Entity entity);
-		HLAPI glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
-	//	HLAPI Transform GetWorldSpaceTransform(Entity entity);
+		HLAPI void ConvertToLocalSpace(Entity &entity);
+		HLAPI void ConvertToWorldSpace(Entity &entity);
+		HLAPI glm::mat4 GetTransformRelativeToParent(Entity &entity);
+		HLAPI glm::mat4 GetWorldSpaceTransformMatrix(Entity &entity);
+		HLAPI Transform GetWorldSpaceTransform(Entity &entity);
 
-		HLAPI void ParentEntity(Entity entity, Entity parent);
-		HLAPI void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
+		HLAPI void ParentEntity(Entity &entity, Entity &parent);
+		HLAPI void UnparentEntity(Entity &entity, bool convertToWorldSpace = true);
 
 		HLAPI void CopyTo(Ref<Scene> &target);
 		HLAPI static Ref<Scene> GetScene(UUID uuid);

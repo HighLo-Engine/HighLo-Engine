@@ -47,6 +47,7 @@ namespace highlo
 
 		renderer->BeginScene(overlayCamera);
 
+		/*
 		Renderer::Submit([&]() {
 			Renderer2D::BeginScene(overlayCamera);
 			Renderer2D::DrawQuad(Transform::FromPosition({ -0.25f, 0.0f, 0.0f }), glm::vec4(0.941f, 0.502f, 0.502f, 1.0f));
@@ -57,6 +58,17 @@ namespace highlo
 			Renderer2D::DrawText("Hello World!", { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
 			Renderer2D::EndScene();
 		});
+		*/
+
+		Renderer2D::BeginScene(overlayCamera);
+		Renderer2D::DrawQuad(Transform::FromPosition({ -0.25f, 0.0f, 0.0f }), glm::vec4(0.941f, 0.502f, 0.502f, 1.0f));
+		Renderer2D::DrawQuad(Transform::FromPosition({ 0.0f, -0.25f, -0.9f }), glm::vec4(0.641f, 0.502f, 0.902f, 1.0f));
+		Renderer2D::FillCircle(Transform::FromPosition({ 6.0f, 0.25f, 0.0f }), 1.0f, 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+		Renderer2D::DrawCircle(Transform::FromPosition({ -6.0f, 0.25f, 0.0f }), 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+		//	Renderer2D::DrawLine({ 0.0f, 0.0f }, { 6.0f, 6.0f }, glm::vec4(0.2f, 0.3f, 9.0f, 1.0f));
+		Renderer2D::DrawText("Hello World!", { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Renderer2D::EndScene();
+
 
 		renderer->EndScene();
 	}
@@ -99,8 +111,6 @@ namespace highlo
 	
 	void Scene::OnRuntimeStart()
 	{
-		HL_PROFILE_FUNCTION();
-
 
 	}
 	
@@ -128,12 +138,6 @@ namespace highlo
 	
 	Entity Scene::FindEntityByUUID(UUID id)
 	{
-		if (id == 0)
-		{
-			// TODO: This case is not allowed to ever happen, but currently it happens :(
-			return {};
-		}
-
 		auto &view = m_Registry.View<RelationshipComponent>();
 		for (UUID entityID : view)
 		{
@@ -141,7 +145,6 @@ namespace highlo
 				return m_EntityIDMap.at(id);
 		}
 
-		HL_CORE_ERROR("Could not find any matching entity!");
 		return Entity{};
 	}
 	
@@ -158,7 +161,6 @@ namespace highlo
 			}
 		}
 
-		HL_CORE_ERROR("Could not find any matching entity!");
 		return Entity{};
 	}
 
@@ -182,7 +184,7 @@ namespace highlo
 		return Entity{};
 	}
 	
-	void Scene::ConvertToLocalSpace(Entity entity)
+	void Scene::ConvertToLocalSpace(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -201,7 +203,7 @@ namespace highlo
 		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
 	}
 	
-	void Scene::ConvertToWorldSpace(Entity entity)
+	void Scene::ConvertToWorldSpace(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -216,7 +218,7 @@ namespace highlo
 		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
 	}
 	
-	glm::mat4 Scene::GetTransformRelativeToParent(Entity entity)
+	glm::mat4 Scene::GetTransformRelativeToParent(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -229,7 +231,7 @@ namespace highlo
 		return transform * entity.Transform().GetTransform();
 	}
 	
-	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
+	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -243,27 +245,22 @@ namespace highlo
 		return transform;
 	}
 	
-	/*
-	Transform Scene::GetWorldSpaceTransform(Entity entity)
+	Transform Scene::GetWorldSpaceTransform(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 
-		glm::vec3 translation;
-		glm::vec3 scale;
-		glm::vec3 rotation;
+		glm::vec3 translation, scale, rotation;
 		glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
 
 		Transform result;
-
 		Decompose(transform, translation, scale, rotation);
 		result.SetPosition(translation);
 		result.SetScale(scale);
 		result.SetRotation(rotation);
 		return result;
 	}
-	*/
 	
-	void Scene::ParentEntity(Entity entity, Entity parent)
+	void Scene::ParentEntity(Entity &entity, Entity &parent)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -280,17 +277,17 @@ namespace highlo
 		}
 		else
 		{
-		//	Entity prevParent = FindEntityByUUID(entity.GetParentUUID());
-		//	if (prevParent)
-			UnparentEntity(entity);
+			Entity prevParent = FindEntityByUUID(entity.GetParentUUID());
+			if (prevParent)
+				UnparentEntity(entity);
 		}
 
 		entity.SetParentUUID(parent.GetUUID());
 		parent.Children().push_back(entity.GetUUID());
-	//	ConvertToLocalSpace(entity);
+		ConvertToLocalSpace(entity);
 	}
 	
-	void Scene::UnparentEntity(Entity entity, bool convertToWorldSpace)
+	void Scene::UnparentEntity(Entity &entity, bool convertToWorldSpace)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -402,7 +399,7 @@ namespace highlo
 		return entity;
 	}
 	
-	void Scene::DestroyEntity(Entity entity, bool excludeChildren, bool first)
+	void Scene::DestroyEntity(Entity &entity, bool excludeChildren, bool first)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -431,7 +428,7 @@ namespace highlo
 		m_Registry.DestroyAllByEntityId(entity.GetUUID());
 	}
 	
-	Entity Scene::DuplicateEntity(Entity entity)
+	Entity Scene::DuplicateEntity(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 

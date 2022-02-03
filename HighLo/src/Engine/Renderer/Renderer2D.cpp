@@ -14,7 +14,6 @@
 #include "Engine/Utils/StringUtils.h"
 #include "Engine/Renderer/Shaders/UniformBufferSet.h"
 #include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/CommandBuffer.h"
 
 namespace highlo
 {
@@ -74,7 +73,6 @@ namespace highlo
 		static const uint32 MaxLineVertices = MaxLines * 2;
 		static const uint32 MaxLineIndices = MaxLines * 6;
 
-		Ref<CommandBuffer> RenderCommandBuffer;
 		Ref<Texture2D> WhiteTexture;
 
 		// Quads
@@ -133,15 +131,6 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData = new Renderer2DData();
-
-		if (s_2DData->SwapChainTarget)
-		{
-			s_2DData->RenderCommandBuffer = CommandBuffer::CreateFromSwapChain("Renderer2D");
-		}
-		else
-		{
-			s_2DData->RenderCommandBuffer = CommandBuffer::Create("Renderer2D");
-		}
 
 		// Set all texture slots to 0
 		s_2DData->WhiteTexture = Renderer::GetWhiteTexture();
@@ -335,17 +324,10 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		s_2DData->RenderCommandBuffer->Begin();
-	//	Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
-
 		FlushQuads();
 		FlushCircles();
 		FlushLines();
 		FlushText();
-
-	//	Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
-		s_2DData->RenderCommandBuffer->End();
-		s_2DData->RenderCommandBuffer->Submit();
 	}
 
 	void Renderer2D::FlushQuads()

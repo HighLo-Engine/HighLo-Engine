@@ -103,16 +103,11 @@ namespace highlo
 		*/
 
 		// Load Camera Projection into Uniform Buffer block
-		/*
 		Renderer::Submit([&viewProj, &ub = m_UniformBufferSet]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(UniformBufferCamera));
 		});
-		*/
-
-		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		m_UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(UniformBufferCamera));
 
 		/*
 		const auto &dirLight = m_SceneData.ActiveLight;
@@ -143,15 +138,11 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#else
-		/*
 		Ref<SceneRenderer> instance = this;
 		Renderer::Submit([instance]() mutable
 		{
 			instance->FlushDrawList();
 		});
-		*/
-
-		FlushDrawList();
 	#endif
 
 		/*
@@ -172,7 +163,7 @@ namespace highlo
 			glm::mat4 submeshTransform = transform * submeshes[submeshIndex].LocalTransform.GetTransform();
 
 			// If no asset handle is available, the model probably does not have the needed material
-			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : AssetHandle();
+			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : 0;
 
 			MeshKey key = { model->Handle, materialHandle, submeshIndex };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();

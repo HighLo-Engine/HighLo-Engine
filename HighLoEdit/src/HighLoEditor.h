@@ -76,9 +76,9 @@ class HighLoEditor : public HLApplication
 		void OnFileMenuPressed(FileMenu *menu, MenuItem *item);
 
 		void OnSelected(const SelectedMesh &selectionContext);
+		void OnEntityAdded(Entity &e);
 		void OnEntityDeleted(Entity &e);
 		void OnEntityChanged(Entity &e);
-		void OnObjectPropertiesChange(ObjectPropertiesActionType type);
 
 		void OnScenePlay();
 		void OnSceneStop();
@@ -111,7 +111,7 @@ class HighLoEditor : public HLApplication
 		bool m_ViewportPanelMouseOver = false;
 		bool m_ViewportPanelFocused = false;
 		bool m_DrawOnTopBoundingBoxes = false;
-		bool m_SceneIsSaved = false;
+		bool m_SceneIsSaved = true;
 
 		bool m_ShowSettingsPanel = false;
 		bool m_ShowAssetsPanel = true;
@@ -128,6 +128,7 @@ class HighLoEditor : public HLApplication
 		Ref<Texture> m_CheckerboardTex;
 		Ref<Texture> m_PlayButtonTex, m_StopButtonTex, m_PauseButtonTex;
 		Ref<MenuBar> m_MenuBar;
+		HLString m_SceneName = "Untitled Scene";
 
 		SceneState m_SceneState = SceneState::Edit;
 		SelectionMode m_SelectionMode = SelectionMode::Entity;

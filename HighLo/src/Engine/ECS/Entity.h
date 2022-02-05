@@ -59,6 +59,18 @@ namespace highlo
 			return ECS_Registry::Get().HasComponent<T>(m_ID);
 		}
 
+		template<typename... Components>
+		HLAPI bool HasComponents() const
+		{
+			return ECS_Registry::Get().HasComponents<Components...>(m_ID);
+		}
+
+		template<typename... Components>
+		HLAPI bool HasAnyOf() const
+		{
+			return ECS_Registry::Get().HasAnyOf<Components...>(m_ID);
+		}
+
 		template<typename T>
 		HLAPI void RemoveComponent()
 		{

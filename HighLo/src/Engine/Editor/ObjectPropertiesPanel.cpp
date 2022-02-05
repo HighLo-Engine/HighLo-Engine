@@ -5,6 +5,7 @@
 
 #include "Engine/ImGui/ImGui.h"
 #include "Engine/ImGui/ImGuiWidgets.h"
+#include "Engine/ImGui/ImGuiAsset.h"
 #include "Engine/Assets/AssetManager.h"
 
 #include "Engine/Renderer/Renderer.h"
@@ -338,7 +339,20 @@ namespace highlo
 			Ref<StaticModel> mesh = AssetManager::Get()->GetAsset<StaticModel>(component.Model);
 
 			UI::BeginPropertyGrid();
-			// TODO: Add mesh related references
+			UI::AssetReferenceResult result;
+			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>("Static Model", component.Model, [=](Ref<MeshFile> meshAsset)
+			{
+				// TODO: Add MeshConversionCallback that is going to be called here
+			}, &result))
+			{
+				// TODO: When we have mesh colliders we could set them here
+			}
+
+			if (result == UI::AssetReferenceResult::InvalidMetaData)
+			{
+				// TODO: Add InvalidMetaCallback that is going to be called here
+			}
+
 			UI::EndPropertyGrid();
 
 			if (mesh && mesh->IsValid())
@@ -403,13 +417,30 @@ namespace highlo
 
 			UI::BeginPropertyGrid();
 			
-			UI::PushItemDisabled();
-			int32 index = (int32)component.SubmeshIndex;
-			UI::DrawDragInt("SubmeshIndex", index);
-			UI::PopItemDisabled();
+			UI::AssetReferenceResult result;
+			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>("Dynamic Model", component.Model, [=](Ref<MeshFile> meshAsset)
+			{
+				// TODO: Add MeshConversionCallback that is going to be called here
+			}, &result))
+			{
+				// TODO: When we have mesh colliders we could set them here
+			}
 
-			UI::DrawCheckbox("Fractured?", component.IsFractured);
-			
+			if (result == UI::AssetReferenceResult::InvalidMetaData)
+			{
+				// TODO: Add InvalidMetaCallback that is going to be called here
+			}
+
+			if (mesh)
+			{
+				if (UI::DrawUIntSlider("Submesh index", component.SubmeshIndex, 0, (int32)(mesh->Get()->GetSubmeshes().size() - 1)))
+				{
+					component.SubmeshIndex = glm::clamp<uint32>(component.SubmeshIndex, 0, (uint32)(mesh->Get()->GetSubmeshes().size() - 1));
+				}
+
+				UI::DrawCheckbox("Fractured?", component.IsFractured);
+			}
+
 			UI::EndPropertyGrid();
 
 			if (mesh && mesh->IsValid())

@@ -334,6 +334,11 @@ namespace highlo::UI
 		ImGui::EndPopup();
 	}
 
+	uint32 *GetCurrentImGuiIDCounter()
+	{
+		return &s_ImGuiIDCounter;
+	}
+
 	void DisplayDebugInformation()
 	{
 		ImGui::Begin("HighLo Demo Window");
@@ -1362,6 +1367,39 @@ namespace highlo::UI
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
 		if (ImGui::SliderInt(s_ImGuiIDBuffer, &value, min, max))
+			modified = true;
+
+		if (IsItemDisabled())
+			ImGui::PopStyleVar();
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		return modified;
+	}
+
+	bool DrawUIntSlider(const HLString &label, uint32 &value, int32 min, int32 max)
+	{
+		bool modified = false;
+
+		ImGui::Text(*label);
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		s_ImGuiIDBuffer[0] = '#';
+		s_ImGuiIDBuffer[1] = '#';
+		memset(s_ImGuiIDBuffer + 2, 0, 14);
+		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+
+		if (IsItemDisabled())
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+
+		int32 tmp = (int32)value;
+		if (ImGui::SliderInt(s_ImGuiIDBuffer, &tmp, min, max))
+		{
+			modified = true;
+			value = (uint32)tmp;
+		}
 
 		if (IsItemDisabled())
 			ImGui::PopStyleVar();
@@ -1389,9 +1427,10 @@ namespace highlo::UI
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
 		if (ImGui::SliderFloat(s_ImGuiIDBuffer, &value, min, max))
+			modified = true;
 
-			if (IsItemDisabled())
-				ImGui::PopStyleVar();
+		if (IsItemDisabled())
+			ImGui::PopStyleVar();
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
@@ -1416,9 +1455,10 @@ namespace highlo::UI
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
 		if (ImGui::SliderFloat2(s_ImGuiIDBuffer, glm::value_ptr(value), min, max))
+			modified = true;
 
-			if (IsItemDisabled())
-				ImGui::PopStyleVar();
+		if (IsItemDisabled())
+			ImGui::PopStyleVar();
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
@@ -1443,9 +1483,10 @@ namespace highlo::UI
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
 		if (ImGui::SliderFloat3(s_ImGuiIDBuffer, glm::value_ptr(value), min, max))
+			modified = true;
 
-			if (IsItemDisabled())
-				ImGui::PopStyleVar();
+		if (IsItemDisabled())
+			ImGui::PopStyleVar();
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
@@ -1470,9 +1511,10 @@ namespace highlo::UI
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
 		if (ImGui::SliderFloat4(s_ImGuiIDBuffer, glm::value_ptr(value), min, max))
+			modified = true;
 
-			if (IsItemDisabled())
-				ImGui::PopStyleVar();
+		if (IsItemDisabled())
+			ImGui::PopStyleVar();
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
@@ -1501,8 +1543,8 @@ namespace highlo::UI
 
 			{
 				// Begin XYZ area
-				UI::ScopedColor padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
-				UI::ScopedStyle frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+				UI::ScopedColor paddingXYZ(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+				UI::ScopedColor frameXYZ(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
 
 				ImGui::BeginChild(ImGui::GetID((label + "fr").C_Str()), ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			}
@@ -1576,8 +1618,8 @@ namespace highlo::UI
 
 			{
 				// Begin XYZ area
-				UI::ScopedColor padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
-				UI::ScopedStyle frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+				UI::ScopedColor paddingXYZ(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+				UI::ScopedColor frameXYZ(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
 
 				ImGui::BeginChild(ImGui::GetID((label + "fr").C_Str()), ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			}
@@ -1654,8 +1696,8 @@ namespace highlo::UI
 
 			{
 				// Begin XYZ area
-				UI::ScopedColor padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
-				UI::ScopedStyle frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+				UI::ScopedColor paddingXYZ(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+				UI::ScopedColor frameXYZ(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
 
 				ImGui::BeginChild(ImGui::GetID((label + "fr").C_Str()), ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 			}

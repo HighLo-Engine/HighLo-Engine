@@ -26,8 +26,8 @@ namespace highlo
 
 		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::iterator begin() { return m_AssetRegistry.begin(); }
 		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::iterator end() { return m_AssetRegistry.end(); }
-		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cbegin() { return m_AssetRegistry.begin(); }
-		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cend() { return m_AssetRegistry.end(); }
+		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cbegin() const { return m_AssetRegistry.begin(); }
+		HLAPI std::unordered_map<FileSystemPath, AssetMetaData>::const_iterator cend() const { return m_AssetRegistry.end(); }
 
 		HLAPI FileSystemPath GetKey(const FileSystemPath &path) const;
 

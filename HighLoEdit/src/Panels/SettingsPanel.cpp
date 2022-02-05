@@ -33,6 +33,9 @@ void SettingsPanel::OnUIRender(bool *pOpen)
 			{
 			}
 
+			HLString name = "Untitled Scene";
+			UI::DrawInputText("Scene Name", name);
+
 			ImGui::EndTabItem();
 		}
 
@@ -74,6 +77,8 @@ void SettingsPanel::OnUIRender(bool *pOpen)
 
 		ImGui::EndTabBar();
 	}
+
+	UI::DrawButton("Save Settings");
 
 	ImGui::End();
 }

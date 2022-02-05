@@ -11,6 +11,10 @@
 #include "ImGuiScopeHelpers.h"
 #include "Engine/Math/Color.h"
 
+#include "Engine/Assets/Asset.h"
+#include "Engine/Assets/AssetTypes.h"
+#include "Engine/Assets/AssetManager.h"
+
 namespace highlo::UI
 {
 	static bool IsMatchingSearch(const HLString &item, const HLString &searchQuery, bool caseSensitive = false, bool stripWhiteSpaces = true, bool stripUnderScores = true)
@@ -76,7 +80,11 @@ namespace highlo::UI
 			if constexpr (std::is_same<StringType, HLString>::value)
 			{
 				char searchBuffer[BufferSize]{};
-				strcpy_s<BufferSize>(searchBuffer, *searchString);
+
+				// Only copy the content if any is available, otherwise strcpy_s will throw a weird exception ("" seems not be copyable)
+				if (!searchString.IsEmpty())
+					strcpy_s<BufferSize>(searchBuffer, *searchString);
+
 				if (ImGui::InputText(GenerateID(), searchBuffer, BufferSize))
 				{
 					searchString = searchBuffer;
@@ -198,6 +206,9 @@ namespace highlo::UI
 
 			return clicked;
 		}
+
+		HLAPI static bool AssetSearchPopup(const HLString &id, AssetType type, AssetHandle &selected, bool *cleared = nullptr, const HLString &hint = "Search Assets", const ImVec2 &size = { 250.0f, 350.0f });
+		HLAPI static bool AssetSearchPopup(const HLString &id, AssetHandle &selected, bool *cleared = nullptr, const HLString &hint = "Search Assets", const ImVec2 &size = { 250.0f, 350.0f }, std::initializer_list<AssetType> assetTypes = {});
 
 	private:
 

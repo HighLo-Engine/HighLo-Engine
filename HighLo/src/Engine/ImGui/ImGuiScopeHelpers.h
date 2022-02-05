@@ -18,8 +18,7 @@ namespace highlo::UI
 	{
 	public:
 
-		HLAPI ScopedStyle(const ScopedStyle&) = delete;
-		HLAPI ScopedStyle &operator=(const ScopedStyle&) = delete;
+		HL_NON_COPYABLE(ScopedStyle);
 
 		template<typename T>
 		HLAPI ScopedStyle(ImGuiStyleVar styleVar, T style)
@@ -37,8 +36,7 @@ namespace highlo::UI
 	{
 	public:
 
-		HLAPI ScopedColor(const ScopedColor&) = delete;
-		HLAPI ScopedColor &operator=(const ScopedColor&) = delete;
+		HL_NON_COPYABLE(ScopedColor);
 
 		template<typename T>
 		HLAPI ScopedColor(ImGuiCol colorID, T color)
@@ -56,8 +54,7 @@ namespace highlo::UI
 	{
 	public:
 
-		HLAPI ScopedFont(const ScopedFont&) = delete;
-		HLAPI ScopedFont &operator=(const ScopedFont&) = delete;
+		HL_NON_COPYABLE(ScopedFont);
 
 		HLAPI ScopedFont(ImFont *font)
 		{
@@ -74,8 +71,7 @@ namespace highlo::UI
 	{
 	public:
 
-		HLAPI ScopedID(const ScopedID&) = delete;
-		HLAPI ScopedID &operator=(const ScopedID&) = delete;
+		HL_NON_COPYABLE(ScopedID);
 
 		template<typename T>
 		HLAPI ScopedID(T id)
@@ -93,8 +89,7 @@ namespace highlo::UI
 	{
 	public:
 
-		HLAPI ScopedColorStack(const ScopedColorStack&) = delete;
-		HLAPI ScopedColorStack &operator=(const ScopedColorStack&) = delete;
+		HL_NON_COPYABLE(ScopedColorStack);
 
 		template<typename ColorType, typename... OtherColors>
 		HLAPI ScopedColorStack(ImGuiCol colorID, ColorType color, OtherColors&& ...otherColorPairs)
@@ -132,8 +127,7 @@ namespace highlo::UI
 	{
 	public:
 
-		HLAPI ScopedStyleStack(const ScopedStyleStack&) = delete;
-		HLAPI ScopedStyleStack &operator=(const ScopedStyleStack&) = delete;
+		HL_NON_COPYABLE(ScopedStyleStack);
 
 		template<typename StyleType, typename... OtherStyles>
 		HLAPI ScopedStyleStack(ImGuiStyleVar id, StyleType style, OtherStyles&& ...otherStylePairs)

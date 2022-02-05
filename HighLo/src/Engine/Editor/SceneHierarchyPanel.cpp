@@ -86,7 +86,7 @@ namespace highlo
 					const int32 numCols = 3;
 					ImGui::BeginTable(UI::GenerateID(), numCols, flags, ImVec2(ImGui::GetContentRegionAvail()));
 
-					// If the user clicks anywhere on the scene hierarchy window (except on a entity itself), deselect the currently selected entity
+					// If the user clicks anywhere on the scene hierarchy panel (except on a entity itself), deselect the currently selected entity
 					if (m_SelectedEntity && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 					{
 						SetSelected({});
@@ -146,6 +146,9 @@ namespace highlo
 							{
 								auto newEntity = m_Scene->CreateEntity("Null Object");
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							if (ImGui::MenuItem("Camera"))
@@ -153,6 +156,9 @@ namespace highlo
 								auto newEntity = m_Scene->CreateEntity("Camera");
 								newEntity.AddComponent<CameraComponent>();
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							ImGui::Separator();
@@ -163,6 +169,9 @@ namespace highlo
 								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 								component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							if (ImGui::MenuItem("Sphere"))
@@ -171,6 +180,9 @@ namespace highlo
 								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 								component->Model = AssetFactory::CreateSphere(4.0f);
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							if (ImGui::MenuItem("Capsule"))
@@ -179,6 +191,21 @@ namespace highlo
 								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 								component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
+							}
+
+							if (ImGui::MenuItem("Cylinder"))
+							{
+								auto newEntity = m_Scene->CreateEntity("Cylinder");
+								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+								// TODO: Add Cylinders to AssetFactory and MeshFactory
+							//	component->Model = AssetFactory::CreateCylinder();
+								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							ImGui::Separator();
@@ -189,6 +216,9 @@ namespace highlo
 								newEntity.AddComponent<DirectionalLightComponent>();
 								newEntity.Transform().FromRotation({ 80.0f, 10.0f, 0.0f });
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							if (ImGui::MenuItem("Point Light"))
@@ -197,6 +227,9 @@ namespace highlo
 								newEntity.AddComponent<PointLightComponent>();
 								newEntity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							if (ImGui::MenuItem("Sky Light"))
@@ -204,12 +237,24 @@ namespace highlo
 								auto newEntity = m_Scene->CreateEntity("Sky Light");
 								newEntity.AddComponent<SkyLightComponent>();
 								SetSelected(newEntity);
+
+								if (m_EntityAddedCallback)
+									m_EntityAddedCallback(newEntity);
 							}
 
 							ImGui::EndMenu();
 						}
 
 						ImGui::EndPopup();
+					}
+
+					// Hide selected entity
+					if (ImGui::IsWindowFocused() && m_SelectedEntity && Input::IsKeyPressed(HL_KEY_H))
+					{
+						if (m_SelectedEntity.IsHidden())
+							m_SelectedEntity.Show();
+						else
+							m_SelectedEntity.Hide();
 					}
 
 					if (ImGui::IsWindowFocused() && (Input::IsKeyPressed(HL_KEY_DELETE) || Input::IsKeyPressed(HL_KEY_BACKSPACE)) && m_SelectedEntity)
@@ -438,17 +483,12 @@ namespace highlo
 		if (entity.IsHidden())
 		{
 			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-			UI::CenteredText(ICON_FA_TIMES);
+			ImVec2 calculatedSize = UI::CenteredText(ICON_FA_TIMES);
 		}
 		else
 		{
 			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
 			ImVec2 calculatedSize = UI::CenteredText(ICON_FA_CHECK);
-			ImGui::SameLine();
-			if (ImGui::InvisibleButton("##testMakeVisible", ImVec2(calculatedSize.x, calculatedSize.y)))
-			{
-				HL_CORE_TRACE("TEST: CLICKED INVISIBLE");
-			}
 		}
 
 		ImGui::TableNextColumn();

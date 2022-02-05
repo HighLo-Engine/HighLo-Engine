@@ -87,6 +87,7 @@ void HighLoEditor::OnInitialize()
 	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create(m_CurrentScene, true);
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
 	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
+	m_SceneHierarchyPanel->SetEntityAddedCallback(std::bind(&HighLoEditor::OnEntityAdded, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
 	m_ObjectPropertiesPanel = UniqueRef<ObjectPropertiesPanel>::Create(m_CurrentScene, true);
@@ -98,7 +99,7 @@ void HighLoEditor::OnInitialize()
 
 	GetWindow().Maximize();
 	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
-	UpdateWindowTitle("Untitled Scene");
+	UpdateWindowTitle(m_SceneName);
 
 	FileSystemWatcher::Get()->Start(project->GetConfig().AssetDirectory);
 
@@ -261,6 +262,16 @@ void HighLoEditor::UpdateUIFlags()
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ASSET_MANAGER)->IsSelected = m_AssetManagerPanelOpen;
 	m_FileMenu->GetMenuItemWithID(MENU_ITEM_SETTINGS)->IsSelected = m_ShowSettingsPanel;
+
+	if (!m_SceneIsSaved)
+	{
+		// Append a * to the window title
+		UpdateWindowTitle(m_SceneName + " *");
+	}
+	else
+	{
+		UpdateWindowTitle(m_SceneName);
+	}
 }
 
 void HighLoEditor::OnShutdown()
@@ -477,7 +488,7 @@ void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 void HighLoEditor::NewScene(FileMenu *menu, MenuItem *item)
 {
 	HL_TRACE("NewScene");
-	UpdateWindowTitle("Untitled Scene");
+	UpdateWindowTitle(m_SceneName + " *");
 }
 
 void HighLoEditor::OpenScene(FileMenu *menu, MenuItem *item)
@@ -506,6 +517,8 @@ void HighLoEditor::OpenScene(const HLString &path)
 
 void HighLoEditor::SaveScene(FileMenu *menu, MenuItem *item)
 {
+	m_SceneIsSaved = true;
+
 	if (!m_LastSceneFilePath.IsEmpty())
 	{
 		// Serialize scene
@@ -519,6 +532,8 @@ void HighLoEditor::SaveScene(FileMenu *menu, MenuItem *item)
 void HighLoEditor::SaveSceneAs(FileMenu *menu, MenuItem *item)
 {
 	HL_TRACE("SaveSceneAs");
+	m_SceneIsSaved = true;
+
 	Ref<FileDialogue> fd = FileDialogue::Create();
 	FileDialogueFilter filter;
 	filter.AddFilter("High-Lo Scene file", "*.hl");
@@ -737,6 +752,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 			Entity e = m_CurrentScene->CreateEntity("Camera");
 			e.AddComponent<CameraComponent>();
 			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
@@ -746,6 +762,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
 			component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
 			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
@@ -755,6 +772,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
 			component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
 			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
@@ -764,12 +782,18 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
 			component->Model = AssetFactory::CreateSphere(4.0f);
 			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_CYLINDER:
 		{
-			HL_INFO("Creating Cylinder...");
+			Entity e = m_CurrentScene->CreateEntity("Cylinder");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			// TODO: Add Cylinders to AssetFactory and MeshFactory
+		//	component->Model = AssetFactory::CreateCylinder();
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
@@ -783,6 +807,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 		{
 			Entity e = m_CurrentScene->CreateEntity("Null Object");
 			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
@@ -807,8 +832,15 @@ void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
 }
 
+void HighLoEditor::OnEntityAdded(Entity &e)
+{
+	m_SceneIsSaved = false;
+}
+
 void HighLoEditor::OnEntityDeleted(Entity &e)
 {
+	m_SceneIsSaved = false;
+
 	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].Entity == e)
 	{
 		m_SelectionContext.clear();
@@ -819,6 +851,7 @@ void HighLoEditor::OnEntityDeleted(Entity &e)
 
 void HighLoEditor::OnEntityChanged(Entity &e)
 {
+	m_SceneIsSaved = false;
 	m_EditorScene->SetSelectedEntity(e);
 	m_SceneHierarchyPanel->SetSelected(e);
 }
@@ -833,7 +866,7 @@ void HighLoEditor::OnScenePlay()
 
 	// Copy current scene to be able to reset after stop button has been pressed
 	m_RuntimeScene = Ref<Scene>::Create();
-	// m_EditorScene->CopyTo(m_RuntimeScene);
+	m_EditorScene->CopyTo(m_RuntimeScene);
 
 	m_RuntimeScene->OnRuntimeStart();
 	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
@@ -904,5 +937,6 @@ void HighLoEditor::DeleteEntity(Entity entity)
 
 	m_EditorScene->UnparentEntity(entity);
 	m_EditorScene->DestroyEntity(entity);
+	m_SceneIsSaved = false;
 }
 

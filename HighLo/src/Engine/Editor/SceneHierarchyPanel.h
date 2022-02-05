@@ -23,6 +23,7 @@ namespace highlo
 		HLAPI void SetSelected(Entity entity);
 		HLAPI void SetSelectionChangedCallback(const std::function<void(Entity)> &callback) { m_SelectionChangedCallback = callback; }
 		HLAPI void SetEntityDeletedCallback(const std::function<void(Entity)> &callback) { m_EntityDeletedCallback = callback; }
+		HLAPI void SetEntityAddedCallback(const std::function<void(Entity)> &callback) { m_EntityAddedCallback = callback; }
 		HLAPI void SetInvalidAssetMetaDataCallback(const std::function<void(Entity, AssetHandle)> &callback) { m_InvalidAssetMetaDataCallback = callback; }
 
 		HLAPI void OnUIRender(bool *pOpen = nullptr);
@@ -36,7 +37,7 @@ namespace highlo
 		Entity m_SelectedEntity;
 		bool m_IsWindow = false;
 
-		std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
+		std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback, m_EntityAddedCallback;
 		std::function<void(Entity, AssetHandle)> m_InvalidAssetMetaDataCallback;
 
 		Ref<Texture2D> m_TreeNodeRoot;

@@ -61,6 +61,8 @@ namespace highlo::UI
 	HLAPI bool BeginPopup(const char *id, ImGuiWindowFlags flags = 0);
 	HLAPI void EndPopup();
 	
+	HLAPI uint32 *GetCurrentImGuiIDCounter();
+
 	HLAPI void DisplayDebugInformation();
 	HLAPI void SetDarkThemeColors();
 	HLAPI void SetLightThemeColors();
@@ -162,6 +164,7 @@ namespace highlo::UI
 	HLAPI bool DrawDragFloat3(const HLString &label, glm::vec3 &value, float delta = 0.1f);
 	HLAPI bool DrawDragFloat4(const HLString &label, glm::vec4 &value, float delta = 0.1f);
 	HLAPI bool DrawIntSlider(const HLString &label, int32 &value, int32 min, int32 max);
+	HLAPI bool DrawUIntSlider(const HLString &label, uint32 &value, int32 min, int32 max);
 	HLAPI bool DrawFloatSlider(const HLString &label, float &value, float min, float max);
 	HLAPI bool DrawVec2Slider(const HLString &label, glm::vec2 &value, float min, float max);
 	HLAPI bool DrawVec3Slider(const HLString &label, glm::vec3 &value, float min, float max);

@@ -42,6 +42,9 @@ namespace highlo
 
 		HLAPI void OnEvent(Event &e);
 
+		HLAPI const AssetRegistry &GetAssetRegistry() { return s_AssetRegistry; }
+		HLAPI const std::unordered_map<AssetHandle, Ref<Asset>> &GetLoadedAssets() { return s_LoadedAssets; }
+
 		HLAPI AssetMetaData &GetMetaData(AssetHandle handle);
 		HLAPI AssetMetaData &GetMetaData(const FileSystemPath &path);
 		HLAPI AssetMetaData &GetMetaData(const Ref<Asset> &asset) { return GetMetaData(asset->Handle); }

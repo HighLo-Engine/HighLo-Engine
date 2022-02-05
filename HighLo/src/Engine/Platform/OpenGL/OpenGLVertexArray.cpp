@@ -58,6 +58,7 @@ namespace highlo
 		if (m_Specification.Layout.GetElements().size() < 1)
 		{
 			HL_CORE_ERROR("Vertex Buffer has no layout!");
+			HL_ASSERT(false);
 			return;
 		}
 
@@ -71,7 +72,7 @@ namespace highlo
 								  utils::ShaderDataTypeToOpenGLBaseType(element.Type),
 								  element.Normalized,
 								  layout.GetStride(),
-								  (const void *)(intptr_t)element.Offset);
+								  (const void*)(intptr_t)element.Offset);
 			++attribIndex;
 		}
 	}

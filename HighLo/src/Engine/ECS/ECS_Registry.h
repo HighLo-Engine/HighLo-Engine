@@ -143,6 +143,56 @@ namespace highlo
 			return false;
 		}
 
+		template<typename... Args>
+		HLAPI bool HasComponents(UUID entityID)
+		{
+			// Create a list of all types
+			std::vector<std::type_index> componentTypes;
+			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
+
+			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
+				return false;
+
+			bool anyMissing = false;
+			std::vector<std::pair<std::type_index, uint64>> &matchingEntity = m_EntityComponents[entityID];
+			for (auto &[currentType, index] : matchingEntity)
+			{
+				auto it = std::find(componentTypes.begin(), componentTypes.end(), currentType);
+				if (it == componentTypes.end())
+				{
+					anyMissing = true;
+					break;
+				}
+			}
+
+			return !anyMissing;
+		}
+
+		template<typename... Args>
+		HLAPI bool HasAnyOf(UUID entityID)
+		{
+			// Create a list of all types
+			std::vector<std::type_index> componentTypes;
+			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
+
+			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
+				return false;
+
+			bool anyFound = false;
+			std::vector<std::pair<std::type_index, uint64>> &matchingEntity = m_EntityComponents[entityID];
+			for (auto &[currentType, index] : matchingEntity)
+			{
+				auto it = std::find(componentTypes.begin(), componentTypes.end(), currentType);
+				if (it != componentTypes.end())
+				{
+					anyFound = true;
+					break;
+				}
+			}
+
+			return anyFound;
+		}
+
 		template<typename T>
 		HLAPI void RemoveComponent(UUID entityID)
 		{

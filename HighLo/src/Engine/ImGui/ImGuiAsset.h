@@ -5,7 +5,6 @@
 //     - 1.0 (2022-02-05) initial release
 //
 
-
 #pragma once
 
 #include "ImGui.h"

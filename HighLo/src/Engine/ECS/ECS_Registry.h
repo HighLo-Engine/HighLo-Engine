@@ -20,21 +20,24 @@ namespace highlo
 	{
 	public:
 
+		/// <summary>
+		/// Constructor which creates a static instance of the registry.
+		/// </summary>
+		/// <returns></returns>
 		HLAPI ECS_Registry();
+
+		/// <summary>
+		/// Getter to get the static instance of the registry class. Should only be used in a Entity class.
+		/// </summary>
+		/// <returns></returns>
 		HLAPI static ECS_Registry &Get();
 
-		template<typename T>
-		HLAPI const std::vector<T> &GetComponents()
-		{
-			static std::vector<T> s_empty;
-
-			for (const auto &[index, components] : m_Components)
-				if (index == std::type_index(typeid(T)))
-					return components;
-
-			return s_empty;
-		}
-
+		/// <summary>
+		/// Adds a new Component to the given entity. A instance of that created component will be returned.
+		/// </summary>
+		/// <typeparam name="T">The component which should be created.</typeparam>
+		/// <param name="entityID">The entityID in which the component should be created.</param>
+		/// <returns>Returns the freshly created instance of the requested component.</returns>
 		template<typename T>
 		HLAPI T *AddComponent(UUID entityID)
 		{
@@ -52,6 +55,15 @@ namespace highlo
 			return std::any_cast<T>(&m_Components[type][index].second);
 		}
 
+		/// <summary>
+		/// Adds or replaces (if a component of the same type already exists) the component from the srcEntity into the dstEntity.
+		/// This is used when a entity should be duplicated.
+		/// </summary>
+		/// <typeparam name="T">The Template component type, which should be added or replaced.</typeparam>
+		/// <param name="dstEntityID">The Destination Entity ID, where the component should be added or replaced.</param>
+		/// <param name="srcEntityID">The Source Entity ID, from which the component should be retrieved.</param>
+		/// <param name="componentToReplace">A already existing instance of the same template component type. This instance is used, to replace the existing value in the internal storage, if some is found. Can be retrieved with 'srcEntity.GetComponent<T>()'</param>
+		/// <returns></returns>
 		template<typename T>
 		HLAPI T *AddOrReplace(UUID dstEntityID, UUID srcEntityID, T *componentToReplace)
 		{
@@ -98,6 +110,12 @@ namespace highlo
 			return std::any_cast<T>(&m_Components[type][index].second);
 		}
 
+		/// <summary>
+		/// Returns the stored instance of the component specified in the template type.
+		/// </summary>
+		/// <typeparam name="T">The template component type, which instance should be returned.</typeparam>
+		/// <param name="entityID">The entityID, from which the component should be retrieved.</param>
+		/// <returns></returns>
 		template<typename T>
 		HLAPI T *GetComponent(UUID entityID)
 		{
@@ -125,6 +143,11 @@ namespace highlo
 			return nullptr;
 		}
 
+		/// <summary>
+		/// Returns whether the entity has the given component.
+		/// </summary>
+		/// <param name="entityID">The Entity, which should be checked against the given template component type.</param>
+		/// <returns>Returns true, if the entity with the given entityID has the given template component.</returns>
 		template<typename T>
 		HLAPI bool HasComponent(UUID entityID)
 		{
@@ -143,6 +166,12 @@ namespace highlo
 			return false;
 		}
 
+		/// <summary>
+		/// Returns whether the entity has all of the given components.
+		/// @WARN untested
+		/// </summary>
+		/// <param name="entityID">The Entity, which should be checked against the given template component types.</param>
+		/// <returns>Returns true, if the entity with the given entityID has all of the given template components.</returns>
 		template<typename... Args>
 		HLAPI bool HasComponents(UUID entityID)
 		{
@@ -168,6 +197,12 @@ namespace highlo
 			return !anyMissing;
 		}
 
+		/// <summary>
+		/// Returns whether the entity has any of the given components.
+		/// @WARN untested
+		/// </summary>
+		/// <param name="entityID">The Entity, which should be checked against the given template component types.</param>
+		/// <returns>Returns true, if the entity with the given entityID has at least one or more of the given template components.</returns>
 		template<typename... Args>
 		HLAPI bool HasAnyOf(UUID entityID)
 		{
@@ -193,6 +228,10 @@ namespace highlo
 			return anyFound;
 		}
 
+		/// <summary>
+		/// Removes a single component of a specific entity.
+		/// </summary>
+		/// <param name="entityID">The entity ID, which component should be destroyed.</param>
 		template<typename T>
 		HLAPI void RemoveComponent(UUID entityID)
 		{
@@ -213,82 +252,24 @@ namespace highlo
 			}
 		}
 
-		HLAPI void DestroyAllByEntityId(UUID id)
+		/// <summary>
+		/// Destroys all components with the given entity id.
+		/// </summary>
+		/// <param name="entityID">The entity ID, which components should be destroyed.</param>
+		HLAPI void DestroyAllByEntityId(UUID entityID)
 		{
-			if (m_EntityComponents.find(id) == m_EntityComponents.end())
+			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return; // No entities found to delete
 
-			m_EntityComponents[id].clear();
-			m_EntityComponents[id].shrink_to_fit();
-			m_EntityComponents.erase(id);
-		}
-
-		template<typename T>
-		HLAPI void ForEach(const std::function<void(UUID, T &)> &callback)
-		{
-			auto &type = std::type_index(typeid(T));
-			if (m_Components.find(type) != m_Components.end())
-				for (auto &comp : m_Components[type])
-					callback(comp.first, *std::any_cast<T>(&comp.second));
-		}
-
-		template<typename... Args>
-		HLAPI void ForEachMultiple(const std::function<void(UUID, std::vector<void*>&)> &callback)
-		{
-			// Create a list of all types
-			std::vector<std::type_index> componentTypes;
-			componentTypes.insert(componentTypes.end(), { typeid(Args)... });
-
-			HL_ASSERT(componentTypes.size() > 1, "At least two component types must be specified!");
-
-			auto &firstType = componentTypes[0];
-
-			// Iterate over components of the first specified type
-			if (m_Components.find(firstType) != m_Components.end())
-			{
-				for (auto &comp : m_Components[firstType])
-				{
-					UUID entityID = comp.first;
-					std::vector<void *> components = { &comp.second };
-
-					bool shouldSkipEntity = false;
-
-					// Collect other required components from the found entity
-					for (size_t i = 1; i < componentTypes.size(); ++i)
-					{
-						// Skip entity if one of the required components is not found
-						if (m_Components.find(componentTypes[i]) == m_Components.end())
-						{
-							shouldSkipEntity = true;
-							break;
-						}
-
-						auto componentHandle = GetComponentHandle(entityID, componentTypes[i]);
-
-						// Skip entity if the required component handle is nullptr
-						if (!componentHandle)
-						{
-							shouldSkipEntity = true;
-							break;
-						}
-
-						// If all checks are passed, add the component handle to the list
-						components.push_back(componentHandle);
-					}
-
-					// If entity should be skipped, skip
-					if (shouldSkipEntity)
-						continue;
-
-					callback(entityID, components);
-				}
-			}
+			m_EntityComponents[entityID].clear();
+			m_EntityComponents[entityID].shrink_to_fit();
+			m_EntityComponents.erase(entityID);
 		}
 
 		/// <summary>
-		/// Returns a list of entites with the given template component type.
+		/// Returns a list of entites with the given template component types.
 		/// </summary>
-		/// <returns>Returns a list of entites with the given template component type.</returns>
+		/// <returns>Returns only entites, which have all of the specified template component types.</returns>
 		template<typename... Args>
 		HLAPI std::vector<UUID> View()
 		{

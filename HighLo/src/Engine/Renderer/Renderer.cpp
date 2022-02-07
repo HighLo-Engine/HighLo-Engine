@@ -88,6 +88,7 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EquirectangularToCubeMap.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentMipFilter.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/PreethamSky.glsl");
 
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();

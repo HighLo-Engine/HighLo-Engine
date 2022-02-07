@@ -367,7 +367,14 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 		if (m_SelectionMode == SelectionMode::Entity)
 		{
-			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()), glm::value_ptr(m_EditorCamera.GetProjection()), (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(rawTransform), nullptr, snap ? snapValues : nullptr);
+			ImGuizmo::Manipulate(
+				glm::value_ptr(m_EditorCamera.GetViewMatrix()),
+				glm::value_ptr(m_EditorCamera.GetProjection()), 
+				(ImGuizmo::OPERATION)m_GizmoType, 
+				ImGuizmo::LOCAL, 
+				glm::value_ptr(rawTransform), 
+				nullptr, 
+				snap ? snapValues : nullptr);
 
 			if (ImGuizmo::IsUsing())
 			{
@@ -385,6 +392,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
 					entityTransform.SetScale(scale);
 					selection.Entity.SetTransform(entityTransform);
+					SelectEntity(selection.Entity);
 				}
 				else
 				{
@@ -396,22 +404,89 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
 					entityTransform.SetScale(scale);
 					selection.Entity.SetTransform(entityTransform);
+					SelectEntity(selection.Entity);
 				}
 			}
 		}
 		else
 		{
 			glm::mat4 transformBase = rawTransform * selection.Mesh->LocalTransform.GetTransform();
-			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()), glm::value_ptr(m_EditorCamera.GetProjection()), (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transformBase), nullptr, snap ? snapValues : nullptr);
+			ImGuizmo::Manipulate(
+				glm::value_ptr(m_EditorCamera.GetViewMatrix()), 
+				glm::value_ptr(m_EditorCamera.GetProjection()), 
+				(ImGuizmo::OPERATION)m_GizmoType, 
+				ImGuizmo::LOCAL, 
+				glm::value_ptr(transformBase), 
+				nullptr, 
+				snap ? snapValues : nullptr);
 
 			Transform newTransform;
 			newTransform.SetTransform(glm::inverse(rawTransform) * transformBase);
 			selection.Mesh->LocalTransform = newTransform;
 			selection.Entity.SetTransform(entityTransform);
+			SelectEntity(selection.Entity);
 		}
 	}
 
-	// TODO: Add Drag- and drop onto viewport
+	if (ImGui::BeginDragDropTarget())
+	{
+		const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("asset_payload");
+		if (payload)
+		{
+			uint64 count = payload->DataSize / sizeof(AssetHandle);
+			for (uint64 i = 0; i < count; ++i)
+			{
+				AssetHandle current = *(((AssetHandle*)payload->Data) + i);
+				const AssetMetaData &assetData = AssetManager::Get()->GetMetaData(current);
+				Ref<Asset> asset = AssetManager::Get()->GetAsset<Asset>(current);
+
+				if (count == 1 && assetData.Type == AssetType::Scene)
+				{
+					OpenScene(assetData.FilePath.String());
+					break;
+				}
+
+				if (asset)
+				{
+					if (asset->GetAssetType() == AssetType::StaticMesh)
+					{
+						Ref<StaticModel> model = asset.As<StaticModel>();
+						auto &assetData = AssetManager::Get()->GetMetaData(model->Handle);
+						HL_TRACE("Creating Static Model by drag and drop");
+
+					//	Entity entity = m_EditorScene->CreateEntity(assetData.FilePath.Filename());
+					//	StaticModelComponent *comp = entity.AddComponent<StaticModelComponent>();
+					//	comp->Model = model->Handle;
+					//	SelectEntity(entity);
+					}
+					else if (asset->GetAssetType() == AssetType::DynamicMesh)
+					{
+						Ref<DynamicModel> model = asset.As<DynamicModel>();
+						const auto &submeshIndices = model->GetSubmeshIndices();
+						const auto &submeshes = model->Get()->GetSubmeshes();
+						HL_TRACE("Creating Dynamic Model by drag and drop");
+
+						// Entity rootEntity = m_EditorScene->InstantiateMesh(model);
+						// SelectEntity(rootEntity);
+					}
+					else if (asset->GetAssetType() == AssetType::Prefab)
+					{
+						Ref<Prefab> prefab = asset.As<Prefab>();
+						HL_TRACE("Creating Prefab by drag and drop");
+
+					//	m_EditorScene->Instantiate(prefab);
+					}
+				}
+				else
+				{
+					// Invalid metaData found
+					HL_TRACE("Invalid asset created by drag and drop");
+				}
+			}
+		}
+
+		ImGui::EndDragDropTarget();
+	}
 
 	UI::EndViewport();
 
@@ -434,7 +509,7 @@ void HighLoEditor::OnResize(uint32 width, uint32 height)
 	m_EditorCamera.OnWindowResize(width, height);
 }
 
-void HighLoEditor::SelectEntity(Entity entity)
+void HighLoEditor::SelectEntity(Entity &entity)
 {
 	if (!entity)
 	{

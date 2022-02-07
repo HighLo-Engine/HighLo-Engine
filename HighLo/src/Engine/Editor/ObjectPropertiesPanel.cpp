@@ -12,7 +12,6 @@
 
 namespace highlo
 {
-
 	template<typename T, typename UIFunc>
 	static void DrawComponent(const HLString &name, Entity entity, UIFunc func, const Ref<Texture2D> &settingsIcon, bool canBeRemoved = true)
 	{
@@ -105,7 +104,6 @@ namespace highlo
 		if (resetValues)
 		{
 			entity.SetTransform(Transform::Identity());
-			scene->SetEntityTransform(entity, Transform::Identity());
 		}
 
 		if (!open)
@@ -141,7 +139,7 @@ namespace highlo
 		if (m_IsWindow)
 		{
 			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 10.0f));
-			ImGui::Begin("Object Properties", pOpen);
+			ImGui::Begin("Object Properties", pOpen, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 		}
 
 		if (m_SelectedEntity)
@@ -316,7 +314,7 @@ namespace highlo
 			entityTransform.SetRotation(glm::radians(degreeRotation));
 
 			ImGui::TableNextRow();
-			bool scaleChanged = UI::DrawVec3("Scale", entityTransform.GetScale());
+			bool scaleChanged = UI::DrawVec3("Scale", entityTransform.GetScale(), 1.0f);
 
 			ImGui::EndTable();
 

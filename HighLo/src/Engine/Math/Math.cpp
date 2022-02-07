@@ -186,7 +186,7 @@ namespace highlo
 			glm::epsilonNotEqual(localMatrix[1][3], 0.0f, glm::epsilon<float>()) ||
 			glm::epsilonNotEqual(localMatrix[2][3], 0.0f, glm::epsilon<float>()))
 		{
-			localMatrix[0][3] = localMatrix[1][3] = 0.0f;
+			localMatrix[0][3] = localMatrix[1][3] = localMatrix[2][3] = 0.0f;
 			localMatrix[3][3] = 1.0f;
 		}
 
@@ -212,6 +212,7 @@ namespace highlo
 		row[2] = glm::detail::scale(row[2], 1.0f);
 
 		// Get the rotation
+		rotation.y = asin(-row[0][2]);
 		if (cos(rotation.y) != 0)
 		{
 			rotation.x = atan2(row[1][2], row[2][2]);
@@ -239,7 +240,7 @@ namespace highlo
 			glm::epsilonNotEqual(localMatrix[1][3], 0.0f, glm::epsilon<float>()) ||
 			glm::epsilonNotEqual(localMatrix[2][3], 0.0f, glm::epsilon<float>()))
 		{
-			localMatrix[0][3] = localMatrix[1][3] = 0.0f;
+			localMatrix[0][3] = localMatrix[1][3] = localMatrix[2][3] = 0.0f;
 			localMatrix[3][3] = 1.0f;
 		}
 
@@ -247,7 +248,7 @@ namespace highlo
 		translation = glm::vec3(localMatrix[3]);
 		localMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, localMatrix[3].w);
 
-		return false;
+		return true;
 	}
 
 	bool DecomposeScale(const glm::mat4 &transform, glm::vec3 &scale)
@@ -287,7 +288,7 @@ namespace highlo
 		scale.z = glm::length(row[2]);
 		row[2] = glm::detail::scale(row[2], 1.0f);
 
-		return false;
+		return true;
 	}
 
 	bool DecomposeRotation(const glm::mat4 &transform, glm::vec3 &rotation)
@@ -324,6 +325,7 @@ namespace highlo
 		row[2] = glm::detail::scale(row[2], 1.0f);
 
 		// Get the rotation
+		rotation.y = asin(-row[0][2]);
 		if (cos(rotation.y) != 0)
 		{
 			rotation.x = atan2(row[1][2], row[2][2]);
@@ -335,7 +337,7 @@ namespace highlo
 			rotation.z = 0.0f;
 		}
 
-		return false;
+		return true;
 	}
 	
 	void CreateCacheSin(float cacheSize)

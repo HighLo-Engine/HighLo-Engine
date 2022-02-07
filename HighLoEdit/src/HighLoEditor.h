@@ -29,7 +29,7 @@ class HighLoEditor : public HLApplication
 
 		void UpdateUIFlags();
 
-		void SelectEntity(Entity entity);
+		void SelectEntity(Entity &entity);
 
 		void UpdateWindowTitle(const HLString &sceneName);
 		void NewScene(FileMenu *menu, MenuItem *item);

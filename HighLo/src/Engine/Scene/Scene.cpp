@@ -367,11 +367,6 @@ namespace highlo
 		m_EntityIDMap[entity.GetUUID()] = entity;
 	}
 
-	void Scene::SetEntityTransform(Entity &entity, Transform &transform)
-	{
-		m_EntityIDMap[entity.GetUUID()].SetTransform(transform);
-	}
-
 	Entity Scene::CreateEntity(const HLString &name)
 	{
 		HL_PROFILE_FUNCTION();

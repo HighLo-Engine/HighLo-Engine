@@ -72,7 +72,6 @@ namespace highlo
 
 		HLAPI void AddEntity(Entity &entity);
 		HLAPI void UpdateEntity(Entity &entity);
-		HLAPI void SetEntityTransform(Entity &entity, Transform &transform);
 		HLAPI Entity CreateEntity(const HLString &name = "");
 		HLAPI Entity CreateEntityWithUUID(UUID uuid, const HLString &name = "");
 		HLAPI void DestroyEntity(Entity &entity, bool excludeChildren = false, bool first = true);

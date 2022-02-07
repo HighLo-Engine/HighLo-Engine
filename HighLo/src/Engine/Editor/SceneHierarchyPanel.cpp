@@ -92,9 +92,10 @@ namespace highlo
 						SetSelected({});
 					}
 
-					ImGui::TableSetupColumn("", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort); // Label
-					ImGui::TableSetupColumn("", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort); // Visibilty
-					ImGui::TableSetupColumn("", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort); // Materials and other extra settings
+					ImGuiTableFlags columnFlags = ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort;
+					ImGui::TableSetupColumn("", columnFlags); // Label
+					ImGui::TableSetupColumn("", columnFlags); // Visibilty
+					ImGui::TableSetupColumn("", columnFlags); // Materials and other extra settings
 
 					// Headers
 					{

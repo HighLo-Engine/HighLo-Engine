@@ -806,6 +806,7 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 		case MENU_ITEM_ASSET_CREATE_NULL_OBJECT:
 		{
 			Entity e = m_CurrentScene->CreateEntity("Null Object");
+			e.SetAsNullObject();
 			m_CurrentScene->SetSelectedEntity(e);
 			OnEntityAdded(e);
 			break;

@@ -31,6 +31,8 @@ namespace highlo
 		HLAPI Entity(const Entity &other);
 		HLAPI Entity &operator=(const Entity &other);
 
+		HLAPI void SetAsNullObject();
+
 		template<typename T>
 		HLAPI T *AddComponent()
 		{
@@ -88,11 +90,11 @@ namespace highlo
 		HLAPI const HLString &Tag() const { return m_Tag; }
 
 		HLAPI void SetParent(Entity other);
-		HLAPI std::vector<UUID> &Children();
-		HLAPI const std::vector<UUID> &Children() const;
+		HLAPI std::vector<UUID> &Children() { return m_Children; }
+		HLAPI const std::vector<UUID> &Children() const { return m_Children; }
 
-		HLAPI void SetParentUUID(UUID uuid);
-		HLAPI UUID GetParentUUID() const;
+		HLAPI void SetParentUUID(UUID uuid) { m_ParentUUID = uuid; }
+		HLAPI UUID GetParentUUID() const { return m_ParentUUID; }
 		HLAPI bool HasParent() const;
 		HLAPI Entity GetParent();
 		HLAPI bool RemoveChild(Entity child);
@@ -117,6 +119,9 @@ namespace highlo
 		HLString m_Tag;
 		UUID m_ID;
 		UUID m_SceneID;
+
+		UUID m_ParentUUID;
+		std::vector<UUID> m_Children;
 		
 		highlo::Transform m_Transform;
 	};

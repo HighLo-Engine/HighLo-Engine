@@ -9,19 +9,19 @@
 namespace highlo
 {
 	Entity::Entity(UUID sceneID, const HLString &tag)
-		: m_ID(UUID()), m_Tag(tag), m_SceneID(sceneID), m_Initialized(true), m_Hidden(false)
+		: m_ID(UUID()), m_Tag(tag), m_SceneID(sceneID), m_Initialized(true), m_Hidden(false), m_ParentUUID(0)
 	{
 		m_Transform = Transform::Identity();
 	}
 
 	Entity::Entity(UUID sceneID, UUID entityID)
-		: m_ID(entityID), m_SceneID(sceneID), m_Tag("Entity"), m_Initialized(true), m_Hidden(false)
+		: m_ID(entityID), m_SceneID(sceneID), m_Tag("Entity"), m_Initialized(true), m_Hidden(false), m_ParentUUID(0)
 	{
 		m_Transform = Transform::Identity();
 	}
 
 	Entity::Entity(UUID sceneID, UUID entityID, const HLString &tag, const highlo::Transform &transform)
-		: m_ID(entityID), m_SceneID(sceneID), m_Tag(tag), m_Initialized(true), m_Hidden(false), m_Transform(transform)
+		: m_ID(entityID), m_SceneID(sceneID), m_Tag(tag), m_Initialized(true), m_Hidden(false), m_Transform(transform), m_ParentUUID(0)
 	{
 	}
 	
@@ -31,7 +31,9 @@ namespace highlo
 		m_Transform(other.m_Transform), 
 		m_SceneID(other.m_SceneID), 
 		m_Initialized(other.m_Initialized), 
-		m_Hidden(other.m_Hidden)
+		m_Hidden(other.m_Hidden),
+		m_ParentUUID(other.m_ParentUUID),
+		m_Children(other.m_Children)
 	{
 	}
 	
@@ -43,34 +45,21 @@ namespace highlo
 		m_Initialized			= other.m_Initialized;
 		m_Transform				= other.m_Transform;
 		m_Hidden				= other.m_Hidden;
+		m_ParentUUID			= other.m_ParentUUID;
+		m_Children				= other.m_Children;
 
 		return *this;
+	}
+
+	void Entity::SetAsNullObject()
+	{
+		ECS_Registry::Get().AddEmpty(m_ID);
 	}
 
 	void Entity::SetParent(Entity other)
 	{
 		SetParentUUID(other.GetUUID());
 		other.Children().emplace_back(GetUUID());
-	}
-
-	std::vector<UUID> &Entity::Children()
-	{
-		return GetComponent<RelationshipComponent>()->Children;
-	}
-
-	const std::vector<UUID> &Entity::Children() const
-	{
-		return GetComponent<RelationshipComponent>()->Children;
-	}
-
-	void Entity::SetParentUUID(UUID uuid)
-	{
-		GetComponent<RelationshipComponent>()->ParentHandle = uuid;
-	}
-
-	UUID Entity::GetParentUUID() const
-	{
-		return GetComponent<RelationshipComponent>()->ParentHandle;
 	}
 
 	bool Entity::HasParent() const

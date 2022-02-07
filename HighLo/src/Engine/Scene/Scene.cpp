@@ -138,7 +138,7 @@ namespace highlo
 	
 	Entity Scene::FindEntityByUUID(UUID id)
 	{
-		auto &view = m_Registry.View<RelationshipComponent>();
+		auto &view = m_Registry.ViewAll();
 		for (UUID entityID : view)
 		{
 			if (entityID == id && m_EntityIDMap.find(id) != m_EntityIDMap.end())
@@ -150,7 +150,7 @@ namespace highlo
 	
 	Entity Scene::FindEntityByTag(const HLString &tag)
 	{
-		auto &view = m_Registry.View<RelationshipComponent>();
+		auto &view = m_Registry.ViewAll();
 		for (UUID entityID : view)
 		{
 			HL_ASSERT(m_EntityIDMap.find(entityID) != m_EntityIDMap.end());
@@ -377,8 +377,6 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		auto entity = Entity(m_SceneID, name);
-
-		entity.AddComponent<RelationshipComponent>();
 		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
 		m_EntityIDMap[entity.GetUUID()] = entity;
@@ -390,8 +388,6 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		auto entity = Entity(m_SceneID, name);
-
-		entity.AddComponent<RelationshipComponent>();
 		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
 		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());

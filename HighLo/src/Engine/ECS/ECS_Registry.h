@@ -56,6 +56,16 @@ namespace highlo
 		}
 
 		/// <summary>
+		/// Adds an entity without any components. Mainly used to create Null Objects.
+		/// </summary>
+		/// <param name="entityID">The entityID which should be added into the registry.</param>
+		HLAPI void AddEmpty(UUID entityID)
+		{
+			std::vector<std::pair<std::type_index, uint64>> value;
+			m_EntityComponents.insert({ entityID, value });
+		}
+
+		/// <summary>
 		/// Adds or replaces (if a component of the same type already exists) the component from the srcEntity into the dstEntity.
 		/// This is used when a entity should be duplicated.
 		/// </summary>
@@ -296,6 +306,22 @@ namespace highlo
 
 				if (foundComponentsCount == neededComponentsCount)
 					result.push_back(entityId);
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Returns a list of all entites registered in the registry.
+		/// </summary>
+		/// <returns>Returns a list of all entites registered in the registry.</returns>
+		HLAPI std::vector<UUID> ViewAll()
+		{
+			std::vector<UUID> result;
+
+			for (auto &[entityID, component] : m_EntityComponents)
+			{
+				result.push_back(entityID);
 			}
 
 			return result;

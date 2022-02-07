@@ -16,6 +16,12 @@
 
 namespace highlo
 {
+	struct RelationshipComponent
+	{
+		UUID ParentHandle = 0;
+		std::vector<UUID> Children;
+	};
+
 	struct PrefabComponent
 	{
 		UUID PrefabID = 0;

@@ -123,7 +123,7 @@ namespace highlo
 					{
 						UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
 						
-						auto& view = m_Scene->m_Registry.ViewAll();
+						auto& view = m_Scene->m_Registry.View<RelationshipComponent>();
 
 						for (UUID entityId : view)
 						{
@@ -145,7 +145,6 @@ namespace highlo
 							if (ImGui::MenuItem("Null Object"))
 							{
 								auto newEntity = m_Scene->CreateEntity("Null Object");
-								newEntity.SetAsNullObject();
 								SetSelected(newEntity);
 
 								if (m_EntityAddedCallback)

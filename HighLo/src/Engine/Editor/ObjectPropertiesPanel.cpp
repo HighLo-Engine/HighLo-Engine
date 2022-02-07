@@ -12,6 +12,7 @@
 
 namespace highlo
 {
+
 	template<typename T, typename UIFunc>
 	static void DrawComponent(const HLString &name, Entity entity, UIFunc func, const Ref<Texture2D> &settingsIcon, bool canBeRemoved = true)
 	{
@@ -140,7 +141,7 @@ namespace highlo
 		if (m_IsWindow)
 		{
 			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 10.0f));
-			ImGui::Begin("Object Properties", pOpen, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			ImGui::Begin("Object Properties", pOpen);
 		}
 
 		if (m_SelectedEntity)

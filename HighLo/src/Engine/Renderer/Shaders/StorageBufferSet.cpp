@@ -39,6 +39,10 @@ namespace highlo
 	
 	void StorageBufferSet::Resize(uint32 binding, uint32 set, uint32 size)
 	{
+		// Nothing to do, if there are no storage buffers stored
+		if (!m_StorageBuffers.size())
+			return;
+
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{
 			m_StorageBuffers.at(frame).at(set).at(binding)->Resize(size);

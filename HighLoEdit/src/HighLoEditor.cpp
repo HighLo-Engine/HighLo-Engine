@@ -508,6 +508,7 @@ void HighLoEditor::OnResize(uint32 width, uint32 height)
 {
 	m_OverlayCamera.OnWindowResize(width, height);
 	m_EditorCamera.OnWindowResize(width, height);
+	m_ViewportRenderer->SetViewportSize(width, height);
 }
 
 void HighLoEditor::SelectEntity(Entity &entity)

@@ -39,6 +39,7 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferRendererData), 3); // Renderer Data Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), 4); // PointLights Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), 17); // Screen data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), 18); // HBAO data Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 
@@ -99,11 +100,29 @@ namespace highlo
 		
 		m_Active = true;
 		m_SceneData.SceneCamera = camera;
+		m_SceneData.SceneEnvironment = m_Scene->m_Environment;
+		m_SceneData.EnvironmentIntensity = m_Scene->m_EnvironmentIntensity;
+		m_SceneData.ActiveLight = m_Scene->m_Light;
+		m_SceneData.SceneLightEnvironment = m_Scene->m_LightEnvironment;
+		m_SceneData.SkyboxLod = m_Scene->m_SkyboxLod;
 
 		if (m_NeedsResize)
 		{
 			m_NeedsResize = false;
+			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 
+			// TODO: Resize bloom texture
+
+			if (m_Specification.SwapChain)
+				m_CommandBuffer = CommandBuffer::CreateFromSwapChain("SceneRenderer");
+
+			m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
+			m_RendererDataUniformBuffer.TilesCountX = m_LightCullingWorkGroups.x;
+
+			m_StorageBufferSet->Resize(14, 0, m_LightCullingWorkGroups.x * m_LightCullingWorkGroups.y * 4096);
 		}
 
 		auto &sceneCamera = m_SceneData.SceneCamera;
@@ -141,6 +160,16 @@ namespace highlo
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			instance->m_UniformBufferSet->GetUniform(1, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
+		});
+
+		UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
+
+		UpdateHBAOData();
+
+		Renderer::Submit([instance, hbaoData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(18, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
 		});
 
 		UniformBufferScene &sceneData = m_SceneUniformBuffer;
@@ -539,6 +568,7 @@ namespace highlo
 		m_UniformBufferSet->GetUniform(3, 0, frameIndex)->Bind(); // Renderer Data Uniform buffer block
 		m_UniformBufferSet->GetUniform(4, 0, frameIndex)->Bind(); // PointLights Uniform buffer block
 		m_UniformBufferSet->GetUniform(17, 0, frameIndex)->Bind(); // Screen data Uniform buffer block
+		m_UniformBufferSet->GetUniform(18, 0, frameIndex)->Bind(); // HBAO data Uniform buffer block
 
 	}
 
@@ -546,6 +576,33 @@ namespace highlo
 	{
 		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
 		Renderer::EndRenderPass(m_CommandBuffer);
+	}
+
+	void SceneRenderer::UpdateHBAOData()
+	{
+		const auto &opts = m_RendererOptions;
+		UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
+
+		// radius
+		const float meters2viewSpace = 1.0f;
+		const float R = opts.HBAORadius * meters2viewSpace;
+		const float R2 = R * R;
+		const float *P = glm::value_ptr(m_SceneData.SceneCamera.GetProjection());
+		const glm::vec4 projInfoPerspective = {
+			2.0f / (P[4 * 0 + 0]),                 // (x) * (R - L)/N
+			2.0f / (P[4 * 1 + 1]),                 // (y) * (T - B)/N
+			-(1.0f - P[4 * 2 + 0]) / P[4 * 0 + 0], // L/N
+			-(1.0f + P[4 * 2 + 1]) / P[4 * 1 + 1], // B/N
+		};
+
+		hbaoData.NegInvR2 = -1.0f / R2;
+		hbaoData.InvQuarterResolution = 1.f / glm::vec2{ (float)m_ViewportWidth / 4, (float)m_ViewportHeight / 4 };
+		hbaoData.RadiusToScreen = R * 0.5f * (float)m_ViewportHeight / (tanf(glm::radians(m_SceneData.SceneCamera.GetPerspectiveFOV()) * 0.5f) * 2.0f);
+		hbaoData.PerspectiveInfo = projInfoPerspective;
+		hbaoData.IsOrtho = m_SceneData.SceneCamera.IsOrthographic();
+		hbaoData.PowExponent = glm::max(opts.HBAOIntensity, 0.f);
+		hbaoData.NDotVBias = glm::min(std::max(0.f, opts.HBAOBias), 1.f);
+		hbaoData.AOMultiplier = 1.f / (1.f - hbaoData.NDotVBias);
 	}
 
 	void SceneRenderer::ClearPass(Ref<RenderPass> renderPass, bool explicitClear)
@@ -1012,6 +1069,7 @@ namespace highlo
 		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
 
 		auto &shader = Renderer::GetShaderLibrary()->Get("Wireframe");
+		m_ExternalCompositingRenderPass = RenderPass::Create(renderPassSpec);
 
 		VertexArraySpecification spec;
 		spec.DebugName = "Wireframe";
@@ -1028,7 +1086,7 @@ namespace highlo
 			{ "a_MRow2", ShaderDataType::Float4 }
 		};
 		spec.Shader = shader;
-		spec.RenderPass = RenderPass::Create(renderPassSpec);
+		spec.RenderPass = m_ExternalCompositingRenderPass;
 		spec.Wireframe = true;
 		spec.DepthTest = true;
 		spec.LineWidth = 2.0f;

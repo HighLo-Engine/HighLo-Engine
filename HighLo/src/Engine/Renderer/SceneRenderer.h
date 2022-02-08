@@ -28,6 +28,13 @@ namespace highlo
 	struct SceneRendererOptions
 	{
 		bool ShowGrid = true;
+
+		//HBAO
+		bool EnableHBAO = true;
+		float HBAOIntensity = 1.5f;
+		float HBAORadius = 1.0f;
+		float HBAOBias = 0.35f;
+		float HBAOBlurSharpness = 1.0f;
 	};
 
 	struct SceneRendererSpecification
@@ -114,6 +121,21 @@ namespace highlo
 		glm::mat4 View;
 	};
 
+	struct UniformBufferHBAOData
+	{
+		glm::vec4 PerspectiveInfo;
+		glm::vec2 InvQuarterResolution;
+		float RadiusToScreen;
+		float NegInvR2;
+		float NDotVBias;
+		float AOMultiplier;
+		float PowExponent;
+		bool IsOrtho;
+		char Padding0[3] = { 0, 0, 0 };
+		glm::vec4 Float2Offsets[16];
+		glm::vec4 Jitters[16];
+	};
+
 	struct UniformBufferShadow
 	{
 		glm::mat4 ViewProjection[4];
@@ -184,6 +206,8 @@ namespace highlo
 
 		HLAPI void ClearPass(Ref<RenderPass> renderPass, bool explicitClear = false);
 		HLAPI void ClearPass();
+
+		HLAPI void UpdateHBAOData();
 
 		HLAPI SceneRendererOptions &GetOptions();
 
@@ -291,6 +315,11 @@ namespace highlo
 		Ref<Material> m_CompositeMaterial;
 		Ref<VertexArray> m_CompositeVertexArray;
 
+		// External compositing
+		Ref<VertexArray> m_GeometryWireframeVertexArray;
+		Ref<VertexArray> m_GeometryWireframeOnTopVertexArray;
+		Ref<RenderPass> m_ExternalCompositingRenderPass;
+
 		// Light Culling
 		glm::ivec3 m_LightCullingWorkGroups;
 		Ref<Material> m_LightCullingMaterial;
@@ -299,8 +328,6 @@ namespace highlo
 		// Geometry
 		Ref<VertexArray> m_GeometryVertexArray;
 		Ref<VertexArray> m_SelectedGeometryVertexArray;
-		Ref<VertexArray> m_GeometryWireframeVertexArray;
-		Ref<VertexArray> m_GeometryWireframeOnTopVertexArray;
 		Ref<Material> m_SelectedGeometryMaterial;
 
 		// Pre-Depth
@@ -340,6 +367,7 @@ namespace highlo
 		UniformBufferPointLights m_PointLightsUniformBuffer;
 		UniformBufferRendererData m_RendererDataUniformBuffer;
 		UniformBufferScreenData m_ScreenDataUniformBuffer;
+		UniformBufferHBAOData m_HBAOUniformBuffer;
 
 		// Scene information
 		struct SceneInfo

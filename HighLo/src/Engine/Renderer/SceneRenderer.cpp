@@ -14,11 +14,6 @@ namespace highlo
 	// Temp until we can use our own thread implementation
 	static std::vector<std::thread> s_ThreadPool;
 
-	struct UniformBufferCamera
-	{
-		glm::mat4 ViewProjection;
-	};
-
 	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
 		: m_Scene(scene), m_Specification(specification)
 	{
@@ -39,6 +34,11 @@ namespace highlo
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		m_UniformBufferSet = UniformBufferSet::Create(framesInFlight);
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0); // Camera Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferShadow), 1); // Shadow Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScene), 2); // Scene Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferRendererData), 3); // Renderer Data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), 4); // PointLights Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), 17); // Screen data Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 
@@ -75,8 +75,14 @@ namespace highlo
 
 	void SceneRenderer::SetViewportSize(uint32 width, uint32 height)
 	{
-		m_ViewportWidth = width;
-		m_ViewportHeight = height;
+		if (m_ViewportWidth != width || m_ViewportHeight != height)
+		{
+			m_ViewportWidth = width;
+			m_ViewportHeight = height;
+			m_InvertedViewportWidth = 1.0f / (float)width;
+			m_InvertedViewportHeight = 1.0f / (float)height;
+			m_NeedsResize = true;
+		}
 	}
 
 	void SceneRenderer::SetClearColor(const glm::vec4 &color)
@@ -87,42 +93,111 @@ namespace highlo
 	{
 		HL_ASSERT(m_Scene);
 		HL_ASSERT(!m_Active);
+		
+		if (!m_ResourcesCreated)
+			return;
+		
 		m_Active = true;
+		m_SceneData.SceneCamera = camera;
 
-		glm::mat4 viewProj = camera.GetProjection() * camera.GetViewMatrix();
-
-		/*
-		Ref<SceneRenderer> instance = this;
-		Renderer::Submit([instance]()
+		if (m_NeedsResize)
 		{
-			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Bind();
+			m_NeedsResize = false;
 
-			Renderer::ClearScreenColor(instance->m_CompositeRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor);
-			Renderer::ClearScreenBuffers();
-		});
-		*/
+		}
+
+		auto &sceneCamera = m_SceneData.SceneCamera;
+		const auto viewProjection = sceneCamera.GetViewProjectionMatrix();
+		const glm::vec3 cameraPosition = glm::inverse(sceneCamera.GetViewMatrix())[3];
+
+		UniformBufferCamera &cameraData = m_CameraUniformBuffer;
+		cameraData.ViewProjection = sceneCamera.GetProjection() * sceneCamera.GetViewMatrix();
+		cameraData.InverseViewProjection = glm::inverse(viewProjection);
+		cameraData.Projection = sceneCamera.GetProjection();
+		cameraData.View = sceneCamera.GetViewMatrix();
 
 		// Load Camera Projection into Uniform Buffer block
-		Renderer::Submit([&viewProj, &ub = m_UniformBufferSet]() mutable
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance, cameraData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			ub->GetUniform(0, 0, frameIndex)->SetData(&viewProj, sizeof(UniformBufferCamera));
+			instance->m_UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraData, sizeof(cameraData));
 		});
 
-		/*
 		const auto &dirLight = m_SceneData.ActiveLight;
 
-		// calculate cascades
+		// calculate cascades shadows
+		UniformBufferShadow &shadowData = m_ShadowUniformBuffer;
 		CascadeData cascades[4];
 		CalculateCascades(cascades, m_SceneData.SceneCamera, dirLight.Direction);
 
 		for (uint32 i = 0; i < 4; ++i)
 		{
 			m_CascadeSplits[i] = cascades[i].SplitDepth;
-			// TODO: Add Shadow Data structure data here
+			shadowData.ViewProjection[i] = cascades[i].ViewProjection;
 		}
 
-		// TODO: Add shadow data structure into uniform buffer struct on CPU side
+		Renderer::Submit([instance, shadowData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(1, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
+		});
+
+		UniformBufferScene &sceneData = m_SceneUniformBuffer;
+		UniformBufferPointLights &pointLightData = m_PointLightsUniformBuffer;
+		const std::vector<PointLight> &pointLights = m_SceneData.SceneLightEnvironment.PointLights;
+		pointLightData.Count = (uint32)pointLights.size();
+		
+		HL_ASSERT(pointLights.size() < 1024);
+		for (uint64 i = 0; i < pointLights.size(); ++i)
+			pointLightData.PointLights[i] = pointLights[i];
+
+		Renderer::Submit([instance, &pointLightData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(4, 0, frameIndex)->SetData(&pointLightData, (sizeof(PointLight) * pointLightData.Count) + 16ull);
+		});
+
+		const auto &directionalLight = m_SceneData.SceneLightEnvironment.DirectionalLights;
+		sceneData.Lights.Direction = directionalLight->Direction;
+		sceneData.Lights.Radiance = directionalLight->Radiance;
+		sceneData.Lights.Multiplier = directionalLight->Intensity;
+		sceneData.u_CameraPosition = cameraPosition;
+		sceneData.EnvMapIntensity = m_SceneData.EnvironmentIntensity;
+
+		Renderer::Submit([instance, sceneData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(2, 0, frameIndex)->SetData(&sceneData, sizeof(sceneData));
+		});
+
+		UniformBufferRendererData &rendererData = m_RendererDataUniformBuffer;
+		rendererData.CascadeSplits = m_CascadeSplits;
+
+		Renderer::Submit([instance, rendererData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(3, 0, frameIndex)->SetData(&rendererData, sizeof(rendererData));
+		});
+
+		UniformBufferScreenData &screenData = m_ScreenDataUniformBuffer;
+		screenData.FullRes = { m_ViewportWidth, m_ViewportHeight };
+		screenData.InvFullRes = { m_InvertedViewportWidth, m_InvertedViewportHeight };
+
+		Renderer::Submit([instance, screenData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(17, 0, frameIndex)->SetData(&screenData, sizeof(screenData));
+		});
+
+		// Set current scene env
+		// TODO: Uncomment when shadowpasses and pre-depth images are working
+		/*
+		Renderer::SetSceneEnvironment(
+			this,
+			m_SceneData.SceneEnvironment,
+			m_ShadowPassVertexArrays[0]->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>(), 
+			m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>());
 		*/
 	}
 
@@ -144,14 +219,6 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#endif
-
-		/*
-		Ref<SceneRenderer> instance = this;
-		Renderer::Submit([instance]()
-		{
-			instance->m_CompositeRenderPass->GetSpecification().Framebuffer->Unbind();
-		});
-		*/
 	}
 
 	void SceneRenderer::SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
@@ -376,7 +443,7 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return m_CompositeRenderPass;
+		return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -406,7 +473,7 @@ namespace highlo
 
 			// Main Render passes
 		//	ShadowMapPass();
-		//	PreDepthPass();
+			PreDepthPass();
 		//	LightCullingPass();
 			GeometryPass();
 
@@ -464,11 +531,20 @@ namespace highlo
 		}
 
 		m_SubmeshTransformBuffer->UpdateContents(m_TransformVertexData, offset * sizeof(TransformVertexData));
+
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		m_UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind(); // Camera Uniform buffer block
+		m_UniformBufferSet->GetUniform(1, 0, frameIndex)->Bind(); // Shadow Uniform buffer block
+		m_UniformBufferSet->GetUniform(2, 0, frameIndex)->Bind(); // Scene Uniform buffer block
+		m_UniformBufferSet->GetUniform(3, 0, frameIndex)->Bind(); // Renderer Data Uniform buffer block
+		m_UniformBufferSet->GetUniform(4, 0, frameIndex)->Bind(); // PointLights Uniform buffer block
+		m_UniformBufferSet->GetUniform(17, 0, frameIndex)->Bind(); // Screen data Uniform buffer block
+
 	}
 
 	void SceneRenderer::ClearPass()
 	{
-		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeRenderPass, true);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -500,6 +576,8 @@ namespace highlo
 
 	void SceneRenderer::PreDepthPass()
 	{
+		Renderer::BeginRenderPass(m_CommandBuffer, m_PreDepthVertexArray->GetSpecification().RenderPass);
+		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::LightCullingPass()
@@ -514,13 +592,13 @@ namespace highlo
 		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-			//	Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+			Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
 		}
 
 		for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-			//	Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+			Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
 		}
 
 		Renderer::EndRenderPass(m_CommandBuffer);
@@ -546,7 +624,7 @@ namespace highlo
 		for (auto &[mk, dc] : m_DynamicDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
-			//	Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+			Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
 		}
 
 		// Grid
@@ -571,7 +649,15 @@ namespace highlo
 
 	void SceneRenderer::CompositePass()
 	{
-		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeRenderPass, true);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
+		auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+		float exposure = m_SceneData.SceneCamera.GetExposure();
+		int32 textureSamples = framebuffer->GetSpecification().Samples;
+
+		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
+		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
+
+		Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -588,12 +674,12 @@ namespace highlo
 		glm::vec3 frustumCorners[8] =
 		{
 			glm::vec3(-1.0f,  1.0f, -1.0f),
-			glm::vec3(1.0f,  1.0f, -1.0f),
-			glm::vec3(1.0f, -1.0f, -1.0f),
+			glm::vec3( 1.0f,  1.0f, -1.0f),
+			glm::vec3( 1.0f, -1.0f, -1.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f),
 			glm::vec3(-1.0f,  1.0f,  1.0f),
-			glm::vec3(1.0f,  1.0f,  1.0f),
-			glm::vec3(1.0f, -1.0f,  1.0f),
+			glm::vec3( 1.0f,  1.0f,  1.0f),
+			glm::vec3( 1.0f, -1.0f,  1.0f),
 			glm::vec3(-1.0f, -1.0f,  1.0f),
 		};
 
@@ -694,17 +780,22 @@ namespace highlo
 
 	void SceneRenderer::InitLightCullingCompute()
 	{
+		m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
+		auto &shader = Renderer::GetShaderLibrary()->Get("LightCulling");
+
+		m_LightCullingMaterial = Material::Create(shader, "LightCulling");
+		m_LightCullingPipeline = ComputePipeline::Create(shader);
 	}
 
 	void SceneRenderer::InitShadowPass()
 	{
-		/*
 		TextureSpecification imageSpec;
 		imageSpec.Format = TextureFormat::DEPTH32F;
 		imageSpec.Usage = TextureUsage::Attachment;
 		imageSpec.Width = 4096;
 		imageSpec.Height = 4096;
 		imageSpec.Layers = 4; // because we will use 4 cascades
+		
 		Ref<Texture2D> cascadeDepthImage = Texture2D::CreateFromSpecification(imageSpec);
 		cascadeDepthImage->Invalidate();
 		cascadeDepthImage->CreatePerLayerImageViews();
@@ -714,11 +805,11 @@ namespace highlo
 		shadowMapFramebufferSpec.Width = 4096;
 		shadowMapFramebufferSpec.Height = 4096;
 		shadowMapFramebufferSpec.Attachments = { TextureFormat::DEPTH32F };
-		shadowMapFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		shadowMapFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		shadowMapFramebufferSpec.NoResize = true;
 		shadowMapFramebufferSpec.ExistingImage = cascadeDepthImage;
 
-		auto shader = Renderer::GetShaderLibrary()->Get("ShadowMap");
+		auto &shader = Renderer::GetShaderLibrary()->Get("ShadowMap");
 		VertexArraySpecification spec;
 		spec.DebugName = "ShadowPass";
 		spec.Shader = shader;
@@ -737,11 +828,40 @@ namespace highlo
 			m_ShadowPassVertexArrays[i] = VertexArray::Create(spec);
 		}
 		m_ShadowPassMaterial = Material::Create(shader, "ShadowPassMaterial");
-		*/
 	}
 
 	void SceneRenderer::InitPreDepthPass()
 	{
+		FramebufferSpecification framebufferSpec;
+		framebufferSpec.DebugName = "Pre-Depth";
+		framebufferSpec.Attachments = { TextureFormat::RED32F, TextureFormat::DEPTH32F };
+		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+		RenderPassSpecification renderpassSpec;
+		renderpassSpec.DebugName = "Pre-Depth";
+		renderpassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+
+		auto &shader = Renderer::GetShaderLibrary()->Get("PreDepth");
+
+		VertexArraySpecification spec;
+		spec.DebugName = "Pre-Depth";
+		spec.Shader = shader;
+		spec.RenderPass = RenderPass::Create(renderpassSpec);
+		spec.Layout = {
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_Normal", ShaderDataType::Float3 },
+			{ "a_Tangent", ShaderDataType::Float3 },
+			{ "a_Binormal", ShaderDataType::Float3 }
+		};
+		spec.InstanceLayout = {
+			{ "a_MRow0", ShaderDataType::Float4 },
+			{ "a_MRow1", ShaderDataType::Float4 },
+			{ "a_MRow2", ShaderDataType::Float4 }
+		};
+		
+		m_PreDepthVertexArray = VertexArray::Create(spec);
+		m_PreDepthMaterial = Material::Create(shader, "Pre-Depth-Material");
 	}
 
 	void SceneRenderer::InitGeometryPass()
@@ -860,7 +980,17 @@ namespace highlo
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
 		renderPassSpec.DebugName = "SceneComposite";
-		m_CompositeRenderPass = RenderPass::Create(renderPassSpec);
+
+		auto &shader = Renderer::GetShaderLibrary()->Get("Composite");
+
+		VertexArraySpecification spec;
+		spec.Layout = BufferLayout::GetCompositeLayout();
+		spec.InstanceLayout = {};
+		spec.Shader = shader;
+		spec.RenderPass = RenderPass::Create(renderPassSpec);
+		spec.DebugName = "SceneComposite";
+		m_CompositeVertexArray = VertexArray::Create(spec);
+		m_CompositeMaterial = Material::Create(shader, "SceneCompositeMaterial");
 	}
 
 	void SceneRenderer::InitDOF()
@@ -869,6 +999,43 @@ namespace highlo
 
 	void SceneRenderer::InitExternalCompositePass()
 	{
+		FramebufferSpecification framebufferSpec;
+		framebufferSpec.DebugName = "ExternalCompositing";
+		framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
+		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		framebufferSpec.ClearOnLoad = false;
+		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
+		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
+
+		RenderPassSpecification renderPassSpec;
+		renderPassSpec.DebugName = "ExternalCompositing";
+		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+
+		auto &shader = Renderer::GetShaderLibrary()->Get("Wireframe");
+
+		VertexArraySpecification spec;
+		spec.DebugName = "Wireframe";
+		spec.Layout = {
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_Normal", ShaderDataType::Float3 },
+			{ "a_Tangent", ShaderDataType::Float3 },
+			{ "a_Binormal", ShaderDataType::Float3 }
+		};
+		spec.InstanceLayout = {
+			{ "a_MRow0", ShaderDataType::Float4 },
+			{ "a_MRow1", ShaderDataType::Float4 },
+			{ "a_MRow2", ShaderDataType::Float4 }
+		};
+		spec.Shader = shader;
+		spec.RenderPass = RenderPass::Create(renderPassSpec);
+		spec.Wireframe = true;
+		spec.DepthTest = true;
+		spec.LineWidth = 2.0f;
+		m_GeometryWireframeVertexArray = VertexArray::Create(spec);
+		spec.DepthTest = false;
+		m_GeometryWireframeOnTopVertexArray = VertexArray::Create(spec);
+		m_WireframeMaterial = Material::Create(shader, "WireframeMaterial");
 	}
 
 	void SceneRenderer::InitJumpFlood()

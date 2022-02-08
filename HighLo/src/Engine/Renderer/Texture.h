@@ -37,6 +37,8 @@ namespace highlo
 		HLAPI virtual void UpdateResourceData(void *data) = 0;
 		HLAPI virtual void UpdateResourceData() = 0;
 		HLAPI virtual uint32 GetMipLevelCount() = 0;
+		HLAPI virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) = 0;
+		HLAPI virtual void GenerateMips() = 0;
 
 		HLAPI virtual TextureFormat GetFormat() = 0;
 		HLAPI inline HLRendererID GetRendererID() const { return RendererID; }

@@ -155,6 +155,16 @@ namespace highlo
 		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 	}
 
+	std::pair<uint32, uint32> OpenGLTexture3D::GetMipSize(uint32 mip)
+	{
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
+	}
+
+	void OpenGLTexture3D::GenerateMips()
+	{
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	}
+
 	void OpenGLTexture3D::Bind(uint32 slot) const
 	{
 		glBindTextureUnit(slot, RendererID);

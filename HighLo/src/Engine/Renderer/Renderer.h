@@ -105,6 +105,40 @@ namespace highlo
 		HLAPI static void WaitAndRender();
 		HLAPI static void RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform = glm::mat4(1.0f));
 
+		HLAPI static void RenderDynamicMesh(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materials,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset);
+
+		HLAPI static void RenderStaticMesh(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<StaticModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materials,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset);
+
+		HLAPI static void RenderInstancedDynamicMesh(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materials,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset,
+			uint32 instanceCount);
+
 		HLAPI static void RenderInstancedStaticMesh(
 			Ref<CommandBuffer> renderCommandBuffer, 
 			Ref<VertexArray> va,
@@ -116,6 +150,30 @@ namespace highlo
 			Ref<VertexBuffer> transformBuffer, 
 			uint32 transformBufferOffset, 
 			uint32 instanceCount);
+
+		HLAPI static void RenderInstancedStaticMeshWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<StaticModel> model,
+			uint32 submeshIndex,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset,
+			uint32 instanceCount,
+			Ref<Material> overrideMaterial);
+
+		HLAPI static void RenderInstancedDynamicMeshWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset,
+			uint32 instanceCount,
+			Ref<Material> overrideMaterial);
 
 		HLAPI static void OnShaderReloaded(uint64 hash);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);

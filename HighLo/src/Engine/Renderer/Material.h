@@ -30,6 +30,8 @@ namespace highlo
 
 		HLAPI virtual void Invalidate() = 0;
 
+		HLAPI virtual bool Has(const HLString &name) = 0;
+
 		// Setters
 		HLAPI virtual void Set(const HLString &name, float value) = 0;
 		HLAPI virtual void Set(const HLString &name, int32 value) = 0;

@@ -81,6 +81,7 @@ void HighLoEditor::OnInitialize()
 
 	// Editor Panels
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
+	m_ViewportRenderer->SetViewportSize(width, height);
 
 	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
 

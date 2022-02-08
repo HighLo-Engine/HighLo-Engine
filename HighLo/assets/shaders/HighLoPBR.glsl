@@ -201,7 +201,7 @@ struct VertexOutput
 	vec3 ViewPosition;
 };
 
-layout(std140, binding = 4) uniform RendererData
+layout(std140, binding = 3) uniform RendererData
 {
 	uniform vec4 u_CascadeSplits;
 	uniform int u_TilesCountX;
@@ -215,7 +215,7 @@ layout(std140, binding = 4) uniform RendererData
 	uniform float u_CascadeTransitionFade;
 };
 
-layout(std140, binding = 3) uniform SceneData
+layout(std140, binding = 2) uniform SceneData
 {
 	DirectionalLight u_DirectionalLights;
 	vec3 u_CameraPosition;

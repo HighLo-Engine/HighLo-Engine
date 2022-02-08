@@ -98,6 +98,65 @@ namespace highlo
 		uint32 TransformOffset = 0;
 	};
 
+	struct DirLight
+	{
+		glm::vec3 Direction;
+		float Padding = 0.0f;
+		glm::vec3 Radiance;
+		float Multiplier;
+	};
+
+	struct UniformBufferCamera
+	{
+		glm::mat4 ViewProjection;
+		glm::mat4 InverseViewProjection;
+		glm::mat4 Projection;
+		glm::mat4 View;
+	};
+
+	struct UniformBufferShadow
+	{
+		glm::mat4 ViewProjection[4];
+	};
+
+	struct UniformBufferScene
+	{
+		DirLight Lights;
+		glm::vec3 u_CameraPosition;
+		float EnvMapIntensity = 1.0f;
+	};
+
+	struct UniformBufferPointLights
+	{
+		uint32 Count = 0;
+		glm::vec3 Padding{};
+		PointLight PointLights[1024]{};
+	};
+
+	struct UniformBufferRendererData
+	{
+		glm::vec4 CascadeSplits;
+		uint32 TilesCountX{ 0 };
+		bool ShowCascades = false;
+		char Padding0[3] = { 0, 0, 0 };
+		bool SoftShadows = true;
+		char Padding1[3] = { 0, 0, 0 };
+		float LightSize = 0.5f;
+		float MaxShadowDistance = 200.0f;
+		float ShadowFade = 1.0f;
+		bool CascadeFading = true;
+		char Padding2[3] = { 0, 0, 0 };
+		float CascadeTransitionFade = 1.0f;
+		bool ShowLightComplexity = false;
+		char Padding3[3] = { 0, 0, 0 };
+	};
+
+	struct UniformBufferScreenData
+	{
+		glm::vec2 InvFullRes;
+		glm::vec2 FullRes;
+	};
+
 	class SceneRenderer : public IsSharedReference
 	{
 	public:
@@ -188,16 +247,6 @@ namespace highlo
 		SceneRendererSpecification m_Specification;
 		SceneRendererOptions m_RendererOptions;
 
-		Ref<RenderPass> m_CompositeRenderPass;
-		Ref<RenderPass> m_ExternalCompositeRenderPass;
-
-		Ref<Shader> m_CompositeShader;
-		Ref<Shader> m_BloomBlurShader;
-		Ref<Shader> m_BloomBlendShader;
-
-		glm::ivec3 m_HBAOWorkGroups{ 32.f, 32.f, 16.f };
-		glm::ivec3 m_LightCullingWorkGroups;
-
 		Ref<UniformBufferSet> m_UniformBufferSet;
 		Ref<StorageBufferSet> m_StorageBufferSet;
 		Ref<CommandBuffer> m_CommandBuffer;
@@ -219,6 +268,10 @@ namespace highlo
 		Ref<VertexBuffer> m_SubmeshTransformBuffer;
 		TransformVertexData *m_TransformVertexData = nullptr;
 
+		// Bloom
+		Ref<Shader> m_BloomBlurShader;
+		Ref<Shader> m_BloomBlendShader;
+
 		// Shadows
 		float m_LightDistance = 0.1f;
 		float m_CascadeSplitLambda = 0.92f;
@@ -234,13 +287,25 @@ namespace highlo
 
 		glm::vec2 m_FocusPoint = { 0.5f, 0.5f };
 
+		// Composite
 		Ref<Material> m_CompositeMaterial;
+		Ref<VertexArray> m_CompositeVertexArray;
+
+		// Light Culling
+		glm::ivec3 m_LightCullingWorkGroups;
 		Ref<Material> m_LightCullingMaterial;
+		Ref<ComputePipeline> m_LightCullingPipeline;
 
 		// Geometry
 		Ref<VertexArray> m_GeometryVertexArray;
 		Ref<VertexArray> m_SelectedGeometryVertexArray;
+		Ref<VertexArray> m_GeometryWireframeVertexArray;
+		Ref<VertexArray> m_GeometryWireframeOnTopVertexArray;
 		Ref<Material> m_SelectedGeometryMaterial;
+
+		// Pre-Depth
+		Ref<Material> m_PreDepthMaterial;
+		Ref<VertexArray> m_PreDepthVertexArray;
 
 		// HBAO
 		Ref<Material> m_DeinterleavingMaterial;
@@ -254,6 +319,7 @@ namespace highlo
 		Ref<ComputePipeline> m_HBAOPipeline;
 		Ref<Texture2D> m_HBAOOutputImage;
 		Ref<RenderPass> m_HBAORenderPass;
+		glm::ivec3 m_HBAOWorkGroups{ 32.f, 32.f, 16.f };
 
 		// Grid
 		Ref<VertexArray> m_GridVertexArray;
@@ -266,6 +332,14 @@ namespace highlo
 		// Skybox
 		Ref<VertexArray> m_SkyboxVertexArray;
 		Ref<Material> m_SkyboxMaterial;
+
+		// Uniform buffer blocks
+		UniformBufferCamera m_CameraUniformBuffer;
+		UniformBufferShadow m_ShadowUniformBuffer;
+		UniformBufferScene m_SceneUniformBuffer;
+		UniformBufferPointLights m_PointLightsUniformBuffer;
+		UniformBufferRendererData m_RendererDataUniformBuffer;
+		UniformBufferScreenData m_ScreenDataUniformBuffer;
 
 		// Scene information
 		struct SceneInfo

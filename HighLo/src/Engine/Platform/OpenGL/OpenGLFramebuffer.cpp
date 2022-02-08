@@ -254,6 +254,10 @@ namespace highlo
 				case TextureFormat::DEPTH24STENCIL8:
 					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 					break;
+
+				case TextureFormat::DEPTH32F:
+					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH32F_STENCIL8, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					break;
 			}
 		}
 

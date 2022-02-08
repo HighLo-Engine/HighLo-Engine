@@ -115,6 +115,7 @@ namespace highlo
 		HLAPI static BufferLayout GetAnimatedShaderLayout();
 		HLAPI static BufferLayout GetSkyboxLayout();
 		HLAPI static BufferLayout GetGridLayout();
+		HLAPI static BufferLayout GetCompositeLayout();
 
 	private:
 		void CalculateOffsetsAndStride();

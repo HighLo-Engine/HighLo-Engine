@@ -363,7 +363,7 @@ namespace highlo
 		if (m_Buffer)
 		{
 			glTextureSubImage2D(RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, glFormat, glType, m_Buffer.Data);
-			glGenerateTextureMipmap(RendererID);
+			glGenerateMipmap(GL_TEXTURE_2D);
 			m_Loaded = true;
 		}
 	}
@@ -387,7 +387,7 @@ namespace highlo
 	{
 		glGenSamplers(1, &m_SamplerRendererID);
 
-		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, properties.GenerateMips));
+		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(properties.SamplerWrap));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(properties.SamplerWrap));
@@ -467,6 +467,16 @@ namespace highlo
 	uint32 OpenGLTexture2D::GetMipLevelCount()
 	{
 		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
+	}
+
+	std::pair<uint32, uint32> OpenGLTexture2D::GetMipSize(uint32 mip)
+	{
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
+	}
+
+	void OpenGLTexture2D::GenerateMips()
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	
 	void OpenGLTexture2D::Bind(uint32 slot) const

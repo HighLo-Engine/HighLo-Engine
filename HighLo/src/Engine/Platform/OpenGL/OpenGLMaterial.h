@@ -17,6 +17,17 @@ namespace highlo
 
 		virtual void Invalidate() override;
 
+		virtual bool Has(const HLString &name) override
+		{
+			auto decl = FindUniformDeclaration(name);
+			auto resource = FindUniformDeclaration(name);
+
+			if (!decl || !resource)
+				return false;
+
+			return true;
+		}
+
 		// Setters
 		template<typename T>
 		void Set(const HLString &name, const T &value)

@@ -51,6 +51,21 @@ namespace highlo
 			return (uint32)(std::floor(std::log2(glm::min(width, height))) + 1);
 		}
 
+		inline std::pair<uint32, uint32> GetMipSize(uint32 mip, uint32 width, uint32 height)
+		{
+			uint32 w = width;
+			uint32 h = height;
+
+			while (mip != 0)
+			{
+				w /= 2;
+				h /= 2;
+				--mip;
+			}
+
+			return { w, h };
+		}
+
 		inline uint32 GetImageMemorySize(TextureFormat format, uint32 width, uint32 height)
 		{
 			return width * height * GetImageFormatBPP(format);

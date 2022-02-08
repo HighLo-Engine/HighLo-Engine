@@ -66,13 +66,26 @@ namespace highlo
 		const auto &layout = m_Specification.Layout;
 		for (const auto &element : layout)
 		{
+			GLenum glBaseType = utils::ShaderDataTypeToOpenGLBaseType(element.Type);
 			glEnableVertexAttribArray(attribIndex);
-			glVertexAttribPointer(attribIndex,
-								  element.GetComponentCount(),
-								  utils::ShaderDataTypeToOpenGLBaseType(element.Type),
-								  element.Normalized,
-								  layout.GetStride(),
-								  (const void*)(intptr_t)element.Offset);
+
+			if (glBaseType == GL_INT)
+			{
+				glVertexAttribIPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  layout.GetStride(),
+									  (const void*)(intptr_t)element.Offset);
+			}
+			else
+			{
+				glVertexAttribPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  element.Normalized,
+									  layout.GetStride(),
+									  (const void*)(intptr_t)element.Offset);
+			}
 			++attribIndex;
 		}
 	}
@@ -88,6 +101,7 @@ namespace highlo
 			glDeleteVertexArrays(1, &m_ID);
 
 		glGenVertexArrays(1, &m_ID);
+		glBindVertexArray(m_ID);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
@@ -123,8 +137,6 @@ namespace highlo
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
 	{
-		indexBuffer->Bind();
-
 		m_IndexBuffer = indexBuffer;
 	}
 

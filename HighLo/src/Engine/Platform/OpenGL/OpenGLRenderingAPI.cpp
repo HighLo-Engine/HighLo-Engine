@@ -18,6 +18,8 @@
 #include "OpenGLVertexBuffer.h"
 #include "OpenGLIndexBuffer.h"
 
+#define GL_RENDERING_API_LOG_PREFIX "OPENGL>       "
+
 namespace highlo
 {
 	namespace utils
@@ -53,25 +55,25 @@ namespace highlo
 			{
 				case GL_DEBUG_SEVERITY_HIGH:
 				{
-					HL_CORE_ERROR("[OpenGL Debug HIGH] {0}", message);
+					HL_CORE_ERROR(GL_RENDERING_API_LOG_PREFIX "[-] {0} [-]", message);
 					break;
 				}
 
 				case GL_DEBUG_SEVERITY_MEDIUM:
 				{
-					HL_CORE_WARN("[OpenGL Debug MEDIUM] {0}", message);
+					HL_CORE_WARN(GL_RENDERING_API_LOG_PREFIX "[-] {0} [-]", message);
 					break;
 				}
 
 				case GL_DEBUG_SEVERITY_LOW:
 				{
-					HL_CORE_INFO("[OpenGL Debug LOW] {0}", message);
+					HL_CORE_INFO(GL_RENDERING_API_LOG_PREFIX "[+] {0} [+]", message);
 					break;
 				}
 
 				case GL_DEBUG_SEVERITY_NOTIFICATION:
 				{
-					// HL_CORE_TRACE("[OpenGL Debug NOTIFICATION] {0}", message);
+				//	HL_CORE_TRACE(GL_RENDERING_API_LOG_PREFIX "[=] {0} [=]", message);
 					break;
 				}
 			}
@@ -126,7 +128,7 @@ namespace highlo
 		GLenum error = glGetError();
 		while (error != GL_NO_ERROR)
 		{
-			HL_CORE_ERROR("OpenGL Error: {0}", error);
+			HL_CORE_ERROR(GL_RENDERING_API_LOG_PREFIX "[-] OpenGL Error: {0} [-]", error);
 			error = glGetError();
 		}
 
@@ -148,10 +150,9 @@ namespace highlo
 		data[3].Position = glm::vec3(x, y + height, 0.1f);
 		data[3].TexCoord = glm::vec2(0, 1);
 
-		s_GLRendererData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(GLQuadVertex));
-		delete[] data;
-
 		uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
+
+		s_GLRendererData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(GLQuadVertex));
 		s_GLRendererData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32));
 	}
 
@@ -232,42 +233,213 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
 	{
-		material->Set("u_Renderer.Transform", transform);
-		material->UpdateForRendering();
-
-		if (material->GetFlag(MaterialFlag::DepthTest))
-			glEnable(GL_DEPTH_TEST);
-		else
-			glDisable(GL_DEPTH_TEST);
-
 		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
 		va->Bind();
 		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
+
+		if (material)
+		{
+			if (material->Has("u_Renderer.Transform"))
+				material->Set("u_Renderer.Transform", transform);
+
+			material->UpdateForRendering();
+			SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+		}
+		
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	void OpenGLRenderingAPI::DrawStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
 	{
-		for (uint32 i = 0; i < va->GetVertexBuffers().size(); ++i)
-			va->GetVertexBuffers()[i]->Bind();
-		
+		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
-		va->GetIndexBuffer()->Bind();
+		model->Get()->GetIndexBuffer()->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
+			// TODO: This if is temporary because we do not have the material system setup yet
+			if (material)
+			{
+				if (material->Has("u_Renderer.Transform"))
+					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
 
-			material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-			material->UpdateForRendering();
+				material->UpdateForRendering();
+				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+			}
 
-			if (material->GetFlag(MaterialFlag::DepthTest))
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
+			if (model->Get()->m_IsAnimated)
+			{
+				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				{
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
+					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+				}
+			}
+
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
+		}
+	}
+
+	void OpenGLRenderingAPI::DrawDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
+	{
+		model->Get()->GetVertexBuffer()->Bind();
+		va->Bind();
+		model->Get()->GetIndexBuffer()->Bind();
+
+		auto &submeshes = model->Get()->GetSubmeshes();
+		for (Mesh submesh : submeshes)
+		{
+			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
+			// TODO: This if is temporary because we do not have the material system setup yet
+			if (material)
+			{
+				if (material->Has("u_Renderer.Transform"))
+					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
+
+				material->UpdateForRendering();
+				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+			}
+
+			if (model->Get()->m_IsAnimated)
+			{
+				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				{
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
+					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+				}
+			}
+
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
+		}
+	}
+
+	void OpenGLRenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
+		model->Get()->GetVertexBuffer()->Bind();
+		va->Bind();
+		model->Get()->GetIndexBuffer()->Bind();
+
+		auto &submeshes = model->Get()->GetSubmeshes();
+		for (Mesh submesh : submeshes)
+		{
+			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
+			// TODO: This if is temporary because we do not have the material system setup yet
+			if (material)
+			{
+				if (material->Has("u_Renderer.Transform"))
+					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
+				
+				material->UpdateForRendering();
+				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+			}
+
+			if (model->Get()->m_IsAnimated)
+			{
+				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				{
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
+					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+				}
+			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+		}
+	}
+
+	void OpenGLRenderingAPI::DrawInstancedDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
+		model->Get()->GetVertexBuffer()->Bind();
+		va->Bind();
+		model->Get()->GetIndexBuffer()->Bind();
+
+		auto &submeshes = model->Get()->GetSubmeshes();
+		for (Mesh submesh : submeshes)
+		{
+			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
+			// TODO: This if is temporary because we do not have the material system setup yet
+			if (material)
+			{
+				if (material->Has("u_Renderer.Transform"))
+					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
+
+				material->UpdateForRendering();
+				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+			}
+
+			if (model->Get()->m_IsAnimated)
+			{
+				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				{
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
+					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+				}
+			}
+
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+		}
+	}
+
+	void OpenGLRenderingAPI::DrawInstancedStaticMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
+	{
+		model->Get()->GetVertexBuffer()->Bind();
+		va->Bind();
+		model->Get()->GetIndexBuffer()->Bind();
+
+		auto &submeshes = model->Get()->GetSubmeshes();
+		for (Mesh submesh : submeshes)
+		{
+			if (overrideMaterial->Has("u_Renderer.Transform"))
+				overrideMaterial->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
+
+			overrideMaterial->UpdateForRendering();
+			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
+
+			if (model->Get()->m_IsAnimated)
+			{
+				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				{
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
+					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+				}
+			}
+
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+		}
+	}
+
+	void OpenGLRenderingAPI::DrawInstancedDynamicMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
+	{
+		model->Get()->GetVertexBuffer()->Bind();
+		va->Bind();
+		model->Get()->GetIndexBuffer()->Bind();
+
+		auto &submeshes = model->Get()->GetSubmeshes();
+		for (Mesh submesh : submeshes)
+		{
+			if (overrideMaterial->Has("u_Renderer.Transform"))
+				overrideMaterial->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
+
+			overrideMaterial->UpdateForRendering();
+			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
+
+			if (model->Get()->m_IsAnimated)
+			{
+				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				{
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
+					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+				}
+			}
+
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 		}
 	}
 
@@ -375,6 +547,20 @@ namespace highlo
 
 		return Ref<Environment>::Create(filePath, envUnfiltered, envFiltered, irradianceMap);
 	}
+	
+	Ref<Texture3D> OpenGLRenderingAPI::CreatePreethamSky(float turbidity, float azimuth, float inclination)
+	{
+		const uint32 cubemapSize = Renderer::GetConfig().EnvironmentMapResolution;
+		Ref<Texture3D> envMap = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
+		glm::vec3 params = { turbidity, azimuth, inclination };
+
+		Ref<OpenGLShader> preethamSkyShader = Renderer::GetShaderLibrary()->Get("PreethamSky").As<OpenGLShader>();
+		preethamSkyShader->Bind();
+		preethamSkyShader->SetUniform("u_Uniforms.TurbidityAzimuthInclination", params);
+
+		return envMap;
+	}
 }
 
 #endif // HIGHLO_API_OPENGL
+

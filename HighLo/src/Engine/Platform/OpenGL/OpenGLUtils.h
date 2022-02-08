@@ -43,6 +43,9 @@ namespace highlo
 
 				case TextureFormat::RED_INTEGER:
 					return GL_RED_INTEGER;
+
+				case TextureFormat::RED32F:
+					return GL_RED;
 			}
 
 		HL_ASSERT(false);
@@ -77,6 +80,9 @@ namespace highlo
 
 				case TextureFormat::RED_INTEGER:
 					return GL_R32I;
+
+				case TextureFormat::RED32F:
+					return GL_R32F;
 			}
 
 			HL_ASSERT(false);

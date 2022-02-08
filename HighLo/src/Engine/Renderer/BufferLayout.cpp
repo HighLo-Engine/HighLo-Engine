@@ -109,6 +109,15 @@ namespace highlo
 		};
 	}
 
+	BufferLayout BufferLayout::GetCompositeLayout()
+	{
+		return
+		{
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+		};
+	}
+
 	void BufferLayout::CalculateOffsetsAndStride()
 	{
 		uint32 offset = 0;

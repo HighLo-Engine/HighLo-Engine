@@ -1,4 +1,4 @@
-<img src="/HighLo.png" alt="HighLo-Logo" style="width: 100%; height: 50%;">
+<img src="/HighLo.png" alt="HighLo-Logo">
 
 # HighLo-Engine
 

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/HighLo.png" alt="HighLo-Logo" width="1024" height="1024">
+  <img src="/HighLo.png" alt="HighLo-Logo" width="1024" height="256">
 </p>
 
 # HighLo-Engine

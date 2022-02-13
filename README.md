@@ -1,3 +1,5 @@
+<img src="/HighLo.png" alt="HighLo-Logo" style="width: 100%; height: auto;">
+
 # HighLo-Engine
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.

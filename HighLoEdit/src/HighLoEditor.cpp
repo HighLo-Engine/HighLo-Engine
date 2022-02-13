@@ -99,7 +99,7 @@ void HighLoEditor::OnInitialize()
 	m_SettingsPanel = UniqueRef<SettingsPanel>::Create();
 
 	GetWindow().Maximize();
-	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
+	GetWindow().SetWindowIcon("assets/Resources/HighLo.png");
 	UpdateWindowTitle(m_SceneName);
 
 	FileSystemWatcher::Get()->Start(project->GetConfig().AssetDirectory);

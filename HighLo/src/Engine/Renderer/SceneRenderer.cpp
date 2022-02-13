@@ -645,21 +645,21 @@ namespace highlo
 	void SceneRenderer::GeometryPass()
 	{
 		// Render selected geometry
-		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
-
-		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
-		{
-			const auto &transformData = m_MeshTransformMap.at(mk);
-			Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
-		}
-
-		for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
-		{
-			const auto &transformData = m_MeshTransformMap.at(mk);
-			Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
-		}
-
-		Renderer::EndRenderPass(m_CommandBuffer);
+	//	Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
+	//
+	//	for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
+	//	{
+	//		const auto &transformData = m_MeshTransformMap.at(mk);
+	//		Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+	//	}
+	//
+	//	for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
+	//	{
+	//		const auto &transformData = m_MeshTransformMap.at(mk);
+	//		Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+	//	}
+	//
+	//	Renderer::EndRenderPass(m_CommandBuffer);
 
 		// Render normal geometry
 		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);

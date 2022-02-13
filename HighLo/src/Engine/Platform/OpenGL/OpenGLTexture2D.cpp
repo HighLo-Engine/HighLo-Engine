@@ -309,6 +309,7 @@ namespace highlo
 		m_Specification = spec;
 		Name = "unknown";
 		m_Loaded = true;
+		m_InternalFormat = utils::OpenGLTextureInternalFormat(spec.Format);
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -358,7 +359,8 @@ namespace highlo
 		uint32 mipCount = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
 		glGenTextures(1, &RendererID);
-		glTexStorage2D(RendererID, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
+		glBindTexture(GL_TEXTURE_2D, RendererID);
+		glTexStorage2D(GL_TEXTURE_2D, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
 
 		if (m_Buffer)
 		{

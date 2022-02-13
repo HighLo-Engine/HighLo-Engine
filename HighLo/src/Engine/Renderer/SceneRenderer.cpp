@@ -42,6 +42,7 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), 18); // HBAO data Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
+	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway
 
 		const size_t transformBufferCount = 100 * 1024; // 10240 transforms for now
 		m_SubmeshTransformBuffer = VertexBuffer::Create(sizeof(TransformVertexData) * transformBufferCount);

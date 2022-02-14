@@ -104,6 +104,10 @@ namespace highlo
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+
 		// Load Renderer Caps
 		auto& caps = Renderer::GetCapabilities();
 		caps.Vendor = (const char*)glGetString(GL_VENDOR);
@@ -173,7 +177,7 @@ namespace highlo
 	{
 	}
 
-	void OpenGLRenderingAPI::BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear)
+	void OpenGLRenderingAPI::BeginRenderPass(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear)
 	{
 		HL_ASSERT(!s_GLRendererData->ActiveRenderPass, "Another RenderPass has already been started and not ended!");
 		s_GLRendererData->ActiveRenderPass = renderPass;
@@ -187,7 +191,7 @@ namespace highlo
 		}
 	}
 
-	void OpenGLRenderingAPI::EndRenderPass(Ref<CommandBuffer> renderCommandBuffer)
+	void OpenGLRenderingAPI::EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer)
 	{
 		HL_ASSERT(s_GLRendererData->ActiveRenderPass, "Did you forget to call BeginRenderPass() ?");
 	

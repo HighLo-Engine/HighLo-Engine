@@ -26,8 +26,8 @@ namespace highlo
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
 
-		virtual void BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear = false) override;
-		virtual void EndRenderPass(Ref<CommandBuffer> renderCommandBuffer) override;
+		virtual void BeginRenderPass(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear = false) override;
+		virtual void EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer) override;
 
 		virtual void ClearScreenColor(const glm::vec4 &color) override;
 		virtual void ClearScreenBuffers() override;

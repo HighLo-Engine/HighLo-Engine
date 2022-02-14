@@ -43,8 +43,8 @@ namespace highlo
 		HLAPI virtual void BeginFrame() = 0;
 		HLAPI virtual void EndFrame() = 0;
 
-		HLAPI virtual void BeginRenderPass(Ref<CommandBuffer> renderCommandBuffer, Ref<RenderPass> renderPass, bool shouldClear = false) = 0;
-		HLAPI virtual void EndRenderPass(Ref<CommandBuffer> renderCommandBuffer) = 0;
+		HLAPI virtual void BeginRenderPass(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear = false) = 0;
+		HLAPI virtual void EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer) = 0;
 
 		HLAPI virtual void ClearScreenColor(const glm::vec4 &color) = 0;
 		HLAPI virtual void ClearScreenBuffers() = 0;

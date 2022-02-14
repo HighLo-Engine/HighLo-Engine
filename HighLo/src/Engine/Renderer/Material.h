@@ -48,7 +48,7 @@ namespace highlo
 		HLAPI virtual void Set(const HLString &name, const glm::mat4 &value) = 0;
 
 		HLAPI virtual void Set(const HLString &name, const Ref<Texture2D> &texture) = 0;
-		HLAPI virtual void Set(const HLString &name, const Ref<Texture2D> &texture, uint32 arrayIndex) = 0;
+		HLAPI virtual void Set(const HLString &name, const Ref<Texture2D> &texture, uint32 slot) = 0;
 		HLAPI virtual void Set(const HLString &name, const Ref<Texture3D> &texture) = 0;
 		
 		// Getters

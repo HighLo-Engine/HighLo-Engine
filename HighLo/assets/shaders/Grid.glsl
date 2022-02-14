@@ -31,11 +31,13 @@ layout(location = 2) out vec4 o_Unused1;
 
 layout(location = 0) in vec2 v_TexCoord;
 
+/*
 layout(push_constant) uniform Settings
 {
 	layout(offset = 64) float Scale;
 	float Size;
 } u_Settings;
+*/
 
 float grid(vec2 st, float res)
 {
@@ -45,7 +47,7 @@ float grid(vec2 st, float res)
 
 void main()
 {
-	float x = grid(v_TexCoord * u_Settings.Scale, u_Settings.Size);
+	float x = grid(v_TexCoord * 16.025, 0.025);
 	o_Color = vec4(vec3(0.2), 0.5) * (1.0 - x);
 	o_Unused0 = vec4(1.0);
 	o_Unused1 = vec4(1.0);

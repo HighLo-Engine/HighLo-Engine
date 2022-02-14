@@ -503,7 +503,7 @@ namespace highlo
 
 			// Main Render passes
 		//	ShadowMapPass();
-			PreDepthPass();
+		//	PreDepthPass();
 		//	LightCullingPass();
 			GeometryPass();
 
@@ -995,8 +995,8 @@ namespace highlo
 		float gridScale = 16.025f;
 		float gridSize = 0.025f;
 
-		m_GridMaterial->Set("u_Settings.Scale", gridScale);
-		m_GridMaterial->Set("u_Settings.Size", gridSize);
+	//	m_GridMaterial->Set("u_Settings.Scale", gridScale);
+	//	m_GridMaterial->Set("u_Settings.Size", gridSize);
 
 		VertexArraySpecification spec;
 		spec.DebugName = "Grid";

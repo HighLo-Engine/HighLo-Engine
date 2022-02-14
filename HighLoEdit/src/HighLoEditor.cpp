@@ -177,9 +177,9 @@ void HighLoEditor::OnInitialize()
 	GetWindow().SetMenuBar(m_MenuBar);
 
 	// Temp: Try to create a new asset and submit it for rendering
-	AssetHandle cubeHandle = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
-	Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(cubeHandle);
-	m_ViewportRenderer->SubmitStaticModel(model, model->GetMaterials());
+//	AssetHandle cubeHandle = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+//	Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(cubeHandle);
+//	m_ViewportRenderer->SubmitStaticModel(model, model->GetMaterials());
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)

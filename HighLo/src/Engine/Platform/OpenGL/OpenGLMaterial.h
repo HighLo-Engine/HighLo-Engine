@@ -19,8 +19,8 @@ namespace highlo
 
 		virtual bool Has(const HLString &name) override
 		{
-			auto decl = FindUniformDeclaration(name);
-			auto resource = FindUniformDeclaration(name);
+			const ShaderUniform *decl = FindUniformDeclaration(name);
+			const ShaderUniform *resource = FindUniformDeclaration(name);
 
 			if (!decl || !resource)
 				return false;
@@ -70,7 +70,7 @@ namespace highlo
 
 		virtual void Set(const HLString &name, const Ref<Texture2D> &texture) override;
 		virtual void Set(const HLString &name, const Ref<Texture3D> &texture) override;
-		virtual void Set(const HLString &name, const Ref<Texture2D> &texture, uint32 arrayIndex) override;
+		virtual void Set(const HLString &name, const Ref<Texture2D> &texture, uint32 slot) override;
 
 		// Getters
 		template<typename T>

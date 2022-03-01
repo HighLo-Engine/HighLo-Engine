@@ -121,6 +121,7 @@ class HighLoEditor : public HLApplication
 		bool m_ShowConsolePanel = false;
 		bool m_ShowSelectedWireframe = false;
 		bool m_AssetManagerPanelOpen = false;
+		bool m_ShowAnimTimelinePanel = true;
 
 		bool m_UIShowBoundingBoxes = false;
 		bool m_UIShowBoundingBoxesOnTop = false;
@@ -150,6 +151,7 @@ class HighLoEditor : public HLApplication
 		UniqueRef<ObjectPropertiesPanel> m_ObjectPropertiesPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
+		UniqueRef<AnimationTimelinePanel> m_AnimTimelinePanel;
 		UniqueRef<SettingsPanel> m_SettingsPanel;
 
 		// File Menu Panels

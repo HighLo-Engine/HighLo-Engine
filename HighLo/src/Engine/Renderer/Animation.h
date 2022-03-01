@@ -41,7 +41,7 @@ namespace highlo
 		BoneTransform Transform;
 	};
 
-	struct Bone
+	struct Bone : public IsSharedReference
 	{
 		HLString Name;
 		uint32 ID = -1;

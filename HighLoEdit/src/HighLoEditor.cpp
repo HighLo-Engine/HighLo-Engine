@@ -95,6 +95,7 @@ void HighLoEditor::OnInitialize()
 	m_ObjectPropertiesPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::OnEntityChanged, this, std::placeholders::_1));
 
 	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
+	m_AnimTimelinePanel = UniqueRef<AnimationTimelinePanel>::Create();
 
 	m_SettingsPanel = UniqueRef<SettingsPanel>::Create();
 
@@ -163,6 +164,7 @@ void HighLoEditor::OnInitialize()
 	m_WindowMenu = FileMenu::Create("Window");
 	m_WindowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	m_WindowMenu->AddMenuItem("Asset Manager", "", MENU_ITEM_WINDOW_ASSET_MANAGER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu->AddMenuItem("Animation Timeline", "", MENU_ITEM_WINDOW_ANIM_TIMELINE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
 	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
@@ -262,6 +264,7 @@ void HighLoEditor::UpdateUIFlags()
 	// reflects the current opened state of the log tab.
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ASSET_MANAGER)->IsSelected = m_AssetManagerPanelOpen;
+	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ANIM_TIMELINE)->IsSelected = m_ShowAnimTimelinePanel;
 	m_FileMenu->GetMenuItemWithID(MENU_ITEM_SETTINGS)->IsSelected = m_ShowSettingsPanel;
 
 	if (!m_SceneIsSaved)
@@ -307,6 +310,7 @@ void HighLoEditor::OnEvent(Event &e)
 	}
 
 	m_AssetBrowserPanel->OnEvent(e);
+	m_AnimTimelinePanel->OnEvent(e);
 }
 
 void HighLoEditor::OnUIRender(Timestep timestep)
@@ -496,6 +500,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
 	m_ObjectPropertiesPanel->OnUIRender(&m_ShowObjectPropertiesPanel);
 	m_SettingsPanel->OnUIRender(&m_ShowSettingsPanel);
+	m_AnimTimelinePanel->OnUIRender(&m_ShowAnimTimelinePanel);
 	
 	m_ViewportRenderer->OnUIRender();
 
@@ -897,6 +902,12 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 		case MENU_ITEM_WINDOW_ASSET_MANAGER:
 		{
 			m_AssetManagerPanelOpen = !m_AssetManagerPanelOpen;
+			break;
+		}
+
+		case MENU_ITEM_WINDOW_ANIM_TIMELINE:
+		{
+			m_ShowAnimTimelinePanel = !m_ShowAnimTimelinePanel;
 			break;
 		}
 	}

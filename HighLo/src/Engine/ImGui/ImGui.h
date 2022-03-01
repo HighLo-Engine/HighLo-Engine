@@ -72,7 +72,7 @@ namespace highlo::UI
 
 	HLAPI void DrawMenu(const Ref<MenuBar> &menuBar);
 	HLAPI void DrawPopupMenu(const Ref<PopupMenu> &menu);
-	HLAPI void DrawHelpMarker(const HLString &description);
+	HLAPI void DrawHelpMarker(const HLString &description, bool showHelpMarker = true);
 
 	HLAPI void PushID();
 	HLAPI void PopID();

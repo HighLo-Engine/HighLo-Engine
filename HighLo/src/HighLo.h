@@ -107,6 +107,7 @@
 #include "Engine/Editor/ObjectPropertiesPanel.h"
 #include "Engine/Editor/EditorConsolePanel.h"
 #include "Engine/Editor/AssetBrowserPanel.h"
+#include "Engine/Editor/AnimationTimelinePanel.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/FileDialogue.h"

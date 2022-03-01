@@ -197,6 +197,8 @@ namespace highlo::UI
 
 		if (s_ShouldDisplayDebugInformation)
 			DisplayDebugInformation();
+
+	//	ImGui::ShowDemoWindow();
 	}
 
 	void EndScene()
@@ -590,9 +592,14 @@ namespace highlo::UI
 		utils::DrawPopupMenuInternal(menu->GetName(), menu->GetMenuItems());
 	}
 
-	void DrawHelpMarker(const HLString &description)
+	void DrawHelpMarker(const HLString &description, bool showHelpMarker)
 	{
-		ImGui::TextDisabled("(?)");
+		if (showHelpMarker)
+		{
+			ImGui::SameLine();
+			ImGui::TextDisabled("(?)");
+		}
+
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::BeginTooltip();

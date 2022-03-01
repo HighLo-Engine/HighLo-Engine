@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "SceneHierarchyPanel.h"
@@ -201,7 +201,7 @@ namespace highlo
 							{
 								auto newEntity = m_Scene->CreateEntity("Cylinder");
 								StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
-								// TODO: Add Cylinders to AssetFactory and MeshFactory
+// TODO: Add Cylinders to AssetFactory and MeshFactory
 							//	component->Model = AssetFactory::CreateCylinder();
 								SetSelected(newEntity);
 

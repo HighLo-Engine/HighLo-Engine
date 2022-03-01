@@ -1,5 +1,6 @@
 package en.highlo.statistics;
 
+import en.highlo.statistics.copyrightUpdater.CopyRightUpdater;
 import en.highlo.statistics.projectLineCounter.ProjectLineCounter;
 import en.highlo.statistics.todoFinder.TODOEntry;
 import en.highlo.statistics.todoFinder.TODOFinder;
@@ -15,6 +16,7 @@ public class Main
         // supported functions:
         // - a project line counter, that recursively iterates through all engine-related source directories and counts each line of each file and sums them up
         // - a todo finder, that is really useful for all developers, so that they can easily find a todo in any file without having to manually seach for them
+        // - a copyright updater that replaced the current copyright with a new one for every file
         // - more features are more than welcome by any other developer via pull-request or by a feature request! :)
 
         if (args.length < 2)
@@ -53,6 +55,12 @@ public class Main
                 }
                 System.out.println();
             }
+        }
+        else if (desiredMode.equals("copyright"))
+        {
+            CopyRightUpdater updater = new CopyRightUpdater(desiredRootPath, excludeDirs);
+            updater.setCopyRightHeader("// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.");
+            updater.iterateAndUpdate();
         }
         else if (desiredMode.equals("lineCounter") || desiredMode.equals("linecounter") || desiredMode.equals("LINECOUNTER") || desiredMode.equals("line") || desiredMode.equals("LINE"))
         {

@@ -67,7 +67,7 @@ public class TODOFinder
         return result;
     }
 
-    private void onLine(File file, String line)
+    private String onLine(File file, String line)
     {
         if (line.contains("TODO: "))
         {
@@ -100,6 +100,8 @@ public class TODOFinder
             mEntries.get(index).FilePath = file.getAbsolutePath();
             mEntries.get(index).ToDoLines.add(line);
         }
+
+        return line;
     }
 
     private void onFile(File file)

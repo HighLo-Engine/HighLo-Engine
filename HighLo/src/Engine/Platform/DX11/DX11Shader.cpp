@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11Shader.h"
@@ -22,7 +22,7 @@ namespace highlo
 
 	DX11Shader::DX11Shader(const HLString &source)
 	{
-		m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for all apis, so that the user can still access this shader through the shader library
+m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for all apis, so that the user can still access this shader through the shader library
 	}
 
 	DX11Shader::~DX11Shader()

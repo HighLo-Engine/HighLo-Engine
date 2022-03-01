@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -39,7 +39,7 @@ namespace highlo
 		bool ComputeEnvironmentMaps = true;
 		uint32 FramesInFlight = 3;
 
-		uint32 EnvironmentMapResolution = 1024; // TODO: implement this into the CreateEnvironment functions for each rendering api, because this should be controlable via the editor
+uint32 EnvironmentMapResolution = 1024; // TODO: implement this into the CreateEnvironment functions for each rendering api, because this should be controlable via the editor
 		uint32 IrradianceMapComputeSamples = 512;
 	};
 

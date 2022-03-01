@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLTexture3D.h"
@@ -128,20 +128,20 @@ namespace highlo
 
 	void OpenGLTexture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
-		// TODO: Implement
+// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 	}
 
 	glm::ivec4 OpenGLTexture3D::ReadPixel(uint32 row, uint32 column)
 	{
-		// TODO: Implement
+// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 		return {};
 	}
 
 	void OpenGLTexture3D::UpdateResourceData(void *data)
 	{
-		// TODO: Implement
+// TODO: Implement
 		HL_ASSERT(false, "Not implemented yet");
 	}
 

@@ -101,7 +101,7 @@ void ImGui_Marmalade_RenderDrawData(ImDrawData* draw_data)
         IwGxFlush();
     }
 
-    // TODO: restore modified state (i.e. mvp matrix)
+// TODO: restore modified state (i.e. mvp matrix)
 }
 
 static const char* ImGui_Marmalade_GetClipboardText(void* /*user_data*/)
@@ -296,7 +296,7 @@ void ImGui_Marmalade_NewFrame()
         g_MousePressed[i] = false;
     }
 
-    // TODO: Hide OS mouse cursor if ImGui is drawing it
+// TODO: Hide OS mouse cursor if ImGui is drawing it
     // s3ePointerSetInt(S3E_POINTER_HIDE_CURSOR,(io.MouseDrawCursor ? 0 : 1));
 
     // Show/hide OSD keyboard

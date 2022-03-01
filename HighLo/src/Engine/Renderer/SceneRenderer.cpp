@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Albert Slepak and Can Karka. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "SceneRenderer.h"
@@ -115,7 +115,7 @@ namespace highlo
 			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 
-			// TODO: Resize bloom texture
+// TODO: Resize bloom texture
 
 			if (m_Specification.SwapChain)
 				m_CommandBuffer = CommandBuffer::CreateFromSwapChain("SceneRenderer");
@@ -221,7 +221,7 @@ namespace highlo
 		});
 
 		// Set current scene env
-		// TODO: Uncomment when shadowpasses and pre-depth images are working
+// TODO: Uncomment when shadowpasses and pre-depth images are working
 		/*
 		Renderer::SetSceneEnvironment(
 			this,
@@ -435,7 +435,7 @@ namespace highlo
 		{
 			glm::mat4 submeshTransform = transform * submeshData[submeshIndex].LocalTransform.GetTransform();
 
-			// TODO: material index 42 does not exist yet
+// TODO: material index 42 does not exist yet
 			MeshKey key = { model->Handle, 42, submeshIndex };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
@@ -452,7 +452,7 @@ namespace highlo
 
 	void SceneRenderer::SubmitPhysicsDebugDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, const glm::mat4 &transform)
 	{
-		// TODO: material index 42 does not exist yet
+// TODO: material index 42 does not exist yet
 		MeshKey key = { model->Handle, 42, submeshIndex };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -112,7 +112,7 @@ namespace highlo
 		HLAPI ECS_Registry &GetRegistry() { return m_Registry; }
 		HLAPI const ECS_Registry &GetRegistry() const { return m_Registry; }
 
-		// TODO: Only in editor
+// TODO: Only in editor
 		HLAPI void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
 		HLAPI static Ref<Scene> Create(const HLString &name = "Scene1", bool isEditorScene = false, bool constructScene = true);

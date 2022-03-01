@@ -46,9 +46,10 @@ public class ProjectLineCounter
         return mDirectoryCount;
     }
 
-    private void onLine(File file, String line)
+    private String onLine(File file, String line)
     {
         ++mLineCount;
+        return line;
     }
 
     private void onFile(File file)

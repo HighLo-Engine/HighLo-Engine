@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ObjectPropertiesPanel.h"
@@ -340,15 +340,15 @@ namespace highlo
 			UI::AssetReferenceResult result;
 			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>("Static Model", component.Model, [=](Ref<MeshFile> meshAsset)
 			{
-				// TODO: Add MeshConversionCallback that is going to be called here
+// TODO: Add MeshConversionCallback that is going to be called here
 			}, &result))
 			{
-				// TODO: When we have mesh colliders we could set them here
+// TODO: When we have mesh colliders we could set them here
 			}
 
 			if (result == UI::AssetReferenceResult::InvalidMetaData)
 			{
-				// TODO: Add InvalidMetaCallback that is going to be called here
+// TODO: Add InvalidMetaCallback that is going to be called here
 			}
 
 			UI::EndPropertyGrid();
@@ -418,15 +418,15 @@ namespace highlo
 			UI::AssetReferenceResult result;
 			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>("Dynamic Model", component.Model, [=](Ref<MeshFile> meshAsset)
 			{
-				// TODO: Add MeshConversionCallback that is going to be called here
+// TODO: Add MeshConversionCallback that is going to be called here
 			}, &result))
 			{
-				// TODO: When we have mesh colliders we could set them here
+// TODO: When we have mesh colliders we could set them here
 			}
 
 			if (result == UI::AssetReferenceResult::InvalidMetaData)
 			{
-				// TODO: Add InvalidMetaCallback that is going to be called here
+// TODO: Add InvalidMetaCallback that is going to be called here
 			}
 
 			if (mesh)

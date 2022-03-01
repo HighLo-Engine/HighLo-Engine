@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "XMLWriter.h"
@@ -1265,7 +1265,7 @@ namespace highlo
 
 					if (versionStr != m_EngineVersion)
 					{
-						// TODO: if we change the XML structure in the future we can parse old formats here to keep the parser backward compatible
+// TODO: if we change the XML structure in the future we can parse old formats here to keep the parser backward compatible
 						HL_CORE_WARN(XML_LOG_PREFIX "[-] The config file {0} is outdated! Going to re-format the file... [-]", **m_FilePath);
 					}
 				}

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Renderer2D.h"
@@ -25,7 +25,7 @@ namespace highlo
 		float TexIndex;
 		float TilingFactor;
 
-		// TODO: make this editor-only
+// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -34,7 +34,7 @@ namespace highlo
 		glm::vec3 Position;
 		glm::vec4 Color;
 
-		// TODO: make this editor-only
+// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -45,7 +45,7 @@ namespace highlo
 		glm::vec2 LocalPosition;
 		glm::vec4 Color;
 
-		// TODO: make this editor-only
+// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -67,7 +67,7 @@ namespace highlo
 		static const uint32 MaxQuads = 20000;
 		static const uint32 MaxVertices = MaxQuads * 4;
 		static const uint32 MaxIndices = MaxQuads * 6;
-		static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
+static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
 
 		static const uint32 MaxLines = 10000;
 		static const uint32 MaxLineVertices = MaxLines * 2;

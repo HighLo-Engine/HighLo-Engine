@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "AssetImporter.h"
@@ -54,7 +54,7 @@ namespace highlo
 
 	void AssetImporter::Serialize(const AssetMetaData &assetInfo, const Ref<Asset> &asset)
 	{
-		// TODO: write into config file
+// TODO: write into config file
 	}
 	
 	void AssetImporter::Serialize(const Ref<Asset> &asset)

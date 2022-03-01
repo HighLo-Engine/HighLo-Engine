@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11VertexArray.h"
@@ -26,8 +26,8 @@ namespace highlo
 		UINT offset = 0;
 		for (auto i = 0; i < m_VertexBuffers.size(); i++)
 		{
-			// TODO: @FlareCoding: TEST - This should work
-			// TODO: This does not work
+// TODO: @FlareCoding: TEST - This should work
+// TODO: This does not work
 
 			/*
 			Ref<DX11VertexBuffer> dxVertexBuffer = m_VertexBuffers[i].As<DX11VertexBuffer>();

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "MeshFile.h"
@@ -91,7 +91,7 @@ namespace highlo
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
 		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 
-		// TODO: generate bounding box for submeshes,
+// TODO: generate bounding box for submeshes,
 	}
 
 	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const std::vector<Mesh> &subMeshes)
@@ -101,7 +101,7 @@ namespace highlo
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
 		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 
-		// TODO: generate bounding box for submeshes,
+// TODO: generate bounding box for submeshes,
 	}
 
 	MeshFile::~MeshFile()

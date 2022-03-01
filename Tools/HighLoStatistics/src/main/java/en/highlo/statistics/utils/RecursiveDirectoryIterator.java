@@ -1,11 +1,12 @@
 package en.highlo.statistics.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class RecursiveDirectoryIterator
@@ -16,7 +17,7 @@ public class RecursiveDirectoryIterator
 
     private Consumer<File> mFileCallback = null;
     private Consumer<File> mDirectoryCallback = null;
-    private BiConsumer<File, String> mLineCallback = null;
+    private BiFunction<File, String, String> mLineCallback = null;
 
     public RecursiveDirectoryIterator(String rootPath, String[] excludeDirs)
     {
@@ -38,7 +39,7 @@ public class RecursiveDirectoryIterator
         mDirectoryCallback = func;
     }
 
-    public void registerLineCallback(BiConsumer<File, String> func)
+    public void registerLineCallback(BiFunction<File, String, String> func)
     {
         mLineCallback = func;
     }
@@ -102,6 +103,8 @@ public class RecursiveDirectoryIterator
                 mFileCallback.accept(dir);
             }
 
+            ArrayList<String> newContent = new ArrayList<>();
+
             try
             {
                 Scanner s = new Scanner(dir);
@@ -110,7 +113,8 @@ public class RecursiveDirectoryIterator
                     String line = s.nextLine();
                     if (mLineCallback != null)
                     {
-                        mLineCallback.accept(dir, line);
+                        String newLine = mLineCallback.apply(dir, line);
+                        newContent.add(newLine);
                     }
                 }
 
@@ -118,6 +122,25 @@ public class RecursiveDirectoryIterator
                 s.close();
             }
             catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+
+            // Write out the new content into the current file
+            try
+            {
+                FileOutputStream out = new FileOutputStream(dir);
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
+
+                for (String line : newContent)
+                {
+                    bw.write(line);
+                    bw.newLine();
+                }
+
+                bw.close();
+            }
+            catch (IOException e)
             {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "AnimationTimelinePanel.h"
@@ -28,7 +28,7 @@ namespace highlo
 		ImGui::Begin("Animation Timeline", show, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 		
 		ImGui::PushItemWidth(85.0f);
-		if (ImGui::DragInt("##beginframe", &m_BeginFrame, 1, 0, 1000, "%d F")) // TODO: The max value should be the total length of the animation frames
+if (ImGui::DragInt("##beginframe", &m_BeginFrame, 1, 0, 1000, "%d F")) // TODO: The max value should be the total length of the animation frames
 		{
 		}
 		ImGui::PopItemWidth();
@@ -42,7 +42,7 @@ namespace highlo
 		ImGui::SameLine();
 
 		ImGui::PushItemWidth(85);
-		if (ImGui::DragInt("##endframe", &m_EndFrame, 1, 0, 1000, "%d F")) // TODO: The max value should be the total length of the animation frames
+if (ImGui::DragInt("##endframe", &m_EndFrame, 1, 0, 1000, "%d F")) // TODO: The max value should be the total length of the animation frames
 		{
 		}
 		ImGui::PopItemWidth();

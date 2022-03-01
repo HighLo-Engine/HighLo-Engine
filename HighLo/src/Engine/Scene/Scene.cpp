@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Scene.h"
@@ -197,7 +197,7 @@ namespace highlo
 
 		glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
 		
-		// TODO: test if this works
+// TODO: test if this works
 		glm::vec3 translation, rotation, scale;
 		Decompose(localTransform, translation, scale, rotation);
 		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
@@ -211,7 +211,7 @@ namespace highlo
 		if (!parent)
 			return;
 
-		// TODO: test if this works
+// TODO: test if this works
 		glm::mat4 transform = GetTransformRelativeToParent(entity);
 		glm::vec3 translation, rotation, scale;
 		Decompose(transform, translation, scale, rotation);
@@ -431,7 +431,7 @@ namespace highlo
 		newEntity.SetTransform(entity.Transform());
 		CopyAllComponents(newEntity, entity);
 
-		// TODO: For debug only - during entity duplication testing
+// TODO: For debug only - during entity duplication testing
 		HL_ASSERT(newEntity.Tag() == entity.Tag());
 
 		auto childIds = entity.Children();

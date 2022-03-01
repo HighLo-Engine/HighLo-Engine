@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLRenderingAPI.h"
@@ -266,7 +266,7 @@ namespace highlo
 		for (Mesh submesh : submeshes)
 		{
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
+// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
 				if (material->Has("u_Renderer.Transform"))
@@ -300,7 +300,7 @@ namespace highlo
 		for (Mesh submesh : submeshes)
 		{
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
+// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
 				if (material->Has("u_Renderer.Transform"))
@@ -334,7 +334,7 @@ namespace highlo
 		for (Mesh submesh : submeshes)
 		{
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
+// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
 				if (material->Has("u_Renderer.Transform"))
@@ -368,7 +368,7 @@ namespace highlo
 		for (Mesh submesh : submeshes)
 		{
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
+// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
 				if (material->Has("u_Renderer.Transform"))

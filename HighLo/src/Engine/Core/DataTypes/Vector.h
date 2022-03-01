@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -235,7 +235,7 @@ namespace highlo
 		HLAPI ~HLVector()
 		{
 			Clear();
-			// TODO: check why this is crashing
+// TODO: check why this is crashing
 			//::operator delete(m_Data, m_Capacity * sizeof(T));
 		}
 

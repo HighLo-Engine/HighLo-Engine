@@ -26,7 +26,7 @@ namespace highlo
 
 		if (serialize)
 		{
-			// TODO: Serialize data
+// TODO: Serialize data
 		}
 	}
 	
@@ -36,7 +36,7 @@ namespace highlo
 
 		newEntity.AddComponent<PrefabComponent>();
 
-		// TODO: copy all other components
+// TODO: copy all other components
 
 		return newEntity;
 	}

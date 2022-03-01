@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "AssetBrowserItem.h"
@@ -471,7 +471,7 @@ namespace highlo
 			return false;
 		}
 
-		// TODO: this could be optimized, but should work for now
+// TODO: this could be optimized, but should work for now
 		FileSystemPath destReplacer = dest;
 		AssetManager::OnAssetMoved(m_AssetInfo.Handle, destReplacer);
 		return true;
@@ -482,7 +482,7 @@ namespace highlo
 		HL_CORE_TRACE("Opening editor window {0}", actionResult.Field);
 		if (m_AssetInfo.Type == AssetType::Scene)
 		{
-			// TODO: Open in viewport
+// TODO: Open in viewport
 		}
 		else
 		{

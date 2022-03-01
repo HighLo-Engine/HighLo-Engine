@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -12,7 +12,7 @@
 
 namespace highlo
 {
-	// TODO: The values should not be hardcoded, they should be loaded from the serialized scene file
+// TODO: The values should not be hardcoded, they should be loaded from the serialized scene file
 	struct ProjectConfig
 	{
 		HLString Name = "Unnamed Project";

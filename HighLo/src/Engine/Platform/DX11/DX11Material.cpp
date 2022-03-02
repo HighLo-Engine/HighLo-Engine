@@ -20,6 +20,11 @@ namespace highlo
 	void DX11Material::Invalidate()
 	{
 	}
+
+	bool DX11Material::Has(const HLString &name)
+	{
+		return false;
+	}
 	
 	void DX11Material::Set(const HLString &name, float value)
 	{

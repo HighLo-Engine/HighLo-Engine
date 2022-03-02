@@ -72,6 +72,15 @@ namespace highlo
 	{
 		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 	}
+
+	std::pair<uint32, uint32> DX12Texture3D::GetMipSize(uint32 mip)
+	{
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
+	}
+
+	void DX12Texture3D::GenerateMips()
+	{
+	}
 }
 
 #endif // HIGHLO_API_DX12

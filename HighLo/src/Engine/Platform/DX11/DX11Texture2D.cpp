@@ -89,6 +89,15 @@ namespace highlo
 	{
 		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 	}
+
+	std::pair<uint32, uint32> DX11Texture2D::GetMipSize(uint32 mip)
+	{
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
+	}
+
+	void DX11Texture2D::GenerateMips()
+	{
+	}
 	
 	void DX11Texture2D::CreatePerLayerImageViews()
 	{

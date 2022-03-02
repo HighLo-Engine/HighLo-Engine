@@ -6,7 +6,9 @@
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLComputePipeline.h"
 #elif HIGHLO_API_DX11
+#include "Engine/Platform/DX11/DX11ComputePipeline.h"
 #elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12ComputePipeline.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanComputePipeline.h"
 #endif // HIGHLO_API_OPENGL
@@ -20,11 +22,9 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanComputePipeline>::Create(computeShader);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11ComputePipeline>::Create(computeShader);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12ComputePipeline>::Create(computeShader);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

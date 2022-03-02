@@ -16,6 +16,8 @@ namespace highlo
 
 		virtual void Invalidate() override;
 
+		virtual bool Has(const HLString &name) override;
+
 		// Setters
 		virtual void Set(const HLString &name, float value) override;
 		virtual void Set(const HLString &name, int32 value) override;

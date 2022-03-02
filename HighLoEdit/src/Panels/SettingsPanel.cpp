@@ -31,12 +31,14 @@ void SettingsPanel::OnUIRender(bool *pOpen)
 				ImGui::OpenPopup("RestoreDefaultSettings");
 			}
 
-			if (ShowYesNoDialogue())
+			HLString name = "Untitled Scene";
+			if (UI::DrawInputText("Scene Name", name))
 			{
 			}
 
-			HLString name = "Untitled Scene";
-			UI::DrawInputText("Scene Name", name);
+			if (ShowYesNoDialogue())
+			{
+			}
 
 			ImGui::EndTabItem();
 		}
@@ -66,13 +68,47 @@ void SettingsPanel::OnUIRender(bool *pOpen)
 				ImGui::OpenPopup("RestoreDefaultSettings");
 			}
 
-			if (ShowYesNoDialogue())
-			{
-				AssetBrowserPanel::RestoreDefaultSettings();
-			}
-
 			UI::DrawFloatSlider("Thumbnail Size", settings.ThumbnailSize, 1.0f, 512.0f);
 			UI::DrawCheckbox("Show Asset Type", settings.ShowAssetType, UI::LabelAlignment::Right);
+
+			if (ShowYesNoDialogue())
+				AssetBrowserPanel::RestoreDefaultSettings();
+
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Language"))
+		{
+			std::vector<Translation> &translations = HLApplication::Get().GetTranslations().GetAllTranslations();
+			std::vector<HLString> languages = HLApplication::Get().GetTranslations().GetAllLanguages();
+
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - buttonWidth);
+			if (UI::DrawButton("Restore default settings", { buttonWidth, buttonHeight }))
+			{
+				ImGui::OpenPopup("RestoreDefaultSettings");
+			}
+
+			int32 selected = 0;
+			for (int32 i = 0; i < translations.size(); ++i)
+			{
+				HLString selectedLangCode = HLApplication::Get().GetApplicationSettings().ActiveTranslationLanguageCode;
+				HLString currentLangCode = translations[i].GetLanguageCode();
+
+				if (selectedLangCode == currentLangCode)
+				{
+					selected = i;
+					break;
+				}
+			}
+
+			if (UI::DrawDropdown("Language", languages, &selected, false))
+			{
+				HLString selectedLangCode = translations[selected].GetLanguageCode();
+				HLApplication::Get().GetApplicationSettings().ActiveTranslationLanguageCode = selectedLangCode;
+			}
+
+			if (ShowYesNoDialogue())
+				HLApplication::Get().GetApplicationSettings().ActiveTranslationLanguageCode = "en-EN";
 
 			ImGui::EndTabItem();
 		}

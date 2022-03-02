@@ -11,6 +11,7 @@
 #include "Engine/Math/Color.h"
 #include "Engine/ImGui/imgui.h"
 #include "Engine/ImGui/ImGuiScopeHelpers.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo
 {
@@ -317,24 +318,24 @@ namespace highlo
 
 	void AssetBrowserBaseItem::OnContextMenuOpen(AssetBrowserActionResult &actionResult)
 	{
-		if (ImGui::MenuItem(ICON_FA_SYNC_ALT " Reload"))
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+
+		if (ImGui::MenuItem((HLString(ICON_FA_SYNC_ALT) + " " + translation->GetText("asset-browser-item-reload")).C_Str()))
 			actionResult.Set(AssetBrowserAction::Reload);
 
-		if (ImGui::MenuItem(ICON_FA_EDIT " Rename"))
+		if (ImGui::MenuItem((HLString(ICON_FA_EDIT) + " " + translation->GetText("asset-browser-item-rename")).C_Str()))
 			actionResult.Set(AssetBrowserAction::StartRenaming);
 
-		if (ImGui::MenuItem(ICON_FA_COPY " Copy"))
+		if (ImGui::MenuItem((HLString(ICON_FA_COPY) + " " + translation->GetText("asset-browser-item-copy")).C_Str()))
 			actionResult.Set(AssetBrowserAction::Copy);
 
-		if (ImGui::MenuItem(ICON_FA_TRASH_ALT " Delete"))
+		if (ImGui::MenuItem((HLString(ICON_FA_TRASH_ALT) + " " + translation->GetText("asset-browser-item-delete")).C_Str()))
 			actionResult.Set(AssetBrowserAction::OpenDeleteDialogue);
 
-		if (ImGui::MenuItem(ICON_FA_EXTERNAL_LINK_ALT " Show in Explorer"))
+		if (ImGui::MenuItem((HLString(ICON_FA_EXTERNAL_LINK_ALT) + " " + translation->GetText("asset-browser-item-explorer")).C_Str()))
 			actionResult.Set(AssetBrowserAction::ShowInExplorer);
 
-	//	if (ImGui::MenuItem( " Open externally"))
-	//		actionResult.Set(AssetBrowserAction::OpenExternal);
-
+		ImGui::Separator();
 		RenderCustomContextItems();
 	}
 
@@ -471,7 +472,7 @@ namespace highlo
 			return false;
 		}
 
-// TODO: this could be optimized, but should work for now
+		// TODO: this could be optimized, but should work for now
 		FileSystemPath destReplacer = dest;
 		AssetManager::OnAssetMoved(m_AssetInfo.Handle, destReplacer);
 		return true;
@@ -482,7 +483,7 @@ namespace highlo
 		HL_CORE_TRACE("Opening editor window {0}", actionResult.Field);
 		if (m_AssetInfo.Type == AssetType::Scene)
 		{
-// TODO: Open in viewport
+			// TODO: Open in viewport
 		}
 		else
 		{

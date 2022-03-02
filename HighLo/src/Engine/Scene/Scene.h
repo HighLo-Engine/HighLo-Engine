@@ -112,10 +112,11 @@ namespace highlo
 		HLAPI ECS_Registry &GetRegistry() { return m_Registry; }
 		HLAPI const ECS_Registry &GetRegistry() const { return m_Registry; }
 
-// TODO: Only in editor
+		// TODO: Only in editor
 		HLAPI void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
 		HLAPI static Ref<Scene> Create(const HLString &name = "Scene1", bool isEditorScene = false, bool constructScene = true);
+		HLAPI static Scene *GetActiveScene();
 
 		HLAPI void CopyAllComponents(Entity &dest, const Entity &src);
 

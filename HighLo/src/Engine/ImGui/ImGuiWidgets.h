@@ -14,6 +14,7 @@
 #include "Engine/Assets/Asset.h"
 #include "Engine/Assets/AssetTypes.h"
 #include "Engine/Assets/AssetManager.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo::UI
 {
@@ -51,11 +52,22 @@ namespace highlo::UI
 		HLAPI static void Shutdown();
 
 		template<uint32 BufferSize = 256, typename StringType = HLString>
-		HLAPI static bool SearchWidget(StringType &searchString, const char *hint = "Search...", bool *grabFocus = nullptr)
+		HLAPI static bool SearchWidget(StringType &searchString, const char *hint = nullptr, bool *grabFocus = nullptr)
 		{
 			UI::PushID();
 
 			UI::ShiftCursorY(1.0f);
+
+			HLString searchPlaceholder = "";
+			if (hint)
+			{
+				searchPlaceholder = hint;
+			}
+			else
+			{
+				Translation *translation = HLApplication::Get().GetActiveTranslation();
+				searchPlaceholder = translation->GetText("imgui-widgets-search-widget-placeholder");
+			}
 
 			const bool layoutSuspended = []
 			{
@@ -152,7 +164,7 @@ namespace highlo::UI
 					UI::ShiftCursorY(-framePaddingY + 1.0f);
 					UI::ScopedColor text(ImGuiCol_Text, Colors::Theme::TextDarker);
 					UI::ScopedStyle padding(ImGuiStyleVar_FramePadding, ImVec2(0.0f, framePaddingY));
-					ImGui::TextUnformatted(hint);
+					ImGui::TextUnformatted(*searchPlaceholder);
 					UI::ShiftCursorY(-1.0f);
 				}
 			}

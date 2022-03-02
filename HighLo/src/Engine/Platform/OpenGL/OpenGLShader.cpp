@@ -308,7 +308,7 @@ namespace highlo
 	{
 		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
 		int32 location = m_UniformLocations.at(fullname);
-		glUniform2fv(location, 1, glm::value_ptr(value));
+		glUniform3fv(location, 1, glm::value_ptr(value));
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec4 &value)

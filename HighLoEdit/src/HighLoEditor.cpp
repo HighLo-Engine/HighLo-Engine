@@ -2,6 +2,7 @@
 
 #include "HighLoEditor.h"
 #include "Core/MenuItems.h"
+#include "Core/Translations.h"
 
 #define EDITOR_LOG_PREFIX "HighloEdit>   "
 
@@ -49,6 +50,8 @@ HighLoEditor::HighLoEditor(const ApplicationSettings &settings)
 	{
 		FileSystem::Get()->CreateFolder(m_RoamingPath);
 	}
+
+	InitEditorTranslations();
 
 	// TODO: Write UserPreferences into roaming path
 	// The UserPreferences file should contain the following data:
@@ -107,68 +110,69 @@ void HighLoEditor::OnInitialize()
 
 	// Create FileMenu
 	m_MenuBar = MenuBar::Create();
+	Translation *translation = HLApplication::Get().GetActiveTranslation();
 
-	Ref<FileMenu> importMenu = FileMenu::Create("Import");
-	importMenu->AddMenuItem("Import .obj", "", MENU_ITEM_IMPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .fbx", "", MENU_ITEM_IMPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .stl", "", MENU_ITEM_IMPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .3ds", "", MENU_ITEM_IMPORT_3DS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .c4d", "", MENU_ITEM_IMPORT_C4D, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .mb", "", MENU_ITEM_IMPORT_MB, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	Ref<FileMenu> exportMenu = FileMenu::Create("Export");
-	exportMenu->AddMenuItem("Export .obj", "", MENU_ITEM_EXPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .fbx", "", MENU_ITEM_EXPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .stl", "", MENU_ITEM_EXPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	Ref<FileMenu> importMenu = FileMenu::Create(translation->GetText("import-file-menu"));
+	importMenu->AddMenuItem(translation->GetText("import-obj-file-menu"), "", MENU_ITEM_IMPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-fbx-file-menu"), "", MENU_ITEM_IMPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-stl-file-menu"), "", MENU_ITEM_IMPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-3ds-file-menu"), "", MENU_ITEM_IMPORT_3DS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-c4d-file-menu"), "", MENU_ITEM_IMPORT_C4D, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-mb-file-menu"), "", MENU_ITEM_IMPORT_MB, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	Ref<FileMenu> exportMenu = FileMenu::Create(translation->GetText("export-file-menu"));
+	exportMenu->AddMenuItem(translation->GetText("export-obj-file-menu"), "", MENU_ITEM_EXPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-fbx-file-menu"), "", MENU_ITEM_EXPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-stl-file-menu"), "", MENU_ITEM_EXPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
 	exportMenu->AddSeparator();
-	exportMenu->AddMenuItem("Export .mp4", "", MENU_ITEM_EXPORT_MP4, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .avi", "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .mov", "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-mp4-file-menu"), "", MENU_ITEM_EXPORT_MP4, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-avi-file-menu"), "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-mov-file-menu"), "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
 
-	m_FileMenu = FileMenu::Create("File");
-	m_FileMenu->AddMenuItem("New Scene", "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	m_FileMenu->AddMenuItem("Open Scene...", "Strg+O", MENU_ITEM_OPEN_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu = FileMenu::Create(translation->GetText("file-menu"));
+	m_FileMenu->AddMenuItem(translation->GetText("new-scene-file-menu"), "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddMenuItem(translation->GetText("open-scene-file-menu"), "Strg+O", MENU_ITEM_OPEN_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	m_FileMenu->AddSeparator();
-	m_FileMenu->AddMenuItem("Save Scene", "Strg+S", MENU_ITEM_SAVE_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	m_FileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", MENU_ITEM_SAVE_SCENE_AS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddMenuItem(translation->GetText("save-scene-file-menu"), "Strg+S", MENU_ITEM_SAVE_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	m_FileMenu->AddMenuItem(translation->GetText("save-scene-as-file-menu"), "Strg+Shift+S", MENU_ITEM_SAVE_SCENE_AS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	m_FileMenu->AddSeparator();
-	m_FileMenu->AddMenuItem("Settings", "", MENU_ITEM_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddMenuItem(translation->GetText("settings-file-menu"), "", MENU_ITEM_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	m_FileMenu->AddSeparator();
 	m_FileMenu->AddSubMenu(importMenu);
 	m_FileMenu->AddSubMenu(exportMenu);
 	m_FileMenu->AddSeparator();
-	m_FileMenu->AddMenuItem("Quit", "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddMenuItem(translation->GetText("exit-file-menu"), "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> editMenu = FileMenu::Create("Edit");
-	editMenu->AddMenuItem("Undo", "Strg+Z", MENU_ITEM_UNDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	editMenu->AddMenuItem("Redo", "Strg+Y", MENU_ITEM_REDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> editMenu = FileMenu::Create(translation->GetText("edit-menu"));
+	editMenu->AddMenuItem(translation->GetText("edit-undo-menu"), "Strg+Z", MENU_ITEM_UNDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	editMenu->AddMenuItem(translation->GetText("edit-redo-menu"), "Strg+Y", MENU_ITEM_REDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	editMenu->AddSeparator();
 
-	Ref<FileMenu> modelSubMenu = FileMenu::Create("Create 3D Objects");
-	modelSubMenu->AddMenuItem("Create Null Object", "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> modelSubMenu = FileMenu::Create(translation->GetText("game-objects-3d-objects-menu"));
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-null-menu"), "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	modelSubMenu->AddSeparator();
-	modelSubMenu->AddMenuItem("Create Cube", "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	modelSubMenu->AddMenuItem("Create Sphere", "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	modelSubMenu->AddMenuItem("Create Capsule", "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	modelSubMenu->AddMenuItem("Create Cylinder", "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-cube-menu"), "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-sphere-menu"), "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-capsule-menu"), "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-cylinder-menu"), "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> gameObjectMenu = FileMenu::Create("Game Objects");
-	gameObjectMenu->AddMenuItem("Create Folder", "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> gameObjectMenu = FileMenu::Create(translation->GetText("game-objects-menu"));
+	gameObjectMenu->AddMenuItem(translation->GetText("game-objects-folder-menu"), "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	gameObjectMenu->AddSubMenu(modelSubMenu);
-	gameObjectMenu->AddMenuItem("Create Camera", "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	gameObjectMenu->AddMenuItem(translation->GetText("game-objects-camera-menu"), "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> rendererMenu = FileMenu::Create("Renderer");
-	rendererMenu->AddMenuItem("Rendering Settings", "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	rendererMenu->AddMenuItem(translation->GetText("renderer-settings-menu"), "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	rendererMenu->AddSeparator();
 	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	m_WindowMenu = FileMenu::Create("Window");
-	m_WindowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	m_WindowMenu->AddMenuItem("Asset Manager", "", MENU_ITEM_WINDOW_ASSET_MANAGER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	m_WindowMenu->AddMenuItem("Animation Timeline", "", MENU_ITEM_WINDOW_ANIM_TIMELINE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu = FileMenu::Create(translation->GetText("window-menu"));
+	m_WindowMenu->AddMenuItem(translation->GetText("window-editor-console-menu"), "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu->AddMenuItem(translation->GetText("window-asset-manager-menu"), "", MENU_ITEM_WINDOW_ASSET_MANAGER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu->AddMenuItem(translation->GetText("window-animation-timeline-menu"), "", MENU_ITEM_WINDOW_ANIM_TIMELINE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
-	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	helpMenu->AddMenuItem("Documentation", "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> helpMenu = FileMenu::Create(translation->GetText("help-menu"));
+	helpMenu->AddMenuItem(translation->GetText("help-about-menu"), "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	helpMenu->AddMenuItem(translation->GetText("help-docs-menu"), "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	m_MenuBar->AddMenu(m_FileMenu);
 	m_MenuBar->AddMenu(editMenu);
@@ -764,6 +768,7 @@ bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 		&& !UI::IsMouseOverGizmo()
 		&& m_SceneState != SceneState::Play)
 	{
+		HL_CORE_TRACE("Pressed mouse over viewport! User probably wants to select an entity...");
 	}
 
 	return false;

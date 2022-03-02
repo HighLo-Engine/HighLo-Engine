@@ -15,6 +15,8 @@
 #include "Engine/ECS/ECS_Registry.h"
 #include "Engine/ECS/ECS_SystemManager.h"
 #include "Engine/Encryption/Encryptor.h"
+#include "Engine/Localization/Translations.h"
+#include "Engine/Editor/RenderDebugPanel.h"
 
 #include "ApplicationSettings.h"
 
@@ -52,6 +54,8 @@ namespace highlo
 		HLAPI static HLApplication &Get() { return *s_Instance; }
 		HLAPI Window &GetWindow() { return *m_Window; }
 		HLAPI static bool HasStarted() { return (bool)s_Instance; }
+		HLAPI Translations &GetTranslations() { return m_Translations; }
+		HLAPI Translation *GetActiveTranslation();
 
 	private:
 
@@ -63,6 +67,8 @@ namespace highlo
 		bool m_IsShuttingDown = false;
 		UniqueRef<Window> m_Window;
 		Ref<Encryptor> m_Encryptor;
+		UniqueRef<RenderDebugPanel> m_RenderDebugPanel;
+		Translations m_Translations;
 
 		ECS_Registry m_ECS_Registry;
 		ECS_SystemManager m_ECS_SystemManager;

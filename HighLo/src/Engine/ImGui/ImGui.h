@@ -220,7 +220,7 @@ namespace highlo::UI
 	}
 
 	HLAPI bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, int32 *selected);
-	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected);
+	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected, bool labelInSameLine = true);
 
 	HLAPI ImTextureID GetTextureID(const Ref<Texture2D> &texture);
 

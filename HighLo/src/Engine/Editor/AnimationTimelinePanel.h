@@ -34,13 +34,13 @@ namespace highlo
 		bool m_AnimPlaying = false;
 		bool m_AnimPausing = false;
 		
-		uint32 m_NumFrames = 1;
 		float m_Zoom = 50.0f;
 		float m_Offset = 0.0f;
 		float m_ButtonPos = 0.0f;
 		float m_RectSize = 700.0f;
 
 		float m_Progress = 0.0f;
+		int32 m_NumFrames = 1;
 		int32 m_BeginFrame = 0;
 		int32 m_EndFrame = 1000;
 

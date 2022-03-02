@@ -37,6 +37,8 @@ namespace highlo
 
 	HLApplication::~HLApplication()
 	{
+		Translations::Shutdown();
+
 		ThreadRegistry::Get()->Shutdown();
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
@@ -61,7 +63,7 @@ namespace highlo
 		// Main Rendering Thread
 		while (m_Running)
 		{
-			Time::FrameUpdate();
+			Time::TimeUpdate();
 
 		#ifdef HL_DEBUG
 			if (Input::IsKeyPressed(HL_KEY_ESCAPE))
@@ -97,12 +99,17 @@ namespace highlo
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUIRender(Time::GetTimestep());
 
+				bool showDebugPanel = true;
+				m_RenderDebugPanel->OnUIRender(&showDebugPanel);
+
 				UI::EndScene();
 			}
 			
 			// Swap Window Buffers (Double buffer)
 			if (!m_Settings.Headless)
 				m_Window->Update();
+
+			Time::FrameUpdate();
 		}
 
 		OnShutdown();
@@ -125,6 +132,11 @@ namespace highlo
 	{
 		m_IsShuttingDown = true;
 		m_Running = false;
+	}
+
+	Translation *HLApplication::GetActiveTranslation()
+	{
+		return m_Translations.GetTranslation(m_Settings.ActiveTranslationLanguageCode);
 	}
 
 	void HLApplication::Init()
@@ -178,6 +190,10 @@ namespace highlo
 
 		// Sort all registered services
 		Service::Sort();
+
+		Translations::Init();
+
+		m_RenderDebugPanel = UniqueRef<RenderDebugPanel>::Create();
 
 		HL_CORE_INFO("Engine Initialized");
 	}

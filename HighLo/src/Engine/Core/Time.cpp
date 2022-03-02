@@ -7,46 +7,74 @@
 
 namespace highlo
 {
-	float Time::s_ElapsedTime = 0;
-	float Time::s_TimeScale = 1;
-	float Time::s_TimeStep = 0;
+	double Time::s_ElapsedTime = 0.0;
+	double Time::s_TimeScale = 1.0;
+	double Time::s_TimeStep = 0.0;
+	
+	double Time::s_InitialTime = -1.0;
+	double Time::s_TmpSecondTimer = 0.0;
+	double Time::s_LastTrackedTime = 0.0;
+	double Time::s_FrameTime = 0.0;
 
-	float Time::s_InitialTime = -1;
-	float Time::s_LastTrackedTime = 0;
-
-	float Time::GetElapsedTime()
+	uint32 Time::s_FrameCounter = 0;
+	uint32 Time::s_FramesPerSecond = 0;
+	
+	double Time::GetElapsedTime()
 	{
 		return s_ElapsedTime;
 	}
 
-	float Time::GetTimeScale()
+	double Time::GetFrameTime()
+	{
+		return s_FrameTime;
+	}
+
+	uint32 Time::GetFPS()
+	{
+		return s_FramesPerSecond;
+	}
+
+	double Time::GetTimeScale()
 	{
 		return s_TimeScale;
 	}
 
-	void Time::SetTimeScale(float scale)
+	void Time::SetTimeScale(double scale)
 	{
 		s_TimeScale = scale;
 	}
 
 	Timestep Time::GetTimestep()
 	{
-		return s_TimeStep;
+		return (float)s_TimeStep;
+	}
+
+	void Time::TimeUpdate()
+	{
+		if (s_InitialTime == -1)
+		{
+			s_InitialTime = GetSystemTime();
+		}
+
+		double currentTime = GetSystemTime();
+
+		s_ElapsedTime = (currentTime - s_InitialTime) / 1000000.0; // converting to seconds
+
+		s_TimeStep = (s_ElapsedTime - s_LastTrackedTime) * 1000.0f; // converting to miliseconds
+		s_LastTrackedTime = s_ElapsedTime;
+		s_FrameTime = s_ElapsedTime;
 	}
 
 	void Time::FrameUpdate()
 	{
-		if (s_InitialTime == -1)
+		++s_FrameCounter;
+
+		if (s_ElapsedTime - s_TmpSecondTimer > 1.0f)
 		{
-			s_InitialTime = (float)GetSystemTime();
+			s_FramesPerSecond = s_FrameCounter;
+			s_FrameCounter = 0;
+			s_TmpSecondTimer += 1.0f;
 		}
-
-		double current_time = GetSystemTime();
-
-		s_ElapsedTime = (float)((current_time - (double)s_InitialTime) / 1000000.0); // converting to seconds
-
-		s_TimeStep = (s_ElapsedTime - s_LastTrackedTime) * 1000.0f; // converting to miliseconds
-		s_LastTrackedTime = s_ElapsedTime;
 	}
 
 	double Time::GetSystemTime()
@@ -172,3 +200,4 @@ namespace highlo
 		return result;
 	}
 }
+

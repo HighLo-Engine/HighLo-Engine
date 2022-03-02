@@ -341,6 +341,15 @@ namespace highlo
 		return Ref<Scene>::Create(name, isEditorScene, constructScene);
 	}
 
+	Scene *Scene::GetActiveScene()
+	{
+		Scene *selected = nullptr;
+		for (auto &[id, scene] : s_ActiveScenes)
+			selected = scene;
+
+		return selected;
+	}
+
 	void Scene::CopyAllComponents(Entity &dest, const Entity &src)
 	{
 		PrefabComponent *pc = dest.AddOrReplace<PrefabComponent>(src);						// HL_ASSERT(pc, "Prefab Component could not be copied!");

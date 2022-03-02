@@ -1830,7 +1830,7 @@ namespace highlo::UI
 		return changed;
 	}
 
-	bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected)
+	bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected, bool labelInSameLine)
 	{
 		const char *current = options[*selected].C_Str();
 		bool changed = false;
@@ -1843,7 +1843,9 @@ namespace highlo::UI
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
-		ImGui::SameLine();
+		if (labelInSameLine)
+			ImGui::SameLine();
+
 		if (ImGui::BeginCombo(*id, current))
 		{
 			for (int32 i = 0; i < options.size(); ++i)

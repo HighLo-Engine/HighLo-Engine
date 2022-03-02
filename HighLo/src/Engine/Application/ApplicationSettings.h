@@ -93,6 +93,12 @@ namespace highlo
 		FileSystemPath AssetsRegistryPath = "assets/assets.registry";
 
 		/// <summary>
+		/// Determines the default language the engine should start with.
+		/// </summary>
+		HLString ActiveTranslationLanguageCode = "en-EN";
+	//	HLString ActiveTranslationLanguageCode = "de-DE";
+
+		/// <summary>
 		/// Determines the path to the startup project for the Editor.
 		/// </summary>
 		FileSystemPath ProjectPath = "";

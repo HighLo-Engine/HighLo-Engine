@@ -55,7 +55,10 @@ namespace highlo
 
 	std::vector<UUID> &Entity::Children()
 	{
-		return GetComponent<RelationshipComponent>()->Children;
+		if (HasComponent<RelationshipComponent>())
+			return GetComponent<RelationshipComponent>()->Children;
+		else
+			return AddComponent<RelationshipComponent>()->Children;
 	}
 
 	const std::vector<UUID> &Entity::Children() const
@@ -70,7 +73,10 @@ namespace highlo
 
 	UUID Entity::GetParentUUID() const
 	{
-		return GetComponent<RelationshipComponent>()->ParentHandle;
+		if (HasComponent<RelationshipComponent>())
+			return GetComponent<RelationshipComponent>()->ParentHandle;
+
+		return 0;
 	}
 
 	bool Entity::HasParent() const

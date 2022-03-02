@@ -9,6 +9,7 @@
 #include "Engine/Assets/AssetManager.h"
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo
 {
@@ -17,6 +18,9 @@ namespace highlo
 	{
 		if (entity.HasComponent<T>())
 		{
+			Translation *translation = HLApplication::Get().GetActiveTranslation();
+			HL_ASSERT(translation);
+
 			ImGui::PushID((void*)typeid(T).hash_code());
 			auto *component = entity.GetComponent<T>();
 			ImVec2 contentRegion = ImGui::GetContentRegionAvail();
@@ -37,12 +41,12 @@ namespace highlo
 
 			if (UI::BeginPopup("settings_comp_popup"))
 			{
-				if (ImGui::MenuItem("Reset"))
+				if (ImGui::MenuItem(translation->GetText("object-properties-reset-component")))
 					resetValues = true;
 
 				if (canBeRemoved)
 				{
-					if (ImGui::MenuItem("Remove component"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-remove-component")))
 						removeComponent = true;
 				}
 
@@ -71,6 +75,9 @@ namespace highlo
 	template<typename UIFunction>
 	static void DrawTransformComponent(const HLString &name, Ref<Scene> &scene, Entity entity, UIFunction func, const Ref<Texture2D> &settingsIcon)
 	{
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+		HL_ASSERT(translation);
+
 		ImGui::PushID(HLString("##" + name).C_Str());
 		ImVec2 contentRegion = ImGui::GetContentRegionAvail();
 
@@ -89,7 +96,7 @@ namespace highlo
 
 		if (UI::BeginPopup("settings_comp_popup"))
 		{
-			if (ImGui::MenuItem("Reset"))
+			if (ImGui::MenuItem(translation->GetText("object-properties-reset-component")))
 				resetValues = true;
 
 			UI::EndPopup();
@@ -136,10 +143,12 @@ namespace highlo
 
 	void ObjectPropertiesPanel::OnUIRender(bool *pOpen)
 	{
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+
 		if (m_IsWindow)
 		{
 			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 10.0f));
-			ImGui::Begin("Object Properties", pOpen, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			ImGui::Begin(translation->GetText("object-properties-window-title"), pOpen, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 		}
 
 		if (m_SelectedEntity)
@@ -159,10 +168,18 @@ namespace highlo
 	
 	void ObjectPropertiesPanel::DrawComponents(Entity &entity)
 	{
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+
 		ImGui::AlignTextToFramePadding();
 
 		auto id = entity.GetUUID();
+
 		const char *addText = " ADD NEW COMPONENT            ";
+		if (translation->GetLanguageCode() == "de-DE")
+		{
+			addText = u8" Komponent hinzufügen            ";
+		}
+
 		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 		UI::ShiftCursor(4.0f, 4.0f);
 
@@ -234,7 +251,7 @@ namespace highlo
 			{
 				if (!entity.HasComponent<CameraComponent>())
 				{
-					if (ImGui::MenuItem("Camera"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-camera-component")))
 					{
 						entity.AddComponent<CameraComponent>();
 						ImGui::CloseCurrentPopup();
@@ -243,7 +260,7 @@ namespace highlo
 
 				if (!entity.HasComponent<StaticModelComponent>() && !m_SelectedEntity.HasComponent<DynamicModelComponent>())
 				{
-					if (ImGui::MenuItem("Static Model"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-static-model-component")))
 					{
 						entity.AddComponent<StaticModelComponent>();
 						ImGui::CloseCurrentPopup();
@@ -252,7 +269,7 @@ namespace highlo
 
 				if (!entity.HasComponent<DynamicModelComponent>() && !m_SelectedEntity.HasComponent<StaticModelComponent>())
 				{
-					if (ImGui::MenuItem("Dynamic Model"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-dynamic-model-component")))
 					{
 						entity.AddComponent<DynamicModelComponent>();
 						ImGui::CloseCurrentPopup();
@@ -261,7 +278,7 @@ namespace highlo
 
 				if (!entity.HasComponent<DirectionalLightComponent>())
 				{
-					if (ImGui::MenuItem("Directional Light"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-directional-light-component")))
 					{
 						entity.AddComponent<DirectionalLightComponent>();
 						ImGui::CloseCurrentPopup();
@@ -270,7 +287,7 @@ namespace highlo
 
 				if (!entity.HasComponent<PointLightComponent>())
 				{
-					if (ImGui::MenuItem("Point Light"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-point-light-component")))
 					{
 						entity.AddComponent<PointLightComponent>();
 						ImGui::CloseCurrentPopup();
@@ -279,21 +296,19 @@ namespace highlo
 
 				if (!entity.HasComponent<SkyLightComponent>())
 				{
-					if (ImGui::MenuItem("Sky Light"))
+					if (ImGui::MenuItem(translation->GetText("object-properties-sky-light-component")))
 					{
 						entity.AddComponent<SkyLightComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
 
-
-
 				UI::EndPopup();
 			}
 		}
 
 		// Draw Transform
-		DrawTransformComponent("Transform", m_Scene, entity, [&]()
+		DrawTransformComponent(translation->GetText("object-properties-transform-component"), m_Scene, entity, [&]()
 		{
 			UI::ScopedStyle spacing(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 8.0f));
 			UI::ScopedStyle padding(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
@@ -314,7 +329,7 @@ namespace highlo
 			entityTransform.SetRotation(glm::radians(degreeRotation));
 
 			ImGui::TableNextRow();
-			bool scaleChanged = UI::DrawVec3("Scale", entityTransform.GetScale(), 1.0f);
+			bool scaleChanged = UI::DrawVec3(translation->GetText("object-properties-transform-component-scale"), entityTransform.GetScale(), 1.0f);
 
 			ImGui::EndTable();
 
@@ -332,30 +347,30 @@ namespace highlo
 
 		}, m_SettingsIcon);
 
-		DrawComponent<StaticModelComponent>("Static Model", entity, [](StaticModelComponent &component)
+		DrawComponent<StaticModelComponent>(translation->GetText("object-properties-static-model-component"), entity, [&](StaticModelComponent &component)
 		{
 			Ref<StaticModel> mesh = AssetManager::Get()->GetAsset<StaticModel>(component.Model);
 
 			UI::BeginPropertyGrid();
 			UI::AssetReferenceResult result;
-			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>("Static Model", component.Model, [=](Ref<MeshFile> meshAsset)
+			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>(translation->GetText("object-properties-static-model-component"), component.Model, [=](Ref<MeshFile> meshAsset)
 			{
-// TODO: Add MeshConversionCallback that is going to be called here
+				// TODO: Add MeshConversionCallback that is going to be called here
 			}, &result))
 			{
-// TODO: When we have mesh colliders we could set them here
+				// TODO: When we have mesh colliders we could set them here
 			}
 
 			if (result == UI::AssetReferenceResult::InvalidMetaData)
 			{
-// TODO: Add InvalidMetaCallback that is going to be called here
+				// TODO: Add InvalidMetaCallback that is going to be called here
 			}
 
 			UI::EndPropertyGrid();
 
 			if (mesh && mesh->IsValid())
 			{
-				if (UI::BeginTreeNode("Materials"))
+				if (UI::BeginTreeNode(translation->GetText("object-properties-materials")))
 				{
 					UI::BeginPropertyGrid();
 
@@ -389,7 +404,7 @@ namespace highlo
 							{
 								HLString meshMaterialName = meshMaterialAsset->GetMaterial()->GetName();
 								if (meshMaterialName.IsEmpty())
-									meshMaterialName = "Unnamed Material";
+									meshMaterialName = translation->GetText("object-properties-unnamed-material");
 							}
 
 							if (hasLocalMaterial)
@@ -409,24 +424,24 @@ namespace highlo
 			}
 		}, m_SettingsIcon);
 
-		DrawComponent<DynamicModelComponent>("Dynamic Model", entity, [](DynamicModelComponent &component)
+		DrawComponent<DynamicModelComponent>(translation->GetText("object-properties-dynamic-model-component"), entity, [&](DynamicModelComponent &component)
 		{
 			Ref<DynamicModel> mesh = AssetManager::Get()->GetAsset<DynamicModel>(component.Model);
 
 			UI::BeginPropertyGrid();
 			
 			UI::AssetReferenceResult result;
-			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>("Dynamic Model", component.Model, [=](Ref<MeshFile> meshAsset)
+			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>(translation->GetText("object-properties-dynamic-model-component"), component.Model, [=](Ref<MeshFile> meshAsset)
 			{
-// TODO: Add MeshConversionCallback that is going to be called here
+				// TODO: Add MeshConversionCallback that is going to be called here
 			}, &result))
 			{
-// TODO: When we have mesh colliders we could set them here
+				// TODO: When we have mesh colliders we could set them here
 			}
 
 			if (result == UI::AssetReferenceResult::InvalidMetaData)
 			{
-// TODO: Add InvalidMetaCallback that is going to be called here
+				// TODO: Add InvalidMetaCallback that is going to be called here
 			}
 
 			if (mesh)
@@ -443,7 +458,7 @@ namespace highlo
 
 			if (mesh && mesh->IsValid())
 			{
-				if (UI::BeginTreeNode("Materials"))
+				if (UI::BeginTreeNode(translation->GetText("object-properties-materials")))
 				{
 					UI::BeginPropertyGrid();
 
@@ -477,7 +492,7 @@ namespace highlo
 							{
 								HLString meshMaterialName = meshMaterialAsset->GetMaterial()->GetName();
 								if (meshMaterialName.IsEmpty())
-									meshMaterialName = "Unnamed Material";
+									meshMaterialName = translation->GetText("object-properties-unnamed-material");
 							}
 
 							if (hasLocalMaterial)
@@ -497,22 +512,22 @@ namespace highlo
 			}
 		}, m_SettingsIcon);
 
-		DrawComponent<CameraComponent>("Camera", entity, [&](CameraComponent &component)
+		DrawComponent<CameraComponent>(translation->GetText("object-properties-camera-component"), entity, [&](CameraComponent &component)
 		{
 			UI::BeginPropertyGrid();
 
 			std::vector<HLString> projectionTypes;
-			projectionTypes.push_back("Perspective");
-			projectionTypes.push_back("Orthographic");
+			projectionTypes.push_back(translation->GetText("object-properties-camera-component-perspective"));
+			projectionTypes.push_back(translation->GetText("object-properties-camera-component-orthographic"));
 			int32 currentProjectionType = (int32)component.Camera.GetCurrentProjectionType();
 
 			bool primary = component.Primary;
-			if (UI::DrawCheckbox("Primary Camera?", primary))
+			if (UI::DrawCheckbox(translation->GetText("object-properties-camera-component-primary"), primary))
 			{
 				component.Primary = primary;
 			}
 
-			if (UI::DrawDropdown("Projection", projectionTypes, &currentProjectionType))
+			if (UI::DrawDropdown(translation->GetText("object-properties-camera-component-projection"), projectionTypes, &currentProjectionType))
 			{
 				component.Camera.SetProjectionType((Camera::ProjectionType)currentProjectionType);
 			}
@@ -523,13 +538,13 @@ namespace highlo
 				float nearPlane = component.Camera.GetOrthographicNearPlane();
 				float farPlane = component.Camera.GetOrthographicFarPlane();
 
-				if (UI::DrawDragFloat("Size", orthographicSize))
+				if (UI::DrawDragFloat(translation->GetText("object-properties-camera-component-orthographic-size"), orthographicSize))
 				{
 					component.Camera.SetOrthographicSize(orthographicSize);
 				}
 
 				glm::vec2 values = { nearPlane, farPlane };
-				if (UI::DrawDragFloat2("Near and Far Planes", values))
+				if (UI::DrawDragFloat2(translation->GetText("object-properties-camera-component-near-far-planes"), values))
 				{
 					component.Camera.SetOrthographicNearPlane(values[0]);
 					component.Camera.SetOrthographicFarPlane(values[1]);
@@ -541,13 +556,13 @@ namespace highlo
 				float nearPlane = component.Camera.GetPerspectiveNearPlane();
 				float farPlane = component.Camera.GetPerspectiveFarPlane();
 
-				if (UI::DrawDragFloat("Vertical FOV", verticalFOV))
+				if (UI::DrawDragFloat(translation->GetText("object-properties-camera-component-vertical-fov"), verticalFOV))
 				{
 					component.Camera.SetPerspectiveFOV(verticalFOV);
 				}
 
 				glm::vec2 values = { nearPlane, farPlane };
-				if (UI::DrawDragFloat2("Near and Far Planes", values))
+				if (UI::DrawDragFloat2(translation->GetText("object-properties-camera-component-near-far-planes"), values))
 				{
 					component.Camera.SetPerspectiveNearPlane(values[0]);
 					component.Camera.SetPerspectiveFarPlane(values[1]);
@@ -557,34 +572,34 @@ namespace highlo
 			UI::EndPropertyGrid();
 		}, m_SettingsIcon);
 
-		DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](DirectionalLightComponent &component)
+		DrawComponent<DirectionalLightComponent>(translation->GetText("object-properties-directional-light-component"), entity, [&](DirectionalLightComponent &component)
 		{
 			UI::BeginPropertyGrid();
-			UI::DrawColorPicker("Radiance", component.Radiance);
-			UI::DrawDragFloat("Intensity", component.Intensity);
-			UI::DrawCheckbox("Cast Shadows", component.CastShadows);
-			UI::DrawCheckbox("Soft Shadows", component.SoftShadows);
-			UI::DrawDragFloat("Source Size", component.LightSize);
+			UI::DrawColorPicker(translation->GetText("object-properties-light-component-radiance"), component.Radiance);
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-intensity"), component.Intensity);
+			UI::DrawCheckbox(translation->GetText("object-properties-light-component-cast-shadows"), component.CastShadows);
+			UI::DrawCheckbox(translation->GetText("object-properties-light-component-soft-shadows"), component.SoftShadows);
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-source-size"), component.LightSize);
 			UI::EndPropertyGrid();
 		}, m_SettingsIcon);
 
-		DrawComponent<PointLightComponent>("Point Light", entity, [](PointLightComponent &component)
+		DrawComponent<PointLightComponent>(translation->GetText("object-properties-point-light-component"), entity, [&](PointLightComponent &component)
 		{
 			UI::BeginPropertyGrid();
-			UI::DrawColorPicker("Radiance", component.Radiance);
-			UI::DrawDragFloat("Intensity", component.Intensity);
-			UI::DrawDragFloat("Radius", component.Radius, 0.1f, 0.0f, std::numeric_limits<float>::max());
-			UI::DrawDragFloat("Falloff", component.Falloff, 0.005f, 0.0f, 1.0f);
-			UI::DrawCheckbox("Cast Shadows", component.CastShadows);
-			UI::DrawCheckbox("Soft Shadows", component.SoftShadows);
-			UI::DrawDragFloat("Source Size", component.LightSize);
+			UI::DrawColorPicker(translation->GetText("object-properties-light-component-radiance"), component.Radiance);
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-intensity"), component.Intensity);
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-radius"), component.Radius, 0.1f, 0.0f, std::numeric_limits<float>::max());
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-falloff"), component.Falloff, 0.005f, 0.0f, 1.0f);
+			UI::DrawCheckbox(translation->GetText("object-properties-light-component-cast-shadows"), component.CastShadows);
+			UI::DrawCheckbox(translation->GetText("object-properties-light-component-soft-shadows"), component.SoftShadows);
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-source-size"), component.LightSize);
 			UI::EndPropertyGrid();
 		}, m_SettingsIcon);
 
-		DrawComponent<SkyLightComponent>("Sky Light", entity, [](SkyLightComponent &component)
+		DrawComponent<SkyLightComponent>(translation->GetText("object-properties-sky-light-component"), entity, [&](SkyLightComponent &component)
 		{
 			UI::BeginPropertyGrid();
-			UI::DrawDragFloat("Intensity", component.Intensity);
+			UI::DrawDragFloat(translation->GetText("object-properties-light-component-intensity"), component.Intensity);
 			if (AssetManager::Get()->IsAssetHandleValid(component.SceneEnvironment))
 			{
 				auto env = AssetManager::Get()->GetAsset<Environment>(component.SceneEnvironment);
@@ -601,7 +616,7 @@ namespace highlo
 
 			ImGui::Separator();
 
-			UI::DrawCheckbox("Dynamic Sky", component.DynamicSky);
+			UI::DrawCheckbox(translation->GetText("object-properties-light-component-dynamic-sky"), component.DynamicSky);
 			if (component.DynamicSky)
 			{
 				bool changed = UI::DrawDragFloat("Turbidity", component.TurbityAzimuthInclination.x, 0.01f);

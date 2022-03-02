@@ -14,6 +14,7 @@
 #include "Engine/Scene/Scene.h"
 #include "Engine/ECS/Prefab.h"
 #include "Engine/Math/Color.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo
 {
@@ -59,8 +60,6 @@ namespace highlo
 		m_AssetIconMap["hdr"] = Texture2D::LoadFromFile("assets/Resources/icons/hdr-file-format.png");
 		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
 	//	m_AssetIconMap["hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap["ttc"] = Texture2D::LoadFromFile("assets/Resources/icons/");
-	//	m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/");
 
 		HLString basePath = project->GetAssetDirectory().String();
 		if (basePath.EndsWith('/'))
@@ -82,6 +81,8 @@ namespace highlo
 	
 	void AssetBrowserPanel::OnUIRender()
 	{
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+
 		ImGui::Begin("Asset Browser", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
 		m_IsAssetBrowserHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
 		m_IsAssetBrowserFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
@@ -109,7 +110,7 @@ namespace highlo
 
 				ImGui::BeginChild("##folders_common");
 				{
-					if (ImGui::CollapsingHeader("Content", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+					if (ImGui::CollapsingHeader(translation->GetText("asset-browser-content-headline"), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 					{
 						UI::ScopedStyle spacing(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 						UI::ScopedColorStack itemBg(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
@@ -148,9 +149,9 @@ namespace highlo
 						ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 4.0f));
 						if (ImGui::BeginPopupContextWindow(0, 1, false))
 						{
-							if (ImGui::BeginMenu(ICON_FA_PLUS "  New"))
+							if (ImGui::BeginMenu((HLString(ICON_FA_PLUS) + " " + translation->GetText("asset-browser-right-click-menu-new")).C_Str()))
 							{
-								if (ImGui::MenuItem(ICON_FA_FOLDER " Folder"))
+								if (ImGui::MenuItem((HLString(ICON_FA_FOLDER) + " " + translation->GetText("asset-browser-right-click-menu-new-folder")).C_Str()))
 								{
 									FileSystemPath newFilePath = Project::GetAssetDirectory() / m_CurrentDirectory->FilePath / "New Folder";
 									bool created = FileSystem::Get()->CreateFolder(newFilePath);
@@ -175,27 +176,27 @@ namespace highlo
 									}
 								}
 
-								if (ImGui::MenuItem(ICON_FA_FILM " Scene"))
+								if (ImGui::MenuItem((HLString(ICON_FA_FILM) + " " + translation->GetText("asset-browser-right-click-menu-new-scene")).C_Str()))
 									CreateAssetRepresentation<Scene>("New Scene.hlscene");
 
 								ImGui::EndMenu();
 							}
 
-							if (ImGui::MenuItem(ICON_FA_TRUCK_LOADING " Import"))
+							if (ImGui::MenuItem((HLString(ICON_FA_TRUCK_LOADING) + " " + translation->GetText("asset-browser-right-click-menu-import").C_Str())))
 							{
 								// TODO
 							}
 
-							if (ImGui::MenuItem(ICON_FA_SYNC_ALT " Refresh"))
+							if (ImGui::MenuItem((HLString(ICON_FA_SYNC_ALT) + " " + translation->GetText("asset-browser-right-click-menu-refresh")).C_Str()))
 								Refresh();
 
-							if (ImGui::MenuItem(ICON_FA_COPY " Copy", "Ctrl+C", nullptr, m_SelectionStack.Count() > 0))
+							if (ImGui::MenuItem((HLString(ICON_FA_COPY) + " " + translation->GetText("asset-browser-right-click-menu-copy")).C_Str(), "Ctrl+C", nullptr, m_SelectionStack.Count() > 0))
 								m_CopiedAssets.CopyFrom(m_SelectionStack);
 
-							if (ImGui::MenuItem(ICON_FA_PASTE " Paste", "Ctrl+V", nullptr, m_CopiedAssets.Count() > 0))
+							if (ImGui::MenuItem((HLString(ICON_FA_PASTE) + " " + translation->GetText("asset-browser-right-click-menu-paste")).C_Str(), "Ctrl+V", nullptr, m_CopiedAssets.Count() > 0))
 								PasteCopiedAssets();
 
-							if (ImGui::MenuItem(ICON_FA_CLONE " Duplicate", "Ctrl+D", nullptr, m_SelectionStack.Count() > 0))
+							if (ImGui::MenuItem((HLString(ICON_FA_CLONE) + " " + translation->GetText("asset-browser-right-click-menu-duplicate")).C_Str(), "Ctrl+D", nullptr, m_SelectionStack.Count() > 0))
 							{
 								m_CopiedAssets.CopyFrom(m_SelectionStack);
 								PasteCopiedAssets();
@@ -203,7 +204,7 @@ namespace highlo
 
 							ImGui::Separator();
 
-							if (ImGui::MenuItem(ICON_FA_EXTERNAL_LINK_ALT " Show in Explorer"))
+							if (ImGui::MenuItem((HLString(ICON_FA_EXTERNAL_LINK_ALT) + " " + translation->GetText("asset-browser-right-click-menu-explorer")).C_Str()))
 							{
 								FileSystemPath p = m_CurrentDirectory->FilePath.Absolute();
 								FileSystem::Get()->OpenInExplorer(p);
@@ -243,10 +244,14 @@ namespace highlo
 
 				if (ImGui::BeginDragDropTarget())
 				{
-					auto data = ImGui::AcceptDragDropPayload("scene_entity_hierarchy");
+					const ImGuiPayload *data = ImGui::AcceptDragDropPayload("scene_entity_hierarchy");
 					if (data)
 					{
-						Entity &e = *(Entity*)data->Data;
+						UUID &entityId = *(UUID*)data->Data;
+						Scene *currentScene = Scene::GetActiveScene();
+						HL_ASSERT(currentScene, "No scene has been created yet");
+
+						Entity &e = currentScene->FindEntityByUUID(entityId);
 						Ref<Prefab> prefab = CreateAssetRepresentation<Prefab>("New Prefab.hprefab");
 						prefab->Create(e);
 
@@ -507,6 +512,7 @@ namespace highlo
 	{
 		ImGui::BeginChild("##top_bar", ImVec2(0, height));
 		ImGui::BeginHorizontal("##top_bar", ImGui::GetWindowSize());
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
 
 		// ====================================================================================================================================
 		// ===========================================================  Navigation buttons  ===================================================
@@ -531,7 +537,7 @@ namespace highlo
 				ChangeDirectory(m_PrevDirectory);
 			}
 
-		//	UI::SetToolTip("Previous Directory");
+			UI::DrawHelpMarker(translation->GetText("asset-browser-prev-dir-btn-tooltip"), false);
 			ImGui::Spring(-1.0f, edgeOffset);
 
 			if (ContentBrowserButton(ICON_FA_ARROW_RIGHT))
@@ -539,13 +545,13 @@ namespace highlo
 				ChangeDirectory(m_NextDirectory);
 			}
 
-		//	UI::SetToolTip("Next Directory");
+			UI::DrawHelpMarker(translation->GetText("asset-browser-next-dir-btn-tooltip"), false);
 			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
 
 			if (ContentBrowserButton(ICON_FA_SYNC_ALT))
 				Refresh();
 
-		//	UI::SetToolTip("Refresh");
+			UI::DrawHelpMarker(translation->GetText("asset-browser-refresh-dir-btn-tooltip"), false);
 			ImGui::Spring(-1.0f, edgeOffset * 2.0f);
 		}
 
@@ -807,10 +813,16 @@ namespace highlo
 			ClearSelections();
 
 		if (Input::IsKeyPressed(HL_KEY_DELETE) && m_SelectionStack.Count() > 0)
+		{
+			HL_CORE_TRACE("Showing delete popup");
 			ImGui::OpenPopup("Delete");
+		}
 
 		if (Input::IsKeyPressed(HL_KEY_F5))
+		{
+			HL_CORE_TRACE("Refreshing from disk");
 			Refresh();
+		}
 	}
 	
 	void AssetBrowserPanel::PasteCopiedAssets()

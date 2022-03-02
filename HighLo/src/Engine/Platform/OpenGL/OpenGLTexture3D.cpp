@@ -60,9 +60,10 @@ namespace highlo
 		uint32 levels = utils::CalculateMipCount(width, height);
 
 		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
 		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
 
-		if (m_Buffer.Data)
+		if (m_Buffer)
 			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.Data);
 
 		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, levels > 1));

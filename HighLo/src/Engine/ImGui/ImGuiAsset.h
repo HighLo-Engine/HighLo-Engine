@@ -13,6 +13,7 @@
 #include "Engine/ECS/Entity.h"
 #include "Engine/Assets/Asset.h"
 #include "Engine/Assets/AssetManager.h"
+#include "Engine/Scene/Scene.h"
 
 namespace highlo::UI
 {
@@ -230,7 +231,11 @@ namespace highlo::UI
 			const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("scene_entity_hierarchy");
 			if (payload)
 			{
-				entity = *(Entity*)payload->Data;
+				UUID &entityID = *(UUID*)payload->Data;
+				Scene *currentScene = Scene::GetActiveScene();
+				HL_ASSERT(currentScene);
+
+				entity = currentScene->FindEntityByUUID(entityID);
 				receivedValudEntity = true;
 			}
 
@@ -271,7 +276,11 @@ namespace highlo::UI
 			const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("scene_entity_hierarchy");
 			if (payload)
 			{
-				Entity tmp = *(Entity*)payload->Data;
+				UUID &entityId = *(UUID*)payload->Data;
+				Scene *currentScene = Scene::GetActiveScene();
+				HL_ASSERT(currentScene);
+
+				Entity &tmp = currentScene->FindEntityByUUID(entityId);
 				if (requireAllComponents)
 				{
 					if (tmp.HasComponents<Components...>())

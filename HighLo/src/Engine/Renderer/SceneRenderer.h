@@ -29,7 +29,7 @@ namespace highlo
 	{
 		bool ShowGrid = true;
 
-		//HBAO
+		// HBAO
 		bool EnableHBAO = true;
 		float HBAOIntensity = 1.5f;
 		float HBAORadius = 1.0f;

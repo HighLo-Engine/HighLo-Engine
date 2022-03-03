@@ -13,7 +13,7 @@
 
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Assert.h"
-#include "Engine/Renderer/TextureFormat.h"
+#include "Engine/Graphics/TextureFormat.h"
 
 namespace highlo
 {

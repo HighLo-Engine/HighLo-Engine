@@ -7,7 +7,7 @@
 
 #include <glad/glad.h>
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/BufferLayout.h"
+#include "Engine/Graphics/BufferLayout.h"
 
 namespace highlo
 {

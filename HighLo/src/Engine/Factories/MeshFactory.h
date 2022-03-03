@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Meshes/StaticModel.h"
+#include "Engine/Graphics/Meshes/StaticModel.h"
 #include "Engine/Assets/Asset.h"
 
 namespace highlo

@@ -10,14 +10,14 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Math/Math.h"
 
-#include "Environment.h"
 #include "CommandBuffer.h"
 #include "RenderPass.h"
 #include "ComputePipeline.h"
-#include "Engine/Renderer/Shaders/UniformBufferSet.h"
-#include "Engine/Renderer/Shaders/StorageBufferSet.h"
-#include "Engine/Renderer/Meshes/DynamicModel.h"
-#include "Engine/Renderer/Meshes/StaticModel.h"
+#include "Engine/Renderer/Environment.h"
+#include "Engine/Graphics/Shaders/UniformBufferSet.h"
+#include "Engine/Graphics/Shaders/StorageBufferSet.h"
+#include "Engine/Graphics/Meshes/DynamicModel.h"
+#include "Engine/Graphics/Meshes/StaticModel.h"
 
 namespace highlo
 {

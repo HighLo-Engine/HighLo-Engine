@@ -10,8 +10,8 @@
 #include "Mesh.h"
 
 #include "Engine/Assets/Asset.h"
-#include "Engine/Renderer/MaterialTable.h"
-#include "Engine/Renderer/Meshes/MeshFile.h"
+#include "Engine/Graphics/MaterialTable.h"
+#include "Engine/Graphics/Meshes/MeshFile.h"
 
 namespace highlo
 {

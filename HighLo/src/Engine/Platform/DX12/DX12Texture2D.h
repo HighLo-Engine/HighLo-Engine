@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture2D.h"
+#include "Engine/Graphics/Texture2D.h"
 
 #ifdef HIGHLO_API_DX12
 

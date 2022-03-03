@@ -11,10 +11,10 @@
 
 #include "Engine/Assets/Asset.h"
 #include "Engine/Core/FileSystemPath.h"
-#include "Engine/Renderer/Shaders/Shader.h"
-#include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/VertexBuffer.h"
-#include "Engine/Renderer/IndexBuffer.h"
+#include "Engine/Graphics/Shaders/Shader.h"
+#include "Engine/Graphics/Material.h"
+#include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Graphics/IndexBuffer.h"
 
 #include "Engine/Loaders/MeshLoader.h"
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/CommandBuffer.h"
+#include "Engine/Graphics/CommandBuffer.h"
 
 #ifdef HIGHLO_API_DX11
 

@@ -3,17 +3,18 @@
 #include "HighLoPch.h"
 #include "Renderer2D.h"
 
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shaders/Shader.h"
-#include "Renderer.h"
-#include "Framebuffer.h"
-#include "FontData.h"
+#include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Graphics/IndexBuffer.h"
+#include "Engine/Graphics/VertexArray.h"
+#include "Engine/Graphics/Shaders/Shader.h"
+#include "Engine/Graphics/Framebuffer.h"
+#include "Engine/Graphics/Shaders/UniformBufferSet.h"
+#include "Engine/Graphics/Material.h"
+
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/FontData.h"
 
 #include "Engine/Utils/StringUtils.h"
-#include "Engine/Renderer/Shaders/UniformBufferSet.h"
-#include "Engine/Renderer/Material.h"
 
 namespace highlo
 {

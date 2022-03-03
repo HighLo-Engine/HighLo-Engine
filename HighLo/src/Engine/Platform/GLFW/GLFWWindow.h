@@ -15,7 +15,7 @@
 #include <shobjidl_core.h>
 
 #include "Engine/Window/Window.h"
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Window/MenuBar.h"
 
 namespace highlo

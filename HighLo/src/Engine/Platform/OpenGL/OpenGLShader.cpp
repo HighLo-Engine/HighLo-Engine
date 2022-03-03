@@ -7,7 +7,7 @@
 
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/Shaders/ShaderCache.h"
+#include "Engine/Graphics/Shaders/ShaderCache.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <shaderc/shaderc.hpp>

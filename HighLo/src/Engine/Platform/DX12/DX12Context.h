@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Window/Window.h"
 
 #ifdef HIGHLO_API_DX12

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/Shaders/StorageBuffer.h"
+#include "Engine/Graphics/Shaders/StorageBuffer.h"
 
 #ifdef HIGHLO_API_DX11
 

@@ -12,7 +12,7 @@
 #include "MeshFile.h"
 #include "Engine/Assets/Asset.h"
 #include "Engine/Core/Time.h"
-#include "Engine/Renderer/MaterialTable.h"
+#include "Engine/Graphics/MaterialTable.h"
 
 namespace highlo
 {

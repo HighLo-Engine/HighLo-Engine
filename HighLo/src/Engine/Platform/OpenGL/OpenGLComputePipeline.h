@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/ComputePipeline.h"
+#include "Engine/Graphics/ComputePipeline.h"
 
 #ifdef HIGHLO_API_OPENGL
 

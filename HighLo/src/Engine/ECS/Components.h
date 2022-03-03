@@ -9,8 +9,10 @@
 
 #pragma once
 
-#include "Engine/Renderer/Meshes/DynamicModel.h"
-#include "Engine/Renderer/Meshes/StaticModel.h"
+#include "Engine/Graphics/Meshes/DynamicModel.h"
+#include "Engine/Graphics/Meshes/StaticModel.h"
+#include "Engine/Graphics/Texture2D.h"
+#include "Engine/Graphics/MaterialTable.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Core/UUID.h"
 

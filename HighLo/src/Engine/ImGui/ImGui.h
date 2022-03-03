@@ -24,7 +24,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Engine/ECS/Entity.h"
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Graphics/Texture.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/PopupMenu.h"

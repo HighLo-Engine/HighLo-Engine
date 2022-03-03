@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Shaders/Shader.h"
+#include "Engine/Graphics/Shaders/Shader.h"
 #include "Engine/Core/Defines/BaseTypes.h"
 
 #ifdef HIGHLO_API_OPENGL

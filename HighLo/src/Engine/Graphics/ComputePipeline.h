@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CommandBuffer.h"
-#include "Engine/Renderer/Shaders/Shader.h"
+#include "Engine/Graphics/Shaders/Shader.h"
 
 namespace highlo
 {

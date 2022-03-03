@@ -9,7 +9,7 @@
 
 #ifdef HIGHLO_API_OPENGL
 
-#include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Graphics/Framebuffer.h"
 
 namespace highlo
 {

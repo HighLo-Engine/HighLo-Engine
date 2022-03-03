@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "Engine/Renderer/RenderingAPI.h"
+#include "Engine/Graphics/RenderingAPI.h"
+#include "Engine/Graphics/VertexArray.h"
 #include "Engine/Core/Log.h"
-#include "Engine/Renderer/VertexArray.h"
 
 #ifdef HIGHLO_API_DX11
 

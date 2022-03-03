@@ -13,8 +13,8 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/DataTypes/String.h"
-#include "Engine/Renderer/TextureFormat.h"
-#include "Engine/Renderer/Texture2D.h"
+#include "Engine/Graphics/TextureFormat.h"
+#include "Engine/Graphics/Texture2D.h"
 
 namespace highlo
 {

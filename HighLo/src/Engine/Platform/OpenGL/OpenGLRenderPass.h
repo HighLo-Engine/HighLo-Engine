@@ -11,7 +11,7 @@
 
 #include <glad/glad.h>
 
-#include "Engine/Renderer/RenderPass.h"
+#include "Engine/Graphics/RenderPass.h"
 
 namespace highlo
 {

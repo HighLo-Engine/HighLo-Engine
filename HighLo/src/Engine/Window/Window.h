@@ -12,8 +12,8 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Core/UniqueReference.h"
 #include "Engine/Core/DataTypes/String.h"
-#include "Engine/Renderer/RenderingContext.h"
-#include "Engine/Renderer/SwapChain.h"
+#include "Engine/Graphics/RenderingContext.h"
+#include "Engine/Graphics/SwapChain.h"
 #include "MenuBar.h"
 
 // Windows macro

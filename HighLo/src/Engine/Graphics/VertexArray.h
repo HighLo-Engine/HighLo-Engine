@@ -10,9 +10,9 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
-#include "Engine/Renderer/RenderPass.h"
-#include "Engine/Renderer/RenderingAPI.h"
-#include "Engine/Renderer/Shaders/Shader.h"
+#include "Engine/Graphics/RenderPass.h"
+#include "Engine/Graphics/RenderingAPI.h"
+#include "Engine/Graphics/Shaders/Shader.h"
 
 namespace highlo
 {

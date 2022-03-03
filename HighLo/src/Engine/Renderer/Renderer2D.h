@@ -13,8 +13,8 @@
 
 #include "Engine/Math/Transform.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
-#include "Texture.h"
-#include "RenderPass.h"
+#include "Engine/Graphics/Texture.h"
+#include "Engine/Graphics/RenderPass.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Camera/EditorCamera.h"
 #include "FontManager.h"

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/VertexArray.h"
+#include "Engine/Graphics/VertexArray.h"
 #include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_OPENGL

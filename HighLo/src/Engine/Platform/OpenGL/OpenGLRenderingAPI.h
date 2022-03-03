@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/RenderingAPI.h"
+#include "Engine/Graphics/RenderingAPI.h"
 #include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_OPENGL

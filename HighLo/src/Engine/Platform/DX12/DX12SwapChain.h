@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/SwapChain.h"
+#include "Engine/Graphics/SwapChain.h"
 
 #ifdef HIGHLO_API_DX12
 

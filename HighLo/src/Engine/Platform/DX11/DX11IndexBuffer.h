@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/IndexBuffer.h"
+#include "Engine/Graphics/IndexBuffer.h"
 #include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_DX11

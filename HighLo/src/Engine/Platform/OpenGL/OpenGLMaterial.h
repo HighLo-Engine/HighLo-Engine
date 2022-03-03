@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/Material.h"
+#include "Engine/Graphics/Material.h"
 #include "Engine/Core/Allocator.h"
 
 #ifdef HIGHLO_API_OPENGL

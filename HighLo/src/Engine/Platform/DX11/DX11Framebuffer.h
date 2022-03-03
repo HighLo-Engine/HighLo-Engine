@@ -11,7 +11,7 @@
 
 #ifdef HIGHLO_API_DX11
 
-#include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Graphics/Framebuffer.h"
 
 namespace highlo
 {

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/VertexBuffer.h"
+#include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Allocator.h"
 

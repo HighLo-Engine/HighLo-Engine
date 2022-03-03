@@ -4,8 +4,6 @@
 #include "DocumentWriter.h"
 
 #include "Engine/Platform/JSON/JsonWriter.h"
-#include "Engine/Platform/XML/XMLWriter.h"
-#include "Engine/Platform/YAML/YAMLWriter.h"
 
 namespace highlo
 {
@@ -19,10 +17,10 @@ namespace highlo
 					return Ref<JSONWriter>::Create(filePath);
 
 				case DocumentType::XML:
-					return Ref<XMLWriter>::Create(filePath);
+					break;
 
 				case DocumentType::Yaml:
-					return Ref<YAMLWriter>::Create(filePath);
+					break;
 			}
 		}
 

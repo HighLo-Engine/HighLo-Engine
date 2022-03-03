@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Shaders/UniformBuffer.h"
+#include "Engine/Graphics/Shaders/UniformBuffer.h"
 
 #ifdef HIGHLO_API_OPENGL
 

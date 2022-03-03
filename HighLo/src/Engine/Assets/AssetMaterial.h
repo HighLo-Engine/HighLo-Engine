@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine/Assets/Asset.h"
-#include "Engine/Renderer/Material.h"
+#include "Engine/Graphics/Material.h"
 
 namespace highlo
 {

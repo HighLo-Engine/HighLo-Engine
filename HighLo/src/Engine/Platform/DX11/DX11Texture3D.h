@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture3D.h"
+#include "Engine/Graphics/Texture3D.h"
 
 #ifdef HIGHLO_API_DX11
 

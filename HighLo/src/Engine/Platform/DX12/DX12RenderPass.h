@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/RenderPass.h"
+#include "Engine/Graphics/RenderPass.h"
 
 #ifdef HIGHLO_API_DX12
 

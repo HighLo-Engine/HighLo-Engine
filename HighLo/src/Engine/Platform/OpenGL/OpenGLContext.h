@@ -10,7 +10,7 @@
 #ifdef HIGHLO_API_OPENGL
 
 #include "Engine/Window/Window.h"
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Core/Log.h"
 
 namespace highlo

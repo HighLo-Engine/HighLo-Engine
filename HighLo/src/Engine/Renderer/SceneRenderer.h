@@ -11,17 +11,18 @@
 
 #include "Engine/Scene/Scene.h"
 #include "Engine/Camera/Camera.h"
-#include "Engine/Renderer/RenderPass.h"
-#include "Engine/Renderer/VertexArray.h"
-#include "Engine/Renderer/Texture.h"
-#include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/MaterialTable.h"
-#include "Engine/Renderer/ComputePipeline.h"
-#include "Engine/Renderer/CommandBuffer.h"
-#include "Engine/Renderer/Shaders/UniformBufferSet.h"
-#include "Engine/Renderer/Shaders/StorageBufferSet.h"
-#include "Engine/Renderer/Meshes/DynamicModel.h"
-#include "Engine/Renderer/Meshes/StaticModel.h"
+
+#include "Engine/Graphics/RenderPass.h"
+#include "Engine/Graphics/VertexArray.h"
+#include "Engine/Graphics/Texture.h"
+#include "Engine/Graphics/Material.h"
+#include "Engine/Graphics/MaterialTable.h"
+#include "Engine/Graphics/ComputePipeline.h"
+#include "Engine/Graphics/CommandBuffer.h"
+#include "Engine/Graphics/Shaders/UniformBufferSet.h"
+#include "Engine/Graphics/Shaders/StorageBufferSet.h"
+#include "Engine/Graphics/Meshes/DynamicModel.h"
+#include "Engine/Graphics/Meshes/StaticModel.h"
 
 namespace highlo
 {

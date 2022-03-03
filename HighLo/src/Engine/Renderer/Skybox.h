@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Engine/Renderer/Meshes/StaticModel.h"
-#include "Material.h"
+#include "Engine/Graphics/Meshes/StaticModel.h"
+#include "Engine/Graphics/Material.h"
 #include "Engine/Camera/ICamera.h"
 
 namespace highlo

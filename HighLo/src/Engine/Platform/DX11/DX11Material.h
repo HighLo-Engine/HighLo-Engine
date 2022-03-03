@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/Material.h"
+#include "Engine/Graphics/Material.h"
 
 #ifdef HIGHLO_API_DX11
 

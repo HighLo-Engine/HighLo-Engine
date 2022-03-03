@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 
 namespace highlo
 {

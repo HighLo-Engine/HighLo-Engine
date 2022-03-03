@@ -11,6 +11,7 @@
 
 #include "Engine/Scene/Project.h"
 #include "Engine/Loaders/DocumentWriter.h"
+#include "Engine/Loaders/DocumentReader.h"
 
 #define ASSET_MANAGER_LOG_PREFIX "AManager>     "
 
@@ -147,7 +148,7 @@ namespace highlo
 		if (!FileSystem::Get()->FileExists(assetRegistryPath))
 			return;
 
-		Ref<DocumentWriter> reader = DocumentWriter::Create(assetRegistryPath, DocumentType::Json);
+		Ref<DocumentReader> reader = DocumentReader::Create(assetRegistryPath, DocumentType::Json);
 		reader->ReadContents();
 
 		// TODO
@@ -177,8 +178,6 @@ namespace highlo
 
 		HL_CORE_INFO(ASSET_MANAGER_LOG_PREFIX "[+] Serializing asset registry with {0} entries [+]", sortedAssets.size());
 
-		// TODO
-		/*
 		writer->BeginArray();
 		for (auto &[handle, entry] : sortedAssets)
 		{
@@ -189,7 +188,8 @@ namespace highlo
 			writer->EndObject();
 		}
 		writer->EndArray();
-		*/
+
+		writer->WriteOut();
 	}
 
 	void AssetManager::ProcessDirectory(const FileSystemPath &dirPath)

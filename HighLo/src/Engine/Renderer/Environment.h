@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Texture2D.h"
-#include "Texture3D.h"
+#include "Engine/Graphics/Texture2D.h"
+#include "Engine/Graphics/Texture3D.h"
 
 namespace highlo
 {

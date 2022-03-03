@@ -150,8 +150,8 @@ namespace highlo
 		Logger::Init();
 
 		// Create cache for sin() and cos()
-		CreateCacheSin();
-		CreateCacheCos();
+		Math::CreateCacheSin();
+		Math::CreateCacheCos();
 
 		// Read the json registry with previous shader cache data
 		ShaderCache::Init();

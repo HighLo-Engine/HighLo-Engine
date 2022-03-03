@@ -394,7 +394,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 					rawTransform = glm::inverse(parentTransform) * rawTransform;
 
 					glm::vec3 translation, rotation, scale;
-					Decompose(rawTransform, translation, scale, rotation);
+					Math::Decompose(rawTransform, translation, scale, rotation);
 
 					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
 					entityTransform.SetPosition(translation);
@@ -406,7 +406,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 				else
 				{
 					glm::vec3 translation, rotation, scale;
-					Decompose(rawTransform, translation, scale, rotation);
+					Math::Decompose(rawTransform, translation, scale, rotation);
 
 					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
 					entityTransform.SetPosition(translation);

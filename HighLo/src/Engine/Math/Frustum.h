@@ -13,6 +13,10 @@
 
 namespace highlo
 {
+#define HL_INTERSECTING 0
+#define HL_INSIDE		1
+#define HL_OUTSIDE		2
+
 #define HL_FRUSTUM_NEAR  0
 #define HL_FRUSTUM_FAR   1
 #define HL_FRUSTUM_LEFT  2

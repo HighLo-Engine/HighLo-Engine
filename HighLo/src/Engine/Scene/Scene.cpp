@@ -197,9 +197,9 @@ namespace highlo
 
 		glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
 		
-// TODO: test if this works
+		// TODO: test if this works
 		glm::vec3 translation, rotation, scale;
-		Decompose(localTransform, translation, scale, rotation);
+		Math::Decompose(localTransform, translation, scale, rotation);
 		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
 	}
 	
@@ -211,10 +211,10 @@ namespace highlo
 		if (!parent)
 			return;
 
-// TODO: test if this works
+		// TODO: test if this works
 		glm::mat4 transform = GetTransformRelativeToParent(entity);
 		glm::vec3 translation, rotation, scale;
-		Decompose(transform, translation, scale, rotation);
+		Math::Decompose(transform, translation, scale, rotation);
 		entity.SetTransform(Transform::FromPosition(translation).Scale(scale).Rotate(rotation));
 	}
 	
@@ -253,7 +253,7 @@ namespace highlo
 		glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
 
 		Transform result;
-		Decompose(transform, translation, scale, rotation);
+		Math::Decompose(transform, translation, scale, rotation);
 		result.SetPosition(translation);
 		result.SetScale(scale);
 		result.SetRotation(rotation);

@@ -22,14 +22,14 @@ namespace highlo
 
 		HLAPI virtual void Update() = 0;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) = 0;
-		HLAPI virtual void OnEvent(Event& e) = 0;
+		HLAPI virtual void OnEvent(Event &e) = 0;
 
-		HLAPI const glm::mat4& GetProjection() const { return m_ProjectionMatrix; }
-		HLAPI const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+		HLAPI const glm::mat4 &GetProjection() const { return m_ProjectionMatrix; }
+		HLAPI const glm::mat4 &GetViewMatrix() const { return m_ViewMatrix; }
 		HLAPI glm::mat4 GetViewProjectionMatrix() { return m_ProjectionMatrix * m_ViewMatrix; }
-		HLAPI void GetViewProjectionMatrix(glm::mat4& out) { MatrixMulSSE(m_ProjectionMatrix, m_ViewMatrix, out); }
+		HLAPI void GetViewProjectionMatrix(glm::mat4 &out) { Math::MatrixMulSSE(m_ProjectionMatrix, m_ViewMatrix, out); }
 
-		HLAPI const glm::vec3& GetPosition()	 const { return m_Position; }
+		HLAPI const glm::vec3 &GetPosition()	 const { return m_Position; }
 		HLAPI const glm::vec3 GetYawPitchRoll()  const { return glm::vec3(m_Yaw, m_Pitch, m_Roll); }
 
 		HLAPI const float GetYaw()   const { return m_Yaw; }
@@ -52,10 +52,12 @@ namespace highlo
 		HLAPI float &GetExposure() { return m_Exposure; }
 
 	protected:
+
 		glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
 		glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
 
 	protected:
+
 		glm::vec3 m_Position = glm::vec3(0, 0, 0);
 		float m_Yaw = 0.0f;
 		float m_Pitch = 0.0f;
@@ -63,3 +65,4 @@ namespace highlo
 		float m_Exposure = 0.0f;
 	};
 }
+

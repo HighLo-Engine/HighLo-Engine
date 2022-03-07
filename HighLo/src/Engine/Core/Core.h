@@ -34,7 +34,7 @@
 
 #define HL_BIND_EVENT_FUNCTION(fn) std::bind(&fn, this, std::placeholders::_1)
 
-#define HL_COPYABLE(className) HLAPI className(const className&) = default; HLAPI className& operator=(const className&) = default
+#define HL_COPYABLE(className) HLAPI className(const className&) = default; HLAPI className &operator=(const className&) = default
 #define HL_NON_COPYABLE(className) HLAPI className(const className&) = delete; HLAPI className &operator=(const className&) = delete
 
 #define HL_MOVABLE(className) HLAPI className(className&&) = default; HLAPI className &operator=(className&&) = default

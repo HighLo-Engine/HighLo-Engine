@@ -54,7 +54,7 @@ namespace highlo
 
 	void AssetImporter::Serialize(const AssetMetaData &assetInfo, const Ref<Asset> &asset)
 	{
-// TODO: write into config file
+		// TODO: write into config file
 	}
 	
 	void AssetImporter::Serialize(const Ref<Asset> &asset)

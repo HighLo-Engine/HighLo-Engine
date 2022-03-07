@@ -39,14 +39,46 @@ namespace highlo
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
 		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
-		writer->BeginArray();
-		for (auto &[filePath, hash] : shaderCache)
-		{
-			writer->BeginObject();
-			writer->WriteUInt64(filePath, hash);
-			writer->EndObject();
-		}
-		writer->EndArray();
+	//	writer->BeginArray();
+	//	for (auto &[filePath, hash] : shaderCache)
+	//	{
+	//		writer->BeginObject();
+	//		writer->WriteUInt64(filePath, hash);
+	//		writer->EndObject();
+	//	}
+	//	writer->EndArray();
+
+		writer->WriteUInt64ArrayMap("shaderCache", shaderCache);
+
+		// CHECK - Example #1
+	//	writer->WriteString("Hello", "World");
+	//	writer->WriteUInt64("number", 42);
+
+		// CHECK - Example #2
+	//	writer->BeginObject();
+	//	writer->WriteString("Hello", "World");
+	//	writer->WriteUInt64("number", 42);
+	//	writer->EndObject();
+
+		// CHECK - Example #3
+	//	writer->BeginArray();
+	//	for (uint32 i = 0; i < 10; ++i)
+	//	{
+	//		writer->WriteUInt32("i_" + HLString::ToString(i), i);
+	//		writer->WriteString("Hello", "World");
+	//	}
+	//	writer->EndArray();
+
+		// CHECK - Example #4
+	//	writer->BeginArray();
+	//	for (uint32 i = 0; i < 10; ++i)
+	//	{
+	//		writer->BeginObject();
+	//		writer->WriteUInt32("i_" + HLString::ToString(i), i);
+	//	//	writer->WriteString("Hello", "World");
+	//		writer->EndObject();
+	//	}
+	//	writer->EndArray();
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);

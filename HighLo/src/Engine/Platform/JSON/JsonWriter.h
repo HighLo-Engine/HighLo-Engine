@@ -27,6 +27,92 @@
  * {"type":"int32","value":{"test":[10,42]}}
  */
 
+/**
+ * =========================================================================================================
+ *													API usage
+ * =========================================================================================================
+ * 
+ * Example #1:
+ * -----------
+ * 
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->WriteString("Hello", "World");
+ * writer->WriteUint64("number", 64);
+ * writer->WriteOut();
+ * 
+ * -> should result in json:
+ * {
+ *    "Hello":"World",
+ *    "number":64
+ * }
+ * 
+ * Example #2:
+ * -----------
+ * 
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->BeginObject();
+ * writer->WriteString("Hello", "World");
+ * writer->WriteUInt64("number", 64);
+ * writer->EndObject();
+ * writer->WriterOut();
+ * 
+ * -> should result in json:
+ * {
+ *     "Hello":
+ *     {
+ *       "value":"World",
+ *       "type":"string"
+ *     },
+ *     "number":
+ *     {
+ *       "value":64,
+ *       "type":"uint64"
+ *     }
+ * }
+ * 
+ * Example #3:
+ * -----------
+ * 
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->BeginArray();
+ * writer->WriteString("Hello", "World");
+ * writer->WriteUInt64("number", 64);
+ * writer->EndArray();
+ * writer->WriteOut();
+ * 
+ * -> should result in json:
+ * [
+ *   "World",
+ *   64
+ * ]
+ * 
+ * Example #4:
+ * -----------
+ * 
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->BeginArray();
+ * for ()
+ *   writer->BeginObject();
+ *   writer->WriteString("Hello", "World");
+ *   writer->WriteUInt64("number", 64);
+ *   writer->EndObject();
+ * endfor
+ * writer->EndArray();
+ * writer->WriteOut();
+ * 
+ * -> should result in json:
+ * [
+ *  {
+ *     "Hello":"World",
+ *     "type":"string"
+ *   },
+ *   {
+ *     "number":64,
+ *     "type":"uint64"
+ *   }
+ * ]
+ */
+
 #pragma once
 
 #include "Engine/Loaders/DocumentWriter.h"
@@ -35,6 +121,14 @@
 
 namespace highlo
 {
+	enum class NodeInsertType
+	{
+		Direct = 0,
+		Array = 1,
+		Object = 2,
+		ArrayObject = 3
+	};
+
 	class JSONWriter : public DocumentWriter
 	{
 	public:
@@ -46,7 +140,10 @@ namespace highlo
 		virtual void EndArray(const HLString &key = "") override;
 
 		virtual void BeginObject() override;
-		virtual void EndObject() override;
+		virtual void EndObject(const HLString &key = "") override;
+
+		virtual void EnableTypeSafety() override { m_UseTypeSafety = true; }
+		virtual void DisableTypeSafety() override { m_UseTypeSafety = false; }
 
 		virtual bool WriteFloat(const HLString &key, float value) override;
 		virtual bool WriteDouble(const HLString &key, double value) override;
@@ -104,8 +201,6 @@ namespace highlo
 
 	private:
 
-		bool AddIntoStructure(rapidjson::Value &keyType, rapidjson::Value &valType, DocumentDataType type);
-
 		template<typename T>
 		rapidjson::Value ConvertStdArrToRapidJsonArr(const std::vector<T> &arr)
 		{
@@ -122,9 +217,16 @@ namespace highlo
 
 		rapidjson::Document m_Document;
 		FileSystemPath m_FilePath;
+		bool m_UseTypeSafety = true;
 
 		bool m_ShouldWriteIntoArray = false;
 		bool m_ShouldWriteIntoObject = false;
+		bool m_ObjectsNeverUsed = true;
+
+		uint32 m_ObjectsPerGroup = 0;
+
+		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_ValuePairs;
+		std::vector<std::pair<rapidjson::Value, rapidjson::Value>> m_TypePairs;
 	};
 }
 

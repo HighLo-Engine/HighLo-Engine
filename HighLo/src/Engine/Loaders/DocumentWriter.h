@@ -145,7 +145,10 @@ namespace highlo
 		HLAPI virtual void EndArray(const HLString &key = "") = 0;
 
 		HLAPI virtual void BeginObject() = 0;
-		HLAPI virtual void EndObject() = 0;
+		HLAPI virtual void EndObject(const HLString &key = "") = 0;
+
+		HLAPI virtual void EnableTypeSafety() = 0;
+		HLAPI virtual void DisableTypeSafety() = 0;
 
 		HLAPI virtual bool WriteFloat(const HLString &key, float value) = 0;
 		HLAPI virtual bool WriteDouble(const HLString &key, double value) = 0;

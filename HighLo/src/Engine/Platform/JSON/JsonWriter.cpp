@@ -21,25 +21,6 @@
 
 namespace highlo
 {
-	namespace utils
-	{
-		std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
-		{
-			std::pair<rapidjson::Value, rapidjson::Value> result;
-			rapidjson::Value keyType(rapidjson::kStringType);
-			keyType.SetString("type", document.GetAllocator());
-
-			rapidjson::Value valType(rapidjson::kStringType);
-
-			HLString typeStr = utils::DocumentDataTypeToString(type);
-			valType.SetString(*typeStr, typeStr.Length(), document.GetAllocator());
-
-			result.first = keyType;
-			result.second = valType;
-			return result;
-		}
-	}
-
 	JSONWriter::JSONWriter(const FileSystemPath &filePath)
 		: m_FilePath(filePath)
 	{
@@ -56,15 +37,99 @@ namespace highlo
 
 	void JSONWriter::EndArray(const HLString &key)
 	{
+		if (m_ShouldWriteIntoArray)
+		{
+			m_ShouldWriteIntoArray = false;
+			m_Document.SetArray();
+
+			if (m_ObjectsNeverUsed)
+			{
+				// The values should be inserted into the array structure without type safety, see example #3
+
+				for (uint32 i = 0; i < m_ValuePairs.size(); ++i)
+				{
+					auto &valuePair = m_ValuePairs[i];
+					m_Document.PushBack(valuePair.second, m_Document.GetAllocator());
+				}
+			}
+			else
+			{
+				if (m_ObjectsPerGroup > 1)
+				{
+					// We have more than one object per group, so add them into their own sub-array, to keep the objects of one group together
+					for (uint32 i = 0; i < m_ValuePairs.size(); i += m_ObjectsPerGroup)
+					{
+						auto &valuePair = m_ValuePairs[i];
+						auto &typePair = m_TypePairs[i];
+
+						rapidjson::Value arrElem(rapidjson::kArrayType);
+
+						rapidjson::Value currentObj(rapidjson::kObjectType);
+						currentObj.AddMember(valuePair.first, valuePair.second, m_Document.GetAllocator());
+						currentObj.AddMember(typePair.first, typePair.second, m_Document.GetAllocator());
+						arrElem.PushBack(currentObj, m_Document.GetAllocator());
+
+						for (uint32 j = i + 1; j < i + m_ObjectsPerGroup; ++j)
+						{
+							auto &anotherValuePair = m_ValuePairs[j];
+							auto &anotherTypePair = m_TypePairs[j];
+
+							rapidjson::Value otherObj(rapidjson::kObjectType);
+							otherObj.AddMember(anotherValuePair.first, anotherValuePair.second, m_Document.GetAllocator());
+							otherObj.AddMember(anotherTypePair.first, anotherTypePair.second, m_Document.GetAllocator());
+							arrElem.PushBack(otherObj, m_Document.GetAllocator());
+						}
+
+						m_Document.PushBack(arrElem, m_Document.GetAllocator());
+					}
+				}
+				else
+				{
+					// We only have one object per group, so instead of a sub-array we add the objects normally to the document
+					for (uint32 i = 0; i < m_ValuePairs.size(); ++i)
+					{
+						auto &valuePair = m_ValuePairs[i];
+						auto &typePair = m_TypePairs[i];
+
+						rapidjson::Value currentObj(rapidjson::kObjectType);
+						currentObj.AddMember(valuePair.first, valuePair.second, m_Document.GetAllocator());
+						currentObj.AddMember(typePair.first, typePair.second, m_Document.GetAllocator());
+						m_Document.PushBack(currentObj, m_Document.GetAllocator());
+					}
+				}
+			}
+		}
 	}
 
 	void JSONWriter::BeginObject()
 	{
 		m_ShouldWriteIntoObject = true;
+		m_ObjectsNeverUsed = false;
+		m_ObjectsPerGroup = 0;
 	}
 
-	void JSONWriter::EndObject()
+	void JSONWriter::EndObject(const HLString &key)
 	{
+		if (m_ShouldWriteIntoObject)
+		{
+			m_ShouldWriteIntoObject = false;
+
+			if (!m_ShouldWriteIntoArray)
+			{
+				m_Document.SetObject();
+				for (uint32 i = 0; i < m_ValuePairs.size(); ++i)
+				{
+					auto &valuePair = m_ValuePairs[i];
+					auto &typePair = m_TypePairs[i];
+
+					rapidjson::Value currentObj(rapidjson::kObjectType);
+					currentObj.AddMember("value", valuePair.second, m_Document.GetAllocator());
+					currentObj.AddMember(typePair.first, typePair.second, m_Document.GetAllocator());
+
+					m_Document.AddMember(valuePair.first, currentObj, m_Document.GetAllocator());
+				}
+			}
+		}
 	}
 	
 	bool JSONWriter::WriteFloat(const HLString &key, float value)
@@ -518,7 +583,33 @@ namespace highlo
 
 	bool JSONWriter::WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt64, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+				
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetUint64(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::UInt64);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map)
@@ -613,15 +704,41 @@ namespace highlo
 	{
 		m_Document.Parse(*content);
 	}
-
-	bool JSONWriter::AddIntoStructure(rapidjson::Value &keyType, rapidjson::Value &valType, DocumentDataType type)
-	{
-		return false;
-	}
 	
 	bool JSONWriter::Write(const HLString &key, DocumentDataType type, const std::function<rapidjson::Value()> &insertFunc)
 	{
-		return false;
+		++m_ObjectsPerGroup;
+		rapidjson::Value val = insertFunc();
+		
+		rapidjson::Value keyVal(rapidjson::kStringType);
+		if (!key.IsEmpty())
+			keyVal.SetString(*key, key.Length(), m_Document.GetAllocator());
+
+		if (!m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
+		{
+			static bool firstPushIntoDocument = true;
+			if (firstPushIntoDocument)
+			{
+				firstPushIntoDocument = false;
+				m_Document.SetObject();
+			}
+
+			m_Document.AddMember(keyVal, val, m_Document.GetAllocator());
+		}
+		else
+		{
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(m_Document, type);
+
+			auto &valuePair = m_ValuePairs.emplace_back();
+			valuePair.first = keyVal;
+			valuePair.second = val;
+
+			auto &typePair = m_TypePairs.emplace_back();
+			typePair.first = typeKey;
+			typePair.second = typeValue;
+		}
+
+		return true;
 	}
 }
 

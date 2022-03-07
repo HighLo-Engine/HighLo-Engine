@@ -178,16 +178,16 @@ namespace highlo
 
 		HL_CORE_INFO(ASSET_MANAGER_LOG_PREFIX "[+] Serializing asset registry with {0} entries [+]", sortedAssets.size());
 
-	//	writer->BeginArray();
-	//	for (auto &[handle, entry] : sortedAssets)
-	//	{
-	//		writer->BeginObject();
-	//		writer->WriteUInt64("Handle", (uint64)handle);
-	//		writer->WriteString("FilePath", entry.FilePath.String());
-	//		writer->WriteString("Type", utils::AssetTypeToString(entry.Type));
-	//		writer->EndObject();
-	//	}
-	//	writer->EndArray();
+		writer->BeginArray();
+		for (auto &[handle, entry] : sortedAssets)
+		{
+			writer->BeginObject();
+			writer->WriteUInt64("Handle", (uint64)handle);
+			writer->WriteString("FilePath", entry.FilePath.String());
+			writer->WriteString("AssetType", utils::AssetTypeToString(entry.Type));
+			writer->EndObject();
+		}
+		writer->EndArray();
 
 		writer->WriteOut();
 	}

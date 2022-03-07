@@ -121,14 +121,6 @@
 
 namespace highlo
 {
-	enum class NodeInsertType
-	{
-		Direct = 0,
-		Array = 1,
-		Object = 2,
-		ArrayObject = 3
-	};
-
 	class JSONWriter : public DocumentWriter
 	{
 	public:

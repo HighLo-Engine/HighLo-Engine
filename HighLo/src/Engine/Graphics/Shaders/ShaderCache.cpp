@@ -48,40 +48,11 @@ namespace highlo
 	//	}
 	//	writer->EndArray();
 
-		writer->WriteUInt64ArrayMap("shaderCache", shaderCache);
-
-		// CHECK - Example #1
-	//	writer->WriteString("Hello", "World");
-	//	writer->WriteUInt64("number", 42);
-
-		// CHECK - Example #2
-	//	writer->BeginObject();
-	//	writer->WriteString("Hello", "World");
-	//	writer->WriteUInt64("number", 42);
-	//	writer->EndObject();
-
-		// CHECK - Example #3
-	//	writer->BeginArray();
-	//	for (uint32 i = 0; i < 10; ++i)
-	//	{
-	//		writer->WriteUInt32("i_" + HLString::ToString(i), i);
-	//		writer->WriteString("Hello", "World");
-	//	}
-	//	writer->EndArray();
-
-		// CHECK - Example #4
-	//	writer->BeginArray();
-	//	for (uint32 i = 0; i < 10; ++i)
-	//	{
-	//		writer->BeginObject();
-	//		writer->WriteUInt32("i_" + HLString::ToString(i), i);
-	//	//	writer->WriteString("Hello", "World");
-	//		writer->EndObject();
-	//	}
-	//	writer->EndArray();
-
-		bool success = writer->WriteOut();
-		HL_ASSERT(success);
+		if (writer->WriteUInt64ArrayMap("shaderCache", shaderCache))
+		{
+			bool success = writer->WriteOut();
+			HL_ASSERT(success);
+		}
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
@@ -90,7 +61,7 @@ namespace highlo
 		Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::Json);
 		if (reader->ReadContents())
 		{
-			if (!reader->ReadUInt64ArrayMap("", shaderCache))
+			if (!reader->ReadUInt64ArrayMap("shaderCache", shaderCache))
 			{
 				HL_CORE_ERROR("Could not read ShaderCache!");
 				HL_ASSERT(false);

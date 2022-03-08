@@ -218,10 +218,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			return v;
+			return utils::Vec2ToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -230,11 +227,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
-			return v;
+			return utils::Vec3ToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -243,12 +236,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.w, instance->m_Document.GetAllocator());
-			return v;
+			return utils::Vec4ToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -257,12 +245,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
-			return v;
+			return utils::Mat2ToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -271,19 +254,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][2], instance->m_Document.GetAllocator());
-
-			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][2], instance->m_Document.GetAllocator());
-
-			v.PushBack<float>(value[2][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][2], instance->m_Document.GetAllocator());
-			return v;
+			return utils::Mat3ToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -292,27 +263,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][3], instance->m_Document.GetAllocator());
-
-			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][3], instance->m_Document.GetAllocator());
-
-			v.PushBack<float>(value[2][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][3], instance->m_Document.GetAllocator());
-
-			v.PushBack<float>(value[3][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[3][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[3][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[3][3], instance->m_Document.GetAllocator());
-			return v;
+			return utils::Mat4ToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -321,12 +272,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.w, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
-			return v;
+			return utils::QuatToJSON(value, instance->m_Document);
 		});
 	}
 
@@ -417,9 +363,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::Vec2ToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -434,10 +378,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::Vec3ToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -452,11 +393,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].w, instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::Vec4ToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -471,11 +408,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::Mat2ToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -490,18 +423,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][2], instance->m_Document.GetAllocator());
-
-				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][2], instance->m_Document.GetAllocator());
-				
-				entry.PushBack<float>(value[i][2][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][2], instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::Mat3ToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -516,26 +438,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][3], instance->m_Document.GetAllocator());
-
-				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][3], instance->m_Document.GetAllocator());
-
-				entry.PushBack<float>(value[i][2][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][3], instance->m_Document.GetAllocator());
-
-				entry.PushBack<float>(value[i][3][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][3][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][3][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][3][3], instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::Mat4ToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -550,11 +453,7 @@ namespace highlo
 			rapidjson::Value v(rapidjson::kArrayType);
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
-				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].w, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
+				rapidjson::Value entry = utils::QuatToJSON(value[i], instance->m_Document);
 				v.PushBack(entry, instance->m_Document.GetAllocator());
 			}
 			return v;
@@ -563,22 +462,126 @@ namespace highlo
 
 	bool JSONWriter::WriteStringArrayMap(const HLString &key, const std::map<HLString, HLString> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::String, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper(rapidjson::kStringType);
+				valueWrapper.SetString(*value, value.Length(), instance->m_Document.GetAllocator());
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::String);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteInt32ArrayMap(const HLString &key, const std::map<HLString, int32> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int32, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetInt(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Int32);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteUInt32ArrayMap(const HLString &key, const std::map<HLString, uint32> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt32, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetUint(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::UInt32);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int64, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetInt64(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Int64);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map)
@@ -614,52 +617,256 @@ namespace highlo
 
 	bool JSONWriter::WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Bool, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetBool(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Bool);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteFloatArrayMap(const HLString &key, const std::map<HLString, float> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Float, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetFloat(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Float);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteDoubleArrayMap(const HLString &key, const std::map<HLString, double> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Double, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper;
+				valueWrapper.SetDouble(value);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+
+				if (instance->m_UseTypeSafety)
+				{
+					auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Double);
+					obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				}
+
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteVec2ArrayMap(const HLString &key, const std::map<HLString, glm::vec2> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec2, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::Vec2ToJSON(value, instance->m_Document);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteVec3ArrayMap(const HLString &key, const std::map<HLString, glm::vec3> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec3, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::Vec3ToJSON(value, instance->m_Document);
+				
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteVec4ArrayMap(const HLString &key, const std::map<HLString, glm::vec4> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec4, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::Vec4ToJSON(value, instance->m_Document);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteMat2ArrayMap(const HLString &key, const std::map<HLString, glm::mat2> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat2, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::Mat2ToJSON(value, instance->m_Document);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteMat3ArrayMap(const HLString &key, const std::map<HLString, glm::mat3> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat3, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::Mat3ToJSON(value, instance->m_Document);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteMat4ArrayMap(const HLString &key, const std::map<HLString, glm::mat4> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat4, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::Mat4ToJSON(value, instance->m_Document);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteQuaternionArrayMap(const HLString &key, const std::map<HLString, glm::quat> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Quat, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value entries(rapidjson::kArrayType);
+			for (auto &[str, value] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+
+				rapidjson::Value strWrapper(rapidjson::kStringType);
+				strWrapper.SetString(*str, str.Length(), instance->m_Document.GetAllocator());
+
+				rapidjson::Value valueWrapper = utils::QuatToJSON(value, instance->m_Document);
+
+				obj.AddMember(strWrapper, valueWrapper, instance->m_Document.GetAllocator());
+				entries.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+
+			return entries;
+		});
 	}
 
 	bool JSONWriter::WriteOut()

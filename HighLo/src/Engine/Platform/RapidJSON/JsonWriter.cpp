@@ -923,10 +923,8 @@ namespace highlo
 
 		if (!m_ShouldWriteIntoArray && !m_ShouldWriteIntoObject)
 		{
-			static bool firstPushIntoDocument = true;
-			if (firstPushIntoDocument)
+			if (m_ObjectsPerGroup == 1)
 			{
-				firstPushIntoDocument = false;
 				m_Document.SetObject();
 			}
 

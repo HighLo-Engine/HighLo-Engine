@@ -512,18 +512,46 @@ namespace highlo
 
 		if (entity.IsHidden())
 		{
-			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-			ImVec2 calculatedSize = UI::CenteredText(ICON_FA_TIMES);
+			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
+		//	ImVec2 calculatedSize = UI::CenteredText(ICON_FA_EYE);
+			UI::DrawText(ICON_FA_EYE);
 		}
 		else
 		{
-			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
-			ImVec2 calculatedSize = UI::CenteredText(ICON_FA_CHECK);
+			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+		//	ImVec2 calculatedSize = UI::CenteredText(ICON_FA_EYE_SLASH);
+			UI::DrawText(ICON_FA_EYE_SLASH);
 		}
 
 		ImGui::TableNextColumn();
 
-		UI::DrawText("CHECKED 2");
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+		if (m_SelectedEntity.HasComponent<StaticModelComponent>())
+		{
+			StaticModelComponent *component = m_SelectedEntity.GetComponent<StaticModelComponent>();
+			if (component->Materials->HasAnyMaterial())
+			{
+				if (ImGui::Button(ICON_FA_CIRCLE))
+				{
+					// TODO: Show material properties of this specific model
+				}
+			}
+		}
+		else if (m_SelectedEntity.HasComponent<DynamicModelComponent>())
+		{
+			DynamicModelComponent *component = m_SelectedEntity.GetComponent<DynamicModelComponent>();
+			if (component->Materials->HasAnyMaterial())
+			{
+				if (ImGui::Button(ICON_FA_CIRCLE))
+				{
+					// TODO: Show material properties of this specific model
+				}
+			}
+		}
+
+		ImGui::PopStyleVar();
+
+		//UI::DrawText("CHECKED 2");
 
 		// Draw all children
 		if (opened)

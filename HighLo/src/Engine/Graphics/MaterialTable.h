@@ -32,6 +32,8 @@ namespace highlo
 		HLAPI uint32 GetMaterialCount() const { return m_MaterialCount; }
 		HLAPI void SetMaterialCount(uint32 materialCount) { m_MaterialCount = materialCount; }
 
+		HLAPI bool HasAnyMaterial() const { return m_MaterialCount == 0; }
+
 		HLAPI static Ref<MaterialTable> Create(uint32 materialCount = 1);
 
 	private:

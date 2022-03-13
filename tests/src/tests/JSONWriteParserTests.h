@@ -2,8 +2,94 @@
 
 //
 // version history:
-//     - 1.0 (2022-01-12) initial release
+//     - 1.0 (2022-03-08) initial release
 //
+
+/**
+ * =========================================================================================================
+ *													API usage
+ * =========================================================================================================
+ *
+ * Example #1:
+ * -----------
+ *
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->WriteString("Hello", "World");
+ * writer->WriteUint64("number", 64);
+ * writer->WriteOut();
+ *
+ * -> should result in json:
+ * {
+ *    "Hello":"World",
+ *    "number":64
+ * }
+ *
+ * Example #2:
+ * -----------
+ *
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->BeginObject();
+ * writer->WriteString("Hello", "World");
+ * writer->WriteUInt64("number", 64);
+ * writer->EndObject();
+ * writer->WriterOut();
+ *
+ * -> should result in json:
+ * {
+ *     "Hello":
+ *     {
+ *       "value":"World",
+ *       "type":"string"
+ *     },
+ *     "number":
+ *     {
+ *       "value":64,
+ *       "type":"uint64"
+ *     }
+ * }
+ *
+ * Example #3:
+ * -----------
+ *
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->BeginArray();
+ * writer->WriteString("Hello", "World");
+ * writer->WriteUInt64("number", 64);
+ * writer->EndArray();
+ * writer->WriteOut();
+ *
+ * -> should result in json:
+ * [
+ *   "World",
+ *   64
+ * ]
+ *
+ * Example #4:
+ * -----------
+ *
+ * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
+ * writer->BeginArray();
+ * for ()
+ *   writer->BeginObject();
+ *   writer->WriteString("Hello", "World");
+ *   writer->WriteUInt64("number", 64);
+ *   writer->EndObject();
+ * endfor
+ * writer->EndArray();
+ * writer->WriteOut();
+ *
+ * -> should result in json:
+ * [
+ *  {
+ *     "Hello":"World",
+ *     "type":"string"
+ *   },
+ *   {
+ *     "number":64,
+ *     "type":"uint64"
+ *   }
+ * ]
+ */
 
 #pragma once
 
@@ -11,8 +97,6 @@
 #include <gtest/gtest.h>
 
 #include "TestUtils.h"
-
-using namespace highlo;
 
 struct JsonWriteParserTests : public testing::Test
 {
@@ -28,2045 +112,2226 @@ struct JsonWriteParserTests : public testing::Test
 	}
 };
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_String)
+/// =========================================================================================================
+/// ==============================================  Int32 Tests  ============================================
+/// =========================================================================================================
+TEST_F(JsonWriteParserTests, write_int32)
 {
-	HLString expected = "{\"test\":\"Hello World!\"}";
+	HLString expected = "{\"value\":42}";
+	int32 value = 42;
 
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteString("test", "Hello World!");
-	Writer->EndObject(true);
+	Writer->WriteInt32("value", value);
+	HLString result = Writer->GetContent();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_String_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_int32_multiple)
 {
-	HLString expected = "{\"type\":\"string\",\"value\":{\"test\":\"Hello World!\"}}";
+	HLString expected = "{\"value\":42,\"anotherValue\":10}";
+	int32 value = 42;
+	int32 anotherValue = 10;
 
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteString("test", "Hello World!");
-	Writer->EndObject();
-	HLString content = Writer->GetContent();
-
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteInt32("value", value);
+	Writer->WriteInt32("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int32)
+TEST_F(JsonWriteParserTests, write_int32_typesafe)
 {
-	HLString expected = "{\"test\":-10}";
+	int32 value = 42;
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"int32\"}}";
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteInt32("test", -10);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"int32\",\"value\":{\"test\":-10}}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteInt32("test", -10);
+	Writer->WriteInt32("value", value);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32)
+TEST_F(JsonWriteParserTests, write_int32_typesafe_multiple)
 {
-	HLString expected = "{\"test\":42}";
+	int32 value = 42;
+	int32 anotherValue = 10;
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"int32\"},\"anotherValue\":{\"value\":10,\"type\":\"int32\"}}";
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteUInt32("test", 42);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"uint32\",\"value\":{\"test\":42}}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteUInt32("test", 42);
+	Writer->WriteInt32("value", value);
+	Writer->WriteInt32("anotherValue", anotherValue);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int64)
+TEST_F(JsonWriteParserTests, write_int32_array)
 {
-	HLString expected = "{\"test\":42}";
+	HLString expected = "{\"value\":[42,10]}";
+	std::vector<int32> value;
+	value.push_back(42);
+	value.push_back(10);
 
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteInt64("test", 42);
-	Writer->EndObject(true);
+	Writer->WriteInt32Array("value", value);
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_int32_array_multiple)
 {
-	HLString expected = "{\"type\":\"int64\",\"value\":{\"test\":42}}";
+	HLString expected = "{\"value\":[42,10],\"anotherValue\":[42,10]}";
+	std::vector<int32> value;
+	value.push_back(42);
+	value.push_back(10);
 
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteInt64("test", 42);
-	Writer->EndObject();
+	std::vector<int32> anotherValue;
+	anotherValue.push_back(42);
+	anotherValue.push_back(10);
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteInt32Array("value", value);
+	Writer->WriteInt32Array("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64)
+TEST_F(JsonWriteParserTests, write_int32_arraymap)
 {
-	HLString expected = "{\"test\":42}";
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"int32\"},{\"Entry2\":10,\"type\":\"int32\"}]}";
+	std::map<HLString, int32> value;
+	value.insert({"Entry1", 42});
+	value.insert({"Entry2", 10});
 
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteUInt64("test", 42);
-	Writer->EndObject(true);
+	Writer->WriteInt32ArrayMap("value", value);
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_int32_arraymap_multiple)
 {
-	HLString expected = "{\"type\":\"uint64\",\"value\":{\"test\":42}}";
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"int32\"},{\"Entry2\":10,\"type\":\"int32\"}],\"anotherValue\":[{\"Entry3\":42,\"type\":\"int32\"},{\"Entry4\":10,\"type\":\"int32\"}]}";
+	std::map<HLString, int32> value;
+	value.insert({ "Entry1", 42 });
+	value.insert({ "Entry2", 10 });
 
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteUInt64("test", 42);
-	Writer->EndObject();
+	std::map<HLString, int32> anotherValue;
+	anotherValue.insert({ "Entry3", 42 });
+	anotherValue.insert({ "Entry4", 10 });
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteInt32ArrayMap("value", value);
+	Writer->WriteInt32ArrayMap("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Bool)
+TEST_F(JsonWriteParserTests, write_int32_array_direct)
 {
-	HLString expected = "{\"test\":true}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteBool("test", true);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"bool\",\"value\":{\"test\":true}}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteBool("test", true);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Float)
-{
-	HLString expected = "{\"test\":20.2}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteFloat("test", 20.2f);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Float_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"float\",\"value\":{\"test\":20.2}}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteFloat("test", 20.2f);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Double)
-{
-	HLString expected = "{\"test\":20.2}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteDouble("test", 20.2);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Double_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"double\",\"value\":{\"test\":20.2}}";
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteDouble("test", 20.2);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2)
-{
-	HLString expected = "{\"test\":[20.2,10.5]}";
-	glm::vec2 v(20.2f, 10.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec2("test", v);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"vec2\",\"value\":{\"test\":[20.2,10.5]}}";
-	glm::vec2 v(20.2f, 10.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec2("test", v);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3)
-{
-	HLString expected = "{\"test\":[20.2,10.5,23.5]}";
-	glm::vec3 v(20.2f, 10.5f, 23.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec3("test", v);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"vec3\",\"value\":{\"test\":[20.2,10.5,23.5]}}";
-	glm::vec3 v(20.2f, 10.5f, 23.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec3("test", v);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4)
-{
-	HLString expected = "{\"test\":[20.2,10.5,23.5,11.5]}";
-	glm::vec4 v(20.2f, 10.5f, 23.5f, 11.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec4("test", v);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"vec4\",\"value\":{\"test\":[20.2,10.5,23.5,11.5]}}";
-	glm::vec4 v(20.2f, 10.5f, 23.5f, 11.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec4("test", v);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2)
-{
-	HLString expected = "{\"test\":[20.2,10.5,23.5,11.5]}";
-
-	glm::mat2 m;
-	m[0][0] = 20.2f;
-	m[0][1] = 10.5f;
-	m[1][0] = 23.5f;
-	m[1][1] = 11.5f;
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat2("test", m);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"mat2\",\"value\":{\"test\":[20.2,10.5,23.5,11.5]}}";
-
-	glm::mat2 m;
-	m[0][0] = 20.2f;
-	m[0][1] = 10.5f;
-	m[1][0] = 23.5f;
-	m[1][1] = 11.5f;
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat2("test", m);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3)
-{
-	HLString expected = "{\"test\":[20.2,10.5,23.5,11.5,534.5,234.5,12.5,45.7,42.4]}";
-
-	glm::mat3 m;
-	m[0][0] = 20.2f;
-	m[0][1] = 10.5f;
-	m[0][2] = 23.5f;
-
-	m[1][0] = 11.5f;
-	m[1][1] = 534.5f;
-	m[1][2] = 234.5f;
-
-	m[2][0] = 12.5f;
-	m[2][1] = 45.7f;
-	m[2][2] = 42.4f;
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat3("test", m);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"mat3\",\"value\":{\"test\":[20.2,10.5,23.5,11.5,534.5,234.5,12.5,45.7,42.4]}}";
-
-	glm::mat3 m;
-	m[0][0] = 20.2f;
-	m[0][1] = 10.5f;
-	m[0][2] = 23.5f;
-
-	m[1][0] = 11.5f;
-	m[1][1] = 534.5f;
-	m[1][2] = 234.5f;
-
-	m[2][0] = 12.5f;
-	m[2][1] = 45.7f;
-	m[2][2] = 42.4f;
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat3("test", m);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4)
-{
-	HLString expected = "{\"test\":[20.2,10.5,23.5,11.5,534.5,234.5,12.5,45.7,42.4,47.2,55.4,48.4,32.0,15.1,499.1,22.5]}";
-
-	glm::mat4 m;
-	m[0][0] = 20.2f;
-	m[0][1] = 10.5f;
-	m[0][2] = 23.5f;
-	m[0][3] = 11.5f;
-
-	m[1][0] = 534.5f;
-	m[1][1] = 234.5f;
-	m[1][2] = 12.5f;
-	m[1][3] = 45.7f;
-
-	m[2][0] = 42.4f;
-	m[2][1] = 47.2f;
-	m[2][2] = 55.4f;
-	m[2][3] = 48.4f;
-
-	m[3][0] = 32.0f;
-	m[3][1] = 15.1f;
-	m[3][2] = 499.1f;
-	m[3][3] = 22.5f;
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat4("test", m);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"mat4\",\"value\":{\"test\":[20.2,10.5,23.5,11.5,534.5,234.5,12.5,45.7,42.4,47.2,55.4,48.4,32.0,15.1,499.1,22.5]}}";
-
-	glm::mat4 m;
-	m[0][0] = 20.2f;
-	m[0][1] = 10.5f;
-	m[0][2] = 23.5f;
-	m[0][3] = 11.5f;
-
-	m[1][0] = 534.5f;
-	m[1][1] = 234.5f;
-	m[1][2] = 12.5f;
-	m[1][3] = 45.7f;
-
-	m[2][0] = 42.4f;
-	m[2][1] = 47.2f;
-	m[2][2] = 55.4f;
-	m[2][3] = 48.4f;
-
-	m[3][0] = 32.0f;
-	m[3][1] = 15.1f;
-	m[3][2] = 499.1f;
-	m[3][3] = 22.5f;
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat4("test", m);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Quaternion)
-{
-	HLString expected = "{\"test\":[20.2,10.5,23.1,11.5]}";
-	glm::quat q(20.2f, 10.5f, 23.1f, 11.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteQuaternion("test", q);
-	Writer->EndObject(true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Quaternion_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"quat\",\"value\":{\"test\":[20.2,10.5,23.1,11.5]}}";
-	glm::quat q(20.2f, 10.5f, 23.1f, 11.5f);
-
-	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteQuaternion("test", q);
-	Writer->EndObject();
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-///
-/// Array
-/// 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_String_Array)
-{
-	HLString expected = "[{\"object0\":\"Hello\"},{\"object1\":\"world\"},{\"object2\":\"!\"}]";
-	std::vector<HLString> arr;
-	arr.push_back("Hello");
-	arr.push_back("world");
-	arr.push_back("!");
+	int32 value = 42;
+	HLString expected = "[42]";
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteString("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_String_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKey\":[{\"object0\":\"Hello\"},{\"object1\":\"world\"},{\"object2\":\"!\"}]}";
-	std::vector<HLString> arr;
-	arr.push_back("Hello");
-	arr.push_back("world");
-	arr.push_back("!");
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteString("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKey", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_String_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"string\",\"value\":{\"object0\":\"Hello\"}},{\"type\":\"string\",\"value\":{\"object1\":\"world\"}},{\"type\":\"string\",\"value\":{\"object2\":\"!\"}}]";
-	std::vector<HLString> arr;
-	arr.push_back("Hello");
-	arr.push_back("world");
-	arr.push_back("!");
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteString("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteInt32("value", value);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array)
+TEST_F(JsonWriteParserTests, write_int32_array_direct_multiple)
 {
-	HLString expected = "[{\"object0\":42},{\"object1\":10},{\"object2\":-10}]";
-	std::vector<int32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(-10);
+	int32 value = 42;
+	int32 anotherValue = 10;
+	HLString expected = "[42,10]";
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":42},{\"object1\":10},{\"object2\":-10}]}";
-	std::vector<int32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(-10);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int32_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"int32\",\"value\":{\"object0\":42}},{\"type\":\"int32\",\"value\":{\"object1\":10}},{\"type\":\"int32\",\"value\":{\"object2\":-10}}]";
-	std::vector<int32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(-10);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteInt32("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteInt32("value", value);
+	Writer->WriteInt32("anotherValue", anotherValue);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array)
+TEST_F(JsonWriteParserTests, write_int32_direct_arraymap)
 {
-	HLString expected = "[{\"object0\":42},{\"object1\":10},{\"object2\":12}]";
-	std::vector<uint32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
+	int32 value = 42;
+	HLString expected = "[{\"value\":42,\"type\":\"int32\"}]";
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":42},{\"object1\":10},{\"object2\":12}]}";
-	std::vector<uint32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt32_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"uint32\",\"value\":{\"object0\":42}},{\"type\":\"uint32\",\"value\":{\"object1\":10}},{\"type\":\"uint32\",\"value\":{\"object2\":12}}]";
-	std::vector<uint32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteUInt32("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteInt32("value", value);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array)
+TEST_F(JsonWriteParserTests, write_int32_arraymap_direct_multiple)
 {
-	HLString expected = "[{\"object0\":42},{\"object1\":10},{\"object2\":12}]";
-	std::vector<int64> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
+	int32 value = 42;
+	int32 anotherValue = 10;
+	HLString expected = "[[{\"value\":42,\"type\":\"int32\"},{\"anotherValue\":10,\"type\":\"int32\"}]]";
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":42},{\"object1\":10},{\"object2\":12}]}";
-	std::vector<int64> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Int64_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"int64\",\"value\":{\"object0\":42}},{\"type\":\"int64\",\"value\":{\"object1\":10}},{\"type\":\"int64\",\"value\":{\"object2\":12}}]";
-	std::vector<int64> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteInt64("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteInt32("value", value);
+	Writer->WriteInt32("anotherValue", anotherValue);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
+/// =========================================================================================================
+/// ==============================================  UInt32 Tests  ===========================================
+/// =========================================================================================================
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array)
+TEST_F(JsonWriteParserTests, write_uint32)
 {
-	HLString expected = "[{\"object0\":42},{\"object1\":10},{\"object2\":12}]";
-	std::vector<uint64> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
+	HLString expected = "{\"value\":42}";
+	uint32 value = 42;
 
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteUInt32("value", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array_With_Keys)
+TEST_F(JsonWriteParserTests, write_uint32_multiple)
 {
-	HLString expected = "{\"arrayKeys\":[{\"object0\":42},{\"object1\":10},{\"object2\":12}]}";
-	std::vector<uint64> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
+	HLString expected = "{\"value\":42,\"anotherValue\":10}";
+	uint32 value = 42;
+	uint32 anotherValue = 10;
 
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
+	Writer->WriteUInt32("value", value);
+	Writer->WriteUInt32("anotherValue", anotherValue);
 
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_UInt64_Array_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_uint32_typesafe)
 {
-	HLString expected = "[{\"type\":\"uint64\",\"value\":{\"object0\":42}},{\"type\":\"uint64\",\"value\":{\"object1\":10}},{\"type\":\"uint64\",\"value\":{\"object2\":12}}]";
-	std::vector<uint64> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(12);
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"uint32\"}}";
+	uint32 value = 42;
+
+	Writer->BeginObject();
+	Writer->WriteUInt32("value", value);
+	Writer->EndObject();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint32_typesafe_multiple)
+{
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"uint32\"},\"anotherValue\":{\"value\":10,\"type\":\"uint32\"}}";
+	uint32 value = 42;
+	uint32 anotherValue = 10;
+
+	Writer->BeginObject();
+	Writer->WriteUInt32("value", value);
+	Writer->WriteUInt32("anotherValue", anotherValue);
+	Writer->EndObject();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint32_array)
+{
+	HLString expected = "{\"value\":[42,10]}";
+	std::vector<uint32> value;
+	value.push_back(42);
+	value.push_back(10);
+
+	Writer->WriteUInt32Array("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint32_array_multiple)
+{
+	HLString expected = "{\"value\":[42,10],\"anotherValue\":[42,10]}";
+	std::vector<uint32> value;
+	value.push_back(42);
+	value.push_back(10);
+
+	std::vector<uint32> anotherValue;
+	anotherValue.push_back(42);
+	anotherValue.push_back(10);
+
+	Writer->WriteUInt32Array("value", value);
+	Writer->WriteUInt32Array("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint32_arraymap)
+{
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"uint32\"},{\"Entry2\":10,\"type\":\"uint32\"}]}";
+	std::map<HLString, uint32> value;
+	value.insert({"Entry1", 42});
+	value.insert({"Entry2", 10});
+
+	Writer->WriteUInt32ArrayMap("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint32_arraymap_multiple)
+{
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"uint32\"},{\"Entry2\":10,\"type\":\"uint32\"}],\"anotherValue\":[{\"Entry3\":42,\"type\":\"uint32\"},{\"Entry4\":10,\"type\":\"uint32\"}]}";
+	std::map<HLString, uint32> value;
+	value.insert({ "Entry1", 42 });
+	value.insert({ "Entry2", 10 });
+
+	std::map<HLString, uint32> anotherValue;
+	anotherValue.insert({ "Entry3", 42 });
+	anotherValue.insert({ "Entry4", 10 });
+
+	Writer->WriteUInt32ArrayMap("value", value);
+	Writer->WriteUInt32ArrayMap("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint32_array_direct)
+{
+	HLString expected = "[42]";
+	uint32 value = 42;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteUInt64("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteUInt32("value", value);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array)
+TEST_F(JsonWriteParserTests, write_uint32_array_direct_multiple)
 {
-	HLString expected = "[{\"object0\":true},{\"object1\":false},{\"object2\":true}]";
-	std::vector<bool> arr;
-	arr.push_back(true);
-	arr.push_back(false);
-	arr.push_back(true);
+	HLString expected = "[42,10]";
+	uint32 value = 42;
+	uint32 anotherValue = 10;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":true},{\"object1\":false},{\"object2\":true}]}";
-	std::vector<bool> arr;
-	arr.push_back(true);
-	arr.push_back(false);
-	arr.push_back(true);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Bool_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"bool\",\"value\":{\"object0\":true}},{\"type\":\"bool\",\"value\":{\"object1\":false}},{\"type\":\"bool\",\"value\":{\"object2\":true}}]";
-	std::vector<bool> arr;
-	arr.push_back(true);
-	arr.push_back(false);
-	arr.push_back(true);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteBool("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteUInt32("value", value);
+	Writer->WriteUInt32("anotherValue", anotherValue);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array)
+TEST_F(JsonWriteParserTests, write_uint32_arraymap_direct)
 {
-	HLString expected = "[{\"object0\":2.5},{\"object1\":6.3},{\"object2\":23.0}]";
-	std::vector<float> arr;
-	arr.push_back(2.5f);
-	arr.push_back(6.3f);
-	arr.push_back(23.0f);
+	HLString expected = "[{\"value\":42,\"type\":\"uint32\"}]";
+	uint32 value = 42;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":2.5},{\"object1\":6.3},{\"object2\":23.0}]}";
-	std::vector<float> arr;
-	arr.push_back(2.5f);
-	arr.push_back(6.3f);
-	arr.push_back(23.0f);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Float_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"float\",\"value\":{\"object0\":2.5}},{\"type\":\"float\",\"value\":{\"object1\":6.3}},{\"type\":\"float\",\"value\":{\"object2\":23.0}}]";
-	std::vector<float> arr;
-	arr.push_back(2.5f);
-	arr.push_back(6.3f);
-	arr.push_back(23.0f);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteFloat("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteUInt32("value", value);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array)
+TEST_F(JsonWriteParserTests, write_uint32_arraymap_direct_multiple)
 {
-	HLString expected = "[{\"object0\":2.5},{\"object1\":6.3},{\"object2\":23.0}]";
-	std::vector<double> arr;
-	arr.push_back(2.5);
-	arr.push_back(6.3);
-	arr.push_back(23.0);
+	HLString expected = "[[{\"value\":42,\"type\":\"uint32\"},{\"anotherValue\":10,\"type\":\"uint32\"}]]";
+	uint32 value = 42;
+	uint32 anotherValue = 10;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":2.5},{\"object1\":6.3},{\"object2\":23.0}]}";
-	std::vector<double> arr;
-	arr.push_back(2.5);
-	arr.push_back(6.3);
-	arr.push_back(23.0);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Double_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"double\",\"value\":{\"object0\":2.5}},{\"type\":\"double\",\"value\":{\"object1\":6.3}},{\"type\":\"double\",\"value\":{\"object2\":23.0}}]";
-	std::vector<double> arr;
-	arr.push_back(2.5);
-	arr.push_back(6.3);
-	arr.push_back(23.0);
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteDouble("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteUInt32("value", value);
+	Writer->WriteUInt32("anotherValue", anotherValue);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
+/// =========================================================================================================
+/// ==============================================  Int64 Tests  ============================================
+/// =========================================================================================================
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array)
+TEST_F(JsonWriteParserTests, write_int64)
 {
-	HLString expected = "[{\"object0\":[2.5,2.0]},{\"object1\":[6.3,4.5]},{\"object2\":[23.0,9.5]}]";
-	std::vector<glm::vec2> arr;
-	arr.push_back({ 2.5f, 2.0f });
-	arr.push_back({ 6.3f, 4.5f });
-	arr.push_back({ 23.0f, 9.5f });
+	HLString expected = "{\"value\":42}";
+	int64 value = 42;
 
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteInt64("value", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array_With_Keys)
+TEST_F(JsonWriteParserTests, write_int64_multiple)
 {
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[2.5,2.0]},{\"object1\":[6.3,4.5]},{\"object2\":[23.0,9.5]}]}";
-	std::vector<glm::vec2> arr;
-	arr.push_back({ 2.5f, 2.0f });
-	arr.push_back({ 6.3f, 4.5f });
-	arr.push_back({ 23.0f, 9.5f });
+	HLString expected = "{\"value\":42,\"anotherValue\":10}";
+	int64 value = 42;
+	int64 anotherValue = 10;
 
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
+	Writer->WriteInt64("value", value);
+	Writer->WriteInt64("anotherValue", anotherValue);
 
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec2_Array_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_int64_typesafe)
 {
-	HLString expected = "[{\"type\":\"vec2\",\"value\":{\"object0\":[2.5,2.0]}},{\"type\":\"vec2\",\"value\":{\"object1\":[6.3,4.5]}},{\"type\":\"vec2\",\"value\":{\"object2\":[23.0,9.5]}}]";
-	std::vector<glm::vec2> arr;
-	arr.push_back({ 2.5f, 2.0f });
-	arr.push_back({ 6.3f, 4.5f });
-	arr.push_back({ 23.0f, 9.5f });
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"int64\"}}";
+	int64 value = 42;
+	
+	Writer->BeginObject();
+	Writer->WriteInt64("value", value);
+	Writer->EndObject();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_int64_typesafe_multiple)
+{
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"int64\"},\"anotherValue\":{\"value\":10,\"type\":\"int64\"}}";
+	int64 value = 42;
+	int64 anotherValue = 10;
+
+	Writer->BeginObject();
+	Writer->WriteInt64("value", value);
+	Writer->WriteInt64("anotherValue", anotherValue);
+	Writer->EndObject();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_int64_array)
+{
+	HLString expected = "{\"value\":[42,10]}";
+	std::vector<int64> value;
+	value.push_back(42);
+	value.push_back(10);
+
+	Writer->WriteInt64Array("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_int64_array_multiple)
+{
+	HLString expected = "{\"value\":[42,10],\"anotherValue\":[42,10]}";
+	std::vector<int64> value;
+	value.push_back(42);
+	value.push_back(10);
+
+	std::vector<int64> anotherValue;
+	anotherValue.push_back(42);
+	anotherValue.push_back(10);
+
+	Writer->WriteInt64Array("value", value);
+	Writer->WriteInt64Array("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_int64_arraymap)
+{
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"int64\"},{\"Entry2\":10,\"type\":\"int64\"}]}";
+	std::map<HLString, int64> value;
+	value.insert({ "Entry1", 42 });
+	value.insert({ "Entry2", 10 });
+
+	Writer->WriteInt64ArrayMap("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_int64_arraymap_multiple)
+{
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"int64\"},{\"Entry2\":10,\"type\":\"int64\"}],\"anotherValue\":[{\"Entry3\":42,\"type\":\"int64\"},{\"Entry4\":10,\"type\":\"int64\"}]}";
+	std::map<HLString, int64> value;
+	value.insert({ "Entry1", 42 });
+	value.insert({ "Entry2", 10 });
+
+	std::map<HLString, int64> anotherValue;
+	anotherValue.insert({ "Entry3", 42 });
+	anotherValue.insert({ "Entry4", 10 });
+
+	Writer->WriteInt64ArrayMap("value", value);
+	Writer->WriteInt64ArrayMap("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_int64_array_direct)
+{
+	HLString expected = "[42]";
+	int64 value = 42;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec2("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteInt64("value", value);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array)
+TEST_F(JsonWriteParserTests, write_int64_array_direct_multiple)
 {
-	HLString expected = "[{\"object0\":[2.5,2.0,2.9]},{\"object1\":[6.3,4.5,2.0]},{\"object2\":[23.0,9.0,5.0]}]";
-	std::vector<glm::vec3> arr;
-	arr.push_back({ 2.5f, 2.0f, 2.9f });
-	arr.push_back({ 6.3f, 4.5f, 2.0f });
-	arr.push_back({ 23.0f, 9.0f, 5.0f });
+	HLString expected = "[42,10]";
+	int64 value = 42;
+	int64 anotherValue = 10;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[2.5,2.0,2.9]},{\"object1\":[6.3,4.5,2.0]},{\"object2\":[23.0,9.0,5.0]}]}";
-	std::vector<glm::vec3> arr;
-	arr.push_back({ 2.5f, 2.0f, 2.9f });
-	arr.push_back({ 6.3f, 4.5f, 2.0f });
-	arr.push_back({ 23.0f, 9.0f, 5.0f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec3_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"vec3\",\"value\":{\"object0\":[2.5,2.0,2.9]}},{\"type\":\"vec3\",\"value\":{\"object1\":[6.3,4.5,2.0]}},{\"type\":\"vec3\",\"value\":{\"object2\":[23.0,9.0,5.0]}}]";
-	std::vector<glm::vec3> arr;
-	arr.push_back({ 2.5f, 2.0f, 2.9f });
-	arr.push_back({ 6.3f, 4.5f, 2.0f });
-	arr.push_back({ 23.0f, 9.0f, 5.0f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec3("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteInt64("value", value);
+	Writer->WriteInt64("anotherValue", anotherValue);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array)
+TEST_F(JsonWriteParserTests, write_int64_arraymap_direct)
 {
-	HLString expected = "[{\"object0\":[2.5,2.0,2.9,6.0]},{\"object1\":[6.3,4.5,2.0,7.5]},{\"object2\":[23.0,9.5,5.5,1.5]}]";
-	std::vector<glm::vec4> arr;
-	arr.push_back({ 2.5f, 2.0f, 2.9f, 6.0f });
-	arr.push_back({ 6.3f, 4.5f, 2.0f, 7.5f });
-	arr.push_back({ 23.0f, 9.5f, 5.5f, 1.5f });
+	HLString expected = "[{\"value\":42,\"type\":\"int64\"}]";
+	int64 value = 42;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[2.5,2.0,2.9,6.0]},{\"object1\":[6.3,4.5,2.0,7.5]},{\"object2\":[23.0,9.5,5.5,1.5]}]}";
-	std::vector<glm::vec4> arr;
-	arr.push_back({ 2.5f, 2.0f, 2.9f, 6.0f });
-	arr.push_back({ 6.3f, 4.5f, 2.0f, 7.5f });
-	arr.push_back({ 23.0f, 9.5f, 5.5f, 1.5f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Vec4_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"vec4\",\"value\":{\"object0\":[2.5,2.0,2.9,6.0]}},{\"type\":\"vec4\",\"value\":{\"object1\":[6.3,4.5,2.0,7.5]}},{\"type\":\"vec4\",\"value\":{\"object2\":[23.0,9.5,5.5,1.5]}}]";
-	std::vector<glm::vec4> arr;
-	arr.push_back({ 2.5f, 2.0f, 2.9f, 6.0f });
-	arr.push_back({ 6.3f, 4.5f, 2.0f, 7.5f });
-	arr.push_back({ 23.0f, 9.5f, 5.5f, 1.5f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteVec4("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteInt64("value", value);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array)
+TEST_F(JsonWriteParserTests, write_int64_arraymap_direct_multiple)
 {
-	HLString expected = "[{\"object0\":[0.0,0.0,0.0,0.0]},{\"object1\":[1.0,0.0,0.0,1.0]},{\"object2\":[23.0,9.0,5.5,1.5]}]";
-	std::vector<glm::mat2> arr;
-	arr.push_back(glm::mat2(0.0f));
-	arr.push_back(glm::mat2(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f });
+	HLString expected = "[[{\"value\":42,\"type\":\"int64\"},{\"anotherValue\":10,\"type\":\"int64\"}]]";
+	int64 value = 42;
+	int64 anotherValue = 10;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[0.0,0.0,0.0,0.0]},{\"object1\":[1.0,0.0,0.0,1.0]},{\"object2\":[23.0,9.0,5.5,1.5]}]}";
-	std::vector<glm::mat2> arr;
-	arr.push_back(glm::mat2(0.0f));
-	arr.push_back(glm::mat2(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat2_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"mat2\",\"value\":{\"object0\":[0.0,0.0,0.0,0.0]}},{\"type\":\"mat2\",\"value\":{\"object1\":[1.0,0.0,0.0,1.0]}},{\"type\":\"mat2\",\"value\":{\"object2\":[23.0,9.0,5.5,1.5]}}]";
-	std::vector<glm::mat2> arr;
-	arr.push_back(glm::mat2(0.0f));
-	arr.push_back(glm::mat2(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat2("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteInt64("value", value);
+	Writer->WriteInt64("anotherValue", anotherValue);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array)
+/// =========================================================================================================
+/// ==============================================  UInt64 Tests  ===========================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_uint64)
 {
-	HLString expected = "[{\"object0\":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{\"object1\":[1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0]},{\"object2\":[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5]}]";
-	std::vector<glm::mat3> arr;
-	arr.push_back(glm::mat3(0.0f));
-	arr.push_back(glm::mat3(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f });
+	HLString expected = "{\"value\":42}";
+	uint64 value = 42;
 
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteUInt64("value", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array_With_Keys)
+TEST_F(JsonWriteParserTests, write_uint64_multiple)
 {
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{\"object1\":[1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0]},{\"object2\":[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5]}]}";
-	std::vector<glm::mat3> arr;
-	arr.push_back(glm::mat3(0.0f));
-	arr.push_back(glm::mat3(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f });
+	HLString expected = "{\"value\":42,\"anotherValue\":10}";
+	uint64 value = 42;
+	uint64 anotherValue = 10;
 
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteUInt64("value", value);
+	Writer->WriteUInt64("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat3_Array_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_uint64_typesafe)
 {
-	HLString expected = "[{\"type\":\"mat3\",\"value\":{\"object0\":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]}},{\"type\":\"mat3\",\"value\":{\"object1\":[1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0]}},{\"type\":\"mat3\",\"value\":{\"object2\":[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5]}}]";
-	std::vector<glm::mat3> arr;
-	arr.push_back(glm::mat3(0.0f));
-	arr.push_back(glm::mat3(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f });
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"uint64\"}}";
+	uint64 value = 42;
+
+	Writer->BeginObject();
+	Writer->WriteUInt64("value", value);
+	Writer->EndObject();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint64_typesafe_multiple)
+{
+	HLString expected = "{\"value\":{\"value\":42,\"type\":\"uint64\"},\"anotherValue\":{\"value\":10,\"type\":\"uint64\"}}";
+	uint64 value = 42;
+	uint64 anotherValue = 10;
+
+	Writer->BeginObject();
+	Writer->WriteUInt64("value", value);
+	Writer->WriteUInt64("anotherValue", anotherValue);
+	Writer->EndObject();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint64_array)
+{
+	HLString expected = "{\"value\":[42,10]}";
+	std::vector<uint64> value;
+	value.push_back(42);
+	value.push_back(10);
+
+	Writer->WriteUInt64Array("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint64_array_multiple)
+{
+	HLString expected = "{\"value\":[42,10],\"anotherValue\":[42,10]}";
+	std::vector<uint64> value;
+	value.push_back(42);
+	value.push_back(10);
+
+	std::vector<uint64> anotherValue;
+	anotherValue.push_back(42);
+	anotherValue.push_back(10);
+
+	Writer->WriteUInt64Array("value", value);
+	Writer->WriteUInt64Array("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint64_arraymap)
+{
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"uint64\"},{\"Entry2\":10,\"type\":\"uint64\"}]}";
+	std::map<HLString, uint64> value;
+	value.insert({ "Entry1", 42 });
+	value.insert({ "Entry2", 10 });
+
+	Writer->WriteUInt64ArrayMap("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint64_arraymap_multiple)
+{
+	HLString expected = "{\"value\":[{\"Entry1\":42,\"type\":\"uint64\"},{\"Entry2\":10,\"type\":\"uint64\"}],\"anotherValue\":[{\"Entry3\":42,\"type\":\"uint64\"},{\"Entry4\":10,\"type\":\"uint64\"}]}";
+	std::map<HLString, uint64> value;
+	value.insert({ "Entry1", 42 });
+	value.insert({ "Entry2", 10 });
+
+	std::map<HLString, uint64> anotherValue;
+	anotherValue.insert({ "Entry3", 42 });
+	anotherValue.insert({ "Entry4", 10 });
+
+	Writer->WriteUInt64ArrayMap("value", value);
+	Writer->WriteUInt64ArrayMap("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_uint64_array_direct)
+{
+	HLString expected = "[42]";
+	uint64 value = 42;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat3("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteUInt64("value", value);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array)
+TEST_F(JsonWriteParserTests, write_uint64_array_direct_multiple)
 {
-	HLString expected = "[{\"object0\":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{\"object1\":[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]},{\"object2\":[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5,10.5,1.1,5.32,3.2,1.5,5.3,4.8]}]";
-	std::vector<glm::mat4> arr;
-	arr.push_back(glm::mat4(0.0f));
-	arr.push_back(glm::mat4(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
+	HLString expected = "[42,10]";
+	uint64 value = 42;
+	uint64 anotherValue = 10;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{\"object1\":[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]},{\"object2\":[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5,10.5,1.1,5.32,3.2,1.5,5.3,4.8]}]}";
-	std::vector<glm::mat4> arr;
-	arr.push_back(glm::mat4(0.0f));
-	arr.push_back(glm::mat4(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Mat4_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"mat4\",\"value\":{\"object0\":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]}},{\"type\":\"mat4\",\"value\":{\"object1\":[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0]}},{\"type\":\"mat4\",\"value\":{\"object2\":[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5,10.5,1.1,5.32,3.2,1.5,5.3,4.8]}}]";
-	std::vector<glm::mat4> arr;
-	arr.push_back(glm::mat4(0.0f));
-	arr.push_back(glm::mat4(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteMat4("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->WriteUInt64("value", value);
+	Writer->WriteUInt64("anotherValue", anotherValue);
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array)
+TEST_F(JsonWriteParserTests, write_uint64_arraymap_direct)
 {
-	HLString expected = "[{\"object0\":[0.0,1.0,1.0,1.0]},{\"object1\":[1.0,0.0,0.0,0.0]},{\"object2\":[23.0,9.0,5.5,1.5]}]";
-	std::vector<glm::quat> arr;
-	arr.push_back({ 0.0f, 1.0f, 1.0f, 1.0f });
-	arr.push_back({ 1.0f, 0.0f, 0.0f, 0.0f });
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f });
+	HLString expected = "[{\"value\":42,\"type\":\"uint64\"}]";
+	uint64 value = 42;
 
 	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array_With_Keys)
-{
-	HLString expected = "{\"arrayKeys\":[{\"object0\":[0.0,1.0,1.0,1.0]},{\"object1\":[1.0,0.0,0.0,0.0]},{\"object2\":[23.0,9.0,5.5,1.5]}]}";
-	std::vector<glm::quat> arr;
-	arr.push_back({ 0.0f, 1.0f, 1.0f, 1.0f });
-	arr.push_back({ 1.0f, 0.0f, 0.0f, 0.0f });
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
-	Writer->EndArray("arrayKeys", true);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Quat_Array_WithTypeCheck)
-{
-	HLString expected = "[{\"type\":\"quat\",\"value\":{\"object0\":[0.0,1.0,1.0,1.0]}},{\"type\":\"quat\",\"value\":{\"object1\":[1.0,0.0,0.0,0.0]}},{\"type\":\"quat\",\"value\":{\"object2\":[23.0,9.0,5.5,1.5]}}]";
-	std::vector<glm::quat> arr;
-	arr.push_back({ 0.0f, 1.0f, 1.0f, 1.0f });
-	arr.push_back({ 1.0f, 0.0f, 0.0f, 0.0f });
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f });
-
-	Writer->BeginArray();
-	for (uint32 i = 0; i < arr.size(); ++i)
-	{
-		Writer->BeginObject();
-		bool writeSuccess = Writer->WriteQuaternion("object" + HLString::ToString(i), arr[i]);
-		Writer->EndObject();
-
-		EXPECT_EQ(writeSuccess, true);
-	}
+	Writer->BeginObject();
+	Writer->WriteUInt64("value", value);
+	Writer->EndObject();
 	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-///
-/// Direct Array Tests
-///
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int32)
+TEST_F(JsonWriteParserTests, write_uint64_arraymap_direct_multiple)
 {
-	HLString expected = "{\"test\":[42,10,-10]}";
-	std::vector<int32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(-10);
+	HLString expected = "[[{\"value\":42,\"type\":\"uint64\"},{\"anotherValue\":10,\"type\":\"uint64\"}]]";
+	uint64 value = 42;
+	uint64 anotherValue = 10;
 
-	bool writeSuccess = Writer->WriteInt32Array("test", arr);
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteUInt64("value", value);
+	Writer->WriteUInt64("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int32_WithTypeCheck)
+/// =========================================================================================================
+/// ==============================================  Float Tests  ============================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_float)
 {
-	HLString expected = "{\"type\":\"int32\",\"value\":{\"test\":[42,10,-10]}}";
-	std::vector<int32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(-10);
+	HLString expected = "{\"value\":42.5}";
+	float value = 42.5f;
+
+	Writer->WriteFloat("value", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_float_multiple)
+{
+	HLString expected = "{\"value\":42.5,\"anotherValue\":12.5}";
+	float value = 42.5f;
+	float anotherValue = 12.5f;
+
+	Writer->WriteFloat("value", value);
+	Writer->WriteFloat("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_float_typesafe)
+{
+	HLString expected = "{\"value\":{\"value\":42.5,\"type\":\"float\"}}";
+	float value = 42.5f;
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteInt32Array("test", arr);
+	Writer->WriteFloat("value", value);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt32)
+TEST_F(JsonWriteParserTests, write_float_typesafe_multiple)
 {
-	HLString expected = "{\"test\":[42,10,100]}";
-	std::vector<uint32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(100);
-
-	bool writeSuccess = Writer->WriteUInt32Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt32_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"uint32\",\"value\":{\"test\":[42,10,100]}}";
-	std::vector<uint32> arr;
-	arr.push_back(42);
-	arr.push_back(10);
-	arr.push_back(100);
+	HLString expected = "{\"value\":{\"value\":42.5,\"type\":\"float\"},\"anotherValue\":{\"value\":12.5,\"type\":\"float\"}}";
+	float value = 42.5f;
+	float anotherValue = 12.5f;
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteUInt32Array("test", arr);
+	Writer->WriteFloat("value", value);
+	Writer->WriteFloat("anotherValue", anotherValue);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int64)
+TEST_F(JsonWriteParserTests, write_float_array)
 {
-	HLString expected = "{\"test\":[452,105,100]}";
-	std::vector<int64> arr;
-	arr.push_back(452);
-	arr.push_back(105);
-	arr.push_back(100);
 
-	bool writeSuccess = Writer->WriteInt64Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Int64_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_float_array_multiple)
 {
-	HLString expected = "{\"type\":\"int64\",\"value\":{\"test\":[452,105,100]}}";
-	std::vector<int64> arr;
-	arr.push_back(452);
-	arr.push_back(105);
-	arr.push_back(100);
+
+}
+
+TEST_F(JsonWriteParserTests, write_float_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_float_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_float_array_direct)
+{
+	HLString expected = "[42.5]";
+	float value = 42.5f;
+
+	Writer->BeginArray();
+	Writer->WriteFloat("value", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_float_array_direct_multiple)
+{
+	HLString expected = "[42.5,12.5]";
+	float value = 42.5f;
+	float anotherValue = 12.5f;
+
+	Writer->BeginArray();
+	Writer->WriteFloat("value", value);
+	Writer->WriteFloat("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_float_arraymap_direct)
+{
+	HLString expected = "[{\"value\":42.5,\"type\":\"float\"}]";
+	float value = 42.5f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteFloat("value", value);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_float_arraymap_direct_multiple)
+{
+	HLString expected = "[[{\"value\":42.5,\"type\":\"float\"},{\"anotherValue\":12.5,\"type\":\"float\"}]]";
+	float value = 42.5f;
+	float anotherValue = 12.5f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteFloat("value", value);
+	Writer->WriteFloat("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+/// =========================================================================================================
+/// ==============================================  Double Tests  ===========================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_double)
+{
+	HLString expected = "{\"value\":42.5}";
+	double value = 42.5;
+
+	Writer->WriteDouble("value", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_double_multiple)
+{
+	HLString expected = "{\"value\":42.5,\"anotherValue\":12.5}";
+	double value = 42.5;
+	double anotherValue = 12.5;
+
+	Writer->WriteDouble("value", value);
+	Writer->WriteDouble("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_double_typesafe)
+{
+	HLString expected = "{\"value\":{\"value\":42.5,\"type\":\"double\"}}";
+	double value = 42.5;
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteInt64Array("test", arr);
+	Writer->WriteDouble("value", value);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt64)
+TEST_F(JsonWriteParserTests, write_double_typesafe_multiple)
 {
-	HLString expected = "{\"test\":[452,105,100]}";
-	std::vector<uint64> arr;
-	arr.push_back(452);
-	arr.push_back(105);
-	arr.push_back(100);
-
-	bool writeSuccess = Writer->WriteUInt64Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_UInt64_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"uint64\",\"value\":{\"test\":[452,105,100]}}";
-	std::vector<uint64> arr;
-	arr.push_back(452);
-	arr.push_back(105);
-	arr.push_back(100);
+	HLString expected = "{\"value\":{\"value\":42.5,\"type\":\"double\"},\"anotherValue\":{\"value\":12.5,\"type\":\"double\"}}";
+	double value = 42.5;
+	double anotherValue = 12.5;
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteUInt64Array("test", arr);
+	Writer->WriteDouble("value", value);
+	Writer->WriteDouble("anotherValue", anotherValue);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Float)
+TEST_F(JsonWriteParserTests, write_double_array)
 {
-	HLString expected = "{\"test\":[44.0,10.5,16.0]}";
-	std::vector<float> arr;
-	arr.push_back(44.0f);
-	arr.push_back(10.5f);
-	arr.push_back(16.0f);
 
-	bool writeSuccess = Writer->WriteFloatArray("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Float_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_double_array_multiple)
 {
-	HLString expected = "{\"type\":\"float\",\"value\":{\"test\":[44.0,10.5,16.0]}}";
-	std::vector<float> arr;
-	arr.push_back(44.0f);
-	arr.push_back(10.5f);
-	arr.push_back(16.0f);
+
+}
+
+TEST_F(JsonWriteParserTests, write_double_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_double_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_double_array_direct)
+{
+	HLString expected = "[42.5]";
+	double value = 42.5;
+
+	Writer->BeginArray();
+	Writer->WriteDouble("value", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_double_array_direct_multiple)
+{
+	HLString expected = "[42.5,12.5]";
+	double value = 42.5;
+	double anotherValue = 12.5;
+
+	Writer->BeginArray();
+	Writer->WriteDouble("value", value);
+	Writer->WriteDouble("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_double_arraymap_direct)
+{
+	HLString expected = "[{\"value\":42.5,\"type\":\"double\"}]";
+	double value = 42.5;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteDouble("value", value);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_double_arraymap_direct_multiple)
+{
+	HLString expected = "[[{\"value\":42.5,\"type\":\"double\"},{\"anotherValue\":12.5,\"type\":\"double\"}]]";
+	double value = 42.5;
+	double anotherValue = 12.5;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteDouble("value", value);
+	Writer->WriteDouble("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+/// =========================================================================================================
+/// ==============================================  Bool Tests  =============================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_bool)
+{
+	HLString expected = "{\"value\":true}";
+	bool value = true;
+
+	Writer->WriteBool("value", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_bool_multiple)
+{
+	HLString expected = "{\"value\":true,\"anotherValue\":false}";
+	bool value = true;
+	bool anotherValue = false;
+
+	Writer->WriteBool("value", value);
+	Writer->WriteBool("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_bool_typesafe)
+{
+	HLString expected = "{\"value\":{\"value\":true,\"type\":\"bool\"}}";
+	bool value = true;
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteFloatArray("test", arr);
+	Writer->WriteBool("value", value);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Double)
+TEST_F(JsonWriteParserTests, write_bool_typesafe_multiple)
 {
-	HLString expected = "{\"test\":[44.1,10.5,16.6]}";
-	std::vector<double> arr;
-	arr.push_back(44.1);
-	arr.push_back(10.5);
-	arr.push_back(16.6);
-
-	bool writeSuccess = Writer->WriteDoubleArray("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Double_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"double\",\"value\":{\"test\":[44.1,10.5,16.6]}}";
-	std::vector<double> arr;
-	arr.push_back(44.1);
-	arr.push_back(10.5);
-	arr.push_back(16.6);
+	HLString expected = "{\"value\":{\"value\":true,\"type\":\"bool\"},\"anotherValue\":{\"value\":false,\"type\":\"bool\"}}";
+	bool value = true;
+	bool anotherValue = false;
 
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteDoubleArray("test", arr);
+	Writer->WriteBool("value", value);
+	Writer->WriteBool("anotherValue", anotherValue);
 	Writer->EndObject();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Bool)
+TEST_F(JsonWriteParserTests, write_bool_array)
 {
-	HLString expected = "{\"test\":[true,false,true]}";
-	std::vector<bool> arr;
-	arr.push_back(true);
-	arr.push_back(false);
-	arr.push_back(true);
 
-	bool writeSuccess = Writer->WriteBoolArray("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Bool_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_bool_array_multiple)
 {
-	HLString expected = "{\"type\":\"bool\",\"value\":{\"test\":[true,false,true]}}";
-	std::vector<bool> arr;
-	arr.push_back(true);
-	arr.push_back(false);
-	arr.push_back(true);
 
+}
+
+TEST_F(JsonWriteParserTests, write_bool_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_bool_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_bool_array_direct)
+{
+	HLString expected = "[true]";
+	bool value = true;
+
+	Writer->BeginArray();
+	Writer->WriteBool("value", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_bool_array_direct_multiple)
+{
+	HLString expected = "[true,false]";
+	bool value = true;
+	bool anotherValue = false;
+
+	Writer->BeginArray();
+	Writer->WriteBool("value", value);
+	Writer->WriteBool("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_bool_arraymap_direct)
+{
+	HLString expected = "[{\"value\":true,\"type\":\"bool\"}]";
+	bool value = true;
+
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteBoolArray("test", arr);
+	Writer->WriteBool("value", value);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_String)
+TEST_F(JsonWriteParserTests, write_bool_arraymap_direct_multiple)
 {
-	HLString expected = "{\"test\":[\"Hello\",\"world\",\"!\"]}";
-	std::vector<HLString> arr;
-	arr.push_back("Hello");
-	arr.push_back("world");
-	arr.push_back("!");
+	HLString expected = "[[{\"value\":true,\"type\":\"bool\"},{\"anotherValue\":false,\"type\":\"bool\"}]]";
+	bool value = true;
+	bool anotherValue = false;
 
-	bool writeSuccess = Writer->WriteStringArray("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_String_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"string\",\"value\":{\"test\":[\"Hello\",\"world\",\"!\"]}}";
-	std::vector<HLString> arr;
-	arr.push_back("Hello");
-	arr.push_back("world");
-	arr.push_back("!");
-
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteStringArray("test", arr);
+	Writer->WriteBool("value", value);
+	Writer->WriteBool("anotherValue", anotherValue);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
+/// =========================================================================================================
+/// ==============================================  Vec2 Tests  =============================================
+/// =========================================================================================================
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec2)
+TEST_F(JsonWriteParserTests, write_vec2)
 {
-	HLString expected = "{\"test\":[[1.5,6.0],[2.5,1.0],[1.0,0.0]]}";
-	std::vector<glm::vec2> arr;
-	arr.push_back({ 1.5f, 6.0f });
-	arr.push_back({ 2.5f, 1.0f });
-	arr.push_back({ 1.0f, 0.0f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5],\"type\":\"vec2\"}}";
+	glm::vec2 value = { 12.5f, 42.5f };
 
-	bool writeSuccess = Writer->WriteVec2Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteVec2("test", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec2_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_vec2_multiple)
 {
-	HLString expected = "{\"type\":\"vec2\",\"value\":{\"test\":[[1.5,6.0],[2.5,1.0],[1.0,0.0]]}}";
-	std::vector<glm::vec2> arr;
-	arr.push_back({ 1.5f, 6.0f });
-	arr.push_back({ 2.5f, 1.0f });
-	arr.push_back({ 1.0f, 0.0f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5],\"type\":\"vec2\"},\"anotherValue\":{\"value\":[6.0,1205.4],\"type\":\"vec2\"}}";
+	glm::vec2 value = { 12.5f, 42.5f };
+	glm::vec2 anotherValue = { 6.0f, 1205.4f };
 
+	Writer->WriteVec2("test", value);
+	Writer->WriteVec2("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5],\"type\":\"vec2\"}]";
+	glm::vec2 value = { 12.5f, 42.5f };
+
+	Writer->BeginArray();
+	Writer->WriteVec2("test", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5],\"type\":\"vec2\"},{\"value\":[6.0,1205.4],\"type\":\"vec2\"}]";
+	glm::vec2 value = { 12.5f, 42.5f };
+	glm::vec2 anotherValue = { 6.0f, 1205.4f };
+
+	Writer->BeginArray();
+	Writer->WriteVec2("test", value);
+	Writer->WriteVec2("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec2_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5],\"type\":\"vec2\"}]";
+	glm::vec2 value = { 12.5f, 42.5f };
+
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec2Array("test", arr);
+	Writer->WriteVec2("test", value);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec3)
+TEST_F(JsonWriteParserTests, write_vec2_arraymap_direct_multiple)
 {
-	HLString expected = "{\"test\":[[1.5,6.0,5.3],[2.5,1.0,5.8],[1.0,0.0,5.5]]}";
-	std::vector<glm::vec3> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f });
+	HLString expected = "[[{\"test\":[12.5,42.5],\"type\":\"vec2\"},{\"anotherValue\":[6.0,1205.4],\"type\":\"vec2\"}]]";
+	glm::vec2 value = { 12.5f, 42.5f };
+	glm::vec2 anotherValue = { 6.0f, 1205.4f };
 
-	bool writeSuccess = Writer->WriteVec3Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec3_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"vec3\",\"value\":{\"test\":[[1.5,6.0,5.3],[2.5,1.0,5.8],[1.0,0.0,5.5]]}}";
-	std::vector<glm::vec3> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f });
-
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec3Array("test", arr);
+	Writer->WriteVec2("test", value);
+	Writer->WriteVec2("anotherValue", anotherValue);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
+/// =========================================================================================================
+/// ==============================================  Vec3 Tests  =============================================
+/// =========================================================================================================
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec4)
+TEST_F(JsonWriteParserTests, write_vec3)
 {
-	HLString expected = "{\"test\":[[1.5,6.0,5.3,2.7],[2.5,1.0,5.8,2.9],[1.0,0.0,5.5,2.5]]}";
-	std::vector<glm::vec4> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5],\"type\":\"vec3\"}}";
+	glm::vec3 value = { 12.5f, 42.5f, 16.5f };
 
-	bool writeSuccess = Writer->WriteVec4Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteVec3("test", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Vec4_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_vec3_multiple)
 {
-	HLString expected = "{\"type\":\"vec4\",\"value\":{\"test\":[[1.5,6.0,5.3,2.7],[2.5,1.0,5.8,2.9],[1.0,0.0,5.5,2.5]]}}";
-	std::vector<glm::vec4> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5],\"type\":\"vec3\"},\"anotherValue\":{\"value\":[6.0,1205.4,42.5],\"type\":\"vec3\"}}";
+	glm::vec3 value = { 12.5f, 42.5f, 16.5f };
+	glm::vec3 anotherValue = { 6.0f, 1205.4f, 42.5f };
 
+	Writer->WriteVec3("test", value);
+	Writer->WriteVec3("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5],\"type\":\"vec3\"}]";
+	glm::vec3 value = { 12.5f, 42.5f, 16.5f };
+
+	Writer->BeginArray();
+	Writer->WriteVec3("test", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5],\"type\":\"vec3\"},{\"value\":[6.0,1205.4,42.5],\"type\":\"vec3\"}]";
+	glm::vec3 value = { 12.5f, 42.5f, 16.5f };
+	glm::vec3 anotherValue = { 6.0f, 1205.4f, 42.5f };
+
+	Writer->BeginArray();
+	Writer->WriteVec3("test", value);
+	Writer->WriteVec3("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec3_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5,16.5],\"type\":\"vec3\"}]";
+	glm::vec3 value = { 12.5f, 42.5f, 16.5f };
+
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteVec4Array("test", arr);
+	Writer->WriteVec3("test", value);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat2)
+TEST_F(JsonWriteParserTests, write_vec3_arraymap_direct_multiple)
 {
-	HLString expected = "{\"test\":[[1.5,6.0,5.3,2.7],[2.5,1.0,5.8,2.9],[1.0,0.0,5.5,2.5]]}";
-	std::vector<glm::mat2> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
+	HLString expected = "[[{\"test\":[12.5,42.5,16.5],\"type\":\"vec3\"},{\"anotherValue\":[6.0,1205.4,42.5],\"type\":\"vec3\"}]]";
+	glm::vec3 value = { 12.5f, 42.5f, 16.5f };
+	glm::vec3 anotherValue = { 6.0f, 1205.4f, 42.5f };
 
-	bool writeSuccess = Writer->WriteMat2Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat2_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"mat2\",\"value\":{\"test\":[[1.5,6.0,5.3,2.7],[2.5,1.0,5.8,2.9],[1.0,0.0,5.5,2.5]]}}";
-	std::vector<glm::mat2> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f });
-
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat2Array("test", arr);
+	Writer->WriteVec3("test", value);
+	Writer->WriteVec3("anotherValue", anotherValue);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
+/// =========================================================================================================
+/// ==============================================  Vec4 Tests  =============================================
+/// =========================================================================================================
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat3)
+TEST_F(JsonWriteParserTests, write_vec4)
 {
-	HLString expected = "{\"test\":[[1.5,6.0,5.3,2.7,142.0,155.0,231.0,1.753,3571.05],[2.5,1.0,5.8,2.9,15.0,152.0,7451.0,175.0,1573.03],[1.0,0.0,5.5,2.5,1.2,165.0,861.0,341.0,1375.75]]}";
-	std::vector<glm::mat3> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f, 142.0f, 155.0f, 231.0f, 1.753f, 3571.05f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f, 15.0f, 152.0f, 7451.0f, 175.0f, 1573.03f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f, 1.20f, 165.0f, 861.0f, 341.0f, 1375.750f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"vec4\"}}";
+	glm::vec4 value = { 12.5f, 42.5f, 16.5f, 498.5f };
 
-	bool writeSuccess = Writer->WriteMat3Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteVec4("test", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat3_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_vec4_multiple)
 {
-	HLString expected = "{\"type\":\"mat3\",\"value\":{\"test\":[[1.5,6.0,5.3,2.7,142.0,155.0,231.0,1.753,3571.05],[2.5,1.0,5.8,2.9,15.0,152.0,7451.0,175.0,1573.03],[1.0,0.0,5.5,2.5,1.2,165.0,861.0,341.0,1375.75]]}}";
-	std::vector<glm::mat3> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f, 142.0f, 155.0f, 231.0f, 1.753f, 3571.05f });
-	arr.push_back({ 2.5f, 1.0f, 5.8f, 2.9f, 15.0f, 152.0f, 7451.0f, 175.0f, 1573.03f });
-	arr.push_back({ 1.0f, 0.0f, 5.5f, 2.5f, 1.20f, 165.0f, 861.0f, 341.0f, 1375.750f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"vec4\"},\"anotherValue\":{\"value\":[16.5,157.0,1234.5,146.0],\"type\":\"vec4\"}}";
+	glm::vec4 value = { 12.5f, 42.5f, 16.5f, 498.5f };
+	glm::vec4 anotherValue = { 16.5f, 157.0f, 1234.5f, 146.0f };
 
+	Writer->WriteVec4("test", value);
+	Writer->WriteVec4("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"vec4\"}]";
+	glm::vec4 value = { 12.5f, 42.5f, 16.5f, 498.5f };
+
+	Writer->BeginArray();
+	Writer->WriteVec4("test", value);
+	Writer->EndArray();
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"vec4\"},{\"value\":[16.5,157.0,1234.5,146.0],\"type\":\"vec4\"}]";
+	glm::vec4 value = { 12.5f, 42.5f, 16.5f, 498.5f };
+	glm::vec4 anotherValue = { 16.5f, 157.0f, 1234.5f, 146.0f };
+
+	Writer->BeginArray();
+	Writer->WriteVec4("test", value);
+	Writer->WriteVec4("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_vec4_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5,16.5,498.5],\"type\":\"vec4\"}]";
+	glm::vec4 value = { 12.5f, 42.5f, 16.5f, 498.5f };
+
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat3Array("test", arr);
+	Writer->WriteVec4("test", value);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat4)
+TEST_F(JsonWriteParserTests, write_vec4_arraymap_direct_multiple)
 {
-	HLString expected = "{\"test\":[[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0],[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5,10.5,1.1,5.32,3.2,1.5,5.3,4.8]]}";
-	std::vector<glm::mat4> arr;
-	arr.push_back(glm::mat4(0.0f));
-	arr.push_back(glm::mat4(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
+	HLString expected = "[[{\"test\":[12.5,42.5,16.5,498.5],\"type\":\"vec4\"},{\"anotherValue\":[16.5,157.0,1234.5,146.0],\"type\":\"vec4\"}]]";
+	glm::vec4 value = { 12.5f, 42.5f, 16.5f, 498.5f };
+	glm::vec4 anotherValue = { 16.5f, 157.0f, 1234.5f, 146.0f };
 
-	bool writeSuccess = Writer->WriteMat4Array("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
-}
-
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Mat4_WithTypeCheck)
-{
-	HLString expected = "{\"type\":\"mat4\",\"value\":{\"test\":[[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],[1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0],[23.0,9.0,5.5,1.5,6.0,1.0,7.5,0.0,4.5,10.5,1.1,5.32,3.2,1.5,5.3,4.8]]}}";
-	std::vector<glm::mat4> arr;
-	arr.push_back(glm::mat4(0.0f));
-	arr.push_back(glm::mat4(1.0f));
-	arr.push_back({ 23.0f, 9.0f, 5.5f, 1.5f, 6.0f, 1.0f, 7.5f, 0.0f, 4.5f, 10.5f, 1.1f, 5.32f, 3.2f, 1.5f, 5.3f, 4.8f });
-
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteMat4Array("test", arr);
+	Writer->WriteVec4("test", value);
+	Writer->WriteVec4("anotherValue", anotherValue);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
+/// =========================================================================================================
+/// ==============================================  Mat2 Tests  =============================================
+/// =========================================================================================================
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Quat)
+TEST_F(JsonWriteParserTests, write_mat2)
 {
-	HLString expected = "{\"test\":[[1.5,6.0,5.3,2.7],[164.5,326.5,235.3,32.0],[14.5,32.5,23.53,3.2]]}";
-	std::vector<glm::quat> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f });
-	arr.push_back({ 164.5f, 326.5f, 235.3f, 32.0f });
-	arr.push_back({ 14.5f, 32.5f, 23.53f, 3.20f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"mat2\"}}";
+	
+	glm::mat2 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
 
-	bool writeSuccess = Writer->WriteQuaternionArray("test", arr);
-
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	Writer->WriteMat2("test", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
-TEST_F(JsonWriteParserTests, JSONParser_Write_Complete_Array_Quat_WithTypeCheck)
+TEST_F(JsonWriteParserTests, write_mat2_multiple)
 {
-	HLString expected = "{\"type\":\"quat\",\"value\":{\"test\":[[1.5,6.0,5.3,2.7],[164.5,326.5,235.3,32.0],[14.5,32.5,23.53,3.2]]}}";
-	std::vector<glm::quat> arr;
-	arr.push_back({ 1.5f, 6.0f, 5.3f, 2.7f });
-	arr.push_back({ 164.5f, 326.5f, 235.3f, 32.0f });
-	arr.push_back({ 14.5f, 32.5f, 23.53f, 3.20f });
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"mat2\"},\"anotherValue\":{\"value\":[2324.5,123.5,1345.0,464.0],\"type\":\"mat2\"}}";
 
+	glm::mat2 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+
+	glm::mat2 anotherValue;
+	anotherValue[0][0] = 2324.5f;
+	anotherValue[0][1] = 123.5f;
+	anotherValue[1][0] = 1345.0f;
+	anotherValue[1][1] = 464.0f;
+
+	Writer->WriteMat2("test", value);
+	Writer->WriteMat2("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"mat2\"}]";
+
+	glm::mat2 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+
+	Writer->BeginArray();
+	Writer->WriteMat2("test", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"mat2\"},{\"value\":[2324.5,123.5,1345.0,464.0],\"type\":\"mat2\"}]";
+
+	glm::mat2 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+
+	glm::mat2 anotherValue;
+	anotherValue[0][0] = 2324.5f;
+	anotherValue[0][1] = 123.5f;
+	anotherValue[1][0] = 1345.0f;
+	anotherValue[1][1] = 464.0f;
+
+	Writer->BeginArray();
+	Writer->WriteMat2("test", value);
+	Writer->WriteMat2("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5,16.5,498.5],\"type\":\"mat2\"}]";
+
+	glm::mat2 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+
+	Writer->BeginArray();
 	Writer->BeginObject();
-	bool writeSuccess = Writer->WriteQuaternionArray("test", arr);
+	Writer->WriteMat2("test", value);
 	Writer->EndObject();
+	Writer->EndArray();
 
-	HLString content = Writer->GetContent();
-	EXPECT_EQ(writeSuccess, true);
-	EXPECT_EQ(StringEquals(expected, content), true);
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat2_arraymap_direct_multiple)
+{
+	HLString expected = "[[{\"test\":[12.5,42.5,16.5,498.5],\"type\":\"mat2\"},{\"anotherValue\":[2324.5,123.5,1345.0,464.0],\"type\":\"mat2\"}]]";
+
+	glm::mat2 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+
+	glm::mat2 anotherValue;
+	anotherValue[0][0] = 2324.5f;
+	anotherValue[0][1] = 123.5f;
+	anotherValue[1][0] = 1345.0f;
+	anotherValue[1][1] = 464.0f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteMat2("test", value);
+	Writer->WriteMat2("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+/// =========================================================================================================
+/// ==============================================  Mat3 Tests  =============================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_mat3)
+{
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,456.0,16.5,498.5,457.0,4245.0,32.5,343245.0],\"type\":\"mat3\"}}";
+
+	glm::mat3 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+
+	Writer->WriteMat3("test", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_multiple)
+{
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,456.0,16.5,498.5,457.0,4245.0,32.5,343245.0],\"type\":\"mat3\"},\"anotherValue\":{\"value\":[246.0,536.0,757.0,757.5,646.5,75.5,753.0,645.0,64.0],\"type\":\"mat3\"}}";
+
+	glm::mat3 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+
+	glm::mat3 anotherValue;
+	anotherValue[0][0] = 246.0f;
+	anotherValue[0][1] = 536.0f;
+	anotherValue[0][2] = 757.0f;
+
+	anotherValue[1][0] = 757.5f;
+	anotherValue[1][1] = 646.5f;
+	anotherValue[1][2] = 75.5f;
+
+	anotherValue[2][0] = 753.0f;
+	anotherValue[2][1] = 645.0f;
+	anotherValue[2][2] = 64.0f;
+
+	Writer->WriteMat3("test", value);
+	Writer->WriteMat3("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,456.0,16.5,498.5,457.0,4245.0,32.5,343245.0],\"type\":\"mat3\"}]";
+
+	glm::mat3 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+
+	Writer->BeginArray();
+	Writer->WriteMat3("test", value);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,456.0,16.5,498.5,457.0,4245.0,32.5,343245.0],\"type\":\"mat3\"},{\"value\":[246.0,536.0,757.0,757.5,646.5,75.5,753.0,645.0,64.0],\"type\":\"mat3\"}]";
+
+	glm::mat3 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+
+	glm::mat3 anotherValue;
+	anotherValue[0][0] = 246.0f;
+	anotherValue[0][1] = 536.0f;
+	anotherValue[0][2] = 757.0f;
+
+	anotherValue[1][0] = 757.5f;
+	anotherValue[1][1] = 646.5f;
+	anotherValue[1][2] = 75.5f;
+
+	anotherValue[2][0] = 753.0f;
+	anotherValue[2][1] = 645.0f;
+	anotherValue[2][2] = 64.0f;
+
+	Writer->BeginArray();
+	Writer->WriteMat3("test", value);
+	Writer->WriteMat3("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5,456.0,16.5,498.5,457.0,4245.0,32.5,343245.0],\"type\":\"mat3\"}]";
+
+	glm::mat3 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteMat3("test", value);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat3_arraymap_direct_multiple)
+{
+	HLString expected = "[[{\"test\":[12.5,42.5,456.0,16.5,498.5,457.0,4245.0,32.5,343245.0],\"type\":\"mat3\"},{\"anotherValue\":[246.0,536.0,757.0,757.5,646.5,75.5,753.0,645.0,64.0],\"type\":\"mat3\"}]]";
+
+	glm::mat3 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+
+	glm::mat3 anotherValue;
+	anotherValue[0][0] = 246.0f;
+	anotherValue[0][1] = 536.0f;
+	anotherValue[0][2] = 757.0f;
+
+	anotherValue[1][0] = 757.5f;
+	anotherValue[1][1] = 646.5f;
+	anotherValue[1][2] = 75.5f;
+
+	anotherValue[2][0] = 753.0f;
+	anotherValue[2][1] = 645.0f;
+	anotherValue[2][2] = 64.0f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteMat3("test", value);
+	Writer->WriteMat3("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+/// =========================================================================================================
+/// ==============================================  Mat4 Tests  =============================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_mat4)
+{
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,456.0,435.0,16.5,498.5,457.0,324.0,4245.0,32.5,343245.0,4353.5,3245.0,757.5,4353.0,475.5],\"type\":\"mat4\"}}";
+
+	glm::mat4 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+	value[0][3] = 435.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	value[1][3] = 324.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+	value[2][3] = 4353.5f;
+
+	value[3][0] = 3245.0f;
+	value[3][1] = 757.5f;
+	value[3][2] = 4353.0f;
+	value[3][3] = 475.5f;
+
+	Writer->WriteMat4("test", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_multiple)
+{
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,456.0,435.0,16.5,498.5,457.0,324.0,4245.0,32.5,343245.0,4353.5,3245.0,757.5,4353.0,475.5],\"type\":\"mat4\"},\"anotherValue\":{\"value\":[246.0,536.0,757.0,457.0,757.5,646.5,75.5,46.5,753.0,645.0,64.0,5445.0,53.5,324.5,423.5,63.5],\"type\":\"mat4\"}}";
+
+	glm::mat4 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+	value[0][3] = 435.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	value[1][3] = 324.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+	value[2][3] = 4353.5f;
+
+	value[3][0] = 3245.0f;
+	value[3][1] = 757.5f;
+	value[3][2] = 4353.0f;
+	value[3][3] = 475.5f;
+
+	glm::mat4 anotherValue;
+	anotherValue[0][0] = 246.0f;
+	anotherValue[0][1] = 536.0f;
+	anotherValue[0][2] = 757.0f;
+	anotherValue[0][3] = 457.0f;
+
+	anotherValue[1][0] = 757.5f;
+	anotherValue[1][1] = 646.5f;
+	anotherValue[1][2] = 75.5f;
+	anotherValue[1][3] = 46.5f;
+
+	anotherValue[2][0] = 753.0f;
+	anotherValue[2][1] = 645.0f;
+	anotherValue[2][2] = 64.0f;
+	anotherValue[2][3] = 5445.0f;
+
+	anotherValue[3][0] = 53.5f;
+	anotherValue[3][1] = 324.5f;
+	anotherValue[3][2] = 423.5f;
+	anotherValue[3][3] = 63.5f;
+
+	Writer->WriteMat4("test", value);
+	Writer->WriteMat4("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,456.0,435.0,16.5,498.5,457.0,324.0,4245.0,32.5,343245.0,4353.5,3245.0,757.5,4353.0,475.5],\"type\":\"mat4\"}]";
+
+	glm::mat4 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+	value[0][3] = 435.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	value[1][3] = 324.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+	value[2][3] = 4353.5f;
+
+	value[3][0] = 3245.0f;
+	value[3][1] = 757.5f;
+	value[3][2] = 4353.0f;
+	value[3][3] = 475.5f;
+
+	Writer->BeginArray();
+	Writer->WriteMat4("test", value);
+	Writer->EndArray();
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,456.0,435.0,16.5,498.5,457.0,324.0,4245.0,32.5,343245.0,4353.5,3245.0,757.5,4353.0,475.5],\"type\":\"mat4\"},{\"value\":[246.0,536.0,757.0,457.0,757.5,646.5,75.5,46.5,753.0,645.0,64.0,5445.0,53.5,324.5,423.5,63.5],\"type\":\"mat4\"}]";
+
+	glm::mat4 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+	value[0][3] = 435.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	value[1][3] = 324.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+	value[2][3] = 4353.5f;
+
+	value[3][0] = 3245.0f;
+	value[3][1] = 757.5f;
+	value[3][2] = 4353.0f;
+	value[3][3] = 475.5f;
+
+	glm::mat4 anotherValue;
+	anotherValue[0][0] = 246.0f;
+	anotherValue[0][1] = 536.0f;
+	anotherValue[0][2] = 757.0f;
+	anotherValue[0][3] = 457.0f;
+
+	anotherValue[1][0] = 757.5f;
+	anotherValue[1][1] = 646.5f;
+	anotherValue[1][2] = 75.5f;
+	anotherValue[1][3] = 46.5f;
+
+	anotherValue[2][0] = 753.0f;
+	anotherValue[2][1] = 645.0f;
+	anotherValue[2][2] = 64.0f;
+	anotherValue[2][3] = 5445.0f;
+
+	anotherValue[3][0] = 53.5f;
+	anotherValue[3][1] = 324.5f;
+	anotherValue[3][2] = 423.5f;
+	anotherValue[3][3] = 63.5f;
+
+	Writer->BeginArray();
+	Writer->WriteMat4("test", value);
+	Writer->WriteMat4("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5,456.0,435.0,16.5,498.5,457.0,324.0,4245.0,32.5,343245.0,4353.5,3245.0,757.5,4353.0,475.5],\"type\":\"mat4\"}]";
+
+	glm::mat4 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+	value[0][3] = 435.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	value[1][3] = 324.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+	value[2][3] = 4353.5f;
+
+	value[3][0] = 3245.0f;
+	value[3][1] = 757.5f;
+	value[3][2] = 4353.0f;
+	value[3][3] = 475.5f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteMat4("test", value);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_mat4_arraymap_direct_multiple)
+{
+	HLString expected = "[[{\"test\":[12.5,42.5,456.0,435.0,16.5,498.5,457.0,324.0,4245.0,32.5,343245.0,4353.5,3245.0,757.5,4353.0,475.5],\"type\":\"mat4\"},{\"anotherValue\":[246.0,536.0,757.0,457.0,757.5,646.5,75.5,46.5,753.0,645.0,64.0,5445.0,53.5,324.5,423.5,63.5],\"type\":\"mat4\"}]]";
+
+	glm::mat4 value;
+	value[0][0] = 12.5f;
+	value[0][1] = 42.5f;
+	value[0][2] = 456.0f;
+	value[0][3] = 435.0f;
+
+	value[1][0] = 16.5f;
+	value[1][1] = 498.5f;
+	value[1][2] = 457.0f;
+	value[1][3] = 324.0f;
+
+	value[2][0] = 4245.0f;
+	value[2][1] = 32.5f;
+	value[2][2] = 343245.0f;
+	value[2][3] = 4353.5f;
+
+	value[3][0] = 3245.0f;
+	value[3][1] = 757.5f;
+	value[3][2] = 4353.0f;
+	value[3][3] = 475.5f;
+
+	glm::mat4 anotherValue;
+	anotherValue[0][0] = 246.0f;
+	anotherValue[0][1] = 536.0f;
+	anotherValue[0][2] = 757.0f;
+	anotherValue[0][3] = 457.0f;
+
+	anotherValue[1][0] = 757.5f;
+	anotherValue[1][1] = 646.5f;
+	anotherValue[1][2] = 75.5f;
+	anotherValue[1][3] = 46.5f;
+
+	anotherValue[2][0] = 753.0f;
+	anotherValue[2][1] = 645.0f;
+	anotherValue[2][2] = 64.0f;
+	anotherValue[2][3] = 5445.0f;
+
+	anotherValue[3][0] = 53.5f;
+	anotherValue[3][1] = 324.5f;
+	anotherValue[3][2] = 423.5f;
+	anotherValue[3][3] = 63.5f;
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteMat4("test", value);
+	Writer->WriteMat4("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+/// =========================================================================================================
+/// ==============================================  Quat Tests  =============================================
+/// =========================================================================================================
+
+TEST_F(JsonWriteParserTests, write_quat)
+{
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"quat\"}}";
+	glm::quat value = { 12.5f, 42.5f, 16.5f, 498.5f };
+
+	Writer->WriteQuaternion("test", value);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_quat_multiple)
+{
+	HLString expected = "{\"test\":{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"quat\"},\"anotherValue\":{\"value\":[49.5,457.0,46.5,496.5],\"type\":\"quat\"}}";
+	glm::quat value = { 12.5f, 42.5f, 16.5f, 498.5f };
+	glm::quat anotherValue = { 49.5f, 457.0f, 46.5f, 496.5f };
+
+	Writer->WriteQuaternion("test", value);
+	Writer->WriteQuaternion("anotherValue", anotherValue);
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_quat_array)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_quat_array_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_quat_arraymap)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_quat_arraymap_multiple)
+{
+
+}
+
+TEST_F(JsonWriteParserTests, write_quat_array_direct)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"quat\"}]";
+	glm::quat value = { 12.5f, 42.5f, 16.5f, 498.5f };
+
+	Writer->BeginArray();
+	Writer->WriteQuaternion("test", value);
+	Writer->EndArray();
+	
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_quat_array_direct_multiple)
+{
+	HLString expected = "[{\"value\":[12.5,42.5,16.5,498.5],\"type\":\"quat\"},{\"value\":[49.5,457.0,46.5,496.5],\"type\":\"quat\"}]";
+	glm::quat value = { 12.5f, 42.5f, 16.5f, 498.5f };
+	glm::quat anotherValue = { 49.5f, 457.0f, 46.5f, 496.5f };
+
+	Writer->BeginArray();
+	Writer->WriteQuaternion("test", value);
+	Writer->WriteQuaternion("anotherValue", anotherValue);
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_quat_arraymap_direct)
+{
+	HLString expected = "[{\"test\":[12.5,42.5,16.5,498.5],\"type\":\"quat\"}]";
+	glm::quat value = { 12.5f, 42.5f, 16.5f, 498.5f };
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteQuaternion("test", value);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
+}
+
+TEST_F(JsonWriteParserTests, write_quat_arraymap_direct_multiple)
+{
+	HLString expected = "[[{\"test\":[12.5,42.5,16.5,498.5],\"type\":\"quat\"},{\"anotherValue\":[49.5,457.0,46.5,496.5],\"type\":\"quat\"}]]";
+	glm::quat value = { 12.5f, 42.5f, 16.5f, 498.5f };
+	glm::quat anotherValue = { 49.5f, 457.0f, 46.5f, 496.5f };
+
+	Writer->BeginArray();
+	Writer->BeginObject();
+	Writer->WriteQuaternion("test", value);
+	Writer->WriteQuaternion("anotherValue", anotherValue);
+	Writer->EndObject();
+	Writer->EndArray();
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 

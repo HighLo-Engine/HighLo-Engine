@@ -3,7 +3,8 @@
 #include "HighLoPch.h"
 #include "DocumentWriter.h"
 
-#include "Engine/Platform/JSON/JsonWriter.h"
+#include "Engine/Platform/RapidJSON/JsonWriter.h"
+#include "Engine/Platform/RapidXML/XMLWriter.h"
 
 namespace highlo
 {
@@ -15,7 +16,7 @@ namespace highlo
 				return Ref<JSONWriter>::Create(filePath);
 
 			case DocumentType::XML:
-				break;
+				return Ref<XMLWriter>::Create(filePath);
 
 			case DocumentType::Yaml:
 				break;

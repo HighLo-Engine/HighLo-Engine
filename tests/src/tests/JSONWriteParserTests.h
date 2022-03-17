@@ -882,12 +882,34 @@ TEST_F(JsonWriteParserTests, write_float_typesafe_multiple)
 
 TEST_F(JsonWriteParserTests, write_float_array)
 {
+	HLString expected = "{\"value\":[42.5,12.5]}";
+	std::vector<float> value;
+	value.push_back(42.5f);
+	value.push_back(12.5f);
 
+	Writer->WriteFloatArray("value", value);
+
+	HLString result = Writer->GetContent();
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
 TEST_F(JsonWriteParserTests, write_float_array_multiple)
 {
+	HLString expected = "{\"value\":[42.5,12.5],\"anotherValue\":[153.5,426.5]}";
+	std::vector<float> value;
+	value.push_back(42.5f);
+	value.push_back(12.5f);
 
+	std::vector<float> anotherValue;
+	value.push_back(153.5f);
+	value.push_back(426.5f);
+
+	Writer->WriteFloatArray("value", value);
+	Writer->WriteFloatArray("anotherValue", anotherValue);
+
+	HLString result = Writer->GetContent();
+	std::cout << *result << std::endl;
+	EXPECT_EQ(StringEquals(result, expected), true);
 }
 
 TEST_F(JsonWriteParserTests, write_float_arraymap)

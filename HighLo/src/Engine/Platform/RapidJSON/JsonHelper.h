@@ -19,6 +19,37 @@
 
 namespace highlo::utils
 {
+	template<typename T>
+	static rapidjson::Value ConvertStdArrToRapidJsonArr(const std::vector<T> &arr, rapidjson::Document &document)
+	{
+		rapidjson::Value result(rapidjson::kArrayType);
+		for (uint32 i = 0; i < arr.size(); ++i)
+			result.PushBack(arr[i], document.GetAllocator());
+
+		return result;
+	}
+
+	template<typename T>
+	static rapidjson::Value ConvertStdMapToRapidJsonArr(const std::map<HLString, T> &map, rapidjson::Document &document)
+	{
+		rapidjson::Value result(rapidjson::kArrayType);
+		for (auto &[key, value] : map)
+		{
+			rapidjson::Value obj(rapidjson::kObjectType);
+			
+			rapidjson::Value k(rapidjson::kStringType);
+			k.SetString(*key, key.Length(), document.GetAllocator());
+
+			rapidjson::Value v;
+			v.Set<T>(value);
+
+			obj.AddMember(k, v, document.GetAllocator());
+			result.PushBack(obj, document.GetAllocator());
+		}
+
+		return result;
+	}
+
 	static std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
 	{
 		std::pair<rapidjson::Value, rapidjson::Value> result;
@@ -37,139 +68,90 @@ namespace highlo::utils
 
 	static rapidjson::Value Vec2ToJSON(const glm::vec2 &v, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
-
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(v.x, document.GetAllocator());
-		obj.PushBack<float>(v.y, document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Vec2);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(v.x, document.GetAllocator());
+		result.PushBack<float>(v.y, document.GetAllocator());
 		return result;
 	}
 
 	static rapidjson::Value Vec3ToJSON(const glm::vec3 &v, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
-
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(v.x, document.GetAllocator());
-		obj.PushBack<float>(v.y, document.GetAllocator());
-		obj.PushBack<float>(v.z, document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-		
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Vec3);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(v.x, document.GetAllocator());
+		result.PushBack<float>(v.y, document.GetAllocator());
+		result.PushBack<float>(v.z, document.GetAllocator());
 		return result;
 	}
 
 	static rapidjson::Value Vec4ToJSON(const glm::vec4 &v, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
-		
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(v.x, document.GetAllocator());
-		obj.PushBack<float>(v.y, document.GetAllocator());
-		obj.PushBack<float>(v.z, document.GetAllocator());
-		obj.PushBack<float>(v.w, document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Vec4);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(v.x, document.GetAllocator());
+		result.PushBack<float>(v.y, document.GetAllocator());
+		result.PushBack<float>(v.z, document.GetAllocator());
+		result.PushBack<float>(v.w, document.GetAllocator());
 		return result;
 	}
 
 	static rapidjson::Value Mat2ToJSON(const glm::mat2 &mat, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
-
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(mat[0][0], document.GetAllocator());
-		obj.PushBack<float>(mat[0][1], document.GetAllocator());
-		obj.PushBack<float>(mat[1][0], document.GetAllocator());
-		obj.PushBack<float>(mat[1][1], document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Mat2);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(mat[0][0], document.GetAllocator());
+		result.PushBack<float>(mat[0][1], document.GetAllocator());
+		result.PushBack<float>(mat[1][0], document.GetAllocator());
+		result.PushBack<float>(mat[1][1], document.GetAllocator());
 		return result;
 	}
 
 	static rapidjson::Value Mat3ToJSON(const glm::mat3 &mat, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(mat[0][0], document.GetAllocator());
+		result.PushBack<float>(mat[0][1], document.GetAllocator());
+		result.PushBack<float>(mat[0][2], document.GetAllocator());
 
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(mat[0][0], document.GetAllocator());
-		obj.PushBack<float>(mat[0][1], document.GetAllocator());
-		obj.PushBack<float>(mat[0][2], document.GetAllocator());
+		result.PushBack<float>(mat[1][0], document.GetAllocator());
+		result.PushBack<float>(mat[1][1], document.GetAllocator());
+		result.PushBack<float>(mat[1][2], document.GetAllocator());
 
-		obj.PushBack<float>(mat[1][0], document.GetAllocator());
-		obj.PushBack<float>(mat[1][1], document.GetAllocator());
-		obj.PushBack<float>(mat[1][2], document.GetAllocator());
-
-		obj.PushBack<float>(mat[2][0], document.GetAllocator());
-		obj.PushBack<float>(mat[2][1], document.GetAllocator());
-		obj.PushBack<float>(mat[2][2], document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Mat3);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		result.PushBack<float>(mat[2][0], document.GetAllocator());
+		result.PushBack<float>(mat[2][1], document.GetAllocator());
+		result.PushBack<float>(mat[2][2], document.GetAllocator());
 		return result;
 	}
 
 	static rapidjson::Value Mat4ToJSON(const glm::mat4 &mat, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(mat[0][0], document.GetAllocator());
+		result.PushBack<float>(mat[0][1], document.GetAllocator());
+		result.PushBack<float>(mat[0][2], document.GetAllocator());
+		result.PushBack<float>(mat[0][3], document.GetAllocator());
 
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(mat[0][0], document.GetAllocator());
-		obj.PushBack<float>(mat[0][1], document.GetAllocator());
-		obj.PushBack<float>(mat[0][2], document.GetAllocator());
-		obj.PushBack<float>(mat[0][3], document.GetAllocator());
+		result.PushBack<float>(mat[1][0], document.GetAllocator());
+		result.PushBack<float>(mat[1][1], document.GetAllocator());
+		result.PushBack<float>(mat[1][2], document.GetAllocator());
+		result.PushBack<float>(mat[1][3], document.GetAllocator());
 
-		obj.PushBack<float>(mat[1][0], document.GetAllocator());
-		obj.PushBack<float>(mat[1][1], document.GetAllocator());
-		obj.PushBack<float>(mat[1][2], document.GetAllocator());
-		obj.PushBack<float>(mat[1][3], document.GetAllocator());
+		result.PushBack<float>(mat[2][0], document.GetAllocator());
+		result.PushBack<float>(mat[2][1], document.GetAllocator());
+		result.PushBack<float>(mat[2][2], document.GetAllocator());
+		result.PushBack<float>(mat[2][3], document.GetAllocator());
 
-		obj.PushBack<float>(mat[2][0], document.GetAllocator());
-		obj.PushBack<float>(mat[2][1], document.GetAllocator());
-		obj.PushBack<float>(mat[2][2], document.GetAllocator());
-		obj.PushBack<float>(mat[2][3], document.GetAllocator());
-
-		obj.PushBack<float>(mat[3][0], document.GetAllocator());
-		obj.PushBack<float>(mat[3][1], document.GetAllocator());
-		obj.PushBack<float>(mat[3][2], document.GetAllocator());
-		obj.PushBack<float>(mat[3][3], document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Mat4);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		result.PushBack<float>(mat[3][0], document.GetAllocator());
+		result.PushBack<float>(mat[3][1], document.GetAllocator());
+		result.PushBack<float>(mat[3][2], document.GetAllocator());
+		result.PushBack<float>(mat[3][3], document.GetAllocator());
 		return result;
 	}
 
 	static rapidjson::Value QuatToJSON(const glm::quat &q, rapidjson::Document &document)
 	{
-		rapidjson::Value result(rapidjson::kObjectType);
-
-		rapidjson::Value obj(rapidjson::kArrayType);
-		obj.PushBack<float>(q.w, document.GetAllocator());
-		obj.PushBack<float>(q.x, document.GetAllocator());
-		obj.PushBack<float>(q.y, document.GetAllocator());
-		obj.PushBack<float>(q.z, document.GetAllocator());
-		result.AddMember("value", obj, document.GetAllocator());
-
-		auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(document, DocumentDataType::Quat);
-		result.AddMember(typeKey, typeValue, document.GetAllocator());
-
+		rapidjson::Value result(rapidjson::kArrayType);
+		result.PushBack<float>(q.w, document.GetAllocator());
+		result.PushBack<float>(q.x, document.GetAllocator());
+		result.PushBack<float>(q.y, document.GetAllocator());
+		result.PushBack<float>(q.z, document.GetAllocator());
 		return result;
 	}
 

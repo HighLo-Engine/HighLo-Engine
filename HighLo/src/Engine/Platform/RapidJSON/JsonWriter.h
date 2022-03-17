@@ -171,16 +171,6 @@ namespace highlo
 
 	private:
 
-		template<typename T>
-		rapidjson::Value ConvertStdArrToRapidJsonArr(const std::vector<T> &arr)
-		{
-			rapidjson::Value result(rapidjson::kArrayType);
-			for (uint32 i = 0; i < arr.size(); ++i)
-				result.PushBack(arr[i], m_Document.GetAllocator());
-
-			return result;
-		}
-
 		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidjson::Value()> &insertFunc);
 
 	private:

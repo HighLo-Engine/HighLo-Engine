@@ -218,7 +218,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::Vec2ToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::Vec2ToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::Vec2ToJSON(value, instance->m_Document);
+			
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Vec2);
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -227,7 +236,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::Vec3ToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::Vec3ToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::Vec3ToJSON(value, instance->m_Document);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Vec3);
+			
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -236,7 +254,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::Vec4ToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::Vec4ToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::Vec4ToJSON(value, instance->m_Document);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Vec4);
+
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -245,7 +272,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::Mat2ToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::Mat2ToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::Mat2ToJSON(value, instance->m_Document);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Mat2);
+
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -254,7 +290,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::Mat3ToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::Mat3ToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::Mat3ToJSON(value, instance->m_Document);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Mat3);
+
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -263,7 +308,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::Mat4ToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::Mat4ToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::Mat4ToJSON(value, instance->m_Document);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Mat4);
+
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -272,7 +326,16 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
 		{
-			return utils::QuatToJSON(value, instance->m_Document);
+			if (!instance->m_UseTypeSafety)
+				return utils::QuatToJSON(value, instance->m_Document);
+
+			rapidjson::Value result(rapidjson::kObjectType);
+			rapidjson::Value node = utils::QuatToJSON(value, instance->m_Document);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::Quat);
+
+			result.AddMember("value", node, instance->m_Document.GetAllocator());
+			result.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+			return result;
 		});
 	}
 
@@ -297,7 +360,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int32, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 
@@ -306,7 +369,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt32, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 
@@ -315,7 +378,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int64, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 
@@ -324,7 +387,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt64, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 
@@ -333,7 +396,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Bool, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 
@@ -342,7 +405,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Float, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 	
@@ -351,7 +414,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Double, [instance, value]() mutable -> rapidjson::Value
 		{
-			return instance->ConvertStdArrToRapidJsonArr(value);
+			return utils::ConvertStdArrToRapidJsonArr(value, instance->m_Document);
 		});
 	}
 	

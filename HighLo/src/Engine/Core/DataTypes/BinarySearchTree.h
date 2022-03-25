@@ -24,12 +24,6 @@ namespace highlo
 			Node(T value)
 				: Value(value), Left(nullptr), Right(nullptr) {}
 
-			/**
-			 *
-			 * Calculates the Height of the current BST. A height is determined by the amount of levels a BST has.
-			 *
-			 * @return Returns the height of the current BST instance.
-			 */
 			uint32 CalcHeight()
 			{
 				uint32 leftVal = 0, rightVal = 0;
@@ -294,3 +288,4 @@ namespace highlo
 		}
 	};
 }
+

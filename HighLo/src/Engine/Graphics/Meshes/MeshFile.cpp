@@ -5,10 +5,13 @@
 
 #include "Engine/Renderer/Renderer.h"
 
+#define MESH_FILE_LOG_PREFIX "         >"
+
 namespace highlo
 {
 	MeshFile::MeshFile(const FileSystemPath &filePath, bool shouldBeAnimated)
 	{
+		HL_CORE_INFO(MESH_FILE_LOG_PREFIX "Trying to load model {0}", **filePath);
 		m_MeshShader = shouldBeAnimated ? Renderer::GetShaderLibrary()->Get("HighLoPBRAnimated") : Renderer::GetShaderLibrary()->Get("HighLoPBR");
 		m_MeshLoader = MeshLoader::Create(filePath, m_MeshShader);
 		m_IsAnimated = m_MeshLoader->IsAnimated();

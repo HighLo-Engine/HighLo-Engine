@@ -2,7 +2,7 @@
 
 //
 // version history:
-//     - 1.1 (2021-10-21) Added Unique reference class (equals std::unique_ptr)
+//     - 1.2 (2021-10-21) Added Unique reference class (equals std::unique_ptr)
 //     - 1.1 (2021-09-22) Added Singleton class
 //     - 1.0 (2021-09-14) initial release
 //

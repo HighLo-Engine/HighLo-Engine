@@ -30,9 +30,9 @@ namespace highlo
 		ImGui::SameLine();
 	//	ImGui::Text("Frame Time: %.3fms", Time::GetFrameTime());
 	//	ImGui::SameLine();
-		ImGui::Text("Elapsed Time since start: %.3fs", Time::GetElapsedTime());
-		ImGui::SameLine();
 		ImGui::Text("Time Scale: %.3f", Time::GetTimeScale());
+		ImGui::SameLine();
+		ImGui::Text("Elapsed Time since start: %.3fs", Time::GetElapsedTime());
 		ImGui::SameLine();
 
 		ImGui::End();

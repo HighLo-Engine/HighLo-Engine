@@ -1878,7 +1878,7 @@ namespace highlo::UI
 	{
 #ifdef HIGHLO_API_VULKAN
 		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
-		const VkDescriptorImageInfo &textureInfo = vulkanTexture->GetVulkanDescriptorInfo();
+		const VkDescriptorImageInfo &textureInfo = vulkanTexture->GetDescriptorInfo();
 		if (!textureInfo.imageView)
 			return nullptr;
 
@@ -1896,7 +1896,7 @@ namespace highlo::UI
 		if (!textureInfo.ImageView)
 			return;
 
-		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetVulkanDescriptorInfo().imageLayout);
+		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetDescriptorInfo().imageLayout);
 		ImGui::Image(textureId, size, uv0, uv1, tintColor, borderColor);
 #else
 		ImGui::Image(GetTextureID(texture), size, uv0, uv1, tintColor, borderColor);
@@ -1912,7 +1912,7 @@ namespace highlo::UI
 		if (!textureInfo.ImageView)
 			return;
 
-		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetVulkanDescriptorInfo().imageLayout);
+		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetDescriptorInfo().imageLayout);
 		return ImGui::Image(textureId, size, uv0, uv1, tintColor, borderColor);
 #else
 		ImGui::Image(GetTextureID(texture), size, uv0, uv1, tintColor, borderColor);
@@ -1928,7 +1928,7 @@ namespace highlo::UI
 		if (!textureInfo.ImageView)
 			return;
 
-		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetVulkanDescriptorInfo().imageLayout);
+		const auto textureId = ImGui_ImplVulkan_AddTexture(textureInfo.Sampler, textureInfo.ImageView, vulkanTexture->GetDescriptorInfo().imageLayout);
 		return ImGui::Image(textureId, size, uv0, uv1, tintColor, borderColor);
 #else
 		// TODO
@@ -1948,7 +1948,7 @@ namespace highlo::UI
 
 		Ref<VulkanTexture2D> vulkanTexture = texture.As<VulkanTexture2D>();
 
-		const VkDescriptorImageInfo &imageInfo = vulkanTexture->GetVulkanDescriptorInfo();
+		const VkDescriptorImageInfo &imageInfo = vulkanTexture->GetDescriptorInfo();
 		const auto textureId = ImGui_ImplVulkan_AddTexture(imageInfo.sampler, imageInfo.imageView, imageInfo.imageLayout);
 		ImGuiID imguiId = (ImGuiID)((((uint64)imageInfo.imageView) >> 32) ^ (uint32)imageInfo.imageView);
 		if (!id.IsEmpty())

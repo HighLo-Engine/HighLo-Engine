@@ -48,7 +48,7 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		glDeleteVertexArrays(1, &m_ID);
+		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
@@ -97,11 +97,11 @@ namespace highlo
 
 	void OpenGLVertexArray::Invalidate()
 	{
-	//	if (m_ID)
-	//		glDeleteVertexArrays(1, &m_ID);
+	//	if (m_RendererID)
+	//		glDeleteVertexArrays(1, &m_RendererID);
 	//
-	//	glGenVertexArrays(1, &m_ID);
-	//	glBindVertexArray(m_ID);
+	//	glGenVertexArrays(1, &m_RendererID);
+	//	glBindVertexArray(m_RendererID);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)

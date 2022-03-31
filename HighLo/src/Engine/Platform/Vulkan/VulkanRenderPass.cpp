@@ -5,7 +5,14 @@
 
 namespace highlo
 {
+    VulkanRenderPass::VulkanRenderPass(const RenderPassSpecification &spec)
+        : m_Specification(spec)
+    {
+    }
 
+    VulkanRenderPass::~VulkanRenderPass()
+    {
+    }
 }
 
 #endif // HIGHLO_API_VULKAN

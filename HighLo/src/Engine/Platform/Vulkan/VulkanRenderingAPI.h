@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Engine/Graphics/RenderingAPI.h"
+#include "Engine/Graphics/VertexArray.h"
 
 #ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
 
 namespace highlo
 {
@@ -109,8 +112,8 @@ namespace highlo
 		virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
 		virtual Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination) override;
 
-	private:
-
+		// Vulkan-specific
+		static VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo);
 	};
 }
 

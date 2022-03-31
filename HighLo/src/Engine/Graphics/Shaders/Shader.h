@@ -21,6 +21,8 @@ namespace highlo
 
 		using ShaderReloadedCallback = std::function<void()>;
 
+		HLAPI virtual ~Shader() {}
+
 		HLAPI virtual void Reload(bool forceCompile = false) = 0;
 		HLAPI virtual uint64 GetHash() const = 0;
 

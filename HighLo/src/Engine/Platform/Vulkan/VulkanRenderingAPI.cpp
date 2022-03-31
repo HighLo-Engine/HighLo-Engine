@@ -114,6 +114,11 @@ namespace highlo
 	{
 		return Ref<Texture3D>();
 	}
+	
+	VkDescriptorSet VulkanRenderingAPI::AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo)
+	{
+		return VkDescriptorSet();
+	}
 }
 
 #endif // HIGHLO_API_VULKAN

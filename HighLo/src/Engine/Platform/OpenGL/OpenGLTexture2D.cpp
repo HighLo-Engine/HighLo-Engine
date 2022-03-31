@@ -43,6 +43,9 @@ namespace highlo
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
 		m_DataFormat = channels == 4 ? GL_RGBA : GL_RGB;
 
+		// Clean up loaded data because it has been copied into our own allocator
+		stbi_image_free(data);
+
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		m_Specification.Format = format;

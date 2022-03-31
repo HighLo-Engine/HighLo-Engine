@@ -5,6 +5,7 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 namespace highlo
 {
@@ -13,7 +14,7 @@ namespace highlo
 		VkImage Image = nullptr;
 		VkImageView ImageView = nullptr;
 		VkSampler Sampler = nullptr;
-	//	VmaAllocation MemoryAlloc = nullptr; // TODO: Add this memory header: #include <vk_mem_allocator.h>
+		VmaAllocation MemoryAlloc = nullptr;
 	};
 
 	class VulkanTexture2D : public Texture2D
@@ -61,7 +62,7 @@ namespace highlo
 		virtual void Unbind(uint32 slot) const override;
 
 		// Vulkan-specific
-		const VkDescriptorImageInfo &GetDescriptorInfo() const { return VkDescriptorImageInfo(); }
+		const VkDescriptorImageInfo &GetDescriptorInfo() const { return m_DescriptorImageInfo; }
 
 		VulkanImageInfo &GetTextureInfo() { return m_Info; }
 		const VulkanImageInfo &GetTextureInfo() const { return m_Info; }

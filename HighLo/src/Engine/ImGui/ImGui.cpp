@@ -1950,7 +1950,13 @@ namespace highlo::UI
 
 		const VkDescriptorImageInfo &imageInfo = vulkanTexture->GetDescriptorInfo();
 		const auto textureId = ImGui_ImplVulkan_AddTexture(imageInfo.sampler, imageInfo.imageView, imageInfo.imageLayout);
+	#pragma warning(push)
+	#pragma warning(disable: 4311)
+	#pragma warning(disable: 4302)
+		// This generates type conversion warnings, because we try to convert VkImageViews into uint32
+		// this is expected
 		ImGuiID imguiId = (ImGuiID)((((uint64)imageInfo.imageView) >> 32) ^ (uint32)imageInfo.imageView);
+	#pragma warning(pop)
 		if (!id.IsEmpty())
 		{
 			const ImGuiID strID = ImGui::GetID(*id);
@@ -1958,7 +1964,6 @@ namespace highlo::UI
 		}
 
 		return ImGui::ImageButtonEx(imguiId, textureId, size, uv0, uv1, ImVec2((float)framePadding, (float)framePadding), bgColor, tintColor);
-
 #else
 		if (!texture)
 			return false;

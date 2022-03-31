@@ -218,6 +218,10 @@ namespace highlo
 			HL_CORE_TRACE("  Vendor: {0}", *caps.Vendor);
 			HL_CORE_TRACE("  Device: {0}", *caps.Device);
 			HL_CORE_TRACE("  Version: {0}", *caps.Version);
+			HL_CORE_TRACE("  MAX TEXTURES: {0}", caps.MaxTextures);
+			HL_CORE_TRACE("  MAX TEXTURES UNITS: {0}", caps.MaxTextureUnits);
+			HL_CORE_TRACE("  MAX SAMPLES: {0}", caps.MaxSamples);
+			HL_CORE_TRACE("  MAX ANISOTROPY: {0}", caps.MaxAnisotropy);
 		}
 	}
 }

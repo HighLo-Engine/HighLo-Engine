@@ -115,6 +115,7 @@ namespace highlo
 		caps.Version = (const char*)glGetString(GL_VERSION);
 		glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &caps.MaxTextures);
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
 
 		utils::DumpGPUInfos();

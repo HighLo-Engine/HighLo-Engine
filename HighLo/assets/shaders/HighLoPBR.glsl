@@ -444,19 +444,19 @@ vec3 CalculatePointLights(in vec3 F0)
 	return result;
 }
 
-vec3 IBL(vec3 F0, vec3 Lr)
+vec3 IBL(samplerCube envTexture, samplerCube envRadianceTexture, sampler2D brdfTexture, vec3 F0, vec3 Lr)
 {
-	vec3 irradiance = texture(u_EnvironmentIrradianceTexture, m_Params.Normal).rgb;
+	vec3 irradiance = texture(envTexture, m_Params.Normal).rgb;
 	vec3 F = fresnelSchlickRoughness(F0, m_Params.NdotV, m_Params.Roughness);
 	vec3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
 	vec3 diffuseIBL = m_Params.Diffuse * irradiance;
 
-	int environmentRadianceTextureLevels = textureQueryLevels(u_EnvironmentRadianceTexture);
+	int environmentRadianceTextureLevels = textureQueryLevels(envRadianceTexture);
 	float NoV = clamp(m_Params.NdotV, 0.0, 1.0);
 	vec3 R = 2.0 * dot(m_Params.View, m_Params.Normal) * m_Params.Normal - m_Params.View;
-	vec3 specularIrradiance = textureLod(u_EnvironmentRadianceTexture, RotateVectorAboutYAxis(u_MaterialUniforms.EnvironmentMapRotation, Lr), (m_Params.Roughness) * environmentRadianceTextureLevels).rgb;
+	vec3 specularIrradiance = textureLod(envRadianceTexture, RotateVectorAboutYAxis(u_MaterialUniforms.EnvironmentMapRotation, Lr), (m_Params.Roughness) * environmentRadianceTextureLevels).rgb;
 
-	vec2 specularBRDF = texture(u_BRDFLUTTexture, vec2(m_Params.NdotV, 1.0 - m_Params.Roughness)).rg;
+	vec2 specularBRDF = texture(brdfTexture, vec2(m_Params.NdotV, 1.0 - m_Params.Roughness)).rg;
 	vec3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
 
 	return kd * diffuseIBL + specularIBL;
@@ -667,7 +667,7 @@ void main()
 	lightContribution += CalculatePointLights(F0);
 	lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
 
-	vec3 iblContribution = IBL(F0, Lr) * u_EnvironmentMapIntensity;
+	vec3 iblContribution = IBL(u_EnvironmentIrradianceTexture, u_EnvironmentRadianceTexture, u_BRDFLUTTexture, F0, Lr) * u_EnvironmentMapIntensity;
 
 	o_Color = vec4(iblContribution + lightContribution, 1.0);
 

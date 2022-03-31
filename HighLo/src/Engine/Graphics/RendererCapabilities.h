@@ -19,6 +19,7 @@ namespace highlo
 
 		int32 MaxSamples = 0;
 		int32 MaxTextureUnits = 0;
+		int32 MaxTextures = 0;
 		float MaxAnisotropy = 0.0f;
 	};
 }

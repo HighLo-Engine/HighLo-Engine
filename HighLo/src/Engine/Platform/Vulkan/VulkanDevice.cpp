@@ -43,7 +43,7 @@ namespace highlo
 
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(physicalDevice->m_QueueCreateInfos.size());;
+        deviceCreateInfo.queueCreateInfoCount = static_cast<uint32>(physicalDevice->m_QueueCreateInfos.size());;
         deviceCreateInfo.pQueueCreateInfos = physicalDevice->m_QueueCreateInfos.data();
         deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
         if (canEnableAftermath)

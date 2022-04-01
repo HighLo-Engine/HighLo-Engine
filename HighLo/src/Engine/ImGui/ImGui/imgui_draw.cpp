@@ -4091,7 +4091,7 @@ static unsigned int stb_decompress(unsigned char *output, const unsigned char *i
 // [SECTION] Default font data (ProggyClean.ttf)
 //-----------------------------------------------------------------------------
 // ProggyClean.ttf
-// Copyright (c) 2004, 2005 Tristan Grimmer
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 // MIT license (see License.txt in http://www.upperbounds.net/download/ProggyClean.ttf.zip)
 // Download and more information at http://upperbounds.net
 //-----------------------------------------------------------------------------

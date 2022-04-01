@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/VertexBuffer.h"
+#include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Allocator.h"
 

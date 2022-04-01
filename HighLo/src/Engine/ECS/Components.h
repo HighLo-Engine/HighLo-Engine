@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -9,59 +9,15 @@
 
 #pragma once
 
-#include "Engine/Renderer/Meshes/DynamicModel.h"
-#include "Engine/Renderer/Meshes/StaticModel.h"
+#include "Engine/Graphics/Meshes/DynamicModel.h"
+#include "Engine/Graphics/Meshes/StaticModel.h"
+#include "Engine/Graphics/Texture2D.h"
+#include "Engine/Graphics/MaterialTable.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Core/UUID.h"
 
 namespace highlo
 {
-	struct IDComponent
-	{
-		UUID ID = 0;
-	};
-
-	struct SceneComponent
-	{
-		UUID SceneID = 0;
-	};
-
-	struct TransformComponent
-	{
-		Transform Transform;
-	};
-
-	struct RenderComponent
-	{
-		Ref<StaticModel> MainModel;
-		Ref<StaticModel> ModelLOD1;
-		Ref<StaticModel> ModelLOD2;
-		bool UseLOD = false;
-		int32 LodLevel = 0;
-		bool Enabled = true;
-		bool Wireframe = false;
-		bool ResetForNextFrame = false;
-	};
-
-	struct CameraComponent
-	{
-		Ref<Camera> Camera;
-		bool Primary = true;
-	};
-
-	struct SpriteComponent
-	{
-		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float TilingFactor = 1.0f;
-		Ref<Texture2D> Texture;
-	};
-
-	struct DynamicModelComponent
-	{
-		Ref<DynamicModel> Model;
-		bool IsFractured = false;
-	};
-
 	struct RelationshipComponent
 	{
 		UUID ParentHandle = 0;
@@ -72,6 +28,80 @@ namespace highlo
 	{
 		UUID PrefabID = 0;
 		UUID EntityID = 0;
+	};
+
+	struct SceneComponent
+	{
+		UUID SceneID = 0;
+	};
+
+	struct CameraComponent
+	{
+		Camera Camera;
+		bool Primary = true;
+	};
+
+	struct SpriteComponent
+	{
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float TilingFactor = 1.0f;
+		Ref<Texture2D> Texture;
+	};
+
+	struct StaticModelComponent
+	{
+		UUID Model; // contains the asset ID, which is maintained by the AssetManager
+		Ref<MaterialTable> Materials = MaterialTable::Create();
+	};
+
+	struct DynamicModelComponent
+	{
+		UUID Model; // contains the asset ID, which is maintained by the AssetManager
+		uint32 SubmeshIndex = 0;
+		Ref<MaterialTable> Materials = MaterialTable::Create();
+		bool IsFractured = false;
+	};
+
+	struct DirectionalLightComponent
+	{
+		glm::vec3 Radiance = { 1.0f, 1.0f, 1.0f };
+		float Intensity = 1.0f;
+		bool CastShadows = true;
+		bool SoftShadows = true;
+		float LightSize = 0.5f;
+	};
+
+	struct PointLightComponent
+	{
+		glm::vec3 Radiance = { 1.0f, 1.0f, 1.0f };
+		float Intensity = 1.0f;
+		float Radius = 10.0f;
+		float LightSize = 0.5f;
+		float MinRadius = 1.0f;
+		float MaxRadius = 10.0f;
+		bool CastShadows = true;
+		bool SoftShadows = true;
+		float Falloff = 1.0f;
+	};
+
+	struct SkyLightComponent
+	{
+		AssetHandle SceneEnvironment;
+		float Intensity = 1.0f;
+		float Lod = 0.0f;
+
+		bool DynamicSky = false;
+		glm::vec3 TurbityAzimuthInclination = { 2.0f, 0.0f, 0.0f };
+	};
+
+	struct TextComponent
+	{
+		HLString Text = "Text";
+		AssetHandle FontAsset;
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float LineSpacing = 0.0f;
+		float Kerning = 0.0f;
+		float MaxWidth = 10.0f;
 	};
 
 

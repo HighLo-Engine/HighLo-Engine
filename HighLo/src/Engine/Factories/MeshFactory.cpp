@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "MeshFactory.h"
@@ -7,7 +7,7 @@
 
 namespace highlo
 {
-	AssetHandle MeshFactory::CreateCube(const glm::vec3 &size)
+	Ref<MeshFile> MeshFactory::CreateCube(const glm::vec3 &size)
 	{
 		std::vector<Vertex> vertices;
 		vertices.resize(8);
@@ -51,12 +51,10 @@ namespace highlo
 
 		AABB boundingBox = AABB(glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), glm::vec3(size.x / 2, size.y / 2, size.z / 2));
 
-		AssetHandle handle = AssetManager::Get()->CreateMemoryOnlyAsset<MeshFile>(vertices, indices, boundingBox);
-		Ref<MeshFile> result = AssetManager::Get()->GetAsset<MeshFile>(handle);
-		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
+		return MeshFile::Create(vertices, indices, boundingBox);
 	}
 
-	AssetHandle MeshFactory::CreateSphere(float radius)
+	Ref<MeshFile> MeshFactory::CreateSphere(float radius)
 	{
 		const float PI = HL_PI;
 		float sectorCount = 36;
@@ -144,12 +142,10 @@ namespace highlo
 			}
 		}
 
-		AssetHandle handle = AssetManager::Get()->CreateMemoryOnlyAsset<MeshFile>(vertices, indices, glm::mat4(1.0f));
-		Ref<MeshFile> result = AssetManager::Get()->GetAsset<MeshFile>(handle);
-		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
+		return MeshFile::Create(vertices, indices, glm::mat4(1.0f));
 	}
 
-	AssetHandle MeshFactory::CreateCapsule(float radius, float height)
+	Ref<MeshFile> MeshFactory::CreateCapsule(float radius, float height)
 	{
 		std::vector<Vertex> vertices;
 		std::vector<VertexIndex> indices;
@@ -224,9 +220,7 @@ namespace highlo
 			}
 		}
 
-		AssetHandle handle = AssetManager::Get()->CreateMemoryOnlyAsset<MeshFile>(vertices, indices, glm::mat4(1.0f));
-		Ref<MeshFile> result = AssetManager::Get()->GetAsset<MeshFile>(handle);
-		return AssetManager::Get()->CreateMemoryOnlyAsset<StaticModel>(result);
+		return MeshFile::Create(vertices, indices, glm::mat4(1.0f));
 	}
 }
 

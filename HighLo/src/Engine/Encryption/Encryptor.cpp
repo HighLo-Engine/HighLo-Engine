@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Encryptor.h"
@@ -72,7 +72,7 @@ namespace highlo
 	{
 		// This Init function is used by the engine itself, without the user being able to manipulate parameters here
 
-		// TODO: all the passphrases, salts, keys and ivs are going to be part of config files in the future, we don't want them to be accessible directly here
+// TODO: all the passphrases, salts, keys and ivs are going to be part of config files in the future, we don't want them to be accessible directly here
 		// because the source is open and it shouldn't be visible to the public. 
 
 		// Pass = secretPassPhrase

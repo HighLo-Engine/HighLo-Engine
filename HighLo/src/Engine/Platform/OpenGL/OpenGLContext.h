@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -10,7 +10,7 @@
 #ifdef HIGHLO_API_OPENGL
 
 #include "Engine/Window/Window.h"
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Core/Log.h"
 
 namespace highlo

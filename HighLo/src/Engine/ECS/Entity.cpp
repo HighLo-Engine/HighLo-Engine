@@ -1,32 +1,50 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Entity.h"
+
 #include "Engine/ECS/Components.h"
 #include "Engine/Scene/Scene.h"
 
 namespace highlo
 {
 	Entity::Entity(UUID sceneID, const HLString &tag)
-		: m_ID(UUID()), m_Tag(tag), m_SceneID(sceneID), m_Initialized(true)
+		: m_ID(UUID()), m_Tag(tag), m_SceneID(sceneID), m_Initialized(true), m_Hidden(false)
 	{
-		m_TransformComponent = ECS_Registry::Get().AddComponent<TransformComponent>(m_ID);
+		m_Transform = Transform::Identity();
 	}
 
 	Entity::Entity(UUID sceneID, UUID entityID)
-		: m_ID(entityID), m_SceneID(sceneID), m_Tag("Entity"), m_Initialized(true)
+		: m_ID(entityID), m_SceneID(sceneID), m_Tag("Entity"), m_Initialized(true), m_Hidden(false)
 	{
-		m_TransformComponent = ECS_Registry::Get().GetComponent<TransformComponent>(m_ID);
+		m_Transform = Transform::Identity();
+	}
+
+	Entity::Entity(UUID sceneID, UUID entityID, const HLString &tag, const highlo::Transform &transform)
+		: m_ID(entityID), m_SceneID(sceneID), m_Tag(tag), m_Initialized(true), m_Hidden(false), m_Transform(transform)
+	{
 	}
 	
 	Entity::Entity(const Entity &other)
-		: m_ID(other.m_ID), m_Tag(other.m_Tag), m_TransformComponent(other.m_TransformComponent), m_SceneID(other.m_SceneID), m_Initialized(other.m_Initialized)
+		: m_ID(other.m_ID),
+		m_Tag(other.m_Tag), 
+		m_Transform(other.m_Transform), 
+		m_SceneID(other.m_SceneID), 
+		m_Initialized(other.m_Initialized), 
+		m_Hidden(other.m_Hidden)
 	{
 	}
 	
-	Entity Entity::operator=(const Entity &other)
+	Entity &Entity::operator=(const Entity &other)
 	{
-		return Entity(other.m_SceneID, other.m_ID);
+		m_ID					= other.m_ID;
+		m_SceneID				= other.m_SceneID;
+		m_Tag					= other.m_Tag;
+		m_Initialized			= other.m_Initialized;
+		m_Transform				= other.m_Transform;
+		m_Hidden				= other.m_Hidden;
+
+		return *this;
 	}
 
 	void Entity::SetParent(Entity other)
@@ -37,7 +55,10 @@ namespace highlo
 
 	std::vector<UUID> &Entity::Children()
 	{
-		return GetComponent<RelationshipComponent>()->Children;
+		if (HasComponent<RelationshipComponent>())
+			return GetComponent<RelationshipComponent>()->Children;
+		else
+			return AddComponent<RelationshipComponent>()->Children;
 	}
 
 	const std::vector<UUID> &Entity::Children() const
@@ -52,7 +73,10 @@ namespace highlo
 
 	UUID Entity::GetParentUUID() const
 	{
-		return GetComponent<RelationshipComponent>()->ParentHandle;
+		if (HasComponent<RelationshipComponent>())
+			return GetComponent<RelationshipComponent>()->ParentHandle;
+
+		return 0;
 	}
 
 	bool Entity::HasParent() const
@@ -108,26 +132,6 @@ namespace highlo
 	bool Entity::IsDescendantOf(Entity other)
 	{
 		return other.IsAncesterOf(*this);
-	}
-
-	bool Entity::operator==(const Entity &other) const
-	{
-		return m_ID == other.m_ID;
-	}
-
-	bool Entity::operator!=(const Entity &other) const
-	{
-		return !(*this == other);
-	}
-
-	Entity::operator bool() const
-	{
-		return m_Initialized;
-	}
-
-	Entity::operator uint64() const
-	{
-		return (uint64)m_ID;
 	}
 }
 

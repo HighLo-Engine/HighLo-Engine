@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -13,7 +13,7 @@
 
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Assert.h"
-#include "Engine/Renderer/TextureFormat.h"
+#include "Engine/Graphics/TextureFormat.h"
 
 namespace highlo
 {
@@ -43,6 +43,9 @@ namespace highlo
 
 				case TextureFormat::RED_INTEGER:
 					return GL_RED_INTEGER;
+
+				case TextureFormat::RED32F:
+					return GL_RED;
 			}
 
 		HL_ASSERT(false);
@@ -77,6 +80,9 @@ namespace highlo
 
 				case TextureFormat::RED_INTEGER:
 					return GL_R32I;
+
+				case TextureFormat::RED32F:
+					return GL_R32F;
 			}
 
 			HL_ASSERT(false);

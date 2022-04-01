@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11Framebuffer.h"
@@ -59,7 +59,7 @@ namespace highlo
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 
-		// TODO: Generate DX11 Framebuffer and set the ColorAttachments and the DepthAttachment
+// TODO: Generate DX11 Framebuffer and set the ColorAttachments and the DepthAttachment
 	}
 
 	void DX11Framebuffer::AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func)

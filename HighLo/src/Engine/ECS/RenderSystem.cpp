@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "RenderSystem.h"
@@ -10,7 +10,7 @@ namespace highlo
 {
 	void RenderSystem::OnUpdate(Timestep ts, ECS_Registry &registry)
 	{
-		// TODO: Needs refactor
+// TODO: Needs refactor
 	#if 0
 		FrameEntitiesRendered = 0;
 		FrameMeshesRendered = 0;

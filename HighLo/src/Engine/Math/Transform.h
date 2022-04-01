@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -46,8 +46,11 @@ namespace highlo
 
 		HLAPI static void Decompose(const glm::mat4 &transform, Transform &outTransform);
 
+		HLAPI inline glm::vec3 &GetPosition() {	return m_Position; }
 		HLAPI inline const glm::vec3 &GetPosition() const {	return m_Position; }
+		HLAPI inline glm::vec3 &GetScale() { return m_Scale; }
 		HLAPI inline const glm::vec3 &GetScale() const { return m_Scale; }
+		HLAPI inline glm::vec3 &GetRotation() { return m_Rotation; }
 		HLAPI inline const glm::vec3 &GetRotation() const { return m_Rotation; }
 		HLAPI inline const glm::quat GetRotationAsQuat() const { return glm::quat(m_Rotation); }
 		HLAPI inline const glm::mat4 &GetTransform() const { return m_Transform; }

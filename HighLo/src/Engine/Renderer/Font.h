@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -12,7 +12,7 @@
 
 #include "Engine/Assets/Asset.h"
 #include "Engine/Core/FileSystemPath.h"
-#include "Engine/Renderer/Texture2D.h"
+#include "Engine/Graphics/Texture2D.h"
 
 namespace highlo
 {

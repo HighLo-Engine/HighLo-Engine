@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/VertexArray.h"
+#include "Engine/Graphics/VertexArray.h"
 #include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_DX11
@@ -20,7 +20,7 @@ namespace highlo
 	{
 	public:
 
-		DX11VertexArray(const VertexArraySpecification& spec);
+		DX11VertexArray(const VertexArraySpecification &spec);
 		virtual ~DX11VertexArray();
 
 		virtual void Bind() const override;
@@ -34,6 +34,9 @@ namespace highlo
 		virtual std::vector<Ref<VertexBuffer>> &GetVertexBuffers() override { return m_VertexBuffers; }
 		virtual Ref<IndexBuffer> &GetIndexBuffer() override { return m_IndexBuffer; }
 
+		virtual VertexArraySpecification &GetSpecification() override { return m_Specification; }
+		virtual const VertexArraySpecification &GetSpecification() const override { return m_Specification; }
+
 	private:
 
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
@@ -43,3 +46,4 @@ namespace highlo
 }
 
 #endif // HIGHLO_API_DX11
+

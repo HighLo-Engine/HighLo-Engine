@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -24,10 +24,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Engine/ECS/Entity.h"
-#include "Engine/Renderer/Texture.h"
+#include "Engine/Graphics/Texture.h"
 
 #include "Engine/Window/Window.h"
 #include "Engine/Window/PopupMenu.h"
+
+#include "ImGuiTreeNode.h"
 
 namespace highlo::UI
 {
@@ -36,6 +38,12 @@ namespace highlo::UI
 		None = 0,
 		Dark,
 		Light
+	};
+
+	enum class LabelAlignment
+	{
+		Left = 0,
+		Right
 	};
 
 	HLAPI void InitImGui(Window *window, ImGuiWindowStyle windowStyle);
@@ -53,6 +61,8 @@ namespace highlo::UI
 	HLAPI bool BeginPopup(const char *id, ImGuiWindowFlags flags = 0);
 	HLAPI void EndPopup();
 	
+	HLAPI uint32 *GetCurrentImGuiIDCounter();
+
 	HLAPI void DisplayDebugInformation();
 	HLAPI void SetDarkThemeColors();
 	HLAPI void SetLightThemeColors();
@@ -62,7 +72,7 @@ namespace highlo::UI
 
 	HLAPI void DrawMenu(const Ref<MenuBar> &menuBar);
 	HLAPI void DrawPopupMenu(const Ref<PopupMenu> &menu);
-	HLAPI void DrawHelpMarker(const HLString &description);
+	HLAPI void DrawHelpMarker(const HLString &description, bool showHelpMarker = true);
 
 	HLAPI void PushID();
 	HLAPI void PopID();
@@ -71,14 +81,17 @@ namespace highlo::UI
 	HLAPI void SetToolTipV(const char *format, va_list args);
 	HLAPI void SetToolTip(const char *format, ...);
 
+	HLAPI ImVec2 CenteredText(const HLString &text, bool fullWidth = false);
 	HLAPI void Separator();
 
 	HLAPI void PushItemDisabled();
 	HLAPI void PopItemDisabled();
 	HLAPI bool IsItemDisabled();
+	HLAPI bool NavigatedTo();
 
 	HLAPI void BeginPropertyGrid(int32 colNum = 1);
 	HLAPI void EndPropertyGrid();
+	HLAPI bool PropertyGridHeader(const HLString &name, bool openByDefault = true);
 
 	HLAPI bool BeginTreeNode(const HLString &name, bool defaultOpen = true);
 	HLAPI void EndTreeNode();
@@ -137,10 +150,10 @@ namespace highlo::UI
 	// UI Rendering
 	HLAPI void DrawText(const HLString &text);
 	HLAPI void DrawInputText(const HLString &label, const HLString &value);
-	HLAPI bool DrawInputText(const HLString &label, HLString &value);
+	HLAPI bool DrawInputText(const HLString &label, HLString &value, bool fullWidth = false);
 	HLAPI bool DrawInputTextWithLength(const HLString &label, HLString &value, size_t length);
 
-	HLAPI bool DrawCheckbox(const HLString &label, bool &value);
+	HLAPI bool DrawCheckbox(const HLString &label, bool &value, LabelAlignment alignment = LabelAlignment::Left);
 	HLAPI bool DrawCheckboxGroup(const HLString &label, bool &value);
 	HLAPI bool DrawColorPicker(const HLString &label, glm::vec3 &value);
 	HLAPI bool DrawButton(const HLString &label, const ImVec2 &size = ImVec2(0, 0));
@@ -151,6 +164,7 @@ namespace highlo::UI
 	HLAPI bool DrawDragFloat3(const HLString &label, glm::vec3 &value, float delta = 0.1f);
 	HLAPI bool DrawDragFloat4(const HLString &label, glm::vec4 &value, float delta = 0.1f);
 	HLAPI bool DrawIntSlider(const HLString &label, int32 &value, int32 min, int32 max);
+	HLAPI bool DrawUIntSlider(const HLString &label, uint32 &value, int32 min, int32 max);
 	HLAPI bool DrawFloatSlider(const HLString &label, float &value, float min, float max);
 	HLAPI bool DrawVec2Slider(const HLString &label, glm::vec2 &value, float min, float max);
 	HLAPI bool DrawVec3Slider(const HLString &label, glm::vec3 &value, float min, float max);
@@ -159,6 +173,8 @@ namespace highlo::UI
 	HLAPI bool DrawVec2(const HLString &label, glm::vec2 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
 	HLAPI bool DrawVec3(const HLString &label, glm::vec3 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
 	HLAPI bool DrawVec4(const HLString &label, glm::vec4 &values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
+	HLAPI void DrawUnderline(bool fullWidth = false, float offsetX = 0.0f, float offsetY = -1.0f);
 
 	template<typename TEnum, typename TType = int32>
 	HLAPI bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, TEnum &selected)
@@ -204,7 +220,7 @@ namespace highlo::UI
 	}
 
 	HLAPI bool DrawDropdown(const HLString &label, const char **options, int32 optionsCount, int32 *selected);
-	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 optionsCount, int32 *selected);
+	HLAPI bool DrawDropdown(const HLString &label, const std::vector<HLString> &options, int32 *selected, bool labelInSameLine = true);
 
 	HLAPI ImTextureID GetTextureID(const Ref<Texture2D> &texture);
 

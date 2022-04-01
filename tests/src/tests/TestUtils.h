@@ -49,19 +49,14 @@ static bool MapEquals(const std::map<HLString, T> &map1, const std::map<HLString
 
 	for (auto it_m1 = map1.cbegin(), end_m1 = map1.cend(),
 		 it_m2 = map2.cbegin(), end_m2 = map2.cend();
-		 it_m1 != end_m1 || it_m2 != end_m2;)
+		 it_m1 != end_m1 || it_m2 != end_m2;
+		 ++it_m1, ++it_m2)
 	{
-		if (it_m1 != end_m1 && it_m2 != end_m2)
-		{
-			if (it_m1->first != it_m2->first)
-				return false;
+		if (it_m1->first != it_m2->first)
+			return false;
 
-			if (it_m1->second != it_m2->second)
-				return false;
-
-			++it_m1;
-			++it_m2;
-		}
+		if (it_m1->second != it_m2->second)
+			return false;
 	}
 
 	return true;

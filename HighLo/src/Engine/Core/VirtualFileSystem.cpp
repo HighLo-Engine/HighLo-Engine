@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VirtualFileSystem.h"
@@ -48,7 +48,7 @@ namespace highlo
 		for (const HLString &physicalPath : m_MountPoints[virtualDir])
 		{
 			HLString p = physicalPath + fileName;
-			if (FileSystem::Get()->FileExists(p) || FileSystem::Get()->PathExists(physicalPath))
+			if (FileSystem::Get()->FileExists(p) || FileSystem::Get()->FolderExists(physicalPath))
 			{
 				outPath = p;
 				return true;
@@ -103,7 +103,7 @@ namespace highlo
 	bool VirtualFileSystem::PathExists(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->PathExists(physicalPath) : false;
+		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->FolderExists(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::CreateFolder(const HLString &path)

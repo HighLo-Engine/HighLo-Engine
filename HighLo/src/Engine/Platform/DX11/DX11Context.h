@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Core/Log.h"
 
 #ifdef HIGHLO_API_DX11

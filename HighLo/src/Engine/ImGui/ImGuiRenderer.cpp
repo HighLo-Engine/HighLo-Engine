@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ImGuiRenderer.h"
@@ -10,7 +10,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11ImGuiRenderer.h"
 #elif HIGHLO_API_DX12
-// TODO
+#include "Engine/Platform/DX12/DX12ImGuiRenderer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -22,8 +22,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11ImGuiRenderer>::Create();
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12ImGuiRenderer>::Create();
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanImGuiRenderer>::Create();
 	#else

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Camera.h"
@@ -51,18 +51,18 @@ namespace highlo
 
 		// rotation angle about X-axis (pitch)
 		theta = glm::radians(m_Pitch);
-		sx = Sin(theta);
-		cx = Cos(theta);
+		sx = Math::Sin(theta);
+		cx = Math::Cos(theta);
 
 		// rotation angle about Y-axis (yaw)
 		theta = glm::radians(m_Yaw);
-		sy = Sin(theta);
-		cy = Cos(theta);
+		sy = Math::Sin(theta);
+		cy = Math::Cos(theta);
 
 		// rotation angle about Z-axis (roll)
 		theta = glm::radians(m_Roll);
-		sz = Sin(theta);
-		cz = Cos(theta);
+		sz = Math::Sin(theta);
+		cz = Math::Cos(theta);
 
 		left.x = cy * cz;
 		left.y = sx * sy * cz + cx * sz;

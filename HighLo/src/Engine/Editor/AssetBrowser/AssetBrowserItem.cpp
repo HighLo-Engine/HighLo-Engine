@@ -1,17 +1,17 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "AssetBrowserItem.h"
 
-#include "AssetBrowserPanel.h"
+#include "Engine/Editor/AssetBrowserPanel.h"
 #include "Engine/Assets/AssetManager.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Scene/Project.h"
-#include "Engine/Editor/AssetEditorPanel.h"
 #include "Engine/Math/Color.h"
 #include "Engine/ImGui/imgui.h"
 #include "Engine/ImGui/ImGuiScopeHelpers.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo
 {
@@ -152,10 +152,10 @@ namespace highlo
 				ImGui::Spring();
 
 				const AssetMetaData &metaData = AssetManager::Get()->GetMetaData(m_ID);
-				const HLString &assetType = utils::AssetTypeToString(metaData.Type).ToUpperCase();
+				const HLString &assetType = utils::AssetTypeToString(metaData.Type);
 
 				UI::ScopedColor textColor(ImGuiCol_Text, Colors::Theme::TextDarker);
-				ImGui::TextUnformatted(*assetType);
+				ImGui::TextUnformatted(*assetType.ToUpperCase());
 
 				ImGui::EndHorizontal();
 				ImGui::Spring(-1.0f, edgeOffset);
@@ -318,24 +318,24 @@ namespace highlo
 
 	void AssetBrowserBaseItem::OnContextMenuOpen(AssetBrowserActionResult &actionResult)
 	{
-		if (ImGui::MenuItem(ICON_FA_SYNC_ALT " Reload"))
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+
+		if (ImGui::MenuItem((HLString(ICON_FA_SYNC_ALT) + " " + translation->GetText("asset-browser-item-reload")).C_Str()))
 			actionResult.Set(AssetBrowserAction::Reload);
 
-		if (ImGui::MenuItem(ICON_FA_EDIT " Rename"))
+		if (ImGui::MenuItem((HLString(ICON_FA_EDIT) + " " + translation->GetText("asset-browser-item-rename")).C_Str()))
 			actionResult.Set(AssetBrowserAction::StartRenaming);
 
-		if (ImGui::MenuItem(ICON_FA_COPY " Copy"))
+		if (ImGui::MenuItem((HLString(ICON_FA_COPY) + " " + translation->GetText("asset-browser-item-copy")).C_Str()))
 			actionResult.Set(AssetBrowserAction::Copy);
 
-		if (ImGui::MenuItem(ICON_FA_TRASH_ALT " Delete"))
+		if (ImGui::MenuItem((HLString(ICON_FA_TRASH_ALT) + " " + translation->GetText("asset-browser-item-delete")).C_Str()))
 			actionResult.Set(AssetBrowserAction::OpenDeleteDialogue);
 
-		if (ImGui::MenuItem(ICON_FA_EXTERNAL_LINK_ALT " Show in Explorer"))
+		if (ImGui::MenuItem((HLString(ICON_FA_EXTERNAL_LINK_ALT) + " " + translation->GetText("asset-browser-item-explorer")).C_Str()))
 			actionResult.Set(AssetBrowserAction::ShowInExplorer);
 
-	//	if (ImGui::MenuItem( " Open externally"))
-	//		actionResult.Set(AssetBrowserAction::OpenExternal);
-
+		ImGui::Separator();
 		RenderCustomContextItems();
 	}
 
@@ -354,7 +354,8 @@ namespace highlo
 
 	void AssetBrowserDirectory::Delete()
 	{
-		bool deleted = FileSystem::Get()->RemoveFile(Project::GetActive()->GetAssetDirectory() / m_DirectoryInfo->FilePath);
+		FileSystemPath p = m_DirectoryInfo->FilePath;
+		bool deleted = FileSystem::Get()->RemoveFile(p);
 		if (!deleted)
 		{
 			HL_CORE_WARN("Failed to delete folder {0}!", *m_DirectoryInfo->FilePath.String());
@@ -479,13 +480,13 @@ namespace highlo
 
 	void AssetBrowserItem::Activate(AssetBrowserActionResult &actionResult)
 	{
+		HL_CORE_TRACE("Opening editor window {0}", actionResult.Field);
 		if (m_AssetInfo.Type == AssetType::Scene)
 		{
 			// TODO: Open in viewport
 		}
 		else
 		{
-			AssetEditorPanel::OpenEditor(AssetManager::Get()->GetAsset<Asset>(m_AssetInfo.Handle));
 		}
 	}
 }

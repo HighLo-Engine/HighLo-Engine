@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -54,6 +54,18 @@ namespace highlo
 			std::wstring_convert<std::codecvt_utf8<int16>, int16> conv;
 			const int16 *p = reinterpret_cast<const int16*>(*str);
 			return conv.to_bytes(p, p + str.Length());
+		}
+
+		static HLString FillWithLeading(HLString &str, const HLString &leadingCharacter, uint32 count = 1)
+		{
+			HLString leadingString = "";
+			for (uint32 i = 0; i < count; ++i)
+			{
+				leadingString += leadingCharacter;
+			}
+
+			str = leadingString + str;
+			return str;
 		}
 
 		template<typename toType, typename fromType>

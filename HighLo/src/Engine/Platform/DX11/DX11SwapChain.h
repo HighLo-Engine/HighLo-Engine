@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/SwapChain.h"
+#include "Engine/Graphics/SwapChain.h"
 
 namespace highlo
 {

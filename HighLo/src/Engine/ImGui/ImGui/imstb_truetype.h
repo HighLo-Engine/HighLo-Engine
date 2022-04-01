@@ -1476,7 +1476,7 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
          return ttUSHORT(data + index_map + 10 + (unicode_codepoint - first)*2);
       return 0;
    } else if (format == 2) {
-      STBTT_assert(0); // @TODO: high-byte mapping for japanese/chinese/korean
+STBTT_assert(0); // @TODO: high-byte mapping for japanese/chinese/korean
       return 0;
    } else if (format == 4) { // standard mapping for windows fonts: binary search collection of ranges
       stbtt_uint16 segcount = ttUSHORT(data+index_map+6) >> 1;
@@ -2474,7 +2474,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
                             stbtt_uint8 *pairValueTable = table + pairPosOffset;
                             stbtt_uint16 pairValueCount = ttUSHORT(pairValueTable);
                             stbtt_uint8 *pairValueArray = pairValueTable + 2;
-                            // TODO: Support more formats.
+// TODO: Support more formats.
                             STBTT_GPOS_TODO_assert(valueFormat1 == 4);
                             if (valueFormat1 != 4) return 0;
                             STBTT_GPOS_TODO_assert(valueFormat2 == 0);
@@ -2520,7 +2520,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
                             STBTT_assert(glyph1class < class1Count);
                             STBTT_assert(glyph2class < class2Count);
 
-                            // TODO: Support more formats.
+// TODO: Support more formats.
                             STBTT_GPOS_TODO_assert(valueFormat1 == 4);
                             if (valueFormat1 != 4) return 0;
                             STBTT_GPOS_TODO_assert(valueFormat2 == 0);
@@ -2545,7 +2545,7 @@ static stbtt_int32  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, i
             } // [DEAR IMGUI] removed ;
 
             default:
-                // TODO: Implement other stuff.
+// TODO: Implement other stuff.
                 break;
         }
     }
@@ -4481,7 +4481,7 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
             for (i=0; i < num_verts; ++i) {
                float x0 = verts[i].x*scale_x, y0 = verts[i].y*scale_y;
 
-               // check against every point here rather than inside line/curve primitives -- @TODO: wrong if multiple 'moves' in a row produce a garbage point, and given culling, probably more efficient to do within line/curve
+// check against every point here rather than inside line/curve primitives -- @TODO: wrong if multiple 'moves' in a row produce a garbage point, and given culling, probably more efficient to do within line/curve
                float dist2 = (x0-sx)*(x0-sx) + (y0-sy)*(y0-sy);
                if (dist2 < min_dist*min_dist)
                   min_dist = (float) STBTT_sqrt(dist2);

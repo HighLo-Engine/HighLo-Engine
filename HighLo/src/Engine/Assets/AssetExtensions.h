@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -17,20 +17,24 @@ namespace highlo
 	inline static std::unordered_map<HLString, AssetType> s_AssetExtesions =
 	{
 		// Engine specific file extensions
-		{ ".hlscene", AssetType::Scene },
-		{ ".hlmesh", AssetType::Mesh },
-		{ ".hlmaterial", AssetType::Material },
+		{ "hlscene", AssetType::Scene },
+		{ "hlmesh", AssetType::StaticMesh },
+		{ "hldmesh", AssetType::DynamicMesh },
+		{ "hlmaterial", AssetType::Material },
+		{ "hlfont", AssetType::Font },
 		
 		// global file extensions
-		{ ".fbx", AssetType::MeshAsset },
-		{ ".obj", AssetType::MeshAsset },
-		{ ".gltf", AssetType::MeshAsset },
-		{ ".glb", AssetType::MeshAsset },
+		{ "fbx", AssetType::MeshAsset },
+		{ "obj", AssetType::MeshAsset },
+		{ "gltf", AssetType::MeshAsset },
+		{ "glb", AssetType::MeshAsset },
 
-		{ ".png", AssetType::Texture },
-		{ ".jpg", AssetType::Texture },
-		{ ".jpeg", AssetType::Texture },
-		{ ".tiff", AssetType::Texture },
-		{ ".hdr", AssetType::EnvMap },
+		{ "png", AssetType::Texture },
+		{ "jpg", AssetType::Texture },
+		{ "jpeg", AssetType::Texture },
+		{ "tiff", AssetType::Texture },
+		{ "tga", AssetType::Texture },
+		{ "hdr", AssetType::EnvMap },
+		{ "ttf", AssetType::Font },
 	};
 }

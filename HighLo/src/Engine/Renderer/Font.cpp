@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Font.h"
@@ -240,7 +240,10 @@ namespace highlo
 		// Load fonts
 		bool anyCodepointsAvailable = false;
 		if (!font.Load(fontInput.FontFileName))
-			HL_ASSERT(false);
+		{
+			HL_CORE_ERROR(FONT_LOG_PREFIX "[-] Could not load font {0} [-]", *fontInput.FontFileName);
+			return;
+		}
 
 		if (fontInput.FontScale <= 0.0)
 			fontInput.FontScale = 1.0;

@@ -1,10 +1,14 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "MeshLoader.h"
 
-#include "Engine/Platform/Assimp/AssimpMeshLoader.h"
-
 // currently we only support assimp as a Mesh loader
 #define HIGHLO_API_ASSIMP_LOADER
+
+#ifdef HIGHLO_API_ASSIMP_LOADER
+#include "Engine/Platform/Assimp/AssimpMeshLoader.h"
+#endif // HIGHLO_API_ASSIMP_LOADER
 
 namespace highlo
 {

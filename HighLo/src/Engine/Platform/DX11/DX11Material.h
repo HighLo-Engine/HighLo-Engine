@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/Material.h"
+#include "Engine/Graphics/Material.h"
 
 #ifdef HIGHLO_API_DX11
 
@@ -15,6 +15,8 @@ namespace highlo
 		virtual ~DX11Material();
 
 		virtual void Invalidate() override;
+
+		virtual bool Has(const HLString &name) override;
 
 		// Setters
 		virtual void Set(const HLString &name, float value) override;
@@ -62,6 +64,8 @@ namespace highlo
 
 		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }
+
+		virtual void UpdateForRendering() override;
 
 	private:
 

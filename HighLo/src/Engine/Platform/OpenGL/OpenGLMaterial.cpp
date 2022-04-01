@@ -116,7 +116,7 @@ namespace highlo
 		m_Texture2Ds[slot] = texture;
 	}
 
-	void OpenGLMaterial::Set(const HLString &name, const Ref<Texture2D> &texture, uint32 arrayIndex)
+	void OpenGLMaterial::Set(const HLString &name, const Ref<Texture2D> &texture, uint32 slot)
 	{
 		auto decl = FindResourceDeclaration(name);
 		if (!decl)
@@ -125,7 +125,7 @@ namespace highlo
 			return;
 		}
 
-		m_Texture2Ds[arrayIndex] = texture;
+		m_Texture2Ds[slot] = texture;
 	}
 
 	void OpenGLMaterial::Set(const HLString &name, const Ref<Texture3D> &texture)
@@ -250,108 +250,109 @@ namespace highlo
 		const auto &shaderBuffers = GetShader()->GetShaderBuffers();
 		if (shaderBuffers.size() > 0)
 		{
-			const ShaderBuffer &buffer = (*shaderBuffers.begin()).second;
-			for (auto &[name, uniform] : buffer.Uniforms)
+			for (auto &[bufferName, buffer] : shaderBuffers)
 			{
-				switch (uniform.GetType())
+				for (auto &[name, uniform] : buffer.Uniforms)
 				{
-					case ShaderUniformType::Bool:
-					case ShaderUniformType::Uint:
+					switch (uniform.GetType())
 					{
-						const uint32 value = m_LocalData.Read<uint32>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-
-					case ShaderUniformType::Int:
-					{
-						const int32 value = m_LocalData.Read<int32>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-
-					case ShaderUniformType::Float:
-					{
-						const float value = m_LocalData.Read<float>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-
-					case ShaderUniformType::IVec2:
-					{
-						const glm::ivec2 &value = m_LocalData.Read<glm::ivec2>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-					
-					case ShaderUniformType::IVec3:
-					{
-						const glm::ivec3 &value = m_LocalData.Read<glm::ivec3>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-					
-					case ShaderUniformType::IVec4:
-					{
-						const glm::ivec4 &value = m_LocalData.Read<glm::ivec4>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-					
-					case ShaderUniformType::Vec2:
-					{
-						const glm::vec2 &value = m_LocalData.Read<glm::vec2>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-
-					case ShaderUniformType::Vec3:
-					{
-						const glm::vec3 &value = m_LocalData.Read<glm::vec3>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-					
-					case ShaderUniformType::Vec4:
-					{
-						const glm::vec4 &value = m_LocalData.Read<glm::vec4>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-
-					case ShaderUniformType::Mat2:
-					{
-						const glm::mat2 &value = m_LocalData.Read<glm::mat2>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-					
-					case ShaderUniformType::Mat3:
-					{
-						const glm::mat3 &value = m_LocalData.Read<glm::mat3>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-					
-					case ShaderUniformType::Mat4:
-					{
-						const glm::mat4 &value = m_LocalData.Read<glm::mat4>(uniform.GetOffset());
-						shader->SetUniform(name, value);
-						break;
-					}
-
-					case ShaderUniformType::Struct:
-					{
-						std::vector<OpenGLShader::ShaderUniformStruct> structs = shader->GetUniformStructs();
-						for (OpenGLShader::ShaderUniformStruct &currentStruct : structs)
+						case ShaderUniformType::Bool:
+						case ShaderUniformType::Uint:
 						{
-							std::vector<OpenGLShader::ShaderUniformStructMember> members = currentStruct.Members;
-							for (OpenGLShader::ShaderUniformStructMember &currentMember : members)
-							{
-								HLString uniformName = fmt::format("{}.{}", currentStruct.Name, currentMember.Name);
+							const uint32 value = m_LocalData.Read<uint32>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
 
-								switch (currentMember.Type)
+						case ShaderUniformType::Int:
+						{
+							const int32 value = m_LocalData.Read<int32>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Float:
+						{
+							const float value = m_LocalData.Read<float>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::IVec2:
+						{
+							const glm::ivec2 &value = m_LocalData.Read<glm::ivec2>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::IVec3:
+						{
+							const glm::ivec3 &value = m_LocalData.Read<glm::ivec3>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::IVec4:
+						{
+							const glm::ivec4 &value = m_LocalData.Read<glm::ivec4>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Vec2:
+						{
+							const glm::vec2 &value = m_LocalData.Read<glm::vec2>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Vec3:
+						{
+							const glm::vec3 &value = m_LocalData.Read<glm::vec3>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Vec4:
+						{
+							const glm::vec4 &value = m_LocalData.Read<glm::vec4>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Mat2:
+						{
+							const glm::mat2 &value = m_LocalData.Read<glm::mat2>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Mat3:
+						{
+							const glm::mat3 &value = m_LocalData.Read<glm::mat3>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Mat4:
+						{
+							const glm::mat4 &value = m_LocalData.Read<glm::mat4>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+
+						case ShaderUniformType::Struct:
+						{
+							std::vector<OpenGLShader::ShaderUniformStruct> structs = shader->GetUniformStructs();
+							for (OpenGLShader::ShaderUniformStruct &currentStruct : structs)
+							{
+								std::vector<OpenGLShader::ShaderUniformStructMember> members = currentStruct.Members;
+								for (OpenGLShader::ShaderUniformStructMember &currentMember : members)
 								{
+									HLString uniformName = fmt::format("{}.{}", currentStruct.Name, currentMember.Name);
+
+									switch (currentMember.Type)
+									{
 									case ShaderUniformType::Float:
 									{
 										const float value = m_LocalData.Read<float>(uniform.GetOffset());
@@ -447,12 +448,13 @@ namespace highlo
 						}
 
 						break;
-					}
+						}
 
-					default:
-					{
-						HL_ASSERT(false);
-						break;
+						default:
+						{
+							HL_ASSERT(false);
+							break;
+						}
 					}
 				}
 			}
@@ -475,7 +477,8 @@ namespace highlo
 			{
 				uint32 textureSlot = slot;
 				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-				glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
+				if (glTexture->GetSamplerRendererID() != 0)
+					glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
 				glBindTextureUnit(textureSlot, glTexture->GetRendererID());
 			}
 		}
@@ -506,11 +509,13 @@ namespace highlo
 
 		if (shaderBuffers.size() > 0)
 		{
-			const ShaderBuffer &buffer = (*shaderBuffers.begin()).second;
-			if (buffer.Uniforms.find(name) == buffer.Uniforms.end())
-				return nullptr;
-		
-			return &buffer.Uniforms.at(name);
+			for (const auto &[n, buffer] : shaderBuffers)
+			{
+				if (buffer.Uniforms.find(name) != buffer.Uniforms.end())
+				{
+					return &buffer.Uniforms.at(name);
+				}
+			}
 		}
 
 		return nullptr;

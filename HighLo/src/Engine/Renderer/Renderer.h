@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -13,22 +13,22 @@
 #include "Engine/Core/FileSystemPath.h"
 #include "Engine/Core/Allocator.h"
 #include "Engine/ImGui/ImGui.h"
-#include "RenderingAPI.h"
-#include "CoreRenderer.h"
 #include "SceneRenderer.h"
-#include "Texture.h"
 #include "Environment.h"
-#include "Shaders/ShaderLibrary.h"
-#include "RendererCapabilities.h"
-#include "RenderPass.h"
 #include "Engine/Math/AABB.h"
 #include "RenderCommandQueue.h"
-#include "CommandBuffer.h"
-#include "RenderingContext.h"
-#include "CommandBuffer.h"
-#include "ComputePipeline.h"
-#include "Shaders/UniformBufferSet.h"
-#include "Shaders/StorageBufferSet.h"
+
+#include "Engine/Graphics/CommandBuffer.h"
+#include "Engine/Graphics/RenderingContext.h"
+#include "Engine/Graphics/CommandBuffer.h"
+#include "Engine/Graphics/ComputePipeline.h"
+#include "Engine/Graphics/Shaders/UniformBufferSet.h"
+#include "Engine/Graphics/Shaders/StorageBufferSet.h"
+#include "Engine/Graphics/RenderingAPI.h"
+#include "Engine/Graphics/Shaders/ShaderLibrary.h"
+#include "Engine/Graphics/RendererCapabilities.h"
+#include "Engine/Graphics/RenderPass.h"
+#include "Engine/Graphics/Texture.h"
 
 namespace highlo
 {
@@ -103,6 +103,77 @@ namespace highlo
 		}
 
 		HLAPI static void WaitAndRender();
+		HLAPI static void RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform = glm::mat4(1.0f));
+
+		HLAPI static void RenderDynamicMesh(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materials,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset);
+
+		HLAPI static void RenderStaticMesh(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<StaticModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materials,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset);
+
+		HLAPI static void RenderInstancedDynamicMesh(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<MaterialTable> materials,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset,
+			uint32 instanceCount);
+
+		HLAPI static void RenderInstancedStaticMesh(
+			Ref<CommandBuffer> renderCommandBuffer, 
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet, 
+			Ref<StorageBufferSet> storageBufferSet, 
+			Ref<StaticModel> model, 
+			uint32 submeshIndex, 
+			Ref<MaterialTable> materials, 
+			Ref<VertexBuffer> transformBuffer, 
+			uint32 transformBufferOffset, 
+			uint32 instanceCount);
+
+		HLAPI static void RenderInstancedStaticMeshWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<StaticModel> model,
+			uint32 submeshIndex,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset,
+			uint32 instanceCount,
+			Ref<Material> overrideMaterial);
+
+		HLAPI static void RenderInstancedDynamicMeshWithMaterial(
+			Ref<CommandBuffer> renderCommandBuffer,
+			Ref<VertexArray> va,
+			Ref<UniformBufferSet> uniformBufferSet,
+			Ref<StorageBufferSet> storageBufferSet,
+			Ref<DynamicModel> model,
+			uint32 submeshIndex,
+			Ref<VertexBuffer> transformBuffer,
+			uint32 transformBufferOffset,
+			uint32 instanceCount,
+			Ref<Material> overrideMaterial);
 
 		HLAPI static void OnShaderReloaded(uint64 hash);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);
@@ -117,6 +188,8 @@ namespace highlo
 		HLAPI static RendererCapabilities &GetCapabilities();
 		HLAPI static Ref<Texture2D> &GetBRDFLutTexture();
 		HLAPI static HLString GetCurrentRenderingAPI();
+		HLAPI static void SetLineWidth(float width);
+		HLAPI static float GetCurrentLineWidth();
 
 		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
 		HLAPI static Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination);
@@ -145,6 +218,10 @@ namespace highlo
 			HL_CORE_TRACE("  Vendor: {0}", *caps.Vendor);
 			HL_CORE_TRACE("  Device: {0}", *caps.Device);
 			HL_CORE_TRACE("  Version: {0}", *caps.Version);
+			HL_CORE_TRACE("  MAX TEXTURES: {0}", caps.MaxTextures);
+			HL_CORE_TRACE("  MAX TEXTURES UNITS: {0}", caps.MaxTextureUnits);
+			HL_CORE_TRACE("  MAX SAMPLES: {0}", caps.MaxSamples);
+			HL_CORE_TRACE("  MAX ANISOTROPY: {0}", caps.MaxAnisotropy);
 		}
 	}
 }

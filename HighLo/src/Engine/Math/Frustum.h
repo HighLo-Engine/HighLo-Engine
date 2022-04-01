@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -13,6 +13,10 @@
 
 namespace highlo
 {
+#define HL_INTERSECTING 0
+#define HL_INSIDE		1
+#define HL_OUTSIDE		2
+
 #define HL_FRUSTUM_NEAR  0
 #define HL_FRUSTUM_FAR   1
 #define HL_FRUSTUM_LEFT  2

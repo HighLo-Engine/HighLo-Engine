@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -13,8 +13,8 @@
 
 #include "Engine/Math/Transform.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
-#include "Texture.h"
-#include "RenderPass.h"
+#include "Engine/Graphics/Texture.h"
+#include "Engine/Graphics/RenderPass.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Camera/EditorCamera.h"
 #include "FontManager.h"

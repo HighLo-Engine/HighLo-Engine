@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -12,9 +12,12 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Core/UniqueReference.h"
 #include "Engine/Core/DataTypes/String.h"
-#include "Engine/Renderer/RenderingContext.h"
-#include "Engine/Renderer/SwapChain.h"
+#include "Engine/Graphics/RenderingContext.h"
+#include "Engine/Graphics/SwapChain.h"
 #include "MenuBar.h"
+
+// Windows macro
+#undef ERROR
 
 namespace highlo
 {
@@ -60,6 +63,16 @@ namespace highlo
 		ICON_ERROR
 	};
 
+	enum class WindowProgressState
+	{
+		None = 0,
+		NORMAL,
+		ERROR,
+		PAUSED,
+		NOPROGRESS,
+		INDETERMINATE
+	};
+
 	class Window
 	{
 	public:
@@ -78,6 +91,8 @@ namespace highlo
 
 		HLAPI virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) = 0;
 		HLAPI virtual void SetMenuBar(const Ref<MenuBar> &bar) = 0;
+		HLAPI virtual bool SetProgress(WindowProgressState state) = 0;
+		HLAPI virtual bool SetProgressValue(uint64 completed, uint64 total) = 0;
 
 		HLAPI virtual void SetVSync(bool bEnabled) = 0;
 		HLAPI virtual void SetVisible(bool bVisible) = 0;

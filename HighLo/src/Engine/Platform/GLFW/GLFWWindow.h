@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -11,9 +11,11 @@
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <shobjidl_core.h>
 
 #include "Engine/Window/Window.h"
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Window/MenuBar.h"
 
 namespace highlo
@@ -42,6 +44,8 @@ namespace highlo
 
 		virtual int32 ShowMessageBox(const HLString &title, const HLString &msg, WindowMessageButtonType btnType = WindowMessageButtonType::None, WindowMessageIcon icon = WindowMessageIcon::None) override;
 		virtual void SetMenuBar(const Ref<MenuBar> &bar) override;
+		virtual bool SetProgress(WindowProgressState state) override;
+		virtual bool SetProgressValue(uint64 completed, uint64 total) override;
 
 		virtual void SetVSync(bool bEnabled) override;
 		virtual void SetVisible(bool bVisible) override;
@@ -78,6 +82,7 @@ namespace highlo
 
 		WindowData m_Properties;
 		WNDPlacement m_Placement;
+		ITaskbarList4 *m_Taskbar;
 
 		Ref<MenuBar> m_MenuBar = nullptr;
 		Ref<RenderingContext> m_Context;

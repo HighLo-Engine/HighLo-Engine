@@ -47,9 +47,13 @@ namespace highlo::utils
 			{
 				m_Settings.ProjectPath = m_Arguments[i + 1];
 			}
-			else if (cmd == "--shader-cache")
+			else if (cmd == "--shader-registry")
 			{
-				m_Settings.CacheRegistryPath = m_Arguments[i + 1];
+				m_Settings.ShaderRegistryPath = m_Arguments[i + 1];
+			}
+			else if (cmd == "--asset-registry")
+			{
+				m_Settings.AssetsRegistryPath = m_Arguments[i + 1];
 			}
 			else if (cmd == "--window-title")
 			{

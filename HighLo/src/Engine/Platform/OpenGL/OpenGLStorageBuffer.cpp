@@ -48,10 +48,13 @@ namespace highlo
 
 	void OpenGLStorageBuffer::Resize(uint32 size)
 	{
-		if (m_Size < size)
+		if (size != m_Size)
+		{
 			m_Size = size;
 
-
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
+			glNamedBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, m_LocalStorage);
+		}
 	}
 }
 

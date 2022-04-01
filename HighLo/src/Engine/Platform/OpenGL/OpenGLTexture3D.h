@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture3D.h"
+#include "Engine/Graphics/Texture3D.h"
 
 #ifdef HIGHLO_API_OPENGL
 
@@ -40,6 +40,8 @@ namespace highlo
 		virtual void UpdateResourceData(void *data) override;
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
+		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
+		virtual void GenerateMips() override;
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }

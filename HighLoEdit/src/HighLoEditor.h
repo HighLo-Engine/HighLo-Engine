@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -10,6 +10,8 @@
 
 #include <HighLo.h>
 using namespace highlo;
+
+#include "Panels/SettingsPanel.h"
 
 class HighLoEditor : public HLApplication
 	{
@@ -27,7 +29,7 @@ class HighLoEditor : public HLApplication
 
 		void UpdateUIFlags();
 
-		void SelectEntity(Entity entity);
+		void SelectEntity(Entity &entity);
 
 		void UpdateWindowTitle(const HLString &sceneName);
 		void NewScene(FileMenu *menu, MenuItem *item);
@@ -74,7 +76,9 @@ class HighLoEditor : public HLApplication
 		void OnFileMenuPressed(FileMenu *menu, MenuItem *item);
 
 		void OnSelected(const SelectedMesh &selectionContext);
-		void OnEntityDeleted(Entity e);
+		void OnEntityAdded(Entity &e);
+		void OnEntityDeleted(Entity &e);
+		void OnEntityChanged(Entity &e);
 
 		void OnScenePlay();
 		void OnSceneStop();
@@ -86,6 +90,7 @@ class HighLoEditor : public HLApplication
 		void DeleteEntity(Entity entity);
 
 	private:
+
 		glm::vec4 m_ClearColor = { 0.4f, 0.5f, 0.4f, 1 };
 
 		HLString m_ProjectPath;
@@ -93,7 +98,7 @@ class HighLoEditor : public HLApplication
 		Ref<UserSettings> m_UserSettings;
 
 		HLString m_LastSceneFilePath;
-		GizmoType m_GizmoType = GizmoType::None;
+		int32 m_GizmoType = -1;
 		EditorCamera m_EditorCamera;
 		Camera m_OverlayCamera;
 
@@ -106,15 +111,17 @@ class HighLoEditor : public HLApplication
 		bool m_ViewportPanelMouseOver = false;
 		bool m_ViewportPanelFocused = false;
 		bool m_DrawOnTopBoundingBoxes = false;
-		bool m_SceneIsSaved = false;
+		bool m_SceneIsSaved = true;
 
+		bool m_ShowSettingsPanel = false;
 		bool m_ShowAssetsPanel = true;
 		bool m_ShowSceneHierarchyPanel = true;
 		bool m_ShowViewportPanel = true;
 		bool m_ShowObjectPropertiesPanel = true;
 		bool m_ShowConsolePanel = false;
 		bool m_ShowSelectedWireframe = false;
-		bool m_AssetManagerPanelOpen = true;
+		bool m_AssetManagerPanelOpen = false;
+		bool m_ShowAnimTimelinePanel = true;
 
 		bool m_UIShowBoundingBoxes = false;
 		bool m_UIShowBoundingBoxesOnTop = false;
@@ -122,6 +129,7 @@ class HighLoEditor : public HLApplication
 		Ref<Texture> m_CheckerboardTex;
 		Ref<Texture> m_PlayButtonTex, m_StopButtonTex, m_PauseButtonTex;
 		Ref<MenuBar> m_MenuBar;
+		HLString m_SceneName = "Untitled Scene";
 
 		SceneState m_SceneState = SceneState::Edit;
 		SelectionMode m_SelectionMode = SelectionMode::Entity;
@@ -140,10 +148,14 @@ class HighLoEditor : public HLApplication
 		// Editor Panels
 		Ref<SceneRenderer> m_ViewportRenderer;
 		UniqueRef<SceneHierarchyPanel> m_SceneHierarchyPanel;
+		UniqueRef<ObjectPropertiesPanel> m_ObjectPropertiesPanel;
 		UniqueRef<EditorConsolePanel> m_EditorConsolePanel;
 		UniqueRef<AssetBrowserPanel> m_AssetBrowserPanel;
+		UniqueRef<AnimationTimelinePanel> m_AnimTimelinePanel;
+		UniqueRef<SettingsPanel> m_SettingsPanel;
 
 		// File Menu Panels
 		Ref<FileMenu> m_WindowMenu = nullptr;
+		Ref<FileMenu> m_FileMenu = nullptr;
 	};
 

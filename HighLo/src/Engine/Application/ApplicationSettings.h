@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -57,6 +57,12 @@ namespace highlo
 		bool VSync = false;
 
 		/// <summary>
+		/// Determines, whether to use Dear ImGui as the main UI library. This option overrides every other UI framework,
+		/// including the engine's own UI framwork, but it is only relevant for the Editor build, runtime builds will always use the engine's own UI code.
+		/// </summary>
+		bool EnableDearImGui = true;
+
+		/// <summary>
 		/// Determines the rendering api that should be used in the backend to render, if Headless is false.
 		/// </summary>
 		HLString RenderingAPI = "OpenGL";
@@ -67,15 +73,30 @@ namespace highlo
 		HLString WindowAPI = "GLFW";
 
 		/// <summary>
+		/// Determines the target framerate with which the engine should render.
+		/// </summary>
+		uint32 TargetFramerate = 60;
+
+		/// <summary>
 		/// Determines the Main Thread ID of the main thread
 		/// </summary>
 		uint64 MainThreadID;
 
 		/// <summary>
-		/// Determines the path to the cache config.
-		/// The Cache config stores all hashes for later comparison
+		/// Determines the path to the shader cache config.
 		/// </summary>
-		FileSystemPath CacheRegistryPath = "assets/cache.registry";
+		FileSystemPath ShaderRegistryPath = "assets/shaders.registry";
+
+		/// <summary>
+		/// Determines the path to the asset registry. It holds all assets created in the editor.
+		/// </summary>
+		FileSystemPath AssetsRegistryPath = "assets/assets.registry";
+
+		/// <summary>
+		/// Determines the default language the engine should start with.
+		/// </summary>
+		HLString ActiveTranslationLanguageCode = "en-EN";
+	//	HLString ActiveTranslationLanguageCode = "de-DE";
 
 		/// <summary>
 		/// Determines the path to the startup project for the Editor.

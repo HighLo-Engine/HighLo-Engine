@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Application.h"
@@ -6,16 +6,19 @@
 #include "Engine/Core/VirtualFileSystem.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Service.h"
-#include "Engine/Renderer/Framebuffer.h"
-#include "Engine/Renderer/FontManager.h"
-#include "Engine/Renderer/Shaders/ShaderCache.h"
-#include "Engine/Math/Math.h"
-
-#include "Engine/ImGui/ImGui.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
-#include "Engine/ECS/RenderSystem.h"
+
+#include "Engine/Graphics/Framebuffer.h"
+#include "Engine/Graphics/Shaders/ShaderCache.h"
+
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/FontManager.h"
+
+#include "Engine/Math/Math.h"
+#include "Engine/ImGui/ImGui.h"
+#include "Engine/ECS/RenderSystem.h"
 #include "Engine/Threading/ThreadRegistry.h"
+#include "Engine/Loaders/AssetImporter.h"
 
 namespace highlo
 {
@@ -36,6 +39,8 @@ namespace highlo
 
 	HLApplication::~HLApplication()
 	{
+		Translations::Shutdown();
+
 		ThreadRegistry::Get()->Shutdown();
 		m_Encryptor->Shutdown();
 		m_ECS_SystemManager.Shutdown();
@@ -43,6 +48,8 @@ namespace highlo
 
 		// Save the current shader cache state into the json registry
 		ShaderCache::Shutdown();
+
+		AssetImporter::Shutdown();
 
 		Renderer::Shutdown();
 		Logger::Shutdown();
@@ -58,7 +65,7 @@ namespace highlo
 		// Main Rendering Thread
 		while (m_Running)
 		{
-			Time::FrameUpdate();
+			Time::TimeUpdate();
 
 		#ifdef HL_DEBUG
 			if (Input::IsKeyPressed(HL_KEY_ESCAPE))
@@ -94,12 +101,17 @@ namespace highlo
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUIRender(Time::GetTimestep());
 
+				bool showDebugPanel = true;
+				m_RenderDebugPanel->OnUIRender(&showDebugPanel);
+
 				UI::EndScene();
 			}
 			
 			// Swap Window Buffers (Double buffer)
 			if (!m_Settings.Headless)
 				m_Window->Update();
+
+			Time::FrameUpdate();
 		}
 
 		OnShutdown();
@@ -124,6 +136,11 @@ namespace highlo
 		m_Running = false;
 	}
 
+	Translation *HLApplication::GetActiveTranslation()
+	{
+		return m_Translations.GetTranslation(m_Settings.ActiveTranslationLanguageCode);
+	}
+
 	void HLApplication::Init()
 	{
 		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
@@ -133,8 +150,8 @@ namespace highlo
 		Logger::Init();
 
 		// Create cache for sin() and cos()
-		CreateCacheSin();
-		CreateCacheCos();
+		Math::CreateCacheSin();
+		Math::CreateCacheCos();
 
 		// Read the json registry with previous shader cache data
 		ShaderCache::Init();
@@ -163,6 +180,8 @@ namespace highlo
 
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
 
+		AssetImporter::Init();
+
 		// Init Fonts
 		FontManager::Get()->Init();
 
@@ -173,6 +192,10 @@ namespace highlo
 
 		// Sort all registered services
 		Service::Sort();
+
+		Translations::Init();
+
+		m_RenderDebugPanel = UniqueRef<RenderDebugPanel>::Create();
 
 		HL_CORE_INFO("Engine Initialized");
 	}
@@ -213,18 +236,6 @@ namespace highlo
 		return true;
 	}
 
-	bool HLApplication::OnFileMenuChangedEvent(FileMenuChangedEvent &e)
-	{
-	//	HL_CORE_TRACE("FileMenu {0} has changed!", e.GetItem()->Name);
-		return false;
-	}
-
-	bool HLApplication::OnFileSystemChangedEvent(FileSystemChangedEvent &e)
-	{
-		HL_CORE_INFO("{0}", *e.ToString());
-		return false;
-	}
-
 	void HLApplication::InternalEventHandler(Event &e)
 	{
 		// Drop certain input events if the window is not in focus
@@ -234,8 +245,6 @@ namespace highlo
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
-		dispatcher.Dispatch<FileMenuChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileMenuChangedEvent));
-		dispatcher.Dispatch<FileSystemChangedEvent>(BIND_APPLICATION_EVENT_FN(OnFileSystemChangedEvent));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{

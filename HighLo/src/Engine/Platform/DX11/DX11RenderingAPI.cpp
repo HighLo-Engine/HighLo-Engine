@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11RenderingAPI.h"
@@ -31,16 +31,32 @@ namespace highlo
 		DX11Resources::s_DeviceContext->OMSetDepthStencilState(DX11Resources::s_DepthStencilState.Get(), 0);
 	}
 
+	void DX11RenderingAPI::BeginFrame()
+	{
+	}
+
+	void DX11RenderingAPI::EndFrame()
+	{
+	}
+
+	void DX11RenderingAPI::BeginRenderPass(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear)
+	{
+	}
+
+	void DX11RenderingAPI::EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer)
+	{
+	}
+
 	void DX11RenderingAPI::DrawIndexed(Ref<VertexArray> &va, PrimitiveType type)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawIndexed(uint32 indexCount, PrimitiveType type, bool depthTest)
+	void DX11RenderingAPI::DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type, bool depthTest, const glm::mat4 &localTransform)
 	{
 		DX11Resources::s_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		
+
 		//																	|	how many instances do we need here? @FlareFlax
 		DX11Resources::s_DeviceContext->DrawIndexedInstanced(indexCount, indexCount, 0, 0, 0);
 	}
@@ -57,11 +73,31 @@ namespace highlo
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::BeginFrame()
+	void DX11RenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
 	{
 	}
 
-	void DX11RenderingAPI::EndFrame()
+	void DX11RenderingAPI::DrawStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
+	{
+	}
+
+	void DX11RenderingAPI::DrawDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
+	{
+	}
+
+	void DX11RenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
+	}
+
+	void DX11RenderingAPI::DrawInstancedDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	{
+	}
+
+	void DX11RenderingAPI::DrawInstancedStaticMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
+	{
+	}
+
+	void DX11RenderingAPI::DrawInstancedDynamicMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
 	{
 	}
 
@@ -116,6 +152,12 @@ namespace highlo
 	{
 		// TODO
 		return Ref<Environment>();
+	}
+	
+	Ref<Texture3D> DX11RenderingAPI::CreatePreethamSky(float turbidity, float azimuth, float inclination)
+	{
+		// TODO
+		return Ref<Texture3D>();
 	}
 }
 

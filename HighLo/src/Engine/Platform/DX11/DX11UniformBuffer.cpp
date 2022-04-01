@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11UniformBuffer.h"
@@ -25,6 +25,14 @@ namespace highlo
 	}
 	
 	DX11UniformBuffer::~DX11UniformBuffer()
+	{
+	}
+
+	void DX11UniformBuffer::Bind() const
+	{
+	}
+
+	void DX11UniformBuffer::Unbind() const
 	{
 	}
 	

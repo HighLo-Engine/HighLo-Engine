@@ -60,8 +60,17 @@ namespace highlo
 		m_Scene = scene;
 		m_IsAnimated = scene->mAnimations != nullptr;
 		m_InverseTransform = glm::inverse(utils::Mat4FromAssimp(scene->mRootNode->mTransformation));
-		m_TicksPerSecond = (float)scene->mAnimations[0]->mTicksPerSecond;
-		m_AnimationDuration = (float)scene->mAnimations[0]->mDuration;
+
+		if (scene->mAnimations)
+		{
+			m_TicksPerSecond = (float)scene->mAnimations[0]->mTicksPerSecond;
+			m_AnimationDuration = (float)scene->mAnimations[0]->mDuration;
+		}
+		else
+		{
+			m_TicksPerSecond = -1.0f;
+			m_AnimationDuration = -1.0f;
+		}
 
 		m_BoundingBox.Min = { FLT_MAX, FLT_MAX, FLT_MAX };
 		m_BoundingBox.Max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
@@ -249,7 +258,7 @@ namespace highlo
 					if (aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiEmission) == AI_SUCCESS)
 						emission = aiEmission.r;
 
-					mi->Set("u_MaterialUniforms.Diffuse", diffuseColor);
+					mi->Set("u_MaterialUniforms.DiffuseColor", diffuseColor);
 					mi->Set("u_MaterialUniforms.Emission", emission);
 
 					// Shininess and metalness

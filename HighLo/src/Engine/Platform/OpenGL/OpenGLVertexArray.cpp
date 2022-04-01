@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLVertexArray.h"
@@ -7,7 +7,7 @@
 
 #include <glad/glad.h>
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/BufferLayout.h"
+#include "Engine/Graphics/BufferLayout.h"
 
 namespace highlo
 {
@@ -48,12 +48,46 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		glDeleteVertexArrays(1, &m_ID);
+		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		glBindVertexArray(m_ID);
+	//	glBindVertexArray(m_ID);
+
+		if (m_Specification.Layout.GetElements().size() < 1)
+		{
+			HL_CORE_ERROR("Vertex Buffer has no layout!");
+			HL_ASSERT(false);
+			return;
+		}
+
+		uint32 attribIndex = 0;
+		const auto &layout = m_Specification.Layout;
+		for (const auto &element : layout)
+		{
+			GLenum glBaseType = utils::ShaderDataTypeToOpenGLBaseType(element.Type);
+			glEnableVertexAttribArray(attribIndex);
+
+			if (glBaseType == GL_INT)
+			{
+				glVertexAttribIPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  layout.GetStride(),
+									  (const void*)(intptr_t)element.Offset);
+			}
+			else
+			{
+				glVertexAttribPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  element.Normalized,
+									  layout.GetStride(),
+									  (const void*)(intptr_t)element.Offset);
+			}
+			++attribIndex;
+		}
 	}
 
 	void OpenGLVertexArray::Unbind() const
@@ -63,43 +97,20 @@ namespace highlo
 
 	void OpenGLVertexArray::Invalidate()
 	{
-		if (m_ID)
-			glDeleteVertexArrays(1, &m_ID);
-
-		glGenVertexArrays(1, &m_ID);
+	//	if (m_RendererID)
+	//		glDeleteVertexArrays(1, &m_RendererID);
+	//
+	//	glGenVertexArrays(1, &m_RendererID);
+	//	glBindVertexArray(m_RendererID);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
 	{
-		if (m_Specification.Layout.GetElements().size() < 1)
-		{
-			HL_CORE_ERROR("Vertex Buffer has no layout!");
-			return;
-		}
-
-		vertexBuffer->Bind();
-
-		uint32 attribIndex = 0;
-		const auto& layout = m_Specification.Layout;
-		for (const auto& element : layout)
-		{
-			glEnableVertexAttribArray(attribIndex);
-			glVertexAttribPointer(attribIndex,
-				element.GetComponentCount(),
-				utils::ShaderDataTypeToOpenGLBaseType(element.Type),
-				element.Normalized,
-				layout.GetStride(),
-				(const void*)(intptr_t)element.Offset);
-			++attribIndex;
-		}
-
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
 	{
-		indexBuffer->Bind();
-
 		m_IndexBuffer = indexBuffer;
 	}
 
@@ -115,3 +126,4 @@ namespace highlo
 }
 
 #endif // HIGHLO_API_OPENGL
+

@@ -37,6 +37,7 @@ project "HighLo"
 		"%{IncludeDir.gmock}",
 		"%{IncludeDir.vulkan}",
 		"%{IncludeDir.vulkan_local}",
+		"%{IncludeDir.vulkan_memory_alloc}",
 		"%{IncludeDir.yamlCpp}",
     }
 

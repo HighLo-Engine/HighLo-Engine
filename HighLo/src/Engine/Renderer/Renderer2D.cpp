@@ -1,20 +1,20 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Renderer2D.h"
 
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shaders/Shader.h"
-#include "Renderer.h"
-#include "Framebuffer.h"
-#include "FontData.h"
+#include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Graphics/IndexBuffer.h"
+#include "Engine/Graphics/VertexArray.h"
+#include "Engine/Graphics/Shaders/Shader.h"
+#include "Engine/Graphics/Framebuffer.h"
+#include "Engine/Graphics/Shaders/UniformBufferSet.h"
+#include "Engine/Graphics/Material.h"
+
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/FontData.h"
 
 #include "Engine/Utils/StringUtils.h"
-#include "Engine/Renderer/Shaders/UniformBufferSet.h"
-#include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/CommandBuffer.h"
 
 namespace highlo
 {
@@ -26,7 +26,7 @@ namespace highlo
 		float TexIndex;
 		float TilingFactor;
 
-		// TODO: make this editor-only
+// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -35,7 +35,7 @@ namespace highlo
 		glm::vec3 Position;
 		glm::vec4 Color;
 
-		// TODO: make this editor-only
+// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -46,7 +46,7 @@ namespace highlo
 		glm::vec2 LocalPosition;
 		glm::vec4 Color;
 
-		// TODO: make this editor-only
+// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -58,7 +58,7 @@ namespace highlo
 		float TexIndex;
 	};
 
-	struct UniformBufferCamera
+	struct UniformBufferCamera2D
 	{
 		glm::mat4 ViewProjection;
 	};
@@ -68,13 +68,12 @@ namespace highlo
 		static const uint32 MaxQuads = 20000;
 		static const uint32 MaxVertices = MaxQuads * 4;
 		static const uint32 MaxIndices = MaxQuads * 6;
-		static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
+static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
 
 		static const uint32 MaxLines = 10000;
 		static const uint32 MaxLineVertices = MaxLines * 2;
 		static const uint32 MaxLineIndices = MaxLines * 6;
 
-		Ref<CommandBuffer> RenderCommandBuffer;
 		Ref<Texture2D> WhiteTexture;
 
 		// Quads
@@ -133,15 +132,6 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData = new Renderer2DData();
-
-		if (s_2DData->SwapChainTarget)
-		{
-			s_2DData->RenderCommandBuffer = CommandBuffer::CreateFromSwapChain("Renderer2D");
-		}
-		else
-		{
-			s_2DData->RenderCommandBuffer = CommandBuffer::Create("Renderer2D");
-		}
 
 		// Set all texture slots to 0
 		s_2DData->WhiteTexture = Renderer::GetWhiteTexture();
@@ -275,7 +265,7 @@ namespace highlo
 		// Uniform Buffer
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0);
+		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera2D), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -301,7 +291,7 @@ namespace highlo
 
 		// Load Camera Projection into Uniform Buffer block
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera));
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera2D));
 
 		StartBatch();
 		ResetStatistics();
@@ -318,7 +308,7 @@ namespace highlo
 
 		// Load Camera Projection into Uniform Buffer block
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera));
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera2D));
 
 		StartBatch();
 		ResetStatistics();
@@ -335,17 +325,10 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		s_2DData->RenderCommandBuffer->Begin();
-		Renderer::BeginRenderPass(s_2DData->RenderCommandBuffer, s_2DData->QuadVertexArray->GetSpecification().RenderPass);
-
 		FlushQuads();
 		FlushCircles();
 		FlushLines();
 		FlushText();
-
-		Renderer::EndRenderPass(s_2DData->RenderCommandBuffer);
-		s_2DData->RenderCommandBuffer->End();
-		s_2DData->RenderCommandBuffer->Submit();
 	}
 
 	void Renderer2D::FlushQuads()
@@ -371,7 +354,9 @@ namespace highlo
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextureShader->Bind();
+			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->Bind();
 			s_2DData->QuadVertexArray->Bind();
+			s_2DData->QuadVertexArray->GetIndexBuffer()->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
@@ -391,7 +376,9 @@ namespace highlo
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->CircleShader->Bind();
+			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->Bind();
 			s_2DData->CircleVertexArray->Bind();
+			s_2DData->CircleVertexArray->GetIndexBuffer()->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, s_2DData->CircleMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
@@ -411,7 +398,9 @@ namespace highlo
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->LineShader->Bind();
+			s_2DData->LineVertexArray->GetVertexBuffers()[0]->Bind();
 			s_2DData->LineVertexArray->Bind();
+			s_2DData->LineVertexArray->GetIndexBuffer()->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, s_2DData->LineMaterial, s_2DData->UniformBufferSet, PrimitiveType::Lines, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
@@ -439,7 +428,9 @@ namespace highlo
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
+			s_2DData->TextVertexArray->GetVertexBuffers()[0]->Bind();
 			s_2DData->TextVertexArray->Bind();
+			s_2DData->TextVertexArray->GetIndexBuffer()->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}

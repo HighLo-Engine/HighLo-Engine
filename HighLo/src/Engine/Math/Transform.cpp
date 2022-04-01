@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Transform.h"
@@ -14,7 +14,7 @@ namespace highlo
 		m_Transform = transform;
 
 		glm::vec3 translation, rotation, scale;
-		highlo::Decompose(transform, translation, scale, rotation);
+		highlo::Math::Decompose(transform, translation, scale, rotation);
 		m_Position = translation;
 		m_Scale = scale;
 		m_Rotation = rotation;
@@ -73,8 +73,8 @@ namespace highlo
 	{
 		glm::mat4 rotationMatrix = glm::toMat4(rotation);
 
-		glm::vec3 rot;
-		highlo::DecomposeRotation(rotationMatrix, rot);
+		glm::vec3 translation, scale, rot;
+		Math::Decompose(rotationMatrix, translation, scale, rot);
 		m_Rotation += rot;
 
 		//m_BoundingBox->SetTransform(m_Position, glm::eulerAngles(m_Rotation), m_Scale);
@@ -146,11 +146,11 @@ namespace highlo
 	void Transform::SetTransform(const glm::mat4 &transform)
 	{
 		m_Transform = transform;
-		highlo::Decompose(transform, m_Position, m_Scale, m_Rotation);
+		highlo::Math::Decompose(transform, m_Position, m_Scale, m_Rotation);
 	}
 	
 	void Transform::Decompose(const glm::mat4 &transform, Transform &outTransform)
 	{
-		highlo::Decompose(transform, outTransform.m_Position, outTransform.m_Scale, outTransform.m_Rotation);
+		highlo::Math::Decompose(transform, outTransform.m_Position, outTransform.m_Scale, outTransform.m_Rotation);
 	}
 }

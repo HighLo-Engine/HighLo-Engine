@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLTexture2D.h"
@@ -42,6 +42,9 @@ namespace highlo
 		m_Buffer = Allocator::Copy(data, width * height * 4); // 4 byte per pixel
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
 		m_DataFormat = channels == 4 ? GL_RGBA : GL_RGB;
+
+		// Clean up loaded data because it has been copied into our own allocator
+		stbi_image_free(data);
 
 		m_Specification.Width = width;
 		m_Specification.Height = height;
@@ -293,8 +296,8 @@ namespace highlo
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		auto openglFormat = utils::OpenGLTextureFormat(m_Specification.Format);
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, openglFormat, (openglFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
+		auto glFormat = utils::OpenGLTextureFormat(m_Specification.Format);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, glFormat, (glFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -304,6 +307,27 @@ namespace highlo
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification &spec)
+	{
+		m_Specification = spec;
+		Name = "unknown";
+		m_Loaded = true;
+		m_InternalFormat = utils::OpenGLTextureInternalFormat(spec.Format);
+
+		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_2D, RendererID);
+
+		auto glFormat = utils::OpenGLTextureFormat(m_Specification.Format);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, glFormat, (glFormat == GL_DEPTH_STENCIL) ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE, 0);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		Release();
@@ -338,12 +362,13 @@ namespace highlo
 		uint32 mipCount = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
 		glGenTextures(1, &RendererID);
-		glTexStorage2D(RendererID, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
+		glBindTexture(GL_TEXTURE_2D, RendererID);
+		glTexStorage2D(GL_TEXTURE_2D, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
 
 		if (m_Buffer)
 		{
 			glTextureSubImage2D(RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, glFormat, glType, m_Buffer.Data);
-			glGenerateTextureMipmap(RendererID);
+			glGenerateMipmap(GL_TEXTURE_2D);
 			m_Loaded = true;
 		}
 	}
@@ -361,14 +386,13 @@ namespace highlo
 
 	void OpenGLTexture2D::CreatePerLayerImageViews()
 	{
-		HL_ASSERT(false, "Unsupported in OpenGL");
 	}
 
 	void OpenGLTexture2D::CreateSampler(TextureProperties properties)
 	{
 		glGenSamplers(1, &m_SamplerRendererID);
 
-		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, properties.GenerateMips));
+		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(properties.SamplerWrap));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(properties.SamplerWrap));
@@ -448,6 +472,16 @@ namespace highlo
 	uint32 OpenGLTexture2D::GetMipLevelCount()
 	{
 		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
+	}
+
+	std::pair<uint32, uint32> OpenGLTexture2D::GetMipSize(uint32 mip)
+	{
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
+	}
+
+	void OpenGLTexture2D::GenerateMips()
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	
 	void OpenGLTexture2D::Bind(uint32 slot) const

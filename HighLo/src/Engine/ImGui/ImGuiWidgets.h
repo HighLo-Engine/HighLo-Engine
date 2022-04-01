@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -10,6 +10,11 @@
 #include "imgui.h"
 #include "ImGuiScopeHelpers.h"
 #include "Engine/Math/Color.h"
+
+#include "Engine/Assets/Asset.h"
+#include "Engine/Assets/AssetTypes.h"
+#include "Engine/Assets/AssetManager.h"
+#include "Engine/Application/Application.h"
 
 namespace highlo::UI
 {
@@ -46,13 +51,25 @@ namespace highlo::UI
 		HLAPI static void Init();
 		HLAPI static void Shutdown();
 
-		template<uint32 bufferSize = 256, typename StringType>
-		HLAPI static bool SearchWidget(StringType &searchString, const char *hint = "Search...", bool *grabFocus = nullptr)
+		template<uint32 BufferSize = 256, typename StringType = HLString>
+		HLAPI static bool SearchWidget(StringType &searchString, const char *hint = nullptr, bool *grabFocus = nullptr)
 		{
 			UI::PushID();
+
 			UI::ShiftCursorY(1.0f);
 
-			const bool LayoutSuspended = []
+			HLString searchPlaceholder = "";
+			if (hint)
+			{
+				searchPlaceholder = hint;
+			}
+			else
+			{
+				Translation *translation = HLApplication::Get().GetActiveTranslation();
+				searchPlaceholder = translation->GetText("imgui-widgets-search-widget-placeholder");
+			}
+
+			const bool layoutSuspended = []
 			{
 				ImGuiWindow *window = ImGui::GetCurrentWindow();
 				if (window->DC.CurrentLayout)
@@ -60,7 +77,6 @@ namespace highlo::UI
 					ImGui::SuspendLayout();
 					return true;
 				}
-
 				return false;
 			}();
 
@@ -75,10 +91,13 @@ namespace highlo::UI
 
 			if constexpr (std::is_same<StringType, HLString>::value)
 			{
-				char searchBuffer[bufferSize];
-				strcpy_s(searchBuffer, *searchString);
+				char searchBuffer[BufferSize]{};
 
-				if (ImGui::InputText(GenerateID(), searchBuffer, bufferSize))
+				// Only copy the content if any is available, otherwise strcpy_s will throw a weird exception ("" seems not be copyable)
+				if (!searchString.IsEmpty())
+					strcpy_s<BufferSize>(searchBuffer, *searchString);
+
+				if (ImGui::InputText(GenerateID(), searchBuffer, BufferSize))
 				{
 					searchString = searchBuffer;
 					modified = true;
@@ -93,10 +112,10 @@ namespace highlo::UI
 			}
 			else
 			{
-				// TODO:
-			//	static_assert(std::is_same<decltype(&searchString[0], char*)>::value);
+				static_assert(std::is_same<decltype(&searchString[0]), char *>::value,
+							  "searchString paramenter must be HLString& or char*");
 
-				if (ImGui::InputText(GenerateID(), searchString, bufferSize))
+				if (ImGui::InputText(GenerateID(), searchString, BufferSize))
 				{
 					modified = true;
 				}
@@ -110,7 +129,9 @@ namespace highlo::UI
 
 			if (grabFocus && *grabFocus)
 			{
-				if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0))
+				if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)
+					&& !ImGui::IsAnyItemActive()
+					&& !ImGui::IsMouseClicked(0))
 				{
 					ImGui::SetKeyboardFocusHere(-1);
 				}
@@ -124,56 +145,56 @@ namespace highlo::UI
 
 			ImGui::SameLine(areaPosX + 5.0f);
 
-			if (LayoutSuspended)
+			if (layoutSuspended)
 				ImGui::ResumeLayout();
 
 			ImGui::BeginHorizontal(GenerateID(), ImGui::GetItemRectSize());
 			const ImVec2 iconSize(ImGui::GetTextLineHeight(), ImGui::GetTextLineHeight());
 
-			// Search Icon
+			// Search icon
 			{
 				const float iconYOffset = framePaddingY - 3.0f;
 				UI::ShiftCursorY(iconYOffset);
 				UI::Image(s_SearchIcon, iconSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.0f, 1.0f, 1.0f, 0.2f));
 				UI::ShiftCursorY(-iconYOffset);
 
+				// Hint
 				if (!searching)
 				{
 					UI::ShiftCursorY(-framePaddingY + 1.0f);
 					UI::ScopedColor text(ImGuiCol_Text, Colors::Theme::TextDarker);
 					UI::ScopedStyle padding(ImGuiStyleVar_FramePadding, ImVec2(0.0f, framePaddingY));
-					ImGui::TextUnformatted(hint);
+					ImGui::TextUnformatted(*searchPlaceholder);
 					UI::ShiftCursorY(-1.0f);
 				}
 			}
 
 			ImGui::Spring();
 
-			// Clear Icon
+			// Clear icon
+			if (searching)
 			{
 				const float spacingX = 4.0f;
 				const float lineHeight = ImGui::GetItemRectSize().y - framePaddingY / 2.0f;
 
-				if (ImGui::InvisibleButton(GenerateID(), ImVec2(lineHeight, lineHeight)))
+				if (ImGui::InvisibleButton(GenerateID(), ImVec2{ lineHeight, lineHeight }))
 				{
 					if constexpr (std::is_same<StringType, HLString>::value)
-					{
 						searchString.Clear();
-					}
 					else
-					{
-						memset(searchString, 0, bufferSize);
-					}
+						memset(searchString, 0, BufferSize);
 
 					modified = true;
 				}
 
 				if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()))
-				{
 					ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-				}
 
-				UI::DrawButtonImage(s_ClearIcon, IM_COL32(160, 160, 160, 200), IM_COL32(170, 170, 170, 255), IM_COL32(160, 160, 160, 150), UI::RectExpanded(UI::GetItemRect(), -2.0f, -2.0f));
+				UI::DrawButtonImage(s_ClearIcon, IM_COL32(160, 160, 160, 200),
+									IM_COL32(170, 170, 170, 255),
+									IM_COL32(160, 160, 160, 150),
+									UI::RectExpanded(UI::GetItemRect(), -2.0f, -2.0f));
+
 				ImGui::Spring(-1.0f, spacingX * 2.0f);
 			}
 
@@ -197,6 +218,9 @@ namespace highlo::UI
 
 			return clicked;
 		}
+
+		HLAPI static bool AssetSearchPopup(const HLString &id, AssetType type, AssetHandle &selected, bool *cleared = nullptr, const HLString &hint = "Search Assets", const ImVec2 &size = { 250.0f, 350.0f });
+		HLAPI static bool AssetSearchPopup(const HLString &id, AssetHandle &selected, bool *cleared = nullptr, const HLString &hint = "Search Assets", const ImVec2 &size = { 250.0f, 350.0f }, std::initializer_list<AssetType> assetTypes = {});
 
 	private:
 

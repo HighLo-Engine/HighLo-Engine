@@ -28,7 +28,7 @@ namespace highlo
 
 	MaterialAsset::MaterialAsset()
 	{
-		m_Material = Material::Create(Renderer::GetShaderLibrary()->Get("DefaultShaderPBR"));
+		m_Material = Material::Create(Renderer::GetShaderLibrary()->Get("HighLoPBR"));
 
 		// Set Default values
 		SetDiffuseColor(glm::vec3(0.8f));
@@ -46,6 +46,18 @@ namespace highlo
 	MaterialAsset::MaterialAsset(const Ref<Material> &material)
 	{
 		m_Material = Material::Copy(material);
+
+		// Set Default values
+		SetDiffuseColor(glm::vec3(0.8f));
+		SetEmission(0.0f);
+		SetUsingNormalMap(false);
+		SetMetalness(0.0f);
+		SetRoughness(0.4f);
+
+		SetDiffuseMap(Renderer::GetWhiteTexture());
+		SetNormalMap(Renderer::GetWhiteTexture());
+		SetMetalnessMap(Renderer::GetWhiteTexture());
+		SetRoughnessMap(Renderer::GetWhiteTexture());
 	}
 	
 	MaterialAsset::~MaterialAsset()

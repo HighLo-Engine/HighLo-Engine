@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Skybox.h"
@@ -9,7 +9,7 @@
 
 namespace highlo
 {
-	// TODO: Needs Refactor
+// TODO: Needs Refactor
 
 	static constexpr uint32 SKYBOX_SIZE = 2048;
 

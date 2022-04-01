@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -11,7 +11,7 @@
 
 #include <glad/glad.h>
 
-#include "Engine/Renderer/RenderPass.h"
+#include "Engine/Graphics/RenderPass.h"
 
 namespace highlo
 {

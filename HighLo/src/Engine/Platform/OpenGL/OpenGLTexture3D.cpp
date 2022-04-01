@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLTexture3D.h"
@@ -26,7 +26,7 @@ namespace highlo
 		stbi_set_flip_vertically_on_load(flipOnLoad);
 
 		int32 width, height, nrComponents;
-		Byte *data = (Byte *)stbi_loadf(*filePath.String(), &width, &height, &nrComponents, 0);
+		Byte *data = (Byte*)stbi_loadf(*filePath.String(), &width, &height, &nrComponents, 0);
 
 		if (data)
 		{
@@ -36,7 +36,7 @@ namespace highlo
 		}
 		else
 		{
-			HL_CORE_ERROR(TEXTURE3D_LOG_PREFIX "[-] Failed to load Texture3D: {0} [-]", **filePath);
+			HL_CORE_ERROR(TEXTURE3D_LOG_PREFIX "[-] Failed to load Texture3D: {0} (reason: {1}) [-]", **filePath, stbi_failure_reason());
 			stbi_image_free(data);
 		}
 
@@ -54,16 +54,17 @@ namespace highlo
 		m_Specification.Format = format;
 		m_Loaded = true;
 
-		if (data)
-			m_Buffer = Allocator::Copy(data, width * height * 4 * 6); // Six Layers
-
 		uint32 levels = utils::CalculateMipCount(width, height);
 
 		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
 		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
 
-		if (m_Buffer.Data)
+		if (data)
+		{
+			m_Buffer = Allocator::Copy(data, width * height * 4 * 6); // Six Layers
 			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.Data);
+		}
 
 		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, levels > 1));
 		glTextureParameteri(RendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
@@ -153,6 +154,16 @@ namespace highlo
 	uint32 OpenGLTexture3D::GetMipLevelCount()
 	{
 		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
+	}
+
+	std::pair<uint32, uint32> OpenGLTexture3D::GetMipSize(uint32 mip)
+	{
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
+	}
+
+	void OpenGLTexture3D::GenerateMips()
+	{
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}
 
 	void OpenGLTexture3D::Bind(uint32 slot) const

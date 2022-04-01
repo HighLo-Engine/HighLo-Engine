@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Task.h"
@@ -81,7 +81,7 @@ namespace highlo
 	{
 		HL_ASSERT(!IsRunning());
 
-		// TODO: Delete object
+// TODO: Delete object
 	}
 	
 	void Task::OnFinish()

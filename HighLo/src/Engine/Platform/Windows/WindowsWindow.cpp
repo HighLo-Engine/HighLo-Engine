@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "WindowsWindow.h"
@@ -83,6 +83,16 @@ namespace highlo
 		}
 
 		m_NativeHandle = hwnd;
+
+		HRESULT hr = ::CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITaskbarList4), reinterpret_cast<void **>(&m_Taskbar));
+		if (SUCCEEDED(hr))
+		{
+			hr = m_Taskbar->HrInit();
+			if (!SUCCEEDED(hr))
+			{
+				HL_CORE_ERROR("Error: Taskbar could not be created!");
+			}
+		}
 
 		if (m_Properties.Fullscreen)
 		{
@@ -242,6 +252,40 @@ namespace highlo
 		s_IsMenubarSet = true;
 		m_MenuBar = bar;
 		SetMenu(m_NativeHandle, (HMENU) m_MenuBar->GetNativeMenuBar());
+	}
+
+	bool WindowsWindow::SetProgress(WindowProgressState state)
+	{
+		TBPFLAG flag = TBPF_NORMAL;
+		switch (state)
+		{
+			case WindowProgressState::NORMAL:
+				flag = TBPF_NORMAL;
+				break;
+
+			case WindowProgressState::ERROR:
+				flag = TBPF_ERROR;
+				break;
+
+			case WindowProgressState::PAUSED:
+				flag = TBPF_PAUSED;
+				break;
+
+			case WindowProgressState::NOPROGRESS:
+				flag = TBPF_NOPROGRESS;
+				break;
+
+			case WindowProgressState::INDETERMINATE:
+				flag = TBPF_INDETERMINATE;
+				break;
+		}
+
+		return m_Taskbar->SetProgressState(m_NativeHandle, flag) == S_OK;
+	}
+
+	bool WindowsWindow::SetProgressValue(uint64 completed, uint64 total)
+	{
+		return m_Taskbar->SetProgressValue(m_NativeHandle, completed, total) == S_OK;
 	}
 
 	void WindowsWindow::SetVSync(bool bEnabled)

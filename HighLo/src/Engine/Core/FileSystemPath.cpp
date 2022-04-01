@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "FileSystemPath.h"
@@ -50,32 +50,29 @@ namespace highlo
 		if (m_CurrentPath.Contains('\\'))
 			m_CurrentPath = m_CurrentPath.Replace("\\", "/");
 
-		if (Exists())
+		m_Handle = std::filesystem::path(*m_CurrentPath);
+		m_File.ExistsOnHardDrive = Exists();
+		m_File.IsFile = !std::filesystem::is_directory(m_Handle);
+		m_File.Size = Size();
+		m_File.FullPath = std::filesystem::absolute(m_Handle).string();
+
+		if (m_File.FullPath.Contains('\\'))
+			m_File.FullPath = m_File.FullPath.Replace("\\", "/");
+
+		m_CurrentAbsolutePath = m_File.FullPath;
+
+		if (m_File.IsFile)
 		{
-			m_Handle = std::filesystem::path(*m_CurrentPath);
-			m_File.ExistsOnHardDrive = true;
-			m_File.IsFile = !std::filesystem::is_directory(m_Handle);
-			m_File.Size = Size();
-			m_File.FullPath = std::filesystem::absolute(m_Handle).string();
-			
-			if (m_File.FullPath.Contains('\\'))
-				m_File.FullPath = m_File.FullPath.Replace("\\", "/");
+			m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
+			m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
+			m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
+		}
+		else
+		{
+			m_File.Extension = "folder";
+			m_File.Name = ExtractFolderNameFromPath(m_File.FullPath);
+			m_File.FileName = m_File.Name;
 
-			m_CurrentAbsolutePath = m_File.FullPath;
-
-			if (m_File.IsFile)
-			{
-				m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
-				m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
-				m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
-			}
-			else
-			{
-				m_File.Extension = "folder";
-				m_File.Name = ExtractFolderNameFromPath(m_File.FullPath);
-				m_File.FileName = m_File.Name;
-
-			}
 		}
 	}
 
@@ -110,15 +107,15 @@ namespace highlo
 	bool FileSystemPath::IsParentPath() const
 	{
 		uint32 minSlashes = 0;
-		
+		uint32 numSlashes = m_CurrentAbsolutePath.CountOf('/');
+
 		if (IsRootPath())
 			++minSlashes;
 		
-		if (m_CurrentAbsolutePath.EndsWith("/"))
+		if (m_CurrentAbsolutePath.EndsWith('/'))
 			++minSlashes;
 
-		std::cout << "MinSlash: " << minSlashes << std::endl;
-		return minSlashes > 0;
+		return (numSlashes - minSlashes) > 0;
 	}
 
 	bool FileSystemPath::IsAbsolute() const
@@ -243,13 +240,19 @@ namespace highlo
 			HLString result = m_CurrentAbsolutePath;
 			
 			if (result.EndsWith("/"))
-				result = result.Substr(0, result.LastIndexOf("/"));
+				result = result.Substr(0, result.LastIndexOf('/'));
 
-			result = result.Substr(0, result.LastIndexOf("/"));
+			result = result.Substr(0, result.LastIndexOf('/'));
+
 			return FileSystemPath(result);
 		}
 	
 		return *this;
+	}
+
+	FileSystemPath FileSystemPath::LexicallyNormal() const
+	{
+		return m_Handle.lexically_normal().string();
 	}
 	
 	bool FileSystemPath::operator==(const FileSystemPath &other) const
@@ -421,6 +424,9 @@ namespace highlo
 
 		HLString newPath = "";
 
+		if (lhs.String().IsEmpty())
+			return rhs;
+
 		if (lhs.String().EndsWith('/'))
 			newPath = lhs.String() + rhs.String();
 		else
@@ -436,6 +442,9 @@ namespace highlo
 
 		HLString newPath = "";
 
+		if (lhs.String().IsEmpty())
+			return FileSystemPath(path);
+
 		if (lhs.String().EndsWith('/'))
 			newPath = lhs.String() + path;
 		else
@@ -450,6 +459,9 @@ namespace highlo
 			return lhs;
 
 		HLString newPath = "";
+
+		if (lhs.String().IsEmpty())
+			return FileSystemPath(path);
 
 		if (lhs.String().EndsWith('/'))
 			newPath = lhs.String() + path;

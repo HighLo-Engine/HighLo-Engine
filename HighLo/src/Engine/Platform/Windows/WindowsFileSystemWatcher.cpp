@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Engine/Core/FileSystemWatcher.h"
@@ -11,6 +11,8 @@
 #include <Windows.h>
 
 #include "Engine/Core/FileSystemPath.h"
+
+#define FILESYSTEMWATCHER_LOG_PREFIX "FSWatcher>    "
 
 namespace highlo
 {
@@ -25,14 +27,15 @@ namespace highlo
         s_WatchPath = filePath;
 		s_WatcherThread = CreateThread(NULL, 0, Watch, 0, 0, &threadId);
 		HL_ASSERT(s_WatcherThread != NULL);
+		SetThreadDescription(s_WatcherThread, L"HighLoFileSystemWatcher");
+
+		s_Watching = true;
 	}
 
 	void FileSystemWatcher::Stop()
 	{
 		s_Watching = false;
-		DWORD result = WaitForSingleObject(s_WatcherThread, 5000);
-		if (result == WAIT_TIMEOUT)
-			TerminateThread(s_WatcherThread, 0);
+		TerminateThread(s_WatcherThread, 0);
 		CloseHandle(s_WatcherThread);
 	}
 
@@ -69,7 +72,7 @@ namespace highlo
 
 		OVERLAPPED pollingOverlap;
 		pollingOverlap.OffsetHigh = 0;
-		pollingOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		pollingOverlap.hEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
 
 		while (s_Watching && result)
 		{
@@ -77,12 +80,15 @@ namespace highlo
 
 			WaitForSingleObject(pollingOverlap.hEvent, INFINITE);
 
+			HL_CORE_TRACE("SHOULD BE IGNORED?: {0}", s_IgnoreNextChange);
+			/*
 			if (s_IgnoreNextChange)
 			{
 				s_IgnoreNextChange = false;
 				result = false;
 				continue;
 			}
+			*/
 
 			FILE_NOTIFY_INFORMATION *pNotify;
 			int32 offset = 0;
@@ -93,32 +99,45 @@ namespace highlo
 				pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buffer + offset);
 				uint32 fileNameLength = pNotify->FileNameLength / (sizeof(wchar_t));
 
+				std::wstring tmpW = std::wstring(pNotify->FileName, fileNameLength);
+
+			#pragma warning( push )
+			#pragma warning( disable : 4244 ) 
+				std::string tmp = std::string(tmpW.begin(), tmpW.end());
+			#pragma warning( pop )
+
 				FileSystemChangedEvent e;
-				e.FilePath = FileSystemPath(HLString(pNotify->FileName, fileNameLength));
+				e.FilePath = FileSystemPath(HLString(tmp.c_str(), (uint32)tmp.size()));
 				e.IsDirectory = FileSystem::Get()->FolderExists(e.FilePath);
+				
+				HL_CORE_TRACE(FILESYSTEMWATCHER_LOG_PREFIX "[+] FILEPATH CHANGE AT: {0} [+]", **e.FilePath);
 
 				switch (pNotify->Action)
 				{
 					case FILE_ACTION_ADDED:
 					{
+						HL_CORE_INFO(FILESYSTEMWATCHER_LOG_PREFIX "[+] FILE ADDED: {0} [+]", **e.FilePath);
 						e.Action = FileSystemAction::Added;
 						break;
 					}
 
 					case FILE_ACTION_REMOVED:
 					{
+						HL_CORE_INFO(FILESYSTEMWATCHER_LOG_PREFIX "[+] FILE REMOVED: {0} [+]", **e.FilePath);
 						e.Action = FileSystemAction::Deleted;
 						break;
 					}
 
 					case FILE_ACTION_MODIFIED:
 					{
+						HL_CORE_INFO(FILESYSTEMWATCHER_LOG_PREFIX "[+] FILE MODIFIED: {0} [+]", **e.FilePath);
 						e.Action = FileSystemAction::Modified;
 						break;
 					}
 
 					case FILE_ACTION_RENAMED_OLD_NAME:
 					{
+						HL_CORE_INFO(FILESYSTEMWATCHER_LOG_PREFIX "[+] SAVING OLD NAME: {0} [+]", *e.FilePath.Filename());
 						oldName = e.FilePath.Filename();
 						break;
 					}
@@ -126,14 +145,16 @@ namespace highlo
 					case FILE_ACTION_RENAMED_NEW_NAME:
 					{
 						e.OldName = oldName;
+						e.NewName = e.FilePath.Filename();
 						e.Action = FileSystemAction::Renamed;
+						HL_CORE_INFO(FILESYSTEMWATCHER_LOG_PREFIX "[+] FILE RENAMED FROM {0} to {1} [+]", *e.OldName, **e.FilePath);
 						break;
 					}
 				}
 
 				if (pNotify->Action != FILE_ACTION_RENAMED_OLD_NAME)
 				{
-					HL_CORE_TRACE("Triggering FileSystemChangedEvent {0}", *e.ToString());
+					HL_CORE_INFO(FILESYSTEMWATCHER_LOG_PREFIX "[+] Triggering FileSystemChangedEvent {0} [+]", *e.ToString());
 					HLApplication::Get().GetWindow().GetEventCallback()(e);
 				}
 

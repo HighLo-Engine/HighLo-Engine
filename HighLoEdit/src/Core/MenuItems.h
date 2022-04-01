@@ -1,3 +1,5 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
 #pragma once
 
 #define MENU_ITEM_NEW_SCENE 1
@@ -40,4 +42,6 @@
 #define MENU_RENDERER_OFFLINE_RENDERER 33
 
 #define MENU_ITEM_WINDOW_EDITOR_CONSOLE 34
+#define MENU_ITEM_WINDOW_ASSET_MANAGER 35
+#define MENU_ITEM_WINDOW_ANIM_TIMELINE 36
 

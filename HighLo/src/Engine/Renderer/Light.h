@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -45,7 +45,7 @@ namespace highlo
 
 	struct LightEnvironment
 	{
-		DirectionalLight DirectionalLight[4];
+		DirectionalLight DirectionalLights[4];
 		std::vector<PointLight> PointLights;
 	};
 

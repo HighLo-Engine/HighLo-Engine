@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -85,6 +85,7 @@ namespace highlo
 		HLAPI FileSystemPath RelativePath() const;
 		HLAPI FileSystemPath RelativePath(const FileSystemPath &parentPath) const;
 		HLAPI FileSystemPath ParentPath() const;
+		HLAPI FileSystemPath LexicallyNormal() const;
 
 		HLAPI HLString &String() { return m_CurrentPath; }
 		HLAPI const HLString &String() const { return m_CurrentPath; }

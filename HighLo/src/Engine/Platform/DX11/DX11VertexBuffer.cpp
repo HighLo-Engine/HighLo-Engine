@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11VertexBuffer.h"
@@ -47,8 +47,8 @@ namespace highlo
 
 	void DX11VertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
 	{
-		// TODO: Add offset
-		// TODO: This crashes
+// TODO: Add offset
+// TODO: This crashes
 
 		/*
 		D3D11_MAPPED_SUBRESOURCE resource;

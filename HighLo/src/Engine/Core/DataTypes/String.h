@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -682,6 +682,18 @@ namespace highlo
 			}
 
 			return *this;
+		}
+
+		HLAPI uint32 CountOf(StringType letter) const
+		{
+			uint32 count = 0;
+			for (uint32 i = 0; i < m_Size; ++i)
+			{
+				if (m_Data[i] == letter)
+					++count;
+			}
+
+			return count;
 		}
 
 		HLAPI uint64 Hash() const

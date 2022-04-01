@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLShader.h"
@@ -7,7 +7,7 @@
 
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/Shaders/ShaderCache.h"
+#include "Engine/Graphics/Shaders/ShaderCache.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <shaderc/shaderc.hpp>
@@ -308,7 +308,7 @@ namespace highlo
 	{
 		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
 		int32 location = m_UniformLocations.at(fullname);
-		glUniform2fv(location, 1, glm::value_ptr(value));
+		glUniform3fv(location, 1, glm::value_ptr(value));
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec4 &value)
@@ -356,14 +356,16 @@ namespace highlo
 	{
 		if (FileSystem::Get()->FileExists(m_AssetPath))
 		{
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
-			m_ShaderSources = PreProcess(source);
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0} [+]", **m_AssetPath);
 			bool cacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
 
+			m_ShaderSources = PreProcess(source);
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile || cacheHasChanged);
 			CompileOrGetOpenGLBinary(shaderData, forceCompile || cacheHasChanged);
 			ReflectAllShaderStages(shaderData);
+
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
 		}
 		else
 		{
@@ -490,7 +492,11 @@ namespace highlo
 			uint32 dimensions = type.image.dim;
 
 			int32 location = glGetUniformLocation(m_RendererID, *name);
-			HL_ASSERT(location != -1);
+			if (location == -1)
+			{
+				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not find uniform location for {0} [-]", *name);
+			//	HL_ASSERT(false);
+			}
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 			glUniform1i(location, binding);
@@ -685,14 +691,19 @@ namespace highlo
 		{
 			int32 maxLength = 0;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+			
+			// This check is here to prevent laptops (integrated gpus) to trigger this error
+			// for some reason they seem to not set isLinked properly, so the maxLength will tell us if there was an error.
+			if (maxLength > 0)
+			{
+				std::vector<GLchar> infoLog(maxLength);
+				glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
-			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-			HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
-
-			glDeleteProgram(program);
-			for (auto id : shaderRendererIds)
-				glDeleteShader(id);
+				glDeleteProgram(program);
+				for (auto id : shaderRendererIds)
+					glDeleteShader(id);
+			}
 		}
 		
 		for (auto id : shaderRendererIds)

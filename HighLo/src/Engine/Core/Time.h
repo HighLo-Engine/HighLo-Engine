@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -34,24 +34,33 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static float	GetElapsedTime();
+		HLAPI static double		GetElapsedTime();
+		HLAPI static double		GetFrameTime();
+		HLAPI static uint32		GetFPS();
 
-		HLAPI static float	GetTimeScale();
-		HLAPI static void	SetTimeScale(float scale);
+		HLAPI static double		GetTimeScale();
+		HLAPI static void		SetTimeScale(double scale);
 
 		HLAPI static Timestep	GetTimestep();
+		HLAPI static void		TimeUpdate();
 		HLAPI static void		FrameUpdate();
 
 		HLAPI static double		GetSystemTime();
-		HLAPI static HLString GetCurrentTimeStamp(HLDateFormat format = HLDateFormat::English_US, HLTimePrecision precision = HLTimePrecision::Seconds);
+		HLAPI static HLString	GetCurrentTimeStamp(HLDateFormat format = HLDateFormat::English_US, HLTimePrecision precision = HLTimePrecision::Seconds);
 
 	private:
-		static float s_ElapsedTime;
-		static float s_TimeScale;
-		static float s_TimeStep;
-		static float s_InitialTime;
+
+		static double s_ElapsedTime;
+		static double s_TimeScale;
+		static double s_TimeStep;
+		static double s_InitialTime;
+		static double s_TmpSecondTimer;
+		static double s_FrameTime;
+		static uint32 s_FrameCounter;
+		static uint32 s_FramesPerSecond;
 
 	private:
-		static float s_LastTrackedTime;
+
+		static double s_LastTrackedTime;
 	};
 }

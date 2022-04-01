@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Texture2D.h"
+#include "Engine/Graphics/Texture2D.h"
 #include "Engine/Core/Allocator.h"
 
 #ifdef HIGHLO_API_OPENGL
@@ -29,6 +29,7 @@ namespace highlo
 		OpenGLTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 		OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height);
+		OpenGLTexture2D(const TextureSpecification &spec);
 		~OpenGLTexture2D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; };
@@ -54,6 +55,8 @@ namespace highlo
 		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;
+		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
+		virtual void GenerateMips() override;
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 

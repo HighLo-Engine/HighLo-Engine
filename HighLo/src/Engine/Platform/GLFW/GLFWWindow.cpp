@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "GLFWWindow.h"
@@ -99,6 +99,40 @@ namespace highlo
 	{
 		m_MenuBar = bar;
 		UI::EnableMenuBar();
+	}
+
+	bool GLFWWindow::SetProgress(WindowProgressState state)
+	{
+		TBPFLAG flag = TBPF_NORMAL;
+		switch (state)
+		{
+			case WindowProgressState::NORMAL:
+				flag = TBPF_NORMAL;
+				break;
+
+			case WindowProgressState::ERROR:
+				flag = TBPF_ERROR;
+				break;
+
+			case WindowProgressState::PAUSED:
+				flag = TBPF_PAUSED;
+				break;
+
+			case WindowProgressState::NOPROGRESS:
+				flag = TBPF_NOPROGRESS;
+				break;
+
+			case WindowProgressState::INDETERMINATE:
+				flag = TBPF_INDETERMINATE;
+				break;
+		}
+
+		return m_Taskbar->SetProgressState(glfwGetWin32Window(m_NativeHandle), flag) == S_OK;
+	}
+
+	bool GLFWWindow::SetProgressValue(uint64 completed, uint64 total)
+	{
+		return m_Taskbar->SetProgressValue(glfwGetWin32Window(m_NativeHandle), completed, total) == S_OK;
 	}
 
 	void GLFWWindow::SetVSync(bool bEnabled)
@@ -228,6 +262,16 @@ namespace highlo
 		}
 		
 		glfwSetCursor(m_NativeHandle, m_NativeCursor);
+
+		HRESULT hr = ::CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITaskbarList4), reinterpret_cast<void**>(&m_Taskbar));
+		if (SUCCEEDED(hr))
+		{
+			hr = m_Taskbar->HrInit();
+			if (!SUCCEEDED(hr))
+			{
+				HL_CORE_ERROR("Error: Taskbar could not be created!");
+			}
+		}
 
 		m_Context = RenderingContext::Create((void*)m_NativeHandle, m_Properties);
 		m_Context->Init();

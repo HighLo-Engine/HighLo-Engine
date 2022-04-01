@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -14,7 +14,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Assert.h"
-#include "Engine/Renderer/TextureFormat.h"
+#include "Engine/Graphics/TextureFormat.h"
 
 namespace highlo
 {
@@ -49,6 +49,21 @@ namespace highlo
 		inline uint32 CalculateMipCount(uint32 width, uint32 height)
 		{
 			return (uint32)(std::floor(std::log2(glm::min(width, height))) + 1);
+		}
+
+		inline std::pair<uint32, uint32> GetMipSize(uint32 mip, uint32 width, uint32 height)
+		{
+			uint32 w = width;
+			uint32 h = height;
+
+			while (mip != 0)
+			{
+				w /= 2;
+				h /= 2;
+				--mip;
+			}
+
+			return { w, h };
 		}
 
 		inline uint32 GetImageMemorySize(TextureFormat format, uint32 width, uint32 height)

@@ -1,7 +1,8 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoEditor.h"
 #include "Core/MenuItems.h"
+#include "Core/Translations.h"
 
 #define EDITOR_LOG_PREFIX "HighloEdit>   "
 
@@ -18,6 +19,19 @@ namespace editorutils
 		}
 
 		return -1;
+	}
+
+	static HighLoEditor::GizmoType ConvertFromImGuizmoType(int32 type)
+	{
+		switch (type)
+		{
+			case -1: return HighLoEditor::GizmoType::None;
+			case 0: return HighLoEditor::GizmoType::Translate;
+			case 1: return HighLoEditor::GizmoType::Rotate;
+			case 2: return HighLoEditor::GizmoType::Scale;
+		}
+
+		return HighLoEditor::GizmoType::None;
 	}
 }
 
@@ -36,6 +50,8 @@ HighLoEditor::HighLoEditor(const ApplicationSettings &settings)
 	{
 		FileSystem::Get()->CreateFolder(m_RoamingPath);
 	}
+
+	InitEditorTranslations();
 
 	// TODO: Write UserPreferences into roaming path
 	// The UserPreferences file should contain the following data:
@@ -61,105 +77,120 @@ void HighLoEditor::OnInitialize()
 	// TODO: Deserialize project data here
 	Project::SetActive(project);
 
+	AssetManager::Get()->Init();
+
+	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
+	m_CurrentScene = m_EditorScene;
+
 	// Editor Panels
 	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
-	m_ViewportRenderer->SetLineWidth(m_LineWidth);
+	m_ViewportRenderer->SetViewportSize(width, height);
 
 	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
 
-	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create();
+	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create(m_CurrentScene, true);
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
 	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
+	m_SceneHierarchyPanel->SetEntityAddedCallback(std::bind(&HighLoEditor::OnEntityAdded, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
-	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
-	m_EditorScene = Ref<Scene>::Create("Emtpy Scene", true);
+	m_ObjectPropertiesPanel = UniqueRef<ObjectPropertiesPanel>::Create(m_CurrentScene, true);
+	m_ObjectPropertiesPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::OnEntityChanged, this, std::placeholders::_1));
 
-	AssetEditorPanel::Init();
+	m_EditorConsolePanel = UniqueRef<EditorConsolePanel>::Create();
+	m_AnimTimelinePanel = UniqueRef<AnimationTimelinePanel>::Create();
+
+	m_SettingsPanel = UniqueRef<SettingsPanel>::Create();
 
 	GetWindow().Maximize();
-	GetWindow().SetWindowIcon("assets/Resources/HighLoEngine.png");
-	UpdateWindowTitle("Untitled Scene");
+	GetWindow().SetWindowIcon("assets/Resources/HighLo.png");
+	UpdateWindowTitle(m_SceneName);
 
 	FileSystemWatcher::Get()->Start(project->GetConfig().AssetDirectory);
 
 	// Create FileMenu
 	m_MenuBar = MenuBar::Create();
+	Translation *translation = HLApplication::Get().GetActiveTranslation();
 
-	Ref<FileMenu> importMenu = FileMenu::Create("Import");
-	importMenu->AddMenuItem("Import .obj", "", MENU_ITEM_IMPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .fbx", "", MENU_ITEM_IMPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .stl", "", MENU_ITEM_IMPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .3ds", "", MENU_ITEM_IMPORT_3DS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .c4d", "", MENU_ITEM_IMPORT_C4D, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	importMenu->AddMenuItem("Import .mb", "", MENU_ITEM_IMPORT_MB, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	Ref<FileMenu> exportMenu = FileMenu::Create("Export");
-	exportMenu->AddMenuItem("Export .obj", "", MENU_ITEM_EXPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .fbx", "", MENU_ITEM_EXPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .stl", "", MENU_ITEM_EXPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	Ref<FileMenu> importMenu = FileMenu::Create(translation->GetText("import-file-menu"));
+	importMenu->AddMenuItem(translation->GetText("import-obj-file-menu"), "", MENU_ITEM_IMPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-fbx-file-menu"), "", MENU_ITEM_IMPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-stl-file-menu"), "", MENU_ITEM_IMPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-3ds-file-menu"), "", MENU_ITEM_IMPORT_3DS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-c4d-file-menu"), "", MENU_ITEM_IMPORT_C4D, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	importMenu->AddMenuItem(translation->GetText("import-mb-file-menu"), "", MENU_ITEM_IMPORT_MB, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	Ref<FileMenu> exportMenu = FileMenu::Create(translation->GetText("export-file-menu"));
+	exportMenu->AddMenuItem(translation->GetText("export-obj-file-menu"), "", MENU_ITEM_EXPORT_OBJ, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-fbx-file-menu"), "", MENU_ITEM_EXPORT_FBX, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-stl-file-menu"), "", MENU_ITEM_EXPORT_STL, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
 	exportMenu->AddSeparator();
-	exportMenu->AddMenuItem("Export .mp4", "", MENU_ITEM_EXPORT_MP4, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .avi", "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	exportMenu->AddMenuItem("Export .mov", "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-mp4-file-menu"), "", MENU_ITEM_EXPORT_MP4, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-avi-file-menu"), "", MENU_ITEM_EXPORT_AVI, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	exportMenu->AddMenuItem(translation->GetText("export-mov-file-menu"), "", MENU_ITEM_EXPORT_MOV, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
 
-	Ref<FileMenu> fileMenu = FileMenu::Create("File");
-	fileMenu->AddMenuItem("New Scene", "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddMenuItem("Open Scene...", "Strg+O", MENU_ITEM_OPEN_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Save Scene", "Strg+S", MENU_ITEM_SAVE_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
-	fileMenu->AddMenuItem("Save Scene as...", "Strg+Shift+S", MENU_ITEM_SAVE_SCENE_AS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Settings", "", MENU_ITEM_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	fileMenu->AddSeparator();
-	fileMenu->AddSubMenu(importMenu);
-	fileMenu->AddSubMenu(exportMenu);
-	fileMenu->AddSeparator();
-	fileMenu->AddMenuItem("Quit", "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu = FileMenu::Create(translation->GetText("file-menu"));
+	m_FileMenu->AddMenuItem(translation->GetText("new-scene-file-menu"), "Strg+N", MENU_ITEM_NEW_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddMenuItem(translation->GetText("open-scene-file-menu"), "Strg+O", MENU_ITEM_OPEN_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddMenuItem(translation->GetText("save-scene-file-menu"), "Strg+S", MENU_ITEM_SAVE_SCENE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); }, false);
+	m_FileMenu->AddMenuItem(translation->GetText("save-scene-as-file-menu"), "Strg+Shift+S", MENU_ITEM_SAVE_SCENE_AS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddMenuItem(translation->GetText("settings-file-menu"), "", MENU_ITEM_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddSubMenu(importMenu);
+	m_FileMenu->AddSubMenu(exportMenu);
+	m_FileMenu->AddSeparator();
+	m_FileMenu->AddMenuItem(translation->GetText("exit-file-menu"), "Strg+Shift+Q", MENU_ITEM_QUIT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> editMenu = FileMenu::Create("Edit");
-	editMenu->AddMenuItem("Undo", "Strg+Z", MENU_ITEM_UNDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	editMenu->AddMenuItem("Redo", "Strg+Y", MENU_ITEM_REDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> editMenu = FileMenu::Create(translation->GetText("edit-menu"));
+	editMenu->AddMenuItem(translation->GetText("edit-undo-menu"), "Strg+Z", MENU_ITEM_UNDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	editMenu->AddMenuItem(translation->GetText("edit-redo-menu"), "Strg+Y", MENU_ITEM_REDO, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	editMenu->AddSeparator();
 
-	Ref<FileMenu> modelSubMenu = FileMenu::Create("Create 3D Objects");
-	modelSubMenu->AddMenuItem("Create Null Object", "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> modelSubMenu = FileMenu::Create(translation->GetText("game-objects-3d-objects-menu"));
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-null-menu"), "", MENU_ITEM_ASSET_CREATE_NULL_OBJECT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	modelSubMenu->AddSeparator();
-	modelSubMenu->AddMenuItem("Create Cube", "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	modelSubMenu->AddMenuItem("Create Sphere", "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	modelSubMenu->AddMenuItem("Create Capsule", "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	modelSubMenu->AddMenuItem("Create Cylinder", "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-cube-menu"), "", MENU_ITEM_ASSET_CREATE_CUBE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-sphere-menu"), "", MENU_ITEM_ASSET_CREATE_SPHERE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-capsule-menu"), "", MENU_ITEM_ASSET_CREATE_CAPSULE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	modelSubMenu->AddMenuItem(translation->GetText("game-objects-3d-objects-cylinder-menu"), "", MENU_ITEM_ASSET_CREATE_CYLINDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> gameObjectMenu = FileMenu::Create("Game Objects");
-	gameObjectMenu->AddMenuItem("Create Folder", "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> gameObjectMenu = FileMenu::Create(translation->GetText("game-objects-menu"));
+	gameObjectMenu->AddMenuItem(translation->GetText("game-objects-folder-menu"), "", MENU_ITEM_ASSET_CREATE_FOLDER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	gameObjectMenu->AddSubMenu(modelSubMenu);
-	gameObjectMenu->AddMenuItem("Create Camera", "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	gameObjectMenu->AddMenuItem(translation->GetText("game-objects-camera-menu"), "", MENU_ITEM_ASSET_CREATE_CAMERA, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
 	Ref<FileMenu> rendererMenu = FileMenu::Create("Renderer");
-	rendererMenu->AddMenuItem("Rendering Settings", "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	rendererMenu->AddMenuItem(translation->GetText("renderer-settings-menu"), "", MENU_RENDERER_SETTINGS, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	rendererMenu->AddSeparator();
 	rendererMenu->AddMenuItem("Offline Renderer", "", MENU_RENDERER_OFFLINE_RENDERER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	m_WindowMenu = FileMenu::Create("Window");
-	m_WindowMenu->AddMenuItem("Editor Console", "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu = FileMenu::Create(translation->GetText("window-menu"));
+	m_WindowMenu->AddMenuItem(translation->GetText("window-editor-console-menu"), "", MENU_ITEM_WINDOW_EDITOR_CONSOLE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu->AddMenuItem(translation->GetText("window-asset-manager-menu"), "", MENU_ITEM_WINDOW_ASSET_MANAGER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	m_WindowMenu->AddMenuItem(translation->GetText("window-animation-timeline-menu"), "", MENU_ITEM_WINDOW_ANIM_TIMELINE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	Ref<FileMenu> helpMenu = FileMenu::Create("Help");
-	helpMenu->AddMenuItem("About HighLo", "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
-	helpMenu->AddMenuItem("Documentation", "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	Ref<FileMenu> helpMenu = FileMenu::Create(translation->GetText("help-menu"));
+	helpMenu->AddMenuItem(translation->GetText("help-about-menu"), "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+	helpMenu->AddMenuItem(translation->GetText("help-docs-menu"), "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
-	m_MenuBar->AddMenu(fileMenu);
+	m_MenuBar->AddMenu(m_FileMenu);
 	m_MenuBar->AddMenu(editMenu);
 	m_MenuBar->AddMenu(gameObjectMenu);
 	m_MenuBar->AddMenu(rendererMenu);
 	m_MenuBar->AddMenu(m_WindowMenu);
 	m_MenuBar->AddMenu(helpMenu);
 	GetWindow().SetMenuBar(m_MenuBar);
+
+	// Temp: Try to create a new asset and submit it for rendering
+//	AssetHandle cubeHandle = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+//	Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(cubeHandle);
+//	m_ViewportRenderer->SubmitStaticModel(model, model->GetMaterials());
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
 {
 	UpdateUIFlags();
-
-	m_ViewportRenderer->ClearPixelBuffer(TextureFormat::RED_INTEGER, -1);
 
 	switch (m_SceneState)
 	{
@@ -213,8 +244,6 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		}
 	}
 
-	AssetEditorPanel::OnUpdate(ts);
-
 	// Get current mouse positon and mouse pick on the viewport to detect if the user clicked on one of the rendererd objects
 	auto [mx, my] = ImGui::GetMousePos();
 	mx -= m_ViewportBounds[0].x;
@@ -229,6 +258,8 @@ void HighLoEditor::OnUpdate(Timestep ts)
 	{
 	//	HL_CORE_ERROR("TEST: PIXEL SELECTED: {0}", m_ViewportRenderer->GetPixel(TextureFormat::RED_INTEGER, mouseX, mouseY));
 	}
+
+	SceneRenderer::WaitForThreads();
 }
 
 void HighLoEditor::UpdateUIFlags()
@@ -236,13 +267,26 @@ void HighLoEditor::UpdateUIFlags()
 	// Make sure the "Show Console" window always
 	// reflects the current opened state of the log tab.
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_EDITOR_CONSOLE)->IsSelected = m_ShowConsolePanel;
+	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ASSET_MANAGER)->IsSelected = m_AssetManagerPanelOpen;
+	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ANIM_TIMELINE)->IsSelected = m_ShowAnimTimelinePanel;
+	m_FileMenu->GetMenuItemWithID(MENU_ITEM_SETTINGS)->IsSelected = m_ShowSettingsPanel;
+
+	if (!m_SceneIsSaved)
+	{
+		// Append a * to the window title
+		UpdateWindowTitle(m_SceneName + " *");
+	}
+	else
+	{
+		UpdateWindowTitle(m_SceneName);
+	}
 }
 
 void HighLoEditor::OnShutdown()
 {
-	AssetEditorPanel::Shutdown();
-
 	FileSystemWatcher::Get()->Stop();
+
+	AssetManager::Get()->Shutdown();
 }
 
 void HighLoEditor::OnEvent(Event &e)
@@ -269,8 +313,8 @@ void HighLoEditor::OnEvent(Event &e)
 		m_RuntimeScene->OnEvent(e);
 	}
 
-	AssetEditorPanel::OnEvent(e);
 	m_AssetBrowserPanel->OnEvent(e);
+	m_AnimTimelinePanel->OnEvent(e);
 }
 
 void HighLoEditor::OnUIRender(Timestep timestep)
@@ -289,19 +333,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
 	m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-	if (ImGui::BeginPopupContextWindow("#viewportRightClick", ImGuiMouseButton_Right, false))
-	{
-		// TODO
-		if (ImGui::BeginMenu(ICON_FA_PLUS " New"))
-		{
-
-
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndPopup();
-	}
-
 	auto viewportSize = ImGui::GetContentRegionAvail();
 	if (viewportSize.x < 0.0f)
 		viewportSize.x = (float)GetWindow().GetWidth();
@@ -319,60 +350,214 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_EditorCamera.SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 
 	// Render viewport image
-	UI::Image(m_ViewportRenderer->GetFinalRenderTexture(), viewportSize, { 0, 1 }, { 1, 0 });
+	Ref<Texture2D> viewportImage = m_ViewportRenderer->GetFinalRenderTexture();
+	UI::Image(viewportImage, viewportSize, { 0, 1 }, { 1, 0 });
+
+	// TODO: Add Guizmo Toolbar to be able to select the current guizmo type
+
+	// Draw gizmo on top of viewport image
+	if (m_GizmoType != -1 && m_SelectionContext.size())
+	{
+		auto &selection = m_SelectionContext[0];
+
+		float width = (float)ImGui::GetWindowWidth();
+		float height = (float)ImGui::GetWindowHeight();
+
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+		bool snap = Input::IsKeyPressed(HL_KEY_LEFT_CONTROL);
+
+		Transform &entityTransform = selection.Entity.Transform();
+		glm::mat4 rawTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(selection.Entity);
+
+		float snapValue = GetSnapValue();
+		float snapValues[3] = { snapValue, snapValue, snapValue };
+
+		if (m_SelectionMode == SelectionMode::Entity)
+		{
+			ImGuizmo::Manipulate(
+				glm::value_ptr(m_EditorCamera.GetViewMatrix()),
+				glm::value_ptr(m_EditorCamera.GetProjection()), 
+				(ImGuizmo::OPERATION)m_GizmoType, 
+				ImGuizmo::LOCAL, 
+				glm::value_ptr(rawTransform), 
+				nullptr, 
+				snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				Entity parent = m_CurrentScene->FindEntityByUUID(selection.Entity.GetParentUUID());
+				if (parent)
+				{
+					glm::mat4 parentTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(parent);
+					rawTransform = glm::inverse(parentTransform) * rawTransform;
+
+					glm::vec3 translation, rotation, scale;
+					Math::Decompose(rawTransform, translation, scale, rotation);
+
+					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
+					entityTransform.SetPosition(translation);
+					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
+					entityTransform.SetScale(scale);
+					selection.Entity.SetTransform(entityTransform);
+					SelectEntity(selection.Entity);
+				}
+				else
+				{
+					glm::vec3 translation, rotation, scale;
+					Math::Decompose(rawTransform, translation, scale, rotation);
+
+					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
+					entityTransform.SetPosition(translation);
+					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
+					entityTransform.SetScale(scale);
+					selection.Entity.SetTransform(entityTransform);
+					SelectEntity(selection.Entity);
+				}
+			}
+		}
+		else
+		{
+			glm::mat4 transformBase = rawTransform * selection.Mesh->LocalTransform.GetTransform();
+			ImGuizmo::Manipulate(
+				glm::value_ptr(m_EditorCamera.GetViewMatrix()), 
+				glm::value_ptr(m_EditorCamera.GetProjection()), 
+				(ImGuizmo::OPERATION)m_GizmoType, 
+				ImGuizmo::LOCAL, 
+				glm::value_ptr(transformBase), 
+				nullptr, 
+				snap ? snapValues : nullptr);
+
+			Transform newTransform;
+			newTransform.SetTransform(glm::inverse(rawTransform) * transformBase);
+			selection.Mesh->LocalTransform = newTransform;
+			selection.Entity.SetTransform(entityTransform);
+			SelectEntity(selection.Entity);
+		}
+	}
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("asset_payload");
+		if (payload)
+		{
+			uint64 count = payload->DataSize / sizeof(AssetHandle);
+			for (uint64 i = 0; i < count; ++i)
+			{
+				AssetHandle current = *(((AssetHandle*)payload->Data) + i);
+				const AssetMetaData &assetData = AssetManager::Get()->GetMetaData(current);
+				Ref<Asset> asset = AssetManager::Get()->GetAsset<Asset>(current);
+
+				if (count == 1 && assetData.Type == AssetType::Scene)
+				{
+					OpenScene(assetData.FilePath.String());
+					break;
+				}
+
+				if (asset)
+				{
+					if (asset->GetAssetType() == AssetType::StaticMesh)
+					{
+						Ref<StaticModel> model = asset.As<StaticModel>();
+						auto &assetData = AssetManager::Get()->GetMetaData(model->Handle);
+						HL_TRACE("Creating Static Model by drag and drop");
+
+					//	Entity entity = m_EditorScene->CreateEntity(assetData.FilePath.Filename());
+					//	StaticModelComponent *comp = entity.AddComponent<StaticModelComponent>();
+					//	comp->Model = model->Handle;
+					//	SelectEntity(entity);
+					}
+					else if (asset->GetAssetType() == AssetType::DynamicMesh)
+					{
+						Ref<DynamicModel> model = asset.As<DynamicModel>();
+						const auto &submeshIndices = model->GetSubmeshIndices();
+						const auto &submeshes = model->Get()->GetSubmeshes();
+						HL_TRACE("Creating Dynamic Model by drag and drop");
+
+						// Entity rootEntity = m_EditorScene->InstantiateMesh(model);
+						// SelectEntity(rootEntity);
+					}
+					else if (asset->GetAssetType() == AssetType::Prefab)
+					{
+						Ref<Prefab> prefab = asset.As<Prefab>();
+						HL_TRACE("Creating Prefab by drag and drop");
+
+					//	m_EditorScene->Instantiate(prefab);
+					}
+				}
+				else
+				{
+					// Invalid metaData found
+					HL_TRACE("Invalid asset created by drag and drop");
+				}
+			}
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
 	UI::EndViewport();
 
 	m_AssetBrowserPanel->OnUIRender();
 	m_SceneHierarchyPanel->OnUIRender();
 	m_EditorConsolePanel->OnUIRender(&m_ShowConsolePanel);
+	m_ObjectPropertiesPanel->OnUIRender(&m_ShowObjectPropertiesPanel);
+	m_SettingsPanel->OnUIRender(&m_ShowSettingsPanel);
+	m_AnimTimelinePanel->OnUIRender(&m_ShowAnimTimelinePanel);
+	
+	m_ViewportRenderer->OnUIRender();
 
-	// Object Properties Panel
-	UI::BeginViewport("Object Properties");
-	UI::EndViewport();
+	AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
 
 	UI::EndWindow();
-
-	AssetEditorPanel::OnUIRender(timestep);
-
-	// TODO: This breaks
-	//AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
 }
 
 void HighLoEditor::OnResize(uint32 width, uint32 height)
 {
 	m_OverlayCamera.OnWindowResize(width, height);
 	m_EditorCamera.OnWindowResize(width, height);
+	m_ViewportRenderer->SetViewportSize(width, height);
 }
 
-void HighLoEditor::SelectEntity(Entity entity)
+void HighLoEditor::SelectEntity(Entity &entity)
 {
 	if (!entity)
+	{
+		// Invalid entity, de-select everything
+		m_SelectionContext.clear();
+		m_CurrentScene->SetSelectedEntity({});
+		m_ObjectPropertiesPanel->SetSelected({});
 		return;
+	}
 
 	SelectedMesh selection;
 	if (entity.HasComponent<DynamicModelComponent>())
 	{
-		auto meshComp = entity.GetComponent<DynamicModelComponent>();
-		if (meshComp->Model && meshComp->Model->GetAssetType() == AssetType::Mesh)
-		{
-			selection.MeshIndex = meshComp->Model->GetSubmeshIndices()[0];
-		}
+		DynamicModelComponent *meshComp = entity.GetComponent<DynamicModelComponent>();
+		Ref<DynamicModel> model = AssetManager::Get()->GetAsset<DynamicModel>(meshComp->Model);
+		if (model && !model->IsFlagSet(AssetFlag::Missing))
+			selection.Mesh = &model->Get()->GetSubmeshes()[0];
+
+		selection.MeshIndex = meshComp->SubmeshIndex;
+	}
+	else if (entity.HasComponent<StaticModelComponent>())
+	{
+		StaticModelComponent *meshComp = entity.GetComponent<StaticModelComponent>();
+		Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(meshComp->Model);
+		if (model && !model->IsFlagSet(AssetFlag::Missing))
+			selection.Mesh = &model->Get()->GetSubmeshes()[0];
+
+		selection.MeshIndex = 0;
 	}
 
 	selection.Entity = entity;
 	m_SelectionContext.clear();
 	m_SelectionContext.push_back(selection);
 
-	if (m_SceneState == SceneState::Edit)
-	{
-		m_EditorScene->SetSelectedEntity(entity);
-		m_CurrentScene = m_EditorScene;
-	}
-	else if (m_SceneState == SceneState::Simulate)
-	{
-		m_EditorScene->SetSelectedEntity(entity);
-		m_CurrentScene = m_SimulationScene;
-	}
+	m_EditorScene->SetSelectedEntity(entity);
+	m_ObjectPropertiesPanel->SetSelected(entity);
+	m_CurrentScene = m_EditorScene;
 }
 
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
@@ -389,7 +574,7 @@ void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
 void HighLoEditor::NewScene(FileMenu *menu, MenuItem *item)
 {
 	HL_TRACE("NewScene");
-	UpdateWindowTitle("Untitled Scene");
+	UpdateWindowTitle(m_SceneName + " *");
 }
 
 void HighLoEditor::OpenScene(FileMenu *menu, MenuItem *item)
@@ -418,6 +603,8 @@ void HighLoEditor::OpenScene(const HLString &path)
 
 void HighLoEditor::SaveScene(FileMenu *menu, MenuItem *item)
 {
+	m_SceneIsSaved = true;
+
 	if (!m_LastSceneFilePath.IsEmpty())
 	{
 		// Serialize scene
@@ -431,6 +618,8 @@ void HighLoEditor::SaveScene(FileMenu *menu, MenuItem *item)
 void HighLoEditor::SaveSceneAs(FileMenu *menu, MenuItem *item)
 {
 	HL_TRACE("SaveSceneAs");
+	m_SceneIsSaved = true;
+
 	Ref<FileDialogue> fd = FileDialogue::Create();
 	FileDialogueFilter filter;
 	filter.AddFilter("High-Lo Scene file", "*.hl");
@@ -455,31 +644,31 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 					break;
 
 				Entity selectedEntity = m_SelectionContext[0].Entity;
-		//		m_Viewport->Focus(selectedEntity._TransformComponent->Transform.GetPosition());
+				m_EditorCamera.Focus(selectedEntity.Transform().GetPosition());
 				break;
 			}
 
 			case HL_KEY_Q:
 			{
-				m_GizmoType = GizmoType::None;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::None);
 				break;
 			}
 
 			case HL_KEY_W:
 			{
-				m_GizmoType = GizmoType::Translate;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::Translate);
 				break;
 			}
 
 			case HL_KEY_E:
 			{
-				m_GizmoType = GizmoType::Rotate;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::Rotate);
 				break;
 			}
 
 			case HL_KEY_R:
 			{
-				m_GizmoType = GizmoType::Scale;
+				m_GizmoType = editorutils::ConvertToImGuizmoType(GizmoType::Scale);
 				break;
 			}
 		}
@@ -579,6 +768,7 @@ bool HighLoEditor::OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e)
 		&& !UI::IsMouseOverGizmo()
 		&& m_SceneState != SceneState::Play)
 	{
+		HL_CORE_TRACE("Pressed mouse over viewport! User probably wants to select an entity...");
 	}
 
 	return false;
@@ -640,49 +830,71 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 
 		case MENU_ITEM_SETTINGS:
 		{
-			HL_INFO("Open Settings dialog...");
+			m_ShowSettingsPanel = !m_ShowSettingsPanel;
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_CAMERA:
 		{
-			HL_INFO("Creating Camera...");
+			Entity e = m_CurrentScene->CreateEntity("Camera");
+			e.AddComponent<CameraComponent>();
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_CAPSULE:
 		{
-			HL_INFO("Creating Capsule...");
+			Entity e = m_CurrentScene->CreateEntity("Capsule");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_CUBE:
 		{
-			HL_INFO("Creating cube...");
-			break;
-		}
-
-		case MENU_ITEM_ASSET_CREATE_CYLINDER:
-		{
-			HL_INFO("Creating Cylinder...");
-			break;
-		}
-
-		case MENU_ITEM_ASSET_CREATE_FOLDER:
-		{
-			HL_INFO("Creating Folder...");
-			break;
-		}
-
-		case MENU_ITEM_ASSET_CREATE_NULL_OBJECT:
-		{
-			HL_INFO("Creating Null Object...");
+			Entity e = m_CurrentScene->CreateEntity("Cube");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
 		case MENU_ITEM_ASSET_CREATE_SPHERE:
 		{
-			HL_INFO("Creating Sphere");
+			Entity e = m_CurrentScene->CreateEntity("Sphere");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			component->Model = AssetFactory::CreateSphere(4.0f);
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
+			break;
+		}
+
+		case MENU_ITEM_ASSET_CREATE_CYLINDER:
+		{
+			Entity e = m_CurrentScene->CreateEntity("Cylinder");
+			StaticModelComponent *component = e.AddComponent<StaticModelComponent>();
+			// TODO: Add Cylinders to AssetFactory and MeshFactory
+		//	component->Model = AssetFactory::CreateCylinder();
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
+			break;
+		}
+
+		case MENU_ITEM_ASSET_CREATE_FOLDER:
+		{
+			FileSystem::Get()->CreateFolder(Project::GetAssetDirectory() / "New Folder");
+			break;
+		}
+
+		case MENU_ITEM_ASSET_CREATE_NULL_OBJECT:
+		{
+			Entity e = m_CurrentScene->CreateEntity("Null Object");
+			m_CurrentScene->SetSelectedEntity(e);
+			OnEntityAdded(e);
 			break;
 		}
 
@@ -691,22 +903,50 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 			m_ShowConsolePanel = !m_ShowConsolePanel;
 			break;
 		}
+
+		case MENU_ITEM_WINDOW_ASSET_MANAGER:
+		{
+			m_AssetManagerPanelOpen = !m_AssetManagerPanelOpen;
+			break;
+		}
+
+		case MENU_ITEM_WINDOW_ANIM_TIMELINE:
+		{
+			m_ShowAnimTimelinePanel = !m_ShowAnimTimelinePanel;
+			break;
+		}
 	}
 }
 
 void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
 {
 	m_SceneHierarchyPanel->SetSelected(selectionContext.Entity);
+	m_ObjectPropertiesPanel->SetSelected(selectionContext.Entity);
 	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
 }
 
-void HighLoEditor::OnEntityDeleted(Entity e)
+void HighLoEditor::OnEntityAdded(Entity &e)
 {
+	m_SceneIsSaved = false;
+}
+
+void HighLoEditor::OnEntityDeleted(Entity &e)
+{
+	m_SceneIsSaved = false;
+
 	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].Entity == e)
 	{
 		m_SelectionContext.clear();
 		m_EditorScene->SetSelectedEntity({});
+		m_ObjectPropertiesPanel->SetSelected({});
 	}
+}
+
+void HighLoEditor::OnEntityChanged(Entity &e)
+{
+	m_SceneIsSaved = false;
+	m_EditorScene->SetSelectedEntity(e);
+	m_SceneHierarchyPanel->SetSelected(e);
 }
 
 void HighLoEditor::OnScenePlay()
@@ -719,7 +959,7 @@ void HighLoEditor::OnScenePlay()
 
 	// Copy current scene to be able to reset after stop button has been pressed
 	m_RuntimeScene = Ref<Scene>::Create();
-	// m_EditorScene->CopyTo(m_RuntimeScene);
+	m_EditorScene->CopyTo(m_RuntimeScene);
 
 	m_RuntimeScene->OnRuntimeStart();
 	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
@@ -771,7 +1011,8 @@ void HighLoEditor::OnSceneEndSimulation()
 
 float HighLoEditor::GetSnapValue()
 {
-	switch (m_GizmoType)
+	GizmoType type = editorutils::ConvertFromImGuizmoType(m_GizmoType);
+	switch (type)
 	{
 		case GizmoType::Translate:	return 0.5f;
 		case GizmoType::Rotate:		return 45.0f;
@@ -789,5 +1030,6 @@ void HighLoEditor::DeleteEntity(Entity entity)
 
 	m_EditorScene->UnparentEntity(entity);
 	m_EditorScene->DestroyEntity(entity);
+	m_SceneIsSaved = false;
 }
 

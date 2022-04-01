@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/Material.h"
+#include "Engine/Graphics/Material.h"
 #include "Engine/Core/Allocator.h"
 
 #ifdef HIGHLO_API_OPENGL
@@ -16,6 +16,17 @@ namespace highlo
 		virtual ~OpenGLMaterial();
 
 		virtual void Invalidate() override;
+
+		virtual bool Has(const HLString &name) override
+		{
+			const ShaderUniform *decl = FindUniformDeclaration(name);
+			const ShaderUniform *resource = FindUniformDeclaration(name);
+
+			if (!decl || !resource)
+				return false;
+
+			return true;
+		}
 
 		// Setters
 		template<typename T>
@@ -59,7 +70,7 @@ namespace highlo
 
 		virtual void Set(const HLString &name, const Ref<Texture2D> &texture) override;
 		virtual void Set(const HLString &name, const Ref<Texture3D> &texture) override;
-		virtual void Set(const HLString &name, const Ref<Texture2D> &texture, uint32 arrayIndex) override;
+		virtual void Set(const HLString &name, const Ref<Texture2D> &texture, uint32 slot) override;
 
 		// Getters
 		template<typename T>

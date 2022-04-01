@@ -1,7 +1,8 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
+//     - 1.1 (2022-03-24) removed comments
 //     - 1.0 (2021-09-14) initial release
 //
 
@@ -22,88 +23,41 @@ namespace highlo
 		HLAPI HLQueue() {}
 		HLAPI ~HLQueue() {}
 
-		/**
-		 *
-		 * Appends a new item to the Queue.
-		 *
-		 * @param value The Value which should be added to the Queue.
-		 */
 		HLAPI void Enqueue(const T &value)
 		{
 			m_List.Append(value);
 		}
 
-		/**
-		 *
-		 * Removes the last element from the Queue.
-		 *
-		 */
 		HLAPI void Dequeue()
 		{
 			m_List.RemoveFirst();
 		}
 
-		/**
-		 *
-		 * Returns the current element from the Queue.
-		 *
-		 * @return Returns the current element from the Queue.
-		 */
 		HLAPI T Front()
 			{
 			return m_List.GetFirst();
 			}
 
-		/**
-		 *
-		 * Returns true if the Queue is empty.
-		 *
-		 * @return Returns true if the Queue is empty.
-		 */
 		HLAPI bool IsEmpty()
 		{
 			return m_List.IsEmpty();
 		}
 
-		/**
-		 *
-		 * Returns the size of the current Queue.
-		 *
-		 * @return Returns the size of the current Queue.
-		 */
 		HLAPI uint32 Size()
 		{
 			return m_List.Size();
 		}
 
-		/**
-		 *
-		 * Clears the Queue.
-		 *
-		 */
 		HLAPI void Clear()
 		{
 			m_List.Clear();
 		}
 
-		/**
-		 *
-		 * Prints the Queue to the console.
-		 *
-		 */
 		HLAPI void Print()
 		{
 			m_List.Print();
 		}
-
-		/**
-		 *
-		 * Writes the hole Queue into the output stream.
-		 *
-		 * @param stream The stream, which should be filled with the content of the Queue.
-		 * @param queue The Queue, which should be written to the stream.
-		 * @return Returns the stream, which was filled with the content of the Queue.
-		 */
+		
 		HLAPI friend std::ostream &operator<<(std::ostream &stream, HLQueue<T> &queue)
 		{
 			while (!queue.IsEmpty())
@@ -117,3 +71,4 @@ namespace highlo
 		}
 	};
 }
+

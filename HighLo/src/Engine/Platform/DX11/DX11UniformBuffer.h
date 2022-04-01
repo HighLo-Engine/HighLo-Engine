@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Engine/Renderer/Shaders/UniformBuffer.h"
+#include "Engine/Graphics/Shaders/UniformBuffer.h"
 
 #ifdef HIGHLO_API_DX11
 
@@ -21,6 +21,9 @@ namespace highlo
 
 		DX11UniformBuffer(uint32 size, uint32 binding);
 		virtual ~DX11UniformBuffer();
+
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
 
 		virtual void SetData(const void *data, uint32 size, uint32 offset = 0) override;
 		virtual uint32 GetBinding() const override { return m_Binding; }

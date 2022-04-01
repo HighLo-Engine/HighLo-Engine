@@ -1,8 +1,8 @@
-// Copyright (c) 2021 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.1 (2021-10-21) Added Unique reference class (equals std::unique_ptr)
+//     - 1.2 (2021-10-21) Added Unique reference class (equals std::unique_ptr)
 //     - 1.1 (2021-09-22) Added Singleton class
 //     - 1.0 (2021-09-14) initial release
 //

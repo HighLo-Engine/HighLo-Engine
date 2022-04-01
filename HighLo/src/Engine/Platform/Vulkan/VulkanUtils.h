@@ -15,10 +15,22 @@ inline PFN_vkCmdBeginDebugUtilsLabelEXT fpCmdBeginDebugUtilsLabelEXT;
 inline PFN_vkCmdEndDebugUtilsLabelEXT fpCmdEndDebugUtilsLabelEXT;
 inline PFN_vkCmdInsertDebugUtilsLabelEXT fpCmdInsertDebugUtilsLabelEXT;
 
+// We do have a function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
+// it seems that the function is not part of the exported library files
+inline PFN_vkGetQueueCheckpointDataNV fpGetQueueCheckpointDataNV;
+
 namespace highlo::utils
 {
 	inline void LoadDebugExtensions(VkInstance instance)
 	{
+		fpGetQueueCheckpointDataNV = (PFN_vkGetQueueCheckpointDataNV)(vkGetInstanceProcAddr(instance, "vkGetQueueCheckpointDataNV"));
+		if (!fpGetQueueCheckpointDataNV)
+		{
+			fpGetQueueCheckpointDataNV = [](VkQueue queue, uint32 *retrieveCount, VkCheckpointDataNV *data) -> void
+			{
+			};
+		}
+
 		fpSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectNameEXT"));
 		if (!fpSetDebugUtilsObjectNameEXT)
 		{

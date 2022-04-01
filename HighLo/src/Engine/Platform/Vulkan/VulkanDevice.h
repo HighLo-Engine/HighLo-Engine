@@ -12,7 +12,7 @@ namespace highlo
 	{
 	public:
 
-		VulkanDevice();
+		VulkanDevice(const Ref<VulkanPhysicalDevice> &physicalDevice, VkPhysicalDeviceFeatures enabledFeatures);
 		~VulkanDevice();
 
 		void Destroy();

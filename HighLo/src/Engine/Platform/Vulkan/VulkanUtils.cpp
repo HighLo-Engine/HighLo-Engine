@@ -21,7 +21,7 @@ namespace highlo::utils
 				data[i].sType = VK_STRUCTURE_TYPE_CHECKPOINT_DATA_NV;
 
 			uint32 retrievedCount = checkpointCount;
-			vkGetQueueCheckpointDataNV(::highlo::VulkanContext::GetCurrentDevice()->GetGraphicsQueue(), &retrievedCount, data);
+			fpGetQueueCheckpointDataNV(::highlo::VulkanContext::GetCurrentDevice()->GetGraphicsQueue(), &retrievedCount, data);
 			HL_CORE_ERROR("RetrieveDiagnosticCheckpoints (Graphics Queue):");
 			for (uint32 i = 0; i < retrievedCount; ++i)
 			{
@@ -36,7 +36,7 @@ namespace highlo::utils
 				data[i].sType = VK_STRUCTURE_TYPE_CHECKPOINT_DATA_NV;
 
 			uint32 retrievedCount = checkpointCount;
-			vkGetQueueCheckpointDataNV(::highlo::VulkanContext::GetCurrentDevice()->GetComputeQueue(), &retrievedCount, data);
+			fpGetQueueCheckpointDataNV(::highlo::VulkanContext::GetCurrentDevice()->GetComputeQueue(), &retrievedCount, data);
 			HL_CORE_ERROR("RetrieveDiagnosticCheckpoints (Compute Queue):");
 			for (uint32 i = 0; i < retrievedCount; ++i)
 			{

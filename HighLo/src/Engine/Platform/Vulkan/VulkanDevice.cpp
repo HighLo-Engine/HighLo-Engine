@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-    VulkanDevice::VulkanDevice()
+    VulkanDevice::VulkanDevice(const Ref<VulkanPhysicalDevice> &physicalDevice, VkPhysicalDeviceFeatures enabledFeatures)
     {
     }
 

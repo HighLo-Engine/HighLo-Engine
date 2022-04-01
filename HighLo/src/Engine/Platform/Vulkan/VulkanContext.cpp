@@ -5,8 +5,12 @@
 
 namespace highlo
 {
+    VulkanContext::VulkanContext()
+    {
+    }
+    
     VulkanContext::VulkanContext(void *handle, WindowData &data)
-        : m_VulkanWindowHandle(handle)
+        : m_VulkanWindowHandle(handle), m_WindowData(data)
     {
     }
 

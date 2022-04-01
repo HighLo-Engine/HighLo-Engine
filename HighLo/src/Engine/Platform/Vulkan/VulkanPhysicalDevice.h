@@ -36,6 +36,11 @@ namespace highlo
 
 	private:
 
+		VkFormat FindDepthFormat() const;
+		QueueFamilyIndices GetQueueFamilyIndices(int32 queueFlags);
+
+	private:
+
 		QueueFamilyIndices m_QueueFamilyIndices;
 
 		VkPhysicalDevice m_PhysicalDevice = nullptr;

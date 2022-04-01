@@ -1,7 +1,7 @@
 #include "HighLoPch.h"
 #include "VulkanContext.h"
 
-#define VULKAN_CONTEXT_LOG_PREFIX "        Context>"
+#define VULKAN_CONTEXT_LOG_PREFIX "Context>      "
 #define VK_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
 
 #ifdef HIGHLO_API_VULKAN
@@ -100,7 +100,7 @@ namespace highlo
     
     void VulkanContext::Init()
     {
-        HL_CORE_INFO(VULKAN_CONTEXT_LOG_PREFIX "[+]  [+]");
+        HL_CORE_INFO(VULKAN_CONTEXT_LOG_PREFIX "[+] VulkanContext::Init [+]");
         
     #ifdef HIGHLO_API_GLFW
         HL_ASSERT(glfwVulkanSupported(), "GLFW must support Vulkan!");

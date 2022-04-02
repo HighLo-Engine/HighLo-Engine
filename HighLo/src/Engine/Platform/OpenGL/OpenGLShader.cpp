@@ -15,7 +15,7 @@
 namespace highlo
 {
 #define PRINT_SHADERS 0
-#define PRINT_DEBUG_OUTPUTS 0
+#define PRINT_DEBUG_OUTPUTS 1
 #define GL_SHADER_LOG_PREFIX "Shader>       "
 
 	namespace utils
@@ -149,6 +149,8 @@ namespace highlo
 	void OpenGLShader::Reload(bool forceCompile)
 	{
 		HL_CORE_TRACE("Reloading shader {0}...", **m_AssetPath);
+		m_Loaded = false; // Reflect current stage: Shader is being reloaded
+
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 
@@ -366,6 +368,7 @@ namespace highlo
 			ReflectAllShaderStages(shaderData);
 
 			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
+			m_Loaded = true;
 		}
 		else
 		{
@@ -375,10 +378,10 @@ namespace highlo
 	
 	void OpenGLShader::Reflect(GLenum stage, std::vector<uint32> &data)
 	{
+		glUseProgram(m_RendererID);
+
 		spirv_cross::Compiler compiler(data);
 		spirv_cross::ShaderResources res = compiler.get_shader_resources();
-
-		glUseProgram(m_RendererID);
 
 		// Uniform Buffers
 
@@ -495,7 +498,14 @@ namespace highlo
 			if (location == -1)
 			{
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not find uniform location for {0} [-]", *name);
+				// TODO: Re-Add this assert after error is fixed
 			//	HL_ASSERT(false);
+			}
+			else
+			{
+			#if PRINT_DEBUG_OUTPUTS
+				HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] Uniform location found for {0}. [+]", *name);
+			#endif // PRINT_DEBUG_OUTPUTS
 			}
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
@@ -539,6 +549,16 @@ namespace highlo
 					fread(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
 					fclose(f);
 				}
+				else
+				{
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not read cache file {0}. [-]", **path);
+				}
+			}
+			else
+			{
+			#if PRINT_DEBUG_OUTPUTS
+				HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] Force-compiling shader {0}. [+]", *m_Name);
+			#endif // PRINT_DEBUG_OUTPUTS
 			}
 
 			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()))
@@ -579,7 +599,7 @@ namespace highlo
 				}
 				else
 				{
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write into cache path {0} [-]", *path.String());
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write into cache file {0} [-]", *path.String());
 				}
 			}
 		}
@@ -718,7 +738,7 @@ namespace highlo
 				if (location != -1)
 				{
 				#if PRINT_DEBUG_OUTPUTS
-					HL_CORE_INFO("Registering Uniform {0} at location {1}", *name, location);
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Registering Uniform {0} at location {1} [+]", *name, location);
 				#endif // PRINT_DEBUG_OUTPUTS
 
 					m_UniformLocations[name] = location;
@@ -748,17 +768,48 @@ namespace highlo
 			if (line.find("#shader") != std::string::npos)
 			{
 				if (line.find("vertex") != std::string::npos)
+				{
 					type = GL_VERTEX_SHADER;
+				#if PRINT_DEBUG_OUTPUTS
+					HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] {0} is a Vertex Shader. [+]", *m_Name);
+				#endif // PRINT_DEBUG_OUTPUTS
+				}
 				else if (line.find("tess_control") != std::string::npos)
+				{
 					type = GL_TESS_CONTROL_SHADER;
+				#if PRINT_DEBUG_OUTPUTS
+					HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] {0} is a Tesselation Control Shader. [+]", *m_Name);
+				#endif // PRINT_DEBUG_OUTPUTS
+				}
 				else if (line.find("tess_eval") != std::string::npos)
+				{
 					type = GL_TESS_EVALUATION_SHADER;
+				#if PRINT_DEBUG_OUTPUTS
+					HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] {0} is a Tesselation evaluation Shader. [+]", *m_Name);
+				#endif // PRINT_DEBUG_OUTPUTS
+				}
 				else if (line.find("geometry") != std::string::npos)
+				{
 					type = GL_GEOMETRY_SHADER;
+				#if PRINT_DEBUG_OUTPUTS
+					HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] {0} is a Geometry Shader. [+]", *m_Name);
+				#endif // PRINT_DEBUG_OUTPUTS
+				}
 				else if (line.find("pixel") != std::string::npos || line.find("fragment") != std::string::npos)
+				{
 					type = GL_FRAGMENT_SHADER;
+				#if PRINT_DEBUG_OUTPUTS
+					HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] {0} is a Fragment Shader. [+]", *m_Name);
+				#endif // PRINT_DEBUG_OUTPUTS
+				}
 				else if (line.find("compute") != std::string::npos)
+				{
 					type = GL_COMPUTE_SHADER;
+					m_IsCompute = true;
+				#if PRINT_DEBUG_OUTPUTS
+					HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] {0} is a Compute Shader. [+]", *m_Name);
+				#endif // PRINT_DEBUG_OUTPUTS
+				}
 			}
 			else
 			{
@@ -832,7 +883,7 @@ namespace highlo
 				HLString uniformName = fmt::format("{}.{}", *name, *memberName);
 
 			#if PRINT_DEBUG_OUTPUTS
-				HL_CORE_INFO("Registering push_constant with uniform name {0}", *uniformName);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Registering push_constant with uniform name {0} [+]", *uniformName);
 			#endif // PRINT_DEBUG_OUTPUTS
 
 				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);

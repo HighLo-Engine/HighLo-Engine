@@ -47,7 +47,7 @@ namespace highlo
 
 		OpenGLShader(const FileSystemPath &filePath, bool forceCompile);
 		OpenGLShader(const HLString &source);
-		~OpenGLShader();
+		virtual ~OpenGLShader();
 
 		// Inherited via Shader
 		virtual void Reload(bool forceCompile = false) override;

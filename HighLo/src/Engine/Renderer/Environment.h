@@ -12,6 +12,13 @@
 
 namespace highlo
 {
+	enum class EnvironmentType
+	{
+		None	 = 0,
+		Preetham = 1,
+		HDR		 = 2
+	};
+
 	class Environment : public Asset
 	{
 	public:
@@ -29,6 +36,9 @@ namespace highlo
 		HLAPI inline void SetRadianceMap(const Ref<Texture3D> &texture) { m_RadianceMap = texture; }
 		HLAPI inline void SetIrradianceMap(const Ref<Texture3D> &texture) { m_IrradianceMap = texture; }
 
+		HLAPI inline EnvironmentType GetType() const { return m_Type; }
+
+		// Inherited from Asset
 		HLAPI static AssetType GetStaticType() { return AssetType::EnvMap; }
 		HLAPI virtual AssetType GetAssetType() const { return GetStaticType(); }
 
@@ -36,10 +46,11 @@ namespace highlo
 
 	private:
 
-		Ref<Texture3D> m_SkyboxTexture = nullptr;	// unfiltered radiance map
-		Ref<Texture3D> m_RadianceMap = nullptr;		// filtered radiance map
-		Ref<Texture3D> m_IrradianceMap = nullptr;	// irradiance map
-		Ref<Texture2D> m_BRDFMap = nullptr;			// BRDF map
-		FileSystemPath m_FilePath;					// FilePath if HDR texture was loaded, NULL if preetham sky was created
+		Ref<Texture3D> m_SkyboxTexture = nullptr;		// unfiltered radiance map
+		Ref<Texture3D> m_RadianceMap = nullptr;			// filtered radiance map
+		Ref<Texture3D> m_IrradianceMap = nullptr;		// irradiance map
+		Ref<Texture2D> m_BRDFMap = nullptr;				// BRDF map
+		FileSystemPath m_FilePath;						// FilePath if HDR texture was loaded, NULL if preetham sky was created
+		EnvironmentType m_Type = EnvironmentType::None; // Determines the type of the current environment instance
 	};
 }

@@ -12,6 +12,7 @@ namespace highlo
 		m_SkyboxTexture = skyboxTexture;
 		m_RadianceMap = radianceMap;
 		m_IrradianceMap = irradianceMap;
+		m_Type = EnvironmentType::Preetham;
 		m_BRDFMap = Renderer::GetBRDFLutTexture();
 	}
 
@@ -21,6 +22,7 @@ namespace highlo
 		m_SkyboxTexture = skyboxTexture;
 		m_RadianceMap = radianceMap;
 		m_IrradianceMap = irradianceMap;
+		m_Type = EnvironmentType::HDR;
 		m_BRDFMap = Renderer::GetBRDFLutTexture();
 	}
 

@@ -6,6 +6,17 @@
 //     - 1.0 (2021-09-14) initial release
 //
 
+/**
+ * 
+ * Idea for this file (@FlareCoding):
+ * I like the idea of having a default-shape renderer, so maybe we could rewrite this?
+ * In the current state this class would have to get a RenderPass as the render target
+ * and then it would have to render the hole meshes into the RenderPass instead.
+ * 
+ * The rest could stay the same.
+ * 
+ */
+
 #pragma once
 
 #if 0

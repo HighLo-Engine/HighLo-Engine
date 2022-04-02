@@ -31,7 +31,7 @@ class HighLoEditor : public HLApplication
 
 		void SelectEntity(Entity &entity);
 
-		void UpdateWindowTitle(const HLString &sceneName);
+		void UpdateWindowTitle(const HLString &sceneName, bool sceneIsSaved = true);
 		void NewScene(FileMenu *menu, MenuItem *item);
 		void OpenScene(FileMenu *menu, MenuItem *item);
 		void OpenScene(const HLString &path);

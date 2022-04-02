@@ -15,14 +15,6 @@ namespace highlo
     {
     }
     
-    void VulkanVertexArray::Bind() const
-    {
-    }
-    
-    void VulkanVertexArray::Unbind() const
-    {
-    }
-    
     void VulkanVertexArray::Invalidate()
     {
     }

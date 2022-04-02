@@ -50,7 +50,7 @@ namespace highlo
 
 		VkPipelineLayout m_PipelineLayout;
 		VkPipeline m_Pipeline;
-		ShaderMaterialDescriptorSet m_Descriptors;
+		VulkanShaderMaterialDescriptorSet m_Descriptors;
 	};
 }
 

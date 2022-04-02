@@ -7,13 +7,13 @@
 
 namespace highlo
 {
-	struct ShaderMaterialDescriptorSet
+	struct VulkanShaderMaterialDescriptorSet
 	{
 		VkDescriptorPool Pool = nullptr;
 		std::vector<VkDescriptorSet> Descriptors;
 	};
 
-	struct ShaderUniformBuffer
+	struct VulkanShaderUniformBuffer
 	{
 		VkDescriptorBufferInfo Descriptor;
 		uint32 Size = 0;
@@ -22,7 +22,7 @@ namespace highlo
 		VkShaderStageFlagBits Stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
 	};
 
-	struct ShaderStorageBuffer
+	struct VulkanShaderStorageBuffer
 	{
 		VkDescriptorBufferInfo Descriptor;
 		uint32 Size = 0;
@@ -32,7 +32,7 @@ namespace highlo
 		VkShaderStageFlagBits Stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
 	};
 
-	struct ShaderImageSampler
+	struct VulkanShaderImageSampler
 	{
 		uint32 BindingPoint = 0;
 		uint32 DescriptorSet = 0;
@@ -41,21 +41,21 @@ namespace highlo
 		VkShaderStageFlagBits Stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
 	};
 
-	struct ShaderPushConstantRange
+	struct VulkanShaderPushConstantRange
 	{
 		uint32 Offset = 0;
 		uint32 Size = 0;
 		VkShaderStageFlagBits Stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
 	};
 
-	struct ShaderDescriptorSet
+	struct VulkanShaderDescriptorSet
 	{
-		std::unordered_map<uint32, ShaderUniformBuffer*> UniformBuffers;
-		std::unordered_map<uint32, ShaderStorageBuffer*> StorageBuffers;
-		std::unordered_map<uint32, ShaderImageSampler> ImageSamplers;
-		std::unordered_map<uint32, ShaderImageSampler> StorageImages;
-		std::unordered_map<uint32, ShaderImageSampler> SeparateTextures;
-		std::unordered_map<uint32, ShaderImageSampler> SeparateSamplers;
+		std::unordered_map<uint32, VulkanShaderUniformBuffer*> UniformBuffers;
+		std::unordered_map<uint32, VulkanShaderStorageBuffer*> StorageBuffers;
+		std::unordered_map<uint32, VulkanShaderImageSampler> ImageSamplers;
+		std::unordered_map<uint32, VulkanShaderImageSampler> StorageImages;
+		std::unordered_map<uint32, VulkanShaderImageSampler> SeparateTextures;
+		std::unordered_map<uint32, VulkanShaderImageSampler> SeparateSamplers;
 
 		std::unordered_map<HLString, VkWriteDescriptorSet> WriteDescriptorSets;
 

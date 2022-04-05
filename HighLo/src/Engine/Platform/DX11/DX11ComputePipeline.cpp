@@ -7,7 +7,7 @@
 
 namespace highlo
 {
-	DX11ComputePipeline::DX11ComputePipeline(Ref<Shader> computeShader)
+	DX11ComputePipeline::DX11ComputePipeline(const Ref<Shader> &computeShader)
 		: m_Shader(computeShader)
 	{
 		Invalidate();
@@ -17,7 +17,7 @@ namespace highlo
 	{
 	}
 	
-	void DX11ComputePipeline::Begin(Ref<CommandBuffer> renderCommandBuffer)
+	void DX11ComputePipeline::Begin(const Ref<CommandBuffer> &renderCommandBuffer)
 	{
 	}
 	

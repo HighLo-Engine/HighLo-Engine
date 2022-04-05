@@ -17,7 +17,7 @@ namespace highlo
 	{
 	}
 
-	void OpenGLComputePipeline::Begin(Ref<CommandBuffer> renderCommandBuffer)
+	void OpenGLComputePipeline::Begin(const Ref<CommandBuffer> &renderCommandBuffer)
 	{
 	}
 

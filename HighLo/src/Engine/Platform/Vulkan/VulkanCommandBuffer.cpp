@@ -243,6 +243,7 @@ namespace highlo
     
     const PipelineStatistics &VulkanCommandBuffer::GetPipelineStatistics(uint32 frameIndex) const
     {
+        HL_ASSERT(frameIndex < m_PipelineStatisticsQueryResults.size());
         return m_PipelineStatisticsQueryResults[frameIndex];
     }
 }

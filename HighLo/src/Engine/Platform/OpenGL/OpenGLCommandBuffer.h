@@ -18,14 +18,17 @@ namespace highlo
 		virtual void End() override;
 		virtual void Submit() override;
 
-		virtual float GetCPUExecutionTime(uint32 frameIndex, uint32 queryIndex = 0) const override;
+		virtual float GetExecutionGPUTime(uint32 frameIndex, uint32 queryIndex = 0) const override;
 
-		virtual uint64 BeginTimestampQuery() override;
-		virtual void EndTimestampQuery(uint64 queryID) override;
+		virtual uint32 BeginTimestampQuery() override;
+		virtual void EndTimestampQuery(uint32 queryID) override;
+
+		virtual const PipelineStatistics &GetPipelineStatistics(uint32 frameIndex) const override;
 
 	private:
 
 		HLString m_DebugName;
+		std::vector<PipelineStatistics> m_PipelineStatisticsQueryResults;
 	};
 }
 

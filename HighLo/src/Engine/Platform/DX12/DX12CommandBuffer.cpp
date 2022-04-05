@@ -33,18 +33,24 @@ namespace highlo
 	{
 	}
 
-	float DX12CommandBuffer::GetCPUExecutionTime(uint32 frameIndex, uint32 queryIndex) const
+	float DX12CommandBuffer::GetExecutionGPUTime(uint32 frameIndex, uint32 queryIndex) const
 	{
 		return 0.0f;
 	}
 
-	uint64 DX12CommandBuffer::BeginTimestampQuery()
+	uint32 DX12CommandBuffer::BeginTimestampQuery()
 	{
-		return uint64();
+		return 0;
 	}
 
-	void DX12CommandBuffer::EndTimestampQuery(uint64 queryID)
+	void DX12CommandBuffer::EndTimestampQuery(uint32 queryID)
 	{
+	}
+	
+	const PipelineStatistics &DX12CommandBuffer::GetPipelineStatistics(uint32 frameIndex) const
+	{
+		HL_ASSERT(frameIndex < m_PipelineStatisticsQueryResults.size());
+		return m_PipelineStatisticsQueryResults[frameIndex];
 	}
 }
 

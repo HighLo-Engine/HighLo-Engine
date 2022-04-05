@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Engine/Graphics/Device.h"
+#include "Engine/Graphics/PhysicalDevice.h"
+
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
@@ -8,14 +11,17 @@
 
 namespace highlo
 {
-	class VulkanDevice : public IsSharedReference
+	class VulkanDevice : public Device
 	{
 	public:
 
-		VulkanDevice(const Ref<VulkanPhysicalDevice> &physicalDevice, VkPhysicalDeviceFeatures enabledFeatures);
-		~VulkanDevice();
+		VulkanDevice(const Ref<PhysicalDevice> &physicalDevice);
+		virtual ~VulkanDevice();
 
-		void Destroy();
+		virtual void Destroy() override;
+
+		// Vulkan-specific
+		void InitDevice(VkPhysicalDeviceFeatures enabledFeatures);
 
 		VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
 		VkQueue GetComputeQueue() { return m_ComputeQueue; }

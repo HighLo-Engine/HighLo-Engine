@@ -10,10 +10,27 @@
 #include "VulkanDevice.h"
 #include "VulkanContext.h"
 
+// Macro to get a procedure address based on a vulkan instance
+#define GET_INSTANCE_PROC_ADDR(inst, entrypoint)                        \
+{                                                                       \
+	fp##entrypoint = reinterpret_cast<PFN_vk##entrypoint>(vkGetInstanceProcAddr(inst, "vk"#entrypoint)); \
+	HL_ASSERT(fp##entrypoint);                                     \
+}
+
+// Macro to get a procedure address based on a vulkan device
+#define GET_DEVICE_PROC_ADDR(dev, entrypoint)                           \
+{                                                                       \
+	fp##entrypoint = reinterpret_cast<PFN_vk##entrypoint>(vkGetDeviceProcAddr(dev, "vk"#entrypoint));   \
+	HL_ASSERT(fp##entrypoint);                                     \
+}
+
+
 inline PFN_vkSetDebugUtilsObjectNameEXT fpSetDebugUtilsObjectNameEXT;
 inline PFN_vkCmdBeginDebugUtilsLabelEXT fpCmdBeginDebugUtilsLabelEXT;
 inline PFN_vkCmdEndDebugUtilsLabelEXT fpCmdEndDebugUtilsLabelEXT;
 inline PFN_vkCmdInsertDebugUtilsLabelEXT fpCmdInsertDebugUtilsLabelEXT;
+
+inline PFN_vkCmdSetCheckpointNV fpCmdSetCheckpointNV;
 
 // We do have a function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
 // it seems that the function is not part of the exported library files
@@ -61,6 +78,15 @@ namespace highlo::utils
 		{
 			fpCmdInsertDebugUtilsLabelEXT = [](VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT *pLabelInfo)
 			{
+			};
+		}
+
+		fpCmdSetCheckpointNV = (PFN_vkCmdSetCheckpointNV)(vkGetInstanceProcAddr(instance, "vkCmdSetCheckpointNV"));
+		if (!fpCmdSetCheckpointNV)
+		{
+			fpCmdSetCheckpointNV = [](VkCommandBuffer commandBuffer, const void *marker)
+			{
+
 			};
 		}
 	}
@@ -221,7 +247,7 @@ namespace highlo::utils
 	static void InitAllocator(const Ref<VulkanDevice> &device)
 	{
 		s_VulkanAllocationData = new VulkanAllocationData();
-		
+
 		VmaAllocatorCreateInfo allocCreateInfo = {};
 		allocCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
 		allocCreateInfo.device = device->GetNativeDevice();
@@ -239,11 +265,6 @@ namespace highlo::utils
 		s_VulkanAllocationData = nullptr;
 	}
 
-	static VmaAllocator GetVMAAllocator()
-	{
-		return s_VulkanAllocationData->Allocator;
-	}
-
 	static void FreeAllocation(VmaAllocation allocation)
 	{
 		vmaFreeMemory(s_VulkanAllocationData->Allocator, allocation);
@@ -253,6 +274,8 @@ namespace highlo::utils
 	{
 		VmaAllocationCreateInfo allocCreateInfo = {};
 		allocCreateInfo.usage = usage;
+
+		HL_ASSERT(s_VulkanAllocationData);
 
 		VmaAllocation allocation;
 		vmaCreateBuffer(s_VulkanAllocationData->Allocator, &createInfo, &allocCreateInfo, &outBuffer, &allocation, nullptr);
@@ -277,6 +300,8 @@ namespace highlo::utils
 	{
 		VmaAllocationCreateInfo allocCreateInfo = {};
 		allocCreateInfo.usage = usage;
+
+		HL_ASSERT(s_VulkanAllocationData);
 
 		VmaAllocation allocation;
 		vmaCreateImage(s_VulkanAllocationData->Allocator, &createInfo, &allocCreateInfo, &outImage, &allocation, nullptr);

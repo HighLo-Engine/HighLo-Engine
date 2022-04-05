@@ -180,11 +180,6 @@ namespace highlo
         HL_ASSERT(false, "Could not find a suitable memory type!");
         return UINT32_MAX;
     }
-    
-    Ref<VulkanPhysicalDevice> VulkanPhysicalDevice::Create()
-    {
-        return Ref<VulkanPhysicalDevice>::Create();
-    }
 
     // Since all depth formats may be optional, we need to find a suitable depth format to use
     VkFormat VulkanPhysicalDevice::FindDepthFormat() const

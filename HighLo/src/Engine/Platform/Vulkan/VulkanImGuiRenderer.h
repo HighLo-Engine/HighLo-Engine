@@ -4,6 +4,8 @@
 
 #ifdef HIGHLO_API_VULKAN
 
+#include <vulkan/vulkan.h>
+
 namespace highlo
 {
 	class VulkanImGuiRenderer : public ImGuiRenderer

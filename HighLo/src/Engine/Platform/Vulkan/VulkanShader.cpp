@@ -34,6 +34,35 @@ namespace highlo
     {
         m_ReloadedCallbacks.push_back(callback);
     }
+    
+    void VulkanShader::ClearUniformBuffers()
+    {
+    }
+
+    std::vector<VkDescriptorSetLayout> VulkanShader::GetAllDescriptorSetLayouts()
+    {
+        return std::vector<VkDescriptorSetLayout>();
+    }
+    
+    VulkanShaderDescriptorSet VulkanShader::AllocateDescriptorSet(uint32 set)
+    {
+        return VulkanShaderDescriptorSet();
+    }
+    
+    VulkanShaderDescriptorSet VulkanShader::CreateDescriptorSets(uint32 set)
+    {
+        return VulkanShaderDescriptorSet();
+    }
+    
+    VulkanShaderDescriptorSet VulkanShader::CreateDescriptorSets(uint32 set, uint32 numberOfSets)
+    {
+        return VulkanShaderDescriptorSet();
+    }
+    
+    const VkWriteDescriptorSet *VulkanShader::GetDescriptorSet(const HLString &name, uint32 set) const
+    {
+        return nullptr;
+    }
 }
 
 #endif // HIGHLO_API_VULKAN

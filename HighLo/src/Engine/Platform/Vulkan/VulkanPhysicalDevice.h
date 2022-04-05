@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Engine/Graphics/PhysicalDevice.h"
+
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
@@ -13,14 +15,14 @@ namespace highlo
 		int32 Compute = -1;
 	};
 
-	class VulkanPhysicalDevice : public IsSharedReference
+	class VulkanPhysicalDevice : public PhysicalDevice
 	{
 	public:
 
 		VulkanPhysicalDevice();
-		~VulkanPhysicalDevice();
+		virtual ~VulkanPhysicalDevice();
 
-		bool IsExtensionSupported(const HLString &name) const { return m_SupportedExtensions.find(name) != m_SupportedExtensions.end(); }
+		virtual bool IsExtensionSupported(const HLString &name) const override { return m_SupportedExtensions.find(name) != m_SupportedExtensions.end(); }
 		uint32 GetMemoryTypeIndex(uint32 typeBits, VkMemoryPropertyFlags properties) const;
 
 		VkPhysicalDevice GetNativeDevice() const { return m_PhysicalDevice; }
@@ -31,8 +33,6 @@ namespace highlo
 		const VkPhysicalDeviceMemoryProperties &GetMemoryProperties() const { return m_MemoryProperties; }
 
 		VkFormat GetDepthFormat() const { return m_DepthFormat; }
-
-		static Ref<VulkanPhysicalDevice> Create();
 
 	private:
 

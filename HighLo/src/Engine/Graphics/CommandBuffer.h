@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "PipelineStatistics.h"
+
 namespace highlo
 {
 	class CommandBuffer : public IsSharedReference
@@ -20,10 +22,12 @@ namespace highlo
 		HLAPI virtual void End() = 0;
 		HLAPI virtual void Submit() = 0;
 
-		HLAPI virtual float GetCPUExecutionTime(uint32 frameIndex, uint32 queryIndex = 0) const = 0;
+		HLAPI virtual float GetExecutionGPUTime(uint32 frameIndex, uint32 queryIndex = 0) const = 0;
 
-		HLAPI virtual uint64 BeginTimestampQuery() = 0;
-		HLAPI virtual void EndTimestampQuery(uint64 queryID) = 0;
+		HLAPI virtual uint32 BeginTimestampQuery() = 0;
+		HLAPI virtual void EndTimestampQuery(uint32 queryID) = 0;
+
+		HLAPI virtual const PipelineStatistics &GetPipelineStatistics(uint32 frameIndex) const = 0;
 
 		HLAPI static Ref<CommandBuffer> Create(const HLString &debugName = "", uint32 count = 0);
 		HLAPI static Ref<CommandBuffer> CreateFromSwapChain(const HLString &debugName = "");

@@ -7,13 +7,32 @@
 
 namespace highlo
 {
-    VulkanDevice::VulkanDevice(const Ref<VulkanPhysicalDevice> &physicalDevice, VkPhysicalDeviceFeatures enabledFeatures)
-        : m_PhysicalDevice(physicalDevice), m_EnabledFeatures(enabledFeatures)
+    VulkanDevice::VulkanDevice(const Ref<PhysicalDevice> &physicalDevice)
+        : m_PhysicalDevice(physicalDevice.As<VulkanPhysicalDevice>())
     {
+    }
+
+    VulkanDevice::~VulkanDevice()
+    {
+    }
+    
+    void VulkanDevice::Destroy()
+    {
+        vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+        vkDestroyCommandPool(m_Device, m_ComputeCommandPool, nullptr);
+
+        vkDeviceWaitIdle(m_Device);
+        vkDestroyDevice(m_Device, nullptr);
+    }
+
+    void VulkanDevice::InitDevice(VkPhysicalDeviceFeatures enabledFeatures)
+    {
+        m_EnabledFeatures = enabledFeatures;
+
         const bool enableAftermath = true;
 
         // Do we need to enable any other extensions (eg. NV_RAYTRACING?)
-        std::vector<const char*> deviceExtensions;
+        std::vector<const char *> deviceExtensions;
         // If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
         HL_ASSERT(m_PhysicalDevice->IsExtensionSupported(VK_KHR_SWAPCHAIN_EXTENSION_NAME));
         deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -24,8 +43,8 @@ namespace highlo
             deviceExtensions.push_back(VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME);
 
         VkDeviceDiagnosticsConfigCreateInfoNV aftermathInfo = {};
-        bool canEnableAftermath = enableAftermath 
-            && m_PhysicalDevice->IsExtensionSupported(VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME) 
+        bool canEnableAftermath = enableAftermath
+            && m_PhysicalDevice->IsExtensionSupported(VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME)
             && m_PhysicalDevice->IsExtensionSupported(VK_NV_DEVICE_DIAGNOSTICS_CONFIG_EXTENSION_NAME);
 
         if (canEnableAftermath)
@@ -43,8 +62,8 @@ namespace highlo
 
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        deviceCreateInfo.queueCreateInfoCount = static_cast<uint32>(physicalDevice->m_QueueCreateInfos.size());;
-        deviceCreateInfo.pQueueCreateInfos = physicalDevice->m_QueueCreateInfos.data();
+        deviceCreateInfo.queueCreateInfoCount = static_cast<uint32>(m_PhysicalDevice->m_QueueCreateInfos.size());;
+        deviceCreateInfo.pQueueCreateInfos = m_PhysicalDevice->m_QueueCreateInfos.data();
         deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
         if (canEnableAftermath)
             deviceCreateInfo.pNext = &aftermathInfo;
@@ -77,19 +96,6 @@ namespace highlo
         // Get a graphics queue from the device
         vkGetDeviceQueue(m_Device, m_PhysicalDevice->m_QueueFamilyIndices.Graphics, 0, &m_GraphicsQueue);
         vkGetDeviceQueue(m_Device, m_PhysicalDevice->m_QueueFamilyIndices.Compute, 0, &m_ComputeQueue);
-    }
-
-    VulkanDevice::~VulkanDevice()
-    {
-    }
-    
-    void VulkanDevice::Destroy()
-    {
-        vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
-        vkDestroyCommandPool(m_Device, m_ComputeCommandPool, nullptr);
-
-        vkDeviceWaitIdle(m_Device);
-        vkDestroyDevice(m_Device, nullptr);
     }
     
     VkCommandBuffer VulkanDevice::CreateCommandBuffer(bool begin, bool compute)

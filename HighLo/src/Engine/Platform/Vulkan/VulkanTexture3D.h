@@ -4,6 +4,9 @@
 
 #ifdef HIGHLO_API_VULKAN
 
+#include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
+
 namespace highlo
 {
 	class VulkanTexture3D : public Texture3D

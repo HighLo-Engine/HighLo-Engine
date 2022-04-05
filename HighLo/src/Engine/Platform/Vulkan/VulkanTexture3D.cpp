@@ -3,6 +3,8 @@
 
 #ifdef HIGHLO_API_VULKAN
 
+#include "VulkanUtils.h"
+
 namespace highlo
 {
     VulkanTexture3D::VulkanTexture3D(const FileSystemPath &filePath, bool flipOnLoad)

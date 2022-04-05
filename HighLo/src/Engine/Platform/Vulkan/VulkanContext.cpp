@@ -196,7 +196,8 @@ namespace highlo
             VK_CHECK_RESULT(vkCreateDebugUtilsMessengerEXT(s_VulkanInstance, &debugUtilsCreateInfo, nullptr, &m_DebugUtilsMessenger));
         }
 
-        m_PhysicalDevice = VulkanPhysicalDevice::Create();
+        Ref<PhysicalDevice> physicalDevice = PhysicalDevice::Create();
+        m_PhysicalDevice = physicalDevice.As<VulkanPhysicalDevice>();
 
         VkPhysicalDeviceFeatures enabledFeatures = {};
         enabledFeatures.samplerAnisotropy = true;
@@ -204,31 +205,41 @@ namespace highlo
         enabledFeatures.fillModeNonSolid = true;
         enabledFeatures.independentBlend = true;
         enabledFeatures.pipelineStatisticsQuery = true;
-        m_Device = Ref<VulkanDevice>::Create(m_PhysicalDevice, enabledFeatures);
+        
+        // TODO: If we move the enabled Features into the physical device,
+        // we can delete this InitDevice function entirely and move its content into the constructor
+        Ref<Device> device = Device::Create(physicalDevice);
+        m_Device = device.As<VulkanDevice>();
 
-        utils::InitAllocator(m_Device);
+        m_Device->InitDevice(enabledFeatures);
 
         // Pipeline cache
         VkPipelineCacheCreateInfo pipelineCreate = {};
         pipelineCreate.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
         VK_CHECK_RESULT(vkCreatePipelineCache(m_Device->GetNativeDevice(), &pipelineCreate, nullptr, &m_PipelineCache));
+
+        utils::InitAllocator(m_Device);
     }
     
     // All of this below is handled by the SwapChain implementation
     void VulkanContext::SwapBuffers()
     {
+        // TODO
     }
     
     void VulkanContext::MakeCurrent()
     {
+        // TODO
     }
     
     void VulkanContext::SetSwapInterval(bool bEnabled)
     {
+        // TODO
     }
     
     void *VulkanContext::GetCurrentContext()
     {
+        // TODO
         return nullptr;
     }
 }

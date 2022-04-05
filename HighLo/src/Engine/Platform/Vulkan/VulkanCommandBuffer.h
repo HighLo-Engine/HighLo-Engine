@@ -4,6 +4,8 @@
 
 #ifdef HIGHLO_API_VULKAN
 
+#include <vulkan/vulkan.h>
+
 namespace highlo
 {
 	class VulkanCommandBuffer : public CommandBuffer
@@ -18,14 +20,37 @@ namespace highlo
 		virtual void End() override;
 		virtual void Submit() override;
 
-		virtual float GetCPUExecutionTime(uint32 frameIndex, uint32 queryIndex = 0) const override;
+		virtual float GetExecutionGPUTime(uint32 frameIndex, uint32 queryIndex = 0) const override;
 
-		virtual uint64 BeginTimestampQuery() override;
-		virtual void EndTimestampQuery(uint64 queryID) override;
+		virtual uint32 BeginTimestampQuery() override;
+		virtual void EndTimestampQuery(uint32 queryID) override;
+
+		virtual const PipelineStatistics &GetPipelineStatistics(uint32 frameIndex) const override;
+
+		// Vulkan-specific
+		VkCommandBuffer GetCommandBuffer(uint32 frameIndex) const
+		{
+			HL_ASSERT(frameIndex < m_CommandBuffers.size());
+			return m_CommandBuffers[frameIndex];
+		}
 
 	private:
 
+		HLString m_DebugName;
+		bool m_OwnedBySwapchain = false;
+		uint32 m_PipelineQueryCount = 0;
+		std::vector<PipelineStatistics> m_PipelineStatisticsQueryResults;
 
+		VkCommandPool m_CommandPool = nullptr;
+		std::vector<VkCommandBuffer> m_CommandBuffers;
+		std::vector<VkFence> m_WaitFences;
+
+		uint32 m_TimestampQueryCount = 0;
+		uint32 m_TimestampNextAvailQuery = 0;
+		std::vector<VkQueryPool> m_TimestampQueryPools;
+		std::vector<VkQueryPool> m_PipelineStatisticsQueryPools;
+		std::vector<std::vector<uint32>> m_TimestampQueryResults;
+		std::vector<std::vector<float>> m_ExecutionGPUTimes;
 	};
 }
 

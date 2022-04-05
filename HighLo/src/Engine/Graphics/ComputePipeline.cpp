@@ -15,7 +15,7 @@
 
 namespace highlo
 {
-	Ref<ComputePipeline> ComputePipeline::Create(Ref<Shader> computeShader)
+	Ref<ComputePipeline> ComputePipeline::Create(const Ref<Shader> &computeShader)
 	{
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLComputePipeline>::Create(computeShader);

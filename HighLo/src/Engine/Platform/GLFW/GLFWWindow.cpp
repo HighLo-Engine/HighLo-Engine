@@ -232,8 +232,8 @@ namespace highlo
 	}
 
 	void GLFWWindow::Init()
-		{
-		uint32 width, height;
+	{
+		uint32 width = 0, height = 0;
 		
 		if (!s_GLFWInitialized)
 		{
@@ -258,7 +258,7 @@ namespace highlo
 		}
 		else
 		{
-			m_NativeHandle = glfwCreateWindow((int32) m_Properties.Width, (int32) m_Properties.Height, *m_Properties.Title, nullptr, nullptr);
+			m_NativeHandle = glfwCreateWindow((int32)m_Properties.Width, (int32)m_Properties.Height, *m_Properties.Title, nullptr, nullptr);
 		}
 		
 		glfwSetCursor(m_NativeHandle, m_NativeCursor);

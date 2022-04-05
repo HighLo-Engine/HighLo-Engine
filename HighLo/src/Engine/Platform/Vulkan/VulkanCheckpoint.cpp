@@ -4,6 +4,7 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include "VulkanContext.h"
+#include "VulkanUtils.h"
 
 namespace highlo
 {
@@ -20,7 +21,9 @@ namespace highlo
 		VulkanCheckpointData &checkpoint = s_CheckpointStorage[s_CeckpointStorageIndex];
 		memset(checkpoint.Data, 0, sizeof(checkpoint.Data));
 		strcpy_s(checkpoint.Data, *data);
-		vkCmdSetCheckpointNV(commandBuffer, &checkpoint);
+		
+		fpCmdSetCheckpointNV(commandBuffer, &checkpoint);
+		//vkCmdSetCheckpointNV(commandBuffer, &checkpoint);
 	}
 }
 

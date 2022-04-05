@@ -236,104 +236,28 @@ namespace highlo::utils
 
 	// Allocation helpers
 
-	struct VulkanAllocationData
-	{
-		VmaAllocator Allocator;
-		uint64 TotalAllocatedBytes = 0;
-	};
+	void InitAllocator(const Ref<VulkanDevice> &device);
+	void ShutdownAllocator();
 
-	static VulkanAllocationData *s_VulkanAllocationData = nullptr;
+	void FreeAllocation(VmaAllocation allocation);
 
-	static void InitAllocator(const Ref<VulkanDevice> &device)
-	{
-		s_VulkanAllocationData = new VulkanAllocationData();
+	VmaAllocation AllocateBuffer(VkBufferCreateInfo createInfo, VmaMemoryUsage usage, VkBuffer &outBuffer);
+	void DestroyBuffer(VkBuffer buffer, VmaAllocation allocation);
 
-		VmaAllocatorCreateInfo allocCreateInfo = {};
-		allocCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
-		allocCreateInfo.device = device->GetNativeDevice();
-		allocCreateInfo.physicalDevice = device->GetPhysicalDevice()->GetNativeDevice();
-		allocCreateInfo.instance = VulkanContext::GetInstance();
+	VmaAllocation AllocateImage(VkImageCreateInfo createInfo, VmaMemoryUsage usage, VkImage &outImage);
+	void DestroyImage(VkImage image, VmaAllocation allocation);
 
-		vmaCreateAllocator(&allocCreateInfo, &s_VulkanAllocationData->Allocator);
-	}
-
-	static void ShutdownAllocator()
-	{
-		vmaDestroyAllocator(s_VulkanAllocationData->Allocator);
-
-		delete s_VulkanAllocationData;
-		s_VulkanAllocationData = nullptr;
-	}
-
-	static void FreeAllocation(VmaAllocation allocation)
-	{
-		vmaFreeMemory(s_VulkanAllocationData->Allocator, allocation);
-	}
-
-	static VmaAllocation AllocateBuffer(VkBufferCreateInfo createInfo, VmaMemoryUsage usage, VkBuffer &outBuffer)
-	{
-		VmaAllocationCreateInfo allocCreateInfo = {};
-		allocCreateInfo.usage = usage;
-
-		HL_ASSERT(s_VulkanAllocationData);
-
-		VmaAllocation allocation;
-		vmaCreateBuffer(s_VulkanAllocationData->Allocator, &createInfo, &allocCreateInfo, &outBuffer, &allocation, nullptr);
-
-		VmaAllocationInfo allocInfo = {};
-		vmaGetAllocationInfo(s_VulkanAllocationData->Allocator, allocation, &allocInfo);
-
-		// Track the memory usage
-		s_VulkanAllocationData->TotalAllocatedBytes += allocInfo.size;
-
-		return allocation;
-	}
-
-	static void DestroyBuffer(VkBuffer buffer, VmaAllocation allocation)
-	{
-		HL_ASSERT(buffer);
-		HL_ASSERT(allocation);
-		vmaDestroyBuffer(s_VulkanAllocationData->Allocator, buffer, allocation);
-	}
-
-	static VmaAllocation AllocateImage(VkImageCreateInfo createInfo, VmaMemoryUsage usage, VkImage &outImage)
-	{
-		VmaAllocationCreateInfo allocCreateInfo = {};
-		allocCreateInfo.usage = usage;
-
-		HL_ASSERT(s_VulkanAllocationData);
-
-		VmaAllocation allocation;
-		vmaCreateImage(s_VulkanAllocationData->Allocator, &createInfo, &allocCreateInfo, &outImage, &allocation, nullptr);
-
-		VmaAllocationInfo allocInfo = {};
-		vmaGetAllocationInfo(s_VulkanAllocationData->Allocator, allocation, &allocInfo);
-
-		// Track the memory usage
-		s_VulkanAllocationData->TotalAllocatedBytes += allocInfo.size;
-
-		return allocation;
-	}
-
-	static void DestroyImage(VkImage image, VmaAllocation allocation)
-	{
-		HL_ASSERT(image);
-		HL_ASSERT(allocation);
-		vmaDestroyImage(s_VulkanAllocationData->Allocator, image, allocation);
-	}
+	VmaAllocator &GetVMAAllocator();
 
 	template<typename T>
 	static T *MapMemory(VmaAllocation allocation)
 	{
 		T *mappedMemory;
-		vmaMapMemory(s_VulkanAllocationData->Allocator, allocation, (void**)&mappedMemory);
+		vmaMapMemory(GetVMAAllocator(), allocation, (void **)&mappedMemory);
 		return mappedMemory;
 	}
 
-	static void UnmapMemory(VmaAllocation allocation)
-	{
-		vmaUnmapMemory(s_VulkanAllocationData->Allocator, allocation);
-	}
+	void UnmapMemory(VmaAllocation allocation);
 }
 
 #define VK_CHECK_RESULT(f)\

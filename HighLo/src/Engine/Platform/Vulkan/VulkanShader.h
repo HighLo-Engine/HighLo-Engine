@@ -19,10 +19,11 @@ namespace highlo
 		virtual ~VulkanShader();
 
 		virtual void Reload(bool forceCompile = false) override;
+		virtual void Release() override;
 		virtual uint64 GetHash() const override { return m_AssetPath.Hash(); }
 
-		virtual void Bind() const override;
-		virtual void Unbind() override;
+		virtual void Bind() const override {}
+		virtual void Unbind() override {}
 
 		virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) override;
 		virtual const HLString &GetName() const override { return m_Name; }
@@ -30,6 +31,8 @@ namespace highlo
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
+
+		virtual void SetMacro(const HLString &name, const HLString &value) override;
 
 		static void ClearUniformBuffers();
 
@@ -63,6 +66,24 @@ namespace highlo
 
 			return (uint32)m_ShaderDescriptorSets[set].UniformBuffers.size();
 		}
+
+	private:
+
+		void Load(const HLString &source, bool forceCompile);
+
+		// Pre-Processing
+		std::unordered_map<VkShaderStageFlagBits, HLString> PreProcess(const HLString &source);
+		std::unordered_map<VkShaderStageFlagBits, HLString> PreProcessGLSL(const HLString &source);
+		std::unordered_map<VkShaderStageFlagBits, HLString> PreProcessHLSL(const HLString &source);
+
+		// Shader-Reflection
+		void ReflectAllShaderStages(const std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &shaderData);
+		void Reflect(VkShaderStageFlagBits shaderStage, const std::vector<uint32> &shaderData);
+		
+		void CompileOrGetVulkanBinary(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, bool cacheChanged, bool forceCompile);
+		void TryGetVulkanCachedBinary(const FileSystemPath &cacheDirectory, const HLString &extension, std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, VkShaderStageFlagBits stage) const;
+		void LoadAndCreateShaders(const std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &shaderData);
+		void CreateDescriptors();
 
 	private:
 

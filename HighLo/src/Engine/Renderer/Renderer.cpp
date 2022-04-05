@@ -50,6 +50,14 @@ namespace highlo
 
 	static std::unordered_map<uint64, ShaderDependencies> s_ShaderDepedencies;
 
+	struct GlobalShaderInfo
+	{
+		std::unordered_map<HLString, std::unordered_map<uint64, WeakRef<Shader>>> GlobalMacros;
+		std::vector<WeakRef<Shader>> DirtyShaders;
+	};
+
+	static GlobalShaderInfo s_GlobalShaderInfo;
+
 	static RendererData *s_MainRendererData = nullptr;
 	static RenderCommandQueue *s_CommandQueue = nullptr;
 	static RenderCommandQueue s_ResourceFreeQueue[3];
@@ -120,6 +128,58 @@ namespace highlo
 	void Renderer::EndFrame()
 	{
 		s_RenderingAPI->EndFrame();
+	}
+
+	bool Renderer::UpdateDirtyShaders()
+	{
+		const bool updatedAnyShaders = s_GlobalShaderInfo.DirtyShaders.size();
+
+		for (WeakRef<Shader> shader : s_GlobalShaderInfo.DirtyShaders)
+			shader->Reload();
+
+		s_GlobalShaderInfo.DirtyShaders.clear();
+
+		return updatedAnyShaders;
+	}
+
+	void Renderer::AcknowledgeParsedGlobalMacros(const std::unordered_set<HLString> &macros, const Ref<Shader> &shader)
+	{
+		for (const HLString &macro : macros)
+			s_GlobalShaderInfo.GlobalMacros[macro][shader->GetHash()] = shader;
+	}
+
+	void Renderer::SetMacroInShader(Ref<Shader> &shader, const HLString &name, const HLString &value)
+	{
+		shader->SetMacro(name, value);
+
+		auto &it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
+		if (it != s_GlobalShaderInfo.DirtyShaders.end())
+		{
+			// Shader is already part of the dirty shaders, so we can safely skip the next step
+			return;
+		}
+
+		s_GlobalShaderInfo.DirtyShaders.push_back(shader);
+	}
+
+	void Renderer::SetGlobalMacroInShaders(const HLString &name, const HLString &value)
+	{
+		HL_ASSERT(s_GlobalShaderInfo.GlobalMacros.find(name) != s_GlobalShaderInfo.GlobalMacros.end(), "Macro has not been passed from any shader!");
+		for (auto &[hash, shader] : s_GlobalShaderInfo.GlobalMacros.at(name))
+		{
+			HL_ASSERT(shader.IsValid(), "Shader was deleted!");
+			shader->SetMacro(name, value);
+
+			// First check if the shader is already part of the dirty shaders
+			auto &it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
+			if (it != s_GlobalShaderInfo.DirtyShaders.end())
+			{
+				// Shader is already part of the dirty shaders, so we can safely skip the next step
+				continue;
+			}
+
+			s_GlobalShaderInfo.DirtyShaders.push_back(shader);
+		}
 	}
 
 	void Renderer::WaitAndRender()

@@ -45,9 +45,6 @@ using Byte = unsigned char;
 
 namespace highlo
 {
-	template <typename T>
-	using WeakRef = std::weak_ptr<T>;
-
 	struct HLAllocationMetrics
 	{
 		uint64 TotalAllocated = 0;	/**< The total amount of bytes allocated by the program. */

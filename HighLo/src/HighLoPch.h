@@ -36,6 +36,7 @@
 #include "Engine/Core/Singleton.h"
 #include "Engine/Core/SharedReference.h"
 #include "Engine/Core/UniqueReference.h"
+#include "Engine/Core/WeakReference.h"
 #include "Engine/Core/DataTypes/String.h"
 #include "Engine/Core/Exceptions/Exceptions.h"
 

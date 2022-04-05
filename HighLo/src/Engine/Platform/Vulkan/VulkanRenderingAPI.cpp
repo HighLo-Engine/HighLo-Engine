@@ -10,10 +10,13 @@ namespace highlo
 {
 	void VulkanRenderingAPI::Init()
 	{
+		Ref<VulkanDevice> device = VulkanContext::GetCurrentDevice();
+		utils::InitAllocator(device);
 	}
 	
 	void VulkanRenderingAPI::Shutdown()
 	{
+		utils::ShutdownAllocator();
 	}
 	
 	void VulkanRenderingAPI::BeginFrame()

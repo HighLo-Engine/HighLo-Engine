@@ -24,6 +24,7 @@ namespace highlo
 		HLAPI virtual ~Shader() {}
 
 		HLAPI virtual void Reload(bool forceCompile = false) = 0;
+		HLAPI virtual void Release() = 0;
 		HLAPI virtual uint64 GetHash() const = 0;
 
 		HLAPI virtual void Bind() const = 0;
@@ -35,6 +36,8 @@ namespace highlo
 
 		HLAPI virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const = 0;
 		HLAPI virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const = 0;
+
+		HLAPI virtual void SetMacro(const HLString &name, const HLString &value) = 0;
 
 		HLAPI static Ref<Shader> Create(const FileSystemPath &filePath, bool forceCompile = false);
 		HLAPI static Ref<Shader> CreateFromString(const HLString &source);

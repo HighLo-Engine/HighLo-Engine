@@ -93,8 +93,6 @@ namespace highlo
 
         vkDestroyInstance(s_VulkanInstance, nullptr);
         s_VulkanInstance = nullptr;
-
-        utils::ShutdownAllocator();
     }
     
     void VulkanContext::Init()
@@ -217,8 +215,6 @@ namespace highlo
         VkPipelineCacheCreateInfo pipelineCreate = {};
         pipelineCreate.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
         VK_CHECK_RESULT(vkCreatePipelineCache(m_Device->GetNativeDevice(), &pipelineCreate, nullptr, &m_PipelineCache));
-
-        utils::InitAllocator(m_Device);
     }
     
     // All of this below is handled by the SwapChain implementation

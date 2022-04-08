@@ -1,5 +1,5 @@
-#shader vertex
 #version 450 core
+#pragma shader:vertex
 
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec2 a_TexCoord;
@@ -17,8 +17,8 @@ void main()
 	gl_Position = vec4(a_Position.xy, 0.0, 1.0);
 }
 
-#shader pixel
 #version 450 core
+#pragma shader:fragment
 
 layout(location = 0) out vec4 o_Color;
 

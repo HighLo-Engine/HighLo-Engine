@@ -19,6 +19,8 @@ IncludeDir["gmock"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlemo
 IncludeDir["vulkan"]     			 = "%{VULKAN_SDK}/Include"
 IncludeDir["vulkan_local"] 			 = "%{wks.location}/HighLo/vendor/VulkanSDK/Include"
 IncludeDir["vulkan_memory_alloc"] 	 = "%{wks.location}/HighLo/vendor/VulkanMemoryAllocator"
+IncludeDir["shaderc_glslc"] 	 	 = "%{wks.location}/HighLo/vendor/shaderc/glslc"
+IncludeDir["shaderc_util"] 	 	 	 = "%{wks.location}/HighLo/vendor/shaderc/libshaderc_util/include"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"

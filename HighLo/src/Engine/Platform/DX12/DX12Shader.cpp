@@ -7,6 +7,9 @@
 
 namespace highlo
 {
+	static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
+	static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
+
 	DX12Shader::DX12Shader(const FileSystemPath &filePath, bool forceCompile)
 		: m_AssetPath(filePath)
 	{
@@ -18,9 +21,14 @@ namespace highlo
 	
 	DX12Shader::~DX12Shader()
 	{
+		Release();
 	}
 
 	void DX12Shader::Reload(bool forceCompile)
+	{
+	}
+
+	void DX12Shader::Release()
 	{
 	}
 
@@ -40,6 +48,11 @@ namespace highlo
 	void DX12Shader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
 	{
 		m_ReloadedCallbacks.push_back(callback);
+	}
+	
+	void DX12Shader::SetMacro(const HLString &name, const HLString &value)
+	{
+		m_Macros[name] = value;
 	}
 }
 

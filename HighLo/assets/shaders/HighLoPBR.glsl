@@ -1,13 +1,15 @@
-﻿// HighLoPBR Static Shader
+﻿/*
+// HighLoPBR Static Shader
 // 
 // References:
 // - Unreal Engine 4 PBR Notes (https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf)
 // - Frostbite's SIGGRAPH paper from 2014 (https://seblagarde.wordpress.com/2015/07/14/siggraph-2014-moving-frostbite-to-physically-based-rendering/)
 // - Michał Siejak's PBR Project (https://github.com/Nadrin)
 // - Sparky Engine (https://github.com/TheCherno/Sparky)
+*/
 
-#shader vertex
 #version 450 core
+#pragma shader:vertex
 
 // Vertex Buffer
 layout(location = 0) in vec3 a_Position;
@@ -70,8 +72,8 @@ void main()
 	gl_Position = u_ViewProjectionMatrix * u_Renderer.Transform * vec4(a_Position, 1.0);
 }
 
-#shader fragment
 #version 450 core
+#pragma shader:fragment
 
 const float PI = 3.141592;
 const float Epsilon = 0.00001;

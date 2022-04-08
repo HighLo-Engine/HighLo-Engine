@@ -105,15 +105,15 @@ namespace highlo
 		
 		HLAPI FileSystemPath &operator/=(const FileSystemPath &path);
 		HLAPI FileSystemPath &operator+=(const FileSystemPath &path);
-		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const FileSystemPath &rhs);
+		HLAPI friend FileSystemPath operator/(const FileSystemPath &lhs, const FileSystemPath &rhs);
 
 		HLAPI FileSystemPath &operator/=(const HLString &path);
 		HLAPI FileSystemPath &operator+=(const HLString &path);
-		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const HLString &path);
+		HLAPI friend FileSystemPath operator/(const FileSystemPath &lhs, const HLString &path);
 
 		HLAPI FileSystemPath &operator/=(const char *path);
 		HLAPI FileSystemPath &operator+=(const char *path);
-		HLAPI friend FileSystemPath operator/(FileSystemPath &lhs, const char *path);
+		HLAPI friend FileSystemPath operator/(const FileSystemPath &lhs, const char *path);
 
 		HLAPI static HLString ExtractFileNameFromPath(const HLString &path, bool excludeExtension = false);
 		HLAPI static HLString ExtractFileExtensionFromPath(const HLString &path, bool excludeDot = false);

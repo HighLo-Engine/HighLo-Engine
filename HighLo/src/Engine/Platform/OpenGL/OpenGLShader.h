@@ -51,6 +51,7 @@ namespace highlo
 
 		// Inherited via Shader
 		virtual void Reload(bool forceCompile = false) override;
+		virtual void Release() override;
 		virtual uint64 GetHash() const override;
 
 		virtual void Bind() const override;
@@ -59,6 +60,8 @@ namespace highlo
 		virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) override;
 		virtual const HLString &GetName() const override { return m_Name; }
 		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
+
+		virtual void SetMacro(const HLString &name, const HLString &value) override;
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
@@ -140,6 +143,9 @@ namespace highlo
 		bool m_Loaded = false;
 		bool m_IsCompute = false;
 		FileSystemPath m_AssetPath;
+
+		std::unordered_map<HLString, HLString> m_Macros;
+		std::unordered_set<HLString> m_AcknowledgedMacros;
 
 		uint32 m_ConstantBufferOffset = 0;
 		inline static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;

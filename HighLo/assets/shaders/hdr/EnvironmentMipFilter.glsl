@@ -1,6 +1,5 @@
-#shader compute
-
 #version 450 core
+#pragma shader:compute
 
 const float PI = 3.141592;
 const float TwoPI = 2 * PI;

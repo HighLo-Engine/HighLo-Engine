@@ -1,6 +1,5 @@
-#shader vertex
-
 #version 450 core
+#pragma shader:vertex
 
 layout(location = 0) in vec3 in_WorldPosition;
 layout(location = 1) in float in_Thickness;
@@ -37,9 +36,9 @@ void main()
 	gl_Position = u_ViewProjection * u_Renderer.Transform * vec4(in_WorldPosition, 1.0f);
 }
 
-#shader pixel
 
 #version 450 core
+#pragma shader:fragment
 
 layout(location = 0) out vec4 o_Color;
 layout(location = 1) out int o_ObjectID;

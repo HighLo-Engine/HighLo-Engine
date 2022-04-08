@@ -23,6 +23,7 @@ namespace highlo
 		virtual ~DX11Shader();
 
 		virtual void Reload(bool forceCompile = false) override;
+		virtual void Release() override;
 		virtual uint64 GetHash() const override { return m_AssetPath.Hash(); }
 
 		virtual void Bind() const override;
@@ -31,6 +32,8 @@ namespace highlo
 		virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) override;
 		virtual const HLString &GetName() const override { return m_Name; }
 		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
+
+		virtual void SetMacro(const HLString &name, const HLString &value) override;
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
@@ -43,8 +46,8 @@ namespace highlo
 		bool m_IsCompute = false;
 		FileSystemPath m_AssetPath;
 
-		inline static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
-		inline static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
+		std::unordered_map<HLString, HLString> m_Macros;
+		std::unordered_set<HLString> m_AcknowledgedMacros;
 
 		std::unordered_map<uint32, HLString> m_ShaderSources;
 		std::unordered_map<HLString, ShaderBuffer> m_Buffers;

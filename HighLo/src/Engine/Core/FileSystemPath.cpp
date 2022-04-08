@@ -417,7 +417,7 @@ namespace highlo
 		m_CurrentAbsolutePath = m_File.FullPath;
 	}
 
-	FileSystemPath operator/(FileSystemPath &lhs, const FileSystemPath &rhs)
+	FileSystemPath operator/(const FileSystemPath &lhs, const FileSystemPath &rhs)
 	{
 		if (rhs.String().IsEmpty())
 			return lhs;
@@ -435,7 +435,7 @@ namespace highlo
 		return FileSystemPath(newPath);
 	}
 	
-	FileSystemPath operator/(FileSystemPath &lhs, const HLString &path)
+	FileSystemPath operator/(const FileSystemPath &lhs, const HLString &path)
 	{
 		if (path.IsEmpty())
 			return lhs;
@@ -453,7 +453,7 @@ namespace highlo
 		return FileSystemPath(newPath);
 	}
 
-	FileSystemPath operator/(FileSystemPath &lhs, const char *path)
+	FileSystemPath operator/(const FileSystemPath &lhs, const char *path)
 	{
 		if (strlen(path) == 0)
 			return lhs;

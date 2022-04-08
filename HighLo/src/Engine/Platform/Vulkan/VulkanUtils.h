@@ -234,6 +234,210 @@ namespace highlo::utils
 		VulkanCheckResult(result);
 	}
 
+	// Shader helpers
+	static VkShaderStageFlagBits ShaderTypeToVulkanStage(ShaderType type)
+	{
+		switch (type)
+		{
+			case ShaderType::Vertex:
+				return VK_SHADER_STAGE_VERTEX_BIT;
+
+			case ShaderType::Fragment:
+				return VK_SHADER_STAGE_FRAGMENT_BIT;
+
+			case ShaderType::Compute:
+				VK_SHADER_STAGE_COMPUTE_BIT;
+
+			case ShaderType::TessControl:
+				return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+
+			case ShaderType::TessEvaluation:
+				return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+
+			case ShaderType::Geometry:
+				return VK_SHADER_STAGE_GEOMETRY_BIT;
+		}
+
+		HL_ASSERT(false);
+		return VK_SHADER_STAGE_ALL;
+	}
+
+	static ShaderType VulkanStageToShaderType(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:
+				return ShaderType::Vertex;
+
+			case VK_SHADER_STAGE_FRAGMENT_BIT:
+				return ShaderType::Fragment;
+
+			case VK_SHADER_STAGE_COMPUTE_BIT:
+				return ShaderType::Compute;
+
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:
+				return ShaderType::TessControl;
+
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:
+				return ShaderType::TessEvaluation;
+
+			case VK_SHADER_STAGE_GEOMETRY_BIT:
+				return ShaderType::Geometry;
+		}
+
+		HL_ASSERT(false);
+		return ShaderType::None;
+	}
+
+	static HLString ShaderStageToMacro(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+		case VK_SHADER_STAGE_VERTEX_BIT:                    return "__VERTEX_STAGE__";
+		case VK_SHADER_STAGE_FRAGMENT_BIT:                  return "__FRAGMENT_STAGE__";
+		case VK_SHADER_STAGE_COMPUTE_BIT:                   return "__COMPUTE_STAGE__";
+		case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:      return "__TESS_CONTROL_STAGE__";
+		case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:   return "__TESS_EVAL_STAGE__";
+		case VK_SHADER_STAGE_GEOMETRY_BIT:                  return "__GEOMETRY_STAGE__";
+		}
+
+		HL_ASSERT(false);
+		return "";
+	}
+
+	static VkShaderStageFlagBits ShaderStageFromString(const HLString &str)
+	{
+		HLString type = str.ToLowerCase();
+
+		if (type == "vertex")
+			return VK_SHADER_STAGE_VERTEX_BIT;
+
+		if (type == "fragment" || type == "pixel")
+			return VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		if (type == "compute")
+			return VK_SHADER_STAGE_COMPUTE_BIT;
+
+		if (type == "tesscontrol")
+			return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+
+		if (type == "tessevaluation")
+			return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+
+		if (type == "geometry")
+			return VK_SHADER_STAGE_GEOMETRY_BIT;
+
+		return VK_SHADER_STAGE_ALL;
+	}
+
+	static HLString ShaderStageStringToMacro(const HLString &str)
+	{
+		HLString type = str.ToLowerCase();
+
+		if (type == "vertex")
+			return "__VERTEX_STAGE__";
+
+		if (type == "fragment" || type == "pixel")
+			return "__FRAGMENT_STAGE__";
+
+		if (type == "compute")
+			return "__COMPUTE_STAGE__";
+
+		if (type == "tesscontrol")
+			return "__TESS_CONTROL_STAGE__";
+
+		if (type == "tessevaluation")
+			return "__TESS_EVAL_STAGE__";
+
+		if (type == "geometry")
+			return "__GEOMETRY_STAGE__";
+
+		HL_ASSERT(false);
+		return "";
+	}
+
+	static HLString ShaderStageToString(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:                    return "Vertex";
+			case VK_SHADER_STAGE_FRAGMENT_BIT:                  return "Pixel";
+			case VK_SHADER_STAGE_COMPUTE_BIT:                   return "Compute";
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:      return "TessControl";
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:   return "TessEvalulation";
+			case VK_SHADER_STAGE_GEOMETRY_BIT:                  return "Geometry";
+		}
+
+		HL_ASSERT(false);
+		return "";
+	}
+
+	static std::string_view VKStageToShaderMacro(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:					return "__VERTEX_STAGE__";
+			case VK_SHADER_STAGE_FRAGMENT_BIT:					return "__FRAGMENT_STAGE__";
+			case VK_SHADER_STAGE_COMPUTE_BIT:					return "__COMPUTE_STAGE__";
+			case VK_SHADER_STAGE_GEOMETRY_BIT:					return "__GEOMETRY_STAGE__";
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:		return "__TESS_CONTROL_STAGE__";
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:	return "__TESS_EVAL_STAGE__";
+		}
+
+		HL_ASSERT(false, "Unknown shader stage.");
+		return "";
+	}
+
+	static std::string_view StageToShaderMacro(const std::string_view stage)
+	{
+		if (stage == "vertex") return "__VERTEX_STAGE__";
+		if (stage == "fragment") return "__FRAGMENT_STAGE__";
+		if (stage == "compute") return "__COMPUTE_STAGE__";
+		if (stage == "geometry") return "__GEOMETRY_STAGE__";
+		if (stage == "tesscontrol") return "__TESS_CONTROL_STAGE__";
+		if (stage == "tesseval") return "__TESS_EVAL_STAGE__";
+
+		HL_ASSERT(false, "Unknown shader stage.");
+		return "";
+	}
+
+	static VkShaderStageFlagBits StageToVKShaderStage(const std::string_view stage)
+	{
+		if (stage == "vertex")		return VK_SHADER_STAGE_VERTEX_BIT;
+		if (stage == "fragment")	return VK_SHADER_STAGE_FRAGMENT_BIT;
+		if (stage == "compute")		return VK_SHADER_STAGE_COMPUTE_BIT;
+		if (stage == "geometry")	return VK_SHADER_STAGE_GEOMETRY_BIT;
+		if (stage == "tesscontrol") return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+		if (stage == "tesseval")	return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+		
+		HL_ASSERT(false, "Unknown shader stage.");
+		return VK_SHADER_STAGE_ALL;
+	}
+
+	static std::unordered_map<VkShaderStageFlagBits, HLString> ConvertShaderTypeToVulkanStage(const std::unordered_map<ShaderType, HLString> &sources)
+	{
+		std::unordered_map<VkShaderStageFlagBits, HLString> result;
+		for (auto &[type, source] : sources)
+		{
+			VkShaderStageFlagBits stage = utils::ShaderTypeToVulkanStage(type);
+			result.insert({ stage, source });
+		}
+
+		return result;
+	}
+
+	static std::unordered_map<ShaderType, HLString> ConvertVulkanStageToShaderType(const std::unordered_map<VkShaderStageFlagBits, HLString> &sources)
+	{
+		std::unordered_map<ShaderType, HLString> result;
+		for (auto &[stage, source] : sources)
+		{
+			ShaderType type = utils::VulkanStageToShaderType(stage);
+			result.insert({ type, source });
+		}
+
+		return result;
+	}
+
 	// Allocation helpers
 
 	void InitAllocator(const Ref<VulkanDevice> &device);

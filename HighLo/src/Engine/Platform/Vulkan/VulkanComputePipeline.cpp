@@ -171,6 +171,8 @@ namespace highlo
         computePipelineCreateInfo.flags = 0;
 
         const auto &shaderStages = vulkanShader->GetPipelineShaderStageCreateInfos();
+        HL_ASSERT(shaderStages.size() > 0);
+
         computePipelineCreateInfo.stage = shaderStages[0];
 
         VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};

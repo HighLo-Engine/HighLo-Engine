@@ -1,5 +1,5 @@
-#shader vertex
 #version 450 core
+#pragma shader:vertex
 
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec2 a_TexCoord;
@@ -27,8 +27,8 @@ void main()
 	v_Position = (u_InverseViewProjection * pos).xyz;
 }
 
-#shader pixel
 #version 450 core
+#pragma shader:fragment
 
 layout(location = 0) out vec4 out_Color;
 layout(location = 1) out vec4 out_Unused1;

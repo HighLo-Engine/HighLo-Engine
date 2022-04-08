@@ -144,6 +144,7 @@ namespace highlo
 
 	OpenGLShader::~OpenGLShader()
 	{
+		Release();
 	}
 
 	void OpenGLShader::Reload(bool forceCompile)
@@ -158,6 +159,12 @@ namespace highlo
 
 		for (ShaderReloadedCallback callback : m_ReloadedCallbacks)
 			callback();
+	}
+
+	void OpenGLShader::Release()
+	{
+		glUseProgram(0);
+		glDeleteProgram(m_RendererID);
 	}
 
 	uint64 OpenGLShader::GetHash() const
@@ -178,6 +185,11 @@ namespace highlo
 	void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
 	{
 		m_ReloadedCallbacks.push_back(callback);
+	}
+
+	void OpenGLShader::SetMacro(const HLString &name, const HLString &value)
+	{
+		m_Macros[name] = value;
 	}
 	
 	const ShaderUniformBuffer &OpenGLShader::FindUniformBuffer(const HLString &name)

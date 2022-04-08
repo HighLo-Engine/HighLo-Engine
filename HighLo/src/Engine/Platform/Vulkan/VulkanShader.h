@@ -7,9 +7,26 @@
 #include <vulkan/vulkan.h>
 
 #include "VulkanShaderDefs.h"
+#include "Engine/Graphics/Shaders/ShaderPreProcessor.h"
 
 namespace highlo
 {
+	struct StageData
+	{
+		std::unordered_set<IncludeData> Headers;
+		uint64 HashValue = 0;
+
+		bool operator==(const StageData &other) const
+		{
+			return Headers == other.Headers && HashValue == other.HashValue;
+		}
+
+		bool operator!=(const StageData &other) const
+		{
+			return !(*this == other);
+		}
+	};
+
 	class VulkanShader : public Shader
 	{
 	public:
@@ -48,9 +65,9 @@ namespace highlo
 
 		const std::vector<VulkanShaderPushConstantRange> &GetPushConstantRanges() const { return m_PushConstantRanges; }
 
-		VulkanShaderDescriptorSet AllocateDescriptorSet(uint32 set = 0);
-		VulkanShaderDescriptorSet CreateDescriptorSets(uint32 set = 0);
-		VulkanShaderDescriptorSet CreateDescriptorSets(uint32 set, uint32 numberOfSets);
+		VulkanShaderMaterialDescriptorSet AllocateDescriptorSet(uint32 set = 0);
+		VulkanShaderMaterialDescriptorSet CreateDescriptorSets(uint32 set = 0);
+		VulkanShaderMaterialDescriptorSet CreateDescriptorSets(uint32 set, uint32 numberOfSets);
 		const VkWriteDescriptorSet *GetDescriptorSet(const HLString &name, uint32 set = 0) const;
 
 		VulkanShaderUniformBuffer &GetUniformBuffer(const uint32 binding = 0, const uint32 set = 0)
@@ -80,6 +97,8 @@ namespace highlo
 		void ReflectAllShaderStages(const std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &shaderData);
 		void Reflect(VkShaderStageFlagBits shaderStage, const std::vector<uint32> &shaderData);
 		
+		// Shader-compilation
+		HLString Compile(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outputBinary, const VkShaderStageFlagBits stage) const;
 		void CompileOrGetVulkanBinary(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, bool cacheChanged, bool forceCompile);
 		void TryGetVulkanCachedBinary(const FileSystemPath &cacheDirectory, const HLString &extension, std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, VkShaderStageFlagBits stage) const;
 		void LoadAndCreateShaders(const std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &shaderData);
@@ -90,6 +109,8 @@ namespace highlo
 		HLRendererID m_RendererID = 0;
 		HLString m_Name;
 		FileSystemPath m_AssetPath;
+		ShaderLanguage m_Language = ShaderLanguage::None;
+		Ref<ShaderPreProcessor> m_PreProcessor = nullptr;
 
 		std::unordered_map<HLString, ShaderBuffer> m_Buffers;
 		std::unordered_map<HLString, ShaderResourceDeclaration> m_Resources;
@@ -107,7 +128,7 @@ namespace highlo
 		std::unordered_map<uint32, std::vector<VkDescriptorPoolSize>> m_TypeCounts;
 		VkDescriptorSet m_DescriptorSet;
 		
-		//	std::map<VkShaderStageFlagBits, StageData> m_StagesMetaData;
+		std::map<VkShaderStageFlagBits, StageData> m_StagesMetaData;
 	};
 }
 

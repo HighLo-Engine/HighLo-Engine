@@ -15,6 +15,24 @@
 
 namespace highlo
 {
+	enum class ShaderLanguage
+	{
+		None = 0,
+		GLSL,
+		HLSL
+	};
+
+	enum class ShaderType
+	{
+		None = 0,
+		Vertex,
+		Fragment,
+		Geometry,
+		TessEvaluation,
+		TessControl,
+		Compute
+	};
+
 	class Shader : public IsSharedReference
 	{
 	public:

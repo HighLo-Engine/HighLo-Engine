@@ -246,7 +246,7 @@ namespace highlo::utils
 				return VK_SHADER_STAGE_FRAGMENT_BIT;
 
 			case ShaderType::Compute:
-				VK_SHADER_STAGE_COMPUTE_BIT;
+				return VK_SHADER_STAGE_COMPUTE_BIT;
 
 			case ShaderType::TessControl:
 				return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;

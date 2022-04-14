@@ -4,6 +4,7 @@
 #include "ShaderPreProcessor.h"
 
 #ifdef HIGHLO_API_OPENGL
+#include "Engine/Platform/OpenGL/OpenGLShaderPreProcessor.h"
 #elif HIGHLO_API_DX11
 #elif HIGHLO_API_DX12
 #elif HIGHLO_API_VULKAN
@@ -15,8 +16,7 @@ namespace highlo
 	Ref<ShaderPreProcessor> ShaderPreProcessor::Create()
 	{
 	#ifdef HIGHLO_API_OPENGL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<OpenGLShaderPreProcessor>::Create();
 	#elif HIGHLO_API_DX11
 		HL_ASSERT(false);
 		return nullptr;

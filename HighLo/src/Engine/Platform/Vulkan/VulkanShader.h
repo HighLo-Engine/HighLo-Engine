@@ -1,32 +1,16 @@
 #pragma once
 
 #include "Engine/Graphics/Shaders/Shader.h"
+#include "Engine/Graphics/Shaders/ShaderPreProcessor.h"
 
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
 
 #include "VulkanShaderDefs.h"
-#include "Engine/Graphics/Shaders/ShaderPreProcessor.h"
 
 namespace highlo
 {
-	struct StageData
-	{
-		std::unordered_set<IncludeData> Headers;
-		uint64 HashValue = 0;
-
-		bool operator==(const StageData &other) const
-		{
-			return Headers == other.Headers && HashValue == other.HashValue;
-		}
-
-		bool operator!=(const StageData &other) const
-		{
-			return !(*this == other);
-		}
-	};
-
 	class VulkanShader : public Shader
 	{
 	public:

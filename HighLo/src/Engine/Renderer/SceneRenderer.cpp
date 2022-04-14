@@ -52,7 +52,7 @@ namespace highlo
 		InitLightCullingCompute();
 		InitShadowPass();
 		InitPreDepthPass();
-		InitGeometryPass();
+	//	InitGeometryPass();
 		InitBloomCompute();
 		InitDeinterleaving();
 		InitHBAO();
@@ -110,12 +110,12 @@ namespace highlo
 		if (m_NeedsResize)
 		{
 			m_NeedsResize = false;
-			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+		//	m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 
-// TODO: Resize bloom texture
+			// TODO: Resize bloom texture
 
 			if (m_Specification.SwapChain)
 				m_CommandBuffer = CommandBuffer::CreateFromSwapChain("SceneRenderer");
@@ -838,11 +838,11 @@ namespace highlo
 
 	void SceneRenderer::InitLightCullingCompute()
 	{
-		m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
-		auto &shader = Renderer::GetShaderLibrary()->Get("LightCulling");
+	//	m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
+	//	auto &shader = Renderer::GetShaderLibrary()->Get("LightCulling");
 
-		m_LightCullingMaterial = Material::Create(shader, "LightCulling");
-		m_LightCullingPipeline = ComputePipeline::Create(shader);
+	//	m_LightCullingMaterial = Material::Create(shader, "LightCulling");
+	//	m_LightCullingPipeline = ComputePipeline::Create(shader);
 	}
 
 	void SceneRenderer::InitShadowPass()
@@ -1003,8 +1003,8 @@ namespace highlo
 		spec.Layout = BufferLayout::GetGridLayout();
 		spec.Shader = m_GridShader;
 		spec.BackfaceCulling = false;
-		spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
-		m_GridVertexArray = VertexArray::Create(spec);
+	//	spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
+	//	m_GridVertexArray = VertexArray::Create(spec);
 	}
 
 	void SceneRenderer::InitSkybox()
@@ -1016,8 +1016,8 @@ namespace highlo
 		spec.Layout = BufferLayout::GetSkyboxLayout();
 		spec.InstanceLayout = {};
 		spec.Shader = shader;
-		spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
-		m_SkyboxVertexArray = VertexArray::Create(spec);
+	//	spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
+	//	m_SkyboxVertexArray = VertexArray::Create(spec);
 
 		m_SkyboxMaterial = Material::Create(shader, "SkyboxMaterial");
 		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
@@ -1063,7 +1063,7 @@ namespace highlo
 		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		framebufferSpec.ClearOnLoad = false;
 		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
-		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
+	//	framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "ExternalCompositing";

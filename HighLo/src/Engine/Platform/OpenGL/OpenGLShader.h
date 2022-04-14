@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Engine/Graphics/Shaders/Shader.h"
+#include "Engine/Graphics/Shaders/ShaderPreProcessor.h"
 #include "Engine/Core/Defines/BaseTypes.h"
 
 #ifdef HIGHLO_API_OPENGL
@@ -17,32 +18,12 @@
 #include <glad/glad.h>
 #include <spirv_cross/spirv_glsl.hpp>
 
+#include "OpenGLShaderDefs.h"
+
 namespace highlo
 {
 	class OpenGLShader : public Shader
 	{
-	public:
-
-		struct PushConstantRange
-		{
-			uint32 Offset = 0;
-			uint32 Size = 0;
-		};
-
-		struct ShaderUniformStructMember
-		{
-			HLString Name;
-			uint32 Size;
-			uint32 Offset;
-			ShaderUniformType Type;
-		};
-
-		struct ShaderUniformStruct
-		{
-			HLString Name;
-			std::vector<ShaderUniformStructMember> Members;
-		};
-
 	public:
 
 		OpenGLShader(const FileSystemPath &filePath, bool forceCompile);
@@ -67,15 +48,6 @@ namespace highlo
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
 
 		// OpenGL-specific
-		static const ShaderUniformBuffer &FindUniformBuffer(const HLString &name);
-		static void SetUniformBuffer(const ShaderUniformBuffer &buffer, const void *data, uint32 size, uint32 offset = 0);
-		static void SetStorageBuffer(const ShaderStorageBuffer &buffer, const void *data, uint32 size, uint32 offset = 0);
-
-		virtual void SetUniformBuffer(const HLString &name, const void *data, uint32 size);
-		virtual void SetStorageBuffer(const HLString &name, const void *data, uint32 size);
-
-		virtual void ResizeStorageBuffer(uint32 bindingPoint, uint32 newSize);
-
 		virtual void SetUniform(const HLString &fullname, float value);
 		virtual void SetUniform(const HLString &fullname, int32 value);
 		virtual void SetUniform(const HLString &fullname, const glm::ivec2 &value);
@@ -89,25 +61,29 @@ namespace highlo
 		virtual void SetUniform(const HLString &fullname, const glm::mat3 &value);
 		virtual void SetUniform(const HLString &fullname, const glm::mat4 &value);
 
-		const ShaderResourceDeclaration *GetShaderResource(const HLString &name);
-		std::vector<ShaderUniformStruct> &GetUniformStructs() { return m_ShaderUniformStructs; }
-		const std::vector<ShaderUniformStruct> &GetUniformStructs() const { return m_ShaderUniformStructs; }
-
 		static void ClearUniformBuffers();
 
 	private:
 
 		void Load(const HLString &source, bool forceCompile);
-		void Reflect(GLenum stage, std::vector<uint32> &data);
-		void ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData);
-
-		void CompileOrGetVulkanBinary(std::unordered_map<uint32, std::vector<uint32>> &outputBinary, bool forceCompile = false);
-		void CompileOrGetOpenGLBinary(const std::unordered_map<uint32, std::vector<uint32>> &, bool forceCompile = false);
-
+		
+		// Pre-Processing
 		std::unordered_map<GLenum, HLString> PreProcess(const HLString &source);
+		std::unordered_map<GLenum, HLString> PreProcessGLSL(const HLString &source);
+		std::unordered_map<GLenum, HLString> PreProcessHLSL(const HLString &source);
+
+		// Shader-Reflection
+		void ReflectAllShaderStages(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData);
+		void Reflect(GLenum shaderStage, const std::vector<uint32> &shaderData);
+
+		// Shader-compilation
+		HLString Compile(std::unordered_map<GLenum, std::vector<uint32>> &outputBinary, const GLenum stage) const;
+		void CompileOrGetOpenGLBinary(std::unordered_map<GLenum, std::vector<uint32>> &outBinary, bool forceCompile);
+		void TryGetOpenGLCachedBinary(const FileSystemPath &cacheDirectory, const HLString &extension, std::unordered_map<GLenum, std::vector<uint32>> &outBinary, GLenum stage) const;
+		void LoadAndCreateShaders(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData);
+		void CreateDescriptors();
 
 		void ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler);
-
 		int32 GetUniformLocation(const HLString &name) const;
 
 		static GLenum ShaderTypeFromString(const HLString &type);
@@ -143,21 +119,22 @@ namespace highlo
 		bool m_Loaded = false;
 		bool m_IsCompute = false;
 		FileSystemPath m_AssetPath;
+		ShaderLanguage m_Language = ShaderLanguage::None;
+		uint32 m_ConstantBufferOffset = 0;
+		Ref<ShaderPreProcessor> m_PreProcessor = nullptr;
 
 		std::unordered_map<HLString, HLString> m_Macros;
 		std::unordered_set<HLString> m_AcknowledgedMacros;
-
-		uint32 m_ConstantBufferOffset = 0;
-		inline static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
-		inline static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
+		std::vector<OpenGLShaderDescriptorSet> m_ShaderDescriptorSets;
+		std::vector<OpenGLShaderPushConstantRange> m_PushConstantRanges;
 
 		std::unordered_map<uint32, HLString> m_ShaderSources;
 		std::unordered_map<HLString, ShaderBuffer> m_Buffers;
 		std::unordered_map<HLString, ShaderResourceDeclaration> m_Resources;
 		std::unordered_map<HLString, int32> m_UniformLocations;
 		std::vector<ShaderReloadedCallback> m_ReloadedCallbacks;
-		std::vector<PushConstantRange> m_PushConstantRanges;
-		std::vector<ShaderUniformStruct> m_ShaderUniformStructs;
+
+		std::map<GLenum, StageData> m_StagesMetaData;
 	};
 }
 

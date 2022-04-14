@@ -55,6 +55,22 @@ namespace std
 
 namespace highlo
 {
+	struct StageData
+	{
+		std::unordered_set<IncludeData> Headers;
+		uint64 HashValue = 0;
+
+		bool operator==(const StageData &other) const
+		{
+			return Headers == other.Headers && HashValue == other.HashValue;
+		}
+
+		bool operator!=(const StageData &other) const
+		{
+			return !(*this == other);
+		}
+	};
+
 	class ShaderPreProcessor : public IsSharedReference
 	{
 	public:

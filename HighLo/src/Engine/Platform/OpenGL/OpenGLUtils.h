@@ -138,6 +138,122 @@ namespace highlo
 			HL_ASSERT(false);
 			return 0;
 		}
+
+		// Shader utils
+		static GLenum ShaderStageFromString(const HLString &str)
+		{
+			HLString type = str.ToLowerCase();
+
+			if (type == "vertex")
+				return GL_VERTEX_SHADER_BIT;
+
+			if (type == "fragment" || type == "pixel")
+				return GL_FRAGMENT_SHADER_BIT;
+
+			if (type == "compute")
+				return GL_COMPUTE_SHADER_BIT;
+
+			if (type == "tesscontrol")
+				return GL_TESS_CONTROL_SHADER_BIT;
+
+			if (type == "tessevaluation")
+				return GL_TESS_EVALUATION_SHADER_BIT;
+
+			if (type == "geometry")
+				return GL_GEOMETRY_SHADER_BIT;
+
+			return 0;
+		}
+
+		static GLenum ShaderTypeToOpenGLStage(ShaderType type)
+		{
+			switch (type)
+			{
+				case ShaderType::Vertex:
+					return GL_VERTEX_SHADER_BIT;
+
+				case ShaderType::Fragment:
+					return GL_FRAGMENT_SHADER_BIT;
+
+				case ShaderType::Compute:
+					return GL_COMPUTE_SHADER_BIT;
+
+				case ShaderType::TessControl:
+					return GL_TESS_CONTROL_SHADER_BIT;
+
+				case ShaderType::TessEvaluation:
+					return GL_TESS_EVALUATION_SHADER_BIT;
+
+				case ShaderType::Geometry:
+					return GL_GEOMETRY_SHADER_BIT;
+			}
+
+			HL_ASSERT(false);
+			return 0;
+		}
+
+		static ShaderType GLStageToShaderType(const GLenum stage)
+		{
+			switch (stage)
+			{
+				case GL_VERTEX_SHADER_BIT:
+					return ShaderType::Vertex;
+
+				case GL_FRAGMENT_SHADER_BIT:
+					return ShaderType::Fragment;
+
+				case GL_COMPUTE_SHADER_BIT:
+					return ShaderType::Compute;
+
+				case GL_TESS_CONTROL_SHADER_BIT:
+					return ShaderType::TessControl;
+
+				case GL_TESS_EVALUATION_SHADER_BIT:
+					return ShaderType::TessEvaluation;
+
+				case GL_GEOMETRY_SHADER_BIT:
+					return ShaderType::Geometry;
+			}
+
+			return ShaderType::None;
+		}
+
+		static std::unordered_map<GLenum, HLString> ConvertShaderTypeToOpenGLStage(const std::unordered_map<ShaderType, HLString> &sources)
+		{
+			std::unordered_map<GLenum, HLString> result;
+			for (auto &[type, source] : sources)
+			{
+				GLenum stage = utils::ShaderTypeToOpenGLStage(type);
+				result.insert({ stage, source });
+			}
+
+			return result;
+		}
+
+		static std::unordered_map<ShaderType, HLString> ConvertOpenGLStageToShaderType(const std::unordered_map<GLenum, HLString> &sources)
+		{
+			std::unordered_map<ShaderType, HLString> result;
+			for (auto &[stage, source] : sources)
+			{
+				ShaderType type = utils::GLStageToShaderType(stage);
+				result.insert({ type, source });
+			}
+
+			return result;
+		}
+
+		static std::string_view StageToShaderMacro(const std::string_view stage)
+		{
+			if (stage == "vertex") return "__VERTEX_STAGE__";
+			if (stage == "fragment") return "__FRAGMENT_STAGE__";
+			if (stage == "compute") return "__COMPUTE_STAGE__";
+			if (stage == "geometry") return "__GEOMETRY_STAGE__";
+			if (stage == "tesscontrol") return "__TESS_CONTROL_STAGE__";
+			if (stage == "tesseval") return "__TESS_EVAL_STAGE__";
+
+			HL_ASSERT(false, "Unknown shader stage.");
+			return "";
+		}
 	}
 }
 

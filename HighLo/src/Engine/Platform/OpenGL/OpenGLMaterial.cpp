@@ -341,6 +341,7 @@ namespace highlo
 							break;
 						}
 
+						/*
 						case ShaderUniformType::Struct:
 						{
 							std::vector<OpenGLShader::ShaderUniformStruct> structs = shader->GetUniformStructs();
@@ -449,6 +450,7 @@ namespace highlo
 
 						break;
 						}
+						*/
 
 						default:
 						{

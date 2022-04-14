@@ -121,7 +121,6 @@ namespace highlo
 		FileSystemPath m_AssetPath;
 		ShaderLanguage m_Language = ShaderLanguage::None;
 		uint32 m_ConstantBufferOffset = 0;
-		Ref<ShaderPreProcessor> m_PreProcessor = nullptr;
 
 		std::unordered_map<HLString, HLString> m_Macros;
 		std::unordered_set<HLString> m_AcknowledgedMacros;

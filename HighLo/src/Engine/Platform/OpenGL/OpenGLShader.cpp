@@ -281,7 +281,6 @@ namespace highlo
 	{
 		m_Name = filePath.Filename();
 		m_Language = utils::ShaderLanguageFromExtension(filePath.Extension());
-		m_PreProcessor = ShaderPreProcessor::Create();
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 	}
@@ -289,7 +288,6 @@ namespace highlo
 	OpenGLShader::OpenGLShader(const HLString &source)
 	{
 		m_Name = "undefined";
-		m_PreProcessor = ShaderPreProcessor::Create();
 		Load(source, true);
 	}
 
@@ -931,7 +929,7 @@ namespace highlo
 
 	std::unordered_map<GLenum, HLString> OpenGLShader::PreProcessGLSL(const HLString &source)
 	{
-		std::unordered_map<ShaderType, HLString> shaderSources = m_PreProcessor->PreProcessShader(source, m_AcknowledgedMacros);
+		std::unordered_map<ShaderType, HLString> shaderSources = ShaderPreProcessor::PreprocessShader<ShaderLanguage::GLSL>(source, m_AcknowledgedMacros);
 		std::unordered_map<GLenum, HLString> glShaderSources = utils::ConvertShaderTypeToOpenGLStage(shaderSources);
 		shaderc::Compiler compiler;
 

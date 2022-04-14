@@ -18,7 +18,7 @@
 
 namespace highlo
 {
-#define PRINT_SHADERS 0
+#define PRINT_SHADERS 1
 #define PRINT_DEBUG_OUTPUTS 1
 #define GL_SHADER_LOG_PREFIX "Shader>       "
 
@@ -933,6 +933,8 @@ namespace highlo
 		std::unordered_map<GLenum, HLString> glShaderSources = utils::ConvertShaderTypeToOpenGLStage(shaderSources);
 		shaderc::Compiler compiler;
 
+		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Pre-processing GLSL: {0} [+]", **m_AssetPath);
+
 		shaderc_util::FileFinder fileFinder;
 		fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
 		fileFinder.search_path().emplace_back("assets/shaders/Include/Shared/");
@@ -962,6 +964,9 @@ namespace highlo
 			m_AcknowledgedMacros.merge(includer->GetParsedSpecialMacros());
 
 			shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
+		#if PRINT_SHADERS
+			HL_CORE_TRACE("{0}", *shaderSource);
+		#endif // PRINT_SHADERS
 		}
 
 		return glShaderSources;

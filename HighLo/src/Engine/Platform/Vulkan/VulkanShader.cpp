@@ -435,7 +435,7 @@ namespace highlo
         fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
         fileFinder.search_path().emplace_back("assets/shaders/Include/Shared/");
 
-        HL_CORE_TRACE("Pre-processing GLSL:");
+        HL_CORE_INFO(VULKAN_SHADER_LOG_PREFIX "[+] Pre-processing GLSL: {0} [+]", **m_AssetPath);
 
         for (auto &[stage, shaderSource] : vkShaderSources)
         {

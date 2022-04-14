@@ -20,7 +20,7 @@
 #include "Engine/Graphics/Shaders/GLSLIncluder.h"
 
 #define VULKAN_SHADER_LOG_PREFIX "Shader>       "
-#define VULKAN_SHADER_PRINT_SHADERS 0
+#define VULKAN_SHADER_PRINT_SHADERS 1
 
 namespace highlo
 {
@@ -154,7 +154,6 @@ namespace highlo
     {
         m_Name = filePath.Filename();
         m_Language = utils::ShaderLanguageFromExtension(filePath.Extension());
-        m_PreProcessor = ShaderPreProcessor::Create();
         HLString source = FileSystem::Get()->ReadTextFile(filePath);
         Load(source, forceCompile);
     }
@@ -162,7 +161,6 @@ namespace highlo
     VulkanShader::VulkanShader(const HLString &source)
     {
         m_Name = "undefined";
-        m_PreProcessor = ShaderPreProcessor::Create();
         Load(source, true);
     }
     
@@ -186,6 +184,7 @@ namespace highlo
         
         const HLString &source = FileSystem::Get()->ReadTextFile(m_AssetPath);
         Load(source, forceCompile);
+        Renderer::OnShaderReloaded(GetHash());
     }
 
     void VulkanShader::Release()
@@ -406,7 +405,6 @@ namespace highlo
         CreateDescriptors();
 
     //    Renderer::AcknowledgeParsedGlobalMacros(m_AcknowledgedMacros, Ref<VulkanShader>(this));
-        Renderer::OnShaderReloaded(GetHash());
     }
 
     std::unordered_map<VkShaderStageFlagBits, HLString> VulkanShader::PreProcess(const HLString &source)
@@ -429,13 +427,15 @@ namespace highlo
     
     std::unordered_map<VkShaderStageFlagBits, HLString> VulkanShader::PreProcessGLSL(const HLString &source)
     {
-        std::unordered_map<ShaderType, HLString> shaderSources = m_PreProcessor->PreProcessShader(source, m_AcknowledgedMacros);
+        std::unordered_map<ShaderType, HLString> shaderSources = ShaderPreProcessor::PreprocessShader<ShaderLanguage::GLSL>(source, m_AcknowledgedMacros);
         std::unordered_map<VkShaderStageFlagBits, HLString> vkShaderSources = utils::ConvertShaderTypeToVulkanStage(shaderSources);
         shaderc::Compiler compiler;
 
         shaderc_util::FileFinder fileFinder;
         fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
         fileFinder.search_path().emplace_back("assets/shaders/Include/Shared/");
+
+        HL_CORE_TRACE("Pre-processing GLSL:");
 
         for (auto &[stage, shaderSource] : vkShaderSources)
         {
@@ -462,6 +462,9 @@ namespace highlo
             m_AcknowledgedMacros.merge(includer->GetParsedSpecialMacros());
 
             shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
+        #if VULKAN_SHADER_PRINT_SHADERS
+            HL_CORE_TRACE("{0}", *shaderSource);
+        #endif // VULKAN_SHADER_PRINT_SHADERS
         }
 
         return vkShaderSources;
@@ -470,7 +473,7 @@ namespace highlo
     std::unordered_map<VkShaderStageFlagBits, HLString> VulkanShader::PreProcessHLSL(const HLString &source)
     {
         std::unordered_map<VkShaderStageFlagBits, HLString> result;
-
+        // TODO
         return result;
     }
     

@@ -30,8 +30,6 @@ namespace highlo
 
 	private:
 
-		Ref<ShaderPreProcessor> m_PreProcessor = nullptr;
-
 		const shaderc_util::FileFinder &m_FileFinder;
 		std::unordered_set<IncludeData> m_IncludeData;
 		std::unordered_set<HLString> m_ParsedSpecialMacros;

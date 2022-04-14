@@ -94,7 +94,6 @@ namespace highlo
 		HLString m_Name;
 		FileSystemPath m_AssetPath;
 		ShaderLanguage m_Language = ShaderLanguage::None;
-		Ref<ShaderPreProcessor> m_PreProcessor = nullptr;
 
 		std::unordered_map<HLString, ShaderBuffer> m_Buffers;
 		std::unordered_map<HLString, ShaderResourceDeclaration> m_Resources;

@@ -51,13 +51,10 @@ namespace highlo
 	GLSLIncluder::GLSLIncluder(const shaderc_util::FileFinder *fileFinder)
 		: m_FileFinder(*fileFinder)
 	{
-		m_PreProcessor = ShaderPreProcessor::Create();
 	}
 
 	GLSLIncluder::~GLSLIncluder()
 	{
-		// Decrement the ref-count
-		m_PreProcessor = nullptr;
 	}
 
 	shaderc_include_result *GLSLIncluder::GetInclude(const char *requestedPath, shaderc_include_type type, const char *requestingPath, size_t includeDepth)
@@ -72,7 +69,7 @@ namespace highlo
 				HL_CORE_ERROR("Failed to load included file: {0} in {1}", requestedFullPath.string().c_str(), requestingPath);
 
 			sourceHash = source.Hash();
-			shaderType = m_PreProcessor->PreProcessHeader(source, isGuarded, m_ParsedSpecialMacros, m_IncludeData, FileSystemPath(requestedFullPath.string().c_str()));
+			shaderType = ShaderPreProcessor::PreprocessHeader<ShaderLanguage::GLSL>(source, isGuarded, m_ParsedSpecialMacros, m_IncludeData, FileSystemPath(requestedFullPath.string().c_str()));
 		}
 		else if (isGuarded)
 		{

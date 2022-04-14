@@ -387,19 +387,6 @@ namespace highlo::utils
 		return "";
 	}
 
-	static std::string_view StageToShaderMacro(const std::string_view stage)
-	{
-		if (stage == "vertex") return "__VERTEX_STAGE__";
-		if (stage == "fragment") return "__FRAGMENT_STAGE__";
-		if (stage == "compute") return "__COMPUTE_STAGE__";
-		if (stage == "geometry") return "__GEOMETRY_STAGE__";
-		if (stage == "tesscontrol") return "__TESS_CONTROL_STAGE__";
-		if (stage == "tesseval") return "__TESS_EVAL_STAGE__";
-
-		HL_ASSERT(false, "Unknown shader stage.");
-		return "";
-	}
-
 	static VkShaderStageFlagBits StageToVKShaderStage(const std::string_view stage)
 	{
 		if (stage == "vertex")		return VK_SHADER_STAGE_VERTEX_BIT;

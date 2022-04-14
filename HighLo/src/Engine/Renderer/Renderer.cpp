@@ -80,13 +80,16 @@ namespace highlo
 		// Load 3D Shaders
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Collider.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Grid.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SelectedGeometry.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMap.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMapAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Wireframe.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Composite.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/SceneComposite.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepth.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepthAnimated.glsl");
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/LightCulling.glsl");
 
 		// Load 2D Shaders

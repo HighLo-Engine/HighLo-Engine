@@ -853,6 +853,12 @@ namespace highlo
 
 	void OpenGLShader::CreateDescriptors()
 	{
+		for (uint32 set = 0; set < m_ShaderDescriptorSets.size(); ++set)
+		{
+			auto &shaderDescriptorSet = m_ShaderDescriptorSets[set];
+
+			// TODO
+		}
 	}
 	
 	void OpenGLShader::CompileOrGetOpenGLBinary(std::unordered_map<uint32, std::vector<uint32>> &shaderData, bool forceCompile)

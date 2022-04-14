@@ -1,4 +1,4 @@
-#version 430 core
+#version 450 core
 #pragma shader:vertex
 
 layout(location = 0) in vec3 in_WorldPosition;

@@ -1,4 +1,4 @@
-#version 430 core
+#version 450 core
 #pragma shader:compute
 
 #include <EnvironmentMapping.glslh>

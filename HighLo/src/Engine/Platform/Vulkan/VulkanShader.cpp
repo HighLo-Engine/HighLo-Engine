@@ -19,6 +19,9 @@
 
 #include "Engine/Graphics/Shaders/GLSLIncluder.h"
 
+#define VULKAN_SHADER_LOG_PREFIX "Shader>       "
+#define VULKAN_SHADER_PRINT_SHADERS 0
+
 namespace highlo
 {
     namespace utils
@@ -387,10 +390,17 @@ namespace highlo
     {
         HL_ASSERT(!source.IsEmpty(), "Failed to load source!");
         m_ShaderSources = PreProcess(source);
-        bool shaderCacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
+
+    #if VULKAN_SHADER_PRINT_SHADERS
+        HL_CORE_TRACE("SHADERS AFTER PREPROCESSING:");
+        for (auto &[stage, source] : m_ShaderSources)
+        {
+            HL_CORE_TRACE("{0}:\n{1}", *utils::ShaderStageToString(stage), *source);
+        }
+    #endif // VULKAN_SHADER_PRINT_SHADERS
 
         std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> shaderData;
-        CompileOrGetVulkanBinary(shaderData, shaderCacheHasChanged, forceCompile);
+        CompileOrGetVulkanBinary(shaderData, forceCompile);
         LoadAndCreateShaders(shaderData);
         ReflectAllShaderStages(shaderData);
         CreateDescriptors();
@@ -401,6 +411,9 @@ namespace highlo
 
     std::unordered_map<VkShaderStageFlagBits, HLString> VulkanShader::PreProcess(const HLString &source)
     {
+        // Extract vertex and fragment shaders
+
+
         switch (m_Language)
         {
             case ShaderLanguage::GLSL:
@@ -421,8 +434,8 @@ namespace highlo
         shaderc::Compiler compiler;
 
         shaderc_util::FileFinder fileFinder;
-    //    fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
-    //    fileFinder.search_path().emplace_back("assets/shaders/Include/Common/");
+        fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
+        fileFinder.search_path().emplace_back("assets/shaders/Include/Shared/");
 
         for (auto &[stage, shaderSource] : vkShaderSources)
         {
@@ -439,7 +452,9 @@ namespace highlo
 
             const auto preProcessingResult = compiler.PreprocessGlsl(*shaderSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
             if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
+            {
                 HL_CORE_ERROR("Failed to pre-process Shader {0} with error {1}", **m_AssetPath, preProcessingResult.GetErrorMessage());
+            }
 
             m_StagesMetaData[stage].HashValue = shaderSource.Hash();
             m_StagesMetaData[stage].Headers = std::move(includer->GetIncludeData());
@@ -480,7 +495,7 @@ namespace highlo
         spirv_cross::Compiler compiler(shaderData);
         auto &resources = compiler.get_shader_resources();
 
-        HL_CORE_TRACE("Uniform Buffers:");
+        HL_CORE_TRACE("Uniform Buffers: {0}", resources.uniform_buffers.size());
         for (const auto &resource : resources.uniform_buffers)
         {
             auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
@@ -522,7 +537,7 @@ namespace highlo
             }
         }
 
-        HL_CORE_TRACE("Storage Buffers:");
+        HL_CORE_TRACE("Storage Buffers: {0}", resources.storage_buffers.size());
         for (const auto &resource : resources.storage_buffers)
         {
             auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
@@ -564,11 +579,11 @@ namespace highlo
             }
         }
 
-        HL_CORE_TRACE("Push Constant Buffers:");
+        HL_CORE_TRACE("Push Constant Buffers: {0}", resources.push_constant_buffers.size());
         for (const auto &resource : resources.push_constant_buffers)
         {
             const auto &bufferName = resource.name;
-            auto &bufferType = compiler.get_type(resource.id);
+            auto &bufferType = compiler.get_type(resource.type_id);
             uint32 bufferSize = (uint32)compiler.get_declared_struct_size(bufferType);
             uint32 memberCount = (uint32)bufferType.member_types.size();
             uint32 bufferOffset = 0;
@@ -603,7 +618,7 @@ namespace highlo
             }
         }
 
-        HL_CORE_TRACE("Sampled Images:");
+        HL_CORE_TRACE("Sampled Images: {0}", resources.sampled_images.size());
         for (const auto &resource : resources.sampled_images)
         {
             const auto &name = resource.name;
@@ -633,7 +648,7 @@ namespace highlo
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
         }
 
-        HL_CORE_TRACE("Separate Images:");
+        HL_CORE_TRACE("Separate Images: {0}", resources.separate_images.size());
         for (const auto &resource : resources.separate_images)
         {
             const auto &name = resource.name;
@@ -663,7 +678,7 @@ namespace highlo
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
         }
 
-        HL_CORE_TRACE("Separate Samplers:");
+        HL_CORE_TRACE("Separate Samplers: {0}", resources.separate_samplers.size());
         for (const auto &resource : resources.separate_samplers)
         {
             const auto &name = resource.name;
@@ -693,7 +708,7 @@ namespace highlo
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
         }
 
-        HL_CORE_TRACE("Storage Images:");
+        HL_CORE_TRACE("Storage Images: {0}", resources.storage_images.size());
         for (const auto &resource : resources.storage_images)
         {
             const auto &name = resource.name;
@@ -722,7 +737,7 @@ namespace highlo
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
         }
 
-        HL_CORE_TRACE("Special macros:");
+        HL_CORE_TRACE("Special macros: {0}", m_AcknowledgedMacros.size());
         for (const auto &macro : m_AcknowledgedMacros)
         {
             HL_CORE_TRACE("{0}", *macro);
@@ -768,14 +783,18 @@ namespace highlo
         return "unknown Language!";
     }
 
-    void VulkanShader::CompileOrGetVulkanBinary(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, bool cacheChanged, bool forceCompile)
+    void VulkanShader::CompileOrGetVulkanBinary(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, bool forceCompile)
     {
         FileSystemPath cacheDirectory = utils::GetCacheDirectory();
 
         for (auto &[stage, source] : m_ShaderSources)
         {
+            if (source.IsEmpty())
+                continue;
+
+            bool shaderCacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
             const HLString &extension = utils::ShaderStageCachedFileExtension(stage);
-            if (!forceCompile)
+            if (!forceCompile && !shaderCacheHasChanged)
             {
                 TryGetVulkanCachedBinary(cacheDirectory, extension, outBinary, stage);
             }
@@ -798,7 +817,7 @@ namespace highlo
                 }
                 else
                 {
-                    HL_CORE_ERROR("{}", *error);
+                    HL_CORE_ERROR("{0}", *error);
 
                     TryGetVulkanCachedBinary(cacheDirectory, extension, outBinary, stage);
                     if (outBinary[stage].empty())

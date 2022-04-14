@@ -1,4 +1,6 @@
-﻿/*
+﻿#version 430 core
+#pragma shader:vertex
+
 // HighLoPBR Static Shader
 // 
 // References:
@@ -6,10 +8,6 @@
 // - Frostbite's SIGGRAPH paper from 2014 (https://seblagarde.wordpress.com/2015/07/14/siggraph-2014-moving-frostbite-to-physically-based-rendering/)
 // - Michał Siejak's PBR Project (https://github.com/Nadrin)
 // - Sparky Engine (https://github.com/TheCherno/Sparky)
-*/
-
-#version 450 core
-#pragma shader:vertex
 
 // Vertex Buffer
 layout(location = 0) in vec3 a_Position;
@@ -72,7 +70,7 @@ void main()
 	gl_Position = u_ViewProjectionMatrix * u_Renderer.Transform * vec4(a_Position, 1.0);
 }
 
-#version 450 core
+#version 430 core
 #pragma shader:fragment
 
 const float PI = 3.141592;

@@ -15,6 +15,12 @@ project "shaderc"
 		"libshaderc_util/**.cc",
 	}
 	
+	includedirs
+	{
+		"libshaderc_util/include",
+		"%{VULKAN_SDK}/Include"
+	}
+	
 	filter "system:linux"
 		systemversion "latest"
 		staticruntime "On"

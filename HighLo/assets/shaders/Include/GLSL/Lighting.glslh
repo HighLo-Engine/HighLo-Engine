@@ -1,0 +1,38 @@
+#pragma once
+
+#include <Common.glslh>
+#include <Buffers.glslh>
+
+struct DirectionalLight
+{
+	vec3 Direction;
+	float ShadowAmount;
+	vec3 Radiance;
+	float Multiplier;
+};
+
+struct PointLight
+{
+	vec3 Position;
+	float Multiplier;
+	vec3 Radiance;
+	float MinRadius;
+	float Radius;
+	float Falloff;
+	float LightSize;
+	bool CastsShadows;
+};
+
+layout(std140, binding = 2) uniform SceneData
+{
+	DirectionalLight DirectionalLights;
+	vec3 CameraPosition;
+	float EnvironmentMapIntensity;
+} u_Scene;
+
+layout(std140, binding = 4) uniform PointLightData
+{
+	uint LightCount;
+	PointLight Lights[1000];
+} u_PointLights;
+

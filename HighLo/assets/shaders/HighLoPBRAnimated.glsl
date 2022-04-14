@@ -6,7 +6,7 @@
 // - Michał Siejak's PBR Project (https://github.com/Nadrin)
 // - Sparky Engine (https://github.com/TheCherno/Sparky)
 
-#version 450 core
+#version 430 core
 #pragma shader:vertex
 
 layout(location = 0) in vec3 a_Position;
@@ -77,7 +77,7 @@ void main()
 	gl_Position = u_ViewProjectionMatrix * u_Transform * localPosition;
 }
 
-#version 450 core
+#version 430 core
 #pragma shader:fragment
 
 const float PI = 3.141592;

@@ -1,6 +1,6 @@
 // Source: https://www.shadertoy.com/view/llSSDR
 
-#version 450 core
+#version 430 core
 #pragma shader:compute
 
 #define PI 3.14159265359

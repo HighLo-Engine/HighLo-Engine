@@ -172,12 +172,18 @@ namespace highlo
 			{
 				++index;
 
+				if (index >= tokens.size())
+				{
+					HL_CORE_WARN("Could not find any pre-processor directive!");
+					break;
+				}
+
 				if (tokens[index] == "shader")
 				{
 					HL_ASSERT(tokens[index + 1] == ":");
 
 					const std::string_view stage(tokens[++index]);
-					HL_ASSERT(stage == "vertex" || stage == "fragment" || stage == "geometry" || stage == "compute" || stage == "tess_control" || stage == "tess_eval", "Invalid shader type");
+					HL_ASSERT(stage == "vertex" || stage == "fragment" || stage == "pixel" || stage == "geometry" || stage == "compute" || stage == "tess_control" || stage == "tess_eval", "Invalid shader type");
 					VkShaderStageFlagBits foundStage = utils::ShaderStageFromString(std::string(stage.begin(), stage.end()));
 
 					const bool alreadyIncluded = std::find_if(includeData.begin(), includeData.end(), [fullPath](const IncludeData &data)
@@ -191,7 +197,7 @@ namespace highlo
 					}
 					else if (!isGuarded && alreadyIncluded)
 					{
-
+						HL_CORE_WARN("\"{0}\" Header does not contain a header guard (#pragma once).", **fullPath);
 					}
 
 					if (stageCount == 0)
@@ -247,7 +253,7 @@ namespace highlo
 			}
 			else if (!isGuarded && alreadyIncluded)
 			{
-				HL_CORE_WARN("\"{0}\" Header does not contain a header guard (#pragma once)", **fullPath);
+				HL_CORE_WARN("{0} Header does not contain a header guard (#pragma once)", **fullPath);
 			}
 		}
 
@@ -291,7 +297,7 @@ namespace highlo
 				{
 					++index;
 					// Jump over ':'
-					HL_ASSERT(tokens[index] == ":", "Stage pragma is invalid");
+					HL_ASSERT(tokens[index] == ":", "Shader pragma is invalid");
 					++index;
 
 					const std::string_view stage = tokens[index];
@@ -304,7 +310,7 @@ namespace highlo
 			else if (tokens[index] == "ifdef")
 			{
 				++index;
-				if (tokens[index].rfind("__HZ_", 0) == 0) // Hazel special macros start with "__HZ_"
+				if (tokens[index].rfind("__HIGHLO_", 0) == 0)
 				{
 					specialMacros.emplace(tokens[index]);
 				}
@@ -314,7 +320,7 @@ namespace highlo
 				++index;
 				for (uint64 i = index; i < tokens.size(); ++i)
 				{
-					if (tokens[i].rfind("__HZ_", 0) == 0) // Hazel special macros start with "__HZ_"
+					if (tokens[i].rfind("__HIGHLO_", 0) == 0)
 					{
 						specialMacros.emplace(tokens[i]);
 					}
@@ -332,37 +338,34 @@ namespace highlo
 			pos = newSource.find('#', pos + 1);
 		}
 
-		HL_ASSERT(stagePositions.size(), "Could not pre-process shader! There are no known stages defined in file.");
+		HL_ASSERT(stagePositions.size(), "Could not pre-process shader! There are no known shaders defined in file.");
+
+		// Get first stage
 		auto &[firstStage, firstStagePos] = stagePositions[0];
 		if (stagePositions.size() > 1)
 		{
-			// Get first stage
 			const std::string firstStageStr = newSource.substr(0, stagePositions[1].second);
-			uint64 lineCount = std::count(firstStageStr.begin(), firstStageStr.end(), '\n') + 1;
 			shaderSources[firstStage] = firstStageStr;
-
-
-			// Get stages in the middle
-			for (uint64 i = 1; i < stagePositions.size() - 1; ++i)
-			{
-				auto &[stage, stagePos] = stagePositions[i];
-				std::string stageStr = newSource.substr(stagePos, stagePositions[i + 1].second - stagePos);
-				const uint64 secondLinePos = stageStr.find_first_of('\n', 1) + 1;
-				stageStr.insert(secondLinePos, fmt::format("#line {}\n", lineCount));
-				shaderSources[stage] = stageStr;
-				lineCount += std::count(stageStr.begin(), stageStr.end(), '\n') + 1;
-			}
-
-			// Get last stage
-			auto &[stage, stagePos] = stagePositions[stagePositions.size() - 1];
-			std::string lastStageStr = newSource.substr(stagePos);
-			const uint64 secondLinePos = lastStageStr.find_first_of('\n', 1) + 1;
-			lastStageStr.insert(secondLinePos, fmt::format("#line {}\n", lineCount + 1));
-			shaderSources[stage] = lastStageStr;
 		}
 		else
 		{
+			// we only have one shader source
 			shaderSources[firstStage] = newSource;
+		}
+
+		for (uint64 i = 1; i < stagePositions.size(); ++i)
+		{
+			auto &[stage, stagePos] = stagePositions[i];
+
+			if ((i + 1) >= stagePositions.size())
+			{
+				std::string lastStageStr = newSource.substr(stagePos);
+				shaderSources[stage] = lastStageStr;
+				break;
+			}
+
+			std::string stageStr = newSource.substr(stagePos, stagePositions[i + 1].second - stagePos);
+			shaderSources[stage] = stageStr;
 		}
 
 		return utils::ConvertVulkanStageToShaderType(shaderSources);

@@ -285,7 +285,6 @@ namespace highlo::utils
 				return ShaderType::Geometry;
 		}
 
-		HL_ASSERT(false);
 		return ShaderType::None;
 	}
 

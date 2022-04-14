@@ -1,4 +1,4 @@
-#version 450 core
+#version 430 core
 #pragma shader:compute
 
 const float PI = 3.141592;

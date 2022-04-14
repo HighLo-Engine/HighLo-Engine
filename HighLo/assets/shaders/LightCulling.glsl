@@ -3,7 +3,7 @@
 // - https://github.com/bcrusco/Forward-Plus-Renderer
 // - https://gitlab.com/chernoprojects/Hazel-dev/
 
-#version 450 core
+#version 430 core
 #pragma shader:compute
 
 #define TILE_SIZE 16

@@ -1,4 +1,4 @@
-#version 450 core
+#version 430 core
 #pragma shader:vertex
 
 layout(location = 0) in vec3 a_Position;
@@ -17,7 +17,7 @@ void main()
 	gl_Position = vec4(a_Position.xy, 0.0, 1.0);
 }
 
-#version 450 core
+#version 430 core
 #pragma shader:fragment
 
 layout(location = 0) out vec4 o_Color;

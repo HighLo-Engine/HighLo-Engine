@@ -54,11 +54,44 @@ layout(std140, binding = 18) uniform HBAOData
 
 layout(std430, binding = 14) buffer VisiblePointLightIndicesBuffer
 {
-	int indices[];
-} u_VisiblePointLightIndicesBuffer;
+	int Indices[];
+} s_VisiblePointLightIndicesBuffer;
 
 layout(std140, binding = 1) uniform ShadowData
 {
 	mat4 DirLightMatrices[4];
 } u_DirShadow;
+
+struct DirectionalLight
+{
+	vec3 Direction;
+	float ShadowAmount;
+	vec3 Radiance;
+	float Multiplier;
+};
+
+struct PointLight
+{
+	vec3 Position;
+	float Multiplier;
+	vec3 Radiance;
+	float MinRadius;
+	float Radius;
+	float Falloff;
+	float LightSize;
+	bool CastsShadows;
+};
+
+layout(std140, binding = 2) uniform SceneData
+{
+	DirectionalLight DirectionalLights;
+	vec3 CameraPosition;
+	float EnvironmentMapIntensity;
+} u_Scene;
+
+layout(std140, binding = 4) uniform PointLightData
+{
+	uint LightCount;
+	PointLight Lights[1000];
+} u_PointLights;
 

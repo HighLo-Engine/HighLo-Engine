@@ -801,9 +801,18 @@ namespace highlo
 		for (auto &[stage, data] : shaderData)
 		{
 			GLuint shaderId = glCreateShader(stage);
-			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
+		//	glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
+			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), (uint32)data.size());
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderId);
+
+			GLint status;
+			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
+			if (status == GL_FALSE)
+			{
+				HL_ASSERT(false);
+			}
+
 
 			shaderRendererIds.emplace_back(shaderId);
 		}

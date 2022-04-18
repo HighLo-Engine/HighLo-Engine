@@ -2,6 +2,7 @@
 #pragma shader:compute
 
 #include <Buffers.glslh>
+#include <Lighting.glslh>
 
 #define TILE_SIZE 16
 #define MAX_LIGHT_COUNT 1024
@@ -11,7 +12,7 @@
 // - https://github.com/bcrusco/Forward-Plus-Renderer
 // - https://gitlab.com/chernoprojects/Hazel-dev/
 
-layout(set = 0, binding = 15) uniform sampler2D u_PreDepthMap;
+layout(set = 0, binding = 15) uniform sampler2D u_DepthMap;
 
 // Shared values between all the threads in the group
 shared uint minDepthInt;

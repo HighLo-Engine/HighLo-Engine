@@ -16,7 +16,7 @@ layout(location = 6) in vec4 a_BoneWeights;
 
 void main()
 {
-
+	gl_Position = vec4(a_Position, 1.0);
 }
 
 #version 450 core
@@ -27,8 +27,10 @@ void main()
 #include <Lighting.glslh>
 #include <ShadowMapping.glslh>
 
+layout(location = 0) out vec4 o_Color;
+
 void main()
 {
-
+	o_Color = vec4(1.0);
 }
 

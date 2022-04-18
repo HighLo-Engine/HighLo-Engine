@@ -4,11 +4,6 @@
 
 #include <Buffers.glslh>
 
-layout(std140, binding = 1) uniform ShadowData
-{
-	mat4 DirLightMatrices[4];
-} u_DirShadow;
-
 const float ShadowFade = 1.0;
 
 const vec2 PoissonDistribution[64] = vec2[](

@@ -57,3 +57,8 @@ layout(std430, binding = 14) buffer VisiblePointLightIndicesBuffer
 	int indices[];
 } u_VisiblePointLightIndicesBuffer;
 
+layout(std140, binding = 1) uniform ShadowData
+{
+	mat4 DirLightMatrices[4];
+} u_DirShadow;
+

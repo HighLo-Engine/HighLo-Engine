@@ -1,4 +1,5 @@
 #pragma once
+#pragma shader:fragment
 
 #include <Common.glslh>
 #include <Buffers.glslh>

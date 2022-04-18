@@ -390,14 +390,6 @@ namespace highlo
         HL_ASSERT(!source.IsEmpty(), "Failed to load source!");
         m_ShaderSources = PreProcess(source);
 
-    #if VULKAN_SHADER_PRINT_SHADERS
-        HL_CORE_TRACE("SHADERS AFTER PREPROCESSING:");
-        for (auto &[stage, source] : m_ShaderSources)
-        {
-            HL_CORE_TRACE("{0}:\n{1}", *utils::ShaderStageToString(stage), *source);
-        }
-    #endif // VULKAN_SHADER_PRINT_SHADERS
-
         std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> shaderData;
         CompileOrGetVulkanBinary(shaderData, forceCompile);
         LoadAndCreateShaders(shaderData);
@@ -410,7 +402,6 @@ namespace highlo
     std::unordered_map<VkShaderStageFlagBits, HLString> VulkanShader::PreProcess(const HLString &source)
     {
         // Extract vertex and fragment shaders
-
 
         switch (m_Language)
         {
@@ -462,6 +453,7 @@ namespace highlo
             m_AcknowledgedMacros.merge(includer->GetParsedSpecialMacros());
 
             shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
+
         #if VULKAN_SHADER_PRINT_SHADERS
             HL_CORE_TRACE("{0}", *shaderSource);
         #endif // VULKAN_SHADER_PRINT_SHADERS

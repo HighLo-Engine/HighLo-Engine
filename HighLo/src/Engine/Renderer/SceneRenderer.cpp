@@ -662,7 +662,7 @@ namespace highlo
 	//	Renderer::EndRenderPass(m_CommandBuffer);
 
 		// Render normal geometry
-		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
+	//	Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
 
 		// First render skybox
 	//	m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
@@ -694,7 +694,7 @@ namespace highlo
 			Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
 		}
 
-		Renderer::EndRenderPass(m_CommandBuffer);
+	//	Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::JumpFloodPass()
@@ -707,16 +707,16 @@ namespace highlo
 
 	void SceneRenderer::CompositePass()
 	{
-		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
-		auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
-		float exposure = m_SceneData.SceneCamera.GetExposure();
-		int32 textureSamples = framebuffer->GetSpecification().Samples;
-
-		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
-		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
-
-		Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
-		Renderer::EndRenderPass(m_CommandBuffer);
+	//	Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
+	//	auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+	//	float exposure = m_SceneData.SceneCamera.GetExposure();
+	//	int32 textureSamples = framebuffer->GetSpecification().Samples;
+	//
+	//	m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
+	//	m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
+	//
+	//	Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
+	//	Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::UpdateStatistics()
@@ -1039,7 +1039,7 @@ namespace highlo
 		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
 		renderPassSpec.DebugName = "SceneComposite";
 
-		auto &shader = Renderer::GetShaderLibrary()->Get("Composite");
+		auto &shader = Renderer::GetShaderLibrary()->Get("SceneComposite");
 
 		VertexArraySpecification spec;
 		spec.Layout = BufferLayout::GetCompositeLayout();

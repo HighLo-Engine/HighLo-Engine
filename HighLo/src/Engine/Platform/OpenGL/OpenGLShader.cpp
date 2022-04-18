@@ -952,7 +952,7 @@ namespace highlo
 
 			options.SetIncluder(std::unique_ptr<GLSLIncluder>(includer));
 
-			const auto preProcessingResult = compiler.PreprocessGlsl(*shaderSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
+			shaderc::PreprocessedSourceCompilationResult preProcessingResult = compiler.PreprocessGlsl(*shaderSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
 			if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
 			{
 				HL_CORE_ERROR("Failed to pre-process Shader {0} with error {1}", **m_AssetPath, preProcessingResult.GetErrorMessage());
@@ -964,6 +964,7 @@ namespace highlo
 			m_AcknowledgedMacros.merge(includer->GetParsedSpecialMacros());
 
 			shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
+
 		#if PRINT_SHADERS
 			HL_CORE_TRACE("{0}", *shaderSource);
 		#endif // PRINT_SHADERS

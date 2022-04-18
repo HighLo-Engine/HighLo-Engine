@@ -13,14 +13,17 @@ layout(location = 3) in vec4 a_MRow0;
 layout(location = 4) in vec4 a_MRow1;
 layout(location = 5) in vec4 a_MRow2;
 
-layout(binding = 0, set = 1) uniform mat4 u_BoneTransforms[MAX_BONES];
+layout(push_constant) uniform Uniforms
+{
+	mat4 BoneTransforms[MAX_BONES];
+} u_Uniforms;
 
 void main()
 {
-	mat4 boneTransform = u_BoneTransforms[a_BoneIndices[0]] * a_BoneWeights[0];
-    boneTransform += u_BoneTransforms[a_BoneIndices[1]] * a_BoneWeights[1];
-    boneTransform += u_BoneTransforms[a_BoneIndices[2]] * a_BoneWeights[2];
-    boneTransform += u_BoneTransforms[a_BoneIndices[3]] * a_BoneWeights[3];
+	mat4 boneTransform = u_Uniforms.BoneTransforms[a_BoneIndices[0]] * a_BoneWeights[0];
+    boneTransform += u_Uniforms.BoneTransforms[a_BoneIndices[1]] * a_BoneWeights[1];
+    boneTransform += u_Uniforms.BoneTransforms[a_BoneIndices[2]] * a_BoneWeights[2];
+    boneTransform += u_Uniforms.BoneTransforms[a_BoneIndices[3]] * a_BoneWeights[3];
 
 	mat4 transform = mat4(
 		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),

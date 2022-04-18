@@ -25,9 +25,9 @@ namespace highlo
 			return 0;
 		}
 
-		static HLString ReadFileAndSkipBOM(const std::filesystem::path &filePath)
+		static std::string ReadFileAndSkipBOM(const std::filesystem::path &filePath)
 		{
-			HLString result;
+			std::string result;
 			std::ifstream in(filePath, std::ios::in | std::ios::binary);
 			if (in)
 			{
@@ -36,8 +36,8 @@ namespace highlo
 				const int32 skippedChars = SkipBOM(in);
 
 				fileSize -= skippedChars - 1;
-				result.Resize(fileSize);
-				in.read(result.C_Str() + 1, fileSize);
+				result.resize(fileSize);
+				in.read(result.data() + 1, fileSize);
 
 				// Add a dummy tab to beginning of file.
 				result[0] = '\t';
@@ -59,6 +59,7 @@ namespace highlo
 
 	shaderc_include_result *GLSLIncluder::GetInclude(const char *requestedPath, shaderc_include_type type, const char *requestingPath, size_t includeDepth)
 	{
+		shaderc_include_result *result = new shaderc_include_result();
 		std::filesystem::path requestedFullPath = (type == shaderc_include_type_relative) ? m_FileFinder.FindRelativeReadableFilepath(requestingPath, requestedPath) : m_FileFinder.FindReadableFilepath(requestedPath);
 		auto &[source, sourceHash, shaderType, isGuarded] = m_HeaderCache[requestedFullPath.string()];
 
@@ -85,20 +86,19 @@ namespace highlo
 		inc.IncludedType = shaderType;
 		m_IncludeData.emplace(inc);
 
-		auto *const container = new std::array<std::string, 2>;
+		std::array<std::string, 2> *const container = new std::array<std::string, 2>();
 		(*container)[0] = requestedPath;
-		(*container)[1] = *source;
+		(*container)[1] = source.IsEmpty() ? "" : *source;
 
-		auto *const data = new shaderc_include_result();
-		data->user_data = container;
+		result->user_data = container;
 
-		data->source_name = (*container)[0].data();
-		data->source_name_length = (*container)[0].size();
+		result->source_name = (*container)[0].data();
+		result->source_name_length = (*container)[0].size();
 
-		data->content = (*container)[1].data();
-		data->content_length = (*container)[1].size();
+		result->content = (*container)[1].data();
+		result->content_length = (*container)[1].size();
 
-		return data;
+		return result;
 	}
 
 	void GLSLIncluder::ReleaseInclude(shaderc_include_result *result)

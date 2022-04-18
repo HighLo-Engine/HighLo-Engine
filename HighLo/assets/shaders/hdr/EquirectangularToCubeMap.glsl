@@ -9,7 +9,7 @@ layout(binding = 1) uniform sampler2D u_EquirectangularTexture;
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 void main()
 {
-	vec3 cubeTC = GetCubeMapTexCoord(vec2(imagesize(o_Cubemap)));
+	vec3 cubeTC = GetCubeMapTexCoord(vec2(imageSize(o_Cubemap)));
 	
 	float phi = atan(cubeTC.z, cubeTC.x);
 	float theta = acos(cubeTC.y);

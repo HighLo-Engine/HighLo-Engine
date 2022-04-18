@@ -49,7 +49,8 @@ namespace highlo
         {
             (void)pUserData; //Unused argument
 
-            HLString labels, objects;
+            HLString labels = "";
+            HLString objects = "";
             if (pCallbackData->cmdBufLabelCount)
             {
                 labels = fmt::format("\tLabels({}): \n", pCallbackData->cmdBufLabelCount).c_str();
@@ -71,7 +72,7 @@ namespace highlo
                 }
             }
 
-            HL_CORE_WARN(fmt::format("{0} {1} messege: \n\t{2}\n {3} {4}", VkDebugUtilsMessageType(messageType), VkDebugUtilsMessageSeverity(messageSeverity), pCallbackData->pMessage, labels, objects).c_str());
+            HL_CORE_WARN("{0} {1} message: \n\t{2}\n{3} {4}", VkDebugUtilsMessageType(messageType), VkDebugUtilsMessageSeverity(messageSeverity), pCallbackData->pMessage, *labels, *objects);
 
             return VK_FALSE;
 

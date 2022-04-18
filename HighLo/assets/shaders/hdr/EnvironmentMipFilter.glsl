@@ -2,25 +2,26 @@
 #pragma shader:compute
 
 #include <EnvironmentMapping.glslh>
+#include <PBR.glslh>
 
-const uint NumSamples = 1024;
-const float InvNumSamples = 1.0 / float(NumSamples);
-const int NumMipLevels = 1;
-layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture[NumMipLevels];
+#define NUM_SAMPLES 1024
+#define NUM_MIP_LEVELS 1
+#define PARAM_LEVEL 0
+#define INVERSE_NUM_SAMPLES (1.0 / float(NUM_SAMPLES))
+
+layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture[NUM_MIP_LEVELS];
 layout(binding = 1) uniform samplerCube inputTexture;
 
 layout (push_constant) uniform Uniforms
 {
 	float Roughness;
 } u_Uniforms;
+#define PARAM_ROUGHNESS u_Uniforms.Roughness
 
 vec2 SampleHammersley(uint i)
 {
-	return vec2(i * InvNumSamples, RadicalInverse_VdC(i));
+	return vec2(i * INVERSE_NUM_SAMPLES, RadicalInverse_VdC(i));
 }
-
-#define PARAM_LEVEL     0
-#define PARAM_ROUGHNESS u_Uniforms.Roughness
 
 layout(local_size_x=32, local_size_y=32, local_size_z=1) in;
 void main(void)
@@ -48,7 +49,7 @@ void main(void)
 
 	// Convolve environment map using GGX NDF importance sampling.
 	// Weight by cosine term since Epic claims it generally improves quality.
-	for(uint i = 0; i < NumSamples; i++)
+	for(uint i = 0; i < NUM_SAMPLES; i++)
 	{
 		vec2 u = SampleHammersley(i);
 		vec3 Lh = TangentToWorld(SampleGGX(u.x, u.y, PARAM_ROUGHNESS), N, S, T);
@@ -69,7 +70,7 @@ void main(void)
 			float pdf = NdfGGX(cosLh, PARAM_ROUGHNESS) * 0.25;
 
 			// Solid angle associated with this sample.
-			float ws = 1.0 / (NumSamples * pdf);
+			float ws = 1.0 / (NUM_SAMPLES * pdf);
 
 			// Mip level to sample from.
 			float mipLevel = max(0.5 * log2(ws / wt) + 1.0, 0.0);

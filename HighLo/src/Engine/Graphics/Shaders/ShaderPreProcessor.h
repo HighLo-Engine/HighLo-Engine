@@ -310,7 +310,7 @@ namespace highlo
 						newSource.replace(startOfShaderStage, endOfLine - startOfShaderStage, fmt::format("#endif\r#ifdef {}", utils::StageToShaderMacro(stage)));
 					}
 
-					*(int32 *)&stagesInHeader |= (int32)foundStage;
+					*(int32*)&stagesInHeader |= (int32)foundStage;
 					++stageCount;
 				}
 				else if (tokens[index] == "ifdef")

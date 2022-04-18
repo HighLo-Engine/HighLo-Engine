@@ -13,10 +13,17 @@ layout(location = 5) in vec4 a_MRow0;
 layout(location = 6) in vec4 a_MRow1;
 layout(location = 7) in vec4 a_MRow2;
 
+#ifdef __VULKAN__
 layout (push_constant) uniform Transform
 {
 	uint Cascade;
 } u_Renderer;
+#else
+layout(binding = 0, std140) uniform Transform
+{
+	uint Cascade;
+} u_Renderer;
+#endif
 
 void main()
 {

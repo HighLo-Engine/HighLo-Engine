@@ -13,10 +13,17 @@ layout(location = 3) in vec4 a_MRow0;
 layout(location = 4) in vec4 a_MRow1;
 layout(location = 5) in vec4 a_MRow2;
 
+#ifdef __VULKAN__
 layout(push_constant) uniform Uniforms
 {
 	mat4 BoneTransforms[MAX_BONES];
 } u_Uniforms;
+#else
+layout(binding = 0, std140) uniform Uniforms
+{
+	mat4 BoneTransforms[MAX_BONES];
+} u_Uniforms;
+#endif
 
 void main()
 {

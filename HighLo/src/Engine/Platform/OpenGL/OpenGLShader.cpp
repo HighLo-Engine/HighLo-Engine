@@ -18,9 +18,17 @@
 
 namespace highlo
 {
-#define PRINT_SHADERS 1
-#define PRINT_DEBUG_OUTPUTS 1
 #define GL_SHADER_LOG_PREFIX "Shader>       "
+#define PRINT_DEBUG_ALL 0
+
+#ifdef HL_DEBUG
+#define PRINT_DEBUG_OUTPUTS 1
+#endif
+
+#if PRINT_DEBUG_ALL
+#define PRINT_DEBUG_OUTPUTS 1
+#define PRINT_PREPROCESSING_RESULT 1
+#endif
 
 	namespace utils
 	{
@@ -314,6 +322,7 @@ namespace highlo
 	{
 		glUseProgram(0);
 		glDeleteProgram(m_RendererID);
+		m_RendererID = 0;
 	}
 
 	uint64 OpenGLShader::GetHash() const
@@ -788,14 +797,9 @@ namespace highlo
 		std::vector<GLuint> shaderRendererIds;
 		shaderRendererIds.reserve(shaderData.size());
 
-		FileSystemPath cacheDirectory = utils::GetCacheDirectory();
-
 		m_ConstantBufferOffset = 0;
 		for (auto &[stage, data] : shaderData)
 		{
-			if (data.size() == 0)
-				continue;
-
 			GLuint shaderId = glCreateShader(stage);
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
@@ -805,6 +809,7 @@ namespace highlo
 		}
 
 		// Link shader program
+		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Linking Shader {0} [+]", **m_AssetPath);
 		glLinkProgram(program);
 
 		int32 isLinked = 0;
@@ -814,8 +819,6 @@ namespace highlo
 			int32 maxLength = 0;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
-			// This check is here to prevent laptops (integrated gpus) to trigger this error
-			// for some reason they seem to not set isLinked properly, so the maxLength will tell us if there was an error.
 			if (maxLength > 0)
 			{
 				std::vector<GLchar> infoLog(maxLength);
@@ -884,8 +887,8 @@ namespace highlo
 					FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
 					FILE *f;
-					errno_t error = fopen_s(&f, **p, "wb");
-					if (error)
+					errno_t fileError = fopen_s(&f, **p, "wb");
+					if (fileError)
 						HL_CORE_ERROR("Failed to cache shader binary!");
 
 					fwrite(shaderData[stage].data(), sizeof(uint32), shaderData[stage].size(), f);
@@ -943,6 +946,7 @@ namespace highlo
 		{
 			shaderc::CompileOptions options;
 			options.AddMacroDefinition("__GLSL__");
+			options.AddMacroDefinition("__OPENGL__");
 			options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
 
 			for (auto &[name, value] : m_Macros)
@@ -965,9 +969,9 @@ namespace highlo
 
 			shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
 
-		#if PRINT_SHADERS
+		#if PRINT_PREPROCESSING_RESULT
 			HL_CORE_TRACE("{0}", *shaderSource);
-		#endif // PRINT_SHADERS
+		#endif // PRINT_PREPROCESSING_RESULT
 		}
 
 		return glShaderSources;

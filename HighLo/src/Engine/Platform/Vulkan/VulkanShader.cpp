@@ -432,6 +432,7 @@ namespace highlo
         {
             shaderc::CompileOptions options;
             options.AddMacroDefinition("__GLSL__");
+            options.AddMacroDefinition("__VULKAN__");
             options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
 
             for (auto &[name, value] : m_Macros)

@@ -36,12 +36,21 @@ layout (binding = 0) uniform sampler2D u_Texture;
 //layout (binding = 2) uniform sampler2D u_BloomDirtTexture;
 //layout (binding = 3) uniform sampler2D u_DepthTexture;
 
+#ifdef __VULKAN__
 layout(push_constant) uniform Uniforms
 {
 	float Exposure;
 //	float BloomIntensity;
 //	float BloomDirtIntensity;
 } u_Uniforms;
+#else
+layout(binding = 4, std140) uniform Uniforms
+{
+	float Exposure;
+//	float BloomIntensity;
+//	float BloomDirtIntensity;
+} u_Uniforms;
+#endif
 
 vec3 UpsampleTent9(sampler2D tex, float lod, vec2 uv, vec2 texelSize, float radius)
 {

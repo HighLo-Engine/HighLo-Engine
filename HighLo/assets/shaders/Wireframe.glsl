@@ -30,10 +30,17 @@ void main()
 
 layout(location = 0) out vec4 o_Color;
 
+#ifdef __VULKAN__
 layout(push_constant) uniform MaterialUniforms
 {
 	layout(offset = 64) vec4 Color;
 } u_MaterialUniforms;
+#else
+layout(binding = 0, std140) uniform MaterialUniforms
+{
+	layout(offset = 64) vec4 Color;
+} u_MaterialUniforms;
+#endif
 
 void main()
 {

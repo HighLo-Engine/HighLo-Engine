@@ -6,10 +6,17 @@
 layout(binding = 0, rgba32f) restrict writeonly uniform imageCube o_IrradianceMap;
 layout(binding = 1) uniform samplerCube u_RadianceMap;
 
+#ifdef __VULKAN__
 layout(push_constant) uniform Uniforms
 {
 	uint Samples;
 } u_Uniforms;
+#else
+layout(binding = 2, std140) uniform Uniforms
+{
+	uint Samples;
+} u_Uniforms;
+#endif
 
 layout(local_size_x=32, local_size_y=32, local_size_z=1) in;
 void main()

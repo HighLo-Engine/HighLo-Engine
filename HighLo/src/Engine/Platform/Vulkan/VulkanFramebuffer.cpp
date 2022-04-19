@@ -31,6 +31,7 @@ namespace highlo
     
     void VulkanFramebuffer::AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func)
     {
+        m_ResizeCallbacks.push_back(func);
     }
     
     void VulkanFramebuffer::BindTexture(uint32 attachmentIndex, uint32 slot) const
@@ -43,17 +44,18 @@ namespace highlo
     
     int32 VulkanFramebuffer::ReadPixel(uint32 attachmentIndex, int32 x, int32 y)
     {
-        return int32();
+        return 0;
     }
     
     Ref<Texture> VulkanFramebuffer::GetImage(uint32 attachmentIndex) const
     {
-        return Ref<Texture>();
+        HL_ASSERT(attachmentIndex < m_AttachmentImages.size());
+        return m_AttachmentImages[attachmentIndex].As<Texture>();
     }
     
     Ref<Texture> VulkanFramebuffer::GetDepthImage() const
     {
-        return Ref<Texture>();
+        return m_DepthImage.As<Texture>();
     }
 }
 

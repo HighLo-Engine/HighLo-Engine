@@ -9,6 +9,7 @@
 
 #include "VulkanDevice.h"
 #include "VulkanContext.h"
+#include "VulkanShaderDefs.h"
 
 // Macro to get a procedure address based on a vulkan instance
 #define GET_INSTANCE_PROC_ADDR(inst, entrypoint)                        \
@@ -419,6 +420,22 @@ namespace highlo::utils
 		{
 			ShaderType type = utils::VulkanStageToShaderType(stage);
 			result.insert({ type, source });
+		}
+
+		return result;
+	}
+
+	static std::vector<VkPushConstantRange> PushConstantRangeToVulkanPushConstantRange(const std::vector<VulkanShaderPushConstantRange> &pushConstants)
+	{
+		std::vector<VkPushConstantRange> result(pushConstants.size());
+		for (uint32 i = 0; i < pushConstants.size(); ++i)
+		{
+			const auto &pushConstantRange = pushConstants[i];
+			auto &entry = result[i];
+
+			entry.stageFlags = pushConstantRange.Stage;
+			entry.offset = pushConstantRange.Offset;
+			entry.size = pushConstantRange.Size;
 		}
 
 		return result;

@@ -36,10 +36,29 @@ namespace highlo
 		virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
 		virtual const FramebufferSpecification &GetSpecification() const override { return m_Specification; }
 
+		// TODO: make this global
+		uint64 GetColorAttachmentCount() const { return m_Specification.SwapChainTarget ? 1 : m_AttachmentImages.size(); }
+		bool HasDepthAttachment() const { return (bool)m_DepthImage; }
+
+		// Vulkan-specific
+		VkRenderPass GetRenderPass() const { return m_RenderPass; }
+		VkFramebuffer GetFramebuffer() const { return m_Framebuffer; }
+		const std::vector<VkClearValue> &GetClearValues() const { return m_ClearValues; }
+
 	private:
 
 		HLRendererID m_RendererID = 0;
 		FramebufferSpecification m_Specification;
+
+		std::vector<Ref<Texture2D>> m_AttachmentImages;
+		Ref<Texture2D> m_DepthImage;
+
+		std::vector<VkClearValue> m_ClearValues;
+
+		VkRenderPass m_RenderPass = nullptr;
+		VkFramebuffer m_Framebuffer = nullptr;
+
+		std::vector<std::function<void(Ref<Framebuffer>)>> m_ResizeCallbacks;
 	};
 }
 

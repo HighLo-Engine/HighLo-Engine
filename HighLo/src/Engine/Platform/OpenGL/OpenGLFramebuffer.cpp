@@ -7,6 +7,8 @@
 
 #include <glad/glad.h>
 
+#include "Engine/Utils/ImageUtils.h"
+
 #include "Engine/Application/Application.h"
 #include "Engine/Renderer/Renderer.h"
 #include "OpenGLTexture2D.h"
@@ -107,17 +109,6 @@ namespace highlo
 			}
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, utils::TextureTarget(multisampled), id, 0);
-		}
-
-		static bool IsDepthFormat(TextureFormat format)
-		{
-			switch (format)
-			{
-				case TextureFormat::DEPTH24STENCIL8:
-				case TextureFormat::DEPTH32F:
-					return true;
-			}
-			return false;
 		}
 
 		static GLenum HighLoFBTextureFormatToGL(TextureFormat format)

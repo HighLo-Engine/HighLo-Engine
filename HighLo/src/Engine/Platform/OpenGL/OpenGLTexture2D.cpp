@@ -398,6 +398,11 @@ namespace highlo
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(properties.SamplerWrap));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(properties.SamplerWrap));
 	}
+
+	void OpenGLTexture2D::CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices)
+	{
+		// TODO
+	}
 	
 	void OpenGLTexture2D::UpdateResourceData()
 	{

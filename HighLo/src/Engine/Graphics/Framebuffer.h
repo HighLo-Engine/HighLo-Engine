@@ -57,9 +57,12 @@ namespace highlo
 		uint32 Height = 0;
 
 		glm::vec4 ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float DepthClearValue = 0.0f;
 		FramebufferAttachmentSpecification Attachments;
 		uint32 Samples = 1;
 		bool ClearOnLoad = true;
+		bool ClearColorOnLoad = true;
+		bool ClearDepthOnLoad = true;
 
 		bool NoResize = false;
 		bool SwapChainTarget = false;

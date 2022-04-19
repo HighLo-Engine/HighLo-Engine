@@ -15,8 +15,8 @@ namespace highlo
 		VulkanFramebuffer(const FramebufferSpecification &spec);
 		virtual ~VulkanFramebuffer();
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() const override {}
+		virtual void Unbind() const override {}
 
 		virtual void Resize(uint32 width, uint32 height, bool forceRecreate = false) override;
 		virtual void AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func) override;
@@ -44,6 +44,12 @@ namespace highlo
 		VkRenderPass GetRenderPass() const { return m_RenderPass; }
 		VkFramebuffer GetFramebuffer() const { return m_Framebuffer; }
 		const std::vector<VkClearValue> &GetClearValues() const { return m_ClearValues; }
+
+	private:
+
+		// TODO: Make these global
+		void Invalidate();
+		void Release();
 
 	private:
 

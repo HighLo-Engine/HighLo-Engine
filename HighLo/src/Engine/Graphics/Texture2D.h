@@ -34,6 +34,7 @@ namespace highlo
 		HLAPI virtual HLRendererID GetSamplerRendererID() const = 0;
 
 		HLAPI virtual void CreatePerLayerImageViews() = 0;
+		HLAPI virtual void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices) = 0;
 		HLAPI virtual void CreateSampler(TextureProperties properties) = 0;
 
 		HLAPI static AssetType GetStaticType() { return AssetType::Texture; }

@@ -76,6 +76,7 @@ namespace highlo
 			switch (format)
 			{
 				case TextureFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
 				case TextureFormat::DEPTH32F:
 					return true;
 			}

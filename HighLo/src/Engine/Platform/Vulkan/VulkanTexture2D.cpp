@@ -67,6 +67,10 @@ namespace highlo
     void VulkanTexture2D::CreateSampler(TextureProperties properties)
     {
     }
+
+    void VulkanTexture2D::CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices)
+    {
+    }
     
     void VulkanTexture2D::UpdateResourceData()
     {

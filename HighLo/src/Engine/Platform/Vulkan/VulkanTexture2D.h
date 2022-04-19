@@ -44,6 +44,7 @@ namespace highlo
 
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
+		virtual void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices) override;
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }

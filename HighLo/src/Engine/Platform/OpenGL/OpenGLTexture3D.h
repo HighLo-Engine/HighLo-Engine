@@ -41,7 +41,7 @@ namespace highlo
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
-		virtual void GenerateMips() override;
+		virtual void GenerateMips(bool readonly = false) override;
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }

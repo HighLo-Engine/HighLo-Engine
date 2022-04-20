@@ -20,7 +20,16 @@
 #include "Engine/Graphics/Shaders/GLSLIncluder.h"
 
 #define VULKAN_SHADER_LOG_PREFIX "Shader>       "
-#define VULKAN_SHADER_PRINT_SHADERS 1
+#define PRINT_DEBUG_ALL 0
+
+#ifdef HL_DEBUG
+#define PRINT_DEBUG_OUTPUTS 1
+#endif
+
+#if PRINT_DEBUG_ALL
+#define PRINT_DEBUG_OUTPUTS 1
+#define PRINT_PREPROCESSING_RESULT 1
+#endif
 
 namespace highlo
 {
@@ -171,6 +180,8 @@ namespace highlo
     
     void VulkanShader::Reload(bool forceCompile)
     {
+        HL_CORE_INFO(VULKAN_SHADER_LOG_PREFIX "[+] Reloading shader {0}... [+]", **m_AssetPath);
+
         Release();
 
         m_PipelineShaderStageCreateInfos.clear();
@@ -184,7 +195,10 @@ namespace highlo
         
         const HLString &source = FileSystem::Get()->ReadTextFile(m_AssetPath);
         Load(source, forceCompile);
+
         Renderer::OnShaderReloaded(GetHash());
+        for (auto &callback : m_ReloadedCallbacks)
+            callback();
     }
 
     void VulkanShader::Release()
@@ -387,16 +401,25 @@ namespace highlo
     
     void VulkanShader::Load(const HLString &source, bool forceCompile)
     {
-        HL_ASSERT(!source.IsEmpty(), "Failed to load source!");
-        m_ShaderSources = PreProcess(source);
+        if (FileSystem::Get()->FileExists(m_AssetPath))
+        {
+            HL_CORE_INFO(VULKAN_SHADER_LOG_PREFIX "[+] Trying to create shader {0} [+]", **m_AssetPath);
 
-        std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> shaderData;
-        CompileOrGetVulkanBinary(shaderData, forceCompile);
-        LoadAndCreateShaders(shaderData);
-        ReflectAllShaderStages(shaderData);
-        CreateDescriptors();
+            m_ShaderSources = PreProcess(source);
 
-    //    Renderer::AcknowledgeParsedGlobalMacros(m_AcknowledgedMacros, Ref<VulkanShader>(this));
+            std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> shaderData;
+            CompileOrGetVulkanBinary(shaderData, forceCompile);
+            LoadAndCreateShaders(shaderData);
+            ReflectAllShaderStages(shaderData);
+            CreateDescriptors();
+
+            HL_CORE_INFO(VULKAN_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
+            //    Renderer::AcknowledgeParsedGlobalMacros(m_AcknowledgedMacros, Ref<VulkanShader>(this));
+        }
+        else
+        {
+            HL_CORE_WARN(VULKAN_SHADER_LOG_PREFIX "[-] Shader {0} not found! [-]", **m_AssetPath);
+        }
     }
 
     std::unordered_map<VkShaderStageFlagBits, HLString> VulkanShader::PreProcess(const HLString &source)
@@ -455,9 +478,9 @@ namespace highlo
 
             shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
 
-        #if VULKAN_SHADER_PRINT_SHADERS
+        #if PRINT_PREPROCESSING_RESULT
             HL_CORE_TRACE("{0}", *shaderSource);
-        #endif // VULKAN_SHADER_PRINT_SHADERS
+        #endif // PRINT_PREPROCESSING_RESULT
         }
 
         return vkShaderSources;
@@ -484,14 +507,18 @@ namespace highlo
     {
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("===========================");
         HL_CORE_TRACE(" Vulkan Shader Reflection ");
         HL_CORE_TRACE("===========================");
+    #endif // PRINT_DEBUG_OUTPUTS
 
         spirv_cross::Compiler compiler(shaderData);
         auto &resources = compiler.get_shader_resources();
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Uniform Buffers: {0}", resources.uniform_buffers.size());
+    #endif // PRINT_DEBUG_OUTPUTS
         for (const auto &resource : resources.uniform_buffers)
         {
             auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
@@ -526,14 +553,19 @@ namespace highlo
 
                 shaderDescriptorSet.UniformBuffers[binding] = s_UniformBuffers.at(descriptorSet).at(binding);
 
+            #if PRINT_DEBUG_OUTPUTS
                 HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
                 HL_CORE_TRACE("  Member Count: {0}", memberCount);
                 HL_CORE_TRACE("  Size: {0}", size);
                 HL_CORE_TRACE("-------------------");
+            #endif // PRINT_DEBUG_OUTPUTS
             }
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Storage Buffers: {0}", resources.storage_buffers.size());
+    #endif // PRINT_DEBUG_OUTPUTS
+
         for (const auto &resource : resources.storage_buffers)
         {
             auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
@@ -568,14 +600,19 @@ namespace highlo
 
                 shaderDescriptorSet.StorageBuffers[binding] = s_StorageBuffers.at(descriptorSet).at(binding);
 
+            #if PRINT_DEBUG_OUTPUTS
                 HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
                 HL_CORE_TRACE("  Member Count: {0}", memberCount);
                 HL_CORE_TRACE("  Size: {0}", size);
                 HL_CORE_TRACE("-------------------");
+            #endif // PRINT_DEBUG_OUTPUTS
             }
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Push Constant Buffers: {0}", resources.push_constant_buffers.size());
+    #endif // PRINT_DEBUG_OUTPUTS
+
         for (const auto &resource : resources.push_constant_buffers)
         {
             const auto &bufferName = resource.name;
@@ -598,9 +635,11 @@ namespace highlo
             shaderBuffer.Name = bufferName;
             shaderBuffer.Size = bufferSize - bufferOffset;
 
+        #if PRINT_DEBUG_OUTPUTS
             HL_CORE_TRACE("  Name: {0}", bufferName);
             HL_CORE_TRACE("  Member Count: {0}", memberCount);
             HL_CORE_TRACE("  Size: {0}", bufferSize);
+        #endif // PRINT_DEBUG_OUTPUTS
 
             for (uint32 i = 0; i < memberCount; ++i)
             {
@@ -614,7 +653,10 @@ namespace highlo
             }
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Sampled Images: {0}", resources.sampled_images.size());
+    #endif // PRINT_DEBUG_OUTPUTS
+
         for (const auto &resource : resources.sampled_images)
         {
             const auto &name = resource.name;
@@ -641,10 +683,15 @@ namespace highlo
 
             m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+        #if PRINT_DEBUG_OUTPUTS
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+        #endif // PRINT_DEBUG_OUTPUTS
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Separate Images: {0}", resources.separate_images.size());
+    #endif // PRINT_DEBUG_OUTPUTS
+
         for (const auto &resource : resources.separate_images)
         {
             const auto &name = resource.name;
@@ -671,10 +718,15 @@ namespace highlo
 
             m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+        #if PRINT_DEBUG_OUTPUTS
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+        #endif // PRINT_DEBUG_OUTPUTS
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Separate Samplers: {0}", resources.separate_samplers.size());
+    #endif // PRINT_DEBUG_OUTPUTS
+
         for (const auto &resource : resources.separate_samplers)
         {
             const auto &name = resource.name;
@@ -701,10 +753,15 @@ namespace highlo
 
             m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+        #if PRINT_DEBUG_OUTPUTS
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+        #endif // PRINT_DEBUG_OUTPUTS
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Storage Images: {0}", resources.storage_images.size());
+    #endif // PRINT_DEBUG_OUTPUTS
+
         for (const auto &resource : resources.storage_images)
         {
             const auto &name = resource.name;
@@ -730,9 +787,12 @@ namespace highlo
 
             m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+        #if PRINT_DEBUG_OUTPUTS
             HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+        #endif // PRINT_DEBUG_OUTPUTS
         }
 
+    #if PRINT_DEBUG_OUTPUTS
         HL_CORE_TRACE("Special macros: {0}", m_AcknowledgedMacros.size());
         for (const auto &macro : m_AcknowledgedMacros)
         {
@@ -740,6 +800,7 @@ namespace highlo
         }
 
         HL_CORE_TRACE("===========================");
+    #endif // PRINT_DEBUG_OUTPUTS
     }
 
     HLString VulkanShader::Compile(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outputBinary, const VkShaderStageFlagBits stage) const

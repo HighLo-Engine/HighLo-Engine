@@ -57,7 +57,7 @@ namespace highlo
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
-		virtual void GenerateMips() override;
+		virtual void GenerateMips(bool readonly = false) override;
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 

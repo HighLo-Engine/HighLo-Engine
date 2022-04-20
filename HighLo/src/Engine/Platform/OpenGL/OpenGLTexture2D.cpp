@@ -484,7 +484,7 @@ namespace highlo
 		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 
-	void OpenGLTexture2D::GenerateMips()
+	void OpenGLTexture2D::GenerateMips(bool readonly)
 	{
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}

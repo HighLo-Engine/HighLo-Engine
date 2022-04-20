@@ -161,7 +161,7 @@ namespace highlo
 		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 
-	void OpenGLTexture3D::GenerateMips()
+	void OpenGLTexture3D::GenerateMips(bool readonly)
 	{
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}

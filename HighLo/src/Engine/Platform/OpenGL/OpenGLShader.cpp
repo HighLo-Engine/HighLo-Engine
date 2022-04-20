@@ -306,7 +306,7 @@ namespace highlo
 
 	void OpenGLShader::Reload(bool forceCompile)
 	{
-		HL_CORE_TRACE("Reloading shader {0}...", **m_AssetPath);
+		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Reloading shader {0}... [+]", **m_AssetPath);
 		m_Loaded = false; // Reflect current stage: Shader is being reloaded
 
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
@@ -463,14 +463,19 @@ namespace highlo
 	
 	void OpenGLShader::Reflect(GLenum shaderStage, const std::vector<uint32> &shaderData)
 	{
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("===========================");
 		HL_CORE_TRACE(" OpenGL Shader Reflection ");
 		HL_CORE_TRACE("===========================");
+	#endif // PRINT_DEBUG_OUTPUTS
 
 		spirv_cross::Compiler compiler(shaderData);
 		auto &resources = compiler.get_shader_resources();
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Uniform Buffers: {0}", resources.uniform_buffers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.uniform_buffers)
 		{
 			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
@@ -505,14 +510,19 @@ namespace highlo
 
 				shaderDescriptorSet.UniformBuffers[binding] = s_UniformBuffers.at(descriptorSet).at(binding);
 
+			#if PRINT_DEBUG_OUTPUTS
 				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
 				HL_CORE_TRACE("  Member Count: {0}", memberCount);
 				HL_CORE_TRACE("  Size: {0}", size);
 				HL_CORE_TRACE("-------------------");
+			#endif // PRINT_DEBUG_OUTPUTS
 			}
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Storage Buffers: {0}", resources.storage_buffers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.storage_buffers)
 		{
 			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
@@ -547,14 +557,19 @@ namespace highlo
 
 				shaderDescriptorSet.StorageBuffers[binding] = s_StorageBuffers.at(descriptorSet).at(binding);
 
+			#if PRINT_DEBUG_OUTPUTS
 				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
 				HL_CORE_TRACE("  Member Count: {0}", memberCount);
 				HL_CORE_TRACE("  Size: {0}", size);
 				HL_CORE_TRACE("-------------------");
+			#endif // PRINT_DEBUG_OUTPUTS
 			}
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Push Constant Buffers: {0}", resources.push_constant_buffers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.push_constant_buffers)
 		{
 			const auto &bufferName = resource.name;
@@ -577,9 +592,11 @@ namespace highlo
 			shaderBuffer.Name = bufferName;
 			shaderBuffer.Size = bufferSize - bufferOffset;
 
+		#if PRINT_DEBUG_OUTPUTS
 			HL_CORE_TRACE("  Name: {0}", bufferName);
 			HL_CORE_TRACE("  Member Count: {0}", memberCount);
 			HL_CORE_TRACE("  Size: {0}", bufferSize);
+		#endif // PRINT_DEBUG_OUTPUTS
 
 			for (uint32 i = 0; i < memberCount; ++i)
 			{
@@ -593,7 +610,10 @@ namespace highlo
 			}
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Sampled Images: {0}", resources.sampled_images.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.sampled_images)
 		{
 			const auto &name = resource.name;
@@ -620,10 +640,15 @@ namespace highlo
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+		#if PRINT_DEBUG_OUTPUTS
 			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Separate Images: {0}", resources.separate_images.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.separate_images)
 		{
 			const auto &name = resource.name;
@@ -650,10 +675,15 @@ namespace highlo
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+		#if PRINT_DEBUG_OUTPUTS
 			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Separate Samplers: {0}", resources.separate_samplers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.separate_samplers)
 		{
 			const auto &name = resource.name;
@@ -680,10 +710,15 @@ namespace highlo
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+		#if PRINT_DEBUG_OUTPUTS
 			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Storage Images: {0}", resources.storage_images.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
 		for (const auto &resource : resources.storage_images)
 		{
 			const auto &name = resource.name;
@@ -709,9 +744,12 @@ namespace highlo
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
+		#if PRINT_DEBUG_OUTPUTS
 			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
+	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Special macros: {0}", m_AcknowledgedMacros.size());
 		for (const auto &macro : m_AcknowledgedMacros)
 		{
@@ -719,6 +757,7 @@ namespace highlo
 		}
 
 		HL_CORE_TRACE("===========================");
+	#endif // PRINT_DEBUG_OUTPUTS
 	}
 
 	void OpenGLShader::ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData)

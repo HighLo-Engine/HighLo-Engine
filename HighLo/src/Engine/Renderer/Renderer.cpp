@@ -68,15 +68,6 @@ namespace highlo
 		s_CommandQueue = new RenderCommandQueue();
 		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
 
-		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData);
-		
-		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
-		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
-
-		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
-		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
-
 		// Load 3D Shaders
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
@@ -104,8 +95,17 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/PreethamSky.glsl");
 
-		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();
+		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
+
+		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
+		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData);
+
+		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
+		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
+
+		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
+		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
 
 		// Make sure the queue is empty after the renderer is initialized
 		Renderer::WaitAndRender();

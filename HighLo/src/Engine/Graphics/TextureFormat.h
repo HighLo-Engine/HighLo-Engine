@@ -58,7 +58,8 @@ namespace highlo
 	{
 		None = 0,
 		Linear,
-		Nearest
+		Nearest,
+		Cubic
 	};
 
 	enum class TextureType

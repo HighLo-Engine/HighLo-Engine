@@ -190,7 +190,7 @@ namespace highlo
         if (m_OwnedBySwapchain)
             return;
 
-        auto &device = VulkanContext::GetCurrentDevice();
+        auto device = VulkanContext::GetCurrentDevice();
         uint32 frameIndex = Renderer::GetCurrentFrameIndex();
         VkCommandBuffer commandBuffer = m_CommandBuffers[frameIndex];
 

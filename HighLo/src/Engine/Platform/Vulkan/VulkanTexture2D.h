@@ -59,8 +59,8 @@ namespace highlo
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 
-		virtual void Bind(uint32 slot) const override;
-		virtual void Unbind(uint32 slot) const override;
+		virtual void Bind(uint32 slot) const override {}
+		virtual void Unbind(uint32 slot) const override {}
 
 		// Vulkan-specific
 		const VkDescriptorImageInfo &GetDescriptorInfo() const { return m_DescriptorImageInfo; }
@@ -73,7 +73,14 @@ namespace highlo
 
 	private:
 
+		void InvalidateTextureInfo();
+		void ReleaseTextureInfo();
+		void UpdateDescriptor();
+
+	private:
+
 		Allocator m_Buffer;
+		FileSystemPath m_FilePath;
 		HLRendererID m_SamplerRendererID = 0;
 		TextureSpecification m_Specification;
 		bool m_Locked = false;
@@ -81,6 +88,9 @@ namespace highlo
 
 		VkDescriptorImageInfo m_DescriptorImageInfo = {};
 		VulkanImageInfo m_Info;
+
+		std::vector<VkImageView> m_PerLayerImageViews;
+		std::map<uint32, VkImageView> m_PerMipImageViews;
 	};
 }
 

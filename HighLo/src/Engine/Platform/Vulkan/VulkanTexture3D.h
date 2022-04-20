@@ -35,20 +35,30 @@ namespace highlo
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
-		virtual void GenerateMips() override;
+		virtual void GenerateMips(bool readonly = false) override;
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
 
-		virtual void Bind(uint32 slot) const override;
-		virtual void Unbind(uint32 slot) const override;
+		virtual void Bind(uint32 slot) const override {}
+		virtual void Unbind(uint32 slot) const override {}
+
+		// Vulkan-specific
+		const VkDescriptorImageInfo &GetDescriptorInfo() { return m_DescriptorImageInfo; }
+		VkImageView CreateImageViewSingleMap(uint32 mip);
 
 	private:
 
 		Allocator m_Buffer;
+		FileSystemPath m_FilePath;
 		TextureSpecification m_Specification;
 		bool m_Locked = false;
 		bool m_Loaded = false;
+		bool m_MipsGenerated = false;
+
+		VmaAllocation m_MemoryAlloc;
+		VkImage m_Image = nullptr;
+		VkDescriptorImageInfo m_DescriptorImageInfo = {};
 	};
 }
 

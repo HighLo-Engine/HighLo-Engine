@@ -33,7 +33,7 @@ inline PFN_vkCmdInsertDebugUtilsLabelEXT fpCmdInsertDebugUtilsLabelEXT;
 
 inline PFN_vkCmdSetCheckpointNV fpCmdSetCheckpointNV;
 
-// We do have a function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
+// We do have this function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
 // it seems that the function is not part of the exported library files
 inline PFN_vkGetQueueCheckpointDataNV fpGetQueueCheckpointDataNV;
 
@@ -441,6 +441,8 @@ namespace highlo::utils
 		return result;
 	}
 
+	// Texture helpers
+
 	static VkFormat VulkanTextureFormat(TextureFormat format)
 	{
 		switch (format)
@@ -465,6 +467,31 @@ namespace highlo::utils
 
 		HL_ASSERT(false);
 		return VK_FORMAT_UNDEFINED;
+	}
+
+	static VkSamplerAddressMode VulkanSamplerWrap(TextureWrap wrap)
+	{
+		switch (wrap)
+		{
+			case TextureWrap::Clamp:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			case TextureWrap::Repeat:   return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		}
+
+		HL_ASSERT(false);
+		return (VkSamplerAddressMode)0;
+	}
+
+	static VkFilter VulkanSamplerFilter(TextureFilter filter)
+	{
+		switch (filter)
+		{
+			case TextureFilter::Linear:     return VK_FILTER_LINEAR;
+			case TextureFilter::Nearest:    return VK_FILTER_NEAREST;
+			case TextureFilter::Cubic:      return VK_FILTER_CUBIC_IMG;
+		}
+
+		HL_ASSERT(false);
+		return (VkFilter)0;
 	}
 
 	static void InsertImageMemoryBarrier(

@@ -6,6 +6,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "VulkanShaderDefs.h"
+
 namespace highlo
 {
 	class VulkanMaterial : public Material
@@ -23,20 +25,23 @@ namespace highlo
 			const ShaderUniform *decl = FindUniformDeclaration(name);
 			const ShaderUniform *resource = FindUniformDeclaration(name);
 
-			if (!decl || !resource)
+			if (!decl && !resource)
 				return false;
 
 			return true;
 		}
+
 		// Setters
 		template<typename T>
 		void Set(const HLString &name, const T &value)
 		{
 			auto decl = FindUniformDeclaration(name);
 			HL_ASSERT(decl);
+			if (!decl)
+				return;
 
 			auto &buffer = m_LocalData;
-			buffer.Write((Byte *)&value, decl->GetSize(), decl->GetOffset());
+			buffer.Write((Byte*)&value, decl->GetSize(), decl->GetOffset());
 		}
 
 		void Set(const HLString &name, const Ref<Texture> &texture)
@@ -140,13 +145,57 @@ namespace highlo
 		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }
 
+		// Vulkan-specific
+		void InvalidateDescriptorSets();
+		Allocator GetUniformStorageBuffer() { return m_LocalData; }
+
+		void SetUniformBufferWriteDescriptors(const std::vector<std::vector<VkWriteDescriptorSet>> &uniformBufferWriteDescriptors)
+		{
+			m_UniformBufferWriteDescriptorSets = uniformBufferWriteDescriptors;
+		}
+
 	private:
 
 		void AllocateStorage();
 		void OnShaderReloaded();
 
+		void SetVulkanDescriptor(const HLString &name, const Ref<Texture2D> &texture);
+		void SetVulkanDescriptor(const HLString &name, const Ref<Texture2D> &texture, uint32 arrayIndex);
+		void SetVulkanDescriptor(const HLString &name, const Ref<Texture3D> &texture);
+
 		const ShaderUniform *FindUniformDeclaration(const HLString &name);
 		const ShaderResourceDeclaration *FindResourceDeclaration(const HLString &name);
+
+	private:
+
+		enum class PendingDescriptorType
+		{
+			None = 0,
+			Texture2D,
+			Texture3D
+		};
+
+		struct PendingDescriptor : public IsSharedReference
+		{
+			PendingDescriptorType Type = PendingDescriptorType::None;
+			VkWriteDescriptorSet WriteDescriptor;
+			VkDescriptorImageInfo ImageInfo;
+			Ref<Texture> Texture;
+			VkDescriptorImageInfo SubmittedImageInfo{};
+		};
+
+		struct PendingDescriptorArray : public IsSharedReference
+		{
+			PendingDescriptorType Type = PendingDescriptorType::None;
+			VkWriteDescriptorSet WriteDescriptor;
+			std::vector<VkDescriptorImageInfo> ImageInfos;
+			std::vector<Ref<Texture>> Textures;
+			VkDescriptorImageInfo SubmittedImageInfo{};
+		};
+
+		std::unordered_map<uint32, Ref<PendingDescriptor>> m_ResidentDescriptors;
+		std::unordered_map<uint32, Ref<PendingDescriptorArray>> m_ResidentDescriptorArrays;
+		std::vector<WeakRef<PendingDescriptor>> m_PendingDescriptors;
 
 	private:
 
@@ -157,7 +206,12 @@ namespace highlo
 		Allocator m_LocalData;
 
 		std::vector<Ref<Texture>> m_Textures;
-		std::map<uint32, Ref<Texture2D>> m_Texture2Ds;
+		std::vector<std::vector<Ref<Texture>>> m_TextureArrays;
+		std::vector<std::vector<VkWriteDescriptorSet>> m_WriteDescriptorSets;
+		std::vector<std::vector<VkWriteDescriptorSet>> m_UniformBufferWriteDescriptorSets;
+
+		VulkanShaderMaterialDescriptorSet m_DescriptorSets[3];
+		std::vector<bool> m_DirtyDescriptorSets;
 	};
 }
 

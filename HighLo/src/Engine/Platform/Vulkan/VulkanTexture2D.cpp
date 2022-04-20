@@ -13,34 +13,6 @@
 
 namespace highlo
 {
-    namespace utils
-    {
-        static VkSamplerAddressMode VulkanSamplerWrap(TextureWrap wrap)
-        {
-            switch (wrap)
-            {
-                case TextureWrap::Clamp:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-                case TextureWrap::Repeat:   return VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            }
-
-            HL_ASSERT(false);
-            return (VkSamplerAddressMode)0;
-        }
-
-        static VkFilter VulkanSamplerFilter(TextureFilter filter)
-        {
-            switch (filter)
-            {
-            case TextureFilter::Linear:     return VK_FILTER_LINEAR;
-            case TextureFilter::Nearest:    return VK_FILTER_NEAREST;
-            case TextureFilter::Cubic:      return VK_FILTER_CUBIC_IMG;
-            }
-
-            HL_ASSERT(false);
-            return (VkFilter)0;
-        }
-    }
-
     static std::map<VkImage, WeakRef<VulkanTexture2D>> s_ImageReferences;
 
     VulkanTexture2D::VulkanTexture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
@@ -560,7 +532,7 @@ namespace highlo
         return { width, height };
     }
     
-    void VulkanTexture2D::GenerateMips()
+    void VulkanTexture2D::GenerateMips(bool readonly)
     {
         Ref<VulkanDevice> device = VulkanContext::GetCurrentDevice();
         VkDevice vulkanDevice = device->GetNativeDevice();
@@ -580,16 +552,16 @@ namespace highlo
             imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             imageBlit.srcSubresource.layerCount = 1;
             imageBlit.srcSubresource.mipLevel = i - 1;
-            imageBlit.srcOffsets[0].x = int32(m_Specification.Width >> (i - 1));
-            imageBlit.srcOffsets[0].y = int32(m_Specification.Height >> (i - 1));
-            imageBlit.srcOffsets[0].z = 1;
+            imageBlit.srcOffsets[1].x = int32(m_Specification.Width >> (i - 1));
+            imageBlit.srcOffsets[1].y = int32(m_Specification.Height >> (i - 1));
+            imageBlit.srcOffsets[1].z = 1;
 
             imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             imageBlit.dstSubresource.layerCount = 1;
             imageBlit.dstSubresource.mipLevel = i;
-            imageBlit.srcOffsets[1].x = int32(m_Specification.Width >> i);
-            imageBlit.srcOffsets[1].y = int32(m_Specification.Height >> i);
-            imageBlit.srcOffsets[1].z = 1;
+            imageBlit.dstOffsets[1].x = int32(m_Specification.Width >> i);
+            imageBlit.dstOffsets[1].y = int32(m_Specification.Height >> i);
+            imageBlit.dstOffsets[1].z = 1;
 
             VkImageSubresourceRange mipSubRange = {};
             mipSubRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

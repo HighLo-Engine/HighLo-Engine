@@ -22,7 +22,7 @@ namespace highlo
 			const ShaderUniform *decl = FindUniformDeclaration(name);
 			const ShaderUniform *resource = FindUniformDeclaration(name);
 
-			if (!decl || !resource)
+			if (!decl && !resource)
 				return false;
 
 			return true;

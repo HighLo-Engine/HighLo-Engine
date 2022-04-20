@@ -7,6 +7,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "VulkanMaterial.h"
+
 namespace highlo
 {
 	class VulkanRenderingAPI : public RenderingAPI
@@ -114,6 +116,13 @@ namespace highlo
 
 		// Vulkan-specific
 		static VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo);
+
+		static void UpdateMaterialForRendering(Ref<VulkanMaterial> &material, Ref<UniformBufferSet> &uniformBufferSet, Ref<StorageBufferSet> &storageBufferSet);
+		static VkSampler GetClampSampler();
+		static VkSampler GetPointSampler();
+
+		static uint32 GetDescriptorAllocationCount(uint32 frameIndex = 0);
+		static int32 &GetSelectedDrawCall();
 	};
 }
 

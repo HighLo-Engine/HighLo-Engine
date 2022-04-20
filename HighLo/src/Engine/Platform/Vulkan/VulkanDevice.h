@@ -29,7 +29,7 @@ namespace highlo
 		// TODO: Maybe extract the begin parameter into a new function like CreateNewCommandBuffer? 
 		// or GetCommandBuffer for this version and CreateCommandBuffer for the starting version?
 		VkCommandBuffer CreateCommandBuffer(bool begin, bool compute = false);
-		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName) const;
+		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName = "") const;
 
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer);
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);

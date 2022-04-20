@@ -5,18 +5,68 @@
 
 #include "VulkanUtils.h"
 #include "VulkanContext.h"
+#include "VulkanShaderDefs.h"
 
 namespace highlo
 {
+	namespace utils
+	{
+		static const char *VulkanVendorIDToString(uint32 vendorID)
+		{
+			switch (vendorID)
+			{
+				case 0x10DE: return "NVIDIA";
+				case 0x1002: return "AMD";
+				case 0x8086: return "INTEL";
+				case 0x13B5: return "ARM";
+			}
+
+			return "unknown";
+		}
+	}
+
+	struct VulkanRendererData
+	{
+		Ref<VertexBuffer> QuadVertexBuffer;
+		Ref<IndexBuffer> QuadIndexBuffer;
+		VulkanShaderMaterialDescriptorSet QuadDescriptorSet;
+
+
+
+		// Default samplers
+		VkSampler SamplerClamp = nullptr;
+		VkSampler SamplerPoint = nullptr;
+
+		// UniformBufferSet -> Shader Hash -> Frame -> WriteDescriptor
+		std::unordered_map<UniformBufferSet*, std::unordered_map<uint64, std::vector<std::vector<VkWriteDescriptorSet>>>> UniformBufferWriteDescriptorCache;
+		std::unordered_map<StorageBufferSet*, std::unordered_map<uint64, std::vector<std::vector<VkWriteDescriptorSet>>>> StorageBufferWriteDescriptorCache;
+
+		int32 SelectedDrawCall = -1;
+		int32 DrawCallCount = 0;
+	};
+
+	static VulkanRendererData *s_VulkanRendererData = nullptr;
+
 	void VulkanRenderingAPI::Init()
 	{
-		Ref<VulkanDevice> device = VulkanContext::GetCurrentDevice();
-		utils::InitAllocator(device);
+		utils::InitAllocator(VulkanContext::GetCurrentDevice());
+		s_VulkanRendererData = new VulkanRendererData();
+
+		auto &caps = Renderer::GetCapabilities();
+		auto &properties = VulkanContext::GetCurrentDevice()->GetPhysicalDevice()->GetProperties();
+		caps.Vendor = utils::VulkanVendorIDToString(properties.vendorID);
+		caps.Device = properties.deviceName;
+		caps.Version = HLString::ToString(properties.driverVersion);
+		utils::DumpGPUInfos();
+
+
 	}
 	
 	void VulkanRenderingAPI::Shutdown()
 	{
 		utils::ShutdownAllocator();
+		delete s_VulkanRendererData;
+		s_VulkanRendererData = nullptr;
 	}
 	
 	void VulkanRenderingAPI::BeginFrame()
@@ -124,6 +174,30 @@ namespace highlo
 	VkDescriptorSet VulkanRenderingAPI::AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo)
 	{
 		return VkDescriptorSet();
+	}
+
+	void VulkanRenderingAPI::UpdateMaterialForRendering(Ref<VulkanMaterial> &material, Ref<UniformBufferSet> &uniformBufferSet, Ref<StorageBufferSet> &storageBufferSet)
+	{
+	}
+	
+	VkSampler VulkanRenderingAPI::GetClampSampler()
+	{
+		return VkSampler();
+	}
+	
+	VkSampler VulkanRenderingAPI::GetPointSampler()
+	{
+		return VkSampler();
+	}
+	
+	uint32 VulkanRenderingAPI::GetDescriptorAllocationCount(uint32 frameIndex)
+	{
+		return 0;
+	}
+	
+	int32 &VulkanRenderingAPI::GetSelectedDrawCall()
+	{
+		return s_VulkanRendererData->SelectedDrawCall;
 	}
 }
 

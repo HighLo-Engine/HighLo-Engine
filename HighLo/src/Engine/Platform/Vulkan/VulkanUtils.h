@@ -227,7 +227,7 @@ namespace highlo::utils
 		VkDebugUtilsObjectNameInfoEXT nameInfo;
 		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		nameInfo.objectType = obj;
-		nameInfo.pObjectName = *name;
+		nameInfo.pObjectName = name.IsEmpty() ? "" : *name;
 		nameInfo.objectHandle = (uint64)handle;
 		nameInfo.pNext = VK_NULL_HANDLE;
 

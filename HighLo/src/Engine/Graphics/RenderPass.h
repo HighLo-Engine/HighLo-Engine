@@ -15,6 +15,7 @@ namespace highlo
 	{
 		Ref<Framebuffer> Framebuffer;
 		HLString DebugName;
+		glm::vec4 DebugMarkerColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
 	class RenderPass : public IsSharedReference

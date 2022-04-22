@@ -11,6 +11,7 @@
 
 #include "Engine/Core/Defines/Compiler.h"
 #include "Engine/Core/Defines/BaseTypes.h"
+#include "Engine/Core/CrashReporter.h"
 #include "Engine/Core/Assert.h"
 
 #ifdef HIGHLO_USE_DLL

@@ -13,7 +13,7 @@ namespace highlo
 		HL_CORE_FATAL("The Engine is about to crash! going to write recovery files and all caches into their files!");
 		ShaderCache::Shutdown();
 
-		Timer::Sleep(10);
+		Timer::Sleep(5);
 	}
 }
 

@@ -279,11 +279,12 @@ namespace highlo
 					break;
 				}
 
+				++index; // Skip the pragma directive
 				if (tokens[index] == "shader")
 				{
 					HL_ASSERT(tokens[index + 1] == ":");
 
-					const std::string_view stage(tokens[++index]);
+					const std::string_view stage(tokens[index + 2]);
 					HL_ASSERT(stage == "vertex" || stage == "fragment" || stage == "pixel" || stage == "geometry" || stage == "compute" || stage == "tess_control" || stage == "tess_eval", "Invalid shader type");
 					ShaderType foundStage = utils::ShaderTypeFromString(std::string(stage.begin(), stage.end()));
 

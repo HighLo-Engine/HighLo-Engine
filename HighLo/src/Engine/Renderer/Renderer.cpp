@@ -81,7 +81,7 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SceneComposite.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepth.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepthAnimated.glsl");
-	//	Renderer::GetShaderLibrary()->Load("assets/shaders/LightCulling.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/LightCulling.glsl");
 
 		// Load 2D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DQuad.glsl");

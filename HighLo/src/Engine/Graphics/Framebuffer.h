@@ -63,6 +63,7 @@ namespace highlo
 		bool ClearOnLoad = true;
 		bool ClearColorOnLoad = true;
 		bool ClearDepthOnLoad = true;
+		bool ShouldSample = true;
 
 		bool NoResize = false;
 		bool SwapChainTarget = false;

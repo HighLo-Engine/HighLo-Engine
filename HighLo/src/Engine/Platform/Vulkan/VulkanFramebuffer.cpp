@@ -210,22 +210,27 @@ namespace highlo
                 attachmentDescription.format = utils::VulkanTextureFormat(attachmentSpec.Format);
                 attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
                 attachmentDescription.loadOp = m_Specification.ClearDepthOnLoad ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
-                attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+                attachmentDescription.storeOp = m_Specification.ShouldSample ? VK_ATTACHMENT_STORE_OP_STORE : VK_ATTACHMENT_STORE_OP_DONT_CARE;
                 attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
                 attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
                 attachmentDescription.initialLayout = m_Specification.ClearDepthOnLoad ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
                 
-                // TODO: refactor this to be correct
-                if (attachmentSpec.Format == TextureFormat::DEPTH24STENCIL8 || true)
+                if (attachmentSpec.Format == TextureFormat::DEPTH24STENCIL8)
                 {
-                    attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL; // TODO: if no sampling
-                    attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL; // TODO: if sampling
+                    if (m_Specification.ShouldSample)
+                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+                    else
+                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
                     depthAttachmentReference = { attachmentIndex, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
                 }
                 else
                 {
-                    attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL; // TODO: if no sampling
-                    attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL; // TODO: if sampling
+                    if (m_Specification.ShouldSample)
+                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL;
+                    else
+                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+
                     depthAttachmentReference = { attachmentIndex, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL };
                 }
 
@@ -308,9 +313,8 @@ namespace highlo
         if (m_DepthImage)
             subpassDescription.pDepthStencilAttachment = &depthAttachmentReference;
 
-        // TODO: could also be handled via subpass dependencies for layout transitions
         std::vector<VkSubpassDependency> dependencies;
-
+        
         if (m_AttachmentImages.size())
         {
             VkSubpassDependency &fragmentDependency = dependencies.emplace_back();

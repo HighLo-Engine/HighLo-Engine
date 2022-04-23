@@ -364,27 +364,6 @@ namespace highlo
             device->FlushCommandBuffer(transitionCommandBuffer);
         }
 
-        // Create Texture sampler
-        VkSamplerCreateInfo sampler = {};
-        sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        sampler.pNext = nullptr;
-        sampler.magFilter = utils::VulkanSamplerFilter(m_Specification.Properties.SamplerFilter);
-        sampler.minFilter = utils::VulkanSamplerFilter(m_Specification.Properties.SamplerFilter);
-        sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-        sampler.addressModeU = utils::VulkanSamplerWrap(m_Specification.Properties.SamplerWrap);
-        sampler.addressModeV = utils::VulkanSamplerWrap(m_Specification.Properties.SamplerWrap);
-        sampler.addressModeW = utils::VulkanSamplerWrap(m_Specification.Properties.SamplerWrap);
-        sampler.mipLodBias = 0.0f;
-        sampler.compareOp = VK_COMPARE_OP_NEVER;
-        sampler.minLod = 0.0f;
-        sampler.maxLod = (float)mipCount;
-        sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-
-        // TODO: Enable anisotropic filtering
-        sampler.maxAnisotropy = 1.0f;
-        sampler.anisotropyEnable = VK_FALSE;
-        VK_CHECK_RESULT(vkCreateSampler(vulkanDevice, &sampler, nullptr, &m_Info.Sampler));
-
         if (!m_Specification.Properties.Storage)
         {
             VkImageViewCreateInfo imageView = {};
@@ -407,9 +386,6 @@ namespace highlo
 
         if (m_Buffer && m_Specification.Properties.GenerateMips && mipCount > 1)
             GenerateMips();
-
-        stbi_image_free(m_Buffer.Data);
-        m_Buffer = Allocator();
     }
     
     void VulkanTexture2D::Lock()

@@ -15,12 +15,9 @@
 
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "Engine/ImGui/ImGui/imgui_internal.h"
-#include "Engine/ImGui/ImGui/backends/imgui_impl_vulkan.h"
+#include "Engine/ImGui/ImGui/backends/imgui_impl_vulkan_with_textures.h"
 
 #include "Engine/Renderer/Renderer.h"
-
-// TMP
-// Reference: https://github.com/HighLo-Engine/HighLo-Engine/blob/2f2b56f416230944f732922e200cfd34d858c094/HighLo/src/Engine/Platform/Vulkan/VulkanImGuiRenderer.cpp
 
 namespace highlo
 {
@@ -36,7 +33,6 @@ namespace highlo
 
     void VulkanImGuiRenderer::Init(Window *window)
     {
-    #if 0
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
         Ref<VulkanSwapChain> swapChain = HLApplication::Get().GetWindow().GetSwapChain().As<VulkanSwapChain>();
         VkDescriptorPoolSize poolSizes[] =
@@ -90,7 +86,6 @@ namespace highlo
         s_ImGuiCommandBuffers.resize(framesInFlight);
         for (uint32 i = 0; i < framesInFlight; ++i)
             s_ImGuiCommandBuffers[i] = VulkanContext::GetCurrentDevice()->CreateSecondaryCommandBuffer();
-    #endif
     }
 
     void VulkanImGuiRenderer::Shutdown()
@@ -110,7 +105,6 @@ namespace highlo
 
     void VulkanImGuiRenderer::RenderDrawData()
     {
-    #if 0
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
         Ref<VulkanSwapChain> swapChain = HLApplication::Get().GetWindow().GetSwapChain().As<VulkanSwapChain>();
         uint32 width = swapChain->GetWidth();
@@ -171,8 +165,7 @@ namespace highlo
         scissor.offset.y = 0;
         vkCmdSetScissor(s_ImGuiCommandBuffers[commandBufferIndex], 0, 1, &scissor);
 
-        ImDrawData *mainDrawData = ImGui::GetDrawData();
-        ImGui_ImplVulkan_RenderDrawData(mainDrawData, s_ImGuiCommandBuffers[commandBufferIndex]);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), s_ImGuiCommandBuffers[commandBufferIndex]);
         VK_CHECK_RESULT(vkEndCommandBuffer(s_ImGuiCommandBuffers[commandBufferIndex]));
 
         std::vector<VkCommandBuffer> commandBuffers;
@@ -188,7 +181,6 @@ namespace highlo
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
-    #endif
     }
 }
 

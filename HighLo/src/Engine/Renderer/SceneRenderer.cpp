@@ -673,26 +673,26 @@ namespace highlo
 	//	Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
 
 		// Now render static and dynamic meshes
-		for (auto &[mk, dc] : m_StaticDrawList)
-		{
-			const auto &transformData = m_MeshTransformMap.at(mk);
-			Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
-		}
-
-		for (auto &[mk, dc] : m_DynamicDrawList)
-		{
-			const auto &transformData = m_MeshTransformMap.at(mk);
-			Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
-		}
-
-		// Grid
-		if (GetOptions().ShowGrid)
-		{
-			const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
-				* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
-
-			Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
-		}
+	//	for (auto &[mk, dc] : m_StaticDrawList)
+	//	{
+	//		const auto &transformData = m_MeshTransformMap.at(mk);
+	//		Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+	//	}
+	//
+	//	for (auto &[mk, dc] : m_DynamicDrawList)
+	//	{
+	//		const auto &transformData = m_MeshTransformMap.at(mk);
+	//		Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+	//	}
+	//
+	//	// Grid
+	//	if (GetOptions().ShowGrid)
+	//	{
+	//		const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
+	//			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+	//
+	//		Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
+	//	}
 
 	//	Renderer::EndRenderPass(m_CommandBuffer);
 	}

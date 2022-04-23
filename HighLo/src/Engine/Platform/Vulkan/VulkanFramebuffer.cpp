@@ -111,17 +111,18 @@ namespace highlo
     {
         m_ResizeCallbacks.push_back(func);
     }
-    
-    void VulkanFramebuffer::BindTexture(uint32 attachmentIndex, uint32 slot) const
-    {
-    }
-    
+   
     void VulkanFramebuffer::ClearAttachment(uint32 attachmentIndex, int32 value)
     {
+        HL_ASSERT(attachmentIndex < m_AttachmentImages.size());
+        Ref<Texture2D> texture = m_AttachmentImages[attachmentIndex];
+
+        
     }
     
     int32 VulkanFramebuffer::ReadPixel(uint32 attachmentIndex, int32 x, int32 y)
     {
+        HL_ASSERT(attachmentIndex < m_AttachmentImages.size());
         return 0;
     }
     

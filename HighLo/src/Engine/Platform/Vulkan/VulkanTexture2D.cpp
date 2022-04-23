@@ -548,7 +548,7 @@ namespace highlo
         imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
         const uint32 mipLevels = GetMipLevelCount();
-        for (uint32 i = 0; i < mipLevels; ++i)
+        for (uint32 i = 1; i < mipLevels; ++i)
         {
             VkImageBlit imageBlit = {};
             imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

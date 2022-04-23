@@ -185,12 +185,25 @@ namespace highlo::UI
 	{
 		Widgets::Shutdown();
 		s_ImGuiRenderer->Shutdown();
+
+	#ifdef HIGHLO_API_GLFW
+		ImGui_ImplGlfw_Shutdown();
+	#else
+		ImGui_ImplWin32_Shutdown();
+	#endif // HIGHLO_API_GLFW
+
 		ImGui::DestroyContext();
 	}
 
 	void BeginScene()
 	{
 		s_ImGuiRenderer->NewFrame();
+		
+	#ifdef HIGHLO_API_GLFW
+		ImGui_ImplGlfw_NewFrame();
+	#else
+		ImGui_ImplWin32_NewFrame();
+	#endif // HIGHLO_API_GLFW
 
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();

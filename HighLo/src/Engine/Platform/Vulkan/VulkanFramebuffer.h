@@ -28,7 +28,7 @@ namespace highlo
 		virtual void Resize(uint32 width, uint32 height, bool forceRecreate = false) override;
 		virtual void AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func) override;
 
-		virtual void BindTexture(uint32 attachmentIndex = 0, uint32 slot = 0) const override;
+		virtual void BindTexture(uint32 attachmentIndex = 0, uint32 slot = 0) const override {}
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }
 		virtual uint32 GetHeight() const override { return m_Specification.Height; }
 

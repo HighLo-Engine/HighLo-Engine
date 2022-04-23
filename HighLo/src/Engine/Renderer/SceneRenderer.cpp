@@ -707,16 +707,16 @@ namespace highlo
 
 	void SceneRenderer::CompositePass()
 	{
-	//	Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
-	//	auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
-	//	float exposure = m_SceneData.SceneCamera.GetExposure();
-	//	int32 textureSamples = framebuffer->GetSpecification().Samples;
-	//
-	//	m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
-	//	m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
-	//
-	//	Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
-	//	Renderer::EndRenderPass(m_CommandBuffer);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
+		auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+		float exposure = m_SceneData.SceneCamera.GetExposure();
+		int32 textureSamples = framebuffer->GetSpecification().Samples;
+	
+		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
+		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
+	
+		Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
+		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::UpdateStatistics()
@@ -838,11 +838,11 @@ namespace highlo
 
 	void SceneRenderer::InitLightCullingCompute()
 	{
-	//	m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
-	//	auto &shader = Renderer::GetShaderLibrary()->Get("LightCulling");
+		m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
+		auto &shader = Renderer::GetShaderLibrary()->Get("LightCulling");
 
-	//	m_LightCullingMaterial = Material::Create(shader, "LightCulling");
-	//	m_LightCullingPipeline = ComputePipeline::Create(shader);
+		m_LightCullingMaterial = Material::Create(shader, "LightCulling");
+		m_LightCullingPipeline = ComputePipeline::Create(shader);
 	}
 
 	void SceneRenderer::InitShadowPass()

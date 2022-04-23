@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(__FRAGMENT_SHADER__) || defined(__COMPUTE_SHADER__)
-
 #include <Buffers.glslh>
 
 const float ShadowFade = 1.0;
@@ -98,7 +96,7 @@ float GetShadowBias()
 	return max(MINIMUM_SHADOW_BIAS * (1.0 - dot(m_Params.Normal, u_Scene.DirectionalLights.Direction)), MINIMUM_SHADOW_BIAS);
 }
 
-float HardShadows_DirectionalLights(sampler2DArray shadowMap, float shadowFade, uint cascade, vec3 shadowCoords)
+float HardShadows_DirectionalLight(sampler2DArray shadowMap, float shadowFade, uint cascade, vec3 shadowCoords)
 {
 	float bias = GetShadowBias();
 	float shadowMapDepth = texture(shadowMap, vec3(shadowCoords.xy * 0.5 + 0.5, cascade)).x;
@@ -198,5 +196,4 @@ float PCSS_DirectionalLight(sampler2DArray shadowMap, float shadowFade, uint cas
 	return PCF_DirectionalLight(shadowMap, cascade, shadowCoords, uvRadius) * shadowFade;
 }
 
-#endif
 

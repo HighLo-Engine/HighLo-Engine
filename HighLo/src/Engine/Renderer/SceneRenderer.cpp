@@ -52,7 +52,7 @@ namespace highlo
 		InitLightCullingCompute();
 		InitShadowPass();
 		InitPreDepthPass();
-	//	InitGeometryPass();
+		InitGeometryPass();
 		InitBloomCompute();
 		InitDeinterleaving();
 		InitHBAO();
@@ -110,7 +110,7 @@ namespace highlo
 		if (m_NeedsResize)
 		{
 			m_NeedsResize = false;
-		//	m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
@@ -221,7 +221,7 @@ namespace highlo
 		});
 
 		// Set current scene env
-// TODO: Uncomment when shadowpasses and pre-depth images are working
+		// TODO: Uncomment when shadowpasses and pre-depth images are working
 		/*
 		Renderer::SetSceneEnvironment(
 			this,
@@ -435,7 +435,7 @@ namespace highlo
 		{
 			glm::mat4 submeshTransform = transform * submeshData[submeshIndex].LocalTransform.GetTransform();
 
-// TODO: material index 42 does not exist yet
+			// TODO: material index 42 does not exist yet
 			MeshKey key = { model->Handle, 42, submeshIndex };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
@@ -452,7 +452,7 @@ namespace highlo
 
 	void SceneRenderer::SubmitPhysicsDebugDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, const glm::mat4 &transform)
 	{
-// TODO: material index 42 does not exist yet
+		// TODO: material index 42 does not exist yet
 		MeshKey key = { model->Handle, 42, submeshIndex };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
@@ -645,56 +645,56 @@ namespace highlo
 	void SceneRenderer::GeometryPass()
 	{
 		// Render selected geometry
-	//	Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
-	//
-	//	for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
-	//	{
-	//		const auto &transformData = m_MeshTransformMap.at(mk);
-	//		Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
-	//	}
-	//
-	//	for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
-	//	{
-	//		const auto &transformData = m_MeshTransformMap.at(mk);
-	//		Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
-	//	}
-	//
-	//	Renderer::EndRenderPass(m_CommandBuffer);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
+	
+		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
+		{
+			const auto &transformData = m_MeshTransformMap.at(mk);
+			Renderer::RenderInstancedStaticMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+		}
+	
+		for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
+		{
+			const auto &transformData = m_MeshTransformMap.at(mk);
+			Renderer::RenderInstancedDynamicMeshWithMaterial(m_CommandBuffer, m_SelectedGeometryVertexArray, m_UniformBufferSet, nullptr, dc.Model, dc.SubmeshIndex, m_SubmeshTransformBuffer, transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), dc.InstanceCount, m_SelectedGeometryMaterial);
+		}
+	
+		Renderer::EndRenderPass(m_CommandBuffer);
 
 		// Render normal geometry
-	//	Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
 
 		// First render skybox
-	//	m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
-	//	m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
+		m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
+		m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
 
-	//	const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
-	//	m_SkyboxMaterial->Set("u_Texture", radianceMap);
-	//	Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
+		const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
+		m_SkyboxMaterial->Set("u_Texture", radianceMap);
+		Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
 
 		// Now render static and dynamic meshes
-	//	for (auto &[mk, dc] : m_StaticDrawList)
-	//	{
-	//		const auto &transformData = m_MeshTransformMap.at(mk);
-	//		Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
-	//	}
-	//
-	//	for (auto &[mk, dc] : m_DynamicDrawList)
-	//	{
-	//		const auto &transformData = m_MeshTransformMap.at(mk);
-	//		Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
-	//	}
-	//
-	//	// Grid
-	//	if (GetOptions().ShowGrid)
-	//	{
-	//		const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
-	//			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
-	//
-	//		Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
-	//	}
+		for (auto &[mk, dc] : m_StaticDrawList)
+		{
+			const auto &transformData = m_MeshTransformMap.at(mk);
+			Renderer::RenderInstancedStaticMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+		}
+	
+		for (auto &[mk, dc] : m_DynamicDrawList)
+		{
+			const auto &transformData = m_MeshTransformMap.at(mk);
+			Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
+		}
+	
+		// Grid
+		if (GetOptions().ShowGrid)
+		{
+			const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
+				* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+	
+			Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
+		}
 
-	//	Renderer::EndRenderPass(m_CommandBuffer);
+		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::JumpFloodPass()
@@ -1003,8 +1003,8 @@ namespace highlo
 		spec.Layout = BufferLayout::GetGridLayout();
 		spec.Shader = m_GridShader;
 		spec.BackfaceCulling = false;
-	//	spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
-	//	m_GridVertexArray = VertexArray::Create(spec);
+		spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
+		m_GridVertexArray = VertexArray::Create(spec);
 	}
 
 	void SceneRenderer::InitSkybox()
@@ -1016,8 +1016,8 @@ namespace highlo
 		spec.Layout = BufferLayout::GetSkyboxLayout();
 		spec.InstanceLayout = {};
 		spec.Shader = shader;
-	//	spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
-	//	m_SkyboxVertexArray = VertexArray::Create(spec);
+		spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
+		m_SkyboxVertexArray = VertexArray::Create(spec);
 
 		m_SkyboxMaterial = Material::Create(shader, "SkyboxMaterial");
 		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
@@ -1063,7 +1063,7 @@ namespace highlo
 		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		framebufferSpec.ClearOnLoad = false;
 		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
-	//	framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
+		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "ExternalCompositing";
@@ -1100,6 +1100,4 @@ namespace highlo
 	void SceneRenderer::InitJumpFlood()
 	{
 	}
-
-
 }

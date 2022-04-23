@@ -4,7 +4,6 @@
 #include "CrashReporter.h"
 
 #include "Engine/Graphics/Shaders/ShaderCache.h"
-#include "Engine/Core/Timer.h"
 
 namespace highlo
 {
@@ -12,8 +11,6 @@ namespace highlo
 	{
 		HL_CORE_FATAL("The Engine is about to crash! going to write recovery files and all caches into their files!");
 		ShaderCache::Shutdown();
-
-		Timer::Sleep(5);
 	}
 }
 

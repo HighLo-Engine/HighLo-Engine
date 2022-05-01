@@ -36,6 +36,9 @@ namespace highlo
 		HLAPI virtual void Invalidate() = 0;
 		HLAPI virtual bool IsLoaded() const = 0;
 
+		HLAPI virtual void Resize(const glm::uvec2 &size) = 0;
+		HLAPI virtual void Resize(const uint32 width, const uint32 height) = 0;
+
 		HLAPI virtual void Lock() = 0;
 		HLAPI virtual void Unlock() = 0;
 
@@ -46,6 +49,7 @@ namespace highlo
 		HLAPI virtual uint32 GetMipLevelCount() = 0;
 		HLAPI virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) = 0;
 		HLAPI virtual void GenerateMips(bool readonly = false) = 0;
+		HLAPI virtual float GetAspectRatio() const = 0;
 
 		HLAPI virtual TextureFormat GetFormat() = 0;
 		HLAPI inline HLRendererID GetRendererID() const { return RendererID; }

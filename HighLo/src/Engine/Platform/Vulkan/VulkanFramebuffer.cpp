@@ -419,8 +419,8 @@ namespace highlo
     void VulkanFramebuffer::Release()
     {
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
-        vkDestroyRenderPass(device, m_RenderPass, nullptr);
         vkDestroyFramebuffer(device, m_Framebuffer, nullptr);
+        vkDestroyRenderPass(device, m_RenderPass, nullptr);
     }
 }
 

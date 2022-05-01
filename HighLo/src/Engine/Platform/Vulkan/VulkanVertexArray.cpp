@@ -82,7 +82,10 @@ namespace highlo
     
     VulkanVertexArray::~VulkanVertexArray()
     {
-        // TODO: destroy pipeline
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+        vkDestroyPipeline(device, m_Pipeline, nullptr);
+        vkDestroyPipelineCache(device, m_PipelineCache, nullptr);
+        vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
     }
     
     void VulkanVertexArray::Invalidate()

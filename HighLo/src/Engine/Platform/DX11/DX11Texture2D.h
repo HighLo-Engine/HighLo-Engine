@@ -40,6 +40,9 @@ namespace highlo
 		virtual void Invalidate() override;
 		virtual bool IsLoaded() const override { return m_Loaded; }
 
+		virtual void Resize(const glm::uvec2 &size) override;
+		virtual void Resize(const uint32 width, const uint32 height) override;
+
 		virtual void Lock() override;
 		virtual void Unlock() override;
 
@@ -49,7 +52,8 @@ namespace highlo
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
-		virtual void GenerateMips() override;
+		virtual void GenerateMips(bool readonly = false) override;
+		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
 
 		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
 
@@ -59,13 +63,14 @@ namespace highlo
 		// Texture2D specific
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
-
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
+		virtual void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices) override;
 
 	private:
 
 		Allocator m_Buffer;
+		FileSystemPath m_FilePath;
 		HLRendererID m_SamplerRendererID = 0;
 		TextureSpecification m_Specification;
 		bool m_Locked = false;
@@ -73,5 +78,5 @@ namespace highlo
 	};
 }
 
-#endif
+#endif // HIGHLO_API_DX11
 

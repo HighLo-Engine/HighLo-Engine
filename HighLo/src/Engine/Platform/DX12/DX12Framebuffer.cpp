@@ -14,9 +14,27 @@ namespace highlo
 
 	DX12Framebuffer::~DX12Framebuffer()
 	{
+		Release();
 	}
 
 	void DX12Framebuffer::Resize(uint32 width, uint32 height, bool forceRecreate)
+	{
+
+
+		for (auto &callback : m_ResizeCallbacks)
+			callback(this);
+	}
+
+	void DX12Framebuffer::AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func)
+	{
+		m_ResizeCallbacks.push_back(func);
+	}
+
+	void DX12Framebuffer::Invalidate()
+	{
+	}
+
+	void DX12Framebuffer::Release()
 	{
 	}
 	

@@ -373,6 +373,18 @@ namespace highlo
 		}
 	}
 
+	void OpenGLTexture2D::Resize(const glm::uvec2 &size)
+	{
+		Resize(size.x, size.y);
+	}
+
+	void OpenGLTexture2D::Resize(const uint32 width, const uint32 height)
+	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		Invalidate();
+	}
+
 	void OpenGLTexture2D::Lock()
 	{
 		m_Locked = true;

@@ -106,7 +106,6 @@ namespace highlo
 		HLAPI std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
 		HLAPI std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
-		HLAPI static BufferLayout GetShadowMapLayout();
 		HLAPI static BufferLayout GetTextureLayout();
 		HLAPI static BufferLayout GetLineLayout();
 		HLAPI static BufferLayout GetCircleLayout();
@@ -116,6 +115,8 @@ namespace highlo
 		HLAPI static BufferLayout GetSkyboxLayout();
 		HLAPI static BufferLayout GetGridLayout();
 		HLAPI static BufferLayout GetCompositeLayout();
+
+		HLAPI static BufferLayout GetTransformBufferLayout();
 
 	private:
 		void CalculateOffsetsAndStride();

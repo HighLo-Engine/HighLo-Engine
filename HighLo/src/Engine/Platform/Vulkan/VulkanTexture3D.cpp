@@ -231,6 +231,18 @@ namespace highlo
         VK_CHECK_RESULT(vkCreateImageView(vulkanDevice, &imageView, nullptr, &m_DescriptorImageInfo.imageView));
         utils::SetDebugUtilsObjectName(vulkanDevice, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("Texture 3D image view {}", *m_Specification.DebugName), m_DescriptorImageInfo.imageView);
     }
+
+    void VulkanTexture3D::Resize(const glm::uvec2 &size)
+    {
+        Resize(size.x, size.y);
+    }
+
+    void VulkanTexture3D::Resize(const uint32 width, const uint32 height)
+    {
+        m_Specification.Width = width;
+        m_Specification.Height = height;
+        Invalidate();
+    }
     
     void VulkanTexture3D::Lock()
     {

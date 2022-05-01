@@ -371,7 +371,7 @@ namespace highlo
             imageView.pNext = nullptr;
             imageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
             imageView.format = utils::VulkanTextureFormat(m_Specification.Format);
-            imageView.components = {};
+            imageView.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
             imageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             imageView.subresourceRange.baseMipLevel = 0;
             imageView.subresourceRange.baseArrayLayer = 0;
@@ -386,6 +386,18 @@ namespace highlo
 
         if (m_Buffer && m_Specification.Properties.GenerateMips && mipCount > 1)
             GenerateMips();
+    }
+
+    void VulkanTexture2D::Resize(const glm::uvec2 &size)
+    {
+        Resize(size.x, size.y);
+    }
+
+    void VulkanTexture2D::Resize(const uint32 width, const uint32 height)
+    {
+        m_Specification.Width = width;
+        m_Specification.Height = height;
+        Invalidate();
     }
     
     void VulkanTexture2D::Lock()
@@ -435,6 +447,7 @@ namespace highlo
     void VulkanTexture2D::CreateSampler(TextureProperties properties)
     {
         // TODO
+        HL_ASSERT(false);
     }
 
     void VulkanTexture2D::CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices)
@@ -520,6 +533,7 @@ namespace highlo
         VkImageMemoryBarrier imageMemoryBarrier = {};
         imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         imageMemoryBarrier.pNext = nullptr;
+        imageMemoryBarrier.image = m_Info.Image;
         imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 

@@ -49,6 +49,15 @@ namespace highlo
 
 	DX11Framebuffer::~DX11Framebuffer()
 	{
+		Release();
+	}
+
+	void DX11Framebuffer::Invalidate()
+	{
+	}
+
+	void DX11Framebuffer::Release()
+	{
 	}
 
 	void DX11Framebuffer::Resize(uint32 width, uint32 height, bool forceRecreate)
@@ -59,11 +68,15 @@ namespace highlo
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 
-// TODO: Generate DX11 Framebuffer and set the ColorAttachments and the DepthAttachment
+		// TODO: Generate DX11 Framebuffer and set the ColorAttachments and the DepthAttachment
+
+		for (auto &callback : m_ResizeCallbacks)
+			callback(this);
 	}
 
 	void DX11Framebuffer::AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func)
 	{
+		m_ResizeCallbacks.push_back(func);
 	}
 	
 	void DX11Framebuffer::Bind() const

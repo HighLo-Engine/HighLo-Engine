@@ -871,8 +871,8 @@ namespace highlo
 		VertexArraySpecification spec;
 		spec.DebugName = "ShadowPass";
 		spec.Shader = shader;
-		spec.Layout = BufferLayout::GetShadowMapLayout();
-		spec.InstanceLayout = {};
+		spec.Layout = BufferLayout::GetStaticShaderLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 
 		for (int32 i = 0; i < 4; ++i)
 		{
@@ -905,18 +905,8 @@ namespace highlo
 		spec.DebugName = "Pre-Depth";
 		spec.Shader = shader;
 		spec.RenderPass = RenderPass::Create(renderpassSpec);
-		spec.Layout = {
-			{ "a_Position", ShaderDataType::Float3 },
-			{ "a_TexCoord", ShaderDataType::Float2 },
-			{ "a_Normal", ShaderDataType::Float3 },
-			{ "a_Tangent", ShaderDataType::Float3 },
-			{ "a_Binormal", ShaderDataType::Float3 }
-		};
-		spec.InstanceLayout = {
-			{ "a_MRow0", ShaderDataType::Float4 },
-			{ "a_MRow1", ShaderDataType::Float4 },
-			{ "a_MRow2", ShaderDataType::Float4 }
-		};
+		spec.Layout = BufferLayout::GetStaticShaderLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 		
 		m_PreDepthVertexArray = VertexArray::Create(spec);
 		m_PreDepthMaterial = Material::Create(shader, "Pre-Depth-Material");
@@ -938,7 +928,7 @@ namespace highlo
 		spec.DebugName = "PBR-Static";
 		spec.LineWidth = Renderer::GetCurrentLineWidth();
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
-		spec.InstanceLayout = {};
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 		spec.Shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
 		spec.RenderPass = RenderPass::Create(renderPassSpec);
 		m_GeometryVertexArray = VertexArray::Create(spec);
@@ -957,7 +947,7 @@ namespace highlo
 		VertexArraySpecification selectedSpec;
 		selectedSpec.DebugName = "SelectedGeometry";
 		selectedSpec.Layout = BufferLayout::GetStaticShaderLayout();
-		selectedSpec.InstanceLayout = {};
+		selectedSpec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 		selectedSpec.RenderPass = RenderPass::Create(selectedRenderPassSpec);
 		selectedSpec.Shader = Renderer::GetShaderLibrary()->Get("SelectedGeometry");
 		m_SelectedGeometryVertexArray = VertexArray::Create(selectedSpec);
@@ -1074,18 +1064,8 @@ namespace highlo
 
 		VertexArraySpecification spec;
 		spec.DebugName = "Wireframe";
-		spec.Layout = {
-			{ "a_Position", ShaderDataType::Float3 },
-			{ "a_TexCoord", ShaderDataType::Float2 },
-			{ "a_Normal", ShaderDataType::Float3 },
-			{ "a_Tangent", ShaderDataType::Float3 },
-			{ "a_Binormal", ShaderDataType::Float3 }
-		};
-		spec.InstanceLayout = {
-			{ "a_MRow0", ShaderDataType::Float4 },
-			{ "a_MRow1", ShaderDataType::Float4 },
-			{ "a_MRow2", ShaderDataType::Float4 }
-		};
+		spec.Layout = BufferLayout::GetStaticShaderLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 		spec.Shader = shader;
 		spec.RenderPass = m_ExternalCompositingRenderPass;
 		spec.Wireframe = true;

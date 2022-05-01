@@ -80,7 +80,7 @@ namespace highlo
 
 			WaitForSingleObject(pollingOverlap.hEvent, INFINITE);
 
-			HL_CORE_TRACE("SHOULD BE IGNORED?: {0}", s_IgnoreNextChange);
+		//	HL_CORE_TRACE("SHOULD BE IGNORED?: {0}", s_IgnoreNextChange);
 			/*
 			if (s_IgnoreNextChange)
 			{

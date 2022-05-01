@@ -373,19 +373,19 @@ namespace highlo
 	
 	void VulkanRenderingAPI::ClearScreenColor(const glm::vec4 &color)
 	{
-		HL_ASSERT(s_VulkanRendererData->ActiveCommandBuffer);
-
-		VkClearColorValue clearColor = { color.r, color.g, color.b, color.a };
-		VkClearValue clearValue = {};
-		clearValue.color = clearColor;
-
-		VkImageSubresourceRange imageRange = {};
-		imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageRange.levelCount = 1;
-		imageRange.layerCount = 1;
-
-		// TODO: replace the nullptr with the actual image
-		vkCmdClearColorImage(s_VulkanRendererData->ActiveCommandBuffer, nullptr, VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);
+	//	HL_ASSERT(s_VulkanRendererData->ActiveCommandBuffer);
+	//
+	//	VkClearColorValue clearColor = { color.r, color.g, color.b, color.a };
+	//	VkClearValue clearValue = {};
+	//	clearValue.color = clearColor;
+	//
+	//	VkImageSubresourceRange imageRange = {};
+	//	imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	//	imageRange.levelCount = 1;
+	//	imageRange.layerCount = 1;
+	//
+	//	// TODO: replace the nullptr with the actual image
+	//	vkCmdClearColorImage(s_VulkanRendererData->ActiveCommandBuffer, nullptr, VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);
 	}
 	
 	void VulkanRenderingAPI::ClearScreenBuffers()

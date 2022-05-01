@@ -44,6 +44,18 @@ namespace highlo
 	{
 	}
 
+	void DX11Texture3D::Resize(const glm::uvec2 &size)
+	{
+		Resize(size.x, size.y);
+	}
+
+	void DX11Texture3D::Resize(const uint32 width, const uint32 height)
+	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		Invalidate();
+	}
+
 	void DX11Texture3D::Lock()
 	{
 	}
@@ -79,7 +91,7 @@ namespace highlo
 		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 	
-	void DX11Texture3D::GenerateMips()
+	void DX11Texture3D::GenerateMips(bool readonly)
 	{
 	}
 }

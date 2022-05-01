@@ -84,6 +84,9 @@ namespace highlo
 	public:
 		HLAPI virtual ~Framebuffer() = default;
 
+		HLAPI virtual void Invalidate() = 0;
+		HLAPI virtual void Release() = 0;
+
 		HLAPI virtual void Bind() const = 0;
 		HLAPI virtual void Unbind() const = 0;
 
@@ -104,6 +107,9 @@ namespace highlo
 
 		HLAPI virtual FramebufferSpecification &GetSpecification() = 0;
 		HLAPI virtual const FramebufferSpecification &GetSpecification() const = 0;
+
+		HLAPI virtual uint64 GetColorAttachmentCount() const = 0;
+		HLAPI virtual bool HasDepthAttachment() const = 0;
 
 		HLAPI static Ref<Framebuffer> Create(const FramebufferSpecification &spec);
 	};

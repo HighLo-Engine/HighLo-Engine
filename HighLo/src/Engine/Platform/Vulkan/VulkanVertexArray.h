@@ -55,9 +55,9 @@ namespace highlo
 		Ref<IndexBuffer> m_IndexBuffer = nullptr;
 		VertexArraySpecification m_Specification;
 
-		VkPipelineLayout m_PipelineLayout;
-		VkPipeline m_Pipeline;
-		VkPipelineCache m_PipelineCache;
+		VkPipelineLayout m_PipelineLayout = nullptr;
+		VkPipeline m_Pipeline = nullptr;
+		VkPipelineCache m_PipelineCache = nullptr;
 		VulkanShaderMaterialDescriptorSet m_Descriptors;
 	};
 }

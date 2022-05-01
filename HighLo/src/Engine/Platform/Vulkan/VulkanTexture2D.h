@@ -46,6 +46,9 @@ namespace highlo
 		virtual void Invalidate() override;
 		virtual bool IsLoaded() const override { return m_Loaded; }
 
+		virtual void Resize(const glm::uvec2 &size) override;
+		virtual void Resize(const uint32 width, const uint32 height) override;
+
 		virtual void Lock() override;
 		virtual void Unlock() override;
 
@@ -63,6 +66,7 @@ namespace highlo
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
 		virtual void GenerateMips(bool readonly = false) override;
+		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 

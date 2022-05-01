@@ -22,6 +22,9 @@ namespace highlo
 		VulkanFramebuffer(const FramebufferSpecification &spec);
 		virtual ~VulkanFramebuffer();
 
+		virtual void Invalidate() override;
+		virtual void Release() override;
+
 		virtual void Bind() const override {}
 		virtual void Unbind() const override {}
 
@@ -43,20 +46,13 @@ namespace highlo
 		virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
 		virtual const FramebufferSpecification &GetSpecification() const override { return m_Specification; }
 
-		// TODO: make this global
-		uint64 GetColorAttachmentCount() const { return m_Specification.SwapChainTarget ? 1 : m_AttachmentImages.size(); }
-		bool HasDepthAttachment() const { return (bool)m_DepthImage; }
+		virtual uint64 GetColorAttachmentCount() const override { return m_Specification.SwapChainTarget ? 1 : m_AttachmentImages.size(); }
+		virtual bool HasDepthAttachment() const override { return (bool)m_DepthImage; }
 
 		// Vulkan-specific
 		VkRenderPass GetRenderPass() const { return m_RenderPass; }
 		VkFramebuffer GetFramebuffer() const { return m_Framebuffer; }
 		const std::vector<VkClearValue> &GetClearValues() const { return m_ClearValues; }
-
-	private:
-
-		// TODO: Make these global
-		void Invalidate();
-		void Release();
 
 	private:
 

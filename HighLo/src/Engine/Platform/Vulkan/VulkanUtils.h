@@ -651,7 +651,7 @@ namespace highlo::utils
 	static T *MapMemory(VmaAllocation allocation)
 	{
 		T *mappedMemory;
-		vmaMapMemory(GetVMAAllocator(), allocation, (void **)&mappedMemory);
+		vmaMapMemory(GetVMAAllocator(), allocation, (void**)&mappedMemory);
 		return mappedMemory;
 	}
 

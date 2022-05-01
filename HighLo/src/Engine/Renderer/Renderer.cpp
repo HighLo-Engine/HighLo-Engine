@@ -69,8 +69,8 @@ namespace highlo
 		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
 
 		// Load 3D Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Collider.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Grid.glsl");

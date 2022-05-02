@@ -39,6 +39,8 @@ project "HighLo"
 		"%{IncludeDir.vulkan_local}",
 		"%{IncludeDir.vulkan_memory_alloc}",
 		"%{IncludeDir.yamlCpp}",
+		"%{IncludeDir.shaderc_util}",
+		"%{IncludeDir.shaderc_glslc}",
     }
 
     links
@@ -52,6 +54,7 @@ project "HighLo"
 		"%{LibDir.openssl_libcrypto}",
 		"%{LibDir.vulkan_sdk}",
 		"%{LibDir.vulkan_sdk_utils}",
+		"%{LibDir.dxc}",
     }
 
     defines
@@ -61,6 +64,9 @@ project "HighLo"
 		"HIGHLO_LIBRARY_EXPORT",
 		"HIGHLO_ENABLE_PROFILER",
 	}
+
+	filter "files:HighLo/vendor/shaderc/**.cpp"
+		flags { "NoPCH" }
 
     filter "system:windows"
         systemversion "latest"
@@ -121,17 +127,17 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_debug}",
 			"%{LibDir.shaderc_util_debug}",
-			"%{LibDir.glsl_Debug}",
+		--	"%{LibDir.glsl_Debug}",
 
-			"%{LibDir.SPIRV_Debug}",
+		--	"%{LibDir.SPIRV_Debug}",
 			"%{LibDir.SPIRV_Cross_Debug}",
 			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
 			"%{LibDir.SPIRV_Tools_Debug}",
 
-			"%{LibDir.SPIRV_Cross_util_Debug}",
-			"%{LibDir.SPIRV_Cross_cpp_Debug}",
-			"%{LibDir.SPIRV_Cross_reflect_Debug}",
-			"%{LibDir.SpvRemapper_Debug}",
+		--	"%{LibDir.SPIRV_Cross_util_Debug}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Debug}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Debug}",
+		--	"%{LibDir.SpvRemapper_Debug}",
 			"%{LibDir.yamlCpp_debug}",
 		}
 
@@ -155,16 +161,16 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_release}",
 			"%{LibDir.shaderc_util_release}",
-			"%{LibDir.glsl_Release}",
+		--	"%{LibDir.glsl_Release}",
 			
-			"%{LibDir.SPIRV_Release}",
+		--	"%{LibDir.SPIRV_Release}",
 			"%{LibDir.SPIRV_Cross_Release}",
 			"%{LibDir.SPIRV_Cross_GLSL_Release}",
 			
-			"%{LibDir.SPIRV_Cross_util_Release}",
-			"%{LibDir.SPIRV_Cross_cpp_Release}",
-			"%{LibDir.SPIRV_Cross_reflect_Release}",
-			"%{LibDir.SpvRemapper_Release}",
+		--	"%{LibDir.SPIRV_Cross_util_Release}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Release}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Release}",
+		--	"%{LibDir.SpvRemapper_Release}",
 			"%{LibDir.yamlCpp}",
 		}
 		
@@ -186,17 +192,17 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_debug}",
 			"%{LibDir.shaderc_util_debug}",
-			"%{LibDir.glsl_Debug}",
+		--	"%{LibDir.glsl_Debug}",
 
-			"%{LibDir.SPIRV_Debug}",
+		--	"%{LibDir.SPIRV_Debug}",
 			"%{LibDir.SPIRV_Cross_Debug}",
 			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
 			"%{LibDir.SPIRV_Tools_Debug}",
 
-			"%{LibDir.SPIRV_Cross_util_Debug}",
-			"%{LibDir.SPIRV_Cross_cpp_Debug}",
-			"%{LibDir.SPIRV_Cross_reflect_Debug}",
-			"%{LibDir.SpvRemapper_Debug}",
+		--	"%{LibDir.SPIRV_Cross_util_Debug}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Debug}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Debug}",
+		--	"%{LibDir.SpvRemapper_Debug}",
 			"%{LibDir.yamlCpp_debug}",
 		}
 
@@ -220,16 +226,16 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_release}",
 			"%{LibDir.shaderc_util_release}",
-			"%{LibDir.glsl_Release}",
+		--	"%{LibDir.glsl_Release}",
 			
-			"%{LibDir.SPIRV_Release}",
+		--	"%{LibDir.SPIRV_Release}",
 			"%{LibDir.SPIRV_Cross_Release}",
 			"%{LibDir.SPIRV_Cross_GLSL_Release}",
 			
-			"%{LibDir.SPIRV_Cross_util_Release}",
-			"%{LibDir.SPIRV_Cross_cpp_Release}",
-			"%{LibDir.SPIRV_Cross_reflect_Release}",
-			"%{LibDir.SpvRemapper_Release}",
+		--	"%{LibDir.SPIRV_Cross_util_Release}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Release}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Release}",
+		--	"%{LibDir.SpvRemapper_Release}",
 			"%{LibDir.yamlCpp}",
 		}
 
@@ -251,17 +257,17 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_debug}",
 			"%{LibDir.shaderc_util_debug}",
-			"%{LibDir.glsl_Debug}",
+		--	"%{LibDir.glsl_Debug}",
 
-			"%{LibDir.SPIRV_Debug}",
+		--	"%{LibDir.SPIRV_Debug}",
 			"%{LibDir.SPIRV_Cross_Debug}",
 			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
 			"%{LibDir.SPIRV_Tools_Debug}",
 
-			"%{LibDir.SPIRV_Cross_util_Debug}",
-			"%{LibDir.SPIRV_Cross_cpp_Debug}",
-			"%{LibDir.SPIRV_Cross_reflect_Debug}",
-			"%{LibDir.SpvRemapper_Debug}",
+		--	"%{LibDir.SPIRV_Cross_util_Debug}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Debug}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Debug}",
+		--	"%{LibDir.SpvRemapper_Debug}",
 			"%{LibDir.yamlCpp_debug}",
 		}
 
@@ -285,16 +291,16 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_release}",
 			"%{LibDir.shaderc_util_release}",
-			"%{LibDir.glsl_Release}",
+		--	"%{LibDir.glsl_Release}",
 			
-			"%{LibDir.SPIRV_Release}",
+		--	"%{LibDir.SPIRV_Release}",
 			"%{LibDir.SPIRV_Cross_Release}",
 			"%{LibDir.SPIRV_Cross_GLSL_Release}",
 			
-			"%{LibDir.SPIRV_Cross_util_Release}",
-			"%{LibDir.SPIRV_Cross_cpp_Release}",
-			"%{LibDir.SPIRV_Cross_reflect_Release}",
-			"%{LibDir.SpvRemapper_Release}",
+		--	"%{LibDir.SPIRV_Cross_util_Release}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Release}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Release}",
+		--	"%{LibDir.SpvRemapper_Release}",
 			"%{LibDir.yamlCpp}",
 		}
 
@@ -316,17 +322,17 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_debug}",
 			"%{LibDir.shaderc_util_debug}",
-			"%{LibDir.glsl_Debug}",
+		--	"%{LibDir.glsl_Debug}",
 
-			"%{LibDir.SPIRV_Debug}",
+		--	"%{LibDir.SPIRV_Debug}",
 			"%{LibDir.SPIRV_Cross_Debug}",
 			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
 			"%{LibDir.SPIRV_Tools_Debug}",
 
-			"%{LibDir.SPIRV_Cross_util_Debug}",
-			"%{LibDir.SPIRV_Cross_cpp_Debug}",
-			"%{LibDir.SPIRV_Cross_reflect_Debug}",
-			"%{LibDir.SpvRemapper_Debug}",
+		--	"%{LibDir.SPIRV_Cross_util_Debug}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Debug}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Debug}",
+		--	"%{LibDir.SpvRemapper_Debug}",
 			"%{LibDir.yamlCpp_debug}",
 		}
 
@@ -350,16 +356,16 @@ project "HighLo"
 			
 			"%{LibDir.shaderc_release}",
 			"%{LibDir.shaderc_util_release}",
-			"%{LibDir.glsl_Release}",
+		--	"%{LibDir.glsl_Release}",
 			
-			"%{LibDir.SPIRV_Release}",
+		--	"%{LibDir.SPIRV_Release}",
 			"%{LibDir.SPIRV_Cross_Release}",
 			"%{LibDir.SPIRV_Cross_GLSL_Release}",
 			
-			"%{LibDir.SPIRV_Cross_util_Release}",
-			"%{LibDir.SPIRV_Cross_cpp_Release}",
-			"%{LibDir.SPIRV_Cross_reflect_Release}",
-			"%{LibDir.SpvRemapper_Release}",
+		--	"%{LibDir.SPIRV_Cross_util_Release}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Release}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Release}",
+		--	"%{LibDir.SpvRemapper_Release}",
 			"%{LibDir.yamlCpp}",
 		}
 

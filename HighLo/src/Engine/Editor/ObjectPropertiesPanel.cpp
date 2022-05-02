@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+ï»¿// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ObjectPropertiesPanel.h"
@@ -21,7 +21,7 @@ namespace highlo
 			Translation *translation = HLApplication::Get().GetActiveTranslation();
 			HL_ASSERT(translation);
 
-			ImGui::PushID((void*)typeid(T).hash_code());
+			ImGui::PushID((void *)typeid(T).hash_code());
 			auto *component = entity.GetComponent<T>();
 			ImVec2 contentRegion = ImGui::GetContentRegionAvail();
 
@@ -165,7 +165,7 @@ namespace highlo
 	{
 		m_ActionCallback = callback;
 	}
-	
+
 	void ObjectPropertiesPanel::DrawComponents(Entity &entity)
 	{
 		Translation *translation = HLApplication::Get().GetActiveTranslation();
@@ -177,7 +177,7 @@ namespace highlo
 		const char *addText = " ADD NEW COMPONENT            ";
 		if (translation->GetLanguageCode() == "de-DE")
 		{
-			addText = u8" Komponent hinzufügen            ";
+			addText = u8" Komponent hinzufï¿½gen            ";
 		}
 
 		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
@@ -200,7 +200,7 @@ namespace highlo
 				UI::ScopedColor frameColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
 				UI::ScopedFont boldFont(ImGui::GetIO().Fonts->Fonts[0]);
 
-				
+
 				if (UI::DrawInputText("", tag))
 				{
 					entity.SetTag(tag);
@@ -429,7 +429,7 @@ namespace highlo
 			Ref<DynamicModel> mesh = AssetManager::Get()->GetAsset<DynamicModel>(component.Model);
 
 			UI::BeginPropertyGrid();
-			
+
 			UI::AssetReferenceResult result;
 			if (UI::DrawAssetReferenceWithConversion<StaticModel, MeshFile>(translation->GetText("object-properties-dynamic-model-component"), component.Model, [=](Ref<MeshFile> meshAsset)
 			{

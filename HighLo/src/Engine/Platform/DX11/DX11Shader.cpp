@@ -14,6 +14,9 @@
 
 namespace highlo
 {
+	static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
+	static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
+
 	DX11Shader::DX11Shader(const FileSystemPath &filePath, bool forceCompile)
 		: m_AssetPath(filePath)
 	{
@@ -27,9 +30,14 @@ m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for
 
 	DX11Shader::~DX11Shader()
 	{
+		Release();
 	}
 
 	void DX11Shader::Reload(bool forceCompile)
+	{
+	}
+
+	void DX11Shader::Release()
 	{
 	}
 
@@ -44,6 +52,11 @@ m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for
 	void DX11Shader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
 	{
 		m_ReloadedCallbacks.push_back(callback);
+	}
+	
+	void DX11Shader::SetMacro(const HLString &name, const HLString &value)
+	{
+		m_Macros[name] = value;
 	}
 }
 

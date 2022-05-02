@@ -17,10 +17,10 @@ namespace highlo
 	{
 	public:
 
-		DX11ComputePipeline(Ref<Shader> computeShader);
+		DX11ComputePipeline(const Ref<Shader> &computeShader);
 		virtual ~DX11ComputePipeline();
 
-		virtual void Begin(Ref<CommandBuffer> renderCommandBuffer = nullptr) override;
+		virtual void Begin(const Ref<CommandBuffer> &renderCommandBuffer = nullptr) override;
 		virtual void End() override;
 
 		virtual void Invalidate() override;

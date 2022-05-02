@@ -1,3 +1,10 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2022-04-22) initial release
+//
+
 #pragma once
 
 #include "Engine/Renderer/Renderer.h"
@@ -9,13 +16,31 @@
 
 #include "VulkanDevice.h"
 #include "VulkanContext.h"
+#include "VulkanShaderDefs.h"
+
+// Macro to get a procedure address based on a vulkan instance
+#define GET_INSTANCE_PROC_ADDR(inst, entrypoint)                        \
+{                                                                       \
+	fp##entrypoint = reinterpret_cast<PFN_vk##entrypoint>(vkGetInstanceProcAddr(inst, "vk"#entrypoint)); \
+	HL_ASSERT(fp##entrypoint);                                     \
+}
+
+// Macro to get a procedure address based on a vulkan device
+#define GET_DEVICE_PROC_ADDR(dev, entrypoint)                           \
+{                                                                       \
+	fp##entrypoint = reinterpret_cast<PFN_vk##entrypoint>(vkGetDeviceProcAddr(dev, "vk"#entrypoint));   \
+	HL_ASSERT(fp##entrypoint);                                     \
+}
+
 
 inline PFN_vkSetDebugUtilsObjectNameEXT fpSetDebugUtilsObjectNameEXT;
 inline PFN_vkCmdBeginDebugUtilsLabelEXT fpCmdBeginDebugUtilsLabelEXT;
 inline PFN_vkCmdEndDebugUtilsLabelEXT fpCmdEndDebugUtilsLabelEXT;
 inline PFN_vkCmdInsertDebugUtilsLabelEXT fpCmdInsertDebugUtilsLabelEXT;
 
-// We do have a function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
+inline PFN_vkCmdSetCheckpointNV fpCmdSetCheckpointNV;
+
+// We do have this function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
 // it seems that the function is not part of the exported library files
 inline PFN_vkGetQueueCheckpointDataNV fpGetQueueCheckpointDataNV;
 
@@ -61,6 +86,15 @@ namespace highlo::utils
 		{
 			fpCmdInsertDebugUtilsLabelEXT = [](VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT *pLabelInfo)
 			{
+			};
+		}
+
+		fpCmdSetCheckpointNV = (PFN_vkCmdSetCheckpointNV)(vkGetInstanceProcAddr(instance, "vkCmdSetCheckpointNV"));
+		if (!fpCmdSetCheckpointNV)
+		{
+			fpCmdSetCheckpointNV = [](VkCommandBuffer commandBuffer, const void *marker)
+			{
+
 			};
 		}
 	}
@@ -200,7 +234,7 @@ namespace highlo::utils
 		VkDebugUtilsObjectNameInfoEXT nameInfo;
 		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		nameInfo.objectType = obj;
-		nameInfo.pObjectName = *name;
+		nameInfo.pObjectName = name.IsEmpty() ? "" : *name;
 		nameInfo.objectHandle = (uint64)handle;
 		nameInfo.pNext = VK_NULL_HANDLE;
 
@@ -208,107 +242,420 @@ namespace highlo::utils
 		VulkanCheckResult(result);
 	}
 
+	// Shader helpers
+	static VkShaderStageFlagBits ShaderTypeToVulkanStage(ShaderType type)
+	{
+		switch (type)
+		{
+			case ShaderType::Vertex:
+				return VK_SHADER_STAGE_VERTEX_BIT;
+
+			case ShaderType::Fragment:
+				return VK_SHADER_STAGE_FRAGMENT_BIT;
+
+			case ShaderType::Compute:
+				return VK_SHADER_STAGE_COMPUTE_BIT;
+
+			case ShaderType::TessControl:
+				return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+
+			case ShaderType::TessEvaluation:
+				return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+
+			case ShaderType::Geometry:
+				return VK_SHADER_STAGE_GEOMETRY_BIT;
+		}
+
+		HL_ASSERT(false);
+		return VK_SHADER_STAGE_ALL;
+	}
+
+	static ShaderType VulkanStageToShaderType(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:
+				return ShaderType::Vertex;
+
+			case VK_SHADER_STAGE_FRAGMENT_BIT:
+				return ShaderType::Fragment;
+
+			case VK_SHADER_STAGE_COMPUTE_BIT:
+				return ShaderType::Compute;
+
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:
+				return ShaderType::TessControl;
+
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:
+				return ShaderType::TessEvaluation;
+
+			case VK_SHADER_STAGE_GEOMETRY_BIT:
+				return ShaderType::Geometry;
+		}
+
+		return ShaderType::None;
+	}
+
+	static HLString ShaderStageToMacro(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+		case VK_SHADER_STAGE_VERTEX_BIT:                    return "__VERTEX_STAGE__";
+		case VK_SHADER_STAGE_FRAGMENT_BIT:                  return "__FRAGMENT_STAGE__";
+		case VK_SHADER_STAGE_COMPUTE_BIT:                   return "__COMPUTE_STAGE__";
+		case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:      return "__TESS_CONTROL_STAGE__";
+		case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:   return "__TESS_EVAL_STAGE__";
+		case VK_SHADER_STAGE_GEOMETRY_BIT:                  return "__GEOMETRY_STAGE__";
+		}
+
+		HL_ASSERT(false);
+		return "";
+	}
+
+	static VkShaderStageFlagBits ShaderStageFromString(const HLString &str)
+	{
+		HLString type = str.ToLowerCase();
+
+		if (type == "vertex")
+			return VK_SHADER_STAGE_VERTEX_BIT;
+
+		if (type == "fragment" || type == "pixel")
+			return VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		if (type == "compute")
+			return VK_SHADER_STAGE_COMPUTE_BIT;
+
+		if (type == "tesscontrol")
+			return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+
+		if (type == "tessevaluation")
+			return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+
+		if (type == "geometry")
+			return VK_SHADER_STAGE_GEOMETRY_BIT;
+
+		return VK_SHADER_STAGE_ALL;
+	}
+
+	static HLString ShaderStageStringToMacro(const HLString &str)
+	{
+		HLString type = str.ToLowerCase();
+
+		if (type == "vertex")
+			return "__VERTEX_STAGE__";
+
+		if (type == "fragment" || type == "pixel")
+			return "__FRAGMENT_STAGE__";
+
+		if (type == "compute")
+			return "__COMPUTE_STAGE__";
+
+		if (type == "tesscontrol")
+			return "__TESS_CONTROL_STAGE__";
+
+		if (type == "tessevaluation")
+			return "__TESS_EVAL_STAGE__";
+
+		if (type == "geometry")
+			return "__GEOMETRY_STAGE__";
+
+		HL_ASSERT(false);
+		return "";
+	}
+
+	static HLString ShaderStageToString(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:                    return "Vertex";
+			case VK_SHADER_STAGE_FRAGMENT_BIT:                  return "Pixel";
+			case VK_SHADER_STAGE_COMPUTE_BIT:                   return "Compute";
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:      return "TessControl";
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:   return "TessEvalulation";
+			case VK_SHADER_STAGE_GEOMETRY_BIT:                  return "Geometry";
+		}
+
+		HL_ASSERT(false);
+		return "";
+	}
+
+	static std::string_view VKStageToShaderMacro(const VkShaderStageFlagBits stage)
+	{
+		switch (stage)
+		{
+			case VK_SHADER_STAGE_VERTEX_BIT:					return "__VERTEX_STAGE__";
+			case VK_SHADER_STAGE_FRAGMENT_BIT:					return "__FRAGMENT_STAGE__";
+			case VK_SHADER_STAGE_COMPUTE_BIT:					return "__COMPUTE_STAGE__";
+			case VK_SHADER_STAGE_GEOMETRY_BIT:					return "__GEOMETRY_STAGE__";
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:		return "__TESS_CONTROL_STAGE__";
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:	return "__TESS_EVAL_STAGE__";
+		}
+
+		HL_ASSERT(false, "Unknown shader stage.");
+		return "";
+	}
+
+	static VkShaderStageFlagBits StageToVKShaderStage(const std::string_view stage)
+	{
+		if (stage == "vertex")		return VK_SHADER_STAGE_VERTEX_BIT;
+		if (stage == "fragment")	return VK_SHADER_STAGE_FRAGMENT_BIT;
+		if (stage == "compute")		return VK_SHADER_STAGE_COMPUTE_BIT;
+		if (stage == "geometry")	return VK_SHADER_STAGE_GEOMETRY_BIT;
+		if (stage == "tesscontrol") return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+		if (stage == "tesseval")	return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+		
+		HL_ASSERT(false, "Unknown shader stage.");
+		return VK_SHADER_STAGE_ALL;
+	}
+
+	static std::unordered_map<VkShaderStageFlagBits, HLString> ConvertShaderTypeToVulkanStage(const std::unordered_map<ShaderType, HLString> &sources)
+	{
+		std::unordered_map<VkShaderStageFlagBits, HLString> result;
+		for (auto &[type, source] : sources)
+		{
+			VkShaderStageFlagBits stage = utils::ShaderTypeToVulkanStage(type);
+			result.insert({ stage, source });
+		}
+
+		return result;
+	}
+
+	static std::unordered_map<ShaderType, HLString> ConvertVulkanStageToShaderType(const std::unordered_map<VkShaderStageFlagBits, HLString> &sources)
+	{
+		std::unordered_map<ShaderType, HLString> result;
+		for (auto &[stage, source] : sources)
+		{
+			ShaderType type = utils::VulkanStageToShaderType(stage);
+			result.insert({ type, source });
+		}
+
+		return result;
+	}
+
+	static std::vector<VkPushConstantRange> PushConstantRangeToVulkanPushConstantRange(const std::vector<VulkanShaderPushConstantRange> &pushConstants)
+	{
+		std::vector<VkPushConstantRange> result(pushConstants.size());
+		for (uint32 i = 0; i < pushConstants.size(); ++i)
+		{
+			const auto &pushConstantRange = pushConstants[i];
+			auto &entry = result[i];
+
+			entry.stageFlags = pushConstantRange.Stage;
+			entry.offset = pushConstantRange.Offset;
+			entry.size = pushConstantRange.Size;
+		}
+
+		return result;
+	}
+
+	// Texture helpers
+
+	static VkFormat VulkanTextureFormat(TextureFormat format)
+	{
+		switch (format)
+		{
+			case TextureFormat::RED8UN:					return VK_FORMAT_R8_UNORM;
+			case TextureFormat::RED8UI:					return VK_FORMAT_R8_UINT;
+			case TextureFormat::RED16UI:				return VK_FORMAT_R16_UINT;
+			case TextureFormat::RED32UI:				return VK_FORMAT_R32_UINT;
+			case TextureFormat::RED32F:					return VK_FORMAT_R32_SFLOAT;
+			case TextureFormat::RG8:				    return VK_FORMAT_R8G8_UNORM;
+			case TextureFormat::RG16F:					return VK_FORMAT_R16G16_SFLOAT;
+			case TextureFormat::RG32F:					return VK_FORMAT_R32G32_SFLOAT;
+			case TextureFormat::RGBA:					return VK_FORMAT_R8G8B8A8_UNORM;
+			case TextureFormat::RGBA8:					return VK_FORMAT_R8G8B8A8_UNORM;
+			case TextureFormat::RGBA16F:				return VK_FORMAT_R16G16B16A16_SFLOAT;
+			case TextureFormat::RGBA32F:				return VK_FORMAT_R32G32B32A32_SFLOAT;
+			case TextureFormat::B10R11G11UF:			return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+			case TextureFormat::DEPTH32FSTENCIL8UINT:	return VK_FORMAT_D32_SFLOAT_S8_UINT;
+			case TextureFormat::DEPTH32F:				return VK_FORMAT_D32_SFLOAT;
+			case TextureFormat::DEPTH24STENCIL8:		return VulkanContext::GetCurrentDevice()->GetPhysicalDevice()->GetDepthFormat();
+		}
+
+		HL_ASSERT(false);
+		return VK_FORMAT_UNDEFINED;
+	}
+
+	static VkSamplerAddressMode VulkanSamplerWrap(TextureWrap wrap)
+	{
+		switch (wrap)
+		{
+			case TextureWrap::Clamp:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			case TextureWrap::Repeat:   return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		}
+
+		HL_ASSERT(false);
+		return (VkSamplerAddressMode)0;
+	}
+
+	static VkFilter VulkanSamplerFilter(TextureFilter filter)
+	{
+		switch (filter)
+		{
+			case TextureFilter::Linear:     return VK_FILTER_LINEAR;
+			case TextureFilter::Nearest:    return VK_FILTER_NEAREST;
+			case TextureFilter::Cubic:      return VK_FILTER_CUBIC_IMG;
+		}
+
+		HL_ASSERT(false);
+		return (VkFilter)0;
+	}
+
+	static void InsertImageMemoryBarrier(
+		VkCommandBuffer cmdbuffer,
+		VkImage image,
+		VkAccessFlags srcAccessMask,
+		VkAccessFlags dstAccessMask,
+		VkImageLayout oldImageLayout,
+		VkImageLayout newImageLayout,
+		VkPipelineStageFlags srcStageMask,
+		VkPipelineStageFlags dstStageMask,
+		VkImageSubresourceRange subresourceRange)
+	{
+		VkImageMemoryBarrier imageMemoryBarrier = {};
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarrier.pNext = nullptr;
+		imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+		imageMemoryBarrier.srcAccessMask = srcAccessMask;
+		imageMemoryBarrier.dstAccessMask = dstAccessMask;
+		imageMemoryBarrier.oldLayout = oldImageLayout;
+		imageMemoryBarrier.newLayout = newImageLayout;
+		imageMemoryBarrier.image = image;
+		imageMemoryBarrier.subresourceRange = subresourceRange;
+
+		vkCmdPipelineBarrier(cmdbuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+	}
+
+	static void SetImageLayout(
+		VkCommandBuffer cmdbuffer,
+		VkImage image,
+		VkImageLayout oldImageLayout,
+		VkImageLayout newImageLayout,
+		VkImageSubresourceRange subresourceRange,
+		VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT)
+	{
+		VkImageMemoryBarrier imageMemoryBarrier = {};
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarrier.pNext = nullptr;
+		imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		imageMemoryBarrier.oldLayout = oldImageLayout;
+		imageMemoryBarrier.newLayout = newImageLayout;
+		imageMemoryBarrier.image = image;
+		imageMemoryBarrier.subresourceRange = subresourceRange;
+
+		switch (oldImageLayout)
+		{
+			case VK_IMAGE_LAYOUT_UNDEFINED:
+				imageMemoryBarrier.srcAccessMask = 0;
+				break;
+
+			case VK_IMAGE_LAYOUT_PREINITIALIZED:
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+				imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				break;
+
+			default:
+				break;
+		}
+
+		switch (newImageLayout)
+		{
+			case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+				imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+				imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+				imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+				imageMemoryBarrier.dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+				break;
+
+			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+				if (imageMemoryBarrier.srcAccessMask == 0)
+				{
+					imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+				}
+				imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				break;
+
+			default:
+				break;
+		}
+
+		vkCmdPipelineBarrier(cmdbuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
+	}
+
+	static void SetImageLayout(
+		VkCommandBuffer cmdbuffer,
+		VkImage image,
+		VkImageAspectFlags aspectMask,
+		VkImageLayout oldImageLayout,
+		VkImageLayout newImageLayout,
+		VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT)
+	{
+		VkImageSubresourceRange subresourceRange = {};
+		subresourceRange.aspectMask = aspectMask;
+		subresourceRange.baseMipLevel = 0;
+		subresourceRange.levelCount = 1;
+		subresourceRange.layerCount = 1;
+		SetImageLayout(cmdbuffer, image, oldImageLayout, newImageLayout, subresourceRange, srcStageMask, dstStageMask);
+	}
+
+
 	// Allocation helpers
 
-	struct VulkanAllocationData
-	{
-		VmaAllocator Allocator;
-		uint64 TotalAllocatedBytes = 0;
-	};
+	void InitAllocator(const Ref<VulkanDevice> &device);
+	void ShutdownAllocator();
 
-	static VulkanAllocationData *s_VulkanAllocationData = nullptr;
+	void FreeAllocation(VmaAllocation allocation);
 
-	static void InitAllocator(const Ref<VulkanDevice> &device)
-	{
-		s_VulkanAllocationData = new VulkanAllocationData();
-		
-		VmaAllocatorCreateInfo allocCreateInfo = {};
-		allocCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
-		allocCreateInfo.device = device->GetNativeDevice();
-		allocCreateInfo.physicalDevice = device->GetPhysicalDevice()->GetNativeDevice();
-		allocCreateInfo.instance = VulkanContext::GetInstance();
+	VmaAllocation AllocateBuffer(VkBufferCreateInfo createInfo, VmaMemoryUsage usage, VkBuffer &outBuffer);
+	void DestroyBuffer(VkBuffer buffer, VmaAllocation allocation);
 
-		vmaCreateAllocator(&allocCreateInfo, &s_VulkanAllocationData->Allocator);
-	}
+	VmaAllocation AllocateImage(VkImageCreateInfo createInfo, VmaMemoryUsage usage, VkImage &outImage);
+	void DestroyImage(VkImage image, VmaAllocation allocation);
 
-	static void ShutdownAllocator()
-	{
-		vmaDestroyAllocator(s_VulkanAllocationData->Allocator);
-
-		delete s_VulkanAllocationData;
-		s_VulkanAllocationData = nullptr;
-	}
-
-	static VmaAllocator GetVMAAllocator()
-	{
-		return s_VulkanAllocationData->Allocator;
-	}
-
-	static void FreeAllocation(VmaAllocation allocation)
-	{
-		vmaFreeMemory(s_VulkanAllocationData->Allocator, allocation);
-	}
-
-	static VmaAllocation AllocateBuffer(VkBufferCreateInfo createInfo, VmaMemoryUsage usage, VkBuffer &outBuffer)
-	{
-		VmaAllocationCreateInfo allocCreateInfo = {};
-		allocCreateInfo.usage = usage;
-
-		VmaAllocation allocation;
-		vmaCreateBuffer(s_VulkanAllocationData->Allocator, &createInfo, &allocCreateInfo, &outBuffer, &allocation, nullptr);
-
-		VmaAllocationInfo allocInfo = {};
-		vmaGetAllocationInfo(s_VulkanAllocationData->Allocator, allocation, &allocInfo);
-
-		// Track the memory usage
-		s_VulkanAllocationData->TotalAllocatedBytes += allocInfo.size;
-
-		return allocation;
-	}
-
-	static void DestroyBuffer(VkBuffer buffer, VmaAllocation allocation)
-	{
-		HL_ASSERT(buffer);
-		HL_ASSERT(allocation);
-		vmaDestroyBuffer(s_VulkanAllocationData->Allocator, buffer, allocation);
-	}
-
-	static VmaAllocation AllocateImage(VkImageCreateInfo createInfo, VmaMemoryUsage usage, VkImage &outImage)
-	{
-		VmaAllocationCreateInfo allocCreateInfo = {};
-		allocCreateInfo.usage = usage;
-
-		VmaAllocation allocation;
-		vmaCreateImage(s_VulkanAllocationData->Allocator, &createInfo, &allocCreateInfo, &outImage, &allocation, nullptr);
-
-		VmaAllocationInfo allocInfo = {};
-		vmaGetAllocationInfo(s_VulkanAllocationData->Allocator, allocation, &allocInfo);
-
-		// Track the memory usage
-		s_VulkanAllocationData->TotalAllocatedBytes += allocInfo.size;
-
-		return allocation;
-	}
-
-	static void DestroyImage(VkImage image, VmaAllocation allocation)
-	{
-		HL_ASSERT(image);
-		HL_ASSERT(allocation);
-		vmaDestroyImage(s_VulkanAllocationData->Allocator, image, allocation);
-	}
+	VmaAllocator &GetVMAAllocator();
 
 	template<typename T>
 	static T *MapMemory(VmaAllocation allocation)
 	{
 		T *mappedMemory;
-		vmaMapMemory(s_VulkanAllocationData->Allocator, allocation, (void**)&mappedMemory);
+		vmaMapMemory(GetVMAAllocator(), allocation, (void**)&mappedMemory);
 		return mappedMemory;
 	}
 
-	static void UnmapMemory(VmaAllocation allocation)
-	{
-		vmaUnmapMemory(s_VulkanAllocationData->Allocator, allocation);
-	}
+	void UnmapMemory(VmaAllocation allocation);
 }
 
 #define VK_CHECK_RESULT(f)\

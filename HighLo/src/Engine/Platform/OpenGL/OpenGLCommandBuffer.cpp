@@ -33,18 +33,23 @@ namespace highlo
 	{
 	}
 	
-	float OpenGLCommandBuffer::GetCPUExecutionTime(uint32 frameIndex, uint32 queryIndex) const
+	float OpenGLCommandBuffer::GetExecutionGPUTime(uint32 frameIndex, uint32 queryIndex) const
 	{
 		return 0.0f;
 	}
 	
-	uint64 OpenGLCommandBuffer::BeginTimestampQuery()
+	uint32 OpenGLCommandBuffer::BeginTimestampQuery()
 	{
 		return 0;
 	}
 	
-	void OpenGLCommandBuffer::EndTimestampQuery(uint64 queryID)
+	void OpenGLCommandBuffer::EndTimestampQuery(uint32 queryID)
 	{
+	}
+	const PipelineStatistics &OpenGLCommandBuffer::GetPipelineStatistics(uint32 frameIndex) const
+	{
+		HL_ASSERT(frameIndex < m_PipelineStatisticsQueryResults.size());
+		return m_PipelineStatisticsQueryResults[frameIndex];
 	}
 }
 

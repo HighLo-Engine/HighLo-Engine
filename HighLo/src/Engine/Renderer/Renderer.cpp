@@ -50,6 +50,14 @@ namespace highlo
 
 	static std::unordered_map<uint64, ShaderDependencies> s_ShaderDepedencies;
 
+	struct GlobalShaderInfo
+	{
+		std::unordered_map<HLString, std::unordered_map<uint64, WeakRef<Shader>>> GlobalMacros;
+		std::vector<WeakRef<Shader>> DirtyShaders;
+	};
+
+	static GlobalShaderInfo s_GlobalShaderInfo;
+
 	static RendererData *s_MainRendererData = nullptr;
 	static RenderCommandQueue *s_CommandQueue = nullptr;
 	static RenderCommandQueue s_ResourceFreeQueue[3];
@@ -60,25 +68,19 @@ namespace highlo
 		s_CommandQueue = new RenderCommandQueue();
 		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
 
-		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
-		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData);
-		
-		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
-		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
-
-		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
-		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
-
 		// Load 3D Shaders
 	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/Collider.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Grid.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SelectedGeometry.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMap.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMapAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Wireframe.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/Composite.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/SceneComposite.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepth.glsl");
+		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepthAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/LightCulling.glsl");
 
 		// Load 2D Shaders
@@ -93,8 +95,17 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/PreethamSky.glsl");
 
-		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 		s_RenderingAPI->Init();
+		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
+
+		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
+		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData);
+
+		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
+		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
+
+		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
+		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
 
 		// Make sure the queue is empty after the renderer is initialized
 		Renderer::WaitAndRender();
@@ -120,6 +131,58 @@ namespace highlo
 	void Renderer::EndFrame()
 	{
 		s_RenderingAPI->EndFrame();
+	}
+
+	bool Renderer::UpdateDirtyShaders()
+	{
+		const bool updatedAnyShaders = s_GlobalShaderInfo.DirtyShaders.size();
+
+		for (WeakRef<Shader> shader : s_GlobalShaderInfo.DirtyShaders)
+			shader->Reload();
+
+		s_GlobalShaderInfo.DirtyShaders.clear();
+
+		return updatedAnyShaders;
+	}
+
+	void Renderer::AcknowledgeParsedGlobalMacros(const std::unordered_set<HLString> &macros, const Ref<Shader> &shader)
+	{
+		for (const HLString &macro : macros)
+			s_GlobalShaderInfo.GlobalMacros[macro][shader->GetHash()] = shader;
+	}
+
+	void Renderer::SetMacroInShader(Ref<Shader> &shader, const HLString &name, const HLString &value)
+	{
+		shader->SetMacro(name, value);
+
+		auto &it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
+		if (it != s_GlobalShaderInfo.DirtyShaders.end())
+		{
+			// Shader is already part of the dirty shaders, so we can safely skip the next step
+			return;
+		}
+
+		s_GlobalShaderInfo.DirtyShaders.push_back(shader);
+	}
+
+	void Renderer::SetGlobalMacroInShaders(const HLString &name, const HLString &value)
+	{
+		HL_ASSERT(s_GlobalShaderInfo.GlobalMacros.find(name) != s_GlobalShaderInfo.GlobalMacros.end(), "Macro has not been passed from any shader!");
+		for (auto &[hash, shader] : s_GlobalShaderInfo.GlobalMacros.at(name))
+		{
+			HL_ASSERT(shader.IsValid(), "Shader was deleted!");
+			shader->SetMacro(name, value);
+
+			// First check if the shader is already part of the dirty shaders
+			auto &it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
+			if (it != s_GlobalShaderInfo.DirtyShaders.end())
+			{
+				// Shader is already part of the dirty shaders, so we can safely skip the next step
+				continue;
+			}
+
+			s_GlobalShaderInfo.DirtyShaders.push_back(shader);
+		}
 	}
 
 	void Renderer::WaitAndRender()

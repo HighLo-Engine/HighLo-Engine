@@ -1,4 +1,13 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2022-04-22) initial release
+//
+
 #pragma once
+
+#include "Engine/Graphics/PhysicalDevice.h"
 
 #ifdef HIGHLO_API_VULKAN
 
@@ -13,14 +22,14 @@ namespace highlo
 		int32 Compute = -1;
 	};
 
-	class VulkanPhysicalDevice : public IsSharedReference
+	class VulkanPhysicalDevice : public PhysicalDevice
 	{
 	public:
 
 		VulkanPhysicalDevice();
-		~VulkanPhysicalDevice();
+		virtual ~VulkanPhysicalDevice();
 
-		bool IsExtensionSupported(const HLString &name) const { return m_SupportedExtensions.find(name) != m_SupportedExtensions.end(); }
+		virtual bool IsExtensionSupported(const HLString &name) const override { return m_SupportedExtensions.find(name) != m_SupportedExtensions.end(); }
 		uint32 GetMemoryTypeIndex(uint32 typeBits, VkMemoryPropertyFlags properties) const;
 
 		VkPhysicalDevice GetNativeDevice() const { return m_PhysicalDevice; }
@@ -32,7 +41,10 @@ namespace highlo
 
 		VkFormat GetDepthFormat() const { return m_DepthFormat; }
 
-		static Ref<VulkanPhysicalDevice> Create();
+	private:
+
+		VkFormat FindDepthFormat() const;
+		QueueFamilyIndices GetQueueFamilyIndices(int32 queueFlags);
 
 	private:
 

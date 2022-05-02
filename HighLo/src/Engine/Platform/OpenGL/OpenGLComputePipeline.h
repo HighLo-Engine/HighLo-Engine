@@ -22,7 +22,7 @@ namespace highlo
 		OpenGLComputePipeline(const Ref<Shader> &computeShader);
 		virtual ~OpenGLComputePipeline();
 
-		virtual void Begin(Ref<CommandBuffer> renderCommandBuffer = nullptr) override;
+		virtual void Begin(const Ref<CommandBuffer> &renderCommandBuffer = nullptr) override;
 		virtual void End() override;
 
 		virtual void Invalidate() override;
@@ -31,7 +31,7 @@ namespace highlo
 
 	private:
 
-		Ref<Shader> m_Shader;
+		Ref<Shader> m_Shader = nullptr;
 	};
 }
 

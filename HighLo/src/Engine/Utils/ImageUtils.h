@@ -66,9 +66,23 @@ namespace highlo
 			return { w, h };
 		}
 
-		inline uint32 GetImageMemorySize(TextureFormat format, uint32 width, uint32 height)
+		inline uint64 GetImageMemorySize(TextureFormat format, uint32 width, uint32 height)
 		{
-			return width * height * GetImageFormatBPP(format);
+			switch (format)
+			{
+				case TextureFormat::RED16UI: return width * height * sizeof(uint16);
+				case TextureFormat::RG16F: return width * height * 2 * sizeof(uint16);
+				case TextureFormat::RG32F: return width * height * 2 * sizeof(float);
+				case TextureFormat::RED32F: return width * height * sizeof(float);
+				case TextureFormat::RED8UN: return width * height;
+				case TextureFormat::RED8UI: return width * height;
+				case TextureFormat::RGBA: return width * height * 4;
+				case TextureFormat::RGBA32F: return width * height * 4 * sizeof(float);
+				case TextureFormat::B10R11G11UF: return width * height * sizeof(float);
+			}
+
+			HL_ASSERT(false);
+			return 0;
 		}
 
 		inline bool IsDepthFormat(TextureFormat format)
@@ -76,10 +90,29 @@ namespace highlo
 			switch (format)
 			{
 				case TextureFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
 				case TextureFormat::DEPTH32F:
 					return true;
 			}
 
+			return false;
+		}
+
+		inline bool IsIntegerBased(TextureFormat format)
+		{
+			switch (format)
+			{
+				case TextureFormat::RED8UI:
+				case TextureFormat::RED16UI:
+				case TextureFormat::RED32UI:
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
+					return true;
+
+				default:
+					return false;
+			}
+
+			HL_ASSERT(false);
 			return false;
 		}
 	}

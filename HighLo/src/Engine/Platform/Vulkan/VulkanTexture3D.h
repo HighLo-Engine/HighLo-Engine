@@ -1,8 +1,18 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2022-04-22) initial release
+//
+
 #pragma once
 
 #include "Engine/Graphics/Texture3D.h"
 
 #ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 namespace highlo
 {
@@ -23,6 +33,9 @@ namespace highlo
 		virtual void Invalidate() override;
 		virtual bool IsLoaded() const override { return m_Loaded; }
 
+		virtual void Resize(const glm::uvec2 &size) override;
+		virtual void Resize(const uint32 width, const uint32 height) override;
+
 		virtual void Lock() override;
 		virtual void Unlock() override;
 
@@ -32,20 +45,31 @@ namespace highlo
 		virtual void UpdateResourceData() override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
-		virtual void GenerateMips() override;
+		virtual void GenerateMips(bool readonly = false) override;
+		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
 
-		virtual void Bind(uint32 slot) const override;
-		virtual void Unbind(uint32 slot) const override;
+		virtual void Bind(uint32 slot) const override {}
+		virtual void Unbind(uint32 slot) const override {}
+
+		// Vulkan-specific
+		const VkDescriptorImageInfo &GetDescriptorInfo() { return m_DescriptorImageInfo; }
+		VkImageView CreateImageViewSingleMap(uint32 mip);
 
 	private:
 
 		Allocator m_Buffer;
+		FileSystemPath m_FilePath;
 		TextureSpecification m_Specification;
 		bool m_Locked = false;
 		bool m_Loaded = false;
+		bool m_MipsGenerated = false;
+
+		VmaAllocation m_MemoryAlloc;
+		VkImage m_Image = nullptr;
+		VkDescriptorImageInfo m_DescriptorImageInfo = {};
 	};
 }
 

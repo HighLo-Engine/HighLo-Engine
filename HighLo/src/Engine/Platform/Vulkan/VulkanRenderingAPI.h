@@ -1,3 +1,10 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2022-04-22) initial release
+//
+
 #pragma once
 
 #include "Engine/Graphics/RenderingAPI.h"
@@ -6,6 +13,8 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
+
+#include "VulkanMaterial.h"
 
 namespace highlo
 {
@@ -114,6 +123,13 @@ namespace highlo
 
 		// Vulkan-specific
 		static VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo);
+
+		static void UpdateMaterialForRendering(Ref<VulkanMaterial> &material, Ref<UniformBufferSet> &uniformBufferSet, Ref<StorageBufferSet> &storageBufferSet);
+		static VkSampler GetClampSampler();
+		static VkSampler GetPointSampler();
+
+		static uint32 GetDescriptorAllocationCount(uint32 frameIndex = 0);
+		static int32 &GetSelectedDrawCall();
 	};
 }
 

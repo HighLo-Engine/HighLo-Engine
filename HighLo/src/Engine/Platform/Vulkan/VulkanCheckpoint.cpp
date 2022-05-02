@@ -1,9 +1,12 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "VulkanCheckpoint.h"
 
 #ifdef HIGHLO_API_VULKAN
 
 #include "VulkanContext.h"
+#include "VulkanUtils.h"
 
 namespace highlo
 {
@@ -20,7 +23,9 @@ namespace highlo
 		VulkanCheckpointData &checkpoint = s_CheckpointStorage[s_CeckpointStorageIndex];
 		memset(checkpoint.Data, 0, sizeof(checkpoint.Data));
 		strcpy_s(checkpoint.Data, *data);
-		vkCmdSetCheckpointNV(commandBuffer, &checkpoint);
+		
+		fpCmdSetCheckpointNV(commandBuffer, &checkpoint);
+		//vkCmdSetCheckpointNV(commandBuffer, &checkpoint);
 	}
 }
 

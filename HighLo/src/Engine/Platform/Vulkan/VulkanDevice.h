@@ -1,4 +1,14 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2022-04-22) initial release
+//
+
 #pragma once
+
+#include "Engine/Graphics/Device.h"
+#include "Engine/Graphics/PhysicalDevice.h"
 
 #ifdef HIGHLO_API_VULKAN
 
@@ -8,14 +18,17 @@
 
 namespace highlo
 {
-	class VulkanDevice : public IsSharedReference
+	class VulkanDevice : public Device
 	{
 	public:
 
-		VulkanDevice(const Ref<VulkanPhysicalDevice> &physicalDevice, VkPhysicalDeviceFeatures enabledFeatures);
-		~VulkanDevice();
+		VulkanDevice(const Ref<PhysicalDevice> &physicalDevice);
+		virtual ~VulkanDevice();
 
-		void Destroy();
+		virtual void Destroy() override;
+
+		// Vulkan-specific
+		void InitDevice(VkPhysicalDeviceFeatures enabledFeatures);
 
 		VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
 		VkQueue GetComputeQueue() { return m_ComputeQueue; }
@@ -23,7 +36,7 @@ namespace highlo
 		// TODO: Maybe extract the begin parameter into a new function like CreateNewCommandBuffer? 
 		// or GetCommandBuffer for this version and CreateCommandBuffer for the starting version?
 		VkCommandBuffer CreateCommandBuffer(bool begin, bool compute = false);
-		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName) const;
+		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName = "") const;
 
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer);
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);

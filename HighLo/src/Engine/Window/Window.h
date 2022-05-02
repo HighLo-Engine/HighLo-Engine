@@ -120,8 +120,10 @@ namespace highlo
 		HLAPI virtual void *GetNativeContext() = 0;
 		HLAPI virtual void *GetNativeCursor() = 0;
 
-		HLAPI virtual Ref<RenderingContext> GetContext() = 0;
-		HLAPI virtual Ref<SwapChain> GetSwapChain() = 0;
+		HLAPI virtual Ref<RenderingContext> &GetContext() = 0;
+		HLAPI virtual const Ref<RenderingContext> &GetContext() const = 0;
+		HLAPI virtual Ref<SwapChain> &GetSwapChain() = 0;
+		HLAPI virtual const Ref<SwapChain> &GetSwapChain() const = 0;
 		HLAPI virtual const WindowData &GetProperties() const = 0;
 
 		HLAPI static Window &Get();

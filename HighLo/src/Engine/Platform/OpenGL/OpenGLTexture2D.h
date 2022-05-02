@@ -41,11 +41,15 @@ namespace highlo
 		virtual void Invalidate() override;
 		virtual bool IsLoaded() const override { return m_Loaded; }
 
+		virtual void Resize(const glm::uvec2 &size) override;
+		virtual void Resize(const uint32 width, const uint32 height) override;
+
 		virtual void Lock() override;
 		virtual void Unlock() override;
 
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
+		virtual void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices) override;
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
@@ -56,7 +60,8 @@ namespace highlo
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
-		virtual void GenerateMips() override;
+		virtual void GenerateMips(bool readonly = false) override;
+		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 

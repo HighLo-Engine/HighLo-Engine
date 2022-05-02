@@ -20,10 +20,10 @@
 #include "Engine/Threading/ThreadRegistry.h"
 #include "Engine/Loaders/AssetImporter.h"
 
+#define BIND_APPLICATION_EVENT_FN(fn) std::bind(&highlo::HLApplication::fn, this, std::placeholders::_1)
+
 namespace highlo
 {
-#define BIND_APPLICATION_EVENT_FN(fn) std::bind(&HLApplication::fn, this, std::placeholders::_1)
-
 	HLApplication *HLApplication::s_Instance = nullptr;
 
 	HLApplication::HLApplication()
@@ -169,11 +169,8 @@ namespace highlo
 
 			m_Window = Window::Create(data);
 			m_Window->SetEventCallback(BIND_APPLICATION_EVENT_FN(InternalEventHandler));
-		}
 
-		// Init Renderer
-		if (!m_Settings.Headless)
-		{
+			// Init Renderer
 			Renderer::Init(m_Window.Get());
 			Renderer::WaitAndRender();
 		}
@@ -185,6 +182,8 @@ namespace highlo
 		// Init Fonts
 		FontManager::Get()->Init();
 
+		// The encryption module is used to encrypt engine internal data
+		// as well as for multiplayer communications
 		m_Encryptor = Ref<Encryptor>::Create();
 		m_Encryptor->Init();
 
@@ -202,12 +201,21 @@ namespace highlo
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &e)
 	{
+		// Skip window close event in headleass mode
+		if (m_Settings.Headless)
+			return true;
+
 		Close();
 		return true;
 	}
 
 	bool HLApplication::OnWindowReisze(WindowResizeEvent &e)
 	{
+		// Skip window resize events if app is being run from a console
+		// (we do not have a window to resize)
+		if (m_Settings.Headless)
+			return true;
+
 		uint32 width = e.GetWidth();
 		uint32 height = e.GetHeight();
 
@@ -246,6 +254,7 @@ namespace highlo
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_APPLICATION_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_APPLICATION_EVENT_FN(OnWindowReisze));
 
+		// Notify all attached layers that an event has occurred (back-to-front order)
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			if (e.m_Handled)
@@ -254,6 +263,7 @@ namespace highlo
 			(*it)->OnEvent(e);
 		}
 
+		// Notify the main client application of the event
 		OnEvent(e);
 	}
 }

@@ -35,7 +35,7 @@ def getUserInput():
 def findPath(filename):
     result = []
     
-    # get_drives is now platform independent, on windows system it returns C:, D:, etc. and under unix systems it returns /
+    # get_drives is now platform independent, on windows system it returns C:\\, D:\\, etc. and under unix systems it returns /
     drives = get_drives()
         
     for search_path in drives:
@@ -63,9 +63,11 @@ def getBinaryPaths():
     autoDetect = YesOrNo("Would you like to automatically detect the binary files of the engine?")
     if autoDetect:
         print("Searching for " + levelEditor + " on your pc...")
-        paths = findPath(levelEditor)
+        try:
+            paths = findPath(levelEditor)
+        except KeyboardInterrupt:
+            pass
     else:
-    
         while True:
             print("Please provide a path to the file you want to benchmark:")
             path = getUserInput()
@@ -85,12 +87,21 @@ def getBinaryPaths():
         print("You did not enter paths that are part of the engine. Stop.")
         quit()
 
+def benchmark(path):
+    print("Benchmarking file " + path)
+
+    # TODO: Start timer here
+
+    # open the application and get the response
+    result = subprocess.Popen(path)
+    print(result)
+
+    # TODO: End timer here
+
 if __name__ == "__main__":
     paths = getBinaryPaths()    
-    print("these are your paths:")
-            
     for path in paths:
-        print(path)
+        benchmark(path)
             
             
     

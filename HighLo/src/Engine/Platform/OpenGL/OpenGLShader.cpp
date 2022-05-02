@@ -11,12 +11,24 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <shaderc/shaderc.hpp>
+#include <libshaderc_util/file_finder.h>
+
+#include "Engine/Graphics/Shaders/GLSLIncluder.h"
+#include "OpenGLUtils.h"
 
 namespace highlo
 {
-#define PRINT_SHADERS 0
-#define PRINT_DEBUG_OUTPUTS 0
 #define GL_SHADER_LOG_PREFIX "Shader>       "
+#define PRINT_DEBUG_ALL 0
+
+#ifdef HL_DEBUG
+#define PRINT_DEBUG_OUTPUTS 1
+#endif
+
+#if PRINT_DEBUG_ALL
+#define PRINT_DEBUG_OUTPUTS 1
+#define PRINT_PREPROCESSING_RESULT 1
+#endif
 
 	namespace utils
 	{
@@ -127,28 +139,176 @@ namespace highlo
 			HL_ASSERT(false);
 			return ShaderUniformType::None;
 		}
+
+		static shaderc_shader_kind ShaderStageToShaderC(const GLenum stage)
+		{
+			switch (stage)
+			{
+				case GL_VERTEX_SHADER_BIT:
+					return shaderc_vertex_shader;
+
+				case GL_FRAGMENT_SHADER_BIT:
+					return shaderc_fragment_shader;
+
+				case GL_COMPUTE_SHADER_BIT:
+					return shaderc_compute_shader;
+
+				case GL_TESS_CONTROL_SHADER_BIT:
+					return shaderc_tess_control_shader;
+
+				case GL_TESS_EVALUATION_SHADER_BIT:
+					return shaderc_tess_evaluation_shader;
+
+				case GL_GEOMETRY_SHADER_BIT:
+					return shaderc_geometry_shader;
+			}
+
+			HL_ASSERT(false);
+			return {};
+		}
+
+		static ShaderLanguage ShaderLanguageFromExtension(const HLString &extension)
+		{
+			if (extension == "glsl")
+				return ShaderLanguage::GLSL;
+
+			if (extension == "hlsl")
+				return ShaderLanguage::HLSL;
+
+			return ShaderLanguage::None;
+		}
+
+		static HLString ShaderStageCachedFileExtension(const GLenum stage)
+		{
+			switch (stage)
+			{
+				case GL_VERTEX_SHADER_BIT:			return ".cached_opengl.vert";
+				case GL_FRAGMENT_SHADER_BIT:		return ".cached_opengl.frag";
+				case GL_COMPUTE_SHADER_BIT:			return ".cached_opengl.comp";
+				case GL_TESS_CONTROL_SHADER_BIT:	return ".cached_opengl.tessconn";
+				case GL_TESS_EVALUATION_SHADER_BIT:	return ".cached_opengl.tessval";
+				case GL_GEOMETRY_SHADER_BIT:		return ".cached_opengl.geo";
+			}
+
+			HL_ASSERT(false);
+			return "";
+		}
+
+		static HLString ShaderStageToString(GLenum stage)
+		{
+			switch (stage)
+			{
+				case GL_VERTEX_SHADER_BIT:			return "vertex";
+				case GL_FRAGMENT_SHADER_BIT:		return "fragment";
+				case GL_COMPUTE_SHADER_BIT:			return "compute";
+				case GL_TESS_EVALUATION_SHADER_BIT:	return "tess_eval";
+				case GL_TESS_CONTROL_SHADER_BIT:	return "tess_control";
+				case GL_GEOMETRY_SHADER_BIT:		return "geometry";
+			}
+
+			HL_ASSERT(false);
+			return "";
+		}
+
+		static ShaderUniformType SPIRTypeToShaderUniformType(spirv_cross::SPIRType type)
+		{
+			switch (type.basetype)
+			{
+			case spirv_cross::SPIRType::Boolean: return ShaderUniformType::Bool;
+			case spirv_cross::SPIRType::UInt: return ShaderUniformType::Uint;
+			case spirv_cross::SPIRType::Int:
+			{
+				if (type.vecsize == 1)
+					return ShaderUniformType::Int;
+
+				if (type.vecsize == 2)
+					return ShaderUniformType::IVec2;
+
+				if (type.vecsize == 3)
+					return ShaderUniformType::IVec3;
+
+				if (type.vecsize == 4)
+					return ShaderUniformType::IVec4;
+
+				break;
+			}
+
+			case spirv_cross::SPIRType::Float:
+			{
+				if (type.columns == 2)
+					return ShaderUniformType::Mat2;
+
+				if (type.columns == 3)
+					return ShaderUniformType::Mat3;
+
+				if (type.columns == 4)
+					return ShaderUniformType::Mat4;
+
+				if (type.vecsize == 1)
+					return ShaderUniformType::Float;
+
+				if (type.vecsize == 2)
+					return ShaderUniformType::Vec2;
+
+				if (type.vecsize == 3)
+					return ShaderUniformType::Vec3;
+
+				if (type.vecsize == 4)
+					return ShaderUniformType::Vec4;
+
+				break;
+			}
+			}
+
+			HL_ASSERT(false);
+			return ShaderUniformType::None;
+		}
+
+		static HLString ShaderStageToMacro(const GLenum stage)
+		{
+			switch (stage)
+			{
+				case GL_VERTEX_SHADER_BIT:          return "__VERTEX_STAGE__";
+				case GL_FRAGMENT_SHADER_BIT:        return "__FRAGMENT_STAGE__";
+				case GL_COMPUTE_SHADER_BIT:         return "__COMPUTE_STAGE__";
+				case GL_TESS_CONTROL_SHADER_BIT:	return "__TESS_CONTROL_STAGE__";
+				case GL_TESS_EVALUATION_SHADER_BIT:	return "__TESS_EVAL_STAGE__";
+				case GL_GEOMETRY_SHADER_BIT:		return "__GEOMETRY_STAGE__";
+			}
+
+			HL_ASSERT(false);
+			return "";
+		}
 	}
+
+	static std::unordered_map<uint32, std::unordered_map<uint32, OpenGLShaderUniformBuffer*>> s_UniformBuffers;
+	static std::unordered_map<uint32, std::unordered_map<uint32, OpenGLShaderStorageBuffer*>> s_StorageBuffers;
 
 	OpenGLShader::OpenGLShader(const FileSystemPath &filePath, bool forceCompile)
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
+		m_Language = utils::ShaderLanguageFromExtension(filePath.Extension());
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 	}
 
 	OpenGLShader::OpenGLShader(const HLString &source)
 	{
+		m_Name = "undefined";
 		Load(source, true);
 	}
 
 	OpenGLShader::~OpenGLShader()
 	{
+		Release();
 	}
 
 	void OpenGLShader::Reload(bool forceCompile)
 	{
-		HL_CORE_TRACE("Reloading shader {0}...", **m_AssetPath);
+		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Reloading shader {0}... [+]", **m_AssetPath);
+		m_Loaded = false; // Reflect current stage: Shader is being reloaded
+
 		HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
 		Load(source, forceCompile);
 
@@ -156,6 +316,13 @@ namespace highlo
 
 		for (ShaderReloadedCallback callback : m_ReloadedCallbacks)
 			callback();
+	}
+
+	void OpenGLShader::Release()
+	{
+		glUseProgram(0);
+		glDeleteProgram(m_RendererID);
+		m_RendererID = 0;
 	}
 
 	uint64 OpenGLShader::GetHash() const
@@ -177,82 +344,10 @@ namespace highlo
 	{
 		m_ReloadedCallbacks.push_back(callback);
 	}
-	
-	const ShaderUniformBuffer &OpenGLShader::FindUniformBuffer(const HLString &name)
+
+	void OpenGLShader::SetMacro(const HLString &name, const HLString &value)
 	{
-		ShaderUniformBuffer *uniformBuffer = nullptr;
-
-		for (auto &[bindingPoint, ub] : s_UniformBuffers)
-		{
-			if (ub.Name == name)
-			{
-				uniformBuffer = &ub;
-				break;
-			}
-		}
-
-		HL_ASSERT(uniformBuffer);
-		return *uniformBuffer;
-	}
-	
-	void OpenGLShader::SetUniformBuffer(const ShaderUniformBuffer &buffer, const void *data, uint32 size, uint32 offset)
-	{
-		glNamedBufferSubData(buffer.RendererID, offset, size, data);
-	}
-	
-	void OpenGLShader::SetStorageBuffer(const ShaderStorageBuffer &buffer, const void *data, uint32 size, uint32 offset)
-	{
-		glNamedBufferSubData(buffer.RendererID, offset, size, data);
-	}
-	
-	void OpenGLShader::SetUniformBuffer(const HLString &name, const void *data, uint32 size)
-	{
-		ShaderUniformBuffer *uniformBuffer = nullptr;
-
-		for (auto &[bindingPoint, ub] : s_UniformBuffers)
-		{
-			if (ub.Name == name)
-			{
-				uniformBuffer = &ub;
-				break;
-			}
-		}
-
-		HL_ASSERT(uniformBuffer);
-		HL_ASSERT(uniformBuffer->Size >= size);
-		glNamedBufferSubData(uniformBuffer->RendererID, 0, size, data);
-	}
-	
-	void OpenGLShader::SetStorageBuffer(const HLString &name, const void *data, uint32 size)
-	{
-		ShaderStorageBuffer *storageBuffer = nullptr;
-
-		for (auto &[bindingPoint, sb] : s_StorageBuffers)
-		{
-			if (sb.Name == name)
-			{
-				storageBuffer = &sb;
-				break;
-			}
-		}
-
-		HL_ASSERT(storageBuffer);
-		HL_ASSERT(storageBuffer->Size >= size);
-		glNamedBufferSubData(storageBuffer->RendererID, 0, size, data);
-	}
-	
-	void OpenGLShader::ResizeStorageBuffer(uint32 bindingPoint, uint32 newSize)
-	{
-		ShaderStorageBuffer &buffer = s_StorageBuffers.at(bindingPoint);
-		if (newSize == buffer.Size)
-			return;
-
-		buffer.Size = newSize;
-		glNamedBufferData(buffer.RendererID, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
-
-	#if PRINT_DEBUG_OUTPUTS
-		HL_CORE_INFO("Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2}", buffer.BindingPoint, *buffer.Name, buffer.Size);
-	#endif // PRINT_DEBUG_OUTPUTS
+		m_Macros[name] = value;
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, float value)
@@ -339,14 +434,6 @@ namespace highlo
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 	
-	const ShaderResourceDeclaration *OpenGLShader::GetShaderResource(const HLString &name)
-	{
-		if (m_Resources.find(name) == m_Resources.end())
-			return nullptr;
-
-		return &m_Resources.at(name);
-	}
-	
 	void OpenGLShader::ClearUniformBuffers()
 	{
 		s_UniformBuffers.clear();
@@ -357,15 +444,16 @@ namespace highlo
 		if (FileSystem::Get()->FileExists(m_AssetPath))
 		{
 			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0} [+]", **m_AssetPath);
-			bool cacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
 
 			m_ShaderSources = PreProcess(source);
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
-			CompileOrGetVulkanBinary(shaderData, forceCompile || cacheHasChanged);
-			CompileOrGetOpenGLBinary(shaderData, forceCompile || cacheHasChanged);
+			CompileOrGetOpenGLBinary(shaderData, forceCompile);
+			LoadAndCreateShaders(shaderData);
 			ReflectAllShaderStages(shaderData);
+			CreateDescriptors();
 
 			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
+			m_Loaded = true;
 		}
 		else
 		{
@@ -373,341 +461,456 @@ namespace highlo
 		}
 	}
 	
-	void OpenGLShader::Reflect(GLenum stage, std::vector<uint32> &data)
+	void OpenGLShader::Reflect(GLenum shaderStage, const std::vector<uint32> &shaderData)
 	{
-		spirv_cross::Compiler compiler(data);
-		spirv_cross::ShaderResources res = compiler.get_shader_resources();
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("===========================");
+		HL_CORE_TRACE(" OpenGL Shader Reflection ");
+		HL_CORE_TRACE("===========================");
+	#endif // PRINT_DEBUG_OUTPUTS
 
-		glUseProgram(m_RendererID);
+		spirv_cross::Compiler compiler(shaderData);
+		auto &resources = compiler.get_shader_resources();
 
-		// Uniform Buffers
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Uniform Buffers: {0}", resources.uniform_buffers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
 
-		for (const spirv_cross::Resource &resource : res.uniform_buffers)
+		for (const auto &resource : resources.uniform_buffers)
 		{
-			auto &bufferType = compiler.get_type(resource.base_type_id);
-			uint32 bindingPoint = compiler.get_decoration(resource.id, spv::DecorationBinding);
+			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
+			if (activeBuffers.size())
+			{
+				const auto &name = resource.name;
+				auto &bufferType = compiler.get_type(resource.base_type_id);
+				uint32 memberCount = (uint32)bufferType.member_types.size();
+				uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
+				uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+				uint32 size = (uint32)compiler.get_declared_struct_size(bufferType);
+
+				if (descriptorSet >= m_ShaderDescriptorSets.size())
+					m_ShaderDescriptorSets.resize(descriptorSet + 1);
+
+				OpenGLShaderDescriptorSet &shaderDescriptorSet = m_ShaderDescriptorSets[descriptorSet];
+				if (s_UniformBuffers[descriptorSet].find(binding) == s_UniformBuffers[descriptorSet].end())
+				{
+					OpenGLShaderUniformBuffer *uniformBuffer = new OpenGLShaderUniformBuffer();
+					uniformBuffer->BindingPoint = binding;
+					uniformBuffer->Size = size;
+					uniformBuffer->Name = name;
+					uniformBuffer->Stage = GL_UNIFORM_BUFFER;
+					s_UniformBuffers.at(descriptorSet)[binding] = uniformBuffer;
+				}
+				else
+				{
+					OpenGLShaderUniformBuffer *uniformBuffer = s_UniformBuffers.at(descriptorSet).at(binding);
+					if (size > uniformBuffer->Size)
+						uniformBuffer->Size = size;
+				}
+
+				shaderDescriptorSet.UniformBuffers[binding] = s_UniformBuffers.at(descriptorSet).at(binding);
+
+			#if PRINT_DEBUG_OUTPUTS
+				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+				HL_CORE_TRACE("  Member Count: {0}", memberCount);
+				HL_CORE_TRACE("  Size: {0}", size);
+				HL_CORE_TRACE("-------------------");
+			#endif // PRINT_DEBUG_OUTPUTS
+			}
+		}
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Storage Buffers: {0}", resources.storage_buffers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
+		for (const auto &resource : resources.storage_buffers)
+		{
+			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
+			if (activeBuffers.size())
+			{
+				const auto &name = resource.name;
+				auto &bufferType = compiler.get_type(resource.base_type_id);
+				uint32 memberCount = (uint32)bufferType.member_types.size();
+				uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
+				uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+				uint32 size = (uint32)compiler.get_declared_struct_size(bufferType);
+
+				if (descriptorSet >= m_ShaderDescriptorSets.size())
+					m_ShaderDescriptorSets.resize(descriptorSet + 1);
+
+				OpenGLShaderDescriptorSet &shaderDescriptorSet = m_ShaderDescriptorSets[descriptorSet];
+				if (s_StorageBuffers[descriptorSet].find(binding) == s_StorageBuffers[descriptorSet].end())
+				{
+					OpenGLShaderStorageBuffer *storageBuffer = new OpenGLShaderStorageBuffer();
+					storageBuffer->Name = name;
+					storageBuffer->Size = size;
+					storageBuffer->BindingPoint = binding;
+					storageBuffer->Stage = GL_SHADER_STORAGE_BUFFER;
+					s_StorageBuffers.at(descriptorSet)[binding] = storageBuffer;
+				}
+				else
+				{
+					OpenGLShaderStorageBuffer *storageBuffer = s_StorageBuffers.at(descriptorSet).at(binding);
+					if (size > storageBuffer->Size)
+						storageBuffer->Size = size;
+				}
+
+				shaderDescriptorSet.StorageBuffers[binding] = s_StorageBuffers.at(descriptorSet).at(binding);
+
+			#if PRINT_DEBUG_OUTPUTS
+				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+				HL_CORE_TRACE("  Member Count: {0}", memberCount);
+				HL_CORE_TRACE("  Size: {0}", size);
+				HL_CORE_TRACE("-------------------");
+			#endif // PRINT_DEBUG_OUTPUTS
+			}
+		}
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Push Constant Buffers: {0}", resources.push_constant_buffers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
+		for (const auto &resource : resources.push_constant_buffers)
+		{
+			const auto &bufferName = resource.name;
+			auto &bufferType = compiler.get_type(resource.type_id);
 			uint32 bufferSize = (uint32)compiler.get_declared_struct_size(bufferType);
+			uint32 memberCount = (uint32)bufferType.member_types.size();
+			uint32 bufferOffset = 0;
+			if (m_PushConstantRanges.size())
+				bufferOffset = m_PushConstantRanges.back().Offset + m_PushConstantRanges.back().Size;
 
-			if (s_UniformBuffers.find(bindingPoint) == s_UniformBuffers.end())
+			auto &pushConstantRange = m_PushConstantRanges.emplace_back();
+			pushConstantRange.Stage = shaderStage;
+			pushConstantRange.Size = bufferSize - bufferOffset;
+			pushConstantRange.Offset = bufferOffset;
+
+			if (bufferName.empty() || bufferName == "u_Renderer")
+				continue;
+
+			ShaderBuffer &shaderBuffer = m_Buffers[bufferName];
+			shaderBuffer.Name = bufferName;
+			shaderBuffer.Size = bufferSize - bufferOffset;
+
+		#if PRINT_DEBUG_OUTPUTS
+			HL_CORE_TRACE("  Name: {0}", bufferName);
+			HL_CORE_TRACE("  Member Count: {0}", memberCount);
+			HL_CORE_TRACE("  Size: {0}", bufferSize);
+		#endif // PRINT_DEBUG_OUTPUTS
+
+			for (uint32 i = 0; i < memberCount; ++i)
 			{
-				ShaderUniformBuffer &buffer = s_UniformBuffers[bindingPoint];
-				buffer.Name = resource.name;
-				buffer.BindingPoint = bindingPoint;
-				buffer.Size = bufferSize;
-				
-				glCreateBuffers(1, &buffer.RendererID);
-				glBindBuffer(GL_UNIFORM_BUFFER, buffer.RendererID);
-				glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
-				glBindBufferBase(GL_UNIFORM_BUFFER, buffer.BindingPoint, buffer.RendererID);
+				auto &type = compiler.get_type(bufferType.member_types[i]);
+				const auto &memberName = compiler.get_member_name(bufferType.self, i);
+				uint32 size = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
+				uint32 offset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
 
-			#if PRINT_DEBUG_OUTPUTS
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Created Uniform Buffer at binding point {0} with name '{1}' and a size of {2} [+]", buffer.BindingPoint, *buffer.Name, buffer.Size);
-			#endif // PRINT_DEBUG_OUTPUTS
-				glBindBuffer(GL_UNIFORM_BUFFER, 0);
-			}
-			else
-			{
-				ShaderUniformBuffer &buffer = s_UniformBuffers.at(bindingPoint);
-				HL_ASSERT(buffer.Name == resource.name);
-
-				// the buffer has changed by OpenGL, we need to resize our representation to fit the actual data
-				if (bufferSize > buffer.Size)
-				{
-					buffer.Size = bufferSize;
-
-					// Recreate the buffer
-					glDeleteBuffers(1, &buffer.RendererID);
-					glCreateBuffers(1, &buffer.RendererID);
-					glBindBuffer(GL_UNIFORM_BUFFER, buffer.RendererID);
-					glBufferData(GL_UNIFORM_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
-					glBindBufferBase(GL_UNIFORM_BUFFER, buffer.BindingPoint, buffer.RendererID);
-
-				#if PRINT_DEBUG_OUTPUTS
-					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] Resized Uniform Buffer at binding point {0} with name '{1}' and a size of {2} [=]", buffer.BindingPoint, *buffer.Name, buffer.Size);
-				#endif // PRINT_DEBUG_OUTPUTS
-					glBindBuffer(GL_UNIFORM_BUFFER, 0);
-				}
+				HLString uniformName = fmt::format("{}.{}", bufferName, memberName);
+				shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SPIRTypeToShaderUniformType(type), size, offset);
 			}
 		}
 
-		// Storage Buffers
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Sampled Images: {0}", resources.sampled_images.size());
+	#endif // PRINT_DEBUG_OUTPUTS
 
-		for (const spirv_cross::Resource &resource : res.storage_buffers)
+		for (const auto &resource : resources.sampled_images)
 		{
-			const auto &bufferType = compiler.get_type(resource.base_type_id);
-			const uint32 bindingPoint = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			const uint32 bufferSize = (uint32)compiler.get_declared_struct_size(bufferType);
+			const auto &name = resource.name;
+			auto &baseType = compiler.get_type(resource.base_type_id);
+			auto &type = compiler.get_type(resource.type_id);
+			uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32 arraySize = (uint32)type.array[0];
 
-			if (s_StorageBuffers.find(bindingPoint) == s_StorageBuffers.end())
-			{
-				ShaderStorageBuffer &buffer = s_StorageBuffers[bindingPoint];
-				buffer.Name = resource.name;
-				buffer.BindingPoint = bindingPoint;
-				buffer.Size = bufferSize;
+			if (arraySize == 0)
+				arraySize = 1;
 
-				glCreateBuffers(1, &buffer.RendererID);
-				glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffer.RendererID);
-				glBufferData(GL_SHADER_STORAGE_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
-				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, buffer.BindingPoint, buffer.RendererID);
+			if (descriptorSet >= m_ShaderDescriptorSets.size())
+				m_ShaderDescriptorSets.resize(descriptorSet + 1);
 
-			#if PRINT_DEBUG_OUTPUTS
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Created Storage Buffer at binding point {0} with name '{1}' and a size of {2} [+]", buffer.BindingPoint, *buffer.Name, buffer.Size);
-			#endif // PRINT_DEBUG_OUTPUTS
+			OpenGLShaderDescriptorSet &shaderDescriptorSet = m_ShaderDescriptorSets[descriptorSet];
 
-				glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-			}
-			else
-			{
-				ShaderStorageBuffer &buffer = s_StorageBuffers.at(bindingPoint);
-				HL_ASSERT(buffer.Name = resource.name);
-
-				// the buffer has changed by OpenGL, we need to resize our representation to fit the actual data
-				if (bufferSize > buffer.Size)
-				{
-					buffer.Size = bufferSize;
-
-					// Recreate the buffer
-					glDeleteBuffers(1, &buffer.RendererID);
-					glCreateBuffers(1, &buffer.RendererID);
-					glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffer.RendererID);
-					glBufferData(GL_SHADER_STORAGE_BUFFER, buffer.Size, nullptr, GL_DYNAMIC_DRAW);
-					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, buffer.BindingPoint, buffer.RendererID);
-
-				#if PRINT_DEBUG_OUTPUTS
-					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] Resized Storage Buffer at binding point {0} with name '{1}' and a size of {2} [=]", buffer.BindingPoint, *buffer.Name, buffer.Size);
-				#endif // PRINT_DEBUG_OUTPUTS
-
-					glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-				}
-			}
-		}
-
-		// Samplers
-
-		for (const spirv_cross::Resource &resource : res.sampled_images)
-		{
-			auto &type = compiler.get_type(resource.base_type_id);
-			uint32 binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			const HLString &name = resource.name;
-			uint32 dimensions = type.image.dim;
-
-			int32 location = glGetUniformLocation(m_RendererID, *name);
-			if (location == -1)
-			{
-				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not find uniform location for {0} [-]", *name);
-			//	HL_ASSERT(false);
-			}
+			auto &imageSampler = shaderDescriptorSet.ImageSamplers[binding];
+			imageSampler.BindingPoint = binding;
+			imageSampler.ArraySize = arraySize;
+			imageSampler.DescriptorSet = descriptorSet;
+			imageSampler.Stage = shaderStage;
+			imageSampler.Name = name;
 
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
-			glUniform1i(location, binding);
+
+		#if PRINT_DEBUG_OUTPUTS
+			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
 		}
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Separate Images: {0}", resources.separate_images.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
+		for (const auto &resource : resources.separate_images)
+		{
+			const auto &name = resource.name;
+			auto &baseType = compiler.get_type(resource.base_type_id);
+			auto &type = compiler.get_type(resource.type_id);
+			uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32 arraySize = (uint32)type.array[0];
+
+			if (arraySize == 0)
+				arraySize = 1;
+
+			if (descriptorSet >= m_ShaderDescriptorSets.size())
+				m_ShaderDescriptorSets.resize(descriptorSet + 1);
+
+			OpenGLShaderDescriptorSet &shaderDescriptorSet = m_ShaderDescriptorSets[descriptorSet];
+
+			auto &imageSampler = shaderDescriptorSet.SeparateTextures[binding];
+			imageSampler.BindingPoint = binding;
+			imageSampler.ArraySize = arraySize;
+			imageSampler.DescriptorSet = descriptorSet;
+			imageSampler.Name = name;
+			imageSampler.Stage = shaderStage;
+
+			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
+
+		#if PRINT_DEBUG_OUTPUTS
+			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
+		}
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Separate Samplers: {0}", resources.separate_samplers.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
+		for (const auto &resource : resources.separate_samplers)
+		{
+			const auto &name = resource.name;
+			auto &baseType = compiler.get_type(resource.base_type_id);
+			auto &type = compiler.get_type(resource.type_id);
+			uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32 arraySize = (uint32)type.array[0];
+
+			if (arraySize == 0)
+				arraySize = 1;
+
+			if (descriptorSet >= m_ShaderDescriptorSets.size())
+				m_ShaderDescriptorSets.resize(descriptorSet + 1);
+
+			OpenGLShaderDescriptorSet &shaderDescriptorSet = m_ShaderDescriptorSets[descriptorSet];
+
+			auto &imageSampler = shaderDescriptorSet.SeparateSamplers[binding];
+			imageSampler.ArraySize = arraySize;
+			imageSampler.Name = name;
+			imageSampler.BindingPoint = binding;
+			imageSampler.Stage = shaderStage;
+			imageSampler.DescriptorSet = descriptorSet;
+
+			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
+
+		#if PRINT_DEBUG_OUTPUTS
+			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
+		}
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Storage Images: {0}", resources.storage_images.size());
+	#endif // PRINT_DEBUG_OUTPUTS
+
+		for (const auto &resource : resources.storage_images)
+		{
+			const auto &name = resource.name;
+			auto &type = compiler.get_type(resource.type_id);
+			uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
+			uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+			uint32 arraySize = (uint32)type.array[0];
+
+			if (arraySize == 0)
+				arraySize = 1;
+
+			if (descriptorSet >= m_ShaderDescriptorSets.size())
+				m_ShaderDescriptorSets.resize(descriptorSet + 1);
+
+			OpenGLShaderDescriptorSet &shaderDescriptorSet = m_ShaderDescriptorSets[descriptorSet];
+
+			auto &imageSampler = shaderDescriptorSet.StorageImages[binding];
+			imageSampler.ArraySize = arraySize;
+			imageSampler.BindingPoint = binding;
+			imageSampler.DescriptorSet = descriptorSet;
+			imageSampler.Name = name;
+			imageSampler.Stage = shaderStage;
+
+			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
+
+		#if PRINT_DEBUG_OUTPUTS
+			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+		#endif // PRINT_DEBUG_OUTPUTS
+		}
+
+	#if PRINT_DEBUG_OUTPUTS
+		HL_CORE_TRACE("Special macros: {0}", m_AcknowledgedMacros.size());
+		for (const auto &macro : m_AcknowledgedMacros)
+		{
+			HL_CORE_TRACE("{0}", *macro);
+		}
+
+		HL_CORE_TRACE("===========================");
+	#endif // PRINT_DEBUG_OUTPUTS
 	}
 
 	void OpenGLShader::ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData)
 	{
+		m_Resources.clear();
+
 		for (auto [stage, data] : shaderData)
 		{
 			Reflect(stage, data);
 		}
 	}
 	
-	void OpenGLShader::CompileOrGetVulkanBinary(std::unordered_map<uint32, std::vector<uint32>> &outputBinary, bool forceCompile)
+	HLString OpenGLShader::Compile(std::unordered_map<GLenum, std::vector<uint32>> &outputBinary, const GLenum stage) const
 	{
-		FileSystemPath cacheDirectory = utils::GetCacheDirectory();
+		const HLString &stageSource = m_ShaderSources.at(stage);
 
-		for (auto &[stage, source] : m_ShaderSources)
+		if (m_Language == ShaderLanguage::GLSL)
 		{
-			const char *extension = utils::GLShaderStageCachedVulkanFileExtension(stage);
+			shaderc::Compiler compiler;
+			shaderc::CompileOptions options;
+			options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+			options.SetWarningsAsErrors();
+			options.SetGenerateDebugInfo();
 
-			if (m_ShaderSources[stage].IsEmpty())
-				continue;
+			bool optimize = false;
+		#ifdef HL_RELEASE
+			optimize = true;
+		#endif // HL_RELEASE
 
-			if (!forceCompile)
-			{
-				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + extension);
+			if (optimize)
+				options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-				FILE *f;
-				fopen_s(&f, *path.String(), "rb");
-				if (f)
-				{
-					// Get File Size
-					fseek(f, 0, SEEK_END);
-					uint64 size = ftell(f);
-					fseek(f, 0, SEEK_SET);
+			// Compile shader
+			const shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*stageSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
 
-					outputBinary[stage] = std::vector<uint32>(size / sizeof(uint32));
-					fread(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
-					fclose(f);
-				}
-			}
+			if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+				return fmt::format("Shader compilation error: {} ({})", result.GetErrorMessage(), **m_AssetPath).c_str();
 
-			if ((outputBinary[stage].size() == 0 && !m_ShaderSources.at(stage).IsEmpty()))
-			{
-				shaderc::Compiler compiler;
-				shaderc::CompileOptions options;
-
-				options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
-				options.AddMacroDefinition("OPENGL");
-				const bool optimize = false;
-
-				if (optimize)
-					options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-				// Compile Shader
-				{
-					auto &shaderSource = m_ShaderSources.at(stage);
-					shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*shaderSource, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
-
-					if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-					{
-						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
-						HL_ASSERT(false);
-					}
-
-					outputBinary[stage] = std::vector<uint32>(result.cbegin(), result.cend());
-				}
-
-				// Cache compiled shader
-				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + extension);
-
-				FILE *f;
-				fopen_s(&f, *path.String(), "wb");
-				if (f)
-				{
-					fwrite(outputBinary[stage].data(), sizeof(uint32), outputBinary[stage].size(), f);
-					fclose(f);
-				}
-				else
-				{
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write into cache path {0} [-]", *path.String());
-				}
-			}
+			outputBinary[stage] = std::vector<uint32>(result.begin(), result.end());
+			return {};
 		}
+		else if (m_Language == ShaderLanguage::HLSL)
+		{
+			// TODO
+		}
+
+		return "unknown Language!";
 	}
-	
-	void OpenGLShader::CompileOrGetOpenGLBinary(const std::unordered_map<uint32, std::vector<uint32>> &vulkanBinaries, bool forceCompile)
+
+	void OpenGLShader::TryGetOpenGLCachedBinary(const FileSystemPath &cacheDirectory, const HLString &extension, std::unordered_map<GLenum, std::vector<uint32>> &outBinary, GLenum stage) const
+	{
+		FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
+
+		FILE *f;
+		errno_t err = fopen_s(&f, **p, "rb");
+		if (err)
+			return;
+
+		fseek(f, 0, SEEK_END);
+		uint64 size = ftell(f);
+		fseek(f, 0, SEEK_SET);
+
+		outBinary[stage] = std::vector<uint32>(size / sizeof(uint32));
+		fread(outBinary[stage].data(), sizeof(uint32), outBinary[stage].size(), f);
+		fclose(f);
+	}
+
+	void OpenGLShader::LoadAndCreateShaders(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData)
 	{
 		if (m_RendererID)
 			glDeleteProgram(m_RendererID);
 
-		GLuint program = glCreateProgram();
-		m_RendererID = program;
-
 		std::vector<GLuint> shaderRendererIds;
-		shaderRendererIds.reserve(vulkanBinaries.size());
-
-		FileSystemPath cacheDirectory = utils::GetCacheDirectory();
+		shaderRendererIds.reserve(shaderData.size());
+		
+		m_RendererID = glCreateProgram();
 
 		m_ConstantBufferOffset = 0;
-		std::vector<std::vector<uint32>> shaderData;
-		for (auto [stage, binary] : vulkanBinaries)
+		for (auto &[stage, data] : shaderData)
 		{
-			if (binary.size() == 0)
-				continue;
+			GLuint shaderId = glCreateShader(stage);
+		//	glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
+			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), (uint32)data.size());
+			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 
-			shaderc::Compiler compiler;
-			shaderc::CompileOptions options;
-			options.SetTargetEnvironment(shaderc_target_env_opengl_compat, shaderc_env_version_opengl_4_5);
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Compiling Shader {0} [+]", **m_AssetPath);
 
+			GLint isCompiled = 0;
+			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
+			if (isCompiled == GL_FALSE)
 			{
-				spirv_cross::CompilerGLSL glsl(binary);
-				ParseConstantBuffers(glsl);
+				GLint maxInfoLength = 0;
+				glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxInfoLength);
 
-				FileSystemPath path = cacheDirectory / (m_AssetPath.Filename() + utils::GLShaderStageCachedOpenGLFileExtension(stage));
-				std::vector<uint32> &shaderStageData = shaderData.emplace_back();
-
-				if (!forceCompile)
+				if (maxInfoLength > 0)
 				{
-					FILE *f;
-					fopen_s(&f, *path.String(), "rb");
-					if (f)
-					{
-						// Get File size
-						fseek(f, 0, SEEK_END);
-						uint64 size = ftell(f);
-						fseek(f, 0, SEEK_SET);
+					std::vector<GLchar> infoLog(maxInfoLength);
+					glGetShaderInfoLog(shaderId, maxInfoLength, &maxInfoLength, &infoLog[0]);
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Compilation failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
-						shaderStageData = std::vector<uint32>(size / sizeof(uint32));
-						fread(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-						fclose(f);
-						f = nullptr;
-					}
-					else
-					{
-						HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not load Shader from cached binary ({0}), going to compile it from source... [-]", *path.String());
-					}
+					glDeleteShader(shaderId);
+					for (auto id : shaderRendererIds)
+						glDeleteShader(id);
+
+					glDeleteProgram(m_RendererID);
 				}
-
-				if (!shaderStageData.size())
+				else
 				{
-					HLString source = glsl.compile();
-
-				#if PRINT_SHADERS
-					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
-					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[=] {0} Shader: [=] \n{1}\n", utils::GLShaderTypeToString(stage), *source);
-					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "===========================================================================\n");
-				#endif // PRINT_SHADERS
-
-					shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*source, utils::GLShaderStageToShaderC(stage), **m_AssetPath, options);
-					if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-					{
-						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] {0} [-]", result.GetErrorMessage().c_str());
-						HL_ASSERT(false);
-					}
-
-					shaderStageData = std::vector<uint32>(result.cbegin(), result.cend());
-
-					{
-						FILE *f;
-						fopen_s(&f, *path.String(), "wb");
-						if (f)
-						{
-							fwrite(shaderStageData.data(), sizeof(uint32), shaderStageData.size(), f);
-							fclose(f);
-							f = nullptr;
-						}
-						else
-						{
-							HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Could not write Shader into cache file: {0} [-]", *path.String());
-						}
-					}
+					HL_ASSERT(false, "Compilation failed but no infoLog accessible!");
 				}
-
-				GLuint shaderId = glCreateShader(stage);
-				glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, shaderStageData.data(), uint32(shaderStageData.size() * sizeof(uint32)));
-				glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
-				glAttachShader(program, shaderId);
-
-				shaderRendererIds.emplace_back(shaderId);
 			}
+			else
+			{
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader has been successfully compiled! [+]");
+			}
+
+			glAttachShader(m_RendererID, shaderId);
+			shaderRendererIds.emplace_back(shaderId);
 		}
 
 		// Link shader program
-		glLinkProgram(program);
+		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Linking Shader {0} [+]", **m_AssetPath);
+		glLinkProgram(m_RendererID);
 
 		int32 isLinked = 0;
-		glGetProgramiv(program, GL_LINK_STATUS, (int32*)&isLinked);
+		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int32*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			int32 maxLength = 0;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-			
-			// This check is here to prevent laptops (integrated gpus) to trigger this error
-			// for some reason they seem to not set isLinked properly, so the maxLength will tell us if there was an error.
+			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxLength);
+
 			if (maxLength > 0)
 			{
 				std::vector<GLchar> infoLog(maxLength);
-				glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+				glGetProgramInfoLog(m_RendererID, maxLength, &maxLength, &infoLog[0]);
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
-				glDeleteProgram(program);
+				glDeleteProgram(m_RendererID);
 				for (auto id : shaderRendererIds)
 					glDeleteShader(id);
 			}
+			else
+			{
+				HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+			}
 		}
-		
+		else
+		{
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader has been successfully linked! [+]");
+		}
+
 		for (auto id : shaderRendererIds)
-			glDetachShader(program, id);
+			glDetachShader(m_RendererID, id);
 
 		// Get Uniform locations
 		for (auto &[bufferName, buffer] : m_Buffers)
@@ -718,10 +921,70 @@ namespace highlo
 				if (location != -1)
 				{
 				#if PRINT_DEBUG_OUTPUTS
-					HL_CORE_INFO("Registering Uniform {0} at location {1}", *name, location);
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Registering Uniform {0} at location {1} [+]", *name, location);
 				#endif // PRINT_DEBUG_OUTPUTS
 
 					m_UniformLocations[name] = location;
+				}
+			}
+		}
+	}
+
+	void OpenGLShader::CreateDescriptors()
+	{
+		for (uint32 set = 0; set < m_ShaderDescriptorSets.size(); ++set)
+		{
+			auto &shaderDescriptorSet = m_ShaderDescriptorSets[set];
+
+			// TODO
+		}
+	}
+	
+	void OpenGLShader::CompileOrGetOpenGLBinary(std::unordered_map<uint32, std::vector<uint32>> &shaderData, bool forceCompile)
+	{
+		FileSystemPath cacheDirectory = utils::GetCacheDirectory();
+
+		for (auto &[stage, source] : m_ShaderSources)
+		{
+			if (source.IsEmpty())
+				continue;
+
+			bool shaderCacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
+			const HLString &extension = utils::ShaderStageCachedFileExtension(stage);
+			if (!forceCompile && !shaderCacheHasChanged)
+			{
+				TryGetOpenGLCachedBinary(cacheDirectory, extension, shaderData, stage);
+			}
+
+			if (shaderData[stage].empty())
+			{
+				HLString error = Compile(shaderData, stage);
+				if (error.IsEmpty())
+				{
+					// Compile success
+					FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
+
+					FILE *f;
+					errno_t fileError = fopen_s(&f, **p, "wb");
+					if (fileError)
+						HL_CORE_ERROR("Failed to cache shader binary!");
+
+					fwrite(shaderData[stage].data(), sizeof(uint32), shaderData[stage].size(), f);
+					fclose(f);
+				}
+				else
+				{
+					HL_CORE_ERROR("{0}", *error);
+
+					TryGetOpenGLCachedBinary(cacheDirectory, extension, shaderData, stage);
+					if (shaderData[stage].empty())
+					{
+						HL_ASSERT(false, "Failed to compile shader and could not find any cached binary");
+					}
+					else
+					{
+						HL_CORE_ERROR("Failed to compile {0}:{1}, so loaded a cached shader binary instead.", **m_AssetPath, *utils::ShaderStageToString(stage));
+					}
 				}
 			}
 		}
@@ -730,57 +993,73 @@ namespace highlo
 	std::unordered_map<GLenum, HLString> OpenGLShader::PreProcess(const HLString &source)
 	{
 		std::unordered_map<GLenum, HLString> result;
-		std::unordered_map<GLenum, std::stringstream> temp;
-		std::stringstream s(*source);
-		std::string line;
-		GLenum type = GL_NONE;
 
-		// Parse Shader
-		temp[GL_VERTEX_SHADER] = std::stringstream();
-		temp[GL_TESS_CONTROL_SHADER] = std::stringstream();
-		temp[GL_TESS_EVALUATION_SHADER] = std::stringstream();
-		temp[GL_GEOMETRY_SHADER] = std::stringstream();
-		temp[GL_FRAGMENT_SHADER] = std::stringstream();
-		temp[GL_COMPUTE_SHADER] = std::stringstream();
-
-		while (std::getline(s, line))
+		switch (m_Language)
 		{
-			if (line.find("#shader") != std::string::npos)
-			{
-				if (line.find("vertex") != std::string::npos)
-					type = GL_VERTEX_SHADER;
-				else if (line.find("tess_control") != std::string::npos)
-					type = GL_TESS_CONTROL_SHADER;
-				else if (line.find("tess_eval") != std::string::npos)
-					type = GL_TESS_EVALUATION_SHADER;
-				else if (line.find("geometry") != std::string::npos)
-					type = GL_GEOMETRY_SHADER;
-				else if (line.find("pixel") != std::string::npos || line.find("fragment") != std::string::npos)
-					type = GL_FRAGMENT_SHADER;
-				else if (line.find("compute") != std::string::npos)
-					type = GL_COMPUTE_SHADER;
-			}
-			else
-			{
-				temp[type] << line << "\n";
-			}
+			case ShaderLanguage::GLSL:
+				result = PreProcessGLSL(source);
+				break;
+
+			case ShaderLanguage::HLSL:
+				result = PreProcessHLSL(source);
+				break;
 		}
 
-		result[GL_VERTEX_SHADER] = HLString(temp[GL_VERTEX_SHADER].str().c_str());
-		result[GL_TESS_CONTROL_SHADER] = HLString(temp[GL_TESS_CONTROL_SHADER].str().c_str());
-		result[GL_TESS_EVALUATION_SHADER] = HLString(temp[GL_TESS_EVALUATION_SHADER].str().c_str());
-		result[GL_GEOMETRY_SHADER] = HLString(temp[GL_GEOMETRY_SHADER].str().c_str());
-		result[GL_FRAGMENT_SHADER] = HLString(temp[GL_FRAGMENT_SHADER].str().c_str());
-		result[GL_COMPUTE_SHADER] = HLString(temp[GL_COMPUTE_SHADER].str().c_str());
+		return result;
+	}
 
-		// Replace \r\n with \n
-		result[GL_VERTEX_SHADER] = result[GL_VERTEX_SHADER].Replace("\r\n", "\n");
-		result[GL_TESS_CONTROL_SHADER] = result[GL_TESS_CONTROL_SHADER].Replace("\r\n", "\n");
-		result[GL_TESS_EVALUATION_SHADER] = result[GL_TESS_EVALUATION_SHADER].Replace("\r\n", "\n");
-		result[GL_GEOMETRY_SHADER] = result[GL_GEOMETRY_SHADER].Replace("\r\n", "\n");
-		result[GL_FRAGMENT_SHADER] = result[GL_FRAGMENT_SHADER].Replace("\r\n", "\n");
-		result[GL_COMPUTE_SHADER] = result[GL_COMPUTE_SHADER].Replace("\r\n", "\n");
+	std::unordered_map<GLenum, HLString> OpenGLShader::PreProcessGLSL(const HLString &source)
+	{
+		std::unordered_map<ShaderType, HLString> shaderSources = ShaderPreProcessor::PreprocessShader<ShaderLanguage::GLSL>(source, m_AcknowledgedMacros);
+		std::unordered_map<GLenum, HLString> glShaderSources = utils::ConvertShaderTypeToOpenGLStage(shaderSources);
+		shaderc::Compiler compiler;
 
+		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Pre-processing GLSL: {0} [+]", **m_AssetPath);
+
+		shaderc_util::FileFinder fileFinder;
+		fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
+		fileFinder.search_path().emplace_back("assets/shaders/Include/Shared/");
+
+		for (auto &[stage, shaderSource] : glShaderSources)
+		{
+			shaderc::CompileOptions options;
+			options.AddMacroDefinition("__GLSL__");
+			options.AddMacroDefinition("__OPENGL__");
+			options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
+
+			for (auto &[name, value] : m_Macros)
+				options.AddMacroDefinition(*name, *value);
+
+			GLSLIncluder *includer = new GLSLIncluder(&fileFinder);
+
+			options.SetIncluder(std::unique_ptr<GLSLIncluder>(includer));
+			options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+
+			shaderc::PreprocessedSourceCompilationResult preProcessingResult = compiler.PreprocessGlsl(*shaderSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
+			if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
+			{
+				HL_CORE_ERROR("Failed to pre-process Shader {0} with error {1}", **m_AssetPath, preProcessingResult.GetErrorMessage());
+			}
+
+			m_StagesMetaData[stage].HashValue = shaderSource.Hash();
+			m_StagesMetaData[stage].Headers = std::move(includer->GetIncludeData());
+
+			m_AcknowledgedMacros.merge(includer->GetParsedSpecialMacros());
+
+			shaderSource = std::string(preProcessingResult.begin(), preProcessingResult.end());
+
+		#if PRINT_PREPROCESSING_RESULT
+			HL_CORE_TRACE("{0}", *shaderSource);
+		#endif // PRINT_PREPROCESSING_RESULT
+		}
+
+		return glShaderSources;
+	}
+
+	std::unordered_map<GLenum, HLString> OpenGLShader::PreProcessHLSL(const HLString &source)
+	{
+		// TODO
+		std::unordered_map<GLenum, HLString> result;
 		return result;
 	}
 	
@@ -813,9 +1092,6 @@ namespace highlo
 			buffer.Name = name;
 			buffer.Size = bufferSize - bufferOffset;
 
-			ShaderUniformStruct &shaderStruct = m_ShaderUniformStructs.emplace_back();
-			shaderStruct.Name = name;
-
 			for (uint32 i = 0; i < memberCount; ++i)
 			{
 				auto memberType = compiler.get_type(type.member_types[i]);
@@ -823,16 +1099,10 @@ namespace highlo
 				uint32 size = (uint32)compiler.get_declared_struct_member_size(type, i);
 				uint32 offset = compiler.type_struct_member_offset(type, i) - bufferOffset;
 
-				ShaderUniformStructMember &member = shaderStruct.Members.emplace_back();
-				member.Name = memberName;
-				member.Size = size;
-				member.Offset = offset;
-				member.Type = utils::SpirvTypeToShaderUniformType(memberType);
-
 				HLString uniformName = fmt::format("{}.{}", *name, *memberName);
 
 			#if PRINT_DEBUG_OUTPUTS
-				HL_CORE_INFO("Registering push_constant with uniform name {0}", *uniformName);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Registering push_constant with uniform name {0} [+]", *uniformName);
 			#endif // PRINT_DEBUG_OUTPUTS
 
 				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);

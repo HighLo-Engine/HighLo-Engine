@@ -1,7 +1,9 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "VulkanContext.h"
 
-#define VULKAN_CONTEXT_LOG_PREFIX "        Context>"
+#define VULKAN_CONTEXT_LOG_PREFIX "Context>      "
 #define VK_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
 
 #ifdef HIGHLO_API_VULKAN
@@ -45,12 +47,12 @@ namespace highlo
             }
         }
 
-
         static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugUtilsMessengerCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, const VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData)
         {
             (void)pUserData; //Unused argument
 
-            HLString labels, objects;
+            HLString labels = "";
+            HLString objects = "";
             if (pCallbackData->cmdBufLabelCount)
             {
                 labels = fmt::format("\tLabels({}): \n", pCallbackData->cmdBufLabelCount).c_str();
@@ -72,7 +74,7 @@ namespace highlo
                 }
             }
 
-            HL_CORE_WARN(fmt::format("{0} {1} messege: \n\t{2}\n {3} {4}", VkDebugUtilsMessageType(messageType), VkDebugUtilsMessageSeverity(messageSeverity), pCallbackData->pMessage, labels, objects).c_str());
+            HL_CORE_WARN("{0} {1} message: \n\t{2}\n{3} {4}", VkDebugUtilsMessageType(messageType), VkDebugUtilsMessageSeverity(messageSeverity), pCallbackData->pMessage, *labels, *objects);
 
             return VK_FALSE;
 
@@ -94,13 +96,11 @@ namespace highlo
 
         vkDestroyInstance(s_VulkanInstance, nullptr);
         s_VulkanInstance = nullptr;
-
-        utils::ShutdownAllocator();
     }
     
     void VulkanContext::Init()
     {
-        HL_CORE_INFO(VULKAN_CONTEXT_LOG_PREFIX "[+]  [+]");
+        HL_CORE_INFO(VULKAN_CONTEXT_LOG_PREFIX "[+] VulkanContext::Init [+]");
         
     #ifdef HIGHLO_API_GLFW
         HL_ASSERT(glfwVulkanSupported(), "GLFW must support Vulkan!");
@@ -197,7 +197,8 @@ namespace highlo
             VK_CHECK_RESULT(vkCreateDebugUtilsMessengerEXT(s_VulkanInstance, &debugUtilsCreateInfo, nullptr, &m_DebugUtilsMessenger));
         }
 
-        m_PhysicalDevice = VulkanPhysicalDevice::Create();
+        Ref<PhysicalDevice> physicalDevice = PhysicalDevice::Create();
+        m_PhysicalDevice = physicalDevice.As<VulkanPhysicalDevice>();
 
         VkPhysicalDeviceFeatures enabledFeatures = {};
         enabledFeatures.samplerAnisotropy = true;
@@ -205,9 +206,13 @@ namespace highlo
         enabledFeatures.fillModeNonSolid = true;
         enabledFeatures.independentBlend = true;
         enabledFeatures.pipelineStatisticsQuery = true;
-        m_Device = Ref<VulkanDevice>::Create(m_PhysicalDevice, enabledFeatures);
+        
+        // TODO: If we move the enabled Features into the physical device,
+        // we can delete this InitDevice function entirely and move its content into the constructor
+        Ref<Device> device = Device::Create(physicalDevice);
+        m_Device = device.As<VulkanDevice>();
 
-        utils::InitAllocator(m_Device);
+        m_Device->InitDevice(enabledFeatures);
 
         // Pipeline cache
         VkPipelineCacheCreateInfo pipelineCreate = {};
@@ -218,18 +223,22 @@ namespace highlo
     // All of this below is handled by the SwapChain implementation
     void VulkanContext::SwapBuffers()
     {
+        // TODO
     }
     
     void VulkanContext::MakeCurrent()
     {
+        // TODO
     }
     
     void VulkanContext::SetSwapInterval(bool bEnabled)
     {
+        // TODO
     }
     
     void *VulkanContext::GetCurrentContext()
     {
+        // TODO
         return nullptr;
     }
 }

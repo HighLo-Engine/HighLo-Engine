@@ -16,6 +16,19 @@
 
 namespace highlo
 {
+	enum class DepthCompareOperator
+	{
+		None = 0,
+		Never,
+		NotEqual,
+		Less,
+		LessOrEqual,
+		Greater,
+		GreaterOrEqual,
+		Equal,
+		Always
+	};
+
 	struct VertexArraySpecification
 	{
 		Ref<Shader> Shader;
@@ -29,6 +42,7 @@ namespace highlo
 		bool Wireframe = false;
 		float LineWidth = 1.0f;
 		PrimitiveType RenderType = PrimitiveType::Triangles;
+		DepthCompareOperator DepthCompareOp = DepthCompareOperator::GreaterOrEqual;
 
 		HLString DebugName;
 	};

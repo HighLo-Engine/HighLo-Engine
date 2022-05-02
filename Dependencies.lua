@@ -19,6 +19,9 @@ IncludeDir["gmock"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlemo
 IncludeDir["vulkan"]     			 = "%{VULKAN_SDK}/Include"
 IncludeDir["vulkan_local"] 			 = "%{wks.location}/HighLo/vendor/VulkanSDK/Include"
 IncludeDir["vulkan_memory_alloc"] 	 = "%{wks.location}/HighLo/vendor/VulkanMemoryAllocator"
+IncludeDir["SPIRV_Cross"] 	 	 	 = "%{wks.location}/HighLo/vendor/SPIRV-Cross"
+IncludeDir["shaderc_glslc"] 	 	 = "%{wks.location}/HighLo/vendor/shaderc/glslc"
+IncludeDir["shaderc_util"] 	 	 	 = "%{wks.location}/HighLo/vendor/shaderc/libshaderc_util/include"
 
 LibDir = {}
 LibDir["assimp"]                     = "%{wks.location}/HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.lib"
@@ -43,13 +46,13 @@ LibDir["vulkan_sdk_folder_debug"]  	 = "%{wks.location}/HighLo/vendor/VulkanSDK/
 LibDir["vulkan_sdk"]   		 		 = "%{LibDir.vulkan_sdk_folder}/vulkan-1.lib"
 LibDir["vulkan_sdk_utils"]  		 = "%{LibDir.vulkan_sdk_folder}/VKLayer_utils.lib"
 
+--[[
 LibDir["SPIRV_Debug"] 		 		 = "%{LibDir.vulkan_sdk_folder_debug}/SPIRVd.lib"
 LibDir["SPIRV_Cross_Debug"] 		 = "%{LibDir.vulkan_sdk_folder_debug}/spirv-cross-cored.lib"
 LibDir["SPIRV_Cross_GLSL_Debug"] 	 = "%{LibDir.vulkan_sdk_folder_debug}/spirv-cross-glsld.lib"
 LibDir["SPIRV_Cross_util_Debug"] 	 = "%{LibDir.vulkan_sdk_folder_debug}/spirv-cross-utild.lib"
 LibDir["SPIRV_Cross_cpp_Debug"] 	 = "%{LibDir.vulkan_sdk_folder_debug}/spirv-cross-cppd.lib"
 LibDir["SPIRV_Cross_reflect_Debug"]  = "%{LibDir.vulkan_sdk_folder_debug}/spirv-cross-reflectd.lib"
-LibDir["SPIRV_Tools_Debug"] 		 = "%{LibDir.vulkan_sdk_folder_debug}/SPIRV-Toolsd.lib"
 LibDir["SpvRemapper_Debug"] 		 = "%{LibDir.vulkan_sdk_folder_debug}/SPVRemapperd.lib"
 LibDir["glsl_Debug"] 		 		 = "%{LibDir.vulkan_sdk_folder_debug}/glslangd.lib"
 
@@ -61,10 +64,20 @@ LibDir["SPIRV_Cross_cpp_Release"] 	 = "%{LibDir.vulkan_sdk_folder}/spirv-cross-c
 LibDir["SPIRV_Cross_reflect_Release"]= "%{LibDir.vulkan_sdk_folder}/spirv-cross-reflect.lib"
 LibDir["SpvRemapper_Release"] 	 	 = "%{LibDir.vulkan_sdk_folder}/SPVRemapper.lib"
 LibDir["glsl_Release"] 	 			 = "%{LibDir.vulkan_sdk_folder}/glslang.lib"
+--]]
+
+LibDir["SPIRV_Tools_Debug"] 		 = "%{LibDir.vulkan_sdk_folder_debug}/SPIRV-Toolsd.lib"
+
+LibDir["SPIRV_Cross_Debug"]          = "%{wks.location}/HighLo/vendor/SPIRV-Cross/lib/spirv-cross-cored.lib"
+LibDir["SPIRV_Cross_Release"]        = "%{wks.location}/HighLo/vendor/SPIRV-Cross/lib/spirv-cross-core.lib"
+LibDir["SPIRV_Cross_GLSL_Debug"]     = "%{wks.location}/HighLo/vendor/SPIRV-Cross/lib/spirv-cross-glsld.lib"
+LibDir["SPIRV_Cross_GLSL_Release"]   = "%{wks.location}/HighLo/vendor/SPIRV-Cross/lib/spirv-cross-glsl.lib"
 
 LibDir["shaderc_debug"]              = "%{LibDir.vulkan_sdk_folder_debug}/shaderc_sharedd.lib"
 LibDir["shaderc_util_debug"]         = "%{LibDir.vulkan_sdk_folder_debug}/shaderc_utild.lib"
 
 LibDir["shaderc_release"]            = "%{LibDir.vulkan_sdk_folder}/shaderc_shared.lib"
 LibDir["shaderc_util_release"]       = "%{LibDir.vulkan_sdk_folder}/shaderc_util.lib"
+
+LibDir["dxc"]    					 = "%{LibDir.vulkan_sdk_folder}/dxcompiler.lib"
 

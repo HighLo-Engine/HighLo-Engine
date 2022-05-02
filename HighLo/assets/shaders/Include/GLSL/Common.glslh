@@ -1,0 +1,23 @@
+#pragma once
+
+const float PI = 3.141592;
+const float TWO_PI = 2 * PI;
+const float EPSILON = 0.00001;
+
+vec3 Rotate(float angle, vec3 axis)
+{
+	float rad = radians(angle);
+	mat3x3 rotationMatrix = {
+		vec3(cos(rad), 0.0, sin(rad)),
+		vec3(0.0, 1.0, 0.0),
+		vec3(-sin(rad), 0.0, cos(rad))
+	};
+	
+	return rotationMatrix * axis;
+}
+
+float ConvertSRGBFromLinear(float value)
+{
+	return value <= 0.0031308f ? value * 12.92f : pow(value, 1.0f / 2.4f) * 1.055f - 0.055f;
+}
+

@@ -31,6 +31,7 @@ workspace "HighLo"
 		include "HighLo/vendor/RapidJSON"
 		include "HighLo/vendor/IconFontCppHeaders"
 		include "HighLo/vendor/googletest"
+		include "HighLo/vendor/shaderc"
 		include "HighLo/vendor/yaml-cpp"
 		
 		filter "system:windows"

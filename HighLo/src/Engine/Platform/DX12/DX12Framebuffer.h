@@ -21,7 +21,10 @@ namespace highlo
 		virtual ~DX12Framebuffer();
 
 		virtual void Resize(uint32 width, uint32 height, bool forceRecreate = false) override;
-		virtual void AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func) override {}
+		virtual void AddResizeCallback(const std::function<void(Ref<Framebuffer>)> &func) override;
+
+		virtual void Invalidate() override;
+		virtual void Release() override;
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
@@ -42,6 +45,9 @@ namespace highlo
 		inline virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
 		inline virtual const FramebufferSpecification &GetSpecification() const override { return m_Specification; }
 
+		virtual uint64 GetColorAttachmentCount() const override { return m_Specification.SwapChainTarget ? 1 : m_ColorAttachments.size(); }
+		virtual bool HasDepthAttachment() const override { return (bool)m_DepthAttachment; }
+
 	private:
 
 		FramebufferSpecification m_Specification;
@@ -52,6 +58,8 @@ namespace highlo
 
 		std::vector<TextureFormat> m_ColorAttachmentFormats;
 		TextureFormat m_DepthAttachmentFormat = TextureFormat::None;
+
+		std::vector<std::function<void(Ref<Framebuffer>)>> m_ResizeCallbacks;
 	};
 }
 

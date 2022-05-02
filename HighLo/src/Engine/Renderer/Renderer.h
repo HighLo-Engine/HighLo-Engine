@@ -102,6 +102,16 @@ namespace highlo
 			});
 		}
 
+		/// <summary>
+		/// Reloads all shaders that were submitted to be reloaded.
+		/// </summary>
+		/// <returns>Returns true, if any shader was updated</returns>
+		HLAPI static bool UpdateDirtyShaders();
+
+		HLAPI static void AcknowledgeParsedGlobalMacros(const std::unordered_set<HLString> &macros, const Ref<Shader> &shader);
+		HLAPI static void SetMacroInShader(Ref<Shader> &shader, const HLString &name, const HLString &value = "");
+		HLAPI static void SetGlobalMacroInShaders(const HLString &name, const HLString &value = "");
+
 		HLAPI static void WaitAndRender();
 		HLAPI static void RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform = glm::mat4(1.0f));
 

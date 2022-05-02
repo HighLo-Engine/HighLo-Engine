@@ -69,8 +69,10 @@ namespace highlo
 
 		virtual const WindowData &GetProperties() const override { return m_Properties; }
 
-		virtual Ref<RenderingContext> GetContext() override { return m_Context; }
-		virtual Ref<SwapChain> GetSwapChain() override { return m_SwapChain; }
+		virtual Ref<RenderingContext> &GetContext() override { return m_Context; }
+		virtual const Ref<RenderingContext> &GetContext() const override { return m_Context; }
+		virtual Ref<SwapChain> &GetSwapChain() override { return m_SwapChain; }
+		virtual const Ref<SwapChain> &GetSwapChain() const override { return m_SwapChain; }
 
 	private:
 
@@ -85,8 +87,8 @@ namespace highlo
 		ITaskbarList4 *m_Taskbar;
 
 		Ref<MenuBar> m_MenuBar = nullptr;
-		Ref<RenderingContext> m_Context;
-		Ref<SwapChain> m_SwapChain;
+		Ref<RenderingContext> m_Context = nullptr;
+		Ref<SwapChain> m_SwapChain = nullptr;
 
 		GLFWwindow *m_NativeHandle = nullptr;
 		GLFWcursor *m_NativeCursor = nullptr;

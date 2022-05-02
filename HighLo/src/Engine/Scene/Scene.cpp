@@ -440,9 +440,6 @@ namespace highlo
 		newEntity.SetTransform(entity.Transform());
 		CopyAllComponents(newEntity, entity);
 
-// TODO: For debug only - during entity duplication testing
-		HL_ASSERT(newEntity.Tag() == entity.Tag());
-
 		auto childIds = entity.Children();
 		for (auto childId : childIds)
 		{

@@ -57,9 +57,13 @@ namespace highlo
 		uint32 Height = 0;
 
 		glm::vec4 ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float DepthClearValue = 0.0f;
 		FramebufferAttachmentSpecification Attachments;
 		uint32 Samples = 1;
 		bool ClearOnLoad = true;
+		bool ClearColorOnLoad = true;
+		bool ClearDepthOnLoad = true;
+		bool ShouldSample = true;
 
 		bool NoResize = false;
 		bool SwapChainTarget = false;
@@ -79,6 +83,9 @@ namespace highlo
 	{
 	public:
 		HLAPI virtual ~Framebuffer() = default;
+
+		HLAPI virtual void Invalidate() = 0;
+		HLAPI virtual void Release() = 0;
 
 		HLAPI virtual void Bind() const = 0;
 		HLAPI virtual void Unbind() const = 0;
@@ -100,6 +107,9 @@ namespace highlo
 
 		HLAPI virtual FramebufferSpecification &GetSpecification() = 0;
 		HLAPI virtual const FramebufferSpecification &GetSpecification() const = 0;
+
+		HLAPI virtual uint64 GetColorAttachmentCount() const = 0;
+		HLAPI virtual bool HasDepthAttachment() const = 0;
 
 		HLAPI static Ref<Framebuffer> Create(const FramebufferSpecification &spec);
 	};

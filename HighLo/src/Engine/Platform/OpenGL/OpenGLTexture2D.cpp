@@ -373,6 +373,18 @@ namespace highlo
 		}
 	}
 
+	void OpenGLTexture2D::Resize(const glm::uvec2 &size)
+	{
+		Resize(size.x, size.y);
+	}
+
+	void OpenGLTexture2D::Resize(const uint32 width, const uint32 height)
+	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		Invalidate();
+	}
+
 	void OpenGLTexture2D::Lock()
 	{
 		m_Locked = true;
@@ -397,6 +409,11 @@ namespace highlo
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(properties.SamplerWrap));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(properties.SamplerWrap));
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(properties.SamplerWrap));
+	}
+
+	void OpenGLTexture2D::CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices)
+	{
+		// TODO
 	}
 	
 	void OpenGLTexture2D::UpdateResourceData()
@@ -479,7 +496,7 @@ namespace highlo
 		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 
-	void OpenGLTexture2D::GenerateMips()
+	void OpenGLTexture2D::GenerateMips(bool readonly)
 	{
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}

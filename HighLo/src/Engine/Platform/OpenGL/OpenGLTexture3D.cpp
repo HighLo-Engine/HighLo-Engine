@@ -116,6 +116,18 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 	}
 
+	void OpenGLTexture3D::Resize(const glm::uvec2 &size)
+	{
+		Resize(size.x, size.y);
+	}
+
+	void OpenGLTexture3D::Resize(const uint32 width, const uint32 height)
+	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		Invalidate();
+	}
+
 	void OpenGLTexture3D::Lock()
 	{
 		m_Locked = true;
@@ -161,7 +173,7 @@ namespace highlo
 		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 
-	void OpenGLTexture3D::GenerateMips()
+	void OpenGLTexture3D::GenerateMips(bool readonly)
 	{
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}

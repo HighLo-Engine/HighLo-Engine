@@ -38,19 +38,11 @@ namespace highlo
 	void OpenGLImGuiRenderer::Shutdown()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
-
-	#ifdef HIGHLO_API_GLFW
-		ImGui_ImplGlfw_Shutdown();
-	#endif // HIGHLO_API_GLFW
 	}
 
 	void OpenGLImGuiRenderer::NewFrame()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
-
-	#ifdef HIGHLO_API_GLFW
-		ImGui_ImplGlfw_NewFrame();
-	#endif // HIGHLO_API_GLFW
 	}
 
 	void OpenGLImGuiRenderer::Render()

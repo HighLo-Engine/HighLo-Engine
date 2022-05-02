@@ -21,9 +21,10 @@
 
 #pragma once
 
+#include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
+
 #ifdef HIGHLO_API_VULKAN
 
-#include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 #include <vulkan/vulkan.h>
 
 // Initialization data, for ImGui_ImplVulkan_Init()
@@ -40,15 +41,15 @@ struct ImGui_ImplVulkan_InitInfo
     uint32_t            MinImageCount;          // >= 2
     uint32_t            ImageCount;             // >= MinImageCount
     VkSampleCountFlagBits        MSAASamples;   // >= VK_SAMPLE_COUNT_1_BIT
-    const VkAllocationCallbacks* Allocator;
+    const VkAllocationCallbacks *Allocator;
     void                (*CheckVkResultFn)(VkResult err);
 };
 
 // Called by user code
-IMGUI_IMPL_API bool     ImGui_ImplVulkan_Init(ImGui_ImplVulkan_InitInfo* info, VkRenderPass render_pass);
+IMGUI_IMPL_API bool     ImGui_ImplVulkan_Init(ImGui_ImplVulkan_InitInfo *info, VkRenderPass render_pass);
 IMGUI_IMPL_API void     ImGui_ImplVulkan_Shutdown();
 IMGUI_IMPL_API void     ImGui_ImplVulkan_NewFrame();
-IMGUI_IMPL_API void     ImGui_ImplVulkan_RenderDrawData(ImDrawData* draw_data, VkCommandBuffer command_buffer);
+IMGUI_IMPL_API void     ImGui_ImplVulkan_RenderDrawData(ImDrawData *draw_data, VkCommandBuffer command_buffer);
 IMGUI_IMPL_API bool     ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer);
 IMGUI_IMPL_API void     ImGui_ImplVulkan_DestroyFontUploadObjects();
 IMGUI_IMPL_API void     ImGui_ImplVulkan_SetMinImageCount(uint32_t min_image_count); // To override MinImageCount after initialization (e.g. if swap chain is recreated)
@@ -77,10 +78,10 @@ struct ImGui_ImplVulkanH_Frame;
 struct ImGui_ImplVulkanH_Window;
 
 // Helpers
-IMGUI_IMPL_API void                 ImGui_ImplVulkanH_CreateOrResizeWindow(VkInstance instance, VkPhysicalDevice physical_device, VkDevice device, ImGui_ImplVulkanH_Window* wnd, uint32_t queue_family, const VkAllocationCallbacks* allocator, int w, int h, uint32_t min_image_count);
-IMGUI_IMPL_API void                 ImGui_ImplVulkanH_DestroyWindow(VkInstance instance, VkDevice device, ImGui_ImplVulkanH_Window* wnd, const VkAllocationCallbacks* allocator);
-IMGUI_IMPL_API VkSurfaceFormatKHR   ImGui_ImplVulkanH_SelectSurfaceFormat(VkPhysicalDevice physical_device, VkSurfaceKHR surface, const VkFormat* request_formats, int request_formats_count, VkColorSpaceKHR request_color_space);
-IMGUI_IMPL_API VkPresentModeKHR     ImGui_ImplVulkanH_SelectPresentMode(VkPhysicalDevice physical_device, VkSurfaceKHR surface, const VkPresentModeKHR* request_modes, int request_modes_count);
+IMGUI_IMPL_API void                 ImGui_ImplVulkanH_CreateOrResizeWindow(VkInstance instance, VkPhysicalDevice physical_device, VkDevice device, ImGui_ImplVulkanH_Window *wnd, uint32_t queue_family, const VkAllocationCallbacks *allocator, int w, int h, uint32_t min_image_count);
+IMGUI_IMPL_API void                 ImGui_ImplVulkanH_DestroyWindow(VkInstance instance, VkDevice device, ImGui_ImplVulkanH_Window *wnd, const VkAllocationCallbacks *allocator);
+IMGUI_IMPL_API VkSurfaceFormatKHR   ImGui_ImplVulkanH_SelectSurfaceFormat(VkPhysicalDevice physical_device, VkSurfaceKHR surface, const VkFormat *request_formats, int request_formats_count, VkColorSpaceKHR request_color_space);
+IMGUI_IMPL_API VkPresentModeKHR     ImGui_ImplVulkanH_SelectPresentMode(VkPhysicalDevice physical_device, VkSurfaceKHR surface, const VkPresentModeKHR *request_modes, int request_modes_count);
 IMGUI_IMPL_API int                  ImGui_ImplVulkanH_GetMinImageCountFromPresentMode(VkPresentModeKHR present_mode);
 
 // Helper structure to hold the data needed by one rendering frame
@@ -118,8 +119,8 @@ struct ImGui_ImplVulkanH_Window
     uint32_t            FrameIndex;             // Current frame being rendered to (0 <= FrameIndex < FrameInFlightCount)
     uint32_t            ImageCount;             // Number of simultaneous in-flight frames (returned by vkGetSwapchainImagesKHR, usually derived from min_image_count)
     uint32_t            SemaphoreIndex;         // Current set of swapchain wait semaphores we're using (needs to be distinct from per frame data)
-    ImGui_ImplVulkanH_Frame* Frames;
-    ImGui_ImplVulkanH_FrameSemaphores* FrameSemaphores;
+    ImGui_ImplVulkanH_Frame *Frames;
+    ImGui_ImplVulkanH_FrameSemaphores *FrameSemaphores;
 
     ImGui_ImplVulkanH_Window()
     {

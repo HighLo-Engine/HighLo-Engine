@@ -18,14 +18,14 @@ namespace highlo
 
 		HLAPI virtual ~ComputePipeline() {}
 
-		HLAPI virtual void Begin(Ref<CommandBuffer> renderCommandBuffer = nullptr) = 0;
+		HLAPI virtual void Begin(const Ref<CommandBuffer> &renderCommandBuffer = nullptr) = 0;
 		HLAPI virtual void End() = 0;
 
 		HLAPI virtual void Invalidate() = 0;
 
 		HLAPI virtual Ref<Shader> GetShader() = 0;
 
-		HLAPI static Ref<ComputePipeline> Create(Ref<Shader> computeShader);
+		HLAPI static Ref<ComputePipeline> Create(const Ref<Shader> &computeShader);
 	};
 }
 

@@ -271,15 +271,10 @@ void HighLoEditor::UpdateUIFlags()
 	m_WindowMenu->GetMenuItemWithID(MENU_ITEM_WINDOW_ANIM_TIMELINE)->IsSelected = m_ShowAnimTimelinePanel;
 	m_FileMenu->GetMenuItemWithID(MENU_ITEM_SETTINGS)->IsSelected = m_ShowSettingsPanel;
 
-	if (!m_SceneIsSaved)
-	{
-		// Append a * to the window title
-		UpdateWindowTitle(m_SceneName + " *");
-	}
-	else
-	{
-		UpdateWindowTitle(m_SceneName);
-	}
+	// TODO: Currently the window title gets updated every frame,
+	// maybe we could add a new event type that is responsible for updating the window title?
+	// it would give us more performance, because UpdateWindowTitle does String calculations which are expensive
+	UpdateWindowTitle(m_SceneName, m_SceneIsSaved);
 }
 
 void HighLoEditor::OnShutdown()
@@ -560,14 +555,19 @@ void HighLoEditor::SelectEntity(Entity &entity)
 	m_CurrentScene = m_EditorScene;
 }
 
-void HighLoEditor::UpdateWindowTitle(const HLString &sceneName)
+void HighLoEditor::UpdateWindowTitle(const HLString &sceneName, bool sceneIsSaved)
 {
 	HLString mode = "Debug";
+	HLString name = sceneName;
+
 #ifdef HL_RELEASE
 	mode = "Release";
 #endif // HL_RELEASE
 
-	HLString title = sceneName + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI() + " (" + mode + ")";
+	if (!sceneIsSaved)
+		name = name + " *";
+
+	HLString title = name + " - HighLo Engine - Renderer: " + Renderer::GetCurrentRenderingAPI() + " (" + mode + ")";
 	GetWindow().SetTitle(title);
 }
 

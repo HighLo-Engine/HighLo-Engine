@@ -53,6 +53,10 @@ namespace highlo
 			bool success = writer->WriteOut();
 			HL_ASSERT(success);
 		}
+		else
+		{
+			HL_CORE_ERROR("Could not write array map!");
+		}
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
@@ -66,6 +70,10 @@ namespace highlo
 				HL_CORE_ERROR("Could not read ShaderCache!");
 				HL_ASSERT(false);
 			}
+		}
+		else
+		{
+			HL_CORE_ERROR("Could not read file contents!");
 		}
 	}
 }

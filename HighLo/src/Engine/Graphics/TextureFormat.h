@@ -13,6 +13,7 @@ namespace highlo
 	enum class TextureFormat
 	{
 		None = 0,
+		RG8,
 		RGB,
 		RGBA,
 		RGBA8,
@@ -23,10 +24,16 @@ namespace highlo
 		RGBA32F,
 		RG32F,
 		SRGB,
+		B10R11G11UF,
 		DEPTH32F,
 		DEPTH24STENCIL8,
+		DEPTH32FSTENCIL8UINT,
 		RED_INTEGER,
 		RED32F,
+		RED8UN,
+		RED8UI,
+		RED16UI,
+		RED32UI,
 
 		// Default Depth buffer format
 		Depth = DEPTH24STENCIL8
@@ -51,7 +58,8 @@ namespace highlo
 	{
 		None = 0,
 		Linear,
-		Nearest
+		Nearest,
+		Cubic
 	};
 
 	enum class TextureType

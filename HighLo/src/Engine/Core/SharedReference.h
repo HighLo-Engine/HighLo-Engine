@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Core/Core.h"
+#include "Engine/Core/SharedReferenceManager.h"
 
 namespace highlo
 {
@@ -169,7 +170,10 @@ namespace highlo
 		void IncRef() const
 		{
 			if (m_Instance)
+			{
 				m_Instance->IncrementReferenceCount();
+				SharedReferenceManager::Get()->AddToLiveReferences((void*)m_Instance);
+			}
 		}
 
 		void DecRef() const
@@ -179,16 +183,19 @@ namespace highlo
 				m_Instance->DecrementReferenceCount();
 				if (m_Instance->GetReferenceCount() == 0)
 				{
+					SharedReferenceManager::Get()->RemoveFromLiveReferences((void*)m_Instance);
 					delete m_Instance;
+					m_Instance = nullptr;
 				}
 			}
 		}
 
 		template<class T2>
 		friend class SharedReference;
-		T* m_Instance;
+		mutable T *m_Instance;
 	};
 
 	template<typename T>
 	using Ref = SharedReference<T>;
 }
+

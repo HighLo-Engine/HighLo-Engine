@@ -144,23 +144,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER_BIT:
-					return shaderc_vertex_shader;
-
-				case GL_FRAGMENT_SHADER_BIT:
-					return shaderc_fragment_shader;
-
-				case GL_COMPUTE_SHADER_BIT:
-					return shaderc_compute_shader;
-
-				case GL_TESS_CONTROL_SHADER_BIT:
-					return shaderc_tess_control_shader;
-
-				case GL_TESS_EVALUATION_SHADER_BIT:
-					return shaderc_tess_evaluation_shader;
-
-				case GL_GEOMETRY_SHADER_BIT:
-					return shaderc_geometry_shader;
+				case GL_VERTEX_SHADER:			return shaderc_vertex_shader;
+				case GL_FRAGMENT_SHADER:		return shaderc_fragment_shader;
+				case GL_COMPUTE_SHADER:			return shaderc_compute_shader;
+				case GL_TESS_CONTROL_SHADER:	return shaderc_tess_control_shader;
+				case GL_TESS_EVALUATION_SHADER: return shaderc_tess_evaluation_shader;
+				case GL_GEOMETRY_SHADER:		return shaderc_geometry_shader;
 			}
 
 			HL_ASSERT(false);
@@ -182,12 +171,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER_BIT:			return ".cached_opengl.vert";
-				case GL_FRAGMENT_SHADER_BIT:		return ".cached_opengl.frag";
-				case GL_COMPUTE_SHADER_BIT:			return ".cached_opengl.comp";
-				case GL_TESS_CONTROL_SHADER_BIT:	return ".cached_opengl.tessconn";
-				case GL_TESS_EVALUATION_SHADER_BIT:	return ".cached_opengl.tessval";
-				case GL_GEOMETRY_SHADER_BIT:		return ".cached_opengl.geo";
+				case GL_VERTEX_SHADER:			return ".cached_opengl.vert";
+				case GL_FRAGMENT_SHADER:		return ".cached_opengl.frag";
+				case GL_COMPUTE_SHADER:			return ".cached_opengl.comp";
+				case GL_TESS_CONTROL_SHADER:	return ".cached_opengl.tessconn";
+				case GL_TESS_EVALUATION_SHADER:	return ".cached_opengl.tessval";
+				case GL_GEOMETRY_SHADER:		return ".cached_opengl.geo";
 			}
 
 			HL_ASSERT(false);
@@ -198,12 +187,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER_BIT:			return "vertex";
-				case GL_FRAGMENT_SHADER_BIT:		return "fragment";
-				case GL_COMPUTE_SHADER_BIT:			return "compute";
-				case GL_TESS_EVALUATION_SHADER_BIT:	return "tess_eval";
-				case GL_TESS_CONTROL_SHADER_BIT:	return "tess_control";
-				case GL_GEOMETRY_SHADER_BIT:		return "geometry";
+				case GL_VERTEX_SHADER:			return "vertex";
+				case GL_FRAGMENT_SHADER:		return "fragment";
+				case GL_COMPUTE_SHADER:			return "compute";
+				case GL_TESS_EVALUATION_SHADER:	return "tess_eval";
+				case GL_TESS_CONTROL_SHADER:	return "tess_control";
+				case GL_GEOMETRY_SHADER:		return "geometry";
 			}
 
 			HL_ASSERT(false);
@@ -268,12 +257,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER_BIT:          return "__VERTEX_STAGE__";
-				case GL_FRAGMENT_SHADER_BIT:        return "__FRAGMENT_STAGE__";
-				case GL_COMPUTE_SHADER_BIT:         return "__COMPUTE_STAGE__";
-				case GL_TESS_CONTROL_SHADER_BIT:	return "__TESS_CONTROL_STAGE__";
-				case GL_TESS_EVALUATION_SHADER_BIT:	return "__TESS_EVAL_STAGE__";
-				case GL_GEOMETRY_SHADER_BIT:		return "__GEOMETRY_STAGE__";
+				case GL_VERTEX_SHADER:          return "__VERTEX_STAGE__";
+				case GL_FRAGMENT_SHADER:        return "__FRAGMENT_STAGE__";
+				case GL_COMPUTE_SHADER:         return "__COMPUTE_STAGE__";
+				case GL_TESS_CONTROL_SHADER:	return "__TESS_CONTROL_STAGE__";
+				case GL_TESS_EVALUATION_SHADER:	return "__TESS_EVAL_STAGE__";
+				case GL_GEOMETRY_SHADER:		return "__GEOMETRY_STAGE__";
 			}
 
 			HL_ASSERT(false);
@@ -443,7 +432,7 @@ namespace highlo
 	{
 		if (FileSystem::Get()->FileExists(m_AssetPath))
 		{
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0} [+]", **m_AssetPath);
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0}... [+]", **m_AssetPath);
 
 			m_ShaderSources = PreProcess(source);
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
@@ -833,7 +822,7 @@ namespace highlo
 		std::vector<GLuint> shaderRendererIds;
 		shaderRendererIds.reserve(shaderData.size());
 		
-		m_RendererID = glCreateProgram();
+		GLuint program = glCreateProgram();
 
 		m_ConstantBufferOffset = 0;
 		for (auto &[stage, data] : shaderData)
@@ -843,7 +832,7 @@ namespace highlo
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), (uint32)data.size());
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Compiling Shader {0} [+]", **m_AssetPath);
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 
 			GLint isCompiled = 0;
 			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
@@ -862,7 +851,8 @@ namespace highlo
 					for (auto id : shaderRendererIds)
 						glDeleteShader(id);
 
-					glDeleteProgram(m_RendererID);
+					glDeleteProgram(program);
+					program = 0;
 				}
 				else
 				{
@@ -871,31 +861,34 @@ namespace highlo
 			}
 			else
 			{
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader has been successfully compiled! [+]");
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 			}
 
-			glAttachShader(m_RendererID, shaderId);
+			glAttachShader(program, shaderId);
 			shaderRendererIds.emplace_back(shaderId);
 		}
 
 		// Link shader program
 		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Linking Shader {0} [+]", **m_AssetPath);
-		glLinkProgram(m_RendererID);
+		
+		HL_ASSERT(program != 0);
+		glLinkProgram(program);
 
-		int32 isLinked = 0;
-		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int32*)&isLinked);
+		GLint isLinked = 0;
+		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 		if (isLinked == GL_FALSE)
 		{
-			int32 maxLength = 0;
-			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxLength);
+			GLint maxInfoLength = 0;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxInfoLength);
 
-			if (maxLength > 0)
+			if (maxInfoLength > 0)
 			{
-				std::vector<GLchar> infoLog(maxLength);
-				glGetProgramInfoLog(m_RendererID, maxLength, &maxLength, &infoLog[0]);
+				std::vector<GLchar> infoLog(maxInfoLength);
+				glGetProgramInfoLog(program, maxInfoLength, &maxInfoLength, &infoLog[0]);
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
-				glDeleteProgram(m_RendererID);
+				glDeleteProgram(program);
+				program = 0;
 				for (auto id : shaderRendererIds)
 					glDeleteShader(id);
 			}
@@ -911,6 +904,9 @@ namespace highlo
 
 		for (auto id : shaderRendererIds)
 			glDetachShader(m_RendererID, id);
+
+		if (program)
+			m_RendererID = program;
 
 		// Get Uniform locations
 		for (auto &[bufferName, buffer] : m_Buffers)

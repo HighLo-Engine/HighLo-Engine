@@ -220,7 +220,8 @@ namespace highlo
 		if (!depthTest)
 			SetDepthTest(false);
 
-		material->Set("u_Renderer.Transform", localTransform);
+		if (material->Has("u_Renderer.Transform"))
+			material->Set("u_Renderer.Transform", localTransform);
 
 		material->UpdateForRendering();
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
@@ -369,7 +370,7 @@ namespace highlo
 		for (Mesh submesh : submeshes)
 		{
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-// TODO: This if is temporary because we do not have the material system setup yet
+			// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
 				if (material->Has("u_Renderer.Transform"))

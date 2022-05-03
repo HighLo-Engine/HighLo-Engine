@@ -828,8 +828,7 @@ namespace highlo
 		for (auto &[stage, data] : shaderData)
 		{
 			GLuint shaderId = glCreateShader(stage);
-		//	glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
-			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), (uint32)data.size());
+			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 
 			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
@@ -875,7 +874,7 @@ namespace highlo
 		glLinkProgram(program);
 
 		GLint isLinked = 0;
-		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+		glGetProgramiv(program, GL_LINK_STATUS, (GLint*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxInfoLength = 0;
@@ -894,7 +893,8 @@ namespace highlo
 			}
 			else
 			{
-				HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+			//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+				HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Linking failed but no infolog was accessible! [-]");
 			}
 		}
 		else

@@ -665,11 +665,17 @@ namespace highlo
 		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
 
 		// First render skybox
-		m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
-		m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
+		if (m_SkyboxMaterial->Has("u_Uniforms.TextureLod"))
+			m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
+
+		if (m_SkyboxMaterial->Has("u_Uniforms.Intensity"))
+			m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
 
 		const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
-		m_SkyboxMaterial->Set("u_Texture", radianceMap);
+		
+		if (m_SkyboxMaterial->Has("u_Texture"))
+			m_SkyboxMaterial->Set("u_Texture", radianceMap);
+		
 		Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
 
 		// Now render static and dynamic meshes

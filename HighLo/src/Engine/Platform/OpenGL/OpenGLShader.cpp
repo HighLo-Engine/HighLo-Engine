@@ -203,6 +203,7 @@ namespace highlo
 		{
 			switch (type.basetype)
 			{
+			case spirv_cross::SPIRType::Struct: return ShaderUniformType::Struct;
 			case spirv_cross::SPIRType::Boolean: return ShaderUniformType::Bool;
 			case spirv_cross::SPIRType::UInt: return ShaderUniformType::Uint;
 			case spirv_cross::SPIRType::Int:
@@ -476,6 +477,7 @@ namespace highlo
 				uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
 				uint32 descriptorSet = (uint32)compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 				uint32 size = (uint32)compiler.get_declared_struct_size(bufferType);
+				uint32 bufferOffset = 0;
 
 				if (descriptorSet >= m_ShaderDescriptorSets.size())
 					m_ShaderDescriptorSets.resize(descriptorSet + 1);
@@ -498,6 +500,21 @@ namespace highlo
 				}
 
 				shaderDescriptorSet.UniformBuffers[binding] = s_UniformBuffers.at(descriptorSet).at(binding);
+
+				ShaderBuffer &shaderBuffer = m_Buffers[name];
+				shaderBuffer.Name = name;
+				shaderBuffer.Size = size - bufferOffset;
+
+				for (uint32 i = 0; i < memberCount; ++i)
+				{
+					auto &memberType = compiler.get_type(bufferType.member_types[i]);
+					const auto &memberName = compiler.get_member_name(bufferType.self, i);
+					uint32 memberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
+					uint32 memberOffset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
+
+					HLString uniformName = fmt::format("{}.{}", name, memberName);
+					shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SPIRTypeToShaderUniformType(memberType), memberSize, memberOffset);
+				}
 
 			#if PRINT_DEBUG_OUTPUTS
 				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
@@ -737,6 +754,38 @@ namespace highlo
 			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
 		#endif // PRINT_DEBUG_OUTPUTS
 		}
+
+		// Little background on the next block:
+		// We do not have single uniforms in our OpenGL implementation anymore, because we group them in uniform structs.
+		// (this way it is easier to handle the shader transition between OpenGL and Vulkan)
+		// so we need a new way to get the uniform locations, this is discussed here: https://stackoverflow.com/a/4970703/12873837
+
+		// TODO: the problem is, that uniforms differ from uniform block members (which are also uniforms). They are not retrieved in the same way by glGetUniformLocation()
+		// So we need to find another way to maybe differentiate between those two? Is it even necessary?
+		// We also could cut the idea of single uniforms and only support uniform buffer blocks...
+
+		/*
+		int32 totalUniforms = -1;
+		glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &totalUniforms);
+
+		if (totalUniforms != -1)
+		{
+			for (int32 i = 0; i < totalUniforms; ++i)
+			{
+				int32 nameLength = -1;
+				int32 uniformSize = -1;
+				GLenum uniformType = GL_ZERO;
+				char uniformName[128];
+
+				glGetActiveUniform(m_RendererID, GLuint(i), sizeof(uniformName) - 1, &nameLength, &uniformSize, &uniformType, uniformName);
+				int32 location = GetUniformLocation(uniformName);
+				if (location != -1)
+				{
+					m_UniformLocations[uniformName] = location;
+				}
+			}
+		}
+		*/
 
 	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Special macros: {0}", m_AcknowledgedMacros.size());
@@ -1029,7 +1078,6 @@ namespace highlo
 			GLSLIncluder *includer = new GLSLIncluder(&fileFinder);
 
 			options.SetIncluder(std::unique_ptr<GLSLIncluder>(includer));
-			options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
 
 			shaderc::PreprocessedSourceCompilationResult preProcessingResult = compiler.PreprocessGlsl(*shaderSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
 			if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
@@ -1115,33 +1163,6 @@ namespace highlo
 			HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not find uniform location {0} [-]", *name);
 
 		return result;
-	}
-	
-	GLenum OpenGLShader::ShaderTypeFromString(const HLString &type)
-	{
-		HLString typeToCheck = type.ToLowerCase();
-		if (typeToCheck == "vertex")
-			return GL_VERTEX_SHADER;
-
-		if (typeToCheck == "fragment" || typeToCheck == "pixel")
-			return GL_FRAGMENT_SHADER;
-
-		if (typeToCheck == "compute")
-			return GL_COMPUTE_SHADER;
-
-		if (typeToCheck == "geometry")
-			return GL_GEOMETRY_SHADER;
-
-		if (typeToCheck == "tesscontrol" || typeToCheck == "tesselationcontrol")
-			return GL_TESS_CONTROL_SHADER;
-
-		if (typeToCheck == "tesseval"
-		 || typeToCheck == "tesselationeval"
-		 || typeToCheck == "tessevaluation"
-		 || typeToCheck == "tesselationevaluation")
-			return GL_TESS_EVALUATION_SHADER;
-
-		return GL_NONE;
 	}
 	
 	void OpenGLShader::UploadUniformInt(uint32 location, int32 value)

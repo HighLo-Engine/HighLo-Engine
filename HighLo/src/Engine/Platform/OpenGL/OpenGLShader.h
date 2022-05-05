@@ -86,8 +86,6 @@ namespace highlo
 		void ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler);
 		int32 GetUniformLocation(const HLString &name) const;
 
-		static GLenum ShaderTypeFromString(const HLString &type);
-
 		void UploadUniformInt(uint32 location, int32 value);
 		void UploadUniformIntArray(uint32 location, int32 *values, int32 count);
 		void UploadUniformFloat(uint32 location, float value);

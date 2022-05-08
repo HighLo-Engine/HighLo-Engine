@@ -95,3 +95,14 @@ layout(std140, binding = 4) uniform PointLightData
 	PointLight Lights[1000];
 } u_PointLights;
 
+struct PBRParameters
+{
+	vec3 Diffuse;
+	float Roughness;
+	float Metalness;
+
+	vec3 Normal;
+	vec3 View;
+	float NdotV;
+} m_Params;
+

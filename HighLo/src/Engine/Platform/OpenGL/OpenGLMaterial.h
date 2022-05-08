@@ -34,6 +34,8 @@ namespace highlo
 		{
 			auto decl = FindUniformDeclaration(name);
 			HL_ASSERT(decl);
+			if (!decl)
+				return;
 
 			auto &buffer = m_LocalData;
 			buffer.Write((Byte*)&value, decl->GetSize(), decl->GetOffset());

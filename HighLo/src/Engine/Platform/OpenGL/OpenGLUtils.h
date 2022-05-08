@@ -170,22 +170,22 @@ namespace highlo
 			switch (type)
 			{
 				case ShaderType::Vertex:
-					return GL_VERTEX_SHADER_BIT;
+					return GL_VERTEX_SHADER;
 
 				case ShaderType::Fragment:
-					return GL_FRAGMENT_SHADER_BIT;
+					return GL_FRAGMENT_SHADER;
 
 				case ShaderType::Compute:
-					return GL_COMPUTE_SHADER_BIT;
+					return GL_COMPUTE_SHADER;
 
 				case ShaderType::TessControl:
-					return GL_TESS_CONTROL_SHADER_BIT;
+					return GL_TESS_CONTROL_SHADER;
 
 				case ShaderType::TessEvaluation:
-					return GL_TESS_EVALUATION_SHADER_BIT;
+					return GL_TESS_EVALUATION_SHADER;
 
 				case ShaderType::Geometry:
-					return GL_GEOMETRY_SHADER_BIT;
+					return GL_GEOMETRY_SHADER;
 			}
 
 			HL_ASSERT(false);
@@ -196,22 +196,22 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER_BIT:
+				case GL_VERTEX_SHADER:
 					return ShaderType::Vertex;
 
-				case GL_FRAGMENT_SHADER_BIT:
+				case GL_FRAGMENT_SHADER:
 					return ShaderType::Fragment;
 
-				case GL_COMPUTE_SHADER_BIT:
+				case GL_COMPUTE_SHADER:
 					return ShaderType::Compute;
 
-				case GL_TESS_CONTROL_SHADER_BIT:
+				case GL_TESS_CONTROL_SHADER:
 					return ShaderType::TessControl;
 
-				case GL_TESS_EVALUATION_SHADER_BIT:
+				case GL_TESS_EVALUATION_SHADER:
 					return ShaderType::TessEvaluation;
 
-				case GL_GEOMETRY_SHADER_BIT:
+				case GL_GEOMETRY_SHADER:
 					return ShaderType::Geometry;
 			}
 

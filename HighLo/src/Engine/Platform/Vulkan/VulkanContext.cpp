@@ -92,6 +92,9 @@ namespace highlo
 
     VulkanContext::~VulkanContext()
     {
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+        vkDestroyPipelineCache(device, m_PipelineCache, nullptr);
+
         m_Device->Destroy();
 
         vkDestroyInstance(s_VulkanInstance, nullptr);
@@ -109,9 +112,9 @@ namespace highlo
         // Check driver api version support
         uint32 instanceVersion;
         vkEnumerateInstanceVersion(&instanceVersion);
-        if (instanceVersion < VK_API_VERSION_1_2)
+        if (instanceVersion < VK_API_VERSION_1_3)
         {
-            HL_CORE_FATAL(VULKAN_CONTEXT_LOG_PREFIX "[-] Your API version is too low, expected at least {0}, but got {1} [-]", VK_API_VERSION_1_2, instanceVersion);
+            HL_CORE_FATAL(VULKAN_CONTEXT_LOG_PREFIX "[-] Your API version is too low, expected at least {0}, but got {1} [-]", VK_API_VERSION_1_3, instanceVersion);
             HL_ASSERT(false);
         }
 
@@ -119,7 +122,7 @@ namespace highlo
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "HighLo"; // TODO: Maybe retrieve the game/client program name here?
         appInfo.pEngineName = "HighLo";
-        appInfo.apiVersion = VK_API_VERSION_1_2;
+        appInfo.apiVersion = VK_API_VERSION_1_3;
 
         std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
     #ifdef HL_DEBUG
@@ -186,7 +189,9 @@ namespace highlo
 
             VkDebugUtilsMessengerCreateInfoEXT debugUtilsCreateInfo = {};
             debugUtilsCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-            debugUtilsCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugUtilsCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT 
+                | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT 
+                | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
             debugUtilsCreateInfo.pfnUserCallback = utils::VulkanDebugUtilsMessengerCallback;
             debugUtilsCreateInfo.messageSeverity = 
                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
@@ -201,6 +206,7 @@ namespace highlo
         m_PhysicalDevice = physicalDevice.As<VulkanPhysicalDevice>();
 
         VkPhysicalDeviceFeatures enabledFeatures = {};
+        memset(&enabledFeatures, 0, sizeof(VkPhysicalDeviceFeatures));
         enabledFeatures.samplerAnisotropy = true;
         enabledFeatures.wideLines = true;
         enabledFeatures.fillModeNonSolid = true;

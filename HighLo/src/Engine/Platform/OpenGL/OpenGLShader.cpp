@@ -22,7 +22,7 @@ namespace highlo
 #define PRINT_DEBUG_ALL 0
 
 #ifdef HL_DEBUG
-#define PRINT_DEBUG_OUTPUTS 1
+#define PRINT_DEBUG_OUTPUTS 0
 #endif
 
 #if PRINT_DEBUG_ALL
@@ -340,200 +340,6 @@ namespace highlo
 		m_Macros[name] = value;
 	}
 	
-	/*
-	void OpenGLShader::SetUniform(const HLString &fullname, float value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform1f(location, value);
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-			
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, int32 value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform1i(location, value);
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec2 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform2i(location, value.x, value.y);
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec3 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform3i(location, value.x, value.y, value.z);
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec4 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform4i(location, value.x, value.y, value.z, value.w);
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, uint32 value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform1ui(location, value);
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec2 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform2fv(location, 1, glm::value_ptr(value));
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec3 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform3fv(location, 1, glm::value_ptr(value));
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec4 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniform4fv(location, 1, glm::value_ptr(value));
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat2 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat3 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	
-	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat4 &value)
-	{
-		if (!fullname.Contains('.'))
-		{
-			// target uniform is a single uniform with a location
-			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-			int32 location = m_UniformLocations.at(fullname);
-			glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
-		}
-		else
-		{
-			// target uniform is part of a uniform buffer block
-
-		}
-	}
-	*/
-	
 	void OpenGLShader::ClearUniformBuffers()
 	{
 		s_UniformBuffers.clear();
@@ -543,14 +349,13 @@ namespace highlo
 	{
 		if (FileSystem::Get()->FileExists(m_AssetPath))
 		{
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0}... [+]", **m_AssetPath);
+			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0}... [+]", **m_AssetPath);
 
 			m_ShaderSources = PreProcess(source);
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
 			CompileOrGetOpenGLBinary(shaderData, forceCompile);
 			LoadAndCreateShaders(shaderData);
 			ReflectAllShaderStages(shaderData);
-			CreateDescriptors();
 
 			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader {0} loaded [+]", **m_AssetPath);
 			m_Loaded = true;
@@ -958,7 +763,7 @@ namespace highlo
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
+			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 
 			GLint isCompiled = 0;
 			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
@@ -971,7 +776,7 @@ namespace highlo
 				{
 					std::vector<GLchar> infoLog(maxInfoLength);
 					glGetShaderInfoLog(shaderId, maxInfoLength, &maxInfoLength, &infoLog[0]);
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Compilation failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Compilation failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
 					glDeleteShader(shaderId);
 					for (auto id : shaderRendererIds)
@@ -983,11 +788,12 @@ namespace highlo
 				else
 				{
 					HL_ASSERT(false, "Compilation failed but no infoLog accessible!");
+					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Compilation failed but no infoLog accessible! [-]");
 				}
 			}
 			else
 			{
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 			}
 
 			glAttachShader(program, shaderId);
@@ -995,7 +801,7 @@ namespace highlo
 		}
 
 		// Link shader program
-		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Linking Shader {0} [+]", **m_AssetPath);
+		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Linking Shader {0} [+]", **m_AssetPath);
 		
 		HL_ASSERT(program != 0);
 		glLinkProgram(program);
@@ -1011,7 +817,7 @@ namespace highlo
 			{
 				std::vector<GLchar> infoLog(maxInfoLength);
 				glGetProgramInfoLog(program, maxInfoLength, &maxInfoLength, &infoLog[0]);
-				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-] Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
+				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
 				glDeleteProgram(program);
 				program = 0;
@@ -1020,13 +826,13 @@ namespace highlo
 			}
 			else
 			{
-			//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
-				HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Linking failed but no infolog was accessible! [-]");
+				HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+				HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Linking failed but no infolog was accessible! [-]");
 			}
 		}
 		else
 		{
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Shader has been successfully linked! [+]");
+			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     Shader has been successfully linked! [+]");
 		}
 
 		for (auto id : shaderRendererIds)
@@ -1034,33 +840,6 @@ namespace highlo
 
 		if (program)
 			m_RendererID = program;
-
-		// Get Uniform locations
-		for (auto &[bufferName, buffer] : m_Buffers)
-		{
-			for (auto &[name, uniform] : buffer.Uniforms)
-			{
-				int32 location = GetUniformLocation(name);
-				if (location != -1)
-				{
-				#if PRINT_DEBUG_OUTPUTS
-					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Registering Uniform {0} at location {1} [+]", *name, location);
-				#endif // PRINT_DEBUG_OUTPUTS
-
-					m_UniformLocations[name] = location;
-				}
-			}
-		}
-	}
-
-	void OpenGLShader::CreateDescriptors()
-	{
-		for (uint32 set = 0; set < m_ShaderDescriptorSets.size(); ++set)
-		{
-			auto &shaderDescriptorSet = m_ShaderDescriptorSets[set];
-
-			// TODO
-		}
 	}
 	
 	void OpenGLShader::CompileOrGetOpenGLBinary(std::unordered_map<uint32, std::vector<uint32>> &shaderData, bool forceCompile)
@@ -1090,7 +869,7 @@ namespace highlo
 					FILE *f;
 					errno_t fileError = fopen_s(&f, **p, "wb");
 					if (fileError)
-						HL_CORE_ERROR("Failed to cache shader binary!");
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to cache shader binary! [-]");
 
 					fwrite(shaderData[stage].data(), sizeof(uint32), shaderData[stage].size(), f);
 					fclose(f);
@@ -1102,11 +881,12 @@ namespace highlo
 					TryGetOpenGLCachedBinary(cacheDirectory, extension, shaderData, stage);
 					if (shaderData[stage].empty())
 					{
-						HL_ASSERT(false, "Failed to compile shader and could not find any cached binary");
+						HL_ASSERT(false, "Failed to compile shader and could not find any cached binary!");
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to compile shader and could not find any cached binary! [-]");
 					}
 					else
 					{
-						HL_CORE_ERROR("Failed to compile {0}:{1}, so loaded a cached shader binary instead.", **m_AssetPath, *utils::ShaderStageToString(stage));
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to compile {0}:{1}, so loaded a cached shader binary instead. [-]", **m_AssetPath, *utils::ShaderStageToString(stage));
 					}
 				}
 			}
@@ -1137,7 +917,7 @@ namespace highlo
 		std::unordered_map<GLenum, HLString> glShaderSources = utils::ConvertShaderTypeToOpenGLStage(shaderSources);
 		shaderc::Compiler compiler;
 
-		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Pre-processing GLSL: {0} [+]", **m_AssetPath);
+		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Pre-processing GLSL: {0} [+]", **m_AssetPath);
 
 		shaderc_util::FileFinder fileFinder;
 		fileFinder.search_path().emplace_back("assets/shaders/Include/GLSL/");
@@ -1160,7 +940,7 @@ namespace highlo
 			shaderc::PreprocessedSourceCompilationResult preProcessingResult = compiler.PreprocessGlsl(*shaderSource, utils::ShaderStageToShaderC(stage), **m_AssetPath, options);
 			if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
 			{
-				HL_CORE_ERROR("Failed to pre-process Shader {0} with error {1}", **m_AssetPath, preProcessingResult.GetErrorMessage());
+				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to pre-process Shader {0} with error {1} [-]", **m_AssetPath, preProcessingResult.GetErrorMessage());
 			}
 
 			m_StagesMetaData[stage].HashValue = shaderSource.Hash();
@@ -1233,127 +1013,6 @@ namespace highlo
 			m_ConstantBufferOffset += bufferSize;
 		}
 	}
-	
-	int32 OpenGLShader::GetUniformLocation(const HLString &name) const
-	{
-		int32 result = glGetUniformLocation(m_RendererID, *name);
-		if (result == -1)
-			HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-] Could not find uniform location {0} [-]", *name);
-
-		return result;
-	}
-	
-	/*
-	void OpenGLShader::UploadUniformInt(uint32 location, int32 value)
-	{
-		glUniform1i(location, value);
-	}
-	
-	void OpenGLShader::UploadUniformIntArray(uint32 location, int32 *values, int32 count)
-	{
-		glUniform1iv(location, count, values);
-	}
-	
-	void OpenGLShader::UploadUniformFloat(uint32 location, float value)
-	{
-		glUniform1f(location, value);
-	}
-	
-	void OpenGLShader::UploadUniformFloat2(uint32 location, const glm::vec2 &value)
-	{
-		glUniform2f(location, value.x, value.y);
-	}
-	
-	void OpenGLShader::UploadUniformFloat3(uint32 location, const glm::vec3 &value)
-	{
-		glUniform3f(location, value.x, value.y, value.z);
-	}
-	
-	void OpenGLShader::UploadUniformFloat4(uint32 location, const glm::vec4 &value)
-	{
-		glUniform4f(location, value.x, value.y, value.z, value.w);
-	}
-
-	void OpenGLShader::UploadUniformMat2(uint32 location, const glm::mat2 &values)
-	{
-		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(values));
-	}
-	
-	void OpenGLShader::UploadUniformMat3(uint32 location, const glm::mat3 &values)
-	{
-		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(values));
-	}
-	
-	void OpenGLShader::UploadUniformMat4(uint32 location, const glm::mat4 &values)
-	{
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(values));
-	}
-	
-	void OpenGLShader::UploadUniformMat4Array(uint32 location, const glm::mat4 &values, uint32 count)
-	{
-		glUniformMatrix4fv(location, count, GL_FALSE, glm::value_ptr(values));
-	}
-	
-	void OpenGLShader::UploadUniformInt(const HLString &name, int32 value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform1i(location, value);
-	}
-	
-	void OpenGLShader::UploadUniformUInt(const HLString &name, uint32 value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform1ui(location, value);
-	}
-	
-	void OpenGLShader::UploadUniformIntArray(const HLString &name, int32 *values, uint32 count)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform1iv(location, count, values);
-	}
-	
-	void OpenGLShader::UploadUniformFloat(const HLString &name, float value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform1f(location, value);
-	}
-	
-	void OpenGLShader::UploadUniformFloat2(const HLString &name, const glm::vec2 &value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform2f(location, value.x, value.y);
-	}
-	
-	void OpenGLShader::UploadUniformFloat3(const HLString &name, const glm::vec3 &value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform3f(location, value.x, value.y, value.z);
-	}
-	
-	void OpenGLShader::UploadUniformFloat4(const HLString &name, const glm::vec4 &value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniform4f(location, value.x, value.y, value.z, value.w);
-	}
-
-	void OpenGLShader::UploadUniformMat2(const HLString &name, const glm::mat2 &value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
-	}
-
-	void OpenGLShader::UploadUniformMat3(const HLString &name, const glm::mat3 &value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
-	}
-	
-	void OpenGLShader::UploadUniformMat4(const HLString &name, const glm::mat4 &value)
-	{
-		int32 location = GetUniformLocation(name);
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
-	}
-	*/
 }
 
 #endif

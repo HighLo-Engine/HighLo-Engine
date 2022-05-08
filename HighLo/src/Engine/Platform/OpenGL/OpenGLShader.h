@@ -48,21 +48,6 @@ namespace highlo
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
 
 		// OpenGL-specific
-		/*
-		virtual void SetUniform(const HLString &fullname, float value);
-		virtual void SetUniform(const HLString &fullname, int32 value);
-		virtual void SetUniform(const HLString &fullname, const glm::ivec2 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::ivec3 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::ivec4 &value);
-		virtual void SetUniform(const HLString &fullname, uint32 value);
-		virtual void SetUniform(const HLString &fullname, const glm::vec2 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::vec3 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::vec4 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::mat2 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::mat3 &value);
-		virtual void SetUniform(const HLString &fullname, const glm::mat4 &value);
-		*/
-
 		static void ClearUniformBuffers();
 
 	private:
@@ -83,36 +68,8 @@ namespace highlo
 		void CompileOrGetOpenGLBinary(std::unordered_map<GLenum, std::vector<uint32>> &outBinary, bool forceCompile);
 		void TryGetOpenGLCachedBinary(const FileSystemPath &cacheDirectory, const HLString &extension, std::unordered_map<GLenum, std::vector<uint32>> &outBinary, GLenum stage) const;
 		void LoadAndCreateShaders(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData);
-		void CreateDescriptors();
 
 		void ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler);
-		int32 GetUniformLocation(const HLString &name) const;
-
-		/*
-		void UploadUniformInt(uint32 location, int32 value);
-		void UploadUniformIntArray(uint32 location, int32 *values, int32 count);
-		void UploadUniformFloat(uint32 location, float value);
-		void UploadUniformFloat2(uint32 location, const glm::vec2 &value);
-		void UploadUniformFloat3(uint32 location, const glm::vec3 &value);
-		void UploadUniformFloat4(uint32 location, const glm::vec4 &value);
-		void UploadUniformMat2(uint32 location, const glm::mat2 &values);
-		void UploadUniformMat3(uint32 location, const glm::mat3 &values);
-		void UploadUniformMat4(uint32 location, const glm::mat4 &values);
-		void UploadUniformMat4Array(uint32 location, const glm::mat4 &values, uint32 count);
-
-		void UploadUniformInt(const HLString &name, int32 value);
-		void UploadUniformUInt(const HLString &name, uint32 value);
-		void UploadUniformIntArray(const HLString &name, int32 *values, uint32 count);
-
-		void UploadUniformFloat(const HLString &name, float value);
-		void UploadUniformFloat2(const HLString &name, const glm::vec2 &value);
-		void UploadUniformFloat3(const HLString &name, const glm::vec3 &value);
-		void UploadUniformFloat4(const HLString &name, const glm::vec4 &value);
-
-		void UploadUniformMat2(const HLString &name, const glm::mat2 &value);
-		void UploadUniformMat3(const HLString &name, const glm::mat3 &value);
-		void UploadUniformMat4(const HLString &name, const glm::mat4 &value);
-		*/
 
 	private:
 
@@ -132,7 +89,6 @@ namespace highlo
 		std::unordered_map<uint32, HLString> m_ShaderSources;
 		std::unordered_map<HLString, ShaderBuffer> m_Buffers;
 		std::unordered_map<HLString, ShaderResourceDeclaration> m_Resources;
-		std::unordered_map<HLString, int32> m_UniformLocations;
 		std::vector<ShaderReloadedCallback> m_ReloadedCallbacks;
 
 		std::map<GLenum, StageData> m_StagesMetaData;

@@ -140,10 +140,10 @@ namespace highlo
             VK_QUERY_PIPELINE_STATISTIC_COMPUTE_SHADER_INVOCATIONS_BIT;
 
         m_PipelineStatisticsQueryPools.resize(framesInFlight);
+        m_PipelineStatisticsQueryResults.resize(framesInFlight);
+
         for (auto &pipelineStatistics : m_PipelineStatisticsQueryPools)
             VK_CHECK_RESULT(vkCreateQueryPool(device->GetNativeDevice(), &queryPoolCreateInfo, nullptr, &pipelineStatistics));
-
-        m_PipelineStatisticsQueryResults.resize(framesInFlight);
     }
     
     VulkanCommandBuffer::~VulkanCommandBuffer()

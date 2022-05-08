@@ -25,6 +25,10 @@ namespace highlo
 
     VulkanComputePipeline::~VulkanComputePipeline()
     {
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+        vkDestroyPipeline(device, m_ComputePipeline, nullptr);
+        vkDestroyPipelineLayout(device, m_ComputePipelineLayout, nullptr);
+        vkDestroyPipelineCache(device, m_PipelineCache, nullptr);
     }
     
     void VulkanComputePipeline::Begin(const Ref<CommandBuffer> &renderCommandBuffer)
@@ -74,6 +78,7 @@ namespace highlo
             submitInfo.pCommandBuffers = &m_ActiveComputeCommandbuffer;
             VK_CHECK_RESULT(vkQueueSubmit(computeQueue, 1, &submitInfo, s_ComputeFence));
 
+            // Safety instruction: this is here to wait until the execution of the compute shader is finished
             vkWaitForFences(device, 1, &s_ComputeFence, VK_TRUE, UINT64_MAX);
         }
 
@@ -120,6 +125,7 @@ namespace highlo
         submitInfo.pCommandBuffers = &computeCommandBuffer;
         VK_CHECK_RESULT(vkQueueSubmit(computeQueue, 1, &submitInfo, s_ComputeFence));
 
+        // Safety instruction: this is here to wait until the execution of the compute shader is finished
         vkWaitForFences(device, 1, &s_ComputeFence, VK_TRUE, UINT64_MAX);
     }
 
@@ -132,6 +138,7 @@ namespace highlo
     
     void VulkanComputePipeline::SetPushConstants(const void *data, uint32 size, uint32 offset) const
     {
+        HL_ASSERT(m_ActiveComputeCommandbuffer);
         vkCmdPushConstants(m_ActiveComputeCommandbuffer, m_ComputePipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, offset, size, data);
     }
     
@@ -148,16 +155,7 @@ namespace highlo
         pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts.data();
 
         const auto &pushConstantRanges = vulkanShader->GetPushConstantRanges();
-        std::vector<VkPushConstantRange> vulkanPushConstantRanges(pushConstantRanges.size());
-        for (uint32 i = 0; i < pushConstantRanges.size(); ++i)
-        {
-            const auto &pushConstantRange = pushConstantRanges[i];
-            auto &vulkanPushConstantRange = vulkanPushConstantRanges[i];
-
-            vulkanPushConstantRange.stageFlags = pushConstantRange.Stage;
-            vulkanPushConstantRange.offset = pushConstantRange.Offset;
-            vulkanPushConstantRange.size = pushConstantRange.Size;
-        }
+        std::vector<VkPushConstantRange> vulkanPushConstantRanges = utils::PushConstantRangeToVulkanPushConstantRange(pushConstantRanges);
 
         if (pushConstantRanges.size())
         {
@@ -167,22 +165,19 @@ namespace highlo
 
         VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &m_ComputePipelineLayout));
 
-        VkComputePipelineCreateInfo computePipelineCreateInfo = {};
-        computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-        computePipelineCreateInfo.layout = m_ComputePipelineLayout;
-        computePipelineCreateInfo.flags = 0;
+        VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+        pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+        VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &m_PipelineCache));
 
         const auto &shaderStages = vulkanShader->GetPipelineShaderStageCreateInfos();
         HL_ASSERT(shaderStages.size() > 0);
 
+        VkComputePipelineCreateInfo computePipelineCreateInfo = {};
+        computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        computePipelineCreateInfo.layout = m_ComputePipelineLayout;
+        computePipelineCreateInfo.flags = 0;
         computePipelineCreateInfo.stage = shaderStages[0];
-
-        VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-        pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-
-        VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &m_PipelineCache));
         VK_CHECK_RESULT(vkCreateComputePipelines(device, m_PipelineCache, 1, &computePipelineCreateInfo, nullptr, &m_ComputePipeline));
-
         utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_PIPELINE, m_Shader->GetName(), m_ComputePipeline);
     }
 }

@@ -34,7 +34,7 @@ namespace highlo
         const bool enableAftermath = true;
 
         // Do we need to enable any other extensions (eg. NV_RAYTRACING?)
-        std::vector<const char *> deviceExtensions;
+        std::vector<const char*> deviceExtensions;
         // If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
         HL_ASSERT(m_PhysicalDevice->IsExtensionSupported(VK_KHR_SWAPCHAIN_EXTENSION_NAME));
         deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);

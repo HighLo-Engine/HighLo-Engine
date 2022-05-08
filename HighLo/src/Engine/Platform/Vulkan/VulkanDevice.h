@@ -33,8 +33,7 @@ namespace highlo
 		VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
 		VkQueue GetComputeQueue() { return m_ComputeQueue; }
 
-		// TODO: Maybe extract the begin parameter into a new function like CreateNewCommandBuffer? 
-		// or GetCommandBuffer for this version and CreateCommandBuffer for the starting version?
+		// TODO: Maybe extract the begin parameter into a new function like CreateAndStartCommandBuffer? 
 		VkCommandBuffer CreateCommandBuffer(bool begin, bool compute = false);
 		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName = "") const;
 

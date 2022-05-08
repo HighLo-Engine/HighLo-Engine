@@ -97,6 +97,8 @@ namespace highlo
         else
         {
             Ref<VulkanSwapChain> swapchain = HLApplication::Get().GetWindow().GetSwapChain();
+            HL_ASSERT(swapchain);
+
             m_RenderPass = swapchain->GetRenderPass();
 
             m_ClearValues.clear();

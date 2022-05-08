@@ -471,6 +471,17 @@ namespace highlo
 			shaderSources[stage] = stageStr;
 		}
 
+		// Cleanup: make sure nothing is before a #version command
+		for (auto &[stage, source] : shaderSources)
+		{
+			uint32 versionPos = source.IndexOf("#version");
+			if (versionPos > 0)
+			{
+				HLString newS = source.Substr(versionPos);
+				shaderSources[stage] = newS;
+			}
+		}
+
 		return shaderSources;
 	}
 }

@@ -48,6 +48,7 @@ namespace highlo
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
 
 		// OpenGL-specific
+		/*
 		virtual void SetUniform(const HLString &fullname, float value);
 		virtual void SetUniform(const HLString &fullname, int32 value);
 		virtual void SetUniform(const HLString &fullname, const glm::ivec2 &value);
@@ -60,6 +61,7 @@ namespace highlo
 		virtual void SetUniform(const HLString &fullname, const glm::mat2 &value);
 		virtual void SetUniform(const HLString &fullname, const glm::mat3 &value);
 		virtual void SetUniform(const HLString &fullname, const glm::mat4 &value);
+		*/
 
 		static void ClearUniformBuffers();
 
@@ -86,6 +88,7 @@ namespace highlo
 		void ParseConstantBuffers(const spirv_cross::CompilerGLSL &compiler);
 		int32 GetUniformLocation(const HLString &name) const;
 
+		/*
 		void UploadUniformInt(uint32 location, int32 value);
 		void UploadUniformIntArray(uint32 location, int32 *values, int32 count);
 		void UploadUniformFloat(uint32 location, float value);
@@ -109,6 +112,7 @@ namespace highlo
 		void UploadUniformMat2(const HLString &name, const glm::mat2 &value);
 		void UploadUniformMat3(const HLString &name, const glm::mat3 &value);
 		void UploadUniformMat4(const HLString &name, const glm::mat4 &value);
+		*/
 
 	private:
 

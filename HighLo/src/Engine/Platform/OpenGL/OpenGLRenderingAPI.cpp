@@ -220,9 +220,6 @@ namespace highlo
 		if (!depthTest)
 			SetDepthTest(false);
 
-		if (material->Has("u_Renderer.Transform"))
-			material->Set("u_Renderer.Transform", localTransform);
-
 		material->UpdateForRendering();
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
 
@@ -248,9 +245,6 @@ namespace highlo
 
 		if (material)
 		{
-			if (material->Has("u_Renderer.Transform"))
-				material->Set("u_Renderer.Transform", transform);
-
 			material->UpdateForRendering();
 			SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 		}
@@ -271,9 +265,6 @@ namespace highlo
 			// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
-				if (material->Has("u_Renderer.Transform"))
-					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-
 				material->UpdateForRendering();
 				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 			}
@@ -284,7 +275,8 @@ namespace highlo
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
 				}
 			}
 
@@ -305,9 +297,6 @@ namespace highlo
 			// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
-				if (material->Has("u_Renderer.Transform"))
-					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-
 				material->UpdateForRendering();
 				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 			}
@@ -318,7 +307,8 @@ namespace highlo
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+				// 	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
 				}
 			}
 
@@ -338,10 +328,7 @@ namespace highlo
 			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
 			// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
-			{
-				if (material->Has("u_Renderer.Transform"))
-					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-				
+			{				
 				material->UpdateForRendering();
 				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 			}
@@ -352,7 +339,8 @@ namespace highlo
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
 				}
 			}
 
@@ -373,9 +361,6 @@ namespace highlo
 			// TODO: This if is temporary because we do not have the material system setup yet
 			if (material)
 			{
-				if (material->Has("u_Renderer.Transform"))
-					material->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-
 				material->UpdateForRendering();
 				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 			}
@@ -386,7 +371,8 @@ namespace highlo
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
 				}
 			}
 
@@ -401,11 +387,8 @@ namespace highlo
 		model->Get()->GetIndexBuffer()->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
-		for (Mesh submesh : submeshes)
+		for (Mesh &submesh : submeshes)
 		{
-			if (overrideMaterial->Has("u_Renderer.Transform"))
-				overrideMaterial->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-
 			overrideMaterial->UpdateForRendering();
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
@@ -415,7 +398,8 @@ namespace highlo
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
 				}
 			}
 
@@ -430,11 +414,8 @@ namespace highlo
 		model->Get()->GetIndexBuffer()->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
-		for (Mesh submesh : submeshes)
+		for (Mesh &submesh : submeshes)
 		{
-			if (overrideMaterial->Has("u_Renderer.Transform"))
-				overrideMaterial->Set("u_Renderer.Transform", submesh.LocalTransform.GetTransform());
-
 			overrideMaterial->UpdateForRendering();
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
@@ -444,7 +425,8 @@ namespace highlo
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
 				}
 			}
 
@@ -565,7 +547,8 @@ namespace highlo
 
 		Ref<OpenGLShader> preethamSkyShader = Renderer::GetShaderLibrary()->Get("PreethamSky").As<OpenGLShader>();
 		preethamSkyShader->Bind();
-		preethamSkyShader->SetUniform("u_Uniforms.TurbidityAzimuthInclination", params);
+		// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+	//	preethamSkyShader->SetUniform("u_Uniforms.TurbidityAzimuthInclination", params);
 
 		return envMap;
 	}

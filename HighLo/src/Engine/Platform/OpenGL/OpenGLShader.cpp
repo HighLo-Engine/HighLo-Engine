@@ -340,89 +340,199 @@ namespace highlo
 		m_Macros[name] = value;
 	}
 	
+	/*
 	void OpenGLShader::SetUniform(const HLString &fullname, float value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform1f(location, value);
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform1f(location, value);
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+			
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, int32 value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform1i(location, value);
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform1i(location, value);
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec2 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform2i(location, value.x, value.y);
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform2i(location, value.x, value.y);
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec3 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform3i(location, value.x, value.y, value.z);
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform3i(location, value.x, value.y, value.z);
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::ivec4 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform4i(location, value.x, value.y, value.z, value.w);
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform4i(location, value.x, value.y, value.z, value.w);
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, uint32 value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform1ui(location, value);
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform1ui(location, value);
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec2 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform2fv(location, 1, glm::value_ptr(value));
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform2fv(location, 1, glm::value_ptr(value));
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec3 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform3fv(location, 1, glm::value_ptr(value));
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform3fv(location, 1, glm::value_ptr(value));
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::vec4 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniform4fv(location, 1, glm::value_ptr(value));
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniform4fv(location, 1, glm::value_ptr(value));
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat2 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat3 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
 	
 	void OpenGLShader::SetUniform(const HLString &fullname, const glm::mat4 &value)
 	{
-		HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
-		int32 location = m_UniformLocations.at(fullname);
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		if (!fullname.Contains('.'))
+		{
+			// target uniform is a single uniform with a location
+			HL_ASSERT(m_UniformLocations.find(fullname) != m_UniformLocations.end());
+			int32 location = m_UniformLocations.at(fullname);
+			glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		}
+		else
+		{
+			// target uniform is part of a uniform buffer block
+
+		}
 	}
+	*/
 	
 	void OpenGLShader::ClearUniformBuffers()
 	{
@@ -754,38 +864,6 @@ namespace highlo
 			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
 		#endif // PRINT_DEBUG_OUTPUTS
 		}
-
-		// Little background on the next block:
-		// We do not have single uniforms in our OpenGL implementation anymore, because we group them in uniform structs.
-		// (this way it is easier to handle the shader transition between OpenGL and Vulkan)
-		// so we need a new way to get the uniform locations, this is discussed here: https://stackoverflow.com/a/4970703/12873837
-
-		// TODO: the problem is, that uniforms differ from uniform block members (which are also uniforms). They are not retrieved in the same way by glGetUniformLocation()
-		// So we need to find another way to maybe differentiate between those two? Is it even necessary?
-		// We also could cut the idea of single uniforms and only support uniform buffer blocks...
-
-		/*
-		int32 totalUniforms = -1;
-		glGetProgramiv(m_RendererID, GL_ACTIVE_UNIFORMS, &totalUniforms);
-
-		if (totalUniforms != -1)
-		{
-			for (int32 i = 0; i < totalUniforms; ++i)
-			{
-				int32 nameLength = -1;
-				int32 uniformSize = -1;
-				GLenum uniformType = GL_ZERO;
-				char uniformName[128];
-
-				glGetActiveUniform(m_RendererID, GLuint(i), sizeof(uniformName) - 1, &nameLength, &uniformSize, &uniformType, uniformName);
-				int32 location = GetUniformLocation(uniformName);
-				if (location != -1)
-				{
-					m_UniformLocations[uniformName] = location;
-				}
-			}
-		}
-		*/
 
 	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Special macros: {0}", m_AcknowledgedMacros.size());
@@ -1165,6 +1243,7 @@ namespace highlo
 		return result;
 	}
 	
+	/*
 	void OpenGLShader::UploadUniformInt(uint32 location, int32 value)
 	{
 		glUniform1i(location, value);
@@ -1274,6 +1353,7 @@ namespace highlo
 		int32 location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
+	*/
 }
 
 #endif

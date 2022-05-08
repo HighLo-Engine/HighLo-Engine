@@ -254,6 +254,7 @@ namespace highlo
 			{
 				for (auto &[name, uniform] : buffer.Uniforms)
 				{
+					/*
 					switch (uniform.GetType())
 					{
 						case ShaderUniformType::Bool:
@@ -341,7 +342,6 @@ namespace highlo
 							break;
 						}
 
-						/*
 						case ShaderUniformType::Struct:
 						{
 							std::vector<OpenGLShader::ShaderUniformStruct> structs = shader->GetUniformStructs();
@@ -450,7 +450,6 @@ namespace highlo
 
 						break;
 						}
-						*/
 
 						default:
 						{
@@ -458,6 +457,7 @@ namespace highlo
 							break;
 						}
 					}
+					*/
 				}
 			}
 		}

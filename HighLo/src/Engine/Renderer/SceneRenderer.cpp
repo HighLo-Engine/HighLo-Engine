@@ -718,7 +718,7 @@ namespace highlo
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	
-		m_CompositeMaterial->Set("Uniforms.Exposure", exposure);
+		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
 		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
 	
 		Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);

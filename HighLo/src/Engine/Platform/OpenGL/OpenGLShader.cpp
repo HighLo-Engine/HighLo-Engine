@@ -386,7 +386,7 @@ namespace highlo
 			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
 			if (activeBuffers.size())
 			{
-				const auto &name = resource.name;
+				const auto &name = compiler.get_name(resource.id); // this is necessary to get the instance name instead of the structure name
 				auto &bufferType = compiler.get_type(resource.base_type_id);
 				uint32 memberCount = (uint32)bufferType.member_types.size();
 				uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
@@ -484,50 +484,6 @@ namespace highlo
 				HL_CORE_TRACE("  Size: {0}", size);
 				HL_CORE_TRACE("-------------------");
 			#endif // PRINT_DEBUG_OUTPUTS
-			}
-		}
-
-	#if PRINT_DEBUG_OUTPUTS
-		HL_CORE_TRACE("Push Constant Buffers: {0}", resources.push_constant_buffers.size());
-	#endif // PRINT_DEBUG_OUTPUTS
-
-		for (const auto &resource : resources.push_constant_buffers)
-		{
-			const auto &bufferName = resource.name;
-			auto &bufferType = compiler.get_type(resource.type_id);
-			uint32 bufferSize = (uint32)compiler.get_declared_struct_size(bufferType);
-			uint32 memberCount = (uint32)bufferType.member_types.size();
-			uint32 bufferOffset = 0;
-			if (m_PushConstantRanges.size())
-				bufferOffset = m_PushConstantRanges.back().Offset + m_PushConstantRanges.back().Size;
-
-			auto &pushConstantRange = m_PushConstantRanges.emplace_back();
-			pushConstantRange.Stage = shaderStage;
-			pushConstantRange.Size = bufferSize - bufferOffset;
-			pushConstantRange.Offset = bufferOffset;
-
-			if (bufferName.empty() || bufferName == "u_Renderer")
-				continue;
-
-			ShaderBuffer &shaderBuffer = m_Buffers[bufferName];
-			shaderBuffer.Name = bufferName;
-			shaderBuffer.Size = bufferSize - bufferOffset;
-
-		#if PRINT_DEBUG_OUTPUTS
-			HL_CORE_TRACE("  Name: {0}", bufferName);
-			HL_CORE_TRACE("  Member Count: {0}", memberCount);
-			HL_CORE_TRACE("  Size: {0}", bufferSize);
-		#endif // PRINT_DEBUG_OUTPUTS
-
-			for (uint32 i = 0; i < memberCount; ++i)
-			{
-				auto &type = compiler.get_type(bufferType.member_types[i]);
-				const auto &memberName = compiler.get_member_name(bufferType.self, i);
-				uint32 size = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
-				uint32 offset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
-
-				HLString uniformName = fmt::format("{}.{}", bufferName, memberName);
-				shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SPIRTypeToShaderUniformType(type), size, offset);
 			}
 		}
 

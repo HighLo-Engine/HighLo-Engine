@@ -52,7 +52,6 @@ namespace highlo
 
         VkDescriptorPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.pNext = nullptr;
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         poolInfo.maxSets = 100 * (uint32)IM_ARRAYSIZE(poolSizes);
         poolInfo.poolSizeCount = (uint32)IM_ARRAYSIZE(poolSizes);
@@ -60,6 +59,12 @@ namespace highlo
         
         VkDescriptorPool descriptorPool;
         VK_CHECK_RESULT(vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool));
+
+    #ifdef HIGHLO_API_GLFW
+        ImGui_ImplGlfw_InitForVulkan((GLFWwindow *)window->GetNativeHandle(), true);
+    #else
+        ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
+    #endif // HIGHLO_API_GLFW
 
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = VulkanContext::GetInstance();
@@ -74,13 +79,15 @@ namespace highlo
         initInfo.ImageCount = swapChain->GetImageCount();
         initInfo.CheckVkResultFn = utils::VulkanCheckResult;
 
-    #ifdef HIGHLO_API_GLFW
-        ImGui_ImplGlfw_InitForVulkan((GLFWwindow*)window->GetNativeHandle(), true);
-    #else
-        ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
-    #endif // HIGHLO_API_GLFW
-
         ImGui_ImplVulkan_Init(&initInfo, swapChain->GetRenderPass());
+
+        // Upload fonts
+        VkCommandBuffer commandBuffer = VulkanContext::GetCurrentDevice()->CreateCommandBuffer(true);
+        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+        VulkanContext::GetCurrentDevice()->FlushCommandBuffer(commandBuffer);
+        
+        VK_CHECK_RESULT(vkDeviceWaitIdle(device));
+        ImGui_ImplVulkan_DestroyFontUploadObjects();
 
         uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
         s_ImGuiCommandBuffers.resize(framesInFlight);
@@ -90,6 +97,8 @@ namespace highlo
 
     void VulkanImGuiRenderer::Shutdown()
     {
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+        VK_CHECK_RESULT(vkDeviceWaitIdle(device));
         ImGui_ImplVulkan_Shutdown();
     }
 
@@ -174,13 +183,6 @@ namespace highlo
         
         vkCmdEndRenderPass(drawCommandBuffer);
         VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffer));
-
-        ImGuiIO &io = ImGui::GetIO(); (void)io;
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
     }
 }
 

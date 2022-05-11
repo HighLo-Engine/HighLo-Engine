@@ -35,9 +35,8 @@ namespace highlo
 				case TextureFormat::RGBA32F:
 					return GL_RGBA;
 				
-				case TextureFormat::Depth:
-					return GL_DEPTH_STENCIL;
-
+				case TextureFormat::DEPTH24STENCIL8:
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
 				case TextureFormat::DEPTH32F:
 					return GL_DEPTH_STENCIL;
 
@@ -83,6 +82,9 @@ namespace highlo
 
 				case TextureFormat::RED32F:
 					return GL_R32F;
+
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
+					return GL_DEPTH32F_STENCIL8;
 			}
 
 			HL_ASSERT(false);

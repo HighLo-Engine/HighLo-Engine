@@ -870,6 +870,7 @@ namespace highlo
 		shadowMapFramebufferSpec.Height = 4096;
 		shadowMapFramebufferSpec.Attachments = { TextureFormat::DEPTH32F };
 		shadowMapFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		shadowMapFramebufferSpec.DepthClearValue = 1.0f;
 		shadowMapFramebufferSpec.NoResize = true;
 		shadowMapFramebufferSpec.ExistingImage = cascadeDepthImage;
 
@@ -922,7 +923,7 @@ namespace highlo
 	{
 		FramebufferSpecification frameBufferSpec;
 		frameBufferSpec.DebugName = "Geometry";
-		frameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA16F, TextureFormat::Depth };
+		frameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		frameBufferSpec.Samples = 1;
 		frameBufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -1055,7 +1056,7 @@ namespace highlo
 	{
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "ExternalCompositing";
-		framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
+		framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		framebufferSpec.ClearOnLoad = false;
 		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();

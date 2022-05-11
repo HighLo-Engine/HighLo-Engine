@@ -84,7 +84,7 @@ namespace highlo
 
 	private:
 
-		void InvalidateTextureInfo();
+		void InvalidateTextureInfo(TextureFormat format, TextureUsage usage, uint32 width, uint32 height, uint32 mips);
 		void ReleaseTextureInfo();
 		void UpdateDescriptor();
 

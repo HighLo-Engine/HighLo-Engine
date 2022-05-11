@@ -266,18 +266,14 @@ namespace highlo
         VkFormat format = utils::VulkanTextureFormat(m_Specification.Format);
         uint32 mipCount = m_Specification.Properties.GenerateMips ? GetMipLevelCount() : 1;
 
-        InvalidateTextureInfo();
+        InvalidateTextureInfo(m_Specification.Format, m_Specification.Usage, m_Specification.Width, m_Specification.Height, mipCount);
 
         if (m_Buffer)
         {
             VkDeviceSize size = (VkDeviceSize)m_Buffer.Size;
 
-            VkMemoryAllocateInfo allocInfo = {};
-            allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-
             VkBufferCreateInfo bufferCreateInfo = {};
             bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-            bufferCreateInfo.pNext = nullptr;
             bufferCreateInfo.size = size;
             bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
             bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -303,7 +299,6 @@ namespace highlo
             // Transition the texture image layout to transfer target, so we can safely copy our buffer data to it.
             VkImageMemoryBarrier imageMemoryBarrier = {};
             imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-            imageMemoryBarrier.pNext = nullptr;
             imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             imageMemoryBarrier.image = m_Info.Image;
@@ -637,39 +632,40 @@ namespace highlo
         return m_PerMipImageViews.at(mip);
     }
     
-    void VulkanTexture2D::InvalidateTextureInfo()
+    void VulkanTexture2D::InvalidateTextureInfo(TextureFormat format, TextureUsage usage, uint32 width, uint32 height, uint32 mips)
     {
-        HL_ASSERT(m_Specification.Width > 0 && m_Specification.Height > 0);
+        HL_ASSERT(width > 0 && height > 0);
 
+        // Try release first if necessary
         ReleaseTextureInfo();
 
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
-        VkImageUsageFlags usage = VK_IMAGE_USAGE_SAMPLED_BIT;
-        if (m_Specification.Usage == TextureUsage::Attachment)
+
+        VkImageUsageFlags vulkanUsage = VK_IMAGE_USAGE_SAMPLED_BIT; // TODO: this (probably) shouldn't be implied
+        if (usage == TextureUsage::Attachment)
         {
             if (utils::IsDepthFormat(m_Specification.Format))
-                usage |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+                vulkanUsage |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
             else
-                usage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+                vulkanUsage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         }
         else if (m_Specification.Usage == TextureUsage::Texture)
         {
-            usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+            vulkanUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
         }
         else if (m_Specification.Usage == TextureUsage::Storage)
         {
-            usage |= VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+            vulkanUsage |= VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
         }
 
-        VkImageAspectFlags aspectMask = utils::IsDepthFormat(m_Specification.Format) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
-        if (m_Specification.Format == TextureFormat::DEPTH24STENCIL8)
+        VkImageAspectFlags aspectMask = utils::IsDepthFormat(format) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+        if (format == TextureFormat::DEPTH24STENCIL8)
             aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 
-        VkFormat vulkanFormat = utils::VulkanTextureFormat(m_Specification.Format);
+        VkFormat vulkanFormat = utils::VulkanTextureFormat(format);
 
         VkImageCreateInfo imageCreateInfo = {};
         imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        imageCreateInfo.pNext = nullptr;
         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
         imageCreateInfo.format = vulkanFormat;
         imageCreateInfo.extent.width = m_Specification.Width;
@@ -679,14 +675,14 @@ namespace highlo
         imageCreateInfo.arrayLayers = m_Specification.Layers;
         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        imageCreateInfo.usage = usage;
+        imageCreateInfo.usage = vulkanUsage;
         m_Info.MemoryAlloc = utils::AllocateImage(imageCreateInfo, VMA_MEMORY_USAGE_GPU_ONLY, m_Info.Image);
         s_ImageReferences[m_Info.Image] = this;
         utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE, m_Specification.DebugName, m_Info.Image);
 
+        // Create a default image view
         VkImageViewCreateInfo imageViewCreateInfo = {};
         imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        imageViewCreateInfo.pNext = nullptr;
         imageViewCreateInfo.viewType = m_Specification.Layers > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
         imageViewCreateInfo.format = vulkanFormat;
         imageViewCreateInfo.flags = 0;
@@ -698,14 +694,13 @@ namespace highlo
         imageViewCreateInfo.subresourceRange.layerCount = m_Specification.Layers;
         imageViewCreateInfo.image = m_Info.Image;
         VK_CHECK_RESULT(vkCreateImageView(device, &imageViewCreateInfo, nullptr, &m_Info.ImageView));
-        utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, m_Specification.DebugName, m_Info.ImageView);
+        utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("{} default image view", m_Specification.DebugName), m_Info.ImageView);
 
-        // TODO: Renderer should contain a sampler cache
-
+        // TODO: Renderer should contain some kind of sampler cache
         VkSamplerCreateInfo samplerCreateInfo = {};
         samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
         samplerCreateInfo.maxAnisotropy = 1.0f;
-        if (utils::IsIntegerBased(m_Specification.Format))
+        if (utils::IsIntegerBased(format))
         {
             samplerCreateInfo.magFilter = VK_FILTER_NEAREST;
             samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
@@ -727,10 +722,11 @@ namespace highlo
         samplerCreateInfo.maxLod = 100.0f;
         samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
         VK_CHECK_RESULT(vkCreateSampler(device, &samplerCreateInfo, nullptr, &m_Info.Sampler));
-        utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_SAMPLER, fmt::format("{} default sampler", *m_Specification.DebugName), m_Info.Sampler);
+        utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_SAMPLER, fmt::format("{} default sampler", m_Specification.DebugName), m_Info.Sampler);
 
         if (m_Specification.Usage == TextureUsage::Storage)
         {
+            // Transition image to GENERAL layout
             VkCommandBuffer commandBuffer = VulkanContext::GetCurrentDevice()->CreateCommandBuffer(true);
 
             VkImageSubresourceRange subresourceRange = {};
@@ -739,8 +735,8 @@ namespace highlo
             subresourceRange.levelCount = m_Specification.Mips;
             subresourceRange.layerCount = m_Specification.Layers;
 
-            utils::InsertImageMemoryBarrier(commandBuffer, m_Info.Image, 
-                                            0, 0, 
+            utils::InsertImageMemoryBarrier(commandBuffer, m_Info.Image,
+                                            0, 0,
                                             VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL,
                                             VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
                                             subresourceRange);
@@ -786,17 +782,14 @@ namespace highlo
     void VulkanTexture2D::UpdateDescriptor()
     {
         if (m_Specification.Format == TextureFormat::DEPTH24STENCIL8 || m_Specification.Format == TextureFormat::DEPTH32F || m_Specification.Format == TextureFormat::DEPTH32FSTENCIL8UINT)
-        {
             m_DescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-        }
         else if (m_Specification.Usage == TextureUsage::Storage)
-        {
             m_DescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-        }
         else
-        {
             m_DescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        }
+
+        if (m_Specification.Usage == TextureUsage::Storage)
+            m_DescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
         m_DescriptorImageInfo.imageView = m_Info.ImageView;
         m_DescriptorImageInfo.sampler = m_Info.Sampler;

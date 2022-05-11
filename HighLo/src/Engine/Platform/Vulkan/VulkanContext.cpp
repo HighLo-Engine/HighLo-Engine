@@ -75,9 +75,9 @@ namespace highlo
             }
 
             HL_CORE_WARN("{0} {1} message: \n\t{2}\n{3} {4}", VkDebugUtilsMessageType(messageType), VkDebugUtilsMessageSeverity(messageSeverity), pCallbackData->pMessage, *labels, *objects);
+            HL_ASSERT(false, "temporary assert to fix all vulkan issues one by one");
 
             return VK_FALSE;
-
         }
     }
 

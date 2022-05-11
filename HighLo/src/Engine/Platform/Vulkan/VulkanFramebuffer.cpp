@@ -35,13 +35,9 @@ namespace highlo
                 if (m_Specification.ExistingImage && m_Specification.ExistingImage->GetSpecification().Layers > 1)
                 {
                     if (utils::IsDepthFormat(attachmentSpec.Format))
-                    {
                         m_DepthImage = m_Specification.ExistingImage;
-                    }
                     else
-                    {
                         m_AttachmentImages.emplace_back(m_Specification.ExistingImage);
-                    }
                 }
                 else if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
                 {
@@ -217,25 +213,19 @@ namespace highlo
                 attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
                 attachmentDescription.initialLayout = m_Specification.ClearDepthOnLoad ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
                 
+                VkImageLayout layout;
                 if (attachmentSpec.Format == TextureFormat::DEPTH24STENCIL8)
                 {
-                    if (m_Specification.ShouldSample)
-                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-                    else
-                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
+                    layout = m_Specification.ShouldSample ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
                     depthAttachmentReference = { attachmentIndex, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
                 }
                 else
                 {
-                    if (m_Specification.ShouldSample)
-                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL;
-                    else
-                        attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
-
+                    layout = m_Specification.ShouldSample ? VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
                     depthAttachmentReference = { attachmentIndex, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL };
                 }
 
+                attachmentDescription.finalLayout = layout;
                 m_ClearValues[attachmentIndex].depthStencil = { m_Specification.DepthClearValue, 0 };
             }
             else
@@ -293,7 +283,7 @@ namespace highlo
                     attachmentDescription.format = utils::VulkanTextureFormat(attachmentSpec.Format);
                     attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
                     attachmentDescription.loadOp = m_Specification.ClearColorOnLoad ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
-                    attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+                    attachmentDescription.storeOp = m_Specification.ShouldSample ? VK_ATTACHMENT_STORE_OP_STORE : VK_ATTACHMENT_STORE_OP_DONT_CARE;
                     attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
                     attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
                     attachmentDescription.initialLayout = m_Specification.ClearColorOnLoad ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -362,7 +352,6 @@ namespace highlo
         // Create the actual render pass
         VkRenderPassCreateInfo renderPassCreate = {};
         renderPassCreate.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassCreate.pNext = nullptr;
         renderPassCreate.attachmentCount = (uint32)attachmentDescriptions.size();
         renderPassCreate.pAttachments = attachmentDescriptions.data();
         renderPassCreate.subpassCount = 1;
@@ -377,13 +366,9 @@ namespace highlo
         {
             Ref<VulkanTexture2D> texture = m_AttachmentImages[i].As<VulkanTexture2D>();
             if (texture->GetSpecification().Layers > 1)
-            {
                 attachments[i] = texture->GetLayerImageView(m_Specification.ExistingImageLayers[i]);
-            }
             else
-            {
                 attachments[i] = texture->GetTextureInfo().ImageView;
-            }
 
             HL_ASSERT(attachments[i]);
         }
@@ -407,7 +392,6 @@ namespace highlo
         // Create the actual frame buffer
         VkFramebufferCreateInfo framebufferCreate = {};
         framebufferCreate.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferCreate.pNext = nullptr;
         framebufferCreate.renderPass = m_RenderPass;
         framebufferCreate.attachmentCount = (uint32)attachments.size();
         framebufferCreate.pAttachments = attachments.data();

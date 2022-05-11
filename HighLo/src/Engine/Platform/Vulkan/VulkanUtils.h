@@ -243,27 +243,17 @@ namespace highlo::utils
 	}
 
 	// Shader helpers
+
 	static VkShaderStageFlagBits ShaderTypeToVulkanStage(ShaderType type)
 	{
 		switch (type)
 		{
-			case ShaderType::Vertex:
-				return VK_SHADER_STAGE_VERTEX_BIT;
-
-			case ShaderType::Fragment:
-				return VK_SHADER_STAGE_FRAGMENT_BIT;
-
-			case ShaderType::Compute:
-				return VK_SHADER_STAGE_COMPUTE_BIT;
-
-			case ShaderType::TessControl:
-				return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-
-			case ShaderType::TessEvaluation:
-				return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-
-			case ShaderType::Geometry:
-				return VK_SHADER_STAGE_GEOMETRY_BIT;
+			case ShaderType::Vertex:		 return VK_SHADER_STAGE_VERTEX_BIT;
+			case ShaderType::Fragment:		 return VK_SHADER_STAGE_FRAGMENT_BIT;
+			case ShaderType::Compute:		 return VK_SHADER_STAGE_COMPUTE_BIT;
+			case ShaderType::TessControl:	 return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+			case ShaderType::TessEvaluation: return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+			case ShaderType::Geometry:		 return VK_SHADER_STAGE_GEOMETRY_BIT;
 		}
 
 		HL_ASSERT(false);
@@ -274,25 +264,15 @@ namespace highlo::utils
 	{
 		switch (stage)
 		{
-			case VK_SHADER_STAGE_VERTEX_BIT:
-				return ShaderType::Vertex;
-
-			case VK_SHADER_STAGE_FRAGMENT_BIT:
-				return ShaderType::Fragment;
-
-			case VK_SHADER_STAGE_COMPUTE_BIT:
-				return ShaderType::Compute;
-
-			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:
-				return ShaderType::TessControl;
-
-			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:
-				return ShaderType::TessEvaluation;
-
-			case VK_SHADER_STAGE_GEOMETRY_BIT:
-				return ShaderType::Geometry;
+			case VK_SHADER_STAGE_VERTEX_BIT:				  return ShaderType::Vertex;
+			case VK_SHADER_STAGE_FRAGMENT_BIT:				  return ShaderType::Fragment;
+			case VK_SHADER_STAGE_COMPUTE_BIT:				  return ShaderType::Compute;
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:	  return ShaderType::TessControl;
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT: return ShaderType::TessEvaluation;
+			case VK_SHADER_STAGE_GEOMETRY_BIT:				  return ShaderType::Geometry;
 		}
 
+		HL_ASSERT(false);
 		return ShaderType::None;
 	}
 
@@ -300,12 +280,12 @@ namespace highlo::utils
 	{
 		switch (stage)
 		{
-		case VK_SHADER_STAGE_VERTEX_BIT:                    return "__VERTEX_STAGE__";
-		case VK_SHADER_STAGE_FRAGMENT_BIT:                  return "__FRAGMENT_STAGE__";
-		case VK_SHADER_STAGE_COMPUTE_BIT:                   return "__COMPUTE_STAGE__";
-		case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:      return "__TESS_CONTROL_STAGE__";
-		case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:   return "__TESS_EVAL_STAGE__";
-		case VK_SHADER_STAGE_GEOMETRY_BIT:                  return "__GEOMETRY_STAGE__";
+			case VK_SHADER_STAGE_VERTEX_BIT:                    return "__VERTEX_STAGE__";
+			case VK_SHADER_STAGE_FRAGMENT_BIT:                  return "__FRAGMENT_STAGE__";
+			case VK_SHADER_STAGE_COMPUTE_BIT:                   return "__COMPUTE_STAGE__";
+			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:      return "__TESS_CONTROL_STAGE__";
+			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:   return "__TESS_EVAL_STAGE__";
+			case VK_SHADER_STAGE_GEOMETRY_BIT:                  return "__GEOMETRY_STAGE__";
 		}
 
 		HL_ASSERT(false);

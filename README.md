@@ -6,6 +6,10 @@
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.
 
+It's primary purpose is to learn about 3D graphics and game engine design in general. But in the last year we developed ideas of features that we would like to implement as well, which will be the core-features of this engine at some point. Further information will follow, as soon as we built up the base engine :)
+
+Feel free to contribute at any time, but it would be better to discuss major changes in an issue first.
+
 # Getting started
 
 ```sh
@@ -34,9 +38,9 @@ These two modules are needed to automatically download the right Vulkan SDK from
 
 # Supported platforms
 
-| Linux | Windows | MacOS | Android | IOS | Web |
+| Windows | Linux | MacOS | Android | IOS | Web |
 |:--------:| :-: | :-: | :-: | :-: | :-: |
-| X    | ✓ | X | X | X | X |
+| ✓    | X | X | X | X | X |
 
 # Supported rendering APIs
 

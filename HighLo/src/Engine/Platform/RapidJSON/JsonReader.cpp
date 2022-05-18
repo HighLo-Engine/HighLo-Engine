@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "JsonReader.h"
 
+#if 0
+
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Utils/LoaderUtils.h"
 #include "JsonHelper.h"
@@ -1082,3 +1084,4 @@ namespace highlo
 	}
 }
 
+#endif

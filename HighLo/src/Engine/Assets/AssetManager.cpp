@@ -148,9 +148,6 @@ namespace highlo
 		if (!FileSystem::Get()->FileExists(assetRegistryPath))
 			return;
 
-		Ref<DocumentReader> reader = DocumentReader::Create(assetRegistryPath, DocumentType::Json);
-		reader->ReadContents();
-
 		// TODO
 	}
 

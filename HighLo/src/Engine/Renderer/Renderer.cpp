@@ -264,7 +264,7 @@ namespace highlo
 		s_ShaderDepedencies[shader->GetHash()].Materials.push_back(material);
 	}
 
-	void Renderer::BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, Ref<RenderPass> &renderPass, bool shouldClear)
+	void Renderer::BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear)
 	{
 		HL_ASSERT(renderPass, "Renderpass can not be null!");
 		s_RenderingAPI->BeginRenderPass(renderCommandBuffer, renderPass, shouldClear);

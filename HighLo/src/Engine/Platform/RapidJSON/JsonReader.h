@@ -7,6 +7,8 @@
 
 #pragma once
 
+#if 0
+
 #include "Engine/Loaders/DocumentReader.h"
 
 #include <rapidjson/document.h>
@@ -86,3 +88,4 @@ namespace highlo
 	};
 }
 
+#endif

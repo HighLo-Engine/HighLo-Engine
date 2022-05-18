@@ -53,7 +53,7 @@ namespace highlo
 		HLAPI static void BeginFrame();
 		HLAPI static void EndFrame();
 
-		HLAPI static void BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, Ref<RenderPass> &renderPass, bool shouldClear = false);
+		HLAPI static void BeginRenderPass(Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear = false);
 		HLAPI static void EndRenderPass(Ref<CommandBuffer> &renderCommandBuffer);
 
 		HLAPI static void ClearScreenColor(const glm::vec4 &color);
@@ -215,7 +215,7 @@ namespace highlo
 
 		static UniqueRef<RenderingAPI> s_RenderingAPI;
 
-		friend class CoreRenderer;
+	//	friend class CoreRenderer;
 		friend class Renderer2D;
 	};
 

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#if 0
+
 #include "Engine/Core/FileSystemPath.h"
 #include "DocumentType.h"
 
@@ -75,3 +77,4 @@ namespace highlo
 	};
 }
 
+#endif

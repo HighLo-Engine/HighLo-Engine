@@ -2,92 +2,41 @@
 
 //
 // version history:
-//     - 1.0 (2022-03-08) initial release
+//     - 1.0 (2022-01-10) initial release
 //
 
-/**
- * =========================================================================================================
- *													API usage
- * =========================================================================================================
+/*
+ * Here we got the following situation:
+ * The XML format from the engine is in general type-safe, meaning the type is always known by the XMLWriter class.
+ * This is done by writing the type name as the node name into the format, however we got one big exception:
  *
- * Example #1:
- * -----------
+ * Matrices, Vectors and Quaternions are assumed to have always a float-datatype, because their node names are already taken by the values's location.
+ * The future will show, if this assumption is true or if their will be a special case, where we would need to store a ivec4 for example to disk in a XML format...
+ * Then the XML formatter would have to be re-visited.
  *
- * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
- * writer->WriteString("Hello", "World");
- * writer->WriteUint64("number", 64);
- * writer->WriteOut();
+ * Current Vector format: (in this example a 2-dimensional vector)
+ * <vector2 key="someKey">
+ *   <x>20.2</x>
+ *   <y>2242.2</y>
+ * </vector2>
  *
- * -> should result in XML:
- * <?xml version="1.0.0">
- * <HighLo version="1.0.0">
- *   <string key="Hello">World</string>
- *   <uint64 key="number">64</uint64>
- * </HighLo>
+ * The above format assumes that the nodes x, y hold a float value!
  *
- * Example #2:
- * -----------
+ * Current matrix format: (in this example a 2x2 matrix)
+ * <matrix2 key="someKey">
+ *   <m00>434.5</m00>
+ *   <m01>42.5</m01>
+ *   <m10>53.5</m10>
+ *   <m11>76.5</m11>
+ * </matrix2>
  *
- * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
- * writer->BeginObject();
- * writer->WriteString("Hello", "World");
- * writer->WriteUInt64("number", 64);
- * writer->EndObject();
- * writer->WriterOut();
- *
- * -> should result in XML:
- * <?xml version="1.0.0">
- * <HighLo version="1.0.0">
- *   <string key="Hello">World</string>
- *   <uint64 key="number">64</uint64>
- * </HighLo>
- *
- * Example #3:
- * -----------
- *
- * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
- * writer->BeginArray();
- * writer->WriteString("Hello", "World");
- * writer->WriteUInt64("number", 64);
- * writer->EndArray();
- * writer->WriteOut();
- *
- * -> should result in XML:
- * <?xml version="1.0.0">
- * <HighLo version="1.0.0">
- *   <array>
- *     <string>World</string>
- *     <uint64>64</uint64>
- *   </array>
- * </HighLo>
- *
- * Example #4:
- * -----------
- *
- * Ref<DocumentWriter> writer = DocumentWriter::Create("<filepath>");
- * writer->BeginArray();
- * for ()
- *   writer->BeginObject();
- *   writer->WriteString("Hello", "World");
- *   writer->WriteUInt64("number", 64);
- *   writer->EndObject();
- * endfor
- * writer->EndArray();
- * writer->WriteOut();
- *
- * -> should result in XML:
- * <?xml version="1.0.0">
- * <HighLo version="1.0.0">
- *   <arraymap>
- *     <string key="Hello">World</string>
- *     <uint64 key="number">64</uint64>
- *   </arraymap>
- * </HighLo>
+ * The node names are corresponding to the matrix position, m00 would be the 0th row and the 0th column, ...
  */
 
 #pragma once
 
 #include "Engine/Loaders/DocumentWriter.h"
+#include "XMLHelper.h"
 
 #include <rapidxml/rapidxml.hpp>
 
@@ -101,13 +50,10 @@ namespace highlo
 		virtual ~XMLWriter();
 
 		virtual void BeginArray() override;
-		virtual void EndArray(const HLString &key = "") override;
+		virtual void EndArray(const HLString &key = "", bool rawData = false) override;
 
 		virtual void BeginObject() override;
-		virtual void EndObject(const HLString &key = "") override;
-
-		virtual void EnableTypeSafety() override { m_UseTypeSafety = true; }
-		virtual void DisableTypeSafety() override { HL_ASSERT(m_UseTypeSafety, "Type safety is already disabled, did you forget to call EnableTypeSafety()?");  m_UseTypeSafety = false; }
+		virtual void EndObject(bool rawData = false) override;
 
 		virtual bool WriteFloat(const HLString &key, float value) override;
 		virtual bool WriteDouble(const HLString &key, double value) override;
@@ -126,51 +72,97 @@ namespace highlo
 		virtual bool WriteMat4(const HLString &key, const glm::mat4 &value) override;
 		virtual bool WriteQuaternion(const HLString &key, const glm::quat &value) override;
 
-		virtual bool WriteStringArray(const HLString &key, const std::vector<HLString> &value) override;
-		virtual bool WriteInt32Array(const HLString &key, const std::vector<int32> &value) override;
-		virtual bool WriteUInt32Array(const HLString &key, const std::vector<uint32> &value) override;
-		virtual bool WriteInt64Array(const HLString &key, const std::vector<int64> &value) override;
-		virtual bool WriteUInt64Array(const HLString &key, const std::vector<uint64> &value) override;
-		virtual bool WriteBoolArray(const HLString &key, const std::vector<bool> &value) override;
-		virtual bool WriteFloatArray(const HLString &key, const std::vector<float> &value) override;
-		virtual bool WriteDoubleArray(const HLString &key, const std::vector<double> &value) override;
-		virtual bool WriteVec2Array(const HLString &key, const std::vector<glm::vec2> &value) override;
-		virtual bool WriteVec3Array(const HLString &key, const std::vector<glm::vec3> &value) override;
-		virtual bool WriteVec4Array(const HLString &key, const std::vector<glm::vec4> &value) override;
-		virtual bool WriteMat2Array(const HLString &key, const std::vector<glm::mat2> &value) override;
-		virtual bool WriteMat3Array(const HLString &key, const std::vector<glm::mat3> &value) override;
-		virtual bool WriteMat4Array(const HLString &key, const std::vector<glm::mat4> &value) override;
-		virtual bool WriteQuaternionArray(const HLString &key, const std::vector<glm::quat> &value) override;
+		virtual bool WriteStringArray(const HLString &key, std::vector<HLString> &value) override;
+		virtual bool WriteInt32Array(const HLString &key, std::vector<int32> &value) override;
+		virtual bool WriteUInt32Array(const HLString &key, std::vector<uint32> &value) override;
+		virtual bool WriteInt64Array(const HLString &key, std::vector<int64> &value) override;
+		virtual bool WriteUInt64Array(const HLString &key, std::vector<uint64> &value) override;
+		virtual bool WriteBoolArray(const HLString &key, std::vector<bool> &value) override;
+		virtual bool WriteFloatArray(const HLString &key, std::vector<float> &value) override;
+		virtual bool WriteDoubleArray(const HLString &key, std::vector<double> &value) override;
 
-		virtual bool WriteStringArrayMap(const HLString &key, const std::map<HLString, HLString> &map) override;
-		virtual bool WriteInt32ArrayMap(const HLString &key, const std::map<HLString, int32> &map) override;
-		virtual bool WriteUInt32ArrayMap(const HLString &key, const std::map<HLString, uint32> &map) override;
-		virtual bool WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map) override;
-		virtual bool WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map) override;
-		virtual bool WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map) override;
-		virtual bool WriteFloatArrayMap(const HLString &key, const std::map<HLString, float> &map) override;
-		virtual bool WriteDoubleArrayMap(const HLString &key, const std::map<HLString, double> &map) override;
-		virtual bool WriteVec2ArrayMap(const HLString &key, const std::map<HLString, glm::vec2> &map) override;
-		virtual bool WriteVec3ArrayMap(const HLString &key, const std::map<HLString, glm::vec3> &map) override;
-		virtual bool WriteVec4ArrayMap(const HLString &key, const std::map<HLString, glm::vec4> &map) override;
-		virtual bool WriteMat2ArrayMap(const HLString &key, const std::map<HLString, glm::mat2> &map) override;
-		virtual bool WriteMat3ArrayMap(const HLString &key, const std::map<HLString, glm::mat3> &map) override;
-		virtual bool WriteMat4ArrayMap(const HLString &key, const std::map<HLString, glm::mat4> &map) override;
-		virtual bool WriteQuaternionArrayMap(const HLString &key, const std::map<HLString, glm::quat> &map) override;
+		virtual bool WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value) override;
+		virtual bool WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value) override;
+		virtual bool WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value) override;
+		virtual bool WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value) override;
+		virtual bool WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value) override;
+		virtual bool WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value) override;
+		virtual bool WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value) override;
 
+		virtual bool ReadStringArray(const HLString &key, std::vector<HLString> &result) override;
+		virtual bool ReadInt32Array(const HLString &key, std::vector<int32> &result) override;
+		virtual bool ReadUInt32Array(const HLString &key, std::vector<uint32> &result) override;
+		virtual bool ReadInt64Array(const HLString &key, std::vector<int64> &result) override;
+		virtual bool ReadUInt64Array(const HLString &key, std::vector<uint64> &result) override;
+		virtual bool ReadBoolArray(const HLString &key, std::vector<bool> &result) override;
+		virtual bool ReadFloatArray(const HLString &key, std::vector<float> &result) override;
+		virtual bool ReadDoubleArray(const HLString &key, std::vector<double> &result) override;
+		virtual bool ReadVec2Array(const HLString &key, std::vector<glm::vec2> &result) override;
+		virtual bool ReadVec3Array(const HLString &key, std::vector<glm::vec3> &result) override;
+		virtual bool ReadVec4Array(const HLString &key, std::vector<glm::vec4> &result) override;
+		virtual bool ReadMat2Array(const HLString &key, std::vector<glm::mat2> &result) override;
+		virtual bool ReadMat3Array(const HLString &key, std::vector<glm::mat3> &result) override;
+		virtual bool ReadMat4Array(const HLString &key, std::vector<glm::mat4> &result) override;
+		virtual bool ReadQuatArray(const HLString &key, std::vector<glm::quat> &result) override;
+
+		virtual bool ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result) override;
+		virtual bool ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result) override;
+		virtual bool ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result) override;
+		virtual bool ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result) override;
+		virtual bool ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result) override;
+		virtual bool ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result) override;
+		virtual bool ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result) override;
+		virtual bool ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result) override;
+		virtual bool ReadVec2ArrayMap(const HLString &key, std::map<HLString, glm::vec2> &result) override;
+		virtual bool ReadVec3ArrayMap(const HLString &key, std::map<HLString, glm::vec3> &result) override;
+		virtual bool ReadVec4ArrayMap(const HLString &key, std::map<HLString, glm::vec4> &result) override;
+		virtual bool ReadMat2ArrayMap(const HLString &key, std::map<HLString, glm::mat2> &result) override;
+		virtual bool ReadMat3ArrayMap(const HLString &key, std::map<HLString, glm::mat3> &result) override;
+		virtual bool ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &result) override;
+		virtual bool ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &result) override;
+
+		virtual bool ReadFloat(const HLString &key, float *result) override;
+		virtual bool ReadDouble(const HLString &key, double *result) override;
+		virtual bool ReadInt32(const HLString &key, int32 *result) override;
+		virtual bool ReadUInt32(const HLString &key, uint32 *result) override;
+		virtual bool ReadInt64(const HLString &key, int64 *result) override;
+		virtual bool ReadUInt64(const HLString &key, uint64 *result) override;
+		virtual bool ReadBool(const HLString &key, bool *result) override;
+		virtual bool ReadString(const HLString &key, HLString *result) override;
+
+		virtual bool ReadVector2(const HLString &key, glm::vec2 *result) override;
+		virtual bool ReadVector3(const HLString &key, glm::vec3 *result) override;
+		virtual bool ReadVector4(const HLString &key, glm::vec4 *result) override;
+		virtual bool ReadMatrix2(const HLString &key, glm::mat2 *result) override;
+		virtual bool ReadMatrix3(const HLString &key, glm::mat3 *result) override;
+		virtual bool ReadMatrix4(const HLString &key, glm::mat4 *result) override;
+		virtual bool ReadQuaternion(const HLString &key, glm::quat *result) override;
+
+		virtual bool HasKey(const HLString &key) const override;
 		virtual bool WriteOut() override;
+		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
 		virtual HLString GetContent(bool prettify = false) override;
 		virtual void SetContent(const HLString &content) override;
 
 	private:
 
+		bool HasKeyInternal(rapidxml::xml_node<> *parent, const HLString &key) const;
+
+		bool Write(const HLString &key, DocumentDataType type, const std::function<rapidxml::xml_node<> *()> &insertFunc);
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<> *)> &insertFunc);
+
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<> *)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString &, rapidxml::xml_node<> *)> &insertFunc);
+
 		FileSystemPath m_FilePath;
 		rapidxml::xml_document<> m_Document;
 		rapidxml::xml_node<> *m_RootNode = nullptr;
+		HLString m_EngineVersion;
+
+		std::vector<rapidxml::xml_node<> *> m_TempBuffers;
+		rapidxml::xml_node<> *m_TempBuffer = nullptr;
 
 		bool m_ShouldWriteIntoArray = false;
 		bool m_ShouldWriteIntoObject = false;
-		bool m_UseTypeSafety = true;
 	};
 }
-

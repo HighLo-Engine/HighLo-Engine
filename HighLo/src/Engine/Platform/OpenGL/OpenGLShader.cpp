@@ -352,8 +352,10 @@ namespace highlo
 			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+] Trying to create shader {0}... [+]", **m_AssetPath);
 
 			m_ShaderSources = PreProcess(source);
+			bool shaderCacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
+
 			std::unordered_map<uint32, std::vector<uint32>> shaderData;
-			CompileOrGetOpenGLBinary(shaderData, forceCompile);
+			CompileOrGetOpenGLBinary(shaderData, forceCompile || shaderCacheHasChanged);
 			LoadAndCreateShaders(shaderData);
 			ReflectAllShaderStages(shaderData);
 
@@ -807,9 +809,8 @@ namespace highlo
 			if (source.IsEmpty())
 				continue;
 
-			bool shaderCacheHasChanged = ShaderCache::HasChanged(m_AssetPath, source);
 			const HLString &extension = utils::ShaderStageCachedFileExtension(stage);
-			if (!forceCompile && !shaderCacheHasChanged)
+			if (!forceCompile)
 			{
 				TryGetOpenGLCachedBinary(cacheDirectory, extension, shaderData, stage);
 			}

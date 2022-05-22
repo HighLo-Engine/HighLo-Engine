@@ -21,8 +21,14 @@ $ cd HighLo-Engine
 ```
 
 ```sh
-# Generate the Solution files for windows and mac or the makefiles for linux
+# generate the solution files for mac or the makefiles for linux
 $ python scripts/GenerateEngine.py
+
+# or generate the solution files for visual studio 2019 on windows with:
+$ python scripts/GenerateEngine.py -vs vs2019
+
+# or for visual studio 2022 with:
+$ python scripts/GenerateEngine.py -vs vs2022
 ```
 
 # Run Unit Tests

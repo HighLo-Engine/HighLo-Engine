@@ -22,6 +22,7 @@ namespace highlo
 
 	SceneRenderer::~SceneRenderer()
 	{
+		delete[] m_TransformVertexData;
 	}
 
 	void SceneRenderer::Init()
@@ -43,8 +44,9 @@ namespace highlo
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway
+	//	m_StorageBufferSet->CreateStorage(1, 23);
 
-		const size_t transformBufferCount = 100 * 1024; // 10240 transforms for now
+		const uint64 transformBufferCount = 100 * 1024; // 10240 transforms for now
 		m_SubmeshTransformBuffer = VertexBuffer::Create(sizeof(TransformVertexData) * transformBufferCount);
 		m_TransformVertexData = new TransformVertexData[transformBufferCount];
 
@@ -69,7 +71,7 @@ namespace highlo
 		m_ResourcesCreated = true;
 	}
 
-	void SceneRenderer::SetScene(Ref<Scene> scene)
+	void SceneRenderer::SetScene(const Ref<Scene> &scene)
 	{
 		HL_ASSERT(!m_Active, "You can not set a scene while a scene is being rendered!");
 		m_Scene = scene;
@@ -176,7 +178,7 @@ namespace highlo
 		UniformBufferScene &sceneData = m_SceneUniformBuffer;
 		UniformBufferPointLights &pointLightData = m_PointLightsUniformBuffer;
 		const std::vector<PointLight> &pointLights = m_SceneData.SceneLightEnvironment.PointLights;
-		pointLightData.Count = (uint32)pointLights.size();
+		pointLightData.LightCount = (uint32)pointLights.size();
 		
 		HL_ASSERT(pointLights.size() < 1024);
 		for (uint64 i = 0; i < pointLights.size(); ++i)
@@ -185,7 +187,7 @@ namespace highlo
 		Renderer::Submit([instance, &pointLightData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(4, 0, frameIndex)->SetData(&pointLightData, (sizeof(PointLight) * pointLightData.Count) + 16ull);
+			instance->m_UniformBufferSet->GetUniform(4, 0, frameIndex)->SetData(&pointLightData, (sizeof(PointLight) * pointLightData.LightCount) + 16ull);
 		});
 
 		const auto &directionalLight = m_SceneData.SceneLightEnvironment.DirectionalLights;
@@ -211,8 +213,10 @@ namespace highlo
 		});
 
 		UniformBufferScreenData &screenData = m_ScreenDataUniformBuffer;
-		screenData.FullRes = { m_ViewportWidth, m_ViewportHeight };
-		screenData.InvFullRes = { m_InvertedViewportWidth, m_InvertedViewportHeight };
+		screenData.FullResolution = { m_ViewportWidth, m_ViewportHeight };
+		screenData.HalfResolution = { m_ViewportWidth / 2, m_ViewportHeight / 2 };
+		screenData.InvFullResolution = { m_InvertedViewportWidth, m_InvertedViewportHeight };
+		screenData.InvHalfResolution = { m_InvertedViewportWidth / 2, m_InvertedViewportHeight / 2 };
 
 		Renderer::Submit([instance, screenData]() mutable
 		{
@@ -251,7 +255,7 @@ namespace highlo
 	#endif
 	}
 
-	void SceneRenderer::SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
+	void SceneRenderer::SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
 		{
@@ -291,7 +295,7 @@ namespace highlo
 		}
 	}
 
-	void SceneRenderer::SubmitDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
+	void SceneRenderer::SubmitDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
 		const auto &submeshes = model->Get()->GetSubmeshes();
 		uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
@@ -325,7 +329,7 @@ namespace highlo
 		}
 	}
 
-	void SceneRenderer::SubmitSelectedStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
+	void SceneRenderer::SubmitSelectedStaticModel(const Ref<StaticModel> &model, Ref<MaterialTable> materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
 		const auto &submeshData = model->Get()->GetSubmeshes();
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
@@ -379,7 +383,7 @@ namespace highlo
 		}
 	}
 
-	void SceneRenderer::SubmitSelectedDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform, Ref<Material> overrideMaterial)
+	void SceneRenderer::SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
 		const auto &submeshes = model->Get()->GetSubmeshes();
 		uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
@@ -428,7 +432,7 @@ namespace highlo
 		}
 	}
 
-	void SceneRenderer::SubmitPhysicsDebugStaticModel(Ref<StaticModel> model, const glm::mat4 &transform)
+	void SceneRenderer::SubmitPhysicsDebugStaticModel(const Ref<StaticModel> &model, const glm::mat4 &transform)
 	{
 		const auto &submeshData = model->Get()->GetSubmeshes();
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
@@ -450,7 +454,7 @@ namespace highlo
 		}
 	}
 
-	void SceneRenderer::SubmitPhysicsDebugDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, const glm::mat4 &transform)
+	void SceneRenderer::SubmitPhysicsDebugDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const glm::mat4 &transform)
 	{
 		// TODO: material index 42 does not exist yet
 		MeshKey key = { model->Handle, 42, submeshIndex };
@@ -473,7 +477,8 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return m_CompositeVertexArray->GetSpecification().RenderPass;
+		return m_GeometryVertexArray->GetSpecification().RenderPass;
+	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -516,7 +521,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-			CompositePass();
+		//	CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();
@@ -606,7 +611,7 @@ namespace highlo
 		hbaoData.AOMultiplier = 1.f / (1.f - hbaoData.NDotVBias);
 	}
 
-	void SceneRenderer::ClearPass(Ref<RenderPass> renderPass, bool explicitClear)
+	void SceneRenderer::ClearPass(const Ref<RenderPass> &renderPass, bool explicitClear)
 	{
 		Renderer::BeginRenderPass(m_CommandBuffer, renderPass, explicitClear);
 		Renderer::EndRenderPass(m_CommandBuffer);
@@ -662,21 +667,17 @@ namespace highlo
 		Renderer::EndRenderPass(m_CommandBuffer);
 
 		// Render normal geometry
-		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass, true);
 
 		// First render skybox
-		if (m_SkyboxMaterial->Has("u_Uniforms.TextureLod"))
-			m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
-
-		if (m_SkyboxMaterial->Has("u_Uniforms.Intensity"))
-			m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
-
-		const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
-		
-		if (m_SkyboxMaterial->Has("u_Texture"))
-			m_SkyboxMaterial->Set("u_Texture", radianceMap);
-		
-		Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
+	//	m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
+	//	m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
+	//
+	//	const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
+	//	
+	//	m_SkyboxMaterial->Set("u_Texture", radianceMap);
+	//	
+	//	Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
 
 		// Now render static and dynamic meshes
 		for (auto &[mk, dc] : m_StaticDrawList)

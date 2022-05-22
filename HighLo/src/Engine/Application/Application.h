@@ -75,6 +75,8 @@ namespace highlo
 		ApplicationLayerStack m_LayerStack;
 
 		void Init();
+		void Shutdown();
+
 		bool OnWindowClose(WindowCloseEvent &e);
 		bool OnWindowReisze(WindowResizeEvent &e);
 

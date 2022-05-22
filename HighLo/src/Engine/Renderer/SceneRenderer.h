@@ -132,9 +132,10 @@ namespace highlo
 		float AOMultiplier;
 		float PowExponent;
 		bool IsOrtho;
-		char Padding0[3] = { 0, 0, 0 };
 		glm::vec4 Float2Offsets[16];
 		glm::vec4 Jitters[16];
+		glm::vec3 Padding;
+		float ShadowTolerance;
 	};
 
 	struct UniformBufferShadow
@@ -151,7 +152,7 @@ namespace highlo
 
 	struct UniformBufferPointLights
 	{
-		uint32 Count = 0;
+		uint32 LightCount = 0;
 		glm::vec3 Padding{};
 		PointLight PointLights[1024]{};
 	};
@@ -176,8 +177,10 @@ namespace highlo
 
 	struct UniformBufferScreenData
 	{
-		glm::vec2 InvFullRes;
-		glm::vec2 FullRes;
+		glm::vec2 InvFullResolution;
+		glm::vec2 FullResolution;
+		glm::vec2 InvHalfResolution;
+		glm::vec2 HalfResolution;
 	};
 
 	class SceneRenderer : public IsSharedReference
@@ -189,23 +192,23 @@ namespace highlo
 
 		HLAPI void Init();
 
-		HLAPI void SetScene(Ref<Scene> scene);
+		HLAPI void SetScene(const Ref<Scene> &scene);
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
 		HLAPI void SetClearColor(const glm::vec4 &color);
 
 		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
-		HLAPI void SubmitStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
-		HLAPI void SubmitDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
+		HLAPI void SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
 
-		HLAPI void SubmitSelectedStaticModel(Ref<StaticModel> model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
-		HLAPI void SubmitSelectedDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), Ref<Material> overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedStaticModel(const Ref<StaticModel> &model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
 
-		HLAPI void SubmitPhysicsDebugStaticModel(Ref<StaticModel> model, const glm::mat4 &transform = glm::mat4(1.0f));
-		HLAPI void SubmitPhysicsDebugDynamicModel(Ref<DynamicModel> model, uint32 submeshIndex, const glm::mat4 &transform = glm::mat4(1.0f));
+		HLAPI void SubmitPhysicsDebugStaticModel(const Ref<StaticModel> &model, const glm::mat4 &transform = glm::mat4(1.0f));
+		HLAPI void SubmitPhysicsDebugDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const glm::mat4 &transform = glm::mat4(1.0f));
 
-		HLAPI void ClearPass(Ref<RenderPass> renderPass, bool explicitClear = false);
+		HLAPI void ClearPass(const Ref<RenderPass> &renderPass, bool explicitClear = false);
 		HLAPI void ClearPass();
 
 		HLAPI void UpdateHBAOData();
@@ -294,8 +297,8 @@ namespace highlo
 		TransformVertexData *m_TransformVertexData = nullptr;
 
 		// Bloom
-		Ref<Shader> m_BloomBlurShader;
-		Ref<Shader> m_BloomBlendShader;
+		Ref<Shader> m_BloomBlurShader = nullptr;
+		Ref<Shader> m_BloomBlendShader = nullptr;
 
 		// Shadows
 		float m_LightDistance = 0.1f;
@@ -313,53 +316,53 @@ namespace highlo
 		glm::vec2 m_FocusPoint = { 0.5f, 0.5f };
 
 		// Composite
-		Ref<Material> m_CompositeMaterial;
-		Ref<VertexArray> m_CompositeVertexArray;
+		Ref<Material> m_CompositeMaterial = nullptr;
+		Ref<VertexArray> m_CompositeVertexArray = nullptr;
 
 		// External compositing
-		Ref<VertexArray> m_GeometryWireframeVertexArray;
-		Ref<VertexArray> m_GeometryWireframeOnTopVertexArray;
-		Ref<RenderPass> m_ExternalCompositingRenderPass;
+		Ref<VertexArray> m_GeometryWireframeVertexArray = nullptr;
+		Ref<VertexArray> m_GeometryWireframeOnTopVertexArray = nullptr;
+		Ref<RenderPass> m_ExternalCompositingRenderPass = nullptr;
 
 		// Light Culling
 		glm::ivec3 m_LightCullingWorkGroups;
-		Ref<Material> m_LightCullingMaterial;
-		Ref<ComputePipeline> m_LightCullingPipeline;
+		Ref<Material> m_LightCullingMaterial = nullptr;
+		Ref<ComputePipeline> m_LightCullingPipeline = nullptr;
 
 		// Geometry
-		Ref<VertexArray> m_GeometryVertexArray;
-		Ref<VertexArray> m_SelectedGeometryVertexArray;
-		Ref<Material> m_SelectedGeometryMaterial;
+		Ref<VertexArray> m_GeometryVertexArray = nullptr;
+		Ref<VertexArray> m_SelectedGeometryVertexArray = nullptr;
+		Ref<Material> m_SelectedGeometryMaterial = nullptr;
 
 		// Pre-Depth
-		Ref<Material> m_PreDepthMaterial;
-		Ref<VertexArray> m_PreDepthVertexArray;
+		Ref<Material> m_PreDepthMaterial = nullptr;
+		Ref<VertexArray> m_PreDepthVertexArray = nullptr;
 
 		// HBAO
-		Ref<Material> m_DeinterleavingMaterial;
-		Ref<Material> m_ReinterleavingMaterial;
+		Ref<Material> m_DeinterleavingMaterial = nullptr;
+		Ref<Material> m_ReinterleavingMaterial = nullptr;
 		Ref<Material> m_HBAOBlurMaterials[2];
-		Ref<Material> m_HBAOMaterial;
+		Ref<Material> m_HBAOMaterial = nullptr;
 		Ref<VertexArray> m_DeinterleavingPipelines[2];
-		Ref<VertexArray> m_ReinterleavingPipeline;
+		Ref<VertexArray> m_ReinterleavingPipeline = nullptr;
 		Ref<VertexArray> m_HBAOBlurPipelines[2];
 
-		Ref<ComputePipeline> m_HBAOPipeline;
-		Ref<Texture2D> m_HBAOOutputImage;
-		Ref<RenderPass> m_HBAORenderPass;
+		Ref<ComputePipeline> m_HBAOPipeline = nullptr;
+		Ref<Texture2D> m_HBAOOutputImage = nullptr;
+		Ref<RenderPass> m_HBAORenderPass = nullptr;
 		glm::ivec3 m_HBAOWorkGroups{ 32.f, 32.f, 16.f };
 
 		// Grid
-		Ref<VertexArray> m_GridVertexArray;
-		Ref<Shader> m_GridShader;
-		Ref<Material> m_GridMaterial;
-		Ref<Material> m_WireframeMaterial;
-		Ref<Material> m_OutlineMaterial, m_OutlineAnimMaterial;
-		Ref<Material> m_ColliderMaterial;
+		Ref<VertexArray> m_GridVertexArray = nullptr;
+		Ref<Shader> m_GridShader = nullptr;
+		Ref<Material> m_GridMaterial = nullptr;
+		Ref<Material> m_WireframeMaterial = nullptr;
+		Ref<Material> m_OutlineMaterial = nullptr, m_OutlineAnimMaterial = nullptr;
+		Ref<Material> m_ColliderMaterial = nullptr;
 
 		// Skybox
-		Ref<VertexArray> m_SkyboxVertexArray;
-		Ref<Material> m_SkyboxMaterial;
+		Ref<VertexArray> m_SkyboxVertexArray = nullptr;
+		Ref<Material> m_SkyboxMaterial = nullptr;
 
 		// Uniform buffer blocks
 		UniformBufferCamera m_CameraUniformBuffer;
@@ -375,7 +378,7 @@ namespace highlo
 		{
 			Camera SceneCamera;
 
-			Ref<Environment> SceneEnvironment;
+			Ref<Environment> SceneEnvironment = nullptr;
 			float SkyboxLod = 0.0f;
 			float EnvironmentIntensity;
 			LightEnvironment SceneLightEnvironment;

@@ -1,14 +1,16 @@
+import sys
+import os
+import subprocess
+import platform
+
 # First import that checks for other required packages
 import CheckPythonVersion
 
 # Make sure everything we need is installed
 CheckPythonVersion.ValidatePackages()
 
-# The rest of the imports
-import os
-import subprocess
 import Vulkan
-import platform
+import Utils
 
 print('Your detected System is: ' + platform.system())
 
@@ -34,7 +36,13 @@ print("Running premake...")
 os.chdir('scripts/')
 
 if (platform.system() == 'Windows'):
-    subprocess.call(["GenerateEngine-Windows.bat"])
+    visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-v', '--visual-studio'), 'v:', ['visual-studio=', 'vs='])[0]
+    if visualStudioVersion == 'vs2022':
+        subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
+    elif visualStudioVersion == 'vs2019':
+        subprocess.call(["GenerateEngine-Windows-vs2019.bat"])
+    else:
+        print('Error: Unknown Visual Studio version: ', visualStudioVersion, ' - vs2019 or vs2022 are valid')
 elif (platform.system() == 'Linux'):
     subprocess.call(["chmod", "+x", "GenerateEngine-Linux.sh"])
     subprocess.call(["GenerateEngine-Linux.sh"])

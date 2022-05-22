@@ -39,20 +39,7 @@ namespace highlo
 
 	HLApplication::~HLApplication()
 	{
-		Translations::Shutdown();
-
-		ThreadRegistry::Get()->Shutdown();
-		m_Encryptor->Shutdown();
-		m_ECS_SystemManager.Shutdown();
-		FontManager::Get()->Shutdown();
-
-		// Save the current shader cache state into the json registry
-		ShaderCache::Shutdown();
-
-		AssetImporter::Shutdown();
-
-		Renderer::Shutdown();
-		Logger::Shutdown();
+		Shutdown();
 	}
 
 	void HLApplication::Run()
@@ -197,6 +184,24 @@ namespace highlo
 		m_RenderDebugPanel = UniqueRef<RenderDebugPanel>::Create();
 
 		HL_CORE_INFO("Engine Initialized");
+	}
+
+	void HLApplication::Shutdown()
+	{
+		Translations::Shutdown();
+
+		ThreadRegistry::Get()->Shutdown();
+		m_Encryptor->Shutdown();
+		m_ECS_SystemManager.Shutdown();
+		FontManager::Get()->Shutdown();
+
+		// Save the current shader cache state into the json registry
+		ShaderCache::Shutdown();
+
+		AssetImporter::Shutdown();
+
+		Renderer::Shutdown();
+		Logger::Shutdown();
 	}
 
 	bool HLApplication::OnWindowClose(WindowCloseEvent &e)

@@ -87,6 +87,11 @@ namespace highlo
 		glm::vec2 TexCoord;
 	};
 
+	struct AnimatedBoneTransformUniformBuffer
+	{
+		glm::mat4 BoneTransform[100];
+	};
+
 	struct GLRendererData
 	{
 		Ref<VertexBuffer> FullscreenQuadVertexBuffer;
@@ -258,6 +263,8 @@ namespace highlo
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
+		model->Get()->m_MeshShader->Bind();
+
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
@@ -271,16 +278,19 @@ namespace highlo
 
 			if (model->Get()->m_IsAnimated)
 			{
-				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				AnimatedBoneTransformUniformBuffer buffer;
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
-					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
-				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]"); // unused, can go away if not needed for debug print
+					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
 				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
+				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
 		}
 	}
 
@@ -290,6 +300,8 @@ namespace highlo
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
+		model->Get()->m_MeshShader->Bind();
+
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
@@ -303,16 +315,19 @@ namespace highlo
 
 			if (model->Get()->m_IsAnimated)
 			{
-				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				AnimatedBoneTransformUniformBuffer buffer;
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
-				// 	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
 				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
+				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
 		}
 	}
 
@@ -321,6 +336,8 @@ namespace highlo
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
+
+		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
@@ -335,13 +352,16 @@ namespace highlo
 
 			if (model->Get()->m_IsAnimated)
 			{
-				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				AnimatedBoneTransformUniformBuffer buffer;
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
-				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
 				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
+				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
@@ -353,6 +373,8 @@ namespace highlo
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
+
+		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
@@ -367,13 +389,16 @@ namespace highlo
 
 			if (model->Get()->m_IsAnimated)
 			{
-				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				AnimatedBoneTransformUniformBuffer buffer;
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
-				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
 				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
+				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
@@ -386,6 +411,8 @@ namespace highlo
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
+		model->Get()->m_MeshShader->Bind();
+
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh &submesh : submeshes)
 		{
@@ -394,13 +421,16 @@ namespace highlo
 
 			if (model->Get()->m_IsAnimated)
 			{
-				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				AnimatedBoneTransformUniformBuffer buffer;
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
-				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
 				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
+				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
@@ -413,6 +443,8 @@ namespace highlo
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
+		model->Get()->m_MeshShader->Bind();
+
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh &submesh : submeshes)
 		{
@@ -421,13 +453,16 @@ namespace highlo
 
 			if (model->Get()->m_IsAnimated)
 			{
-				Ref<OpenGLShader> glShader = model->Get()->m_MeshShader.As<OpenGLShader>();
+				AnimatedBoneTransformUniformBuffer buffer;
 				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
 				{
 					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
-				//	glShader->SetUniform(uniformName, model->Get()->m_BoneTransforms[i]);
+					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
 				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
+				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);

@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "DocumentReader.h"
 
+#if 0
+
 #include "Engine/Platform/RapidJSON/JsonReader.h"
 #include "Engine/Platform/RapidXML/XMLReader.h"
 
@@ -27,3 +29,4 @@ namespace highlo
 	}
 }
 
+#endif

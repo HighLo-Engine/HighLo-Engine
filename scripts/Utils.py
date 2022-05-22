@@ -1,5 +1,6 @@
 import requests
 import sys
+import getopt
 import time
 
 from fake_useragent import UserAgent
@@ -50,3 +51,18 @@ def YesOrNo():
         except KeyboardInterrupt:
             quit()
             
+def GetCommandLineArgument(argv, options, allowedCharacters, arguments):
+    try:
+        opts, args = getopt.getopt(argv, allowedCharacters, arguments)
+    except getopt.GetoptError as error:
+        print('Error: ', error)
+        print('Usage: GenerateEngine.py -v vs2022, or GenerateEngine.py --visual-studio vs2022, or GenerateEngine.py -v vs2019, or GenerateEngine.py --visual-studio vs2019')
+        sys.exit(2)
+    
+    result = []
+    for opt, arg in opts:
+        if opt in options:
+            result.append(arg)
+    
+    return result
+    

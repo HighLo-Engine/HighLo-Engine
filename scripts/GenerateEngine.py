@@ -36,13 +36,17 @@ print("Running premake...")
 os.chdir('scripts/')
 
 if (platform.system() == 'Windows'):
-    visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-v', '--visual-studio'), 'v:', ['visual-studio=', 'vs='])[0]
-    if visualStudioVersion == 'vs2022':
-        subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
-    elif visualStudioVersion == 'vs2019':
-        subprocess.call(["GenerateEngine-Windows-vs2019.bat"])
+    if len(sys.argv) > 1:
+        visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-v', '--visual-studio'), 'v:', ['visual-studio=', 'vs='])[0]
+        if visualStudioVersion == '2022':
+            subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
+        elif visualStudioVersion == '2019':
+            subprocess.call(["GenerateEngine-Windows-vs2019.bat"])
+        else:
+            print('Error: Unknown Visual Studio version: ', visualStudioVersion, ' - 2019 or 2022 are valid')
     else:
-        print('Error: Unknown Visual Studio version: ', visualStudioVersion, ' - vs2019 or vs2022 are valid')
+        # use the current visual studio version
+        subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
 elif (platform.system() == 'Linux'):
     subprocess.call(["chmod", "+x", "GenerateEngine-Linux.sh"])
     subprocess.call(["GenerateEngine-Linux.sh"])

@@ -23,12 +23,24 @@ $ cd HighLo-Engine
 ```sh
 # generate the solution files for mac or the makefiles for linux
 $ python scripts/GenerateEngine.py
+```
 
-# or generate the solution files for visual studio 2019 on windows with:
-$ python scripts/GenerateEngine.py -vs vs2019
+# Windows Build
 
-# or for visual studio 2022 with:
-$ python scripts/GenerateEngine.py -vs vs2022
+To build the engine on windows, the python script supports multiple options:
+
+If you wish to always build the most current visual studio solution you can use the same call as above, so:
+
+```sh
+$ python scripts/GenerateEngine.py
+```
+
+This builds the most current visual studio solution files (currently it is Visual Studio 2022). 
+
+If you wish to build older visual studio versions (currently the script supports only Visual Studio 2019 as an alternative) you have to specify the version as an optional command, like:
+
+```sh
+$ python scripts/GenerateEngine.py --visual-studio 2019
 ```
 
 # Run Unit Tests

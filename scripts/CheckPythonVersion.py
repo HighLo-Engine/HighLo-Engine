@@ -6,7 +6,7 @@ def install(package):
     try:
         subprocess.check_call(['python', '-m', 'pip', 'install', package])
     except:
-        pass
+        print('Failed to install ', package, '. You have to install it manually.')
 
 def ValidatePackage(package):
     required = { package }
@@ -14,6 +14,7 @@ def ValidatePackage(package):
     missing = required - installed
 
     if missing:
+        print('Detected that package ', package, ' is missing. Trying to install it automatically with pip.')
         install(package)
 
 def ValidatePackages():

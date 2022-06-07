@@ -43,7 +43,7 @@ workspace "HighLo"
 	group ""
 
 	group "Demos"
-		include "demos"
+		include "Demos"
 	group ""
 
 	group "tests"

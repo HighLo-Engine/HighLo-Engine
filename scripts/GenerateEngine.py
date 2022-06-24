@@ -12,6 +12,20 @@ CheckPythonVersion.ValidatePackages()
 import Vulkan
 import Utils
 
+shouldShowVersionMenu = Utils.GetCommandLineArgument(sys.argv[1:], ('-v', '--version'), 'v', ['version'])
+if (shouldShowVersionMenu):
+    print('HighLo Build script for HighLo v1.0.0')
+    exit(0)
+
+shouldShowHelpMenu = Utils.GetCommandLineArgument(sys.argv[1:], ('-h', '--help'), 'h', ['help'])
+if (shouldShowHelpMenu):
+    print('Usage: python GenerateEngine.py [option] {optionValue}')
+    print('Valid options:')
+    print('-v         --version                Show the current version of the build script')
+    print('-h         --help                   Show this help menu')
+    print('-s {value} --visual-studio {value}  Generate the engine for a specific visual studio version (valid values are 2019 and 2022 for now)')
+    exit(0)
+
 print('Your detected System is: ' + platform.system())
 
 # Change from Scripts directory to root
@@ -37,7 +51,7 @@ os.chdir('scripts/')
 
 if (platform.system() == 'Windows'):
     if len(sys.argv) > 1:
-        visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-v', '--visual-studio'), 'v:', ['visual-studio=', 'vs='])[0]
+        visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-s', '--visual-studio'), 's:', ['visual-studio=', 'vs='])[0]
         if visualStudioVersion == '2022':
             subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
         elif visualStudioVersion == '2019':

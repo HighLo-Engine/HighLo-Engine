@@ -48,12 +48,6 @@ $ python scripts/GenerateEngine.py --visual-studio 2019
 To Run the unit tests, you have to build the project from source.
 After that you will be able to select the "HighLoTest" project as the starting project and execute it.
 
-# Troubleshooting
-1. `GenerateEngine.py` fails because the `requests` module is missing: `pip install requests`
-2. `GenerateEngine.py` fails because the `fake_useragent` module is missing: `pip install fake_useragent`
-
-These two modules are needed to automatically download the right Vulkan SDK from the official website. Normally they should be installed automatically if they are detected to be missing, but in some cases it might not work and the script will crash. This might have something to do with administrator privileges, so before installing the modules manually you also could try to run the script as an administrator.
-
 # Supported platforms
 
 | Windows | Linux | MacOS | Android | IOS | Web |

@@ -477,8 +477,8 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
-		return m_CompositeVertexArray->GetSpecification().RenderPass;
+		return m_GeometryVertexArray->GetSpecification().RenderPass;
+	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -719,10 +719,10 @@ namespace highlo
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	
-		m_CompositeMaterial->Set("u_Uniforms.Exposure", 1.0f);
+		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
 		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
 	
-		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
+		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -926,7 +926,7 @@ namespace highlo
 		frameBufferSpec.DebugName = "Geometry";
 		frameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		frameBufferSpec.Samples = 1;
-		frameBufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		frameBufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Geometry";
@@ -946,7 +946,7 @@ namespace highlo
 		selectedFrameBufferSpec.DebugName = frameBufferSpec.DebugName;
 		selectedFrameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::Depth };
 		selectedFrameBufferSpec.Samples = 1;
-		selectedFrameBufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		selectedFrameBufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 		RenderPassSpecification selectedRenderPassSpec;
 		selectedRenderPassSpec.DebugName = renderPassSpec.DebugName;

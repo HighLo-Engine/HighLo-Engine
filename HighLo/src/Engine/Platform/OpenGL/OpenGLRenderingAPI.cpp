@@ -244,9 +244,6 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform)
 	{
-		va->AddVertexBuffer(s_GLRendererData->FullscreenQuadVertexBuffer);
-		va->SetIndexBuffer(s_GLRendererData->FullscreenQuadIndexBuffer);
-
 		va->Bind();
 		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
 		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();

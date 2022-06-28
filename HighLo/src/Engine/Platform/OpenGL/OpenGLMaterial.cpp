@@ -516,11 +516,10 @@ namespace highlo
 			}
 		}
 
-		for (auto &[slot, texture] : m_Texture2Ds)
+		for (auto &[textureSlot, texture] : m_Texture2Ds)
 		{
 			if (texture)
 			{
-				uint32 textureSlot = slot;
 				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
 				if (glTexture->GetSamplerRendererID() != 0)
 					glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
@@ -546,6 +545,7 @@ namespace highlo
 	void OpenGLMaterial::OnShaderReloaded()
 	{
 		// TODO
+		HL_CORE_INFO("Reloading material {0}", *m_Name);
 	}
 
 	const ShaderUniform *OpenGLMaterial::FindUniformDeclaration(const HLString &name)

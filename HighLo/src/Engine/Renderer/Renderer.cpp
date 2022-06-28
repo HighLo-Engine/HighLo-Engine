@@ -191,9 +191,9 @@ namespace highlo
 		s_CommandQueue->Execute();
 	}
 
-	void Renderer::RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
+	void Renderer::RenderFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform)
 	{
-		s_RenderingAPI->DrawQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, transform);
+		s_RenderingAPI->DrawFullscreenQuad(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, material, transform);
 	}
 
 	void Renderer::RenderDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)

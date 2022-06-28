@@ -12,8 +12,8 @@ layout(location = 6) in vec4 a_MRow2;
 
 layout(std140, binding = 0) uniform Camera
 {
-	mat4 u_ViewProjection;
-};
+	mat4 ViewProjection;
+} u_Camera;
 
 struct VertexOutput
 {
@@ -36,7 +36,7 @@ void main()
 	Output.Color = a_Color;
 	Output.TexCoord = a_TexCoord;
 	v_TexIndex = a_TexIndex;
-	gl_Position = u_ViewProjection * transform * vec4(a_Position, 1.0);
+	gl_Position = u_Camera.ViewProjection * transform * vec4(a_Position, 1.0);
 }
 
 #version 450 core

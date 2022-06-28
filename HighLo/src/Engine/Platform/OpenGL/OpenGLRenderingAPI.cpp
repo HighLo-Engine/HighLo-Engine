@@ -242,28 +242,28 @@ namespace highlo
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform)
+	void OpenGLRenderingAPI::DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform)
 	{
-		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
-		va->Bind();
-		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
+		va->AddVertexBuffer(s_GLRendererData->FullscreenQuadVertexBuffer);
+		va->SetIndexBuffer(s_GLRendererData->FullscreenQuadIndexBuffer);
 
+		va->Bind();
+		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
+		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
+		
 		if (material)
 		{
 			material->UpdateForRendering();
-			SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 		}
-		
+
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRenderingAPI::DrawStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
+		model->Get()->GetVertexBuffer()->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
@@ -296,11 +296,9 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
+		model->Get()->GetVertexBuffer()->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
@@ -333,11 +331,9 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
+		model->Get()->GetVertexBuffer()->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
@@ -370,11 +366,9 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawInstancedDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
+		model->Get()->GetVertexBuffer()->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
@@ -407,11 +401,9 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
+		model->Get()->GetVertexBuffer()->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh &submesh : submeshes)
@@ -439,11 +431,9 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawInstancedDynamicMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
+		model->Get()->GetVertexBuffer()->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		model->Get()->m_MeshShader->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh &submesh : submeshes)

@@ -170,7 +170,11 @@ void HighLoEditor::OnInitialize()
 	m_WindowMenu->AddMenuItem(translation->GetText("window-asset-manager-menu"), "", MENU_ITEM_WINDOW_ASSET_MANAGER, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	m_WindowMenu->AddMenuItem(translation->GetText("window-animation-timeline-menu"), "", MENU_ITEM_WINDOW_ANIM_TIMELINE, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 
+	Ref<FileMenu> debugMenu = FileMenu::Create("Debug Options");
+	debugMenu->AddMenuItem("Show Light Complexity", "", MENU_ITEM_DEBUG_SHOW_LIGHT_COMPLEXITY, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
+
 	Ref<FileMenu> helpMenu = FileMenu::Create(translation->GetText("help-menu"));
+	helpMenu->AddSubMenu(debugMenu);
 	helpMenu->AddMenuItem(translation->GetText("help-about-menu"), "", MENU_ITEM_ABOUT, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 	helpMenu->AddMenuItem(translation->GetText("help-docs-menu"), "", MENU_ITEM_DOCUMENTATION, [=](FileMenu *menu, MenuItem *item) { OnFileMenuPressed(menu, item); });
 

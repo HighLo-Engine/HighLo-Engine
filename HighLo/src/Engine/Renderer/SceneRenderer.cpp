@@ -477,8 +477,8 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return m_GeometryVertexArray->GetSpecification().RenderPass;
-	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
+	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
+		return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -521,7 +521,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-		//	CompositePass();
+			CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();
@@ -692,15 +692,6 @@ namespace highlo
 			Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
 		}
 	
-		// Grid
-		if (GetOptions().ShowGrid)
-		{
-			const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
-				* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
-	
-			Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
-		}
-
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -719,10 +710,10 @@ namespace highlo
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	
-		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
+		m_CompositeMaterial->Set("u_Uniforms.Exposure", 1.0f);
 		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
 	
-		Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
+		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 

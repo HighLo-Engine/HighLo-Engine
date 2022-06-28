@@ -48,12 +48,12 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		glDeleteVertexArrays(1, &m_RendererID);
+		//glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-	//	glBindVertexArray(m_ID);
+		//glBindVertexArray(m_RendererID);
 
 		if (m_Specification.Layout.GetElements().size() < 1)
 		{

@@ -7,8 +7,25 @@
 #include "OpenGLTexture2D.h"
 #include "OpenGLTexture3D.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace highlo
 {
+	namespace utils
+	{
+		static GLenum GetUniformLocation(const Ref<Shader> &shader, const HLString &name)
+		{
+			int32 location = glGetUniformLocation(shader->GetRendererID(), *name);
+			if (location == -1)
+			{
+				HL_CORE_WARN("Could not retrieve uniform location for {0}", *name);
+				return 0;
+			}
+
+			return location;
+		}
+	}
+
 	OpenGLMaterial::OpenGLMaterial(const Ref<Shader> &shader, const HLString &name)
 		: m_Shader(shader), m_Name(name)
 	{
@@ -248,100 +265,126 @@ namespace highlo
 		shader->Bind();
 
 		const auto &shaderBuffers = GetShader()->GetShaderBuffers();
+
+		// TODO: This is a workaround until we fully switch to uniform buffer blocks
 		if (shaderBuffers.size() > 0)
 		{
 			for (auto &[bufferName, buffer] : shaderBuffers)
 			{
 				for (auto &[name, uniform] : buffer.Uniforms)
 				{
-					/*
 					switch (uniform.GetType())
 					{
 						case ShaderUniformType::Bool:
 						case ShaderUniformType::Uint:
 						{
 							const uint32 value = m_LocalData.Read<uint32>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform1ui(location, value);
 							break;
 						}
 
 						case ShaderUniformType::Int:
 						{
 							const int32 value = m_LocalData.Read<int32>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform1i(location, value);
 							break;
 						}
 
 						case ShaderUniformType::Float:
 						{
 							const float value = m_LocalData.Read<float>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform1f(location, value);
 							break;
 						}
 
 						case ShaderUniformType::IVec2:
 						{
 							const glm::ivec2 &value = m_LocalData.Read<glm::ivec2>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform2i(location, value.x, value.y);
 							break;
 						}
 
 						case ShaderUniformType::IVec3:
 						{
 							const glm::ivec3 &value = m_LocalData.Read<glm::ivec3>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform3i(location, value.x, value.y, value.z);
 							break;
 						}
 
 						case ShaderUniformType::IVec4:
 						{
 							const glm::ivec4 &value = m_LocalData.Read<glm::ivec4>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform4i(location, value.x, value.y, value.z, value.w);
 							break;
 						}
 
 						case ShaderUniformType::Vec2:
 						{
 							const glm::vec2 &value = m_LocalData.Read<glm::vec2>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform2f(location, value.x, value.y);
 							break;
 						}
 
 						case ShaderUniformType::Vec3:
 						{
 							const glm::vec3 &value = m_LocalData.Read<glm::vec3>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform3f(location, value.x, value.y, value.z);
 							break;
 						}
 
 						case ShaderUniformType::Vec4:
 						{
 							const glm::vec4 &value = m_LocalData.Read<glm::vec4>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniform4f(location, value.x, value.y, value.z, value.w);
 							break;
 						}
 
 						case ShaderUniformType::Mat2:
 						{
 							const glm::mat2 &value = m_LocalData.Read<glm::mat2>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
 							break;
 						}
 
 						case ShaderUniformType::Mat3:
 						{
 							const glm::mat3 &value = m_LocalData.Read<glm::mat3>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
 							break;
 						}
 
 						case ShaderUniformType::Mat4:
 						{
 							const glm::mat4 &value = m_LocalData.Read<glm::mat4>(uniform.GetOffset());
-							shader->SetUniform(name, value);
+							int32 location = utils::GetUniformLocation(m_Shader, name);
+							if (location)
+								glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 							break;
 						}
 
+						/*
 						case ShaderUniformType::Struct:
 						{
 							std::vector<OpenGLShader::ShaderUniformStruct> structs = shader->GetUniformStructs();
@@ -450,6 +493,7 @@ namespace highlo
 
 						break;
 						}
+						*/
 
 						default:
 						{
@@ -457,7 +501,6 @@ namespace highlo
 							break;
 						}
 					}
-					*/
 				}
 			}
 		}

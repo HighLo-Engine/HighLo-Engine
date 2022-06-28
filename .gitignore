@@ -26,4 +26,6 @@ HighLo/vendor/VulkanSDK/
 # Others
 *.log
 
+lfs/
+hooks/
 __pycache__/

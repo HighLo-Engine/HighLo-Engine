@@ -49,6 +49,20 @@ namespace highlo
 		}
 	}
 
+	void StorageBufferSet::ForEach(const StorageBufferCallback &callback)
+	{
+		for (uint32 frame = 0; frame < m_Frames; ++frame)
+		{
+			for (uint32 set = 0; set < m_StorageBuffers.at(frame).size(); ++set)
+			{
+				for (uint32 binding = 0; binding < m_StorageBuffers.at(frame).at(set).size(); ++binding)
+				{
+					callback(m_StorageBuffers.at(frame).at(set).at(binding));
+				}
+			}
+		}
+	}
+
 	Ref<StorageBufferSet> StorageBufferSet::Create(uint32 frames)
 	{
 		return Ref<StorageBufferSet>::Create(frames);

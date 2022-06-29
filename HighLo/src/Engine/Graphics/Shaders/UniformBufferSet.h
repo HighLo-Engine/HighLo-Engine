@@ -15,6 +15,8 @@ namespace highlo
 	{
 	public:
 
+		using UniformBufferCallback = std::function<void>(const Ref<UniformBuffer>&);
+
 		HLAPI UniformBufferSet(uint32 frames);
 		HLAPI virtual ~UniformBufferSet();
 
@@ -22,6 +24,8 @@ namespace highlo
 
 		HLAPI Ref<UniformBuffer> GetUniform(uint32 binding, uint32 set = 0, uint32 frame = 0);
 		HLAPI void SetUniform(const Ref<UniformBuffer> &uniform, uint32 set = 0, uint32 frame = 0);
+
+		HLAPI void ForEach(const UniformBufferCallback &callback);
 
 		HLAPI static Ref<UniformBufferSet> Create(uint32 frames);
 

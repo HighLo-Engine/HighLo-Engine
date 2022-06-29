@@ -15,7 +15,7 @@ namespace highlo
 	{
 	public:
 
-		using UniformBufferCallback = std::function<void>(const Ref<UniformBuffer>&);
+		using UniformBufferCallback = std::function<void(const Ref<UniformBuffer>&)>;
 
 		HLAPI UniformBufferSet(uint32 frames);
 		HLAPI virtual ~UniformBufferSet();

@@ -15,7 +15,7 @@ namespace highlo
 	{
 	public:
 
-		using StorageBufferCallback = std::function<void>(const Ref<StorageBuffer&>);
+		using StorageBufferCallback = std::function<void(const Ref<StorageBuffer>&)>;
 
 		HLAPI StorageBufferSet(uint32 frames);
 		HLAPI virtual ~StorageBufferSet();

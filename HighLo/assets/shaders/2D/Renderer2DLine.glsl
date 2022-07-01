@@ -11,8 +11,8 @@ layout(location = 5) in vec4 a_MRow2;
 
 layout(std140, binding = 0) uniform Camera
 {
-	mat4 u_ViewProjection;
-};
+	mat4 ViewProjection;
+} u_Camera;
 
 struct VertexOutput
 {
@@ -33,7 +33,7 @@ void main()
 
 	Output.Color = in_Color;
 	v_EntityID = in_EntityID;
-	gl_Position = u_ViewProjection * transform * vec4(in_Position, 1.0f);
+	gl_Position = u_Camera.ViewProjection * transform * vec4(in_Position, 1.0f);
 }
 
 #version 450 core

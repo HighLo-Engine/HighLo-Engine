@@ -62,7 +62,7 @@ namespace highlo
 		float m_Yaw = 0.0f;
 		float m_Pitch = 0.0f;
 		float m_Roll = 0.0f;
-		float m_Exposure = 0.0f;
+		float m_Exposure = 1.0f;
 	};
 }
 

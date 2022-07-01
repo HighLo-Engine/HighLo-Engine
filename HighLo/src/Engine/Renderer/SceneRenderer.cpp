@@ -521,7 +521,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-		//	CompositePass();
+			CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();
@@ -693,13 +693,13 @@ namespace highlo
 		}
 	
 		// Grid
-		if (GetOptions().ShowGrid)
-		{
-			const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
-				* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
-	
-			Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
-		}
+	//	if (GetOptions().ShowGrid)
+	//	{
+	//		const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
+	//			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+	//
+	//		Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
+	//	}
 
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
@@ -722,7 +722,7 @@ namespace highlo
 		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
 		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
 	
-		Renderer::RenderQuad(m_CommandBuffer, m_CompositeVertexArray, nullptr, nullptr, m_CompositeMaterial);
+		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -926,7 +926,7 @@ namespace highlo
 		frameBufferSpec.DebugName = "Geometry";
 		frameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		frameBufferSpec.Samples = 1;
-		frameBufferSpec.ClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		frameBufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Geometry";
@@ -946,7 +946,7 @@ namespace highlo
 		selectedFrameBufferSpec.DebugName = frameBufferSpec.DebugName;
 		selectedFrameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::Depth };
 		selectedFrameBufferSpec.Samples = 1;
-		selectedFrameBufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		selectedFrameBufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 		RenderPassSpecification selectedRenderPassSpec;
 		selectedRenderPassSpec.DebugName = renderPassSpec.DebugName;

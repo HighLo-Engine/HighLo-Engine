@@ -113,7 +113,7 @@ namespace highlo
 		HLAPI static void SetGlobalMacroInShaders(const HLString &name, const HLString &value = "");
 
 		HLAPI static void WaitAndRender();
-		HLAPI static void RenderQuad(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<Material> material, const glm::mat4 &transform = glm::mat4(1.0f));
+		HLAPI static void RenderFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform = glm::mat4(1.0f));
 
 		HLAPI static void RenderDynamicMesh(
 			Ref<CommandBuffer> renderCommandBuffer,

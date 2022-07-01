@@ -35,10 +35,10 @@ if 'scripts' in os.getcwd():
     os.chdir('../')
 
 if (not Vulkan.CheckVulkanSDK()):
-    print("Vulkan SDK not installed.")
+    exit(1)
     
 if (not Vulkan.CheckVulkanSDKDebugLibs()):
-    print("Vulkan SDK debug libs not found.")
+    exit(1)
 
 # TODO: This should only be executed if user did a fresh clone
 # subprocess.call(["git", "lfs", "pull"])
@@ -46,25 +46,22 @@ if (not Vulkan.CheckVulkanSDKDebugLibs()):
 
 print("Running premake...")
 
-# Enter the scripts directory
-os.chdir('scripts/')
-
 if (platform.system() == 'Windows'):
     if len(sys.argv) > 1:
         visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-s', '--visual-studio'), 's:', ['visual-studio=', 'vs='])[0]
         if visualStudioVersion == '2022':
-            subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
+            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022"])
         elif visualStudioVersion == '2019':
-            subprocess.call(["GenerateEngine-Windows-vs2019.bat"])
+            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2019"])
         else:
             print('Error: Unknown Visual Studio version: ', visualStudioVersion, ' - 2019 or 2022 are valid')
     else:
         # use the current visual studio version
-        subprocess.call(["GenerateEngine-Windows-vs2022.bat"])
+        subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022"])
 elif (platform.system() == 'Linux'):
-    subprocess.call(["chmod", "+x", "GenerateEngine-Linux.sh"])
-    subprocess.call(["GenerateEngine-Linux.sh"])
+    subprocess.call(["chmod", "+x", "vendor/bin/premake/Linux/premake5"])
+    subprocess.call(["vendor/bin/premake/Linux/premake5", "gmake"])
 elif (platform.system() == 'Darwin'):
-    subprocess.call(["chmod", "+x", "GenerateEngine-MacOS.sh"])
-    subprocess.call(["GenerateEngine-MacOS.sh"])
+    subprocess.call(["chmod", "+x", "vendor/bin/premake/MacOS/premake5"])
+    subprocess.call(["vendor/bin/premake/MacOS/premake5", "xcode4"])
     

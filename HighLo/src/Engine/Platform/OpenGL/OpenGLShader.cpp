@@ -22,7 +22,7 @@ namespace highlo
 #define PRINT_DEBUG_ALL 0
 
 #ifdef HL_DEBUG
-#define PRINT_DEBUG_OUTPUTS 0
+#define PRINT_DEBUG_OUTPUTS 1
 #endif
 
 #if PRINT_DEBUG_ALL
@@ -429,14 +429,28 @@ namespace highlo
 					uint32 memberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
 					uint32 memberOffset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
 
-					HLString uniformName = fmt::format("{}.{}", name, memberName);
+					const HLString &uniformName = fmt::format("{}.{}", name, memberName);
 					shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SPIRTypeToShaderUniformType(memberType), memberSize, memberOffset);
 				}
 
 			#if PRINT_DEBUG_OUTPUTS
-				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+				HL_CORE_TRACE("  {0} (descriptor set: {1}, binding: {2})", name, descriptorSet, binding);
 				HL_CORE_TRACE("  Member Count: {0}", memberCount);
-				HL_CORE_TRACE("  Size: {0}", size);
+				HL_CORE_TRACE("  Size: {0} bytes", size);
+				HL_CORE_TRACE("  Members:");
+				for (uint32 i = 0; i < memberCount; ++i)
+				{
+					const auto &memberName = compiler.get_member_name(bufferType.self, i);
+					uint32 memberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
+					uint32 memberOffset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
+					const HLString &uniformName = fmt::format("{}.{}", name, memberName);
+
+					HL_CORE_TRACE("    Name: {0}, Full name: {1}", memberName, *uniformName);
+					HL_CORE_TRACE("    Size: {0} bytes", memberSize);
+					HL_CORE_TRACE("    Offset: {0} bytes", memberOffset);
+					HL_CORE_TRACE("");
+				}
+
 				HL_CORE_TRACE("-------------------");
 			#endif // PRINT_DEBUG_OUTPUTS
 			}
@@ -481,9 +495,23 @@ namespace highlo
 				shaderDescriptorSet.StorageBuffers[binding] = s_StorageBuffers.at(descriptorSet).at(binding);
 
 			#if PRINT_DEBUG_OUTPUTS
-				HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+				HL_CORE_TRACE("  {0} (descriptor set: {1}, binding: {2})", name, descriptorSet, binding);
 				HL_CORE_TRACE("  Member Count: {0}", memberCount);
-				HL_CORE_TRACE("  Size: {0}", size);
+				HL_CORE_TRACE("  Size: {0} bytes", size);
+				HL_CORE_TRACE("  Members:");
+				for (uint32 i = 0; i < memberCount; ++i)
+				{
+					const auto &memberName = compiler.get_member_name(bufferType.self, i);
+					uint32 memberSize = (uint32)compiler.get_declared_struct_member_size(bufferType, i);
+					uint32 memberOffset = (uint32)compiler.type_struct_member_offset(bufferType, i);
+					const HLString &uniformName = fmt::format("{}.{}", name, memberName);
+
+					HL_CORE_TRACE("    Name: {0}, Full name: {1}", memberName, *uniformName);
+					HL_CORE_TRACE("    Size: {0} bytes", memberSize);
+					HL_CORE_TRACE("    Offset: {0} bytes", memberOffset);
+					HL_CORE_TRACE("");
+				}
+
 				HL_CORE_TRACE("-------------------");
 			#endif // PRINT_DEBUG_OUTPUTS
 			}
@@ -520,7 +548,7 @@ namespace highlo
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
 		#if PRINT_DEBUG_OUTPUTS
-			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+			HL_CORE_TRACE("  {0} (descriptor set: {1}, binding: {2})", name, descriptorSet, binding);
 		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
@@ -555,7 +583,7 @@ namespace highlo
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
 		#if PRINT_DEBUG_OUTPUTS
-			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+			HL_CORE_TRACE("  {0} (descriptor set: {1}, binding: {2})", name, descriptorSet, binding);
 		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
@@ -590,7 +618,7 @@ namespace highlo
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
 		#if PRINT_DEBUG_OUTPUTS
-			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+			HL_CORE_TRACE("  {0} (descriptor set: {1}, binding: {2})", name, descriptorSet, binding);
 		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
@@ -624,7 +652,7 @@ namespace highlo
 			m_Resources[name] = ShaderResourceDeclaration(name, binding, 1);
 
 		#if PRINT_DEBUG_OUTPUTS
-			HL_CORE_TRACE("  {0} ({1}, {2})", name, descriptorSet, binding);
+			HL_CORE_TRACE("  {0} (descriptor set: {1}, binding: {2})", name, descriptorSet, binding);
 		#endif // PRINT_DEBUG_OUTPUTS
 		}
 
@@ -784,7 +812,7 @@ namespace highlo
 			}
 			else
 			{
-				HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+			//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
 				HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Linking failed but no infolog was accessible! [-]");
 			}
 		}

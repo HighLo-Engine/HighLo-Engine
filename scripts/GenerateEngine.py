@@ -35,13 +35,9 @@ if 'scripts' in os.getcwd():
     os.chdir('../')
 
 if (not Vulkan.CheckVulkanSDK()):
-    print("Vulkan SDK not installed.")
-    print("Please follow the documentation and install the Vulkan SDK first!")
     exit(1)
     
 if (not Vulkan.CheckVulkanSDKDebugLibs()):
-    print("Vulkan SDK debug libs not found.")
-    print("Please follow the documentation and install the Vulkan Debug Libs first!")
     exit(1)
 
 # TODO: This should only be executed if user did a fresh clone

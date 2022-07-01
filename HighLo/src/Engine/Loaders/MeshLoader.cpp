@@ -7,7 +7,7 @@
 #define HIGHLO_API_ASSIMP_LOADER
 
 #ifdef HIGHLO_API_ASSIMP_LOADER
-#include "Engine/Platform/Assimp/AssimpMeshLoader.h"
+#include "Engine/ThirdParty/Assimp/AssimpMeshLoader.h"
 #endif // HIGHLO_API_ASSIMP_LOADER
 
 namespace highlo

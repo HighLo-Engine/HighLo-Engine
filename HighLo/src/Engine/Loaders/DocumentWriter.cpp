@@ -3,8 +3,8 @@
 #include "HighLoPch.h"
 #include "DocumentWriter.h"
 
-#include "Engine/Platform/RapidJSON/JsonWriter.h"
-#include "Engine/Platform/RapidXML/XMLWriter.h"
+#include "Engine/ThirdParty/RapidJSON/JsonWriter.h"
+#include "Engine/ThirdParty/RapidXML/XMLWriter.h"
 
 namespace highlo
 {

@@ -50,8 +50,11 @@ workspace "HighLo"
 		include "tests"
 	group ""
 
-	group "Games"
+	group "Tools"
 		include "Sandbox"
 		include "HighLoEdit"
+	group ""
+	
+	group "Games"
 	group ""
 

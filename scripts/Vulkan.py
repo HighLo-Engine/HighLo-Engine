@@ -36,7 +36,9 @@ def InstallVulkanPrompt():
 def CheckVulkanSDK():
     if (VULKAN_SDK is None):
         print("You don't have the Vulkan SDK installed!")
-        InstallVulkanPrompt()
+        if InstallVulkanPrompt():
+            InstallVulkanSDK()
+            exit(0)
         return False
     elif (VULKAN_VERSION not in VULKAN_SDK):
         print(f"Located Vulkan SDK at {VULKAN_SDK}")

@@ -18,16 +18,11 @@ VULKAN_SDK_EXE_PATH = f'{VULKAN_SDK_LOCAL_PATH}/VulkanSDK.exe'
 def InstallVulkanSDK():
     Path(VULKAN_SDK_LOCAL_PATH).mkdir(parents=True, exist_ok=True)
     print('Downloading {} to {}'.format(VULKAN_SDK_INSTALLER_URL, VULKAN_SDK_EXE_PATH))
-    try:
-        Utils.DownloadFile(VULKAN_SDK_INSTALLER_URL, VULKAN_SDK_EXE_PATH)
-        print("Done!")
-        print("Running Vulkan SDK installer...")
-        os.startfile(os.path.abspath(VULKAN_SDK_EXE_PATH))
-        print("Please restart this script after the installation")
-    except:
-        # TODO: Could be thrown as well if there is a HTML parsing error - in that case we have to change this
-        # TODO: Needs testing
-        print("Could not download and run the Vulkan SDK Installer. Please try again with admin privileges.")
+    Utils.DownloadFile(VULKAN_SDK_INSTALLER_URL, VULKAN_SDK_EXE_PATH)
+    print("Done!")
+    print("Running Vulkan SDK installer...")
+    os.startfile(os.path.abspath(VULKAN_SDK_EXE_PATH))
+    print("Please restart this script after the installation")
 
 def InstallVulkanPrompt():
     print("Would you like to install the Vulkan SDK?")
@@ -36,7 +31,9 @@ def InstallVulkanPrompt():
 def CheckVulkanSDK():
     if (VULKAN_SDK is None):
         print("You don't have the Vulkan SDK installed!")
-        InstallVulkanPrompt()
+        if InstallVulkanPrompt():
+            InstallVulkanSDK()
+            exit(0)
         return False
     elif (VULKAN_VERSION not in VULKAN_SDK):
         print(f"Located Vulkan SDK at {VULKAN_SDK}")

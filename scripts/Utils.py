@@ -1,3 +1,4 @@
+from cmath import exp
 import requests
 import sys
 import getopt
@@ -8,9 +9,12 @@ from fake_useragent import UserAgent
 def DownloadFile(url, filepath):
     with open(filepath, 'wb') as file:
         
-        ua = UserAgent()
-        headers = {'User-Agent': ua.chrome}
-        
+        try:
+            ua = UserAgent()
+            headers = {'User-Agent': ua.chrome}
+        except:
+            pass
+
         print('Waiting for response...')
         try:
             response = requests.get(url, headers=headers, stream=True)

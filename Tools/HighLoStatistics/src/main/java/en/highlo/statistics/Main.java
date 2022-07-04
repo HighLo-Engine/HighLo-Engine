@@ -16,7 +16,7 @@ public class Main
         // basically this main class only parses the command line arguments and calls the specific classes, that were requested by the user
         // supported functions:
         // - a project line counter, that recursively iterates through all engine-related source directories and counts each line of each file and sums them up
-        // - a todo finder, that is really useful for all developers, so that they can easily find a todo in any file without having to manually seach for them
+        // - a todo finder, that is really useful for all developers, so that they can easily find a todo in any file without having to manually search for them
         // - a copyright updater that replaced the current copyright with a new one for every file
         // - more features are more than welcome by any other developer via pull-request or by a feature request! :)
 

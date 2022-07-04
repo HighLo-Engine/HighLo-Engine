@@ -14,6 +14,7 @@ public class RecursiveDirectoryIterator
     private String mRootPath;
     private String[] mExcludeDirs;
     private int mIteratedFiles = 0;
+    private boolean mShouldSaveContent = false;
 
     private Consumer<File> mFileCallback = null;
     private Consumer<File> mDirectoryCallback = null;
@@ -27,6 +28,18 @@ public class RecursiveDirectoryIterator
         // Iterate through all files and count all files, to be able to provide the count before any callbacks are executed
         List<File> list = new LinkedList<>();
         iterateRecursiveAndCountFiles(list, new File(rootPath), excludeDirs);
+        mShouldSaveContent = false;
+    }
+
+    public RecursiveDirectoryIterator(String rootPath, String[] excludeDirs, boolean saveContent)
+    {
+        mRootPath = rootPath;
+        mExcludeDirs = excludeDirs;
+
+        // Iterate through all files and count all files, to be able to provide the count before any callbacks are executed
+        List<File> list = new LinkedList<>();
+        iterateRecursiveAndCountFiles(list, new File(rootPath), excludeDirs);
+        mShouldSaveContent = saveContent;
     }
 
     public void registerFileCallback(Consumer<File> func)
@@ -127,22 +140,25 @@ public class RecursiveDirectoryIterator
             }
 
             // Write out the new content into the current file
-            try
+            if (mShouldSaveContent)
             {
-                FileOutputStream out = new FileOutputStream(dir);
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
-
-                for (String line : newContent)
+                try
                 {
-                    bw.write(line);
-                    bw.newLine();
-                }
+                    FileOutputStream out = new FileOutputStream(dir);
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
 
-                bw.close();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
+                    for (String line : newContent)
+                    {
+                        bw.write(line);
+                        bw.newLine();
+                    }
+
+                    bw.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
 
             files.add(dir);

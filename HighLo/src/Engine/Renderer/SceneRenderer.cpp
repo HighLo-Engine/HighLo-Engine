@@ -521,7 +521,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-			CompositePass();
+		//	CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();

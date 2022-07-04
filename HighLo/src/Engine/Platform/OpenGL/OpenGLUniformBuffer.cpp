@@ -31,13 +31,13 @@ namespace highlo
 
 	void OpenGLUniformBuffer::Bind() const
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-		glBindBufferRange(GL_UNIFORM_BUFFER, m_Binding, m_RendererID, 0, m_Size);
+	//	glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+	//	glBindBufferRange(GL_UNIFORM_BUFFER, m_Binding, m_RendererID, 0, m_Size);
 	}
 
 	void OpenGLUniformBuffer::Unbind() const
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	void OpenGLUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
@@ -46,12 +46,12 @@ namespace highlo
 			memcpy(m_LocalStorage, data, size);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-		// glNamedBufferSubData(m_RendererID, offset, size, m_LocalStorage);
+		glNamedBufferSubData(m_RendererID, offset, size, m_LocalStorage);
 
 		// TODO: what about the offset?
-		void *mappedData = glMapBuffer(GL_UNIFORM_BUFFER, GL_READ_WRITE);
-		memcpy(mappedData, data, size);
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		//void *mappedData = glMapBuffer(GL_UNIFORM_BUFFER, GL_READ_WRITE);
+		//memcpy(mappedData, data, size);
+		//glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 }
 

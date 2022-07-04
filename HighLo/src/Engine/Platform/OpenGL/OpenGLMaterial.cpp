@@ -24,6 +24,18 @@ namespace highlo
 
 			return location;
 		}
+
+		static GLuint GetUniformBufferBlockIndex(const Ref<Shader> &shader, const HLString &name)
+		{
+			uint32 location = glGetUniformBlockIndex(shader->GetRendererID(), *name);
+			if (location == GL_INVALID_INDEX)
+			{
+				HL_CORE_WARN("Could not retrieve uniform block index for {0}", *name);
+				return 0;
+			}
+
+			return location;
+		}
 	}
 
 	OpenGLMaterial::OpenGLMaterial(const Ref<Shader> &shader, const HLString &name)
@@ -259,14 +271,28 @@ namespace highlo
 			m_Flags &= ~(uint32)flag;
 	}
 
-	void OpenGLMaterial::UpdateForRendering()
+	void OpenGLMaterial::UpdateForRendering(const Ref<UniformBufferSet> &uniformBufferSet)
 	{
 		Ref<OpenGLShader> shader = m_Shader.As<OpenGLShader>();
 		shader->Bind();
 
 		const auto &shaderBuffers = GetShader()->GetShaderBuffers();
+		if (shaderBuffers.size() > 0)
+		{
+			for (auto &[bufferName, buffer] : shaderBuffers)
+			{
+				for (auto &[name, uniform] : buffer.Uniforms)
+				{
+					uint32 location = utils::GetUniformBufferBlockIndex(m_Shader, buffer.Name);
+					HL_CORE_TRACE("Trying to bind uniform buffer block {0} with location {1} and binding {2}", *buffer.Name, location, uniform.GetBinding());
+					glUniformBlockBinding(m_Shader->GetRendererID(), location, uniform.GetBinding());
+				}
+			}
+		}
+
 
 		// TODO: This is a workaround until we fully switch to uniform buffer blocks
+		/*
 		if (shaderBuffers.size() > 0)
 		{
 			for (auto &[bufferName, buffer] : shaderBuffers)
@@ -384,7 +410,6 @@ namespace highlo
 							break;
 						}
 
-						/*
 						case ShaderUniformType::Struct:
 						{
 							std::vector<OpenGLShader::ShaderUniformStruct> structs = shader->GetUniformStructs();
@@ -493,7 +518,6 @@ namespace highlo
 
 						break;
 						}
-						*/
 
 						default:
 						{
@@ -504,6 +528,8 @@ namespace highlo
 				}
 			}
 		}
+		*/
+
 
 		for (uint32 i = 0; i < (uint32)m_Textures.size(); ++i)
 		{

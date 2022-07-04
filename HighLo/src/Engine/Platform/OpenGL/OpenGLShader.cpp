@@ -389,6 +389,7 @@ namespace highlo
 			if (activeBuffers.size())
 			{
 				const auto &name = compiler.get_name(resource.id); // this is necessary to get the instance name instead of the structure name
+				const auto &uniformBlockName = compiler.get_name(resource.base_type_id);
 				auto &bufferType = compiler.get_type(resource.base_type_id);
 				uint32 memberCount = (uint32)bufferType.member_types.size();
 				uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
@@ -418,8 +419,8 @@ namespace highlo
 
 				shaderDescriptorSet.UniformBuffers[binding] = s_UniformBuffers.at(descriptorSet).at(binding);
 
-				ShaderBuffer &shaderBuffer = m_Buffers[name];
-				shaderBuffer.Name = name;
+				ShaderBuffer &shaderBuffer = m_Buffers[uniformBlockName];
+				shaderBuffer.Name = uniformBlockName;
 				shaderBuffer.Size = size - bufferOffset;
 
 				for (uint32 i = 0; i < memberCount; ++i)
@@ -430,7 +431,7 @@ namespace highlo
 					uint32 memberOffset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
 
 					const HLString &uniformName = fmt::format("{}.{}", name, memberName);
-					shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SPIRTypeToShaderUniformType(memberType), memberSize, memberOffset);
+					shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, binding, utils::SPIRTypeToShaderUniformType(memberType), memberSize, memberOffset);
 				}
 
 			#if PRINT_DEBUG_OUTPUTS
@@ -959,6 +960,7 @@ namespace highlo
 			const HLString &name = resource.name;
 			auto &type = compiler.get_type(resource.base_type_id);
 			auto bufferSize = (uint32)compiler.get_declared_struct_size(type);
+			uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
 			uint32 memberCount = (uint32)type.member_types.size();
 			uint32 bufferOffset = 0;
 
@@ -992,7 +994,7 @@ namespace highlo
 				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Registering push_constant with uniform name {0} [+]", *uniformName);
 			#endif // PRINT_DEBUG_OUTPUTS
 
-				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SpirvTypeToShaderUniformType(type), size, offset);
+				buffer.Uniforms[uniformName] = ShaderUniform(uniformName, binding, utils::SpirvTypeToShaderUniformType(type), size, offset);
 			}
 
 			m_ConstantBufferOffset += bufferSize;

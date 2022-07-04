@@ -26,12 +26,13 @@ namespace highlo
 	public:
 
 		HLAPI ShaderUniform() = default;
-		HLAPI ShaderUniform(const HLString &name, ShaderUniformType type, uint32 size, uint32 offset);
+		HLAPI ShaderUniform(const HLString &name, uint32 binding, ShaderUniformType type, uint32 size, uint32 offset);
 
 		HLAPI const HLString &GetName() const { return m_Name; }
 		HLAPI ShaderUniformType GetType() const { return m_Type; }
 		HLAPI uint32 GetSize() const { return m_Size; }
 		HLAPI uint32 GetOffset() const { return m_Offset; }
+		HLAPI uint32 GetBinding() const { return m_Binding; }
 
 	private:
 
@@ -39,6 +40,7 @@ namespace highlo
 		ShaderUniformType m_Type = ShaderUniformType::None;
 		uint32 m_Size = 0;
 		uint32 m_Offset = 0;
+		uint32 m_Binding = 0;
 	};
 
 	struct ShaderUniformBuffer

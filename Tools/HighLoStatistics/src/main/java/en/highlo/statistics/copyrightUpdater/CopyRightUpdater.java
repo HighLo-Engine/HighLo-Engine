@@ -11,12 +11,12 @@ public class CopyRightUpdater
 
     public CopyRightUpdater(String rootPath)
     {
-        mIterator = new RecursiveDirectoryIterator(rootPath, null);
+        mIterator = new RecursiveDirectoryIterator(rootPath, null, true);
     }
 
     public CopyRightUpdater(String rootPath, String[] excludeDirs)
     {
-        mIterator = new RecursiveDirectoryIterator(rootPath, excludeDirs);
+        mIterator = new RecursiveDirectoryIterator(rootPath, excludeDirs, true);
     }
 
     public void iterateAndUpdate()

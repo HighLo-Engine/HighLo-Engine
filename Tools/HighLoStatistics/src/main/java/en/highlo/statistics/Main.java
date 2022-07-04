@@ -17,8 +17,8 @@ public class Main
         // supported functions:
         // - a project line counter, that recursively iterates through all engine-related source directories and counts each line of each file and sums them up
         // - a todo finder, that is really useful for all developers, so that they can easily find a todo in any file without having to manually search for them
-        // - a copyright updater that replaced the current copyright with a new one for every file
-        // - more features are more than welcome by any other developer via pull-request or by a feature request! :)
+        // - a copyright updater that replaces the current copyright with a new one for every file
+        // - more features are more than welcome via pull-request or by a feature request! :)
 
         if (args.length < 2)
         {

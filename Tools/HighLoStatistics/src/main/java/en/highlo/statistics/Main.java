@@ -5,6 +5,7 @@ import en.highlo.statistics.projectLineCounter.ProjectLineCounter;
 import en.highlo.statistics.todoFinder.TODOEntry;
 import en.highlo.statistics.todoFinder.TODOFinder;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class Main
@@ -59,7 +60,9 @@ public class Main
         else if (desiredMode.equals("copyright"))
         {
             CopyRightUpdater updater = new CopyRightUpdater(desiredRootPath, excludeDirs);
-            updater.setCopyRightHeader("// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.");
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+            updater.setCopyRightHeader("// Copyright (c) 2021-" + currentYear + " Can Karka and Albert Slepak. All rights reserved.");
             updater.iterateAndUpdate();
         }
         else if (desiredMode.equals("lineCounter") || desiredMode.equals("linecounter") || desiredMode.equals("LINECOUNTER") || desiredMode.equals("line") || desiredMode.equals("LINE"))

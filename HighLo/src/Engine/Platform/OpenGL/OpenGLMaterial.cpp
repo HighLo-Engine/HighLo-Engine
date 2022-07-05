@@ -244,15 +244,18 @@ namespace highlo
 			m_Flags &= ~(uint32)flag;
 	}
 
-	void OpenGLMaterial::UpdateForRendering(Ref<UniformBufferSet> &uniformBufferSet)
+	void OpenGLMaterial::UpdateForRendering(const Ref<UniformBufferSet> &uniformBufferSet)
 	{
 		Ref<OpenGLShader> shader = m_Shader.As<OpenGLShader>();
 		shader->Bind();
 
-		uniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
+		if (uniformBufferSet)
 		{
-			uniformBuffer->Bind();
-		});
+			uniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
+			{
+				uniformBuffer->Bind();
+			});
+		}
 
 		for (uint32 i = 0; i < (uint32)m_Textures.size(); ++i)
 		{

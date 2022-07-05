@@ -81,7 +81,7 @@ namespace highlo
 		HLAPI virtual Ref<Shader> GetShader() const = 0;
 		HLAPI virtual const HLString &GetName() const = 0;
 
-		HLAPI virtual void UpdateForRendering(Ref<UniformBufferSet> &unformBufferSet = nullptr) = 0;
+		HLAPI virtual void UpdateForRendering(const Ref<UniformBufferSet> &unformBufferSet = nullptr) = 0;
 
 		HLAPI static Ref<Material> Create(const Ref<Shader> &shader, const HLString &name = "");
 		HLAPI static Ref<Material> Copy(const Ref<Material> &other, const HLString &name = "");

@@ -138,7 +138,7 @@ namespace highlo
 		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }
 
-		virtual void UpdateForRendering(Ref<UniformBufferSet> &uniformBufferSet = nullptr) override;
+		virtual void UpdateForRendering(const Ref<UniformBufferSet> &uniformBufferSet = nullptr) override;
 
 		Allocator GetUniformStorageBuffer() { return m_LocalData; }
 

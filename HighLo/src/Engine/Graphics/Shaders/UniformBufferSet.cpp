@@ -37,7 +37,7 @@ namespace highlo
 		m_UniformBuffers[frame][set][uniform->GetBinding()] = uniform;
 	}
 
-	void UniformBufferSet::ForEach(const UniformBufferCallback &callback)
+	void UniformBufferSet::ForEach(const UniformBufferCallback &callback) const
 	{
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{

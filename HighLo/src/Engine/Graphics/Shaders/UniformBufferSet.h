@@ -25,7 +25,7 @@ namespace highlo
 		HLAPI Ref<UniformBuffer> GetUniform(uint32 binding, uint32 set = 0, uint32 frame = 0);
 		HLAPI void SetUniform(const Ref<UniformBuffer> &uniform, uint32 set = 0, uint32 frame = 0);
 
-		HLAPI void ForEach(const UniformBufferCallback &callback);
+		HLAPI void ForEach(const UniformBufferCallback &callback) const;
 
 		HLAPI static Ref<UniformBufferSet> Create(uint32 frames);
 

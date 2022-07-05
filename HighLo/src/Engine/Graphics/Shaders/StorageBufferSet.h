@@ -26,7 +26,7 @@ namespace highlo
 		HLAPI void SetStorage(const Ref<StorageBuffer> &storageBuffer, uint32 set = 0, uint32 frame = 0);
 		HLAPI void Resize(uint32 binding, uint32 set, uint32 size);
 
-		HLAPI void ForEach(const StorageBufferCallback &callback);
+		HLAPI void ForEach(const StorageBufferCallback &callback) const;
 
 		HLAPI static Ref<StorageBufferSet> Create(uint32 frames);
 

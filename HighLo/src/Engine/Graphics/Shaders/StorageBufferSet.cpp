@@ -49,7 +49,7 @@ namespace highlo
 		}
 	}
 
-	void StorageBufferSet::ForEach(const StorageBufferCallback &callback)
+	void StorageBufferSet::ForEach(const StorageBufferCallback &callback) const
 	{
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{

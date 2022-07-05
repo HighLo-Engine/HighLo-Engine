@@ -30,6 +30,14 @@ namespace highlo
 		bool CastShadows = true;
 	};
 
+	struct DirLight
+	{
+		glm::vec3 Direction;
+		float Padding = 0.0f;
+		glm::vec3 Radiance;
+		float Multiplier;
+	};
+
 	struct PointLight
 	{
 		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };

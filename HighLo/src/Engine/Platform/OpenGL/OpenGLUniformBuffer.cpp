@@ -11,12 +11,27 @@
 
 namespace highlo
 {
+	namespace utils
+	{
+		static GLuint GetUniformBufferBlockIndex(const Ref<Shader> &shader, const HLString &name)
+		{
+			uint32 location = glGetUniformBlockIndex(shader->GetRendererID(), *name);
+			if (location == GL_INVALID_INDEX)
+			{
+				HL_CORE_WARN("Could not retrieve uniform block index for {0}", *name);
+				return 0;
+			}
+
+			return location;
+		}
+	}
+
 	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32 size, uint32 binding)
 		: m_Size(size), m_Binding(binding)
 	{
 		m_LocalStorage = new uint8[size];
 
-		glCreateBuffers(1, &m_RendererID);
+		glGenBuffers(1, &m_RendererID);
 		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
 		glNamedBufferData(m_RendererID, size, nullptr, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
@@ -31,13 +46,15 @@ namespace highlo
 
 	void OpenGLUniformBuffer::Bind() const
 	{
-	//	glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-	//	glBindBufferRange(GL_UNIFORM_BUFFER, m_Binding, m_RendererID, 0, m_Size);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		glBindBufferRange(GL_UNIFORM_BUFFER, m_Binding, m_RendererID, 0, m_Size);
+
+
 	}
 
 	void OpenGLUniformBuffer::Unbind() const
 	{
-	//	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	void OpenGLUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)

@@ -24,32 +24,33 @@ layout(std140, binding = 17) uniform ScreenData
 
 layout(std140, binding = 3) uniform RendererData
 {
-	uniform vec4 CascadeSplits;
-	uniform int TilesCountX;
-	uniform bool ShowCascades;
-	uniform bool SoftShadows;
-	uniform float LightSize;
-	uniform float MaxShadowDistance;
-	uniform float ShadowFade;
-	uniform bool CascadeFading;
-	uniform float CascadeTransitionFade;
-	uniform bool ShowLightComplexity;
+	vec4 CascadeSplits;
+	float LightSize;
+	float MaxShadowDistance;
+	float ShadowFade;
+	float CascadeTransitionFade;
+	int TilesCountX;
+	bool ShowLightComplexity;
+	bool ShowCascades;
+	bool SoftShadows;
+	bool CascadeFading;
 } u_RendererData;
 
 layout(std140, binding = 18) uniform HBAOData
 {
+	vec4 Float2Offsets[16];
+	vec4 Jitters[16];
 	vec4 PerspectiveInfo;
-	vec2 InvQuarterResolution;
 	float RadiusToScreen;
 	float NegInvR2;
 	float NDotVBias;
 	float AOMultiplier;
 	float PowExponent;
-	bool IsOrtho;
-	vec4 Float2Offsets[16];
-	vec4 Jitters[16];
-	vec3 Padding;
+	vec3 Padding1;
 	float ShadowTolerance;
+	vec2 InvQuarterResolution;
+	vec2 Padding2;
+	bool IsOrtho;
 } u_HBAO;
 
 layout(std430, binding = 14) buffer VisiblePointLightIndicesBuffer

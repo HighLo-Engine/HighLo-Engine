@@ -90,6 +90,7 @@ namespace highlo
 		HLAPI static UniformLayout GetSceneDataLayout();
 		HLAPI static UniformLayout GetPointLightDataLayout();
 
+		HLAPI std::vector<HLString> GetNames();
 		HLAPI uint32 GetStride() const { return m_Stride; }
 
 	private:

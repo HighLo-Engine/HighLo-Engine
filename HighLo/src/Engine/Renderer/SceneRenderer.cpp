@@ -30,7 +30,7 @@ namespace highlo
 		if (m_Specification.SwapChain)
 			m_CommandBuffer = CommandBuffer::CreateFromSwapChain("SceneRenderer");
 		else
-			m_CommandBuffer = CommandBuffer::Create("SceneRenderer", 0);
+			m_CommandBuffer = CommandBuffer::Create("SceneRenderer");
 
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		m_UniformBufferSet = UniformBufferSet::Create(framesInFlight);
@@ -477,7 +477,8 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return m_GeometryVertexArray->GetSpecification().RenderPass;
+		return Renderer2D::GetTargetRenderPass();
+	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
 	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 

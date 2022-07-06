@@ -246,8 +246,7 @@ namespace highlo
 
 	void OpenGLMaterial::UpdateForRendering(const Ref<UniformBufferSet> &uniformBufferSet)
 	{
-		Ref<OpenGLShader> shader = m_Shader.As<OpenGLShader>();
-		shader->Bind();
+		m_Shader->Bind();
 
 		if (uniformBufferSet)
 		{

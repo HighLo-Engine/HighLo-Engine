@@ -141,6 +141,7 @@ namespace highlo
 
 		HLAPI Ref<RenderPass> GetFinalRenderPass();
 		HLAPI Ref<Texture2D> GetFinalRenderTexture();
+		HLAPI const Ref<RenderPass> &GetExternalCompositeRenderPass() { return m_ExternalCompositingRenderPass; }
 
 		HLAPI void OnUIRender();
 		HLAPI static void WaitForThreads();

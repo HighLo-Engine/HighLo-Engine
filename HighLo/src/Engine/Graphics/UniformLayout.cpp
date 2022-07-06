@@ -91,6 +91,18 @@ namespace highlo
 		};
 	}
 
+	std::vector<HLString> UniformLayout::GetNames()
+	{
+		std::vector<HLString> result;
+
+		for (auto &element : m_Elements)
+		{
+			result.push_back(element.Name);
+		}
+
+		return result;
+	}
+
 	void UniformLayout::CalculateOffsetsAndStride()
 	{
 		uint32 offset = 0;

@@ -15,15 +15,13 @@ namespace highlo
 		uint32 Size = 0;
 		uint32 Offset = 0;
 
-		HLAPI UniformLayoutElement(const HLString &name, UniformLayoutDataType type, uint32 typeCount = 1)
-			: Name(name), Type(type), TypeCount(typeCount)
-		{
-			Size = GetComponentSize();
-		}
-
 		HLAPI UniformLayoutElement(const HLString &name, UniformLayoutDataType type, uint32 typeCount = 1, uint32 size = 0, uint32 offset = 0)
 			: Name(name), Type(type), TypeCount(typeCount), Size(size), Offset(offset)
 		{
+			if (size == 0)
+			{
+				Size = GetComponentSize();
+			}
 		}
 
 		HLAPI uint32 GetComponentCount() const

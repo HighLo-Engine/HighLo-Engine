@@ -671,7 +671,10 @@ namespace highlo
 			return;
 
 		float textureIndex = 0.0f;
-		HLString32 utf32Text = utils::ToUTF32(text);
+
+		// TODO: Change this with actual text from parameter
+		char32_t *utf32Text = U"Hello World!";
+		uint32 utf32TextLength = 12;
 
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);
@@ -702,7 +705,7 @@ namespace highlo
 			double y = -fsScale * metrics.ascenderY;
 			int32 lastSpace = -1;
 
-			for (uint32 i = 0; i < utf32Text.Length(); ++i)
+			for (uint32 i = 0; i < utf32TextLength; ++i)
 			{
 				char32_t ch = utf32Text[i];
 				if (ch == '\n')
@@ -756,7 +759,7 @@ namespace highlo
 			double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 			double y = 0.0;
 
-			for (uint32 i = 0; i < utf32Text.Length(); ++i)
+			for (uint32 i = 0; i < utf32TextLength; ++i)
 			{
 				char32_t ch = utf32Text[i];
 				if (ch == '\n' || utils::NextLine(i, nextLines))

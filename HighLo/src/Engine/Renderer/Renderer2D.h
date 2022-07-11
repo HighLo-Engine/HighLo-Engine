@@ -69,6 +69,9 @@ namespace highlo
 		HLAPI static void DrawText(const HLString &text, const Ref<Font> &font, const glm::vec3 &position, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f });
 		HLAPI static void DrawText(const HLString &text, const Ref<Font> &font, const Transform &transform, float maxWidth, const glm::vec4 &color = { 1.0f, 1.0f, 1.0f, 1.0f }, float lineHeightOffset = 0.0f, float kerningOffset = 0.0f);
 
+		HLAPI static void SetTargetRenderPass(const Ref<RenderPass> &renderPass);
+		HLAPI static const Ref<RenderPass> &GetTargetRenderPass();
+
 		HLAPI static Renderer2DStats GetStatistics();
 		HLAPI static void ResetStatistics();
 

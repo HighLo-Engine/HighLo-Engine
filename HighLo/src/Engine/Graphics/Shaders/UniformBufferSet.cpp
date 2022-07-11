@@ -14,11 +14,11 @@ namespace highlo
 	{
 	}
 
-	void UniformBufferSet::CreateUniform(uint32 size, uint32 binding)
+	void UniformBufferSet::CreateUniform(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
 	{
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{
-			Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(size, binding);
+			Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(size, binding, layout);
 			SetUniform(uniformBuffer, 0, frame);
 		}
 	}
@@ -37,7 +37,7 @@ namespace highlo
 		m_UniformBuffers[frame][set][uniform->GetBinding()] = uniform;
 	}
 
-	void UniformBufferSet::ForEach(const UniformBufferCallback &callback)
+	void UniformBufferSet::ForEach(const UniformBufferCallback &callback) const
 	{
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{

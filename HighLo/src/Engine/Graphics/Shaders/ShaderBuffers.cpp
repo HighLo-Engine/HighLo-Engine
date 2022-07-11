@@ -5,8 +5,8 @@
 
 namespace highlo
 {
-	ShaderUniform::ShaderUniform(const HLString &name, ShaderUniformType type, uint32 size, uint32 offset)
-		: m_Name(name), m_Type(type), m_Size(size), m_Offset(offset)
+	ShaderUniform::ShaderUniform(const HLString &name, uint32 binding, ShaderUniformType type, uint32 size, uint32 offset)
+		: m_Name(name), m_Binding(binding), m_Type(type), m_Size(size), m_Offset(offset)
 	{
 	}
 }

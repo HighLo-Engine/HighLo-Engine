@@ -90,7 +90,7 @@ namespace highlo
 
 		BufferLayout() {}
 
-		BufferLayout(const std::initializer_list<BufferElement>& elements)
+		BufferLayout(const std::initializer_list<BufferElement> &elements)
 			: m_Elements(elements)
 		{
 			CalculateOffsetsAndStride();

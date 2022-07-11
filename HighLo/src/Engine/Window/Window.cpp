@@ -4,7 +4,7 @@
 #include "Window.h"
 
 #ifdef HIGHLO_API_GLFW
-#include "Engine/Platform/GLFW/GLFWWindow.h"
+#include "Engine/ThirdParty/GLFW/GLFWWindow.h"
 #else
 #include "Engine/Platform/Windows/WindowsWindow.h"
 #endif // HIGHLO_API_GLFW

@@ -48,13 +48,10 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		//glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		//glBindVertexArray(m_RendererID);
-
 		if (m_Specification.Layout.GetElements().size() < 1)
 		{
 			HL_CORE_ERROR("Vertex Buffer has no layout!");
@@ -97,11 +94,6 @@ namespace highlo
 
 	void OpenGLVertexArray::Invalidate()
 	{
-	//	if (m_RendererID)
-	//		glDeleteVertexArrays(1, &m_RendererID);
-	//
-	//	glGenVertexArrays(1, &m_RendererID);
-	//	glBindVertexArray(m_RendererID);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)

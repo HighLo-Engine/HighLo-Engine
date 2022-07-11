@@ -11,12 +11,12 @@ namespace highlo
 	{
 		return
 		{
-			{ "in_Position", ShaderDataType::Float3 },
-			{ "in_Color", ShaderDataType::Float4 },
-			{ "in_TexCoord", ShaderDataType::Float2 },
-			{ "in_TexIndex", ShaderDataType::Float },
-			{ "in_TilingFactor", ShaderDataType::Float },
-			{ "in_EntityID", ShaderDataType::Int }
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_Color", ShaderDataType::Float4 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
+			{ "a_TexIndex", ShaderDataType::Float },
+			{ "a_TilingFactor", ShaderDataType::Float },
+			{ "a_EntityID", ShaderDataType::Int }
 		};
 	}
 
@@ -24,9 +24,9 @@ namespace highlo
 	{
 		return
 		{
-			{ "in_Position", ShaderDataType::Float3 },
-			{ "in_Color", ShaderDataType::Float4 },
-			{ "in_EntityID", ShaderDataType::Int }
+			{ "a_Position", ShaderDataType::Float3 },
+			{ "a_Color", ShaderDataType::Float4 },
+			{ "a_EntityID", ShaderDataType::Int }
 		};
 	}
 
@@ -34,11 +34,11 @@ namespace highlo
 	{
 		return
 		{
-			{ "in_WorldPosition", ShaderDataType::Float3 },
-			{ "in_Thickness", ShaderDataType::Float },
-			{ "in_LocalPosition", ShaderDataType::Float2 },
-			{ "in_Color", ShaderDataType::Float4 },
-			{ "in_EntityID", ShaderDataType::Int }
+			{ "a_WorldPosition", ShaderDataType::Float3 },
+			{ "a_Thickness", ShaderDataType::Float },
+			{ "a_LocalPosition", ShaderDataType::Float2 },
+			{ "a_Color", ShaderDataType::Float4 },
+			{ "a_EntityID", ShaderDataType::Int }
 		};
 	}
 
@@ -120,7 +120,7 @@ namespace highlo
 	{
 		uint32 offset = 0;
 		m_Stride = 0;
-		for (auto& element : m_Elements)
+		for (auto &element : m_Elements)
 		{
 			element.Offset = offset;
 			offset += element.Size;

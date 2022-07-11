@@ -9,6 +9,7 @@
 #include "Engine/Graphics/Shaders/Shader.h"
 #include "Engine/Graphics/Framebuffer.h"
 #include "Engine/Graphics/Shaders/UniformBufferSet.h"
+#include "Engine/Graphics/Shaders/UniformDefinitions.h"
 #include "Engine/Graphics/Material.h"
 
 #include "Engine/Renderer/Renderer.h"
@@ -26,7 +27,7 @@ namespace highlo
 		float TexIndex;
 		float TilingFactor;
 
-// TODO: make this editor-only
+		// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -35,7 +36,7 @@ namespace highlo
 		glm::vec3 Position;
 		glm::vec4 Color;
 
-// TODO: make this editor-only
+		// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -46,7 +47,7 @@ namespace highlo
 		glm::vec2 LocalPosition;
 		glm::vec4 Color;
 
-// TODO: make this editor-only
+		// TODO: make this editor-only
 		int32 EntityID;
 	};
 
@@ -58,17 +59,12 @@ namespace highlo
 		float TexIndex;
 	};
 
-	struct UniformBufferCamera2D
-	{
-		glm::mat4 ViewProjection;
-	};
-
 	struct Renderer2DData
 	{
 		static const uint32 MaxQuads = 20000;
 		static const uint32 MaxVertices = MaxQuads * 4;
 		static const uint32 MaxIndices = MaxQuads * 6;
-static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
+		static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, so get it from the RenderingAPI
 
 		static const uint32 MaxLines = 10000;
 		static const uint32 MaxLineVertices = MaxLines * 2;
@@ -116,11 +112,11 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 
 		glm::vec4 QuadVertexPositions[4];
-		Ref<RenderPass> RenderPass;
+		Ref<RenderPass> ActiveRenderPass = nullptr;
+		Ref<CommandBuffer> ActiveCommandBuffer = nullptr;
 
 		bool DepthTest = true;
 		bool SwapChainTarget = false;
-		glm::mat4 CameraProjection = glm::mat4(1.0f);
 		Ref<UniformBufferSet> UniformBufferSet;
 		Renderer2DStats Statistics;
 	};
@@ -132,6 +128,8 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		HL_PROFILE_FUNCTION();
 
 		s_2DData = new Renderer2DData();
+
+		s_2DData->ActiveCommandBuffer = CommandBuffer::Create("Renderer2D");
 
 		// Set all texture slots to 0
 		s_2DData->WhiteTexture = Renderer::GetWhiteTexture();
@@ -176,7 +174,7 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Renderer2D RenderPass";
 		renderPassSpec.Framebuffer = framebuffer;
-		Ref<RenderPass> renderPass = RenderPass::Create(renderPassSpec);
+		s_2DData->ActiveRenderPass = RenderPass::Create(renderPassSpec);
 
 		std::vector<int32> textIndices;
 		offset = 0;
@@ -201,7 +199,7 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		VertexArraySpecification quadVertexArraySpec;
 		quadVertexArraySpec.Layout = BufferLayout::GetTextureLayout();
 		quadVertexArraySpec.Shader = s_2DData->TextureShader;
-		quadVertexArraySpec.RenderPass = renderPass;
+		quadVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->QuadVertexArray = VertexArray::Create(quadVertexArraySpec);
 		s_2DData->QuadVertexArray->Bind();
 	
@@ -219,7 +217,7 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		VertexArraySpecification circleVertexArraySpec;
 		circleVertexArraySpec.Layout = BufferLayout::GetCircleLayout();
 		circleVertexArraySpec.Shader = s_2DData->CircleShader;
-		circleVertexArraySpec.RenderPass = renderPass;
+		circleVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->CircleVertexArray = VertexArray::Create(circleVertexArraySpec);
 		s_2DData->CircleVertexArray->Bind();
 
@@ -236,7 +234,7 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		VertexArraySpecification lineVertexArraySpec;
 		lineVertexArraySpec.Layout = BufferLayout::GetLineLayout();
 		lineVertexArraySpec.Shader = s_2DData->LineShader;
-		lineVertexArraySpec.RenderPass = renderPass;
+		lineVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->LineVertexArray = VertexArray::Create(lineVertexArraySpec);
 		s_2DData->LineVertexArray->Bind();
 
@@ -253,7 +251,7 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		VertexArraySpecification textVertexArraySpec;
 		textVertexArraySpec.Layout = BufferLayout::GetTextLayout();
 		textVertexArraySpec.Shader = s_2DData->TextShader;
-		textVertexArraySpec.RenderPass = renderPass;
+		textVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->TextVertexArray = VertexArray::Create(textVertexArraySpec);
 		s_2DData->TextVertexArray->Bind();
 
@@ -265,7 +263,7 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		// Uniform Buffer
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera2D), 0);
+		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout());
 	}
 
 	void Renderer2D::Shutdown()
@@ -284,14 +282,18 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 	{
 		HL_PROFILE_FUNCTION();
 
-		s_2DData->CameraProjection = camera.GetProjection();
 		s_2DData->DepthTest = depthTest;
+		UniformBufferCamera cameraStruct;
+		cameraStruct.ViewProjection = camera.GetProjection() * camera.GetViewMatrix();
+		cameraStruct.Projection = camera.GetProjection();
+		cameraStruct.View = camera.GetViewMatrix();
+		cameraStruct.InverseViewProjection = glm::inverse(cameraStruct.ViewProjection);
 
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera2D));
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 
 		StartBatch();
 		ResetStatistics();
@@ -301,14 +303,18 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 	{
 		HL_PROFILE_FUNCTION();
 
-		s_2DData->CameraProjection = camera.GetProjection();
 		s_2DData->DepthTest = depthTest;
+		UniformBufferCamera cameraStruct;
+		cameraStruct.ViewProjection = camera.GetProjection() * camera.GetViewMatrix();
+		cameraStruct.Projection = camera.GetProjection();
+		cameraStruct.View = camera.GetViewMatrix();
+		cameraStruct.InverseViewProjection = glm::inverse(cameraStruct.ViewProjection);
 
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&s_2DData->CameraProjection, sizeof(UniformBufferCamera2D));
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 
 		StartBatch();
 		ResetStatistics();
@@ -325,10 +331,17 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 	{
 		HL_PROFILE_FUNCTION();
 
+		s_2DData->ActiveCommandBuffer->Begin();
+		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass, true);
+
 		FlushQuads();
 		FlushCircles();
 		FlushLines();
 		FlushText();
+
+		Renderer::EndRenderPass(s_2DData->ActiveCommandBuffer);
+		s_2DData->ActiveCommandBuffer->End();
+		s_2DData->ActiveCommandBuffer->Submit();
 	}
 
 	void Renderer2D::FlushQuads()
@@ -805,6 +818,35 @@ static const uint32 MaxTextureSlots = 32; // TODO: This is platform dependent, s
 		}
 
 		s_2DData->Statistics.TextCount++;
+	}
+
+	void Renderer2D::SetTargetRenderPass(const Ref<RenderPass> &renderPass)
+	{
+		if (renderPass != s_2DData->ActiveRenderPass)
+		{
+			VertexArraySpecification &quadSpec = s_2DData->QuadVertexArray->GetSpecification();
+			quadSpec.RenderPass = renderPass;
+			s_2DData->QuadVertexArray = VertexArray::Create(quadSpec);
+
+			VertexArraySpecification &lineSpec = s_2DData->LineVertexArray->GetSpecification();
+			lineSpec.RenderPass = renderPass;
+			s_2DData->LineVertexArray = VertexArray::Create(lineSpec);
+
+			VertexArraySpecification &circleSpec = s_2DData->CircleVertexArray->GetSpecification();
+			circleSpec.RenderPass = renderPass;
+			s_2DData->CircleVertexArray = VertexArray::Create(circleSpec);
+
+			VertexArraySpecification &textSpec = s_2DData->TextVertexArray->GetSpecification();
+			textSpec.RenderPass = renderPass;
+			s_2DData->TextVertexArray = VertexArray::Create(textSpec);
+
+			s_2DData->ActiveRenderPass = renderPass;
+		}
+	}
+
+	const Ref<RenderPass> &Renderer2D::GetTargetRenderPass()
+	{
+		return s_2DData->ActiveRenderPass;
 	}
 
 	Renderer2DStats Renderer2D::GetStatistics()

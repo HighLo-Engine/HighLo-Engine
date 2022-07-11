@@ -12,7 +12,6 @@
 
 #include "Engine/Graphics/RenderPass.h"
 #include "Engine/Graphics/RenderingAPI.h"
-#include "Engine/Graphics/UniformLayout.h"
 #include "Engine/Graphics/Shaders/Shader.h"
 
 namespace highlo
@@ -36,7 +35,6 @@ namespace highlo
 		Ref<RenderPass> RenderPass;
 		BufferLayout Layout;
 		BufferLayout InstanceLayout;
-		std::vector<UniformLayout> UniformLayouts;
 
 		bool BackfaceCulling = true;
 		bool DepthTest = true;

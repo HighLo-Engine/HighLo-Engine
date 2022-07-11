@@ -72,5 +72,12 @@ namespace highlo
 		glm::vec2 InvHalfResolution;
 		glm::vec2 HalfResolution;
 	};
+
+	struct UniformBufferSceneCompositeData
+	{
+		float Exposure;
+		float BloomIntensity;
+		float BloomDirtIntensity;
+	};
 }
 

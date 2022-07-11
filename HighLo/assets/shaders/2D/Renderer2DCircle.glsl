@@ -39,7 +39,7 @@ void main()
 	Output.Color = a_Color;
 	v_EntityID = a_EntityID;
 	//gl_Position = u_Camera.ViewProjectionMatrix * transform * vec4(a_WorldPosition, 1.0f);
-	gl_Position = vec4(a_WorldPosition, 1.0f);
+	gl_Position = u_Camera.ViewProjectionMatrix * vec4(a_WorldPosition, 1.0f);
 }
 
 

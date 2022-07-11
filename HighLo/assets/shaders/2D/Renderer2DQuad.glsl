@@ -42,7 +42,7 @@ void main()
 	Output.TilingFactor = a_TilingFactor;
 	v_EntityID = a_EntityID;
 	//gl_Position = u_Camera.ViewProjectionMatrix * transform * vec4(a_Position, 1.0f);
-	gl_Position = vec4(a_Position, 1.0f);
+	gl_Position = u_Camera.ViewProjectionMatrix * vec4(a_Position, 1.0f);
 }
 
 #version 450 core

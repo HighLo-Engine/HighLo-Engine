@@ -36,7 +36,7 @@ void main()
 	Output.TexCoord = a_TexCoord;
 	v_TexIndex = a_TexIndex;
 	//gl_Position = u_Camera.ViewProjectionMatrix * transform * vec4(a_Position, 1.0);
-	gl_Position = vec4(a_Position, 1.0);
+	gl_Position = u_Camera.ViewProjectionMatrix * vec4(a_Position, 1.0);
 }
 
 #version 450 core

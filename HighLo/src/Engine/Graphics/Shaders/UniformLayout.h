@@ -7,7 +7,7 @@ namespace highlo
 		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
 	};
 
-	struct UniformLayoutElement
+	struct UniformVariable
 	{
 		HLString Name;
 		UniformLayoutDataType Type = UniformLayoutDataType::Float;
@@ -15,7 +15,7 @@ namespace highlo
 		uint32 Size = 0;
 		uint32 Offset = 0;
 
-		HLAPI UniformLayoutElement(const HLString &name, UniformLayoutDataType type, uint32 typeCount = 1, uint32 size = 0, uint32 offset = 0)
+		HLAPI UniformVariable(const HLString &name, UniformLayoutDataType type, uint32 typeCount = 1, uint32 offset = 0, uint32 size = 0)
 			: Name(name), Type(type), TypeCount(typeCount), Size(size), Offset(offset)
 		{
 			if (size == 0)
@@ -76,19 +76,20 @@ namespace highlo
 		{
 		}
 
-		HLAPI UniformLayout(const std::initializer_list<UniformLayoutElement> &elements)
+		HLAPI UniformLayout(const std::initializer_list<UniformVariable> &elements)
 			: m_Elements(elements)
 		{
 			CalculateOffsetsAndStride();
 		}
 
-		HLAPI static UniformLayout GetCameraLayout();
-		HLAPI static UniformLayout GetScreenDataLayout();
-		HLAPI static UniformLayout GetRendererDataLayout();
-		HLAPI static UniformLayout GetHBAODataLayout();
-		HLAPI static UniformLayout GetShadowDataLayout();
-		HLAPI static UniformLayout GetSceneDataLayout();
-		HLAPI static UniformLayout GetPointLightDataLayout();
+		HLAPI static std::vector<UniformVariable> GetCameraLayout();
+		HLAPI static std::vector<UniformVariable> GetScreenDataLayout();
+		HLAPI static std::vector<UniformVariable> GetRendererDataLayout();
+		HLAPI static std::vector<UniformVariable> GetHBAODataLayout();
+		HLAPI static std::vector<UniformVariable> GetShadowDataLayout();
+		HLAPI static std::vector<UniformVariable> GetSceneDataLayout();
+		HLAPI static std::vector<UniformVariable> GetSceneCompositeLayout();
+		HLAPI static std::vector<UniformVariable> GetPointLightDataLayout();
 
 		HLAPI std::vector<HLString> GetNames();
 		HLAPI uint32 GetStride() const { return m_Stride; }
@@ -98,7 +99,7 @@ namespace highlo
 		void CalculateOffsetsAndStride();
 
 		uint32 m_Stride = 0;
-		std::vector<UniformLayoutElement> m_Elements;
+		std::vector<UniformVariable> m_Elements;
 	};
 }
 

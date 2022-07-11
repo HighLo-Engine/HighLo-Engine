@@ -263,7 +263,7 @@ namespace highlo
 		// Uniform Buffer
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0);
+		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout());
 	}
 
 	void Renderer2D::Shutdown()

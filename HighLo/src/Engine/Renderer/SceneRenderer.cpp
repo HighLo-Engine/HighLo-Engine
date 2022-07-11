@@ -34,13 +34,13 @@ namespace highlo
 
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		m_UniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0); // Camera Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferShadow), 1); // Shadow Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScene), 2); // Scene Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferRendererData), 3); // Renderer Data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), 4); // PointLights Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), 17); // Screen data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), 18); // HBAO data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout()); // Camera Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferShadow), 1, UniformLayout::GetShadowDataLayout()); // Shadow Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScene), 2, UniformLayout::GetSceneDataLayout()); // Scene Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferRendererData), 3, UniformLayout::GetRendererDataLayout()); // Renderer Data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), 4, UniformLayout::GetPointLightDataLayout()); // PointLights Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), 17, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), 18, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway

@@ -521,18 +521,18 @@ namespace highlo
 		s_2DData->Statistics.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
+	void Renderer2D::DrawTexture(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor, entityId);
+		DrawTexture({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor, entityId);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
+	void Renderer2D::DrawTexture(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
 		Transform transform = Transform::FromPosition(position).Scale({ size.x, size.y, 1.0f });
-		DrawQuad(transform, texture, tilingFactor, tintColor, entityId);
+		DrawTexture(transform, texture, tilingFactor, tintColor, entityId);
 	}
 	
-	void Renderer2D::DrawQuad(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
+	void Renderer2D::DrawTexture(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
 		HL_PROFILE_FUNCTION();
 

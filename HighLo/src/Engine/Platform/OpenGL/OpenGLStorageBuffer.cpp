@@ -9,21 +9,17 @@
 
 namespace highlo
 {
-	OpenGLStorageBuffer::OpenGLStorageBuffer(uint32 size, uint32 binding)
-		: m_Size(size), m_Binding(binding)
+	OpenGLStorageBuffer::OpenGLStorageBuffer(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
+		: StorageBuffer(binding, layout), m_Size(size)
 	{
-		m_LocalStorage = new uint8[size];
-
-		glCreateBuffers(1, &m_RendererID);
+		glGenBuffers(1, &m_RendererID);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
-		glNamedBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size, m_Data, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, m_RendererID);
 	}
 
 	OpenGLStorageBuffer::~OpenGLStorageBuffer()
 	{
-		delete[] m_LocalStorage;
-
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
@@ -38,12 +34,10 @@ namespace highlo
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
-	void OpenGLStorageBuffer::SetData(const void *data, uint32 size, uint32 offset)
+	void OpenGLStorageBuffer::UploadToShader()
 	{
-		memcpy(m_LocalStorage, data, size);
-
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
-		glNamedBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, size, m_LocalStorage);
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_DataSize, m_Data);
 	}
 
 	void OpenGLStorageBuffer::Resize(uint32 size)
@@ -53,7 +47,7 @@ namespace highlo
 			m_Size = size;
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID);
-			glNamedBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, m_LocalStorage);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, m_Data);
 		}
 	}
 }

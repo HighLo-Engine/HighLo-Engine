@@ -31,7 +31,7 @@ namespace highlo
 			Byte *data = FileSystem::Get()->ReadFile(path, &fileSize);
 
 			MonoImageOpenStatus status;
-			MonoImage *image = mono_image_open_from_data_full((char*)data, fileSize, 1, &status, 0);
+			MonoImage *image = mono_image_open_from_data_full((char*)data, (uint32)fileSize, 1, &status, 0);
 
 			if (status != MONO_IMAGE_OK)
 			{

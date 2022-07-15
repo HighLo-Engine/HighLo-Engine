@@ -10,7 +10,7 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11UniformBuffer.h"
 #elif HIGHLO_API_DX12
-// TODO
+#include "Engine/Platform/DX12/DX12UniformBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -22,8 +22,7 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11UniformBuffer>::Create(size, binding, layout);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12UniformBuffer>::Create(size, binding, layout);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanUniformBuffer>::Create(size, binding, layout);
 	#else

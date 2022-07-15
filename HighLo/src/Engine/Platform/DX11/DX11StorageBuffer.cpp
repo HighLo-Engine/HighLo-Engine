@@ -5,7 +5,8 @@
 
 namespace highlo
 {
-	DX11StorageBuffer::DX11StorageBuffer(uint32 size, uint32 binding)
+	DX11StorageBuffer::DX11StorageBuffer(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
+		: StorageBuffer(binding, layout), m_Size(size)
 	{
 	}
 
@@ -21,7 +22,7 @@ namespace highlo
 	{
 	}
 
-	void DX11StorageBuffer::SetData(const void *data, uint32 size, uint32 offset)
+	void DX11StorageBuffer::UploadToShader()
 	{
 	}
 

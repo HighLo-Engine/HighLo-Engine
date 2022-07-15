@@ -143,6 +143,8 @@ namespace highlo
 		Ref<Material> m_SkyboxMaterial;
 		Ref<Shader> m_SkyboxShader;
 
+		Ref<Texture2D> m_DemoTexture = nullptr;
+
 		Entity m_SelectedEntity;
 
 		bool m_IsPlaying = false;

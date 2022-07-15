@@ -29,8 +29,9 @@ namespace highlo
 		EnvMap = 6,
 		Prefab = 7,
 		Font = 8,
+		Script = 9,
 
-		MeshAsset = 9,
+		MeshAsset = 10,
 	};
 
 	namespace utils

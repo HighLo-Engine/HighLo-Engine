@@ -20,7 +20,7 @@ namespace highlo
 		HLAPI StorageBufferSet(uint32 frames);
 		HLAPI virtual ~StorageBufferSet();
 
-		HLAPI void CreateStorage(uint32 size, uint32 binding);
+		HLAPI void CreateStorage(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout);
 
 		HLAPI Ref<StorageBuffer> GetStorage(uint32 binding, uint32 set = 0, uint32 frame = 0);
 		HLAPI void SetStorage(const Ref<StorageBuffer> &storageBuffer, uint32 set = 0, uint32 frame = 0);

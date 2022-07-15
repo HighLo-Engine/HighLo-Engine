@@ -9,8 +9,8 @@
 
 namespace highlo
 {
-    VulkanUniformBuffer::VulkanUniformBuffer(uint32 size, uint32 binding)
-        : m_Size(size), m_Binding(binding)
+    VulkanUniformBuffer::VulkanUniformBuffer(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
+        : UniformBuffer(binding, layout), m_Size(size)
     {
         Invalidate();
     }
@@ -19,11 +19,11 @@ namespace highlo
     {
         Release();
     }
-    
-    void VulkanUniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
+
+    void VulkanUniformBuffer::UploadToShader()
     {
         uint8 *dst = utils::MapMemory<uint8>(m_MemoryAllocation);
-        memcpy(dst, (uint8*)data + offset, size);
+        memcpy(dst, m_Data, m_DataSize);
         utils::UnmapMemory(m_MemoryAllocation);
     }
 

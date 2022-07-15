@@ -52,9 +52,9 @@ namespace highlo
 		HLAPI static void DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color, int32 entityId = 0);
 		HLAPI static void DrawQuad(const Transform &transform, const glm::vec4 &color, int32 entityId = 0);
 
-		HLAPI static void DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }, int32 entityId = 0);
-		HLAPI static void DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }, int32 entityId = 0);
-		HLAPI static void DrawQuad(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }, int32 entityId = 0);
+		HLAPI static void DrawTexture(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }, int32 entityId = 0);
+		HLAPI static void DrawTexture(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }, int32 entityId = 0);
+		HLAPI static void DrawTexture(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = { 1.0f, 1.0f, 1.0f, 1.0f }, int32 entityId = 0);
 
 		HLAPI static void DrawLine(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color, int32 entityId = 0);
 		HLAPI static void DrawLine(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color, int32 entityId = 0);

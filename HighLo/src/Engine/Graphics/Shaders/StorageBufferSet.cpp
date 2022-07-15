@@ -14,11 +14,11 @@ namespace highlo
 	{
 	}
 	
-	void StorageBufferSet::CreateStorage(uint32 size, uint32 binding)
+	void StorageBufferSet::CreateStorage(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
 	{
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{
-			const Ref<StorageBuffer> storageBuffer = StorageBuffer::Create(size, binding);
+			const Ref<StorageBuffer> storageBuffer = StorageBuffer::Create(size, binding, layout);
 			SetStorage(storageBuffer, 0, frame);
 		}
 	}

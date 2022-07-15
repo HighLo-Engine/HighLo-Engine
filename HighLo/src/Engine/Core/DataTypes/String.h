@@ -16,8 +16,17 @@
 
 #include <iostream>
 
+#define HASH_LENGTH 20
+
 namespace highlo
 {
+	template<typename T>
+	class HLStringBase;
+
+	using HLString = HLStringBase<char>;
+	using HLString16 = HLStringBase<char16_t>;
+	using HLString32 = HLStringBase<char32_t>;
+
 	namespace utils
 	{
 		static char *CopySubStr(const char *str, uint32 pos, uint32 size)
@@ -56,16 +65,12 @@ namespace highlo
 
 			return result;
 		}
+
+		HLString32 ToUTF32(const HLString &str);
+		HLString16 ToUTF16(const HLString &str);
+		HLString ToUTF8(const HLString32 &str);
+		HLString ToUTF8(const HLString16 &str);
 	}
-
-	template<typename T>
-	class HLStringBase;
-
-	using HLString = HLStringBase<char>;
-	using HLString16 = HLStringBase<char16_t>;
-	using HLString32 = HLStringBase<char32_t>;
-
-	#define HASH_LENGTH 20
 
 	template<typename StringType>
 	class HLStringBase
@@ -78,7 +83,7 @@ namespace highlo
 
 		HLAPI HLStringBase(const StringType *data)
 		{
-			m_Size = (uint32)strlen(data);
+			m_Size = (uint32)strlen((const char*)data);
 			m_Data = new StringType[m_Size + 1];
 			m_Data[m_Size] = '\0';
 			memcpy(m_Data, data, m_Size);
@@ -1055,24 +1060,22 @@ namespace highlo
 
 		HLAPI bool ToBool() const
 		{
-			return Compare("1") || Compare("true");
+			return strcmp(m_Data, "1") == 0 || strcmp(m_Data, "true") == 0 || strcmp(m_Data, "TRUE") == 0;
 		}
-
-		// TODO
 
 		HLString ToUTF8() const
 		{
-			return HLString();
+			return utils::ToUTF8(*this);
 		}
 
 		HLString16 ToUTF16() const
 		{
-			return HLString16();
+			return utils::ToUTF16(*this);
 		}
 
 		HLString32 ToUTF32() const
 		{
-			return HLString32();
+			return utils::ToUTF32(*this);
 		}
 
 	private:

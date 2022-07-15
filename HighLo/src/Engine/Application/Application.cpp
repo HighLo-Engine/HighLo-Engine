@@ -19,6 +19,7 @@
 #include "Engine/ECS/RenderSystem.h"
 #include "Engine/Threading/ThreadRegistry.h"
 #include "Engine/Loaders/AssetImporter.h"
+#include "Engine/Scripting/ScriptEngine.h"
 
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&highlo::HLApplication::fn, this, std::placeholders::_1)
 
@@ -180,6 +181,7 @@ namespace highlo
 		Service::Sort();
 
 		Translations::Init();
+		ScriptEngine::Init();
 
 		m_RenderDebugPanel = UniqueRef<RenderDebugPanel>::Create();
 
@@ -188,6 +190,7 @@ namespace highlo
 
 	void HLApplication::Shutdown()
 	{
+		ScriptEngine::Shutdown();
 		Translations::Shutdown();
 
 		ThreadRegistry::Get()->Shutdown();

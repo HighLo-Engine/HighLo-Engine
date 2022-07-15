@@ -39,6 +39,7 @@ project "HighLo"
 		"%{IncludeDir.vulkan_local}",
 		"%{IncludeDir.vulkan_memory_alloc}",
 		"%{IncludeDir.yamlCpp}",
+		"%{IncludeDir.mono}",
 		"%{IncludeDir.shaderc_util}",
 		"%{IncludeDir.shaderc_glslc}",
     }
@@ -52,6 +53,7 @@ project "HighLo"
 		
 		"%{LibDir.openssl_libssl}",
 		"%{LibDir.openssl_libcrypto}",
+		"%{LibDir.mono}",
 		"%{LibDir.vulkan_sdk}",
 		"%{LibDir.vulkan_sdk_utils}",
 		"%{LibDir.dxc}",
@@ -61,6 +63,7 @@ project "HighLo"
 	{
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE",
+		"HIGHLO_API_MONO_SCRIPTING",
 		"HIGHLO_LIBRARY_EXPORT",
 		"HIGHLO_ENABLE_PROFILER",
 	}
@@ -87,6 +90,11 @@ project "HighLo"
 		{
 		    "GLAD",
 			"opengl32.lib",
+			
+			"%{LibDir.WinSock}",
+			"%{LibDir.WinMM}",
+			"%{LibDir.WinVersion}",
+			"%{LibDir.WinBCrypt}",
 		}
 
 	filter "system:macosx"

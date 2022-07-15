@@ -521,18 +521,18 @@ namespace highlo
 		s_2DData->Statistics.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
+	void Renderer2D::DrawTexture(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor, entityId);
+		DrawTexture({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor, entityId);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
+	void Renderer2D::DrawTexture(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
 		Transform transform = Transform::FromPosition(position).Scale({ size.x, size.y, 1.0f });
-		DrawQuad(transform, texture, tilingFactor, tintColor, entityId);
+		DrawTexture(transform, texture, tilingFactor, tintColor, entityId);
 	}
 	
-	void Renderer2D::DrawQuad(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
+	void Renderer2D::DrawTexture(const Transform &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor, int32 entityId)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -671,7 +671,10 @@ namespace highlo
 			return;
 
 		float textureIndex = 0.0f;
-		HLString32 utf32Text = utils::ToUTF32(text);
+
+		// TODO: Change this with actual text from parameter
+		char32_t *utf32Text = U"Hello World!";
+		uint32 utf32TextLength = 12;
 
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);
@@ -702,7 +705,7 @@ namespace highlo
 			double y = -fsScale * metrics.ascenderY;
 			int32 lastSpace = -1;
 
-			for (uint32 i = 0; i < utf32Text.Length(); ++i)
+			for (uint32 i = 0; i < utf32TextLength; ++i)
 			{
 				char32_t ch = utf32Text[i];
 				if (ch == '\n')
@@ -756,7 +759,7 @@ namespace highlo
 			double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 			double y = 0.0;
 
-			for (uint32 i = 0; i < utf32Text.Length(); ++i)
+			for (uint32 i = 0; i < utf32TextLength; ++i)
 			{
 				char32_t ch = utf32Text[i];
 				if (ch == '\n' || utils::NextLine(i, nextLines))

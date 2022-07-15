@@ -90,6 +90,7 @@ project "HighLo"
 		{
 		    "GLAD",
 			"opengl32.lib",
+			
 			"%{LibDir.WinSock}",
 			"%{LibDir.WinMM}",
 			"%{LibDir.WinVersion}",

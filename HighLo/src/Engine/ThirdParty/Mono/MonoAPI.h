@@ -11,10 +11,6 @@
 
 #ifdef HIGHLO_API_MONO_SCRIPTING
 
-#include <mono/jit/jit.h>
-#include <mono/metadata/object.h>
-#include <mono/metadata/assembly.h>
-
 namespace highlo
 {
 	class MonoAPI : public ScriptingAPI
@@ -25,6 +21,11 @@ namespace highlo
 		virtual void Shutdown() override;
 
 
+
+	private:
+
+		void InitMono();
+		void ShutdownMono();
 	};
 }
 

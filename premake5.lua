@@ -40,6 +40,7 @@ workspace "HighLo"
 
 	group "Engine"
 		include "HighLo"
+		include "HighLo/src/Scripting/C#-Bindings"
 	group ""
 
 	group "Demos"

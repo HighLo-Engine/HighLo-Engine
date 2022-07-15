@@ -11,6 +11,8 @@ bin-obj/
 build/
 builds/
 HighLo/vendor/VulkanSDK/
+HighLoEdit/Resources/Scripts/Intermediates
+HighLoEdit/Resources/Scripts/**.pdb
 !vendor/bin/
 
 # Visual Studio and IntelliJ files
@@ -18,6 +20,8 @@ HighLo/vendor/VulkanSDK/
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+**.csproj
+**.csproj.user
 .idea/
 
 # java build files and gradle files

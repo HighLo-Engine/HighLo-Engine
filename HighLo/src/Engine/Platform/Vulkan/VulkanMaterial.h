@@ -147,7 +147,7 @@ namespace highlo
 		virtual bool GetFlag(MaterialFlag flag) const override;
 		virtual void SetFlag(MaterialFlag flag, bool value = true) override;
 
-		virtual void UpdateForRendering() override;
+		virtual void UpdateForRendering(const Ref<UniformBufferSet> &unformBufferSet = nullptr) override;
 
 		virtual Ref<Shader> GetShader() const override { return m_Shader; }
 		virtual const HLString &GetName() const override { return m_Name; }

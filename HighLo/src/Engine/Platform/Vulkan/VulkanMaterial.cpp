@@ -246,7 +246,7 @@ namespace highlo
         }
     }
     
-    void VulkanMaterial::UpdateForRendering()
+    void VulkanMaterial::UpdateForRendering(const Ref<UniformBufferSet> &unformBufferSet)
     {
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
         std::vector<VkDescriptorImageInfo> arrayImageInfos;

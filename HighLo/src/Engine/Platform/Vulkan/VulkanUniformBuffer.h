@@ -20,14 +20,13 @@ namespace highlo
 	{
 	public:
 
-		VulkanUniformBuffer(uint32 size, uint32 binding);
+		VulkanUniformBuffer(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout);
 		virtual ~VulkanUniformBuffer();
 
 		virtual void Bind() const override {}
 		virtual void Unbind() const override {}
 
-		virtual void SetData(const void *data, uint32 size, uint32 offset = 0) override;
-		virtual uint32 GetBinding() const override { return m_Binding; }
+		virtual void UploadToShader() override;
 
 		// Vulkan-specific
 		const VkDescriptorBufferInfo &GetDescriptorBufferInfo() const { return m_DescriptorBufferInfo; }
@@ -40,7 +39,6 @@ namespace highlo
 
 	private:
 
-		uint32 m_Binding = 0;
 		uint32 m_Size = 0;
 
 		VmaAllocation m_MemoryAllocation = nullptr;

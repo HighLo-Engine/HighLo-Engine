@@ -619,6 +619,7 @@ namespace highlo
         {
             const auto &bufferName = resource.name;
             auto &bufferType = compiler.get_type(resource.type_id);
+            uint32 binding = (uint32)compiler.get_decoration(resource.id, spv::DecorationBinding);
             uint32 bufferSize = (uint32)compiler.get_declared_struct_size(bufferType);
             uint32 memberCount = (uint32)bufferType.member_types.size();
             uint32 bufferOffset = 0;
@@ -651,7 +652,7 @@ namespace highlo
                 uint32 offset = (uint32)compiler.type_struct_member_offset(bufferType, i) - bufferOffset;
 
                 HLString uniformName = fmt::format("{}.{}", bufferName, memberName);
-                shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, utils::SPIRTypeToShaderUniformType(type), size, offset);
+                shaderBuffer.Uniforms[uniformName] = ShaderUniform(uniformName, binding, utils::SPIRTypeToShaderUniformType(type), size, offset);
             }
         }
 

@@ -7,8 +7,8 @@
 
 namespace highlo
 {	
-	DX11UniformBuffer::DX11UniformBuffer(uint32 size, uint32 binding)
-		: m_Size(size), m_Binding(binding)
+	DX11UniformBuffer::DX11UniformBuffer(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
+		: UniformBuffer(binding, layout), m_Size(size)
 	{
 		if (m_Buffer.Get() != nullptr)
 			m_Buffer.Reset();
@@ -35,8 +35,8 @@ namespace highlo
 	void DX11UniformBuffer::Unbind() const
 	{
 	}
-	
-	void DX11UniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
+
+	void DX11UniformBuffer::UploadToShader()
 	{
 		// TODO
 	}

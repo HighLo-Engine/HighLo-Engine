@@ -199,7 +199,7 @@ namespace highlo
 	{
 	}
 	
-	void DX11Material::UpdateForRendering()
+	void DX11Material::UpdateForRendering(const Ref<UniformBufferSet> &unformBufferSet)
 	{
 	}
 }

@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "MonoAPI.h"
 
+#ifdef HIGHLO_API_MONO_SCRIPTING
+
 namespace highlo
 {
 	void MonoAPI::Init()
@@ -13,4 +15,6 @@ namespace highlo
 	{
 	}
 }
+
+#endif // HIGHLO_API_MONO_SCRIPTING
 

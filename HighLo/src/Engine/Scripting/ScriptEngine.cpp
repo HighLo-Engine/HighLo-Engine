@@ -5,8 +5,6 @@
 
 #include "ScriptCache.h"
 
-#define HIGHLO_API_MONO_SCRIPTING 1
-
 #ifdef HIGHLO_API_MONO_SCRIPTING
 #include "Engine/ThirdParty/Mono/MonoAPI.h"
 #elif HIGHLO_API_LUA_SCRIPTING

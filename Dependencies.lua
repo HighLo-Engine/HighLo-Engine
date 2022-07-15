@@ -14,6 +14,7 @@ IncludeDir["rapidXML"]               = "%{wks.location}/HighLo/vendor/RapidXML"
 IncludeDir["rapidJSON"]              = "%{wks.location}/HighLo/vendor/RapidJSON/include"
 IncludeDir["yamlCpp"]                = "%{wks.location}/HighLo/vendor/yaml-cpp/include"
 IncludeDir["IconFontCppHeaders"]     = "%{wks.location}/HighLo/vendor/IconFontCppHeaders"
+IncludeDir["mono"]     			 	 = "%{wks.location}/HighLo/vendor/mono/include"
 IncludeDir["gtest"]     			 = "%{wks.location}/HighLo/vendor/googletest/googletest/include"
 IncludeDir["gmock"]     			 = "%{wks.location}/HighLo/vendor/googletest/googlemock/include"
 IncludeDir["vulkan"]     			 = "%{VULKAN_SDK}/Include"
@@ -40,6 +41,9 @@ LibDir["gtest_release"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/R
 LibDir["gtest_main_release"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gtest_main.lib"
 LibDir["gmock_release"]    			 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gmock.lib"
 LibDir["gmock_main_release"]   		 = "%{wks.location}/HighLo/vendor/googletest/lib/Release/gmock_main.lib"
+
+LibDir["mono"]   		 			 = "%{wks.location}/HighLo/vendor/mono/lib/Debug/libmono-static-sgen.lib"
+LibDir["mono_release"]   			 = "%{wks.location}/HighLo/vendor/mono/lib/Release/libmono-static-sgen.lib"
 
 LibDir["vulkan_sdk_folder"]  		 = "%{VULKAN_SDK}/Lib"
 LibDir["vulkan_sdk"]   		 		 = "%{LibDir.vulkan_sdk_folder}/vulkan-1.lib"
@@ -80,3 +84,8 @@ LibDir["shaderc_util_release"]       = "%{LibDir.vulkan_sdk_folder}/shaderc_util
 
 LibDir["dxc"]    					 = "%{LibDir.vulkan_sdk_folder}/dxcompiler.lib"
 
+-- Windows
+LibDir["WinSock"] = "Ws2_32.lib"
+LibDir["WinMM"] = "Winmm.lib"
+LibDir["WinVersion"] = "Version.lib"
+LibDir["WinBCrypt"] = "Bcrypt.lib"

@@ -70,42 +70,50 @@ namespace highlo
 		static const uint32 MaxLineVertices = MaxLines * 2;
 		static const uint32 MaxLineIndices = MaxLines * 6;
 
-		Ref<Texture2D> WhiteTexture;
+		Ref<Texture2D> WhiteTexture = nullptr;
 
 		// Quads
-		Ref<Shader> TextureShader;
-		Ref<VertexArray> QuadVertexArray;
-		Ref<Material> TextureMaterial;
-		uint32 QuadIndexCount = 0;
-		QuadVertex *QuadVertexBufferBase = nullptr;
+		Ref<Shader> TextureShader = nullptr;
+		Ref<VertexArray> QuadVertexArray = nullptr;
+		std::vector<Ref<VertexBuffer>> QuadVertexBuffers;
+		Ref<IndexBuffer> QuadIndexBuffer = nullptr;
+		std::vector<QuadVertex*> QuadVertexBufferBase;
+		Ref<Material> TextureMaterial = nullptr;
 		QuadVertex *QuadVertexBufferPtr = nullptr;
+		uint32 QuadIndexCount = 0;
 
 		// Lines
-		Ref<Shader> LineShader;
-		Ref<VertexArray> LineVertexArray;
-		Ref<Material> LineMaterial;
-		LineVertex *LineVertexBufferBase = nullptr;
+		Ref<Shader> LineShader = nullptr;
+		Ref<VertexArray> LineVertexArray = nullptr;
+		std::vector<Ref<VertexBuffer>> LineVertexBuffers;
+		Ref<IndexBuffer> LineIndexBuffer = nullptr;
+		std::vector<LineVertex*> LineVertexBufferBase;
+		Ref<Material> LineMaterial = nullptr;
 		LineVertex *LineVertexBufferPtr = nullptr;
 		uint32 LineIndexCount = 0;
 
 		// Circles
-		Ref<Shader> CircleShader;
-		Ref<VertexArray> CircleVertexArray;
-		Ref<Material> CircleMaterial;
-		CircleVertex *CircleVertexBufferBase = nullptr;
+		Ref<Shader> CircleShader = nullptr;
+		Ref<VertexArray> CircleVertexArray = nullptr;
+		std::vector<Ref<VertexBuffer>> CircleVertexBuffers;
+		std::vector<CircleVertex*> CircleVertexBufferBase;
+		Ref<Material> CircleMaterial = nullptr;
 		CircleVertex *CircleVertexBufferPtr = nullptr;
 		uint32 CircleIndexCount = 0;
 
 		// Text
-		Ref<Shader> TextShader;
-		Ref<VertexArray> TextVertexArray;
-		Ref<Material> TextMaterial;
-		std::array<Ref<Texture2D>, MaxTextureSlots> FontTextureSlots;
-		uint32 FontTextureSlotIndex = 0;
-
-		uint32 TextIndexCount = 0;
-		TextVertex *TextVertexBufferBase = nullptr;
+		Ref<Shader> TextShader = nullptr;
+		std::vector<Ref<VertexBuffer>> TextVertexBuffers;
+		Ref<IndexBuffer> TextIndexBuffer = nullptr;
+		std::vector<TextVertex*> TextVertexBufferBase;
+		Ref<VertexArray> TextVertexArray = nullptr;
+		Ref<Material> TextMaterial = nullptr;
 		TextVertex *TextVertexBufferPtr = nullptr;
+		uint32 TextIndexCount = 0;
+
+		// Font Atlas
+		uint32 FontTextureSlotIndex = 0;
+		std::array<Ref<Texture2D>, MaxTextureSlots> FontTextureSlots;
 
 		// Textures
 		uint32 TextureSlotIndex = 1;
@@ -117,7 +125,7 @@ namespace highlo
 
 		bool DepthTest = true;
 		bool SwapChainTarget = false;
-		Ref<UniformBufferSet> UniformBufferSet;
+		Ref<UniformBufferSet> UniformBufferSet = nullptr;
 		Renderer2DStats Statistics;
 	};
 
@@ -127,8 +135,9 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		s_2DData = new Renderer2DData();
+		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 
+		s_2DData = new Renderer2DData();
 		s_2DData->ActiveCommandBuffer = CommandBuffer::Create("Renderer2D");
 
 		// Set all texture slots to 0
@@ -194,25 +203,32 @@ namespace highlo
 		// Quads
 		s_2DData->TextureShader = Renderer::GetShaderLibrary()->Get("Renderer2DQuad");
 		s_2DData->TextureMaterial = Material::Create(s_2DData->TextureShader, "TextureMaterial");
-		s_2DData->QuadVertexBufferBase = new QuadVertex[s_2DData->MaxVertices];
 
+		// Quad Vertex array
 		VertexArraySpecification quadVertexArraySpec;
 		quadVertexArraySpec.Layout = BufferLayout::GetTextureLayout();
 		quadVertexArraySpec.Shader = s_2DData->TextureShader;
 		quadVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->QuadVertexArray = VertexArray::Create(quadVertexArraySpec);
 		s_2DData->QuadVertexArray->Bind();
-	
-		auto vb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
-		s_2DData->QuadVertexArray->AddVertexBuffer(vb);
-	
-		s_2DData->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices));
-		s_2DData->QuadVertexArray->Unbind();
+
+		// Quad Vertex buffer and storage for batch data
+		s_2DData->QuadVertexBuffers.resize(framesInFlight);
+		s_2DData->QuadVertexBufferBase.resize(framesInFlight);
+		for (uint32 i = 0; i < framesInFlight; ++i)
+		{
+			s_2DData->QuadVertexBuffers[i] = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(QuadVertex));
+			s_2DData->QuadVertexBufferBase[i] = new QuadVertex[s_2DData->MaxVertices];
+			s_2DData->QuadVertexArray->AddVertexBuffer(s_2DData->QuadVertexBuffers[i]);
+		}
+
+		// Quad Index buffer
+		s_2DData->QuadIndexBuffer = IndexBuffer::Create(&quadIndices[0], s_2DData->MaxIndices);
+		s_2DData->QuadVertexArray->SetIndexBuffer(s_2DData->QuadIndexBuffer);
 
 		// Circles
 		s_2DData->CircleShader = Renderer::GetShaderLibrary()->Get("Renderer2DCircle");
 		s_2DData->CircleMaterial = Material::Create(s_2DData->CircleShader, "CircleMaterial");
-		s_2DData->CircleVertexBufferBase = new CircleVertex[s_2DData->MaxVertices];
 
 		VertexArraySpecification circleVertexArraySpec;
 		circleVertexArraySpec.Layout = BufferLayout::GetCircleLayout();
@@ -221,15 +237,18 @@ namespace highlo
 		s_2DData->CircleVertexArray = VertexArray::Create(circleVertexArraySpec);
 		s_2DData->CircleVertexArray->Bind();
 
-		auto circlesVb = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
-		s_2DData->CircleVertexArray->AddVertexBuffer(circlesVb);
-		s_2DData->CircleVertexArray->SetIndexBuffer(s_2DData->QuadVertexArray->GetIndexBuffer());
-		s_2DData->CircleVertexArray->Unbind();
+		s_2DData->CircleVertexBuffers.resize(framesInFlight);
+		s_2DData->CircleVertexBufferBase.resize(framesInFlight);
+		for (uint32 i = 0; i < framesInFlight; ++i)
+		{
+			s_2DData->CircleVertexBuffers[i] = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(CircleVertex));
+			s_2DData->CircleVertexBufferBase[i] = new CircleVertex[s_2DData->MaxVertices];
+			s_2DData->CircleVertexArray->AddVertexBuffer(s_2DData->CircleVertexBuffers[i]);
+		}
 
 		// Lines
 		s_2DData->LineShader = Renderer::GetShaderLibrary()->Get("Renderer2DLine");
 		s_2DData->LineMaterial = Material::Create(s_2DData->LineShader, "LineMaterial");
-		s_2DData->LineVertexBufferBase = new LineVertex[s_2DData->MaxLines];
 
 		VertexArraySpecification lineVertexArraySpec;
 		lineVertexArraySpec.Layout = BufferLayout::GetLineLayout();
@@ -238,15 +257,21 @@ namespace highlo
 		s_2DData->LineVertexArray = VertexArray::Create(lineVertexArraySpec);
 		s_2DData->LineVertexArray->Bind();
 
-		auto linesVb = VertexBuffer::Create(s_2DData->MaxLineVertices * sizeof(LineVertex));
-		s_2DData->LineVertexArray->AddVertexBuffer(linesVb);
-		s_2DData->LineVertexArray->SetIndexBuffer(IndexBuffer::Create(&lineIndices[0], s_2DData->MaxLineIndices));
-		s_2DData->LineVertexArray->Unbind();
+		s_2DData->LineVertexBuffers.resize(framesInFlight);
+		s_2DData->LineVertexBufferBase.resize(framesInFlight);
+		for (uint32 i = 0; i < framesInFlight; ++i)
+		{
+			s_2DData->LineVertexBuffers[i] = VertexBuffer::Create(s_2DData->MaxLineVertices * sizeof(LineVertex));
+			s_2DData->LineVertexBufferBase[i] = new LineVertex[s_2DData->MaxLineVertices];
+			s_2DData->LineVertexArray->AddVertexBuffer(s_2DData->LineVertexBuffers[i]);
+		}
+
+		s_2DData->LineIndexBuffer = IndexBuffer::Create(&lineIndices[0], s_2DData->MaxLineIndices);
+		s_2DData->LineVertexArray->SetIndexBuffer(s_2DData->LineIndexBuffer);
 
 		// Text
 		s_2DData->TextShader = Renderer::GetShaderLibrary()->Get("Renderer2DText");
 		s_2DData->TextMaterial = Material::Create(s_2DData->TextShader, "TextMaterial");
-		s_2DData->TextVertexBufferBase = new TextVertex[s_2DData->MaxVertices];
 
 		VertexArraySpecification textVertexArraySpec;
 		textVertexArraySpec.Layout = BufferLayout::GetTextLayout();
@@ -255,13 +280,19 @@ namespace highlo
 		s_2DData->TextVertexArray = VertexArray::Create(textVertexArraySpec);
 		s_2DData->TextVertexArray->Bind();
 
-		auto textVb = VertexBuffer::Create(s_2DData->MaxQuads * sizeof(TextVertex));
-		s_2DData->TextVertexArray->AddVertexBuffer(textVb);
-		s_2DData->TextVertexArray->SetIndexBuffer(IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices));
-		s_2DData->TextVertexArray->Unbind();
+		s_2DData->TextVertexBuffers.resize(framesInFlight);
+		s_2DData->TextVertexBufferBase.resize(framesInFlight);
+		for (uint32 i = 0; i < framesInFlight; ++i)
+		{
+			s_2DData->TextVertexBuffers[i] = VertexBuffer::Create(s_2DData->MaxVertices * sizeof(TextVertex));
+			s_2DData->TextVertexBufferBase[i] = new TextVertex[s_2DData->MaxVertices];
+			s_2DData->TextVertexArray->AddVertexBuffer(s_2DData->TextVertexBuffers[i]);
+		}
+
+		s_2DData->TextIndexBuffer = IndexBuffer::Create(&textIndices[0], s_2DData->MaxIndices);
+		s_2DData->TextVertexArray->SetIndexBuffer(s_2DData->TextIndexBuffer);
 
 		// Uniform Buffer
-		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
 		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout());
 	}
@@ -270,10 +301,17 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		delete[] s_2DData->QuadVertexBufferBase;
-		delete[] s_2DData->LineVertexBufferBase;
-		delete[] s_2DData->CircleVertexBufferBase;
-		delete[] s_2DData->TextVertexBufferBase;
+		for (auto &buffer : s_2DData->QuadVertexBufferBase)
+			delete[] buffer;
+
+		for (auto &buffer : s_2DData->TextVertexBufferBase)
+			delete[] buffer;
+
+		for (auto &buffer : s_2DData->LineVertexBufferBase)
+			delete[] buffer;
+
+		for (auto &buffer : s_2DData->CircleVertexBufferBase)
+			delete[] buffer;
 
 		delete s_2DData;
 	}
@@ -349,10 +387,12 @@ namespace highlo
 		if (s_2DData->QuadIndexCount == 0)
 			return;
 
-		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase);
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->QuadVertexBufferBase, dataSize);
+			s_2DData->QuadVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->QuadVertexBufferBase[frameIndex], dataSize);
 
 			for (uint32 i = 0; i < s_2DData->TextureSlots.size(); ++i)
 			{
@@ -380,10 +420,12 @@ namespace highlo
 		if (s_2DData->CircleIndexCount == 0)
 			return;
 
-		uint32 dataSize = (uint32)((uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase);
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->CircleVertexBufferBase, dataSize);
+			s_2DData->CircleVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
 
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
@@ -402,10 +444,12 @@ namespace highlo
 		if (s_2DData->LineIndexCount == 0)
 			return;
 
-		uint32 dataSize = (uint32)((uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase);
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->LineVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->LineVertexBufferBase, dataSize);
+			s_2DData->LineVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
 
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
@@ -424,10 +468,12 @@ namespace highlo
 		if (s_2DData->TextIndexCount == 0)
 			return;
 
-		uint32 dataSize = (uint32)((uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase);
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+
+		uint32 dataSize = (uint32)((uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->TextVertexArray->GetVertexBuffers()[0]->UpdateContents(s_2DData->TextVertexBufferBase, dataSize);
+			s_2DData->TextVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->TextVertexBufferBase[frameIndex], dataSize);
 			s_2DData->TextShader->Bind();
 
 			for (uint32 i = 0; i < s_2DData->FontTextureSlots.size(); ++i)
@@ -453,17 +499,19 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+
 		s_2DData->QuadIndexCount = 0;
-		s_2DData->QuadVertexBufferPtr = s_2DData->QuadVertexBufferBase;
+		s_2DData->QuadVertexBufferPtr = s_2DData->QuadVertexBufferBase[frameIndex];
 
 		s_2DData->LineIndexCount = 0;
-		s_2DData->LineVertexBufferPtr = s_2DData->LineVertexBufferBase;
+		s_2DData->LineVertexBufferPtr = s_2DData->LineVertexBufferBase[frameIndex];
 
 		s_2DData->CircleIndexCount = 0;
-		s_2DData->CircleVertexBufferPtr = s_2DData->CircleVertexBufferBase;
+		s_2DData->CircleVertexBufferPtr = s_2DData->CircleVertexBufferBase[frameIndex];
 
 		s_2DData->TextIndexCount = 0;
-		s_2DData->TextVertexBufferPtr = s_2DData->TextVertexBufferBase;
+		s_2DData->TextVertexBufferPtr = s_2DData->TextVertexBufferBase[frameIndex];
 
 		s_2DData->TextureSlotIndex = 1;
 		s_2DData->FontTextureSlotIndex = 0;
@@ -542,6 +590,14 @@ namespace highlo
 		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 		constexpr uint32 quadVertexCount = 4;
 
+	//	transform = transform.Rotate(-90, { 0, 0, 1 });
+
+		glm::mat4 trans = glm::translate(glm::mat4(1.0f), transform.GetPosition()) 
+			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().x, { 1, 0, 0 })
+			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().y, { 0, 1, 0 })
+			* glm::rotate(glm::mat4(1.0f), transform.GetRotation().z, { 0, 0, 1 })
+			* glm::scale(glm::mat4(1.0f), transform.GetScale());
+
 		float textureIndex = 0.0f;
 		for (uint32 i = 1; i < s_2DData->TextureSlotIndex; ++i)
 		{
@@ -561,7 +617,7 @@ namespace highlo
 
 		for (uint32 i = 0; i < quadVertexCount; ++i)
 		{
-			s_2DData->QuadVertexBufferPtr->Position = transform.GetTransform() * s_2DData->QuadVertexPositions[i];
+			s_2DData->QuadVertexBufferPtr->Position = trans * s_2DData->QuadVertexPositions[i];
 			s_2DData->QuadVertexBufferPtr->Color = tintColor;
 			s_2DData->QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			s_2DData->QuadVertexBufferPtr->TexIndex = textureIndex;
@@ -673,8 +729,10 @@ namespace highlo
 		float textureIndex = 0.0f;
 
 		// TODO: Change this with actual text from parameter
-		char32_t *utf32Text = U"Hello World!";
-		uint32 utf32TextLength = 12;
+		HLString rawText = "Hello World!";
+		HLString32 utf32Text = rawText.ToUTF32();
+		uint32 utf32TextLength = utf32Text.Length();
+
 
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);

@@ -22,7 +22,7 @@ namespace highlo
 
 	SceneRenderer::~SceneRenderer()
 	{
-		delete[] m_TransformVertexData;
+		Shutdown();
 	}
 
 	void SceneRenderer::Init()
@@ -69,6 +69,12 @@ namespace highlo
 		InitSkybox();
 
 		m_ResourcesCreated = true;
+	}
+
+	void SceneRenderer::Shutdown()
+	{
+		delete[] m_TransformVertexData;
+		m_TransformVertexData = nullptr;
 	}
 
 	void SceneRenderer::SetScene(const Ref<Scene> &scene)
@@ -522,7 +528,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-		//	CompositePass();
+			CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();

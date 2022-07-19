@@ -250,7 +250,7 @@ namespace highlo
 		
 		if (material)
 		{
-			material->UpdateForRendering();
+			material->UpdateForRendering(uniformBufferSet);
 		}
 
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);

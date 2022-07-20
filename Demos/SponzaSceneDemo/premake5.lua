@@ -61,6 +61,10 @@ project "SponzaSceneDemo"
     filter "configurations:Debug-DX12"
         defines "HL_DEBUG"
         symbols "On"
+		
+	filter "configurations:Debug-Metal"
+        defines "HL_DEBUG"
+        symbols "On"
 
     filter "configurations:Release-OpenGL"
         defines "HL_RELEASE"
@@ -78,4 +82,8 @@ project "SponzaSceneDemo"
         defines "HL_RELEASE"
         optimize "On"
 
-    
+	filter "configurations:Release-Metal"
+        defines "HL_RELEASE"
+        optimize "On"
+		
+		

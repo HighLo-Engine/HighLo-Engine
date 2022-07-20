@@ -86,6 +86,16 @@ project "Sandbox"
 			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
+    filter "configurations:Debug-Metal"
+        defines "HL_DEBUG"
+        symbols "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/VulkanSDK/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
+		}
+
     filter "configurations:Release-OpenGL"
         defines "HL_RELEASE"
         optimize "On"
@@ -122,4 +132,13 @@ project "Sandbox"
 			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
 		}
 
-        
+	filter "configurations:Release-Metal"
+        defines "HL_RELEASE"
+        optimize "On"
+
+		postbuildcommands
+		{
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+		}
+		
+		

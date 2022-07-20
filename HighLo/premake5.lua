@@ -377,3 +377,33 @@ project "HighLo"
 			"%{LibDir.yamlCpp}",
 		}
 
+	filter "configurations:Debug-Metal"
+		symbols "On"
+	
+		defines
+		{
+			"HL_DEBUG",
+			"HIGHLO_API_METAL"
+		}
+		
+		links
+		{
+		
+		}
+	
+	filter "configurations:Release-Metal"
+        optimize "On"
+		
+		defines
+		{
+			"HL_RELEASE",
+			"NDEBUG",
+			"HIGHLO_API_METAL"
+		}
+		
+		links
+		{
+		
+		}
+		
+		

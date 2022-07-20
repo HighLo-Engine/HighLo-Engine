@@ -26,7 +26,7 @@ namespace highlo
 
 		HLAPI virtual HLRendererID GetRendererID() = 0;
 
-		HLAPI static Ref<IndexBuffer> Create(std::vector<int32>& indices);
+		HLAPI static Ref<IndexBuffer> Create(std::vector<int32> &indices);
 		HLAPI static Ref<IndexBuffer> Create(void *data, uint32 size);
 		HLAPI static Ref<IndexBuffer> Create(uint32 size);
 	};

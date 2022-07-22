@@ -25,8 +25,8 @@ python GenerateEngine.py --generate-unit-tests
 
 | Name        | Optional | Default | Description     |
 | :---        |  :----:  | :----: |         :--- |
-| --version              |   False  |  None  | Show the version of the build system and quit
-| --help                 |   False  |  None  | Show the help menu and quit
-| --visual-studio        |   False  |  2022  | Set the desired visual studio version to generate (either 2022 or 2019)
-| --generate-unit-tests  |   False  |  False  | Enable the Unit tests (they will be included into visual studio as another project in the workspace.)
+| --version              |   True  |  None  | Show the version of the build system and quit
+| --help                 |   True  |  None  | Show the help menu and quit
+| --visual-studio        |   True  |  2022  | Set the desired visual studio version to generate (either 2022 or 2019)
+| --generate-unit-tests  |   True  |  False  | Enable the Unit tests (they will be included into visual studio as another project in the workspace.)
 

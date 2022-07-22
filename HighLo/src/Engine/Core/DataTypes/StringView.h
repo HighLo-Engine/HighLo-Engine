@@ -24,37 +24,37 @@ namespace highlo
 	{
 	public:
 
-		HLStringViewBase()
+		HLAPI HLStringViewBase()
 			: m_Data(nullptr), m_Size(0)
 		{
 		}
 
-		HLStringViewBase(const HLStringBase<StringType> &str)
+		HLAPI HLStringViewBase(const HLStringBase<StringType> &str)
 			: m_Data(str.C_Str()), m_Size(str.Length())
 		{
 		}
 
-		HLStringViewBase(const std::string &str)
+		HLAPI HLStringViewBase(const std::string &str)
 			: m_Data(str.c_str()), m_Size(str.size())
 		{
 		}
 
-		HLStringViewBase(const std::string_view &strView)
+		HLAPI HLStringViewBase(const std::string_view &strView)
 			: m_Data(strView.data()), m_Size(strView.size())
 		{
 		}
 
-		HLStringViewBase(StringType *str)
+		HLAPI HLStringViewBase(StringType *str)
 			: m_Data(str), m_Size(strlen(str))
 		{
 		}
 
-		HLStringViewBase(const HLStringViewBase<StringType> &other)
+		HLAPI HLStringViewBase(const HLStringViewBase<StringType> &other)
 			: m_Data(other.m_Data), m_Size(other.m_Size)
 		{
 		}
 
-		HLStringViewBase(const HLStringViewBase<StringType> &&other)
+		HLAPI HLStringViewBase(const HLStringViewBase<StringType> &&other)
 		{
 			m_Data = other.m_Data;
 			m_Size = other.m_Size;
@@ -63,7 +63,7 @@ namespace highlo
 			other.m_Size = 0;
 		}
 
-		HLStringViewBase<StringType> &operator=(const HLStringViewBase<StringType> &other)
+		HLAPI HLStringViewBase<StringType> &operator=(const HLStringViewBase<StringType> &other)
 		{
 			if (this != &other)
 			{
@@ -74,7 +74,7 @@ namespace highlo
 			return *this;
 		}
 
-		HLStringViewBase<StringType> &&operator=(HLStringViewBase<StringType> &&other)
+		HLAPI HLStringViewBase<StringType> &&operator=(HLStringViewBase<StringType> &&other)
 		{
 			if (this != &other)
 			{
@@ -133,7 +133,7 @@ namespace highlo
 			return stream;
 		}
 
-		HLStringBase<StringType> ToString()
+		HLAPI HLStringBase<StringType> ToString()
 		{
 			return HLStringBase<StringType>(m_Data, m_Size);
 		}

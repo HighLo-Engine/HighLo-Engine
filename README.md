@@ -13,40 +13,21 @@ Feel free to contribute at any time, but it would be better to discuss major cha
 # Getting started
 
 ```sh
-$ git clone --recursive https://github.com/HighLo-Engine/HighLo-Engine.git/
+git clone --recursive https://github.com/HighLo-Engine/HighLo-Engine.git/
 ```
 
 ```sh
-$ cd HighLo-Engine
+cd HighLo-Engine
 ```
 
 ```sh
 # generate the solution files for mac or the makefiles for linux
-$ python scripts/GenerateEngine.py
+python scripts/GenerateEngine.py
 ```
 
-# Windows Build
+# Building the engine
 
-To build the engine on windows, the python script supports multiple options:
-
-If you wish to always build the most current visual studio solution you can use the same call as above, so:
-
-```sh
-$ python scripts/GenerateEngine.py
-```
-
-This builds the most current visual studio solution files (currently it is Visual Studio 2022). 
-
-If you wish to build older visual studio versions (currently the script supports only Visual Studio 2019 as an alternative) you have to specify the version as an optional command, like:
-
-```sh
-$ python scripts/GenerateEngine.py --visual-studio 2019
-```
-
-# Run Unit Tests
-
-To Run the unit tests, you have to build the project from source.
-After that you will be able to select the "HighLoTest" project as the starting project and execute it.
+For detailed information, see the [Build guide](scripts/README.md).
 
 # Supported platforms
 

@@ -5,6 +5,12 @@ project "Sandbox"
 	staticruntime "off"
 	entrypoint "mainCRTStartup"
 
+	dependson
+	{
+		"HighLo",
+		"HighLo-C#",
+	}
+
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     debugdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")

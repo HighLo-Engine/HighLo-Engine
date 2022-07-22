@@ -4,6 +4,12 @@ project "HighLoEdit"
 	cppdialect "C++17"
 	staticruntime "off"
 	entrypoint "mainCRTStartup"
+	
+	dependson
+	{
+		"HighLo",
+		"HighLo-C#",
+	}
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     debugdir ("bin/" .. outputdir .. "/%{prj.name}")

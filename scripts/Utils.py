@@ -54,17 +54,18 @@ def YesOrNo():
                 return False
         except KeyboardInterrupt:
             quit()
-            
-def GetCommandLineArgument(argv, options, allowedCharacters, arguments):
-    try:
-        opts, args = getopt.getopt(argv, allowedCharacters, arguments)
-    except getopt.GetoptError as error:
-        return False
-    
+
+def GetCommandLineArgument(argv, optionToSearchFor):
     result = []
-    for opt, arg in opts:
-        if opt in options:
-            result.append(arg)
-    
+    for v in argv:
+        if v.find(optionToSearchFor) != -1:
+            result.append(True)
+            if v.find('=') != -1:
+                option = v[v.find('=')+1:len(v)]
+                result.append(option)
+            return result
+
+    result.append(False)
     return result
+
     

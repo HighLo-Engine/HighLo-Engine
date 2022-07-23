@@ -12,24 +12,25 @@ CheckPythonVersion.ValidatePackages()
 import Vulkan
 import Utils
 
-shouldShowVersionMenu = Utils.GetCommandLineArgument(sys.argv[1:], ('-v', '--version'), 'v', ['version'])
-if (shouldShowVersionMenu):
+shouldShowVersionMenu = Utils.GetCommandLineArgument(sys.argv[1:], '--version')
+if shouldShowVersionMenu[0]:
     print('HighLo Build script for HighLo v1.0.0')
     exit(0)
 
-shouldShowHelpMenu = Utils.GetCommandLineArgument(sys.argv[1:], ('-h', '--help'), 'h', ['help'])
-if (shouldShowHelpMenu):
+shouldShowHelpMenu = Utils.GetCommandLineArgument(sys.argv[1:], '--help')
+if shouldShowHelpMenu[0]:
     print('Usage: python GenerateEngine.py [option] {optionValue}')
     print('Valid options:')
-    print('-v         --version                Show the current version of the build script')
-    print('-h         --help                   Show this help menu')
-    print('-s {value} --visual-studio {value}  Generate the engine for a specific visual studio version (valid values are 2019 and 2022 for now)')
+    print('--version                Show the current version of the build script')
+    print('--help                   Show this help menu')
+    print('--visual-studio={value}  Generate the engine for a specific visual studio version (valid values are 2019 and 2022 for now)')
+    print('--generate-unit-tests    Generate the unit tests for the engine')
     exit(0)
 
 
 generateUnitTests = ''
-shouldGenerateUnitTests = Utils.GetCommandLineArgument(sys.argv[1:], ('-u', '--generate-unit-tests'), 'u', ['generate-unit-tests'])
-if shouldGenerateUnitTests:
+shouldGenerateUnitTests = Utils.GetCommandLineArgument(sys.argv[1:], '--generate-unit-tests')
+if shouldGenerateUnitTests[0]:
     generateUnitTests = '--generate-unit-tests=True'
 
 print('Your detected System is: ' + platform.system())
@@ -54,16 +55,19 @@ print("Running premake...")
 
 if (platform.system() == 'Windows'):
     if len(sys.argv) > 1:
-        visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], ('-s', '--visual-studio'), 's:', ['visual-studio=', 'vs='])
-        if not visualStudioVersion:
-            visualStudioVersion = ['2022']
-        
-        if visualStudioVersion[0] == '2022':
+        visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], '--visual-studio')
+
+        if not visualStudioVersion[0]:
+            # use default 
             subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", generateUnitTests])
-        elif visualStudioVersion[0] == '2019':
+            exit(0)
+
+        if visualStudioVersion[1] == '2022':
+            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", generateUnitTests])
+        elif visualStudioVersion[1] == '2019':
             subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2019", generateUnitTests])
         else:
-            print('Error: Unknown Visual Studio version: ', visualStudioVersion[0], ' - 2019 or 2022 are valid')
+            print('Error: Unknown Visual Studio version: ', visualStudioVersion[1], ' - 2019 or 2022 are valid')
             exit(1)
     else:
         # use the current visual studio version

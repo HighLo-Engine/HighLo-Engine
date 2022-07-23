@@ -12,7 +12,7 @@ python GenerateEngine.py
 ## Generate older visual studio versions
 
 ```sh
-python GenerateEngine.py --visual-studio 2019
+python GenerateEngine.py --visual-studio=2019
 ```
 
 ## Generate Unit tests

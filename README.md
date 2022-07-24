@@ -27,7 +27,7 @@ python scripts/GenerateEngine.py
 
 # Building the engine
 
-For detailed information, see the [Build guide](scripts/README.md).
+For detailed information, see the [Build guide](BUILDING.md).
 
 # Supported platforms
 

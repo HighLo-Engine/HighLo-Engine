@@ -2,6 +2,10 @@
 
 Our build system uses premake5 and python to generate the visual studio files and setup all build dependencies automatically. You can either select the `GenerateEngine.bat` file to use all default settings or you can call the `GenerateEngine.py` directly with providing your desired command line arguments.
 
+## Building on other operating systems
+
+Our build system already supports all common operating systems. But the code might not compile on the feature branches and at this moment not on the master branch either. For Mac we currently generate `xcode4` solution files and for linux we generate `Makefiles`.
+
 ## Basic usage
 
 ```sh

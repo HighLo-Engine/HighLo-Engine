@@ -47,9 +47,11 @@ if (not Vulkan.CheckVulkanSDK()):
 if (not Vulkan.CheckVulkanSDKDebugLibs()):
     exit(1)
 
-# TODO: This should only be executed if user did a fresh clone
-# subprocess.call(["git", "lfs", "pull"])
-# subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
+# If the user runs the script for the first time, make sure all dependencies exist
+if (not os.path.exists('HighLo/bin')):
+    print('Running the installer for the first time, making sure all lfs data is up-to-date...')
+    subprocess.call(["git", "lfs", "pull"])
+    subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
 
 print("Running premake...")
 

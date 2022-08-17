@@ -409,7 +409,6 @@ namespace highlo
 			}
 
 			// Bind Camera Uniform Buffer block
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextureShader->Bind();
@@ -433,7 +432,6 @@ namespace highlo
 		{
 			s_2DData->CircleVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
 
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->CircleShader->Bind();
@@ -457,7 +455,6 @@ namespace highlo
 		{
 			s_2DData->LineVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
 
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->LineShader->Bind();
@@ -490,7 +487,6 @@ namespace highlo
 					s_2DData->TextMaterial->Set("u_FontAtlases", s_2DData->WhiteTexture, i);
 			}
 
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextVertexArray->GetVertexBuffers()[0]->Bind();

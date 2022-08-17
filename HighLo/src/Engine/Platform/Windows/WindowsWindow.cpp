@@ -412,7 +412,9 @@ namespace highlo
 			}
 		}
 
-		m_Context->SwapBuffers();
+		// The swapchain now takes care of swapping the buffers in the context
+		//m_Context->SwapBuffers();
+		m_SwapChain->Present();
 	}
 
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

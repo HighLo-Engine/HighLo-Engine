@@ -39,10 +39,13 @@ namespace highlo
 	
 	void OpenGLSwapChain::BeginFrame()
 	{
+		auto &queue = Renderer::GetRenderResourceReleaseQueue(m_CurrentBufferIndex);
+		queue.Execute();
 	}
 	
 	void OpenGLSwapChain::EndFrame()
 	{
+		Present();
 	}
 	
 	void OpenGLSwapChain::Present()

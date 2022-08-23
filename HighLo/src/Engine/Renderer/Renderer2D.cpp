@@ -330,11 +330,16 @@ namespace highlo
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
+		/*
 		Renderer::Submit([cameraStruct]()
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 		});
+		*/
+
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 
 		StartBatch();
 		ResetStatistics();
@@ -354,11 +359,16 @@ namespace highlo
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
+		/*
 		Renderer::Submit([cameraStruct]()
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 		});
+		*/
+
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 
 		StartBatch();
 		ResetStatistics();
@@ -398,7 +408,7 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->QuadVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->QuadVertexBufferBase[frameIndex], dataSize);
+			s_2DData->QuadVertexBuffers[frameIndex]->UpdateContents(s_2DData->QuadVertexBufferBase[frameIndex], dataSize);
 
 			for (uint32 i = 0; i < s_2DData->TextureSlots.size(); ++i)
 			{
@@ -412,9 +422,9 @@ namespace highlo
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextureShader->Bind();
-			s_2DData->QuadVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->QuadVertexBuffers[frameIndex]->Bind();
 			s_2DData->QuadVertexArray->Bind();
-			s_2DData->QuadVertexArray->GetIndexBuffer()->Bind();
+			s_2DData->QuadIndexBuffer->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
@@ -430,14 +440,13 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->CircleVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
+			s_2DData->CircleVertexBuffers[frameIndex]->UpdateContents(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
 
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->CircleShader->Bind();
-			s_2DData->CircleVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->CircleVertexBuffers[frameIndex]->Bind();
 			s_2DData->CircleVertexArray->Bind();
-			s_2DData->CircleVertexArray->GetIndexBuffer()->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, s_2DData->CircleMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
@@ -453,14 +462,14 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->LineVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
+			s_2DData->LineVertexBuffers[frameIndex]->UpdateContents(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
 
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->LineShader->Bind();
-			s_2DData->LineVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->LineVertexBuffers[frameIndex]->Bind();
 			s_2DData->LineVertexArray->Bind();
-			s_2DData->LineVertexArray->GetIndexBuffer()->Bind();
+			s_2DData->LineIndexBuffer->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, s_2DData->LineMaterial, s_2DData->UniformBufferSet, PrimitiveType::Lines, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
@@ -476,7 +485,7 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->TextVertexArray->GetVertexBuffers()[frameIndex]->UpdateContents(s_2DData->TextVertexBufferBase[frameIndex], dataSize);
+			s_2DData->TextVertexBuffers[frameIndex]->UpdateContents(s_2DData->TextVertexBufferBase[frameIndex], dataSize);
 			s_2DData->TextShader->Bind();
 
 			for (uint32 i = 0; i < s_2DData->FontTextureSlots.size(); ++i)
@@ -489,9 +498,9 @@ namespace highlo
 
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
-			s_2DData->TextVertexArray->GetVertexBuffers()[0]->Bind();
+			s_2DData->TextVertexBuffers[frameIndex]->Bind();
 			s_2DData->TextVertexArray->Bind();
-			s_2DData->TextVertexArray->GetIndexBuffer()->Bind();
+			s_2DData->TextIndexBuffer->Bind();
 			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}

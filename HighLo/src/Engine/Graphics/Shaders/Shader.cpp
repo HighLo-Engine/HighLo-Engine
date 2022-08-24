@@ -33,16 +33,16 @@ namespace highlo
 	#endif // HIGHLO_API_OPENGL
 	}
 	
-	Ref<Shader> Shader::CreateFromString(const HLString &source)
+	Ref<Shader> Shader::CreateFromString(const HLString &source, const HLString &name, ShaderLanguage language)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLShader>::Create(source);
+		return Ref<OpenGLShader>::Create(source, name, language);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11Shader>::Create(source);
+		return Ref<DX11Shader>::Create(source, name, language);
 	#elif HIGHLO_API_DX12
-		return Ref<DX12Shader>::Create(source);
+		return Ref<DX12Shader>::Create(source, name, language);
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanShader>::Create(source);
+		return Ref<VulkanShader>::Create(source, name, language);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

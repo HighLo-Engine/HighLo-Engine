@@ -23,7 +23,14 @@ namespace highlo
 		HLAPI void Add(const HLString &name, const Ref<Shader> &shader);
 		HLAPI void Load(const FileSystemPath &filePath, bool forceCompile = false);
 		HLAPI void Load(const HLString &name, const FileSystemPath &filePath, bool forceCompile = false);
-		
+		HLAPI void LoadFromString(const HLString &source, ShaderLanguage language = ShaderLanguage::GLSL);
+		HLAPI void LoadFromString(const HLString &name, const HLString &source, ShaderLanguage language = ShaderLanguage::GLSL);
+
+		HLAPI void ReloadShader(const HLString &name);
+		HLAPI void ReloadAllShaders();
+
+		HLAPI void Remove(const HLString &name);
+
 		HLAPI const Ref<Shader> &Get(const HLString &name);
 
 	private:

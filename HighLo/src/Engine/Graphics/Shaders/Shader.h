@@ -58,7 +58,7 @@ namespace highlo
 		HLAPI virtual void SetMacro(const HLString &name, const HLString &value) = 0;
 
 		HLAPI static Ref<Shader> Create(const FileSystemPath &filePath, bool forceCompile = false);
-		HLAPI static Ref<Shader> CreateFromString(const HLString &source);
+		HLAPI static Ref<Shader> CreateFromString(const HLString &source, const HLString &name = "undefined", ShaderLanguage language = ShaderLanguage::GLSL);
 	};
 }
 

@@ -27,7 +27,7 @@ namespace highlo
 	public:
 
 		OpenGLShader(const FileSystemPath &filePath, bool forceCompile);
-		OpenGLShader(const HLString &source);
+		OpenGLShader(const HLString &source, const HLString &name = "undefined", ShaderLanguage language = ShaderLanguage::GLSL);
 		virtual ~OpenGLShader();
 
 		// Inherited via Shader

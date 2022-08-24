@@ -483,9 +483,9 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return Renderer2D::GetTargetRenderPass();
+	//	return Renderer2D::GetTargetRenderPass();
 	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
-	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
+		return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()

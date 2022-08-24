@@ -99,7 +99,7 @@ namespace highlo
 		Ref<RenderPass> ActiveRenderPass;
 	};
 
-	static GLRendererData *s_GLRendererData;
+	static GLRendererData *s_GLRendererData = nullptr;
 
 	void OpenGLRenderingAPI::Init()
 	{
@@ -167,12 +167,16 @@ namespace highlo
 
 		s_GLRendererData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(GLQuadVertex));
 		s_GLRendererData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices);
+		delete[] data;
+		indices.clear();
+		indices.shrink_to_fit();
 	}
 
 	void OpenGLRenderingAPI::Shutdown()
 	{
 		OpenGLShader::ClearUniformBuffers();
 		delete s_GLRendererData;
+		s_GLRendererData = nullptr;
 	}
 
 	void OpenGLRenderingAPI::BeginFrame()

@@ -330,16 +330,11 @@ namespace highlo
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
-		/*
 		Renderer::Submit([cameraStruct]()
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 		});
-		*/
-
-		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 
 		StartBatch();
 		ResetStatistics();
@@ -359,16 +354,11 @@ namespace highlo
 		s_2DData->TextureShader->Bind();
 
 		// Load Camera Projection into Uniform Buffer block
-		/*
 		Renderer::Submit([cameraStruct]()
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 		});
-		*/
-
-		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 
 		StartBatch();
 		ResetStatistics();

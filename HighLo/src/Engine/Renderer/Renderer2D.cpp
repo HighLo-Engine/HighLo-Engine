@@ -178,11 +178,9 @@ namespace highlo
 		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		framebufferSpec.DebugName = "Renderer2D Framebuffer";
 
-		Ref<Framebuffer> framebuffer = Framebuffer::Create(framebufferSpec);
-		
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Renderer2D RenderPass";
-		renderPassSpec.Framebuffer = framebuffer;
+		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
 		s_2DData->ActiveRenderPass = RenderPass::Create(renderPassSpec);
 
 		std::vector<int32> textIndices;

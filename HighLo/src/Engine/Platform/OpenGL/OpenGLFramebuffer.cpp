@@ -58,15 +58,23 @@ namespace highlo
 			return 0;
 		}
 
-		static Ref<Texture> CreateTexture(int32 samples, TextureFormat format, uint32 width, uint32 height, int32 index)
+		static Ref<Texture> CreateTexture(int32 samples, TextureFormat format, uint32 width, uint32 height, int32 index, const Ref<Texture> &existingTexture = nullptr)
 		{
 			bool multisampled = samples > 1;
-			Ref<Texture> texture = Texture2D::Create(format, width, height);
-			Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
 
+			if (!existingTexture)
+			{
+				Ref<Texture> texture = Texture2D::Create(format, width, height);
+				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
+				glBindTexture(utils::TextureTarget(multisampled), glTexture->GetRendererID());
+				glTexture->CreateSampler(TextureProperties());
+				return texture;
+			}
+
+			Ref<OpenGLTexture2D> glTexture = existingTexture.As<OpenGLTexture2D>();
 			glBindTexture(utils::TextureTarget(multisampled), glTexture->GetRendererID());
 			glTexture->CreateSampler(TextureProperties());
-			return texture;
+			return existingTexture;
 		}
 
 		static void AttachColorAttachment(HLRendererID id, int32 samples, GLenum internalFormat, GLenum format, uint32 width, uint32 height, int32 index)
@@ -115,8 +123,8 @@ namespace highlo
 		{
 			switch (format)
 			{
-			case TextureFormat::RGBA:       return GL_RGBA8;
-			case TextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+				case TextureFormat::RGBA:        return GL_RGBA8;
+				case TextureFormat::RED_INTEGER: return GL_RED_INTEGER;
 			}
 
 			HL_ASSERT(false);
@@ -128,12 +136,62 @@ namespace highlo
 		: m_Specification(spec)
 	{
 		HL_ASSERT(spec.Attachments.Attachments.size());
-		for (auto format : m_Specification.Attachments.Attachments)
+
+		// First make sure, that all pre-existing formats are loaded
+		if (!m_Specification.SwapChainTarget)
 		{
-			if (!utils::IsDepthFormat(format.Format))
-				m_ColorAttachmentFormats.emplace_back(format.Format);
-			else
-				m_DepthAttachmentFormat = format.Format;
+			uint32 attachmentIndex = 0;
+			for (auto format : m_Specification.Attachments.Attachments)
+			{
+				if (m_Specification.ExistingImage && m_Specification.ExistingImage->GetSpecification().Layers > 1)
+				{
+					if (utils::IsDepthFormat(format.Format))
+					{
+						m_DepthAttachmentFormat = format.Format;
+						m_DepthAttachment = m_Specification.ExistingImage.As<Texture>();
+					}
+					else
+					{
+						m_ColorAttachmentFormats.push_back(format.Format);
+						m_ColorAttachments.push_back(m_Specification.ExistingImage.As<Texture>());
+					}
+				}
+				else if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
+				{
+					if (!utils::IsDepthFormat(format.Format))
+					{
+						m_ColorAttachmentFormats.push_back(format.Format);
+						Ref<Texture> &existingTexture = m_Specification.ExistingImages.at(attachmentIndex).As<Texture>();
+						m_ColorAttachments.push_back(existingTexture);
+					}
+				}
+				else if (m_Specification.ExistingFramebuffer)
+				{
+					if (utils::IsDepthFormat(format.Format))
+					{
+						Ref<Texture> &depthTexture = m_Specification.ExistingFramebuffer->GetDepthImage();
+						m_DepthAttachment = depthTexture;
+					}
+					else
+					{
+						for (uint32 i = 0; i < m_Specification.ExistingFramebuffer->GetColorAttachmentCount(); ++i)
+						{
+							Ref<Texture> &colorTexture = m_Specification.ExistingFramebuffer->GetImage(i);
+							m_ColorAttachments.push_back(colorTexture);
+						}
+					}
+				}
+				else if (utils::IsDepthFormat(format.Format))
+				{
+					m_DepthAttachmentFormat = format.Format;
+				}
+				else
+				{
+					m_ColorAttachmentFormats.emplace_back(format.Format);
+				}
+
+				++attachmentIndex;
+			}
 		}
 
 		uint32 width = spec.Width;
@@ -164,8 +222,12 @@ namespace highlo
 			}
 
 			m_ColorAttachments.clear();
-			m_DepthAttachment->Release();
-			m_DepthAttachment = nullptr;
+
+			if (m_DepthAttachment)
+			{
+				m_DepthAttachment->Release();
+				m_DepthAttachment = nullptr;
+			}
 		}
 
 		glGenFramebuffers(1, &m_RendererID);
@@ -179,7 +241,8 @@ namespace highlo
 			// Create color attachments
 			for (size_t i = 0; i < m_ColorAttachments.size(); i++)
 			{
-				m_ColorAttachments[i] = utils::CreateTexture(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Specification.Width, m_Specification.Height, int32(i));
+				m_ColorAttachments[i] = utils::CreateTexture(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Specification.Width, m_Specification.Height, int32(i), m_ColorAttachments[i]);
+
 				switch (m_ColorAttachmentFormats[i])
 				{
 					case TextureFormat::SRGB:

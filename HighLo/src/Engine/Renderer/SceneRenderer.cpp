@@ -574,6 +574,12 @@ namespace highlo
 
 		m_SubmeshTransformBuffer->UpdateContents(m_TransformVertexData, offset * sizeof(TransformVertexData));
 
+		m_UniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
+		{
+			uniformBuffer->Bind();
+		});
+
+		/*
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 		m_UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind(); // Camera Uniform buffer block
 		m_UniformBufferSet->GetUniform(1, 0, frameIndex)->Bind(); // Shadow Uniform buffer block
@@ -582,7 +588,7 @@ namespace highlo
 		m_UniformBufferSet->GetUniform(4, 0, frameIndex)->Bind(); // PointLights Uniform buffer block
 		m_UniformBufferSet->GetUniform(17, 0, frameIndex)->Bind(); // Screen data Uniform buffer block
 		m_UniformBufferSet->GetUniform(18, 0, frameIndex)->Bind(); // HBAO data Uniform buffer block
-
+		*/
 	}
 
 	void SceneRenderer::ClearPass()

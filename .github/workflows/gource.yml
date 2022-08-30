@@ -19,7 +19,7 @@ jobs:
         uses: nbprojekt/gource-action@v1
         with:
           git_url: https://github.com/HighLo-Engine/HighLo-Engine
-          gource_title: 'HighLo Gource'
+          gource_title: 'HighLo-Engine'
           gource_resolution: '1080p'
           gource_fps: 60
           gource_font_size: 40
@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Gource
-          path: ./gource/gource.mp4
+          path: ${{ github.sha }}.tar.gz
           retention-days: 1
           
   upload-gource-video-to-webserver:
@@ -49,7 +49,10 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: ./gource/gource.mp4
+          source: ${{ github.sha }}.tar.gz
           target: ${{ secrets.PATH }}
+          script: |
+            tar xzf ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz -C "${{ secrets.PATH }}/gource.mp4"
+            rm ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz
           
           

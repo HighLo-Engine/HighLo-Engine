@@ -29,8 +29,9 @@ jobs:
         id: compress
         with:
           command: c
+          cwd: ./gource
           files: |
-            ./gource/gource.mp4
+            gource.mp4
           outPath: ${{ github.sha }}.tar.gz
 
       - name: 'Upload gource video'
@@ -72,7 +73,7 @@ jobs:
           port: ${{ secrets.PORT }}
           envs: GITHUB_SHA
           script: |
-            tar xzf ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz -C "${{ secrets.PATH }}/gource.mp4"
+            tar xzf ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz -C "${{ secrets.PATH }}"
             rm ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz
           
           

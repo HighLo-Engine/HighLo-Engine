@@ -34,12 +34,13 @@ jobs:
   upload-gource-video-to-webserver:
     name: Upload gource video to HighLo Webserver
     runs-on: ubuntu-latest
+    needs: create-gource-video
     
     steps:
       - name: 'Download artifact'
         uses: actions/download-artifact@v2
         with:
-          name: app-build
+          name: Gource
           
       - name: 'Upload'
         uses: appleboy/scp-action@master

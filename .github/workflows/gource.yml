@@ -60,6 +60,17 @@ jobs:
           port: ${{ secrets.PORT }}
           source: ${{ github.sha }}.tar.gz
           target: ${{ secrets.PATH }}
+          
+      - name: 'Extract archive on Webserver'
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          envs: GITHUB_SHA
           script: |
             tar xzf ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz -C "${{ secrets.PATH }}/gource.mp4"
             rm ${{ secrets.PATH }}/${GITHUB_SHA}.tar.gz

@@ -89,7 +89,7 @@ namespace highlo
 
 	void OpenGLVertexArray::Unbind() const
 	{
-		glBindVertexArray(0);
+	//	glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::Invalidate()

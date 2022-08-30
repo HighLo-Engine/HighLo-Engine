@@ -22,7 +22,7 @@ namespace highlo
 
 	SceneRenderer::~SceneRenderer()
 	{
-		delete[] m_TransformVertexData;
+		Shutdown();
 	}
 
 	void SceneRenderer::Init()
@@ -69,6 +69,12 @@ namespace highlo
 		InitSkybox();
 
 		m_ResourcesCreated = true;
+	}
+
+	void SceneRenderer::Shutdown()
+	{
+		delete[] m_TransformVertexData;
+		m_TransformVertexData = nullptr;
 	}
 
 	void SceneRenderer::SetScene(const Ref<Scene> &scene)
@@ -477,9 +483,9 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return Renderer2D::GetTargetRenderPass();
+	//	return Renderer2D::GetTargetRenderPass();
 	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
-	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
+		return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -522,7 +528,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-		//	CompositePass();
+			CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();
@@ -568,6 +574,12 @@ namespace highlo
 
 		m_SubmeshTransformBuffer->UpdateContents(m_TransformVertexData, offset * sizeof(TransformVertexData));
 
+		m_UniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
+		{
+			uniformBuffer->Bind();
+		});
+
+		/*
 		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 		m_UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind(); // Camera Uniform buffer block
 		m_UniformBufferSet->GetUniform(1, 0, frameIndex)->Bind(); // Shadow Uniform buffer block
@@ -576,7 +588,7 @@ namespace highlo
 		m_UniformBufferSet->GetUniform(4, 0, frameIndex)->Bind(); // PointLights Uniform buffer block
 		m_UniformBufferSet->GetUniform(17, 0, frameIndex)->Bind(); // Screen data Uniform buffer block
 		m_UniformBufferSet->GetUniform(18, 0, frameIndex)->Bind(); // HBAO data Uniform buffer block
-
+		*/
 	}
 
 	void SceneRenderer::ClearPass()

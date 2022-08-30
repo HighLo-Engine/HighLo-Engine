@@ -4,9 +4,16 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "Dependencies.lua"
 
+newoption {
+	trigger = "generate-unit-tests",
+	description = "Generate the unit tests",
+	default = "False",
+	value = "True"
+}
+
 workspace "HighLo"
     architecture "x64"
-    configurations { "Debug-OpenGL", "Release-OpenGL", "Debug-Vulkan", "Release-Vulkan", "Debug-DX11", "Release-DX11", "Debug-DX12", "Release-DX12" }
+    configurations { "Debug-OpenGL", "Release-OpenGL", "Debug-Vulkan", "Release-Vulkan", "Debug-DX11", "Release-DX11", "Debug-DX12", "Release-DX12", "Debug-Metal", "Release-Metal" }
     startproject "HighLoEdit"
 
 	solution_items
@@ -47,10 +54,14 @@ workspace "HighLo"
 		include "Demos"
 	group ""
 
-	group "tests"
-		include "tests"
-	group ""
-
+	-- check if the command line arguments contain the generateUnitTests flag
+	if _OPTIONS['generate-unit-tests'] == "True" then
+		print('generating the unit tests...')
+		group "tests"
+			include "tests"
+		group ""
+	end
+	
 	group "Tools"
 		include "Sandbox"
 		include "HighLoEdit"

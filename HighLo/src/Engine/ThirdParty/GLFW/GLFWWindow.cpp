@@ -53,8 +53,9 @@ namespace highlo
 		glfwPollEvents();
 		Input::Update();
 
-		// Flushes the window buffer or presents the window for vulkan
-		m_Context->SwapBuffers();
+		// The swapchain now takes care of swapping the buffers in the context
+		//m_Context->SwapBuffers();
+		m_SwapChain->Present();
 	}
 
 	void GLFWWindow::SetWindowIcon(const HLString &path, bool flip)

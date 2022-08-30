@@ -1,0 +1,54 @@
+name: Gource Action
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-gource-video:
+    name: Record and save gource video
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+        
+      - name: 'Record user activity'
+        uses: nbprojekt/gource-action@v1
+        with:
+          git_url: https://github.com/HighLo-Engine/HighLo-Engine
+          gource_title: 'HighLo Gource'
+          gource_resolution: '1080p'
+          gource_fps: 60
+          gource_font_size: 40
+
+      - name: 'Upload gource video'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Gource
+          path: ./gource/gource.mp4
+          retention-days: 1
+          
+  upload-gource-video-to-webserver:
+    name: Upload gource video to HighLo Webserver
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 'Download artifact'
+        uses: actions/download-artifact@v2
+        with:
+          name: app-build
+          
+      - name: 'Upload'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          source: ./gource/gource.mp4
+          target: ${{ secrets.PATH }}
+          
+          

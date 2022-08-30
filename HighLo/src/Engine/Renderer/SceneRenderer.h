@@ -115,6 +115,7 @@ namespace highlo
 		HLAPI virtual ~SceneRenderer();
 
 		HLAPI void Init();
+		HLAPI void Shutdown();
 
 		HLAPI void SetScene(const Ref<Scene> &scene);
 		HLAPI void SetViewportSize(uint32 width, uint32 height);

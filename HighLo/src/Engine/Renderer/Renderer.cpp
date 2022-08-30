@@ -100,11 +100,15 @@ namespace highlo
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_MainRendererData->BlackCubeTexture = Texture3D::Create(TextureFormat::RGBA, 1, 1, &blackTextureData);
+		s_MainRendererData->BlackCubeTexture->GetSpecification().DebugName = "BlackCubeTexture";
 
 		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
 		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
+		s_MainRendererData->WhiteTexture->GetSpecification().DebugName = "WhiteTexture";
 
 		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
+		s_MainRendererData->BRDFLut->GetSpecification().DebugName = "BRDFLutTexture";
+
 		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
 
 		// Make sure the queue is empty after the renderer is initialized

@@ -75,6 +75,7 @@ namespace highlo
 
 				// Render all submitted objects to the screen
 				Renderer::BeginFrame();
+				m_Window->GetSwapChain()->BeginFrame();
 				Renderer::WaitAndRender();
 				Renderer::EndFrame();
 			}

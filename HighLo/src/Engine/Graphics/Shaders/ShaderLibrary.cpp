@@ -44,11 +44,56 @@ namespace highlo
 
 		Add(name, shader);
 	}
+
+	void ShaderLibrary::LoadFromString(const HLString &source, ShaderLanguage language)
+	{
+		Ref<Shader> shader = Shader::CreateFromString(source, "undefined", language);
+		if (!shader)
+		{
+			HL_CORE_ERROR("Failed to load shader into shaderlibrary!");
+			return;
+		}
+
+		Add(shader);
+	}
+
+	void ShaderLibrary::LoadFromString(const HLString &name, const HLString &source, ShaderLanguage language)
+	{
+		Ref<Shader> shader = Shader::CreateFromString(source, name, language);
+		if (!shader)
+		{
+			HL_CORE_ERROR("Failed to load shader into shaderlibrary!");
+			return;
+		}
+
+		Add(name, shader);
+	}
+
+	void ShaderLibrary::ReloadShader(const HLString &name)
+	{
+		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+		m_Shaders[name]->Reload();
+	}
+
+	void ShaderLibrary::ReloadAllShaders()
+	{
+		for (auto &[name, shader] : m_Shaders)
+		{
+			shader->Reload();
+		}
+	}
+
+	void ShaderLibrary::Remove(const HLString &name)
+	{
+		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+		m_Shaders[name]->Release();
+		m_Shaders.erase(name);
+	}
 	
 	const Ref<Shader> &ShaderLibrary::Get(const HLString &name)
 	{
-		HL_ASSERT(m_Shaders.find(*name) != m_Shaders.end());
-		return m_Shaders[*name];
+		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+		return m_Shaders[name];
 	}
 }
 

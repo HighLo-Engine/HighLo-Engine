@@ -41,11 +41,12 @@ namespace highlo
 	{
 		for (uint32 frame = 0; frame < m_Frames; ++frame)
 		{
-			for (uint32 set = 0; set < m_UniformBuffers.at(frame).size(); ++set)
+			for (auto &[set, buffer] : m_UniformBuffers.at(frame))
 			{
-				for (uint32 binding = 0; binding < m_UniformBuffers.at(frame).at(set).size(); ++binding)
+				for (auto &[binding, ub] : buffer)
 				{
-					callback(m_UniformBuffers.at(frame).at(set).at(binding));
+					HL_ASSERT(ub);
+					callback(ub);
 				}
 			}
 		}

@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "OpenGLSwapChain.h"
 
+#include "Engine/Renderer/Renderer.h"
+
 #ifdef HIGHLO_API_OPENGL
 
 namespace highlo
@@ -37,15 +39,21 @@ namespace highlo
 	
 	void OpenGLSwapChain::BeginFrame()
 	{
+		auto &queue = Renderer::GetRenderResourceReleaseQueue(m_CurrentBufferIndex);
+		queue.Execute();
 	}
 	
 	void OpenGLSwapChain::EndFrame()
 	{
+		Present();
 	}
 	
 	void OpenGLSwapChain::Present()
 	{
 		m_Context->SwapBuffers();
+
+		const auto &config = Renderer::GetConfig();
+		m_CurrentBufferIndex = (m_CurrentBufferIndex + 1) % config.FramesInFlight;
 	}
 }
 

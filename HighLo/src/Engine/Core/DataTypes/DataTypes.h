@@ -10,6 +10,7 @@
 
 #include "List.h"
 #include "String.h"
+#include "StringView.h"
 #include "Queue.h"
 #include "Stack.h"
 #include "Hashmap.h"

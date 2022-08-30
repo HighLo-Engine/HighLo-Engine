@@ -22,3 +22,4 @@ namespace highlo
 		uint64 FrameTrianglesRendered;
 	};
 }
+

@@ -283,9 +283,10 @@ namespace highlo
 		Load(source, forceCompile);
 	}
 
-	OpenGLShader::OpenGLShader(const HLString &source)
+	OpenGLShader::OpenGLShader(const HLString &source, const HLString &name, ShaderLanguage language)
 	{
-		m_Name = "undefined";
+		m_Name = name;
+		m_Language = language;
 		Load(source, true);
 	}
 

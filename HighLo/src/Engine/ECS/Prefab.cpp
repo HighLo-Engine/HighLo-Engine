@@ -1,3 +1,5 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "Prefab.h"
 
@@ -26,7 +28,7 @@ namespace highlo
 
 		if (serialize)
 		{
-// TODO: Serialize data
+			// TODO: Serialize data
 		}
 	}
 	
@@ -36,7 +38,7 @@ namespace highlo
 
 		newEntity.AddComponent<PrefabComponent>();
 
-// TODO: copy all other components
+		// TODO: copy all other components
 
 		return newEntity;
 	}

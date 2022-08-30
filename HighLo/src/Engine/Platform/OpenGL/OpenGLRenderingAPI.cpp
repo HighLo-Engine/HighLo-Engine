@@ -99,7 +99,7 @@ namespace highlo
 		Ref<RenderPass> ActiveRenderPass;
 	};
 
-	static GLRendererData *s_GLRendererData;
+	static GLRendererData *s_GLRendererData = nullptr;
 
 	void OpenGLRenderingAPI::Init()
 	{
@@ -163,16 +163,20 @@ namespace highlo
 		data[3].Position = glm::vec3(x, y + height, 0.1f);
 		data[3].TexCoord = glm::vec2(0, 1);
 
-		uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
+		std::vector<int32> indices = { 0, 1, 2, 2, 3, 0 };
 
 		s_GLRendererData->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(GLQuadVertex));
-		s_GLRendererData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32));
+		s_GLRendererData->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices);
+		delete[] data;
+		indices.clear();
+		indices.shrink_to_fit();
 	}
 
 	void OpenGLRenderingAPI::Shutdown()
 	{
 		OpenGLShader::ClearUniformBuffers();
 		delete s_GLRendererData;
+		s_GLRendererData = nullptr;
 	}
 
 	void OpenGLRenderingAPI::BeginFrame()
@@ -244,13 +248,18 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform)
 	{
-		va->Bind();
 		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
+		va->Bind();
 		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
 		
 		if (material)
 		{
-			material->UpdateForRendering();
+			material->UpdateForRendering(uniformBufferSet);
+
+			if (material->GetFlag(MaterialFlag::DepthTest))
+				glEnable(GL_DEPTH_TEST);
+			else
+				glDisable(GL_DEPTH_TEST);
 		}
 
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);

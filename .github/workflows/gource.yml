@@ -29,7 +29,7 @@ jobs:
         id: setup-ffmpeg
         
       - name: 'Compress video for mobile devices'
-        run: ffmpeg -i ./gource/gource.mp4 -vcodec h264 -b:v 1000k -acodec mp3 ./gource/gource_mobile.mp4
+        run: ffmpeg -i ./gource/gource.mp4 -s 256x144 -crf 20 -preset veryslow ./gource/gource_mobile.mp4
           
       - name: 'Compress gource video into tar'
         uses: a7ul/tar-action@v1.1.0

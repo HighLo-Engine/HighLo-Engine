@@ -24,7 +24,12 @@ jobs:
           gource_fps: 60
           gource_font_size: 40
           
-      - name: 'Compress gource video'
+      - name: 'Compress video for mobile devices'
+        uses: FedericoCarboni/setup-ffmpeg@v1
+        id: setup-ffmpeg
+      - run: ffmpeg -i ./gource/gource.mp4 -vcodec h264 -acodec mp2 ./gource/compressed.mp4
+          
+      - name: 'Compress gource video into tar'
         uses: a7ul/tar-action@v1.1.0
         id: compress
         with:
@@ -32,6 +37,7 @@ jobs:
           cwd: ./gource
           files: |
             gource.mp4
+            compressed.mp4
           outPath: ${{ github.sha }}.tar.gz
 
       - name: 'Upload gource video'

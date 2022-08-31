@@ -29,12 +29,7 @@ jobs:
         id: setup-ffmpeg
         
       - name: 'Compress video for mobile devices'
-        run: ffmpeg -i ./gource/gource.mp4 -vcodec h264 -b:v 1000k -acodec mp3 ./gource/compressed.mp4
-          
-      - name: 'Remove original video and rename compressed video version'
-        run: |
-          rm ./gource/gource.mp4
-          mv ./gource/compressed.mp4 ./gource/gource.mp4
+        run: ffmpeg -i ./gource/gource.mp4 -vcodec h264 -b:v 1000k -acodec mp3 ./gource/gource_mobile.mp4
           
       - name: 'Compress gource video into tar'
         uses: a7ul/tar-action@v1.1.0
@@ -44,6 +39,7 @@ jobs:
           cwd: ./gource
           files: |
             gource.mp4
+            gource_mobile.mp4
           outPath: ${{ github.sha }}.tar.gz
 
       - name: 'Upload gource video'

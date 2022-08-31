@@ -58,3 +58,9 @@ When the engine gets released, version branches will be created to maintain sing
 ![HighLo-Engine](/Screenshots/HighLo-Screenshot-3.png?raw=true "HighLo-Engine-3")
 ![HighLo-Engine](/Screenshots/HighLo-Screenshot-4.png?raw=true "HighLo-Engine-4")
 
+# Gource statistics
+
+Every time, when a pull request is merged into our master branch we use [gource](https://gource.io) to create this fancy looking contributing graph animation! You can see all users, who participated into this project and what they worked on.
+
+<video src="https://www.highlo-engine.com/uploads/gource.mp4" width="640" autoplay muted loop></video>
+

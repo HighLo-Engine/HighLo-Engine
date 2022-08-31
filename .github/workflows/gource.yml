@@ -29,7 +29,7 @@ jobs:
         id: setup-ffmpeg
         
       - name: 'Compress video for mobile devices'
-        run: ffmpeg -i ./gource/gource.mp4 -s 1280x720 -acodec copy -y ./gource/compressed.mp4
+        run: ffmpeg -i ./gource/gource.mp4 -vcodec h264 -b:v 1000k -acodec mp3 ./gource/compressed.mp4
           
       - name: 'Remove original video and rename compressed video version'
         run: |

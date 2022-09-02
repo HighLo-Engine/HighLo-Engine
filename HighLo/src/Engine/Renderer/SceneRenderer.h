@@ -52,6 +52,7 @@ namespace highlo
 
 	private:
 
+		void PreRender();
 		void FlushDrawList();
 
 	private:

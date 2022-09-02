@@ -259,10 +259,20 @@ namespace highlo
 
 	}
 	
+	void SceneRenderer::PreRender()
+	{
+		m_UniformBufferSet->ForEach([](const Ref<UniformBuffer> &uniformBuffer)
+		{
+			uniformBuffer->Bind();
+		});
+	}
+
 	void SceneRenderer::FlushDrawList()
 	{
 		if (m_ResourcesCreated && m_ViewportWidth > 0 && m_ViewportHeight > 0)
 		{
+			PreRender();
+
 			m_CommandBuffer->Begin();
 
 			// Geometry pass

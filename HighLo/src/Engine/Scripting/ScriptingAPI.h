@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "ScriptingConfig.h"
+
 namespace highlo
 {
 	class ScriptingAPI

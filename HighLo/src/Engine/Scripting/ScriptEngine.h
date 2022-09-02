@@ -8,15 +8,10 @@
 #pragma once
 
 #include "ScriptingAPI.h"
-#include "Engine/Core/FileSystemPath.h"
+#include "ScriptingConfig.h"
 
 namespace highlo
 {
-	struct ScriptEngineConfig
-	{
-		FileSystemPath CoreAssemblyPath;
-	};
-
 	/// <summary>
 	/// The script engine is the global connector between the scripting module and the rest of the engine.
 	/// </summary>

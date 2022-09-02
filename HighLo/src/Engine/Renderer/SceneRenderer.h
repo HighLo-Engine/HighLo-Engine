@@ -14,6 +14,7 @@
 #include "Engine/Graphics/Material.h"
 #include "Engine/Graphics/Shaders/UniformBufferSet.h"
 #include "Engine/Graphics/Shaders/StorageBufferSet.h"
+#include "Engine/Graphics/Shaders/UniformDefinitions.h"
 
 namespace highlo
 {
@@ -39,7 +40,7 @@ namespace highlo
 		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
-		HLAPI void ClearPass(const Ref<RenderPass> &renderPass, bool explicitClear = false);
+		HLAPI void ClearPass(const Ref<RenderPass> &renderPass);
 		HLAPI void ClearPass();
 
 		HLAPI Ref<RenderPass> GetFinalRenderPass();
@@ -48,6 +49,10 @@ namespace highlo
 
 		HLAPI void OnUIRender();
 		HLAPI static void WaitForThreads();
+
+	private:
+
+		void FlushDrawList();
 
 	private:
 
@@ -91,6 +96,15 @@ namespace highlo
 		};
 
 		SceneInfo m_SceneData;
+
+		// Uniform buffer blocks
+		UniformBufferCamera m_CameraUniformBuffer;
+		UniformBufferShadow m_ShadowUniformBuffer;
+		UniformBufferScene m_SceneUniformBuffer;
+		UniformBufferPointLights m_PointLightsUniformBuffer;
+		UniformBufferRendererData m_RendererDataUniformBuffer;
+		UniformBufferScreenData m_ScreenDataUniformBuffer;
+		UniformBufferHBAOData m_HBAOUniformBuffer;
 	};
 }
 

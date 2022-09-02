@@ -4,7 +4,6 @@
 #include "SceneRenderer.h"
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Graphics/Shaders/UniformDefinitions.h"
 
 #include "Engine/Graphics/RenderPassBuilder.h"
 #include "Engine/Graphics/FramebufferBuilder.h"
@@ -146,12 +145,20 @@ namespace highlo
 
 	void SceneRenderer::SetScene(const Ref<Scene> &scene)
 	{
-
+		HL_ASSERT(!m_Active, "You can not set a scene while a scene is being rendered!");
+		m_Scene = scene;
 	}
 
 	void SceneRenderer::SetViewportSize(uint32 width, uint32 height)
 	{
-
+		if (m_ViewportWidth != width || m_ViewportHeight != height)
+		{
+			m_ViewportWidth = width;
+			m_ViewportHeight = height;
+			m_InvertedViewportWidth = 1.0f / (float)width;
+			m_InvertedViewportHeight = 1.0f / (float)height;
+			m_NeedsResize = true;
+		}
 	}
 
 	void SceneRenderer::SetClearColor(const glm::vec4 &color)
@@ -160,22 +167,76 @@ namespace highlo
 
 	void SceneRenderer::BeginScene(const Camera &camera)
 	{
+		HL_ASSERT(m_Scene);
+		HL_ASSERT(!m_Active);
 
+		if (!m_ResourcesCreated)
+			return;
+
+		m_Active = true;
+		if (m_NeedsResize)
+		{
+			m_NeedsResize = false;
+			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_FinalVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+
+			if (m_Specification.SwapChain)
+				m_CommandBuffer = CommandBuffer::CreateFromSwapChain("SceneRenderer");
+		}
+
+		auto &sceneCamera = m_SceneData.SceneCamera;
+		const auto viewProjection = sceneCamera.GetViewProjectionMatrix();
+		const glm::vec3 cameraPosition = glm::inverse(sceneCamera.GetViewMatrix())[3];
+
+		UniformBufferCamera &cameraData = m_CameraUniformBuffer;
+		cameraData.ViewProjection = sceneCamera.GetProjection() * sceneCamera.GetViewMatrix();
+		cameraData.InverseViewProjection = glm::inverse(viewProjection);
+		cameraData.Projection = sceneCamera.GetProjection();
+		cameraData.View = sceneCamera.GetViewMatrix();
+
+		// Load Camera Projection into Uniform Buffer block
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance, cameraData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraData, sizeof(cameraData));
+		});
+
+		UniformBufferScreenData &screenData = m_ScreenDataUniformBuffer;
+		screenData.FullResolution = { m_ViewportWidth, m_ViewportHeight };
+		screenData.HalfResolution = { m_ViewportWidth / 2, m_ViewportHeight / 2 };
+		screenData.InvFullResolution = { m_InvertedViewportWidth, m_InvertedViewportHeight };
+		screenData.InvHalfResolution = { m_InvertedViewportWidth / 2, m_InvertedViewportHeight / 2 };
+
+		Renderer::Submit([instance, screenData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(17, 0, frameIndex)->SetData(&screenData, sizeof(screenData));
+		});
 	}
 
 	void SceneRenderer::EndScene()
 	{
+		HL_ASSERT(m_Active);
+		m_Active = false;
 
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			instance->FlushDrawList();
+		});
 	}
 
-	void SceneRenderer::ClearPass(const Ref<RenderPass> &renderPass, bool explicitClear)
+	void SceneRenderer::ClearPass(const Ref<RenderPass> &renderPass)
 	{
-
+		Renderer::BeginRenderPass(m_CommandBuffer, renderPass, true);
+		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
 	void SceneRenderer::ClearPass()
 	{
-
+		ClearPass(m_FinalVertexArray->GetSpecification().RenderPass);
 	}
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
@@ -196,6 +257,41 @@ namespace highlo
 	void SceneRenderer::WaitForThreads()
 	{
 
+	}
+	
+	void SceneRenderer::FlushDrawList()
+	{
+		if (m_ResourcesCreated && m_ViewportWidth > 0 && m_ViewportHeight > 0)
+		{
+			m_CommandBuffer->Begin();
+
+			// Geometry pass
+			Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryRenderPass);
+			Renderer::EndRenderPass(m_CommandBuffer);
+
+			// Composite pass
+			Renderer::BeginRenderPass(m_CommandBuffer, m_FinalCompositeRenderPass, true);
+
+			auto &geometryFramebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+			float cameraExposure = m_SceneData.SceneCamera.GetExposure();
+			int32 textureSamples = geometryFramebuffer->GetSpecification().Samples;
+
+			m_CompositeMaterial->Set("u_Uniforms.Exposure", cameraExposure);
+			m_CompositeMaterial->Set("u_Texture", geometryFramebuffer->GetImage().As<Texture2D>());
+
+		//	Renderer::RenderFullscreenQuad(m_CommandBuffer, m_FinalVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
+			Renderer::EndRenderPass(m_CommandBuffer);
+
+			m_CommandBuffer->End();
+			m_CommandBuffer->Submit();
+		}
+		else
+		{
+			m_CommandBuffer->Begin();
+			ClearPass();
+			m_CommandBuffer->End();
+			m_CommandBuffer->Submit();
+		}
 	}
 }
 

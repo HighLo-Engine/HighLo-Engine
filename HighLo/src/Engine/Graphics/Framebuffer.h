@@ -47,7 +47,7 @@ namespace highlo
 		FramebufferAttachmentSpecification(const std::initializer_list<FramebufferTextureSpecification> &attachments)
 			: Attachments(attachments) {}
 
-		std::vector<FramebufferTextureSpecification> Attachments;
+		std::vector<FramebufferTextureSpecification> Attachments = std::vector<FramebufferTextureSpecification>();
 	};
 
 	struct FramebufferSpecification

@@ -110,11 +110,14 @@ namespace highlo
 		return *this;
 	}
 
-	FramebufferBuilder &FramebufferBuilder::SetAttachments(const std::vector<FramebufferTextureSpecification> &attachments)
+	FramebufferBuilder &FramebufferBuilder::SetAttachments(const std::initializer_list<FramebufferTextureSpecification> &attachments)
 	{
+		/*
 		for (auto &attachment : attachments)
 			m_TargetSpec.Attachments.Attachments.push_back(attachment);
+		*/
 
+		m_TargetSpec.Attachments.Attachments = attachments;
 		return *this;
 	}
 

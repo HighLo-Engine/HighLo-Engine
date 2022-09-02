@@ -34,7 +34,7 @@ namespace highlo
 		HLAPI FramebufferBuilder &WithBlending();
 		HLAPI FramebufferBuilder &BlendMode(FramebufferBlendMode blendMode);
 		
-		HLAPI FramebufferBuilder &SetAttachments(const std::vector<FramebufferTextureSpecification> &attachments);
+		HLAPI FramebufferBuilder &SetAttachments(const std::initializer_list<FramebufferTextureSpecification> &attachments);
 		HLAPI FramebufferBuilder &SetExistingImage(const Ref<Texture2D> &texture);
 		HLAPI FramebufferBuilder &AddExistingImage(const Ref<Texture2D> &texture);
 		HLAPI FramebufferBuilder &ExistingImageLayers(const std::vector<uint32> &layers);
@@ -44,7 +44,7 @@ namespace highlo
 
 	private:
 
-		FramebufferSpecification m_TargetSpec;
+		FramebufferSpecification m_TargetSpec = {};
 		uint32 m_CurrentImageInsertIndex = 0;
 	};
 }

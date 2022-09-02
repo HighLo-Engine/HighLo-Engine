@@ -47,105 +47,93 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), 17, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), 18, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
 
-		// Geometry RenderPass
-		FramebufferBuilder geometryFramebufferBuilder;
-		Ref<Framebuffer> geometryFramebuffer = geometryFramebufferBuilder
-			.DebugName("Geometry")
-			.SetAttachments({ TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT })
-			.ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f })
-			.Samples(1)
-			.Build();
-
-		RenderPassBuilder geometryRenderPassBuilder;
-		m_GeometryRenderPass = geometryRenderPassBuilder
-			.SetFramebuffer(geometryFramebuffer)
-			.DebugName("Geometry")
-			.Build();
-
-		auto &pbrStaticShader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
-		m_GeometryMaterial = Material::Create(pbrStaticShader, "HighLoPBR");
-
-		VertexArrayBuilder geometryVAOBuilder;
-		m_GeometryVertexArray = geometryVAOBuilder
-			.DebugName("Geometry")
-			.LineWidth(Renderer::GetCurrentLineWidth())
-			.Layout(BufferLayout::GetStaticShaderLayout())
-			.InstanceLayout(BufferLayout::GetTransformBufferLayout())
-			.SetShader(pbrStaticShader)
-			.SetRenderPass(m_GeometryRenderPass)
-			.Build();
-
-		// Selected geometry RenderPass
-		// TODO
-
-		// Final Composite RenderPass
-		FramebufferSpecification finalFramebufferSpec;
-		finalFramebufferSpec.SwapChainTarget = m_Specification.SwapChain;
-		
-		FramebufferBuilder finalFramebufferBuilder = finalFramebufferBuilder
-			.DebugName("FinalCompositeFramebuffer")
-			.ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f })
-			.SetAttachments({ TextureFormat::RGBA, TextureFormat::Depth });
-
-		if (m_Specification.SwapChain)
+		// Init geometry render pass
 		{
-			finalFramebufferBuilder = finalFramebufferBuilder
-				.WithSwapchainTarget()
-				.SetAttachments({ TextureFormat::RGBA });
+			FramebufferSpecification framebufferSpec;
+			framebufferSpec.DebugName = "Geometry";
+			framebufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
+			framebufferSpec.Samples = 1;
+			framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.DebugName = "Geometry";
+			renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+			m_GeometryRenderPass = RenderPass::Create(renderPassSpec);
+
+			auto &pbrShader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
+			m_GeometryMaterial = Material::Create(pbrShader, "GeometryMaterial");
+
+			VertexArraySpecification vaoSpec;
+			vaoSpec.DebugName = "Geometry";
+			vaoSpec.LineWidth = Renderer::GetCurrentLineWidth();
+			vaoSpec.Shader = pbrShader;
+			vaoSpec.RenderPass = m_GeometryRenderPass;
+			vaoSpec.Layout = BufferLayout::GetStaticShaderLayout();
+			vaoSpec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+			m_GeometryVertexArray = VertexArray::Create(vaoSpec);
 		}
 
-		Ref<Framebuffer> finalFramebuffer = finalFramebufferBuilder.Build();
+		// Init composite renderpass
+		{
+			FramebufferSpecification framebufferSpec;
+			framebufferSpec.DebugName = "Composite";
+			framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+			framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
+			framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
 
-		RenderPassBuilder finalRenderPassBuilder;
-		m_FinalCompositeRenderPass = finalRenderPassBuilder
-			.DebugName("FinalRenderPass")
-			.SetFramebuffer(finalFramebuffer)
-			.Build();
+			if (m_Specification.SwapChain)
+				framebufferSpec.Attachments = { TextureFormat::RGBA };
 
-		auto &compositeShader = Renderer::GetShaderLibrary()->Get("SceneComposite");
-		m_FinalMaterial = Material::Create(compositeShader, "CompositeMaterial");
-		
-		VertexArrayBuilder finalVAOBuilder;
-		m_FinalVertexArray = finalVAOBuilder
-			.DebugName("FinalVertexArray")
-			.SetRenderPass(m_FinalCompositeRenderPass)
-			.SetShader(compositeShader)
-			.Layout(BufferLayout::GetCompositeLayout())
-			.Build();
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.DebugName = "Composite";
+			renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+			m_FinalCompositeRenderPass = RenderPass::Create(renderPassSpec);
 
-		// External editing RenderPass
-		FramebufferBuilder externalEditingFramebufferBuilder;
-		Ref<Framebuffer> externalEditingFramebuffer = externalEditingFramebufferBuilder
-			.DebugName("ExternalEditingFramebuffer")
-			.SetAttachments({ TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT })
-			.ClearColor({ 0.1f, 0.1f, 0.1f, 1.0f })
-			.AddExistingImage(m_FinalCompositeRenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>())
-			.AddExistingImage(m_GeometryRenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>())
-			.Build();
+			auto &shader = Renderer::GetShaderLibrary()->Get("SceneComposite");
+			m_CompositeMaterial = Material::Create(shader, "CompositeMaterial");
 
-		RenderPassBuilder externalEditingRenderPassBuilder;
-		m_ExternalCompositingRenderPass = externalEditingRenderPassBuilder
-			.DebugName("ExternalEditingRenderPass")
-			.SetFramebuffer(externalEditingFramebuffer)
-			.Build();
+			VertexArraySpecification vaoSpec;
+			vaoSpec.DebugName = "Composite";
+			vaoSpec.Layout = BufferLayout::GetCompositeLayout();
+			vaoSpec.InstanceLayout = {};
+			vaoSpec.Shader = shader;
+			vaoSpec.RenderPass = m_FinalCompositeRenderPass;
+			m_FinalVertexArray = VertexArray::Create(vaoSpec);
+		}
 
-		auto &wireframeShader = Renderer::GetShaderLibrary()->Get("Wireframe");
-		m_ExternalMaterial = Material::Create(wireframeShader, "WireframeMaterial");
+		// Init external renderpass
+		{
+			FramebufferSpecification framebufferSpec;
+			framebufferSpec.DebugName = "ExternalComposite";
+			framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
+			framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+			framebufferSpec.ClearOnLoad = true;
+			framebufferSpec.ExistingImages[0] = m_FinalCompositeRenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
+			framebufferSpec.ExistingImages[1] = m_GeometryRenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
 
-		VertexArrayBuilder externalEditingVAOBuilder;
-		m_GeometryWireframeOnTopVertexArray = externalEditingVAOBuilder
-			.DebugName("ExternalEditingVertexArray")
-			.SetRenderPass(m_ExternalCompositingRenderPass)
-			.SetShader(wireframeShader)
-			.Layout(BufferLayout::GetStaticShaderLayout())
-			.InstanceLayout(BufferLayout::GetTransformBufferLayout())
-			.LineWidth(2.0f)
-			.WithWireframe()
-			.Build();
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.DebugName = "ExternalComposite";
+			renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+			m_ExternalCompositingRenderPass = RenderPass::Create(renderPassSpec);
 
-		m_ExternalVertexArray = externalEditingVAOBuilder
-			.WithDepthTest()
-			.Build();
+			auto &shader = Renderer::GetShaderLibrary()->Get("Wireframe");
+			m_WireframeMaterial = Material::Create(shader, "WireframeMaterial");
+
+			VertexArraySpecification vaoSpec;
+			vaoSpec.DebugName = "ExternalComposite";
+			vaoSpec.Shader = shader;
+			vaoSpec.RenderPass = m_ExternalCompositingRenderPass;
+			vaoSpec.Layout = BufferLayout::GetStaticShaderLayout();
+			vaoSpec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+			m_ExternalVertexArray = VertexArray::Create(vaoSpec);
+			
+			vaoSpec.Wireframe = true;
+			vaoSpec.DepthTest = true;
+			vaoSpec.LineWidth = 2.0f;
+			m_GeometryWireframeVertexArray = VertexArray::Create(vaoSpec);
+			vaoSpec.DepthTest = false;
+			m_GeometryWireframeOnTopVertexArray = VertexArray::Create(vaoSpec);
+		}
 
 		m_ResourcesCreated = true;
 	}

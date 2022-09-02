@@ -53,16 +53,17 @@ namespace highlo
 
 		Ref<RenderPass> m_GeometryRenderPass = nullptr;
 		Ref<VertexArray> m_GeometryVertexArray = nullptr;
+		Ref<VertexArray> m_GeometryWireframeVertexArray = nullptr;
 		Ref<VertexArray> m_GeometryWireframeOnTopVertexArray = nullptr;
 		Ref<Material> m_GeometryMaterial = nullptr;
 
 		Ref<RenderPass> m_ExternalCompositingRenderPass = nullptr;
 		Ref<VertexArray> m_ExternalVertexArray = nullptr;
-		Ref<Material> m_ExternalMaterial = nullptr; // Wireframe material
+		Ref<Material> m_WireframeMaterial = nullptr;
 
 		Ref<RenderPass> m_FinalCompositeRenderPass = nullptr;
 		Ref<VertexArray> m_FinalVertexArray = nullptr;
-		Ref<Material> m_FinalMaterial = nullptr; // Composite Material
+		Ref<Material> m_CompositeMaterial = nullptr;
 
 		uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 		float m_InvertedViewportWidth = 0.0f, m_InvertedViewportHeight = 0.0f;

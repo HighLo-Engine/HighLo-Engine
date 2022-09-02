@@ -66,8 +66,10 @@ namespace highlo
 			{
 				Ref<Texture> texture = Texture2D::Create(format, width, height);
 				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
+
 				glBindTexture(utils::TextureTarget(multisampled), glTexture->GetRendererID());
 				glTexture->CreateSampler(TextureProperties());
+
 				return texture;
 			}
 

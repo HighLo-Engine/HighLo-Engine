@@ -337,8 +337,8 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
 	{
-		va->Bind();
 		model->Get()->GetVertexBuffer()->Bind();
+		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
 		auto &submeshes = model->Get()->GetSubmeshes();

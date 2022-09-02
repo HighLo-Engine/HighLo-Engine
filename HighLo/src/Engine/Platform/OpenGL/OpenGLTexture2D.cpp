@@ -402,6 +402,10 @@ namespace highlo
 
 	void OpenGLTexture2D::CreateSampler(TextureProperties properties)
 	{
+		// Release the current sampler, if there is one
+		if (m_SamplerRendererID)
+			glDeleteSamplers(1, &m_SamplerRendererID);
+
 		glGenSamplers(1, &m_SamplerRendererID);
 
 		glSamplerParameteri(m_SamplerRendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(properties.SamplerFilter, false));

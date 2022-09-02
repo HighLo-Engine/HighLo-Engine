@@ -139,13 +139,13 @@ namespace highlo
 						{ Max.x + translation.x, Max.y + translation.y,	Max.z + translation.z });
 		}
 
-		HLAPI AABB Scaled(const glm::vec3& scale) const
+		HLAPI AABB Scaled(const glm::vec3 &scale) const
 		{
 			return AABB({ Min.x * scale.x, Min.y * scale.y, Min.z * scale.z },
 				{ Max.x * scale.x, Max.y * scale.y,	Max.z * scale.z });
 		}
 
-		HLAPI AABB Transformed(const glm::vec3& translation, const glm::vec3& scale)
+		HLAPI AABB Transformed(const glm::vec3 &translation, const glm::vec3 &scale)
 		{
 			return AABB({ (Min.x + translation.x) * scale.x, (Min.y + translation.y) * scale.y, (Min.z + translation.z) * scale.z },
 				{ (Max.x + translation.x) * scale.x, (Max.y + translation.y) * scale.y,	(Max.z + translation.z) * scale.z });

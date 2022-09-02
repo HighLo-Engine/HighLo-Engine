@@ -263,9 +263,9 @@ namespace highlo
 
 	void SceneRenderer::SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
+		const auto &submeshes = model->Get()->GetSubmeshes();
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
 		{
-			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
 			glm::mat4 submeshTransform = transform * submeshes[submeshIndex].LocalTransform.GetTransform();
 
@@ -483,9 +483,9 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-	//	return Renderer2D::GetTargetRenderPass();
-	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
-		return m_CompositeVertexArray->GetSpecification().RenderPass;
+	//	return m_ExternalCompositingRenderPass; // 2D
+		return m_GeometryVertexArray->GetSpecification().RenderPass;
+	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -1071,7 +1071,7 @@ namespace highlo
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "ExternalCompositing";
 		framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
-		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		framebufferSpec.ClearOnLoad = false;
 		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
 		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();

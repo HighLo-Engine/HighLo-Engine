@@ -76,7 +76,7 @@ namespace highlo
 		std::map<uint32, Ref<Texture2D>> ExistingImages;
 		Ref<Framebuffer> ExistingFramebuffer;
 
-		HLString DebugName;
+		HLString DebugName = "";
 	};
 
 	class Framebuffer : public IsSharedReference

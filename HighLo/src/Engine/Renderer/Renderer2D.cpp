@@ -374,7 +374,7 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData->ActiveCommandBuffer->Begin();
-		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass, true);
+		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass);
 
 		FlushQuads();
 		FlushCircles();

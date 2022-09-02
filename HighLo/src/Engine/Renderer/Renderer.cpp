@@ -4,6 +4,7 @@
 #include "Renderer.h"
 
 #include "Renderer2D.h"
+#include "Engine/Graphics/VertexArray.h"
 
 #ifdef HIGHLO_API_OPENGL
 #include "Engine/Platform/OpenGL/OpenGLRenderingAPI.h"

@@ -18,7 +18,11 @@ namespace highlo
 		HLAPI RenderPassBuilder();
 		HLAPI virtual ~RenderPassBuilder();
 
+		HLAPI RenderPassBuilder &DebugName(const HLString &debugName);
+		HLAPI RenderPassBuilder &DebugMarkerColor(const glm::vec4 &color);
+		HLAPI RenderPassBuilder &SetFramebuffer(const Ref<Framebuffer> &framebuffer);
 
+		HLAPI Ref<RenderPass> Build(const RenderPassSpecification *overrideSpec = nullptr);
 
 	private:
 

@@ -166,7 +166,10 @@ namespace highlo
 			if (this != &other)
 			{
 				if (m_Data)
+				{
 					delete[] m_Data;
+					m_Data = nullptr;
+				}
 
 				m_Size = other.m_Size;
 				m_Data = new StringType[m_Size + 1];

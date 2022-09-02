@@ -104,5 +104,10 @@ namespace highlo
 		float MaxWidth = 10.0f;
 	};
 
-
+	struct ScriptComponent
+	{
+		AssetHandle ScriptClass = 0;
+		std::vector<uint32> Fields;
+		bool ScriptInitialized = false;
+	};
 }

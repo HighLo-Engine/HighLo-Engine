@@ -4,6 +4,7 @@
 #include "MonoAPI.h"
 
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Scripting/ScriptEngine.h"
 
 #ifdef HIGHLO_API_MONO_SCRIPTING
 
@@ -19,6 +20,7 @@ namespace highlo
 		MonoDomain *AppDomain = nullptr;
 
 		MonoAssembly *CoreAssembly = nullptr;
+		MonoAssembly *AppAssembly = nullptr;
 	};
 
 	ScriptingData *s_ScriptingData = nullptr;
@@ -69,7 +71,7 @@ namespace highlo
 
 	}
 
-	void MonoAPI::Init()
+	void MonoAPI::Init(const ScriptEngineConfig *config)
 	{
 		s_ScriptingData = new ScriptingData();
 		InitMono();

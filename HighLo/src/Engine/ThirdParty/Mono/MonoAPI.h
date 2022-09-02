@@ -11,13 +11,20 @@
 
 #ifdef HIGHLO_API_MONO_SCRIPTING
 
+#define DISABLE_AOT
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/exception.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
+
 namespace highlo
 {
 	class MonoAPI : public ScriptingAPI
 	{
 	public:
 
-		virtual void Init() override;
+		virtual void Init(const ScriptEngineConfig *config = nullptr) override;
 		virtual void Shutdown() override;
 
 

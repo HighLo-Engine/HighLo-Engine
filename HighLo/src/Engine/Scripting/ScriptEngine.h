@@ -8,15 +8,25 @@
 #pragma once
 
 #include "ScriptingAPI.h"
+#include "Engine/Core/FileSystemPath.h"
 
 namespace highlo
 {
+	struct ScriptEngineConfig
+	{
+		FileSystemPath CoreAssemblyPath;
+	};
+
+	/// <summary>
+	/// The script engine is the global connector between the scripting module and the rest of the engine.
+	/// </summary>
 	class ScriptEngine
 	{
 	public:
 
-		HLAPI static void Init();
+		HLAPI static void Init(const ScriptEngineConfig *config = nullptr);
 		HLAPI static void Shutdown();
+
 
 
 	private:

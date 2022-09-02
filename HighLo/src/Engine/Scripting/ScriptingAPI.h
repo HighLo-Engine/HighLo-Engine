@@ -13,7 +13,7 @@ namespace highlo
 	{
 	public:
 
-		HLAPI virtual void Init() = 0;
+		HLAPI virtual void Init(const ScriptEngineConfig *config = nullptr) = 0;
 		HLAPI virtual void Shutdown() = 0;
 
 

@@ -18,7 +18,7 @@ namespace highlo
 	UniqueRef<ScriptingAPI> ScriptEngine::s_ScriptingAPI = UniqueRef<LuaAPI>::Create();
 #endif // HIGHLO_API_MONO
 
-	void ScriptEngine::Init()
+	void ScriptEngine::Init(const ScriptEngineConfig *config)
 	{
 		ScriptCache::Init();
 		s_ScriptingAPI->Init();

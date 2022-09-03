@@ -20,6 +20,8 @@
 
 namespace highlo
 {
+	using AssembliesArray = std::array<Ref<AssemblyInfo>, 2>;
+
 	class MonoAPI : public ScriptingAPI
 	{
 	public:
@@ -27,12 +29,21 @@ namespace highlo
 		virtual void Init(const ScriptEngineConfig *config = nullptr) override;
 		virtual void Shutdown() override;
 
+		virtual bool ReloadAssembly(const FileSystemPath &filePath) override;
+		virtual void UnloadAssembly(Ref<AssemblyInfo> &assemblyInfo) override;
 
+
+
+		virtual ScriptEngineConfig &GetConfig() override;
+		virtual const ScriptEngineConfig &GetConfig() const override;
 
 	private:
 
 		void InitMono(const ScriptEngineConfig *config = nullptr);
 		void ShutdownMono();
+
+		bool LoadCoreAssembly();
+		bool LoadAppAssembly(const FileSystemPath &filePath);
 	};
 }
 

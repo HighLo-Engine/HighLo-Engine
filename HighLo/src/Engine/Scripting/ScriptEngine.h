@@ -24,6 +24,8 @@ namespace highlo
 
 
 
+		HLAPI static ScriptEngineConfig &GetConfig();
+
 	private:
 
 		static UniqueRef<ScriptingAPI> s_ScriptingAPI;

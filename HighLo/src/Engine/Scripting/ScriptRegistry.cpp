@@ -5,6 +5,9 @@
 
 namespace highlo
 {
+	void ScriptRegistry::RegisterAllFunctions()
+	{
 
+	}
 }
 

@@ -32,6 +32,19 @@ namespace highlo
 		/// Determines, if the .pdb file should also be loaded to enable debugging.
 		/// </summary>
 		bool LoadDebugSymbols = true;
+
+		/// <summary>
+		/// Determines, whether to initialize the debugger. 
+		/// If enabled, LoadDebugSymbols will be enabled regardless of the option value.
+		/// </summary>
+		bool EnableDebugger = true;
+
+		/// <summary>
+		/// Determines the port, where the debugger should start on your local machine.
+		/// </summary>
+		HLString DebugPort = "1234";
+
+
 	};
 }
 

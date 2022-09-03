@@ -8,6 +8,7 @@
 #pragma once
 
 #include "ScriptingConfig.h"
+#include "AssemblyInfo.h"
 
 namespace highlo
 {
@@ -21,7 +22,13 @@ namespace highlo
 		HLAPI virtual void Init(const ScriptEngineConfig *config = nullptr) = 0;
 		HLAPI virtual void Shutdown() = 0;
 
-		
+		HLAPI virtual bool ReloadAssembly(const FileSystemPath &filePath) = 0;
+		HLAPI virtual void UnloadAssembly(Ref<AssemblyInfo> &assemblyInfo) = 0;
+
+
+
+		HLAPI virtual ScriptEngineConfig &GetConfig() = 0;
+		HLAPI virtual const ScriptEngineConfig &GetConfig() const = 0;
 	};
 }
 

@@ -13,7 +13,7 @@ namespace highlo
 	{
 	public:
 
-
+		HLAPI static void RegisterAllFunctions();
 	};
 }
 

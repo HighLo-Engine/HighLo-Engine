@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "AssemblyInfo.h"
+
 namespace highlo
 {
 	class ScriptCache
@@ -15,6 +17,8 @@ namespace highlo
 
 		HLAPI static void Init();
 		HLAPI static void Shutdown();
+
+		HLAPI static void GenerateCacheForAssembly(Ref<AssemblyInfo> &assemblyInfo);
 	};
 }
 

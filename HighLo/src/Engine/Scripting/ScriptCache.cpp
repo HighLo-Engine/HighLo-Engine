@@ -12,5 +12,10 @@ namespace highlo
 	void ScriptCache::Shutdown()
 	{
 	}
+
+	void ScriptCache::GenerateCacheForAssembly(Ref<AssemblyInfo> &assemblyInfo)
+	{
+		HL_CORE_TRACE("Generating Cache for {}", **assemblyInfo->FilePath);
+	}
 }
 

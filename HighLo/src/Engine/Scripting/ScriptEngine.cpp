@@ -29,5 +29,10 @@ namespace highlo
 		s_ScriptingAPI->Shutdown();
 		ScriptCache::Shutdown();
 	}
+
+	ScriptEngineConfig &ScriptEngine::GetConfig()
+	{
+		return s_ScriptingAPI->GetConfig();
+	}
 }
 

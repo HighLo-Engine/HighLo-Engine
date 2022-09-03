@@ -46,6 +46,10 @@ namespace highlo
 	{
 	public:
 
+		static const FileSystemPath INVALID_PATH;
+
+	public:
+
 		HLAPI FileSystemPath() = default;
 		HLAPI FileSystemPath(const char *path);
 		HLAPI FileSystemPath(const HLString &path);

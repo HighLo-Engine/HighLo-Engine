@@ -20,6 +20,7 @@
 #include "Engine/Threading/ThreadRegistry.h"
 #include "Engine/Loaders/AssetImporter.h"
 #include "Engine/Scripting/ScriptEngine.h"
+#include "Engine/Core/FileSystem.h"
 
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&highlo::HLApplication::fn, this, std::placeholders::_1)
 
@@ -137,6 +138,11 @@ namespace highlo
 		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
 
 		Logger::Init();
+
+		if (!m_Settings.WorkingDirectory.IsEmpty())
+		{
+			FileSystem::Get()->SetCurrentWorkingDirectory(m_Settings.WorkingDirectory);
+		}
 
 		// Create cache for sin() and cos()
 		Math::CreateCacheSin();

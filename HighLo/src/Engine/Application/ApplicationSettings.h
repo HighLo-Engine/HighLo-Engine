@@ -17,6 +17,11 @@ namespace highlo
 	struct ApplicationSettings
 	{
 		/// <summary>
+		/// Determines the current working directory, HighLo should start with.
+		/// </summary>
+		FileSystemPath WorkingDirectory = "";
+
+		/// <summary>
 		/// Determines whether the engine should launch without a rendering window (useful for game-servers)
 		/// </summary>
 		bool Headless = false;

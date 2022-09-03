@@ -7,6 +7,8 @@
 
 namespace highlo
 {
+	const FileSystemPath FileSystemPath::INVALID_PATH = "INVALID_PATH";
+
 	FileSystemPath::FileSystemPath(const char *path)
 	{
 		Assign(path);

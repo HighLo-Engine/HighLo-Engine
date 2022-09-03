@@ -174,6 +174,33 @@ namespace highlo
         return !(result == INVALID_FILE_ATTRIBUTES && GetLastError() == ERROR_FILE_NOT_FOUND);
     }
 
+    bool FileSystem::SetCurrentWorkingDirectory(const FileSystemPath &path)
+    {
+        return ::SetCurrentDirectoryW(path.String().W_Str());
+    }
+
+    FileSystemPath FileSystem::GetCurrentWorkingDirectory()
+    {
+        TCHAR buffer[MAX_PATH];
+        DWORD dwRet;
+
+        dwRet = ::GetCurrentDirectoryW(MAX_PATH, buffer);
+
+        if (dwRet == 0)
+        {
+            HL_CORE_ERROR("GetCurrentDirectory failed {}", GetLastError());
+            return FileSystemPath::INVALID_PATH;
+        }
+
+        if (dwRet > MAX_PATH)
+        {
+            HL_CORE_ERROR("Buffer too small; need {} characters", dwRet);
+            return FileSystemPath::INVALID_PATH;
+        }
+
+        return FileSystemPath(HLString::FromWideString(buffer));
+    }
+
     bool FileSystem::FolderExists(const FileSystemPath &path)
     {
         HLString pathStr = path.String();

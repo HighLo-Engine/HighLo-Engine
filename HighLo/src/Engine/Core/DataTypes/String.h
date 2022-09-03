@@ -26,6 +26,7 @@ namespace highlo
 	using HLString = HLStringBase<char>;
 	using HLString16 = HLStringBase<char16_t>;
 	using HLString32 = HLStringBase<char32_t>;
+	using HLStringWide = HLStringBase<wchar_t>;
 
 	namespace utils
 	{
@@ -70,11 +71,35 @@ namespace highlo
 		HLString16 ToUTF16(const HLString &str);
 		HLString ToUTF8(const HLString32 &str);
 		HLString ToUTF8(const HLString16 &str);
+
+		template<typename T>
+		static uint32 GetSizeOfUnknownStringType(const T *str)
+		{
+			HL_ASSERT(false, "unknown string type!");
+			return 0;
+		}
+
+		template<>
+		static uint32 GetSizeOfUnknownStringType(const char *str)
+		{
+			return (uint32)strlen(str);
+		}
+
+		template<>
+		static uint32 GetSizeOfUnknownStringType(const wchar_t *str)
+		{
+			return (uint32)wcslen(str);
+		}
 	}
 
 	template<typename StringType>
 	class HLStringBase
 	{
+	private:
+
+		StringType *m_Data = 0;
+		uint32 m_Size = 0;
+
 	public:
 
 		static const uint32 NPOS = static_cast<uint32>(-1);
@@ -83,7 +108,7 @@ namespace highlo
 
 		HLAPI HLStringBase(const StringType *data)
 		{
-			m_Size = (uint32)strlen((const char*)data);
+			m_Size = utils::GetSizeOfUnknownStringType<StringType>(data);
 			m_Data = new StringType[m_Size + 1];
 			m_Data[m_Size] = '\0';
 			memcpy(m_Data, data, m_Size);
@@ -92,14 +117,6 @@ namespace highlo
 		HLAPI HLStringBase(const StringType *data, uint32 length)
 		{
 			m_Size = length;
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, data, m_Size);
-		}
-
-		HLAPI HLStringBase(const wchar_t *data)
-		{
-			m_Size = (uint32)wcslen(data);
 			m_Data = new StringType[m_Size + 1];
 			m_Data[m_Size] = '\0';
 			memcpy(m_Data, data, m_Size);
@@ -864,6 +881,20 @@ namespace highlo
 			return 0;
 		}
 
+		HLAPI static HLString FromWideString(const wchar_t *str)
+		{
+			std::wstring ws(str);
+			std::string s(ws.begin(), ws.end());
+			return s.c_str();
+		}
+
+		HLAPI static HLStringWide FromCString(const char *str)
+		{
+			std::string s(str);
+			std::wstring ws(s.begin(), s.end());
+			return ws.c_str();
+		}
+
 		template<typename IteratorType1, typename IteratorType2>
 		HLAPI static bool LexicographicalCompare(IteratorType1 first1, IteratorType1 last1, IteratorType2 first2, IteratorType2 last2)
 		{
@@ -1089,9 +1120,6 @@ namespace highlo
 		{
 			return (unsigned char)letter >> encoding;
 		}
-
-		StringType *m_Data = 0;
-		uint32 m_Size = 0;
 	};
 }
 

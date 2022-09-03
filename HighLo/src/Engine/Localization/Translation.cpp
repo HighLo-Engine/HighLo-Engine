@@ -21,8 +21,10 @@ namespace highlo
 
 	HLString Translation::GetText(const HLString &key)
 	{
-		HL_ASSERT(m_Translations.find(key) != m_Translations.end(), "Could not find the key!");
-		return m_Translations.at(key);
+		if (m_Translations.find(key) != m_Translations.end())
+			return m_Translations.at(key);
+
+		return key;
 	}
 
 	bool Translation::HasText(const HLString &key) const

@@ -95,7 +95,7 @@ namespace highlo
 		/// <summary>
 		/// Determines the default language the engine should start with.
 		/// </summary>
-		HLString ActiveTranslationLanguageCode = "en-EN";
+		HLString ActiveTranslationLanguageCode = "en-US";
 	//	HLString ActiveTranslationLanguageCode = "de-DE";
 
 		/// <summary>

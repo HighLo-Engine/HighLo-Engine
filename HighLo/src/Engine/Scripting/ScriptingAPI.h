@@ -11,6 +11,9 @@
 
 namespace highlo
 {
+	/// <summary>
+	/// The Scripting API class represents the underlying scripting api (for C# it is currently Mono, Lua and Javascript will be added too).
+	/// </summary>
 	class ScriptingAPI
 	{
 	public:
@@ -18,7 +21,7 @@ namespace highlo
 		HLAPI virtual void Init(const ScriptEngineConfig *config = nullptr) = 0;
 		HLAPI virtual void Shutdown() = 0;
 
-
+		
 	};
 }
 

@@ -31,7 +31,7 @@ namespace highlo
 
 	private:
 
-		void InitMono();
+		void InitMono(const ScriptEngineConfig *config = nullptr);
 		void ShutdownMono();
 	};
 }

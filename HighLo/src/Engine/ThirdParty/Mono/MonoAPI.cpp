@@ -74,7 +74,7 @@ namespace highlo
 	void MonoAPI::Init(const ScriptEngineConfig *config)
 	{
 		s_ScriptingData = new ScriptingData();
-		InitMono();
+		InitMono(config);
 	}
 
 	void MonoAPI::Shutdown()
@@ -83,8 +83,11 @@ namespace highlo
 		delete s_ScriptingData;
 	}
 
-	void MonoAPI::InitMono()
+	void MonoAPI::InitMono(const ScriptEngineConfig *config)
 	{
+		if (!config)
+			return;
+
 		// TODO: implement a working directory solution, the ../../../ should not be here! the runtime would not work with that!
 		mono_set_assemblies_path("../../../ThirdParty/mono/lib");
 
@@ -100,7 +103,7 @@ namespace highlo
 		s_ScriptingData->AppDomain = appDomain;
 
 		// TODO: Same as above
-		MonoAssembly *assembly = utils::LoadCSharpAssembly("../../../Resources/Scripts/HighLo-C#.dll");
+		MonoAssembly *assembly = utils::LoadCSharpAssembly(config->CoreAssemblyPath.String());
 		HL_ASSERT(assembly);
 
 		s_ScriptingData->CoreAssembly = assembly;

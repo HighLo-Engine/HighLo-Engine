@@ -28,7 +28,10 @@ namespace highlo
 		/// </summary>
 		FileSystemPath AppAssemblyPath = "Resources/Scripts/Sandbox.dll";
 
-
+		/// <summary>
+		/// Determines, if the .pdb file should also be loaded to enable debugging.
+		/// </summary>
+		bool LoadDebugSymbols = true;
 	};
 }
 

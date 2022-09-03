@@ -246,7 +246,7 @@ namespace highlo
 	{
 		if (IsParentPath())
 		{
-			HLString result = m_CurrentAbsolutePath;
+			HLString result = m_CurrentPath;
 			
 			if (result.EndsWith("/"))
 				result = result.Substr(0, result.LastIndexOf('/'));

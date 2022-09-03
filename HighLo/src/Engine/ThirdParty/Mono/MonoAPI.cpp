@@ -21,13 +21,15 @@ namespace highlo
 
 		MonoAssembly *CoreAssembly = nullptr;
 		MonoAssembly *AppAssembly = nullptr;
+
+		ScriptEngineConfig Config;
 	};
 
 	ScriptingData *s_ScriptingData = nullptr;
 
 	namespace utils
 	{
-		static MonoAssembly *LoadCSharpAssembly(const HLString &path)
+		static MonoAssembly *LoadCSharpAssembly(const FileSystemPath &path)
 		{
 			int64 fileSize;
 			Byte *data = FileSystem::Get()->ReadFile(path, &fileSize);
@@ -42,7 +44,26 @@ namespace highlo
 				return nullptr;
 			}
 
-			MonoAssembly *assembly = mono_assembly_load_from_full(image, path.C_Str(), &status, 0);
+			// Check if the user wants to load debug symbols as well
+			if (s_ScriptingData->Config.LoadDebugSymbols)
+			{
+				// First we need to check, whether a pdb file exists
+				FileSystemPath pdbPath = path.ParentPath() / path.Filename();
+				FileSystemPath pdbFile = pdbPath.String() + ".pdb";
+
+				// Then load the pdb file
+				if (pdbFile.Exists())
+				{
+					HL_CORE_INFO("Loading debug symbols from {}", **pdbFile);
+
+					int64 size;
+					mono_byte *data = (mono_byte*)FileSystem::Get()->ReadFile(pdbFile, &size);
+					mono_debug_open_image_from_memory(image, data, (int32)size);
+					delete[] data;
+				}
+			}
+
+			MonoAssembly *assembly = mono_assembly_load_from_full(image, path.String().C_Str(), &status, 0);
 			HL_ASSERT(assembly);
 
 			mono_image_close(image);
@@ -73,8 +94,17 @@ namespace highlo
 
 	void MonoAPI::Init(const ScriptEngineConfig *config)
 	{
+		HL_ASSERT(!s_ScriptingData, "You are trying to initialize mono more than one time!");
 		s_ScriptingData = new ScriptingData();
-		InitMono(config);
+
+		if (config)
+		{
+			s_ScriptingData->Config = *config;
+		}
+
+		// If the user does not provide a custom config,
+		// the default config inside s_ScriptingData->Config will be used.
+		InitMono(&s_ScriptingData->Config);
 	}
 
 	void MonoAPI::Shutdown()

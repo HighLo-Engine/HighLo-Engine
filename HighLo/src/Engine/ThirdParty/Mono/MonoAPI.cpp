@@ -81,15 +81,14 @@ namespace highlo
 	{
 		ShutdownMono();
 		delete s_ScriptingData;
+		s_ScriptingData = nullptr;
 	}
 
 	void MonoAPI::InitMono(const ScriptEngineConfig *config)
 	{
-		if (!config)
-			return;
+		HL_ASSERT(config);
 
-		// TODO: implement a working directory solution, the ../../../ should not be here! the runtime would not work with that!
-		mono_set_assemblies_path("../../../ThirdParty/mono/lib");
+		mono_set_assemblies_path("ThirdParty/mono/lib");
 
 		MonoDomain *rootDomain = mono_jit_init("HighLoRuntime");
 		HL_ASSERT(rootDomain);

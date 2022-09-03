@@ -59,6 +59,7 @@ namespace highlo
 
 		HLAPI FileSystemPath &operator=(const FileSystemPath &other);
 		HLAPI FileSystemPath &operator=(const HLString &str);
+		HLAPI FileSystemPath &operator=(const char *str);
 		HLAPI FileSystemPath &operator=(const File &file);
 
 		HLAPI void Assign(const HLString &source);

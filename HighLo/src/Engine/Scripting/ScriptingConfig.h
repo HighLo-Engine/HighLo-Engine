@@ -17,7 +17,7 @@ namespace highlo
 		/// Determines the path to the main C# scripting dll. 
 		/// The main scripting dll contains the C# library which can be accessed through own C# projects
 		/// </summary>
-		FileSystemPath CoreAssemblyPath = "../../../Resources/Scripts/HighLo-C#.dll";
+		FileSystemPath CoreAssemblyPath = "Resources/Scripts/HighLo-C#.dll";
 
 		/// <summary>
 		/// Determines the path to the Sandbox C# scripting dll.
@@ -26,7 +26,7 @@ namespace highlo
 		/// This can be considered to be a debug option, so it's value may be removed in the future
 		/// (or rather changed to be the client's scripting dll)
 		/// </summary>
-		FileSystemPath AppAssemblyPath = "../../../Resources/Scripts/Sandbox.dll";
+		FileSystemPath AppAssemblyPath = "Resources/Scripts/Sandbox.dll";
 
 
 	};

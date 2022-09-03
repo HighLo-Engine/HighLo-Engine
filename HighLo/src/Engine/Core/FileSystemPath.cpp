@@ -40,6 +40,13 @@ namespace highlo
 		return *this;
 	}
 
+	FileSystemPath &FileSystemPath::operator=(const char *str)
+	{
+		HLString s = str;
+		Assign(s);
+		return *this;
+	}
+
 	FileSystemPath &FileSystemPath::operator=(const File &file)
 	{
 		Assign(file.FullPath);

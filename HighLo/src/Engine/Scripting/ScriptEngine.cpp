@@ -21,7 +21,7 @@ namespace highlo
 	void ScriptEngine::Init(const ScriptEngineConfig *config)
 	{
 		ScriptCache::Init();
-		s_ScriptingAPI->Init();
+		s_ScriptingAPI->Init(config);
 	}
 
 	void ScriptEngine::Shutdown()

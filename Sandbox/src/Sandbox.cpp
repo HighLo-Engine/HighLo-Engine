@@ -3,6 +3,11 @@
 // This Sandbox application will render nothing,
 // because the underlying API is currently under heavy development!
 
+Sandbox::Sandbox(highlo::ApplicationSettings &settings)
+	: highlo::HLApplication(settings)
+{
+}
+
 void Sandbox::OnInitialize()
 {
 	// TODO: Fix for GLFW configuration.

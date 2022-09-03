@@ -188,7 +188,9 @@ namespace highlo
 		Service::Sort();
 
 		Translations::Init();
-		ScriptEngine::Init();
+
+		ScriptEngineConfig scriptConfig;
+		ScriptEngine::Init(&scriptConfig);
 
 		m_RenderDebugPanel = UniqueRef<RenderDebugPanel>::Create();
 

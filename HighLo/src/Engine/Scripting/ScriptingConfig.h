@@ -37,7 +37,7 @@ namespace highlo
 		/// Determines, whether to initialize the debugger. 
 		/// If enabled, LoadDebugSymbols will be enabled regardless of the option value.
 		/// </summary>
-		bool EnableDebugger = true;
+		bool EnableDebugger = false;
 
 		/// <summary>
 		/// Determines the port, where the debugger should start on your local machine.

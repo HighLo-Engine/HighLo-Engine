@@ -5,6 +5,25 @@ namespace highlo
 {
     internal class InternalCalls
     {
+        #region Application
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern uint Application_GetWidth();
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_SetWidth(uint width);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern uint Application_GetHeight();
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_SetHeight(uint height);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_Quit();
+
+        #endregion
+
         #region Entity
 
         [MethodImpl(MethodImplOptions.InternalCall)]

@@ -3,8 +3,18 @@
 #include "HighLoPch.h"
 #include "Serializable.h"
 
+#include "Serializer.h"
+
 namespace highlo
 {
+    Serializable::Serializable()
+    {
+        Serializer::RegisterSerializable(this);
+    }
 
+    Serializable::~Serializable()
+    {
+        Serializer::UnregisterSerializable(this);
+    }
 }
 

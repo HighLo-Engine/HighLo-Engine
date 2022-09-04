@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace highlo
+﻿namespace highlo
 {
     public class Quaternion
     {
@@ -20,7 +15,7 @@ namespace highlo
             W = scalar;
         }
 
-        public Quaternion(ref Vector3 v, float scalar)
+        public Quaternion(Vector3 v, float scalar)
         {
             X = v.X;
             Y = v.Y;

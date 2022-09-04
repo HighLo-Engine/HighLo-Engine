@@ -5,7 +5,6 @@
 
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Scripting/ScriptEngine.h"
-#include "Engine/Scripting/ScriptRegistry.h"
 #include "Engine/Scripting/ScriptCache.h"
 
 #ifdef HIGHLO_API_MONO_SCRIPTING
@@ -13,6 +12,8 @@
 #include <mono/jit/jit.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/assembly.h>
+
+#include "MonoScriptRegistry.h"
 
 namespace highlo
 {
@@ -278,7 +279,7 @@ namespace highlo
 		utils::PrintAssemblyTypes(appAssemblyInfo->Assembly);
 #endif
 
-		ScriptRegistry::RegisterAllFunctions();
+		MonoScriptRegistry::MakeRegistry();
 		ScriptCache::GenerateCacheForAssembly(appAssemblyInfo);
 
 		return true;

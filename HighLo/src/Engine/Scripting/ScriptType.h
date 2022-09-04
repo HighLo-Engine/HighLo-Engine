@@ -2,18 +2,19 @@
 
 //
 // version history:
-//     - 1.0 (2022-09-02) initial release
+//     - 1.0 (2022-09-04) initial release
 //
 
 #pragma once
 
 namespace highlo
 {
-	class ScriptRegistry
+	enum class ScriptType
 	{
-	public:
-
-		HLAPI static void RegisterAllFunctions();
+		None = 0, // default will be C# as well
+		CSharp,
+		Lua,
+		Javascript
 	};
 }
 

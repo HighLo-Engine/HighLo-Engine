@@ -2,6 +2,7 @@
 
 //
 // version history:
+//     - 1.3 (2022-09-03) Added Script component
 //     - 1.2 (2021-09-19) Added Prefab Component
 //     - 1.1 (2021-09-15) Changed ID Types to UUID, Removed TagComponent
 //     - 1.0 (2021-09-14) initial release
@@ -15,6 +16,7 @@
 #include "Engine/Graphics/MaterialTable.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Core/UUID.h"
+#include "Engine/Scripting/ScriptType.h"
 
 namespace highlo
 {
@@ -107,7 +109,9 @@ namespace highlo
 	struct ScriptComponent
 	{
 		AssetHandle ScriptClass = 0;
+		ScriptType Type = ScriptType::None;
 		std::vector<uint32> Fields;
 		bool ScriptInitialized = false;
 	};
 }
+

@@ -18,6 +18,8 @@ namespace highlo
 		HLAPI static void Init();
 		HLAPI static void Shutdown();
 
+		HLAPI static void ClearCache();
+
 		HLAPI static void GenerateCacheForAssembly(Ref<AssemblyInfo> &assemblyInfo);
 	};
 }

@@ -328,6 +328,7 @@ namespace highlo
 	{
 		return s_ScriptingData->RootDomain;
 	}
+
 	MonoDomain *MonoAPI::GetAppDomain()
 	{
 		return s_ScriptingData->AppDomain;

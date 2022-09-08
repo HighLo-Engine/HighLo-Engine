@@ -264,7 +264,7 @@ namespace highlo
 			return false;
 		}
 
-		MonoImage *image = mono_assembly_get_image(appAssemblyInfo->Assembly);
+		MonoImage *image = mono_assembly_get_image(appAssembly);
 		if (!image)
 		{
 			HL_CORE_ERROR("Could not load app assembly image from {}", **filePath);

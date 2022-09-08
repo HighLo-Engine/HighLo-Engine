@@ -183,6 +183,90 @@ namespace highlo
 		return fileCount;
 	}
 
+	std::vector<File> FileSystemPath::FilterFileListByName(const HLString &name) const
+	{
+		std::vector<File> result;
+
+		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
+		{
+			int64 size = FileSystem::Get()->GetFileSize(entry.path().string().c_str());
+
+			File file;
+			file.ExistsOnHardDrive = entry.is_block_file() || entry.is_regular_file() || entry.is_directory() || entry.is_character_file() || entry.is_other() || entry.is_symlink();
+			file.IsFile = !entry.is_directory();
+			file.FullPath = std::filesystem::absolute(entry).string().c_str();
+			file.Size = size;
+
+			if (file.FullPath.Contains('\\'))
+				file.FullPath = file.FullPath.Replace("\\", "/");
+
+			HLString fileName = ExtractFileNameFromPath(file.FullPath, true);
+			HLString fileExtension = ExtractFileExtensionFromPath(file.FullPath, true);
+
+			if (fileName != name)
+				continue;
+
+			if (file.IsFile)
+			{
+				file.Extension = fileExtension;
+				file.Name = ExtractFileNameFromPath(file.FullPath);
+				file.FileName = fileName;
+			}
+			else
+			{
+				file.Extension = "folder";
+				file.Name = ExtractFolderNameFromPath(file.FullPath);
+				file.FileName = file.Name;
+			}
+
+			result.push_back(file);
+		}
+
+		return result;
+	}
+
+	std::vector<File> FileSystemPath::FilterFileListByExtension(const HLString &extension) const
+	{
+		std::vector<File> result;
+
+		for (const auto &entry : std::filesystem::directory_iterator(m_Handle))
+		{
+			int64 size = FileSystem::Get()->GetFileSize(entry.path().string().c_str());
+
+			File file;
+			file.ExistsOnHardDrive = entry.is_block_file() || entry.is_regular_file() || entry.is_directory() || entry.is_character_file() || entry.is_other() || entry.is_symlink();
+			file.IsFile = !entry.is_directory();
+			file.FullPath = std::filesystem::absolute(entry).string().c_str();
+			file.Size = size;
+
+			if (file.FullPath.Contains('\\'))
+				file.FullPath = file.FullPath.Replace("\\", "/");
+
+			HLString fileName = ExtractFileNameFromPath(file.FullPath, true);
+			HLString fileExtension = ExtractFileExtensionFromPath(file.FullPath, true);
+
+			if (fileExtension != extension)
+				continue;
+
+			if (file.IsFile)
+			{
+				file.Extension = fileExtension;
+				file.Name = ExtractFileNameFromPath(file.FullPath);
+				file.FileName = fileName;
+			}
+			else
+			{
+				file.Extension = "folder";
+				file.Name = ExtractFolderNameFromPath(file.FullPath);
+				file.FileName = file.Name;
+			}
+
+			result.push_back(file);
+		}
+
+		return result;
+	}
+
 	bool FileSystemPath::Exists() const
 	{
 		return FileSystem::Get()->FileExists(*this) || FileSystem::Get()->FolderExists(*this);

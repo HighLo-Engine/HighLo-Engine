@@ -19,12 +19,26 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static void Init(const ScriptEngineConfig *config = nullptr);
+		HLAPI static void Init(ScriptEngineConfig *config = nullptr);
 		HLAPI static void Shutdown();
 
 
 
 		HLAPI static ScriptEngineConfig &GetConfig();
+
+	private:
+
+		/// <summary>
+		/// Finds the path to the clients DLL file.
+		/// </summary>
+		/// <returns></returns>
+		static FileSystemPath FindClientAssembly(const HLString &projectName);
+
+		/// <summary>
+		/// Finds the path to the clients debug pdb file.
+		/// </summary>
+		/// <returns></returns>
+		static FileSystemPath FindClientDebugSymbols(const HLString &projectName);
 
 	private:
 

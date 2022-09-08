@@ -76,6 +76,9 @@ namespace highlo
 		HLAPI std::vector<File> GetFileList() const;
 		HLAPI uint32 GetFileCount() const;
 
+		HLAPI std::vector<File> FilterFileListByName(const HLString &name) const;
+		HLAPI std::vector<File> FilterFileListByExtension(const HLString &extension) const;
+
 		HLAPI bool Exists() const;
 		HLAPI int64 Size() const;
 		HLAPI HLString Absolute() const;

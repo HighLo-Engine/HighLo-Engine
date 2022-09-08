@@ -59,6 +59,7 @@ namespace highlo
 		m_AssetIconMap["tga"] = imageTex;
 		m_AssetIconMap["hdr"] = Texture2D::LoadFromFile("assets/Resources/icons/hdr-file-format.png");
 		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
+		m_AssetIconMap["cs"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
 	//	m_AssetIconMap["hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
 
 		HLString basePath = project->GetAssetDirectory().String();
@@ -177,7 +178,15 @@ namespace highlo
 								}
 
 								if (ImGui::MenuItem((HLString(ICON_FA_FILM) + " " + translation->GetText("asset-browser-right-click-menu-new-scene")).C_Str()))
+								{
 									CreateAssetRepresentation<Scene>("New Scene.hlscene");
+								}
+
+								if (ImGui::MenuItem(HLString(ICON_FA_FILE) + " " + "Script"))
+								{
+									// TODO: Show create dialogue for script creation
+									HL_CORE_TRACE("Trying to create script file in {}", **m_CurrentDirectory->FilePath);
+								}
 
 								ImGui::EndMenu();
 							}

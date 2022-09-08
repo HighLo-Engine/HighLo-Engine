@@ -21,10 +21,11 @@ shouldShowHelpMenu = Utils.GetCommandLineArgument(sys.argv[1:], '--help')
 if shouldShowHelpMenu[0]:
     print('Usage: python GenerateEngine.py [option] {optionValue}')
     print('Valid options:')
-    print('--version                Show the current version of the build script')
-    print('--help                   Show this help menu')
-    print('--visual-studio={value}  Generate the engine for a specific visual studio version (valid values are 2019 and 2022 for now)')
-    print('--generate-unit-tests    Generate the unit tests for the engine')
+    print('--version                           Show the current version of the build script')
+    print('--help                              Show this help menu')
+    print('--visual-studio={value}             Generate the engine for a specific visual studio version (valid values are 2019 and 2022 for now)')
+    print('--generate-unit-tests               Generate the unit tests for the engine')
+    print('--project-name={projectName}        Generate a C# project that interacts with the engines C# library and can be run in the editor and runtime.')
     exit(0)
 
 
@@ -32,6 +33,8 @@ generateUnitTests = ''
 shouldGenerateUnitTests = Utils.GetCommandLineArgument(sys.argv[1:], '--generate-unit-tests')
 if shouldGenerateUnitTests[0]:
     generateUnitTests = '--generate-unit-tests=True'
+
+shouldGenerateProject = Utils.GetCommandLineArgument(sys.argv[1:], '--project-name')
 
 print('Your detected System is: ' + platform.system())
 
@@ -52,6 +55,26 @@ if (not os.path.exists('HighLo/bin')):
     print('Running the installer for the first time, making sure all lfs data is up-to-date...')
     subprocess.call(["git", "lfs", "pull"])
     subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
+
+if shouldGenerateProject[0]:
+    projectName = shouldGenerateProject[1]
+    print('Generating project ' + projectName)
+    os.chdir('HighLoEdit/Resources/Projects/')
+    
+    if not os.path.isdir(projectName):
+        os.mkdir(projectName)
+        os.chdir(projectName)
+        os.mkdir('src')
+        os.chdir('../')
+    
+    if (platform.system() == 'Windows'):
+        subprocess.call(["../../../vendor/bin/premake/Windows/premake5.exe", "vs2022", '--project-name=' + projectName])
+    elif (platform.system() == 'Linux'):
+        subprocess.call(["../../../vendor/bin/premake/Linux/premake5", "gmake", '--project-name=' + projectName])
+    elif (platform.system() == 'Darwin'):
+        subprocess.call(["../../../vendor/bin/premake/MacOS/premake5", "xcode4", '--project-name=' + projectName])
+    
+    os.chdir('../../../')
 
 print("Running premake...")
 
@@ -80,4 +103,5 @@ elif (platform.system() == 'Linux'):
 elif (platform.system() == 'Darwin'):
     subprocess.call(["chmod", "+x", "vendor/bin/premake/MacOS/premake5"])
     subprocess.call(["vendor/bin/premake/MacOS/premake5", "xcode4", generateUnitTests])
+    
     

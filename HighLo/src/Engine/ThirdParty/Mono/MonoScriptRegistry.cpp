@@ -36,8 +36,6 @@ namespace highlo
 	
 	void MonoScriptRegistry::RegisterInternalFunctions()
 	{
-
-
 		// Input
 		HL_REGISTER_INTERNAL_FUNC(Input_IsKeyPressed);
 		HL_REGISTER_INTERNAL_FUNC(Input_IsMouseButtonPressed);
@@ -97,31 +95,34 @@ namespace highlo::InternalCalls
 	
 	MonoString *Input_GetControllerName(int32 id)
 	{
+		HLString controllerName = Input::GetControllerName(id);
+		// TODO: convert to MonoString*
 		return nullptr;
 	}
 	
 	bool Input_IsControllerButtonPressed(int32 id, int32 button)
 	{
-		return false;
+		return Input::IsControllerButtonPressed(id, button);
 	}
 	
 	float Input_GetControlerAxis(int32 id, int32 axis)
 	{
-		return 0.0f;
+		return Input::GetControllerAxis(id, axis);
 	}
 	
 	uint8 Input_GetControllerHat(int32 id, int32 hat)
 	{
-		return uint8();
+		return Input::GetControllerHat(id, hat);
 	}
 	
 	void Input_SetCursorMode(CursorMode mode)
 	{
+		Input::SetCursorMode(mode);
 	}
 	
 	CursorMode Input_GetCursorMode()
 	{
-		return CursorMode();
+		return Input::GetCursorMode();
 	}
 
 #pragma endregion

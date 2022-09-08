@@ -14,4 +14,39 @@
     {
 
     }
+
+    public class CameraComponent : Component
+    {
+
+    }
+
+    public class StaticModelComponent : Component
+    {
+
+    }
+
+    public class DynamicModelComponent : Component
+    {
+
+    }
+
+    public class DirectionalLightComponent : Component
+    {
+
+    }
+
+    public class PointLightComponent : Component
+    {
+
+    }
+
+    public class SkyLightComponent : Component
+    {
+
+    }
+
+    public class TextComponent : Component
+    {
+
+    }
 }

@@ -12,6 +12,8 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/object.h>
 
+#include "MonoAPI.h"
+
 namespace highlo::utils
 {
 	template<typename T>
@@ -21,8 +23,11 @@ namespace highlo::utils
 	}
 
 	template<typename T>
-	static MonoArray *StdToMonoArr(MonoDomain *domain, const std::vector<T> &vec)
+	static MonoArray *StdToMonoArr(const std::vector<T> &vec)
 	{
+		MonoDomain *domain = MonoAPI::GetCoreDomain();
+		HL_ASSERT(domain);
+
 		MonoArray *result = mono_array_new(domain, utils::TemplateTypeToMonoClass<T>(), vec.size());
 		for (uint32 i = 0; i < vec.size(); ++i)
 		{
@@ -32,8 +37,10 @@ namespace highlo::utils
 		return result;
 	}
 
-	static MonoString *StrToMonoStr(MonoDomain *domain, const HLString &str)
+	static MonoString *StrToMonoStr(const HLString &str)
 	{
+		MonoDomain *domain = MonoAPI::GetCoreDomain();
+		HL_ASSERT(domain);
 		return mono_string_new(domain, *str);
 	}
 }

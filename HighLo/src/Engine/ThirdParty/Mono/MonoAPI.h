@@ -37,6 +37,10 @@ namespace highlo
 		virtual ScriptEngineConfig &GetConfig() override;
 		virtual const ScriptEngineConfig &GetConfig() const override;
 
+		// Mono API specific
+		static MonoDomain *GetCoreDomain();
+		static MonoDomain *GetAppDomain();
+
 	private:
 
 		void InitMono(const ScriptEngineConfig *config = nullptr);

@@ -3,8 +3,6 @@
 #include "HighLoPch.h"
 #include "ScriptEngine.h"
 
-#include "ScriptCache.h"
-
 #ifdef HIGHLO_API_MONO_SCRIPTING
 #include "Engine/ThirdParty/Mono/MonoAPI.h"
 #elif HIGHLO_API_LUA_SCRIPTING
@@ -20,14 +18,12 @@ namespace highlo
 
 	void ScriptEngine::Init(const ScriptEngineConfig *config)
 	{
-		ScriptCache::Init();
 		s_ScriptingAPI->Init(config);
 	}
 
 	void ScriptEngine::Shutdown()
 	{
 		s_ScriptingAPI->Shutdown();
-		ScriptCache::Shutdown();
 	}
 
 	ScriptEngineConfig &ScriptEngine::GetConfig()

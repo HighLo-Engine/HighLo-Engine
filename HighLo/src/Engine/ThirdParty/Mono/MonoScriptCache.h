@@ -2,16 +2,18 @@
 
 //
 // version history:
-//     - 1.0 (2022-07-14) initial release
+//     - 1.0 (2022-09-05) initial release
 //
 
 #pragma once
 
-#include "AssemblyInfo.h"
+#include "Engine/Scripting/AssemblyInfo.h"
+
+#ifdef HIGHLO_API_MONO_SCRIPTING
 
 namespace highlo
 {
-	class ScriptCache
+	class MonoScriptCache
 	{
 	public:
 
@@ -23,4 +25,6 @@ namespace highlo
 		HLAPI static void GenerateCacheForAssembly(Ref<AssemblyInfo> &assemblyInfo);
 	};
 }
+
+#endif // HIGHLO_API_MONO_SCRIPTING
 

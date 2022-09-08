@@ -5,7 +5,6 @@
 
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Scripting/ScriptEngine.h"
-#include "Engine/Scripting/ScriptCache.h"
 
 #ifdef HIGHLO_API_MONO_SCRIPTING
 
@@ -14,6 +13,7 @@
 #include <mono/metadata/assembly.h>
 
 #include "MonoScriptRegistry.h"
+#include "MonoScriptCache.h"
 
 namespace highlo
 {
@@ -136,10 +136,14 @@ namespace highlo
 				HL_CORE_ERROR("Could not load the app assembly from {}", **s_ScriptingData->Config.AppAssemblyPath);
 			}
 		}
+
+		MonoScriptCache::Init();
 	}
 
 	void MonoAPI::Shutdown()
 	{
+		MonoScriptCache::Shutdown();
+
 		ShutdownMono();
 		delete s_ScriptingData;
 		s_ScriptingData = nullptr;
@@ -280,7 +284,7 @@ namespace highlo
 #endif
 
 		MonoScriptRegistry::MakeRegistry();
-		ScriptCache::GenerateCacheForAssembly(appAssemblyInfo);
+		MonoScriptCache::GenerateCacheForAssembly(appAssemblyInfo);
 
 		return true;
 	}
@@ -318,6 +322,15 @@ namespace highlo
 	const ScriptEngineConfig &MonoAPI::GetConfig() const
 	{
 		return s_ScriptingData->Config;
+	}
+
+	MonoDomain *MonoAPI::GetCoreDomain()
+	{
+		return s_ScriptingData->RootDomain;
+	}
+	MonoDomain *MonoAPI::GetAppDomain()
+	{
+		return s_ScriptingData->AppDomain;
 	}
 }
 

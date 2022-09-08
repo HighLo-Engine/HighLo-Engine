@@ -65,6 +65,19 @@ namespace highlo
             }
         }
 
+        public Transform Transform
+        {
+            get
+            {
+                return new Transform();
+            }
+            set
+            {
+                Transform t = value;
+
+            }
+        }
+
         public Entity[] Children => InternalCalls.Entity_GetChildrenOf(ID);
 
         public Entity()

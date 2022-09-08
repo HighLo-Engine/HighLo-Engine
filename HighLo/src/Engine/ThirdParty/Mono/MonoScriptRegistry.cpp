@@ -13,6 +13,8 @@
 #include <mono/metadata/loader.h>
 #include <mono/jit/jit.h>
 
+#include "MonoUtils.h"
+
 namespace highlo
 {
 #define HL_REGISTER_INTERNAL_FUNC(func) mono_add_internal_call("highlo.InternalCalls::"#func, (void*)InternalCalls::func)
@@ -89,15 +91,13 @@ namespace highlo::InternalCalls
 	MonoArray *Input_GetControllerIds()
 	{
 		std::vector<int32> connectedControllers = Input::GetConnectedControllerIDs();
-		// TODO: convert connectedControllers to MonoArray*
-		return nullptr;
+		return utils::StdToMonoArr(connectedControllers);
 	}
 	
 	MonoString *Input_GetControllerName(int32 id)
 	{
 		HLString controllerName = Input::GetControllerName(id);
-		// TODO: convert to MonoString*
-		return nullptr;
+		return utils::StrToMonoStr(controllerName);
 	}
 	
 	bool Input_IsControllerButtonPressed(int32 id, int32 button)

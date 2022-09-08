@@ -22,7 +22,8 @@ namespace highlo
 		HLAPI static void Init(ScriptEngineConfig *config = nullptr);
 		HLAPI static void Shutdown();
 
-
+		HLAPI static const Ref<AssemblyInfo> &GetCoreAssemblyInfo();
+		HLAPI static const Ref<AssemblyInfo> &GetAppAssemblyInfo();
 
 		HLAPI static ScriptEngineConfig &GetConfig();
 

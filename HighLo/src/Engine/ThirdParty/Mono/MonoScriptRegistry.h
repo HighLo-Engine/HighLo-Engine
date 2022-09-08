@@ -29,6 +29,8 @@ namespace highlo
 
 		static void RegisterInternalFunctions();
 		static void RegisterECSComponents();
+
+		static void RegisterComponent(const HLString &name);
 	};
 }
 

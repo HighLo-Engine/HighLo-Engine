@@ -13,6 +13,7 @@
 extern "C" {
 	typedef struct _MonoAssembly MonoAssembly;
 	typedef struct _MonoImage MonoImage;
+	typedef struct _MonoDomain MonoDomain;
 }
 
 namespace highlo
@@ -22,6 +23,7 @@ namespace highlo
 		FileSystemPath FilePath = "";
 		MonoAssembly *Assembly = nullptr;
 		MonoImage *AssemblyImage = nullptr;
+		MonoDomain *Domain = nullptr;
 		std::vector<uint32> Classes;
 		bool IsCoreAssembly = false;
 	};

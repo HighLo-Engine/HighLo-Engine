@@ -25,7 +25,8 @@ namespace highlo
 		HLAPI virtual bool ReloadAssembly(const FileSystemPath &filePath) = 0;
 		HLAPI virtual void UnloadAssembly(Ref<AssemblyInfo> &assemblyInfo) = 0;
 
-
+		HLAPI virtual const Ref<AssemblyInfo> &GetCoreAssemblyInfo() = 0;
+		HLAPI virtual const Ref<AssemblyInfo> &GetAppAssemblyInfo() = 0;
 
 		HLAPI virtual ScriptEngineConfig &GetConfig() = 0;
 		HLAPI virtual const ScriptEngineConfig &GetConfig() const = 0;

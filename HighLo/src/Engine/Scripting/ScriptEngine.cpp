@@ -38,6 +38,16 @@ namespace highlo
 		s_ScriptingAPI->Shutdown();
 	}
 
+	const Ref<AssemblyInfo> &ScriptEngine::GetCoreAssemblyInfo()
+	{
+		return s_ScriptingAPI->GetCoreAssemblyInfo();
+	}
+
+	const Ref<AssemblyInfo> &ScriptEngine::GetAppAssemblyInfo()
+	{
+		return s_ScriptingAPI->GetAppAssemblyInfo();
+	}
+
 	ScriptEngineConfig &ScriptEngine::GetConfig()
 	{
 		return s_ScriptingAPI->GetConfig();

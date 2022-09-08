@@ -12,7 +12,7 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/object.h>
 
-#include "MonoAPI.h"
+#include "Engine/Scripting/ScriptEngine.h"
 
 namespace highlo::utils
 {
@@ -25,7 +25,7 @@ namespace highlo::utils
 	template<typename T>
 	static MonoArray *StdToMonoArr(const std::vector<T> &vec)
 	{
-		MonoDomain *domain = MonoAPI::GetCoreDomain();
+		MonoDomain *domain = ScriptEngine::GetCoreAssemblyInfo()->Domain;
 		HL_ASSERT(domain);
 
 		MonoArray *result = mono_array_new(domain, utils::TemplateTypeToMonoClass<T>(), vec.size());
@@ -39,7 +39,7 @@ namespace highlo::utils
 
 	static MonoString *StrToMonoStr(const HLString &str)
 	{
-		MonoDomain *domain = MonoAPI::GetCoreDomain();
+		MonoDomain *domain = ScriptEngine::GetCoreAssemblyInfo()->Domain;
 		HL_ASSERT(domain);
 		return mono_string_new(domain, *str);
 	}

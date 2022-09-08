@@ -214,6 +214,7 @@ namespace highlo
 
 		Ref<AssemblyInfo> &rootAssemblyInfo = s_ScriptingData->LoadedAssemblies[0];
 		rootAssemblyInfo->IsCoreAssembly = true;
+		rootAssemblyInfo->Domain = s_ScriptingData->RootDomain;
 		rootAssemblyInfo->Classes.clear();
 		rootAssemblyInfo->FilePath = s_ScriptingData->Config.CoreAssemblyPath;
 
@@ -272,6 +273,7 @@ namespace highlo
 		}
 
 		appAssemblyInfo->Assembly = appAssembly;
+		appAssemblyInfo->Domain = s_ScriptingData->AppDomain;
 		appAssemblyInfo->AssemblyImage = image;
 		appAssemblyInfo->Classes.clear();
 		appAssemblyInfo->FilePath = filePath;
@@ -307,6 +309,7 @@ namespace highlo
 		assemblyInfo->Classes.shrink_to_fit();
 		assemblyInfo->Assembly = nullptr;
 		assemblyInfo->AssemblyImage = nullptr;
+		assemblyInfo->Domain = nullptr;
 
 		if (assemblyInfo->IsCoreAssembly)
 			s_ScriptingData->LoadedAssemblies[0] = Ref<AssemblyInfo>::Create();
@@ -324,14 +327,14 @@ namespace highlo
 		return s_ScriptingData->Config;
 	}
 
-	MonoDomain *MonoAPI::GetCoreDomain()
+	const Ref<AssemblyInfo> &MonoAPI::GetCoreAssemblyInfo()
 	{
-		return s_ScriptingData->RootDomain;
+		return s_ScriptingData->LoadedAssemblies[0];
 	}
 
-	MonoDomain *MonoAPI::GetAppDomain()
+	const Ref<AssemblyInfo> &MonoAPI::GetAppAssemblyInfo()
 	{
-		return s_ScriptingData->AppDomain;
+		return s_ScriptingData->LoadedAssemblies[1];
 	}
 }
 

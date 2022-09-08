@@ -32,14 +32,11 @@ namespace highlo
 		virtual bool ReloadAssembly(const FileSystemPath &filePath) override;
 		virtual void UnloadAssembly(Ref<AssemblyInfo> &assemblyInfo) override;
 
-
+		virtual const Ref<AssemblyInfo> &GetCoreAssemblyInfo() override;
+		virtual const Ref<AssemblyInfo> &GetAppAssemblyInfo() override;
 
 		virtual ScriptEngineConfig &GetConfig() override;
 		virtual const ScriptEngineConfig &GetConfig() const override;
-
-		// Mono API specific
-		static MonoDomain *GetCoreDomain();
-		static MonoDomain *GetAppDomain();
 
 	private:
 

@@ -1,21 +1,33 @@
 newoption {
+	trigger = "root-dir",
+	description = "",
+	default = "",
+	value = "True"
+}
+
+newoption {
 	trigger = "project-name",
-	description = "Generate a C# project that interacts with the engines C# library and can be run in the editor and runtime.",
+	description = "Determines the project name of the visual studio solution.",
 	default = "SandboxProject",
 	value = "True"
 }
 
-print('custom project name: ' .. _OPTIONS['project-name'])
+newoption {
+	trigger = "project-path",
+	description = "Determines the path, where the source files should be and where the visual studio solution should be located.",
+	default = "",
+	value = "True"
+}
 
 ProjectName = _OPTIONS['project-name']
-RootDir = "../../.."
-local OutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+ProjectPath = _OPTIONS['project-path']
+RootDir = _OPTIONS['root-dir']
 
 include (RootDir .. "/vendor/bin/premake/solution_items.lua")
 
-workspace (ProjectName .. "")
+workspace (ProjectName)
 	targetdir "build"
-	startproject (ProjectName .. "")
+	startproject (ProjectName)
 	
 	solution_items
 	{
@@ -49,18 +61,18 @@ workspace (ProjectName .. "")
 			}
 	group ""
 
-	project (ProjectName .. "")
-		location (RootDir .. "/HighLoEdit/Resources/Projects/" .. ProjectName)
+	project (ProjectName)
+		location (ProjectPath)
 		kind "SharedLib"
 		language "C#"
 		dotnetframework "4.7.2"
 		
-		targetdir (RootDir .. "/HighLoEdit/Resources/Scripts")
-		objdir (RootDir .. "/HighLoEdit/Resources/Scripts/Intermediates")
+		targetdir (ProjectPath .. "/build")
+		objdir (ProjectPath .. "/build/Intermediates")
 		
 		files
 		{
-			"%{ProjectName}/src/**.cs"
+			"%{ProjectPath}/src/**.cs"
 		}
 		
 		links

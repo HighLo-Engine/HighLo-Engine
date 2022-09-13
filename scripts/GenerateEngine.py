@@ -88,8 +88,14 @@ if shouldGenerateProject[0]:
     os.chdir(projectPath)
 
     # create the src directory if it does not exist
-    if not os.path.isdir('src'):
-        os.mkdir('src')
+    if not os.path.isdir(projectName):
+        os.mkdir(projectName)
+    
+    if not os.path.isdir(projectName + '/src'):
+        os.mkdir(projectName + '/src')
+    
+    projectPath = projectPath.replace('\\', '/')
+    rootDir = rootDir.replace('\\', '/')
     
     if (platform.system() == 'Windows'):
         subprocess.call([rootDir + "/vendor/bin/premake/Windows/premake5.exe", "vs2022", '--root-dir=' + rootDir, '--project-name=' + projectName, '--project-path=' + projectPath])
@@ -104,32 +110,38 @@ if shouldGenerateProject[0]:
 # Now generating the engine itself.
 print("Generating HighLo...")
 
+# We need a specific format for the engine, because all options are pure optional, we need to provide an empty string, if the option is not selected:
+if len(projectPath) == 0:
+    projectPath = ''
+else:
+    projectPath = '--project-dir=' + projectPath
+
 if (platform.system() == 'Windows'):
     if len(sys.argv) > 1:
         visualStudioVersion = Utils.GetCommandLineArgument(sys.argv[1:], '--visual-studio')
 
         if not visualStudioVersion[0]:
             # use default 
-            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", '--project-dir=' + projectPath, generateUnitTests])
+            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", projectPath, generateUnitTests])
             print('HighLo generated successfully.')
             exit(0)
 
         if visualStudioVersion[1] == '2022':
-            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", '--project-dir=' + projectPath, generateUnitTests])
+            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", projectPath, generateUnitTests])
         elif visualStudioVersion[1] == '2019':
-            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2019", '--project-dir=' + projectPath, generateUnitTests])
+            subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2019", projectPath, generateUnitTests])
         else:
             print('Error: Unknown Visual Studio version: ', visualStudioVersion[1], ' - 2019 or 2022 are valid')
             exit(1)
     else:
         # use the current visual studio version
-        subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", '--project-dir=' + projectPath, generateUnitTests])
+        subprocess.call(["vendor/bin/premake/Windows/premake5.exe", "vs2022", projectPath, generateUnitTests])
 elif (platform.system() == 'Linux'):
     subprocess.call(["chmod", "+x", "vendor/bin/premake/Linux/premake5"])
-    subprocess.call(["vendor/bin/premake/Linux/premake5", "gmake", '--project-dir=' + projectPath, generateUnitTests])
+    subprocess.call(["vendor/bin/premake/Linux/premake5", "gmake", projectPath, generateUnitTests])
 elif (platform.system() == 'Darwin'):
     subprocess.call(["chmod", "+x", "vendor/bin/premake/MacOS/premake5"])
-    subprocess.call(["vendor/bin/premake/MacOS/premake5", "xcode4", '--project-dir=' + projectPath, generateUnitTests])
+    subprocess.call(["vendor/bin/premake/MacOS/premake5", "xcode4", projectPath, generateUnitTests])
     
 print('HighLo generated successfully.')
 

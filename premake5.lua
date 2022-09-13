@@ -14,7 +14,7 @@ newoption {
 newoption {
 	trigger = "project-dir",
 	description = "Describes the path to the script folder. The script folder is either provided by the engine when the user interacts with the editor or by the user, when he uses the GenerateEngine.py script",
-	default = "",
+	default = "False",
 	value = "True"
 }
 

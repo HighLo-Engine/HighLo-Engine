@@ -62,22 +62,27 @@ workspace (ProjectName)
 	group ""
 
 	project (ProjectName)
-		location (ProjectPath)
+		location (ProjectPath .. '/' .. ProjectName)
 		kind "SharedLib"
 		language "C#"
 		dotnetframework "4.7.2"
 		
 		targetdir (ProjectPath .. "/build")
 		objdir (ProjectPath .. "/build/Intermediates")
-		
+				
 		files
 		{
-			"%{ProjectPath}/src/**.cs"
+			"%{ProjectPath}/%{ProjectName}/src/**.cs",
+		}
+		
+		includedirs
+		{
+			"%{ProjectPath}/%{ProjectName}/src",
 		}
 		
 		links
 		{
-			"HighLo-C#"
+			(RootDir .. "/HighLoEdit/Resources/Scripts/HighLo-C#.dll")
 		}
 		
 		

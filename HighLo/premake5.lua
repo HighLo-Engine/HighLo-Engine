@@ -59,11 +59,13 @@ project "HighLo"
 		"%{LibDir.dxc}",
     }
 	
-	debugargs
-	{
-		"--project-path",
-		"%{projectDir}",
-	}
+	if projectDir ~= "False" then
+		debugargs
+		{
+			"--project-path",
+			"%{projectDir}",
+		}
+	end
 
     defines
 	{

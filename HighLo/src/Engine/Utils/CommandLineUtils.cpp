@@ -27,7 +27,7 @@ namespace highlo::utils
 		ResetStates();
 
 		// index 0 is the program executable path, we don't need that
-		for (uint32 i = 1; i < m_Arguments.size(); ++i)
+		for (uint32 i = 1; i < m_Arguments.size(); i += 2)
 		{
 			HLString &cmd = m_Arguments[i];
 
@@ -90,6 +90,10 @@ namespace highlo::utils
 			else if (cmd == "--nlog")
 			{
 				m_Settings.NoLog = true;
+			}
+			else if (cmd == "--project-path")
+			{
+				m_Settings.ProjectPath = m_Arguments[i + 1];
 			}
 			else
 			{

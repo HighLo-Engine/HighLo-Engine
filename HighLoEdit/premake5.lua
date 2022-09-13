@@ -36,6 +36,14 @@ project "HighLoEdit"
         "HighLo"
     }
 	
+	if projectDir ~= "False" then
+		debugargs
+		{
+			"--project-path",
+			"%{projectDir}",
+		}
+	end
+	
 	postbuildcommands
 	{
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}HighLoEdit/bin/" .. outputdir .. "/HighLoEdit/libcrypto-3-x64.dll*"),

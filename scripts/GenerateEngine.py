@@ -11,6 +11,7 @@ import CheckPythonVersion
 CheckPythonVersion.ValidatePackages()
 
 import Vulkan
+import Scripting
 import Utils
 
 shouldShowVersionMenu = Utils.GetCommandLineArgument(sys.argv[1:], '--version')
@@ -96,6 +97,11 @@ if shouldGenerateProject[0]:
     
     projectPath = projectPath.replace('\\', '/')
     rootDir = rootDir.replace('\\', '/')
+    
+    # copy the template class and put it into the source directory of the client's project,
+    # to avoid visual studio not recognizing the source directory
+    # the user can either decide to delete the file or create another file, but the source directory will be valid from now on
+    Scripting.CopyFileAndReplaceNamespaceWithProjectName(projectPath + '/' + projectName + '/src/Main.cs', rootDir + '/HighLoEdit/Resources/Projects/Main.template.cs', projectName)
     
     if (platform.system() == 'Windows'):
         subprocess.call([rootDir + "/vendor/bin/premake/Windows/premake5.exe", "vs2022", '--root-dir=' + rootDir, '--project-name=' + projectName, '--project-path=' + projectPath])

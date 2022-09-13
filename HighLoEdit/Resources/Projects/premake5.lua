@@ -72,12 +72,7 @@ workspace (ProjectName)
 				
 		files
 		{
-			"%{ProjectPath}/%{ProjectName}/src/**.cs",
-		}
-		
-		includedirs
-		{
-			"%{ProjectPath}/%{ProjectName}/src",
+			("%{ProjectPath}/%{ProjectName}/src/**.cs"),
 		}
 		
 		links

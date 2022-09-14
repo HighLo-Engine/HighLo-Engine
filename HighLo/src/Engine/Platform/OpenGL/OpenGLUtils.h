@@ -142,7 +142,7 @@ namespace highlo
 		}
 
 		// Shader utils
-		static GLenum ShaderStageFromString(const HLString &str)
+		static GLenum ShaderStageFromString(HLString &str)
 		{
 			HLString type = str.ToLowerCase();
 

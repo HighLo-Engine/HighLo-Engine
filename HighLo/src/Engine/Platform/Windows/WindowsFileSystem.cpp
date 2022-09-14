@@ -335,10 +335,11 @@ namespace highlo
         HANDLE file = utils::OpenFileInternal(path.String());
         uint32 size = (uint32)utils::GetFileSizeInternal(file);
 
-        HLString result;
-        result.Resize(size);
+        char *readBuffer = new char[size];
+        bool success = utils::ReadFileInternal(file, &readBuffer[0], size);
+        HLString result = HLString(readBuffer);
+        delete[] readBuffer;
 
-        bool success = utils::ReadFileInternal(file, &result[0], size);
         CloseHandle(file);
         return success ? result : "";
     }

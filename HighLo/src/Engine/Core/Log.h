@@ -29,12 +29,6 @@ namespace highlo
 		HLAPI static std::shared_ptr<spdlog::logger> &GetCoreLogger();
 		HLAPI static std::shared_ptr<spdlog::logger> &GetClientLogger();
 		HLAPI static std::shared_ptr<spdlog::logger> &GetEditorConsoleLogger();
-
-	private:
-
-		static std::shared_ptr<spdlog::logger> s_EngineLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-		static std::shared_ptr<spdlog::logger> s_EditorLogger;
 	};
 
 	template<typename T>

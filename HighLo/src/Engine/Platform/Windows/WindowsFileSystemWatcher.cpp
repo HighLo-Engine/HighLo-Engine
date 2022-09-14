@@ -55,7 +55,7 @@ namespace highlo
 	ULONG FileSystemWatcher::Watch(void *param)
 	{
 		FileSystemPath assetDir = Project::GetActive()->GetAssetDirectory();
-		wchar_t *wString = assetDir.String().W_Str();
+		const wchar_t *wString = assetDir.String().W_Str();
 		HL_CORE_TRACE("Listening on path {0}", **assetDir);
 
 		char buffer[2048];

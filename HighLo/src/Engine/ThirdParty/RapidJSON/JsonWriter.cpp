@@ -42,10 +42,13 @@ namespace highlo
 	JSONWriter::JSONWriter(const FileSystemPath &filePath)
 		: m_FilePath(filePath)
 	{
+		m_Document = new rapidjson::Document();
 	}
 
 	JSONWriter::~JSONWriter()
 	{
+		delete m_Document;
+		m_Document = nullptr;
 	}
 
 	void JSONWriter::BeginArray()
@@ -61,21 +64,21 @@ namespace highlo
 
 			if (key.IsEmpty())
 			{
-				m_Document.SetArray();
+				m_Document->SetArray();
 				if (!rawData)
 				{
 					for (uint32 i = 0; i < m_TempBufferValues.size(); ++i)
 					{
 						rapidjson::Value realValue(rapidjson::kObjectType);
-						realValue.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document.GetAllocator());
+						realValue.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document->GetAllocator());
 
 						rapidjson::Value keyValue(rapidjson::kStringType);
-						keyValue.SetString("value", m_Document.GetAllocator());
+						keyValue.SetString("value", m_Document->GetAllocator());
 
 						rapidjson::Value v(rapidjson::kObjectType);
-						v.AddMember(m_TempBufferTypes[i].first, m_TempBufferTypes[i].second, m_Document.GetAllocator());
-						v.AddMember(keyValue, realValue, m_Document.GetAllocator());
-						m_Document.PushBack(v, m_Document.GetAllocator());
+						v.AddMember(m_TempBufferTypes[i].first, m_TempBufferTypes[i].second, m_Document->GetAllocator());
+						v.AddMember(keyValue, realValue, m_Document->GetAllocator());
+						m_Document->PushBack(v, m_Document->GetAllocator());
 					}
 				}
 				else
@@ -83,8 +86,8 @@ namespace highlo
 					for (uint32 i = 0; i < m_TempBufferValues.size(); ++i)
 					{
 						rapidjson::Value v(rapidjson::kObjectType);
-						v.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document.GetAllocator());
-						m_Document.PushBack(v, m_Document.GetAllocator());
+						v.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document->GetAllocator());
+						m_Document->PushBack(v, m_Document->GetAllocator());
 					}
 				}
 			}
@@ -96,15 +99,15 @@ namespace highlo
 					for (uint32 i = 0; i < m_TempBufferValues.size(); ++i)
 					{
 						rapidjson::Value realValue(rapidjson::kObjectType);
-						realValue.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document.GetAllocator());
+						realValue.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document->GetAllocator());
 
 						rapidjson::Value keyValue(rapidjson::kStringType);
-						keyValue.SetString("value", m_Document.GetAllocator());
+						keyValue.SetString("value", m_Document->GetAllocator());
 
 						rapidjson::Value v(rapidjson::kObjectType);
-						v.AddMember(m_TempBufferTypes[i].first, m_TempBufferTypes[i].second, m_Document.GetAllocator());
-						v.AddMember(keyValue, realValue, m_Document.GetAllocator());
-						array.PushBack(v, m_Document.GetAllocator());
+						v.AddMember(m_TempBufferTypes[i].first, m_TempBufferTypes[i].second, m_Document->GetAllocator());
+						v.AddMember(keyValue, realValue, m_Document->GetAllocator());
+						array.PushBack(v, m_Document->GetAllocator());
 					}
 				}
 				else
@@ -112,16 +115,16 @@ namespace highlo
 					for (uint32 i = 0; i < m_TempBufferValues.size(); ++i)
 					{
 						rapidjson::Value v(rapidjson::kObjectType);
-						v.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document.GetAllocator());
-						array.PushBack(v, m_Document.GetAllocator());
+						v.AddMember(m_TempBufferValues[i].first, m_TempBufferValues[i].second, m_Document->GetAllocator());
+						array.PushBack(v, m_Document->GetAllocator());
 					}
 				}
 
 				rapidjson::Value arrayKeyName(rapidjson::kStringType);
-				arrayKeyName.SetString(*key, m_Document.GetAllocator());
+				arrayKeyName.SetString(*key, m_Document->GetAllocator());
 
-				m_Document.SetObject();
-				m_Document.AddMember(arrayKeyName, array, m_Document.GetAllocator());
+				m_Document->SetObject();
+				m_Document->AddMember(arrayKeyName, array, m_Document->GetAllocator());
 			}
 		}
 	}
@@ -149,22 +152,22 @@ namespace highlo
 			}
 			else
 			{
-				m_Document.SetObject();
+				m_Document->SetObject();
 
 				if (!rawData)
 				{
 					rapidjson::Value realVal(rapidjson::kObjectType);
-					realVal.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
+					realVal.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document->GetAllocator());
 
 					rapidjson::Value realValStr(rapidjson::kStringType);
-					realValStr.SetString("value", m_Document.GetAllocator());
+					realValStr.SetString("value", m_Document->GetAllocator());
 
-					m_Document.AddMember(m_TempBufferType.first, m_TempBufferType.second, m_Document.GetAllocator());
-					m_Document.AddMember(realValStr, realVal, m_Document.GetAllocator());
+					m_Document->AddMember(m_TempBufferType.first, m_TempBufferType.second, m_Document->GetAllocator());
+					m_Document->AddMember(realValStr, realVal, m_Document->GetAllocator());
 				}
 				else
 				{
-					m_Document.AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document.GetAllocator());
+					m_Document->AddMember(m_TempBufferValue.first, m_TempBufferValue.second, m_Document->GetAllocator());
 				}
 			}
 		}
@@ -246,7 +249,7 @@ namespace highlo
 		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kStringType);
-			v.SetString(*value, value.Length(), instance->m_Document.GetAllocator());
+			v.SetString(*value, value.Length(), instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -257,8 +260,8 @@ namespace highlo
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.x, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -269,9 +272,9 @@ namespace highlo
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.x, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.z, instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -282,10 +285,10 @@ namespace highlo
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.w, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.x, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.z, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.w, instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -296,10 +299,10 @@ namespace highlo
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[0][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][1], instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -310,17 +313,17 @@ namespace highlo
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[0][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[0][2], instance->m_Document->GetAllocator());
 
-			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][2], instance->m_Document->GetAllocator());
 
-			v.PushBack<float>(value[2][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][2], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[2][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[2][2], instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -331,25 +334,25 @@ namespace highlo
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value[0][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[0][3], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[0][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[0][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[0][2], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[0][3], instance->m_Document->GetAllocator());
 
-			v.PushBack<float>(value[1][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[1][3], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[1][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][2], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[1][3], instance->m_Document->GetAllocator());
 
-			v.PushBack<float>(value[2][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[2][3], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[2][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[2][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[2][2], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[2][3], instance->m_Document->GetAllocator());
 
-			v.PushBack<float>(value[3][0], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[3][1], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[3][2], instance->m_Document.GetAllocator());
-			v.PushBack<float>(value[3][3], instance->m_Document.GetAllocator());
+			v.PushBack<float>(value[3][0], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[3][1], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[3][2], instance->m_Document->GetAllocator());
+			v.PushBack<float>(value[3][3], instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -360,10 +363,10 @@ namespace highlo
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value v(rapidjson::kArrayType);
-			v.PushBack<float>(value.w, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.x, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.y, instance->m_Document.GetAllocator());
-			v.PushBack<float>(value.z, instance->m_Document.GetAllocator());
+			v.PushBack<float>(value.w, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.x, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.y, instance->m_Document->GetAllocator());
+			v.PushBack<float>(value.z, instance->m_Document->GetAllocator());
 			return v;
 		});
 	}
@@ -377,8 +380,8 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value str(rapidjson::kStringType);
-				str.SetString(*value[i], value[i].Length(), instance->m_Document.GetAllocator());
-				v.PushBack(str, instance->m_Document.GetAllocator());
+				str.SetString(*value[i], value[i].Length(), instance->m_Document->GetAllocator());
+				v.PushBack(str, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -456,9 +459,9 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].x, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -473,10 +476,10 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].x, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].z, instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -491,11 +494,11 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].w, instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].x, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].z, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].w, instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -510,11 +513,11 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][0][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][1], instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -529,18 +532,18 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][2], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][0][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][0][2], instance->m_Document->GetAllocator());
 
-				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][2], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][2], instance->m_Document->GetAllocator());
 
-				entry.PushBack<float>(value[i][2][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][2], instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][2][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][2][2], instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -555,26 +558,26 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i][0][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][0][3], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][0][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][0][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][0][2], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][0][3], instance->m_Document->GetAllocator());
 
-				entry.PushBack<float>(value[i][1][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][1][3], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][1][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][2], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][1][3], instance->m_Document->GetAllocator());
 
-				entry.PushBack<float>(value[i][2][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][2][3], instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][2][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][2][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][2][2], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][2][3], instance->m_Document->GetAllocator());
 
-				entry.PushBack<float>(value[i][3][0], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][3][1], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][3][2], instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i][3][3], instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i][3][0], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][3][1], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][3][2], instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i][3][3], instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -589,11 +592,11 @@ namespace highlo
 			for (uint32 i = 0; i < value.size(); ++i)
 			{
 				rapidjson::Value entry(rapidjson::kArrayType);
-				entry.PushBack<float>(value[i].w, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].x, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].y, instance->m_Document.GetAllocator());
-				entry.PushBack<float>(value[i].z, instance->m_Document.GetAllocator());
-				v.PushBack(entry, instance->m_Document.GetAllocator());
+				entry.PushBack<float>(value[i].w, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].x, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].y, instance->m_Document->GetAllocator());
+				entry.PushBack<float>(value[i].z, instance->m_Document->GetAllocator());
+				v.PushBack(entry, instance->m_Document->GetAllocator());
 			}
 			return v;
 		});
@@ -1484,7 +1487,7 @@ namespace highlo
 
 	bool JSONWriter::HasKey(const HLString &key) const
 	{
-		return m_Document.HasMember(*key);
+		return m_Document->HasMember(*key);
 	}
 
 	bool JSONWriter::WriteOut()
@@ -1517,7 +1520,7 @@ namespace highlo
 			if (content.IsEmpty())
 				return false;
 
-			m_Document.Parse(*content);
+			m_Document->Parse(*content);
 			return true;
 		}
 		else
@@ -1536,13 +1539,13 @@ namespace highlo
 		{
 			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 			writer.SetMaxDecimalPlaces(3);
-			m_Document.Accept(writer);
+			m_Document->Accept(writer);
 		}
 		else
 		{
 			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 			writer.SetMaxDecimalPlaces(3);
-			m_Document.Accept(writer);
+			m_Document->Accept(writer);
 		}
 
 		return buffer.GetString();
@@ -1550,14 +1553,14 @@ namespace highlo
 
 	void JSONWriter::SetContent(const HLString &content)
 	{
-		m_Document.Parse(*content);
+		m_Document->Parse(*content);
 	}
 
 	bool JSONWriter::AddIntoStructure(rapidjson::Value &keyType, rapidjson::Value &valType, DocumentDataType type)
 	{
 		bool result = false;
 
-		auto &[typeKey, typeVal] = utils::ConvertDocumentTypeToRenderableFormat(m_Document, type);
+		auto &[typeKey, typeVal] = utils::ConvertDocumentTypeToRenderableFormat(*m_Document, type);
 
 		if (m_ShouldWriteIntoArray || m_ShouldWriteIntoObject)
 		{
@@ -1591,13 +1594,13 @@ namespace highlo
 		}
 
 		rapidjson::Value keyType(rapidjson::kStringType);
-		keyType.SetString(*key, key.Length(), m_Document.GetAllocator());
+		keyType.SetString(*key, key.Length(), m_Document->GetAllocator());
 
 		rapidjson::Value value = insertFunc();
 		if (!AddIntoStructure(keyType, value, type))
 		{
-			m_Document.SetObject();
-			m_Document.AddMember(keyType, value, m_Document.GetAllocator());
+			m_Document->SetObject();
+			m_Document->AddMember(keyType, value, m_Document->GetAllocator());
 		}
 
 		return true;
@@ -1605,10 +1608,10 @@ namespace highlo
 
 	bool JSONWriter::Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value &)> &insertFunc)
 	{
-		if (!m_Document.IsObject())
+		if (!m_Document->IsObject())
 			return false;
 
-		auto &obj = m_Document.GetObject();
+		auto &obj = m_Document->GetObject();
 
 		rapidjson::GenericMemberIterator typeVal = obj.FindMember("type");
 		if (typeVal == obj.MemberEnd())
@@ -1656,14 +1659,14 @@ namespace highlo
 
 	bool JSONWriter::ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value &)> &insertFunc)
 	{
-		if (m_Document.IsNull())
+		if (m_Document->IsNull())
 			return false;
 
 		HLString correctDataType = utils::DocumentDataTypeToString(type);
 
-		if (!m_Document.IsArray())
+		if (!m_Document->IsArray())
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
+			rapidjson::GenericObject obj = m_Document->GetObject();
 			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
 			if (it == obj.MemberEnd())
 				return false;
@@ -1721,7 +1724,7 @@ namespace highlo
 			return true;
 		}
 
-		rapidjson::GenericArray arr = m_Document.GetArray();
+		rapidjson::GenericArray arr = m_Document->GetArray();
 		for (auto it = arr.Begin(); it != arr.End(); ++it)
 		{
 			rapidjson::GenericObject currentObj = it->GetObject();
@@ -1773,14 +1776,14 @@ namespace highlo
 
 	bool JSONWriter::ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString, rapidjson::Value &)> &insertFunc)
 	{
-		if (m_Document.IsNull())
+		if (m_Document->IsNull())
 			return false;
 
 		HLString correctDataType = utils::DocumentDataTypeToString(type);
 
-		if (!m_Document.IsArray())
+		if (!m_Document->IsArray())
 		{
-			rapidjson::GenericObject obj = m_Document.GetObject();
+			rapidjson::GenericObject obj = m_Document->GetObject();
 			rapidjson::GenericMemberIterator it = obj.FindMember(*key);
 			if (it == obj.MemberEnd())
 				return false;
@@ -1838,7 +1841,7 @@ namespace highlo
 			return true;
 		}
 
-		rapidjson::GenericArray arr = m_Document.GetArray();
+		rapidjson::GenericArray arr = m_Document->GetArray();
 		for (auto it = arr.Begin(); it != arr.End(); ++it)
 		{
 			rapidjson::GenericObject currentObj = it->GetObject();

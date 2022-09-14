@@ -8,9 +8,9 @@
 
 namespace highlo
 {
-	std::shared_ptr<spdlog::logger> Logger::s_EngineLogger;
-	std::shared_ptr<spdlog::logger> Logger::s_ClientLogger;
-	std::shared_ptr<spdlog::logger> Logger::s_EditorLogger;
+	static std::shared_ptr<spdlog::logger> s_EngineLogger;
+	static std::shared_ptr<spdlog::logger> s_ClientLogger;
+	static std::shared_ptr<spdlog::logger> s_EditorLogger;
 
 	void Logger::Init()
 	{
@@ -61,26 +61,18 @@ namespace highlo
 
 		// Engine patterns
 		engineSinks[0]->set_pattern("%^[%T] %n: %v%$");
+		engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
 		if (shouldLogToFile)
 		{
-			engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
 			engineSinks[2]->set_pattern("[%T] [%l] %n: %v");
-		}
-		else
-		{
-			engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
 		}
 
 		// App patterns
 		appSinks[0]->set_pattern("%^[%T] %n: %v%$");
+		appSinks[1]->set_pattern("[%T] [%l] %n: %v");
 		if (shouldLogToFile)
 		{
-			appSinks[1]->set_pattern("[%T] [%l] %n: %v");
 			appSinks[2]->set_pattern("%^[%T] %n: %v%$");
-		}
-		else
-		{
-			appSinks[1]->set_pattern("%^[%T] %n: %v%$");
 		}
 
 		// Editor Patterns

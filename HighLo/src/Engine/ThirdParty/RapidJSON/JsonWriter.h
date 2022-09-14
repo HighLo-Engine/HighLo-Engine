@@ -146,7 +146,7 @@ namespace highlo
 		{
 			rapidjson::Value result(rapidjson::kArrayType);
 			for (uint32 i = 0; i < arr.size(); ++i)
-				result.PushBack(arr[i], m_Document.GetAllocator());
+				result.PushBack(arr[i], m_Document->GetAllocator());
 
 			return result;
 		}
@@ -157,7 +157,7 @@ namespace highlo
 		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value &)> &insertFunc);
 		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString, rapidjson::Value &)> &insertFunc);
 
-		rapidjson::Document m_Document;
+		rapidjson::Document *m_Document = nullptr;
 		FileSystemPath m_FilePath;
 
 		bool m_ShouldWriteIntoArray = false;

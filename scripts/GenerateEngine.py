@@ -120,7 +120,7 @@ print("Generating HighLo...")
 if len(projectPath) == 0:
     projectPath = ''
 else:
-    projectPath = '--project-dir=' + projectPath
+    projectPath = '--csharp-path=' + projectPath
 
 if (platform.system() == 'Windows'):
     if len(sys.argv) > 1:

@@ -109,6 +109,21 @@ namespace highlo
 		FileSystemPath ProjectPath = "";
 
 		/// <summary>
+		/// Determines the path, where the client C# project files can be found.
+		/// </summary>
+		FileSystemPath CSharpProjectPath = "";
+
+		/// <summary>
+		/// Determines the path, where the client lua project files can be found.
+		/// </summary>
+		FileSystemPath LuaProjectPath = "";
+
+		/// <summary>
+		/// Determines the path, where the native (C++) scripting files can be found.
+		/// </summary>
+		FileSystemPath NativeProjectPath = "";
+
+		/// <summary>
 		/// Determines the current Version String.
 		/// </summary>
 		HLString Version = "1.0.0";

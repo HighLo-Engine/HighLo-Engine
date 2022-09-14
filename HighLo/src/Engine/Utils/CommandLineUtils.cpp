@@ -95,6 +95,18 @@ namespace highlo::utils
 			{
 				m_Settings.ProjectPath = m_Arguments[i + 1];
 			}
+			else if (cmd == "--csharp-path")
+			{
+				m_Settings.CSharpProjectPath = m_Arguments[i + 1];
+			}
+			else if (cmd == "--lua-path")
+			{
+				m_Settings.LuaProjectPath = m_Arguments[i + 1];
+			}
+			else if (cmd == "--native-script-path")
+			{
+				m_Settings.NativeProjectPath = m_Arguments[i + 1];
+			}
 			else
 			{
 				std::cout << "Error: Could not parse argument " << m_Arguments[i] << "! Please refer to the help menu with --help to see all valid arguments." << std::endl;

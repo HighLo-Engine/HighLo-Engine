@@ -24,13 +24,18 @@ int main(int argc, char *argv[])
 	highlo::HLApplication *app = highlo::CreateApp(argc, argv);
 	// HL_PROFILE_END_SESSION();
 
-	// HL_PROFILE_BEGIN_SESSION("Runtime", "runtime.json");
-	app->Run();
-	// HL_PROFILE_END_SESSION();
+	// If the user just wanted to display the help or version menu or interact with specific submodules only,
+	// CreateApp should return nullptr. and therefore we don't need to delete the app nor can we run the application normally.
+	if (app)
+	{
+		// HL_PROFILE_BEGIN_SESSION("Runtime", "runtime.json");
+		app->Run();
+		// HL_PROFILE_END_SESSION();
 
-	// HL_PROFILE_BEGIN_SESSION("Shutdown", "shutdown.json");
-	delete app;
-	// HL_PROFILE_END_SESSION();
+		// HL_PROFILE_BEGIN_SESSION("Shutdown", "shutdown.json");
+		delete app;
+		// HL_PROFILE_END_SESSION();
+	}
 
 	return 0;
 }

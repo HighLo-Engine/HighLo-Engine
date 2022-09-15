@@ -27,7 +27,7 @@ namespace highlo::utils
 		ResetStates();
 
 		// index 0 is the program executable path, we don't need that
-		for (uint32 i = 1; i < m_Arguments.size(); i += 2)
+		for (uint32 i = 1; i < m_Arguments.size(); ++i)
 		{
 			HLString &cmd = m_Arguments[i];
 
@@ -46,46 +46,57 @@ namespace highlo::utils
 			else if (cmd == "--project" || cmd == "-p")
 			{
 				m_Settings.ProjectPath = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--shader-registry")
 			{
 				m_Settings.ShaderRegistryPath = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--asset-registry")
 			{
 				m_Settings.AssetsRegistryPath = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--window-title")
 			{
 				m_Settings.WindowTitle = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--window-width")
 			{
 				m_Settings.WindowWidth = m_Arguments[i + 1].ToUInt32();
+				++i;
 			}
 			else if (cmd == "--window-height")
 			{
 				m_Settings.WindowHeight = m_Arguments[i + 1].ToUInt32();
+				++i;
 			}
 			else if (cmd == "--window-fullscreen")
 			{
 				m_Settings.Fullscreen = m_Arguments[i + 1].ToBool();
+				++i;
 			}
 			else if (cmd == "--window-maximized")
 			{
 				m_Settings.Maximized = m_Arguments[i + 1].ToBool();
+				++i;
 			}
 			else if (cmd == "--window-vsync")
 			{
 				m_Settings.VSync = m_Arguments[i + 1].ToBool();
+				++i;
 			}
 			else if (cmd == "--window-window-api")
 			{
 				m_Settings.WindowAPI = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--window-rendering-api")
 			{
 				m_Settings.RenderingAPI = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--nlog")
 			{
@@ -94,18 +105,22 @@ namespace highlo::utils
 			else if (cmd == "--project-path")
 			{
 				m_Settings.ProjectPath = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--csharp-path")
 			{
 				m_Settings.CSharpProjectPath = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--lua-path")
 			{
 				m_Settings.LuaProjectPath = m_Arguments[i + 1];
+				++i;
 			}
 			else if (cmd == "--native-script-path")
 			{
 				m_Settings.NativeProjectPath = m_Arguments[i + 1];
+				++i;
 			}
 			else
 			{

@@ -10,16 +10,13 @@ namespace highlo
 {
 	Ref<DocumentWriter> DocumentWriter::Create(const FileSystemPath &filePath, DocumentType type)
 	{
-		if (type != DocumentType::None)
+		switch (type)
 		{
-			switch (type)
-			{
 			case DocumentType::Json:
 				return Ref<JSONWriter>::Create(filePath);
 
 			case DocumentType::XML:
 				return Ref<XMLWriter>::Create(filePath);
-			}
 		}
 
 		// Use default parser

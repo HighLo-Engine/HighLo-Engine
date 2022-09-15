@@ -3,8 +3,6 @@
 #include "HighLoPch.h"
 #include "XMLReader.h"
 
-#if 0
-
 namespace highlo
 {
 	XMLReader::XMLReader(const FileSystemPath &filePath)
@@ -256,4 +254,3 @@ namespace highlo
 	}
 }
 
-#endif

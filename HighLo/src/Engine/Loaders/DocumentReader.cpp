@@ -3,10 +3,8 @@
 #include "HighLoPch.h"
 #include "DocumentReader.h"
 
-#if 0
-
-#include "Engine/Platform/RapidJSON/JsonReader.h"
-#include "Engine/Platform/RapidXML/XMLReader.h"
+#include "Engine/ThirdParty/RapidJSON/JsonReader.h"
+#include "Engine/ThirdParty/RapidXML/XMLReader.h"
 
 namespace highlo
 {
@@ -18,7 +16,7 @@ namespace highlo
 				return Ref<JsonReader>::Create(filePath);
 
 			case DocumentType::XML:
-				return Ref<XMLReader>::Create(filePath);
+				break;
 
 			case DocumentType::Yaml:
 				break;
@@ -29,4 +27,3 @@ namespace highlo
 	}
 }
 
-#endif

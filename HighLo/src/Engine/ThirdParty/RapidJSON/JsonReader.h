@@ -7,8 +7,6 @@
 
 #pragma once
 
-#if 0
-
 #include "Engine/Loaders/DocumentReader.h"
 
 #include <rapidjson/document.h>
@@ -78,8 +76,10 @@ namespace highlo
 	private:
 
 		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc);
-		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc);
-		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidjson::Value&)> &insertFunc);
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(const rapidjson::Value&)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(const HLString&, const rapidjson::Value&)> &insertFunc);
+
+		void ParseJSONArray(const HLString &key, const rapidjson::GenericArray<false, rapidjson::Value> &arrayElements, const std::function<void(const rapidjson::Value&)> &elementFunc);
 
 	private:
 
@@ -88,4 +88,3 @@ namespace highlo
 	};
 }
 
-#endif

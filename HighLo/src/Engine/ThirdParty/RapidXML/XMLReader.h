@@ -9,8 +9,6 @@
 
 #include "Engine/Loaders/DocumentReader.h"
 
-#if 0
-
 #include <rapidxml/rapidxml.hpp>
 
 namespace highlo
@@ -82,4 +80,3 @@ namespace highlo
 	};
 }
 
-#endif

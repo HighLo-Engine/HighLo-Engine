@@ -3,8 +3,6 @@
 #include "HighLoPch.h"
 #include "JsonReader.h"
 
-#if 0
-
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Utils/LoaderUtils.h"
 #include "JsonHelper.h"
@@ -243,7 +241,7 @@ namespace highlo
 	
 	bool JsonReader::ReadStringArray(const HLString &key, std::vector<HLString> &result)
 	{
-		return ReadArray(key, DocumentDataType::String, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::String, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsString())
 			{
@@ -257,7 +255,7 @@ namespace highlo
 	
 	bool JsonReader::ReadInt32Array(const HLString &key, std::vector<int32> &result)
 	{
-		return ReadArray(key, DocumentDataType::Int32, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Int32, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsInt())
 			{
@@ -271,7 +269,7 @@ namespace highlo
 	
 	bool JsonReader::ReadUInt32Array(const HLString &key, std::vector<uint32> &result)
 	{
-		return ReadArray(key, DocumentDataType::UInt32, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::UInt32, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsUint())
 			{
@@ -285,7 +283,7 @@ namespace highlo
 	
 	bool JsonReader::ReadInt64Array(const HLString &key, std::vector<int64> &result)
 	{
-		return ReadArray(key, DocumentDataType::Int64, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Int64, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsInt64())
 			{
@@ -299,7 +297,7 @@ namespace highlo
 	
 	bool JsonReader::ReadUInt64Array(const HLString &key, std::vector<uint64> &result)
 	{
-		return ReadArray(key, DocumentDataType::UInt64, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::UInt64, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsUint64())
 			{
@@ -313,7 +311,7 @@ namespace highlo
 	
 	bool JsonReader::ReadBoolArray(const HLString &key, std::vector<bool> &result)
 	{
-		return ReadArray(key, DocumentDataType::Bool, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Bool, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsBool())
 			{
@@ -327,7 +325,7 @@ namespace highlo
 	
 	bool JsonReader::ReadFloatArray(const HLString &key, std::vector<float> &result)
 	{
-		return ReadArray(key, DocumentDataType::Float, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Float, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsFloat())
 			{
@@ -341,7 +339,7 @@ namespace highlo
 	
 	bool JsonReader::ReadDoubleArray(const HLString &key, std::vector<double> &result)
 	{
-		return ReadArray(key, DocumentDataType::Double, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Double, [&result](const rapidjson::Value &value) -> bool
 		{
 			if (value.IsDouble())
 			{
@@ -355,7 +353,7 @@ namespace highlo
 	
 	bool JsonReader::ReadVec2Array(const HLString &key, std::vector<glm::vec2> &result)
 	{
-		return ReadArray(key, DocumentDataType::Vec2, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Vec2, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::vec2 v;
 			if (!utils::JSONToVec2(value, &v))
@@ -368,7 +366,7 @@ namespace highlo
 	
 	bool JsonReader::ReadVec3Array(const HLString &key, std::vector<glm::vec3> &result)
 	{
-		return ReadArray(key, DocumentDataType::Vec3, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Vec3, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::vec3 v;
 			if (!utils::JSONToVec3(value, &v))
@@ -381,7 +379,7 @@ namespace highlo
 	
 	bool JsonReader::ReadVec4Array(const HLString &key, std::vector<glm::vec4> &result)
 	{
-		return ReadArray(key, DocumentDataType::Vec4, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Vec4, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::vec4 v;
 			if (!utils::JSONToVec4(value, &v))
@@ -394,7 +392,7 @@ namespace highlo
 	
 	bool JsonReader::ReadMat2Array(const HLString &key, std::vector<glm::mat2> &result)
 	{
-		return ReadArray(key, DocumentDataType::Mat2, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Mat2, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::mat2 m;
 			if (!utils::JSONToMat2(value, &m))
@@ -407,7 +405,7 @@ namespace highlo
 	
 	bool JsonReader::ReadMat3Array(const HLString &key, std::vector<glm::mat3> &result)
 	{
-		return ReadArray(key, DocumentDataType::Mat3, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Mat3, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::mat3 m;
 			if (!utils::JSONToMat3(value, &m))
@@ -420,7 +418,7 @@ namespace highlo
 	
 	bool JsonReader::ReadMat4Array(const HLString &key, std::vector<glm::mat4> &result)
 	{
-		return ReadArray(key, DocumentDataType::Mat4, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Mat4, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::mat4 m;
 			if (!utils::JSONToMat4(value, &m))
@@ -433,7 +431,7 @@ namespace highlo
 	
 	bool JsonReader::ReadQuatArray(const HLString &key, std::vector<glm::quat> &result)
 	{
-		return ReadArray(key, DocumentDataType::Quat, [&result](rapidjson::Value &value) -> bool
+		return ReadArray(key, DocumentDataType::Quat, [&result](const rapidjson::Value &value) -> bool
 		{
 			glm::quat q;
 			if (!utils::JSONToQuat(value, &q))
@@ -446,7 +444,7 @@ namespace highlo
 	
 	bool JsonReader::ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::String, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::String, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsString())
 			{
@@ -460,7 +458,7 @@ namespace highlo
 	
 	bool JsonReader::ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Int32, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Int32, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsInt())
 			{
@@ -474,7 +472,7 @@ namespace highlo
 	
 	bool JsonReader::ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::UInt32, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::UInt32, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsUint())
 			{
@@ -488,7 +486,7 @@ namespace highlo
 	
 	bool JsonReader::ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Int64, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Int64, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsInt64())
 			{
@@ -502,11 +500,11 @@ namespace highlo
 	
 	bool JsonReader::ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::UInt64, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::UInt64, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsUint64())
 			{
-				result.insert({ key, value.GetUint64()});
+				result.insert({ key, value.GetUint64() });
 				return true;
 			}
 
@@ -516,7 +514,7 @@ namespace highlo
 	
 	bool JsonReader::ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Bool, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Bool, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsBool())
 			{
@@ -530,7 +528,7 @@ namespace highlo
 	
 	bool JsonReader::ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Float, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Float, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsFloat())
 			{
@@ -544,7 +542,7 @@ namespace highlo
 	
 	bool JsonReader::ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Double, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Double, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			if (value.IsDouble())
 			{
@@ -558,7 +556,7 @@ namespace highlo
 	
 	bool JsonReader::ReadVec2ArrayMap(const HLString &key, std::map<HLString, glm::vec2> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Vec2, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Vec2, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::vec2 v;
 			if (utils::JSONToVec2(value, &v))
@@ -573,7 +571,7 @@ namespace highlo
 	
 	bool JsonReader::ReadVec3ArrayMap(const HLString &key, std::map<HLString, glm::vec3> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Vec3, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Vec3, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::vec3 v;
 			if (utils::JSONToVec3(value, &v))
@@ -588,7 +586,7 @@ namespace highlo
 	
 	bool JsonReader::ReadVec4ArrayMap(const HLString &key, std::map<HLString, glm::vec4> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Vec4, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Vec4, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::vec4 v;
 			if (utils::JSONToVec4(value, &v))
@@ -603,7 +601,7 @@ namespace highlo
 	
 	bool JsonReader::ReadMat2ArrayMap(const HLString &key, std::map<HLString, glm::mat2> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Mat2, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Mat2, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::mat2 m;
 			if (utils::JSONToMat2(value, &m))
@@ -618,7 +616,7 @@ namespace highlo
 	
 	bool JsonReader::ReadMat3ArrayMap(const HLString &key, std::map<HLString, glm::mat3> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Mat3, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Mat3, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::mat3 m;
 			if (utils::JSONToMat3(value, &m))
@@ -633,7 +631,7 @@ namespace highlo
 	
 	bool JsonReader::ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Mat4, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Mat4, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::mat4 m;
 			if (utils::JSONToMat4(value, &m))
@@ -648,7 +646,7 @@ namespace highlo
 	
 	bool JsonReader::ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &result)
 	{
-		return ReadArrayMap(key, DocumentDataType::Quat, [&result](HLString &key, rapidjson::Value &value) -> bool
+		return ReadArrayMap(key, DocumentDataType::Quat, [&result](const HLString &key, const rapidjson::Value &value) -> bool
 		{
 			glm::quat q;
 			if (utils::JSONToQuat(value, &q))
@@ -774,7 +772,7 @@ namespace highlo
 		return false;
 	}
 	
-	bool JsonReader::ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidjson::Value&)> &insertFunc)
+	bool JsonReader::ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(const rapidjson::Value&)> &insertFunc)
 	{
 		if (m_Document.IsNull())
 		{
@@ -782,306 +780,125 @@ namespace highlo
 			return false;
 		}
 
-		HLString correctDataType = utils::DocumentDataTypeToString(type);
-
-		if (m_Document.IsArray())
+		if (!m_Document.IsArray())
 		{
-			rapidjson::GenericArray arr = m_Document.GetArray();
-			for (rapidjson::Value *currentIt = arr.Begin(); currentIt != arr.End(); ++currentIt)
+			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected JSON array format, object format given. [-]");
+			return false;
+		}
+
+		rapidjson::GenericArray elements = m_Document.GetArray();
+		ParseJSONArray(key, elements, [=](const rapidjson::Value &arrayElement)
+		{
+
+
+			return true;
+		});
+
+		return true;
+	}
+
+	bool JsonReader::ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(const HLString&, const rapidjson::Value&)> &insertFunc)
+	{
+		if (m_Document.IsNull())
+		{
+			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Document Root was null! [-]");
+			return false;
+		}
+
+		if (!m_Document.IsArray())
+		{
+			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected JSON array format, object format given. [-]");
+			return false;
+		}
+		
+		rapidjson::GenericArray elements = m_Document.GetArray();
+		ParseJSONArray(key, elements, [=](const rapidjson::Value &arrayElement)
+		{
+			if (!arrayElement.IsObject())
 			{
-				rapidjson::Value &currentVal = *currentIt;
+				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected JSON object, array object given! [-]");
+				return false;
+			}
 
-				if (currentVal.IsObject())
+			rapidjson::GenericObject obj = arrayElement.GetObject();
+
+			// First check, if we got a type declaration
+			auto &typeIterator = obj.FindMember("type");
+			if (typeIterator == obj.MemberEnd())
+			{
+				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Parsing Error: Did not find type declaration! [-]");
+				return false;
+			}
+
+			// then check the actual type
+			HLString expectedType = utils::DocumentDataTypeToString(type);
+			HLString actualType = (*typeIterator).value.GetString();
+			if (expectedType != actualType)
+			{
+				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: expected type {0}, but got {1} [-]", *expectedType, *actualType);
+				return false;
+			}
+
+			// Try to find the value definition
+			auto &valueIterator = obj.FindMember("value");
+			if (valueIterator == obj.MemberEnd())
+			{
+				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Parsing Error: Expected to find value declaration! [-]");
+				return false;
+			}
+
+			// Now get the actual value
+			rapidjson::GenericObject valueWrapper = valueIterator->value.GetObject();
+			for (rapidjson::GenericMemberIterator currentValue = valueWrapper.begin(); currentValue != valueWrapper.end(); ++currentValue)
+			{
+				HLString k = currentValue->name.GetString();
+
+				bool inserted = insertFunc(k, currentValue->value);
+				if (!inserted)
 				{
-					rapidjson::GenericObject currentObj = currentVal.GetObject();
-
-					auto typeIterator = currentObj.FindMember("type");
-					if (typeIterator != currentObj.MemberEnd())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any type specification in the JSON document! [-]");
-						return false;
-					}
-
-					auto valueIterator = currentObj.MemberBegin();
-					if (valueIterator == currentObj.MemberEnd())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any value! [-]");
-						return false;
-					}
-
-					rapidjson::Value &value = valueIterator->value;
-					bool insertFuncResult = insertFunc(value);
-					if (!insertFuncResult)
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-						return false;
-					}
-				}
-				else
-				{
-					bool insertFuncResult = insertFunc(currentVal);
-					if (!insertFuncResult)
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-						return false;
-					}
+					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type specific function failed! [-]");
+					return false;
 				}
 			}
 
 			return true;
-		}
-
-		rapidjson::GenericObject obj = m_Document.GetObject();
-		rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find your specified key! [-]");
-			return false;
-		}
-
-		if (!it->value.IsArray())
-		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected Array but got some other type! [-]");
-			return false;
-		}
-
-		rapidjson::GenericArray arr = it->value.GetArray();
-		for (rapidjson::Value *currentIt = arr.Begin(); currentIt != arr.End(); ++currentIt)
-		{
-			rapidjson::Value &currentVal = *currentIt;
-
-			if (currentVal.IsObject())
-			{
-				rapidjson::GenericObject currentObj = currentVal.GetObject();
-
-				auto typeIterator = currentObj.FindMember("type");
-				if (typeIterator != currentObj.MemberEnd())
-				{
-					if (!typeIterator->value.IsString())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any type specification in the JSON document! [-]");
-						return false;
-					}
-
-					HLString typeStr = typeIterator->value.GetString();
-					if (typeStr != correctDataType)
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: The type did not match with the expected type! Expected {0}, but got {1} [-]", *correctDataType, *typeStr);
-						return false;
-					}
-				}
-
-				auto valueIterator = currentObj.MemberBegin();
-				if (valueIterator == currentObj.MemberEnd())
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any value! [-]");
-					return false;
-				}
-
-				rapidjson::Value &value = valueIterator->value;
-				bool insertFuncResult = insertFunc(value);
-				if (!insertFuncResult)
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-					return false;
-				}
-			}
-			else
-			{
-				bool insertFuncResult = insertFunc(currentVal);
-				if (!insertFuncResult)
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-					return false;
-				}
-			}
-		}
+		});
 
 		return true;
 	}
 	
-	bool JsonReader::ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidjson::Value&)> &insertFunc)
+	void JsonReader::ParseJSONArray(const HLString &key, const rapidjson::GenericArray<false, rapidjson::Value> &arrayElements, const std::function<void(const rapidjson::Value&)> &elementFunc)
 	{
-		if (m_Document.IsNull())
-		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Document Root was null! [-]");
-			return false;
-		}
+		bool checkForKey = !key.IsEmpty();
 
-		HLString correctDataType = utils::DocumentDataTypeToString(type);
-
-		if (m_Document.IsArray())
+		for (uint32 i = 0; i < arrayElements.Size(); ++i)
 		{
-			rapidjson::GenericArray arr = m_Document.GetArray();
-			for (rapidjson::Value *currentIt = arr.Begin(); currentIt != arr.End(); ++currentIt)
+			if (arrayElements[i].IsArray())
 			{
-				rapidjson::Value &currentVal = *currentIt;
-				if (currentVal.IsObject())
+				// recursively call the parseArray function, to retrieve the inner array
+				ParseJSONArray(key, arrayElements[i].GetArray(), elementFunc);
+			}
+			else
+			{
+				if (checkForKey)
 				{
-					rapidjson::GenericObject currentObj = currentVal.GetObject();
-
-					auto typeIterator = currentObj.FindMember("type");
-					if (typeIterator != currentObj.MemberEnd())
+					if (arrayElements[i].IsObject())
 					{
-						if (!typeIterator->value.IsString())
+						rapidjson::GenericObject obj = arrayElements[i].GetObject();
+						for (rapidjson::GenericMemberIterator it = obj.MemberBegin(); it != obj.MemberEnd(); ++it)
 						{
-							HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any type specification in the JSON document! [-]");
-							return false;
+							HLString currentKey = it->name.GetString();
+							if (currentKey == key)
+								elementFunc(arrayElements[i]);
 						}
-
-						HLString typeStr = typeIterator->value.GetString();
-						if (typeStr != correctDataType)
-						{
-							HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: The type did not match with the expected type! Expected {0}, but got {1} [-]", *correctDataType, *typeStr);
-							return false;
-						}
-					}
-
-					auto valueIterator = currentObj.MemberBegin();
-					if (valueIterator == currentObj.MemberEnd())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any value! [-]");
-						return false;
-					}
-
-					if (!valueIterator->name.IsString())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected the key to be a string! [-]");
-						return false;
-					}
-
-					HLString valueKey = valueIterator->name.GetString();
-					rapidjson::Value &value = valueIterator->value;
-
-					bool insertFuncResult = insertFunc(valueKey, value);
-					if (!insertFuncResult)
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-						return false;
 					}
 				}
 				else
 				{
-					auto valueIterator = currentVal.MemberBegin();
-					if (valueIterator == currentVal.MemberEnd())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any value! [-]");
-						return false;
-					}
-
-					if (!valueIterator->name.IsString())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected the key to be a string! [-]");
-						return false;
-					}
-
-					HLString key = valueIterator->name.GetString();
-					rapidjson::Value &value = valueIterator->value;
-
-					bool insertFuncResult = insertFunc(key, value);
-					if (!insertFuncResult)
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-						return false;
-					}
-				}
-			}
-
-			return true;
-		}
-
-		auto &obj = m_Document.GetObject();
-		rapidjson::GenericMemberIterator it = obj.FindMember(*key);
-		if (it == obj.MemberEnd())
-		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Could not find your specified key! [-]");
-			return false;
-		}
-
-		if (!it->value.IsArray())
-		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Unexpected JSON object! Expected array, but got a different type! [-]");
-			return false;
-		}
-
-		rapidjson::GenericArray arr = it->value.GetArray();
-		for (rapidjson::Value *currentIt = arr.Begin(); currentIt != arr.End(); ++currentIt)
-		{
-			rapidjson::Value &currentVal = *currentIt;
-			if (currentVal.IsObject())
-			{
-				rapidjson::GenericObject currentObj = currentVal.GetObject();
-
-				// Get the stored type
-				auto typeIterator = currentObj.FindMember("type");
-				if (typeIterator != currentObj.MemberEnd())
-				{
-					if (!typeIterator->value.IsString())
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected type value to be a string, but it was not! [-]");
-						return false;
-					}
-
-					HLString typeStr = typeIterator->value.GetString();
-					if (typeStr != correctDataType)
-					{
-						HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: The type did not match with the expected type! Expected {0}, but got {1} [-]", *correctDataType, *typeStr);
-						return false;
-					}
-				}
-
-				auto valueIterator = currentObj.MemberBegin();
-				if (valueIterator == currentObj.MemberEnd())
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any data in the current object! [-]");
-					return false;
-				}
-
-				if (!valueIterator->name.IsString())
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected Key to be a String, but it was not! [-]");
-					return false;
-				}
-
-				HLString valueKey = valueIterator->name.GetString();
-				rapidjson::Value &value = valueIterator->value;
-
-				bool insertFuncResult = insertFunc(valueKey, value);
-				if (!insertFuncResult)
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-					return false;
-				}
-			}
-			else
-			{
-				auto valueIterator = currentVal.MemberBegin();
-				if (valueIterator == currentVal.MemberEnd())
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Did not find any value! [-]");
-					return false;
-				}
-
-				if (!valueIterator->name.IsString())
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected the key to be a string! [-]");
-					return false;
-				}
-
-				HLString key = valueIterator->name.GetString();
-				rapidjson::Value &value = valueIterator->value;
-
-				bool insertFuncResult = insertFunc(key, value);
-				if (!insertFuncResult)
-				{
-					HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Type-specific function did fail! [-]");
-					return false;
+					elementFunc(arrayElements[i]);
 				}
 			}
 		}
-
-		return true;
 	}
 }
 
-#endif

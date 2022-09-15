@@ -273,7 +273,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteStringArray(const HLString &key, std::vector<HLString> &value)
+	bool XMLWriter::WriteStringArray(const HLString &key, const std::vector<HLString> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -292,7 +292,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteInt32Array(const HLString &key, std::vector<int32> &value)
+	bool XMLWriter::WriteInt32Array(const HLString &key, const std::vector<int32> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -311,7 +311,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteUInt32Array(const HLString &key, std::vector<uint32> &value)
+	bool XMLWriter::WriteUInt32Array(const HLString &key, const std::vector<uint32> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -330,7 +330,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteInt64Array(const HLString &key, std::vector<int64> &value)
+	bool XMLWriter::WriteInt64Array(const HLString &key, const std::vector<int64> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -349,7 +349,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteUInt64Array(const HLString &key, std::vector<uint64> &value)
+	bool XMLWriter::WriteUInt64Array(const HLString &key, const std::vector<uint64> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -368,7 +368,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteBoolArray(const HLString &key, std::vector<bool> &value)
+	bool XMLWriter::WriteBoolArray(const HLString &key, const std::vector<bool> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -387,7 +387,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteFloatArray(const HLString &key, std::vector<float> &value)
+	bool XMLWriter::WriteFloatArray(const HLString &key, const std::vector<float> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -406,7 +406,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteDoubleArray(const HLString &key, std::vector<double> &value)
+	bool XMLWriter::WriteDoubleArray(const HLString &key, const std::vector<double> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -425,7 +425,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value)
+	bool XMLWriter::WriteVec2Array(const HLString &key, const std::vector<glm::vec2> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -441,7 +441,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value)
+	bool XMLWriter::WriteVec3Array(const HLString &key, const std::vector<glm::vec3> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -457,7 +457,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value)
+	bool XMLWriter::WriteVec4Array(const HLString &key, const std::vector<glm::vec4> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -473,7 +473,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value)
+	bool XMLWriter::WriteMat2Array(const HLString &key, const std::vector<glm::mat2> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -489,7 +489,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value)
+	bool XMLWriter::WriteMat3Array(const HLString &key, const std::vector<glm::mat3> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -505,7 +505,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value)
+	bool XMLWriter::WriteMat4Array(const HLString &key, const std::vector<glm::mat4> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -521,7 +521,7 @@ namespace highlo
 		});
 	}
 
-	bool XMLWriter::WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value)
+	bool XMLWriter::WriteQuaternionArray(const HLString &key, const std::vector<glm::quat> &value)
 	{
 		Ref<XMLWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [value, instance]() mutable -> rapidxml::xml_node<>*
@@ -535,6 +535,156 @@ namespace highlo
 
 			return arrayNode;
 		});
+	}
+
+	bool XMLWriter::WriteStringArrayMap(const HLString &key, const std::map<HLString, HLString> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteInt32ArrayMap(const HLString &key, const std::map<HLString, int32> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteUInt32ArrayMap(const HLString &key, const std::map<HLString, uint32> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteFloatArrayMap(const HLString &key, const std::map<HLString, float> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteDoubleArrayMap(const HLString &key, const std::map<HLString, double> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteVec2ArrayMap(const HLString &key, const std::map<HLString, glm::vec2> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteVec3ArrayMap(const HLString &key, const std::map<HLString, glm::vec3> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteVec4ArrayMap(const HLString &key, const std::map<HLString, glm::vec4> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteMat2ArrayMap(const HLString &key, const std::map<HLString, glm::mat2> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteMat3ArrayMap(const HLString &key, const std::map<HLString, glm::mat3> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteMat4ArrayMap(const HLString &key, const std::map<HLString, glm::mat4> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteQuaternionArrayMap(const HLString &key, const std::map<HLString, glm::quat> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteStringArrayMap(const HLString &key, const std::unordered_map<HLString, HLString> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteInt32ArrayMap(const HLString &key, const std::unordered_map<HLString, int32> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteUInt32ArrayMap(const HLString &key, const std::unordered_map<HLString, uint32> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteInt64ArrayMap(const HLString &key, const std::unordered_map<HLString, int64> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteUInt64ArrayMap(const HLString &key, const std::unordered_map<HLString, uint64> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteBoolArrayMap(const HLString &key, const std::unordered_map<HLString, bool> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteFloatArrayMap(const HLString &key, const std::unordered_map<HLString, float> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteDoubleArrayMap(const HLString &key, const std::unordered_map<HLString, double> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteVec2ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec2> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteVec3ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec3> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteVec4ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec4> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteMat2ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat2> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteMat3ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat3> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteMat4ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat4> &map)
+	{
+		return false;
+	}
+
+	bool XMLWriter::WriteQuaternionArrayMap(const HLString &key, const std::unordered_map<HLString, glm::quat> &map)
+	{
+		return false;
 	}
 
 	bool XMLWriter::HasKey(const HLString &key) const

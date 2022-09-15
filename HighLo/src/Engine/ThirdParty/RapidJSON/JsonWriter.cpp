@@ -368,7 +368,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteStringArray(const HLString &key, std::vector<HLString> &value)
+	bool JSONWriter::WriteStringArray(const HLString &key, const std::vector<HLString> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::String, [instance, value]() mutable -> rapidjson::Value
@@ -384,7 +384,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteInt32Array(const HLString &key, std::vector<int32> &value)
+	bool JSONWriter::WriteInt32Array(const HLString &key, const std::vector<int32> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int32, [instance, value]() mutable -> rapidjson::Value
@@ -393,7 +393,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteUInt32Array(const HLString &key, std::vector<uint32> &value)
+	bool JSONWriter::WriteUInt32Array(const HLString &key, const std::vector<uint32> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt32, [instance, value]() mutable -> rapidjson::Value
@@ -402,7 +402,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteInt64Array(const HLString &key, std::vector<int64> &value)
+	bool JSONWriter::WriteInt64Array(const HLString &key, const std::vector<int64> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int64, [instance, value]() mutable -> rapidjson::Value
@@ -411,7 +411,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteUInt64Array(const HLString &key, std::vector<uint64> &value)
+	bool JSONWriter::WriteUInt64Array(const HLString &key, const std::vector<uint64> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt64, [instance, value]() mutable -> rapidjson::Value
@@ -420,7 +420,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteBoolArray(const HLString &key, std::vector<bool> &value)
+	bool JSONWriter::WriteBoolArray(const HLString &key, const std::vector<bool> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Bool, [instance, value]() mutable -> rapidjson::Value
@@ -429,7 +429,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteFloatArray(const HLString &key, std::vector<float> &value)
+	bool JSONWriter::WriteFloatArray(const HLString &key, const std::vector<float> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Float, [instance, value]() mutable -> rapidjson::Value
@@ -438,7 +438,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteDoubleArray(const HLString &key, std::vector<double> &value)
+	bool JSONWriter::WriteDoubleArray(const HLString &key, const std::vector<double> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Double, [instance, value]() mutable -> rapidjson::Value
@@ -447,7 +447,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value)
+	bool JSONWriter::WriteVec2Array(const HLString &key, const std::vector<glm::vec2> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec2, [instance, value]() mutable -> rapidjson::Value
@@ -464,7 +464,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value)
+	bool JSONWriter::WriteVec3Array(const HLString &key, const std::vector<glm::vec3> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec3, [instance, value]() mutable -> rapidjson::Value
@@ -482,7 +482,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value)
+	bool JSONWriter::WriteVec4Array(const HLString &key, const std::vector<glm::vec4> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Vec4, [instance, value]() mutable -> rapidjson::Value
@@ -501,7 +501,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value)
+	bool JSONWriter::WriteMat2Array(const HLString &key, const std::vector<glm::mat2> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat2, [instance, value]() mutable -> rapidjson::Value
@@ -520,7 +520,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value)
+	bool JSONWriter::WriteMat3Array(const HLString &key, const std::vector<glm::mat3> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat3, [instance, value]() mutable -> rapidjson::Value
@@ -546,7 +546,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value)
+	bool JSONWriter::WriteMat4Array(const HLString &key, const std::vector<glm::mat4> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Mat4, [instance, value]() mutable -> rapidjson::Value
@@ -580,7 +580,7 @@ namespace highlo
 		});
 	}
 
-	bool JSONWriter::WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value)
+	bool JSONWriter::WriteQuaternionArray(const HLString &key, const std::vector<glm::quat> &value)
 	{
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Quat, [instance, value]() mutable -> rapidjson::Value
@@ -597,6 +597,183 @@ namespace highlo
 			}
 			return v;
 		});
+	}
+
+	bool JSONWriter::WriteStringArrayMap(const HLString &key, const std::map<HLString, HLString> &map)
+	{
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::String, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value result(rapidjson::kArrayType);
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::String);
+
+			rapidjson::Value valueStr(rapidjson::kStringType);
+			valueStr.SetString("value");
+
+			for (auto &[k, v] : map)
+			{
+				rapidjson::Value obj(rapidjson::kObjectType);
+				rapidjson::Value valueWrapper(rapidjson::kObjectType);
+
+				rapidjson::Value mapKeyStr(rapidjson::kStringType);
+				mapKeyStr.SetString(*k, k.Length());
+
+				rapidjson::Value mapValueStr(rapidjson::kStringType);
+				mapValueStr.SetString(*v, v.Length());
+
+				valueWrapper.AddMember(mapKeyStr, mapValueStr, instance->m_Document.GetAllocator());
+
+				obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				obj.AddMember(valueStr, valueWrapper, instance->m_Document.GetAllocator());
+				result.PushBack(obj, instance->m_Document.GetAllocator());
+			}
+			return result;
+		});
+	}
+
+	bool JSONWriter::WriteInt32ArrayMap(const HLString &key, const std::map<HLString, int32> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteUInt32ArrayMap(const HLString &key, const std::map<HLString, uint32> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteFloatArrayMap(const HLString &key, const std::map<HLString, float> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteDoubleArrayMap(const HLString &key, const std::map<HLString, double> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteVec2ArrayMap(const HLString &key, const std::map<HLString, glm::vec2> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteVec3ArrayMap(const HLString &key, const std::map<HLString, glm::vec3> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteVec4ArrayMap(const HLString &key, const std::map<HLString, glm::vec4> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteMat2ArrayMap(const HLString &key, const std::map<HLString, glm::mat2> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteMat3ArrayMap(const HLString &key, const std::map<HLString, glm::mat3> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteMat4ArrayMap(const HLString &key, const std::map<HLString, glm::mat4> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteQuaternionArrayMap(const HLString &key, const std::map<HLString, glm::quat> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteStringArrayMap(const HLString &key, const std::unordered_map<HLString, HLString> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteInt32ArrayMap(const HLString &key, const std::unordered_map<HLString, int32> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteUInt32ArrayMap(const HLString &key, const std::unordered_map<HLString, uint32> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteInt64ArrayMap(const HLString &key, const std::unordered_map<HLString, int64> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteUInt64ArrayMap(const HLString &key, const std::unordered_map<HLString, uint64> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteBoolArrayMap(const HLString &key, const std::unordered_map<HLString, bool> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteFloatArrayMap(const HLString &key, const std::unordered_map<HLString, float> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteDoubleArrayMap(const HLString &key, const std::unordered_map<HLString, double> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteVec2ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec2> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteVec3ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec3> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteVec4ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec4> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteMat2ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat2> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteMat3ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat3> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteMat4ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat4> &map)
+	{
+		return false;
+	}
+
+	bool JSONWriter::WriteQuaternionArrayMap(const HLString &key, const std::unordered_map<HLString, glm::quat> &map)
+	{
+		return false;
 	}
 
 	bool JSONWriter::HasKey(const HLString &key) const

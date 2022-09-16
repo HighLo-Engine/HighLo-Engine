@@ -91,8 +91,11 @@ namespace highlo
 	//	}
 
 		bool readSuccess = reader->ReadContents();
-		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
-	//	HL_ASSERT(false);
+		if (readSuccess)
+		{
+			bool success = reader->ReadUInt64ArrayMap("", shaderCache);
+		//	HL_ASSERT(false);
+		}
 	}
 }
 

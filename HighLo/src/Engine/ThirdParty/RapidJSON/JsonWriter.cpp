@@ -24,15 +24,14 @@ namespace highlo
 	{
 		std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
 		{
-			std::pair<rapidjson::Value, rapidjson::Value> result;
 			rapidjson::Value keyType(rapidjson::kStringType);
-			keyType.SetString("type", document.GetAllocator());
+			keyType.SetString("type", 4, document.GetAllocator());
 
 			rapidjson::Value valType(rapidjson::kStringType);
-
 			HLString typeStr = utils::DocumentDataTypeToString(type);
-			valType.SetString(*typeStr, typeStr.Length(), document.GetAllocator());
+			valType.SetString(typeStr.C_Str(), typeStr.Length(), document.GetAllocator());
 
+			std::pair<rapidjson::Value, rapidjson::Value> result;
 			result.first = keyType;
 			result.second = valType;
 			return result;
@@ -605,40 +604,55 @@ namespace highlo
 		return Write(key, DocumentDataType::String, [instance, map]() mutable -> rapidjson::Value
 		{
 			rapidjson::Value result(rapidjson::kArrayType);
-			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::String);
-
-			rapidjson::Value valueStr(rapidjson::kStringType);
-			valueStr.SetString("value");
 
 			for (auto &[k, v] : map)
 			{
-				rapidjson::Value obj(rapidjson::kObjectType);
+				// NOTE: Create strings every iteration (even for valueStrDecl), because rapidjson handles value objects only by reference
+				//       and if the references get added as a member they lose their attributes in the next iteration and rapidjson asserts
+				auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::String);
+				
+				rapidjson::Value currentObj(rapidjson::kObjectType);
 				rapidjson::Value valueWrapper(rapidjson::kObjectType);
 
-				rapidjson::Value mapKeyStr(rapidjson::kStringType);
-				mapKeyStr.SetString(*k, k.Length());
+				rapidjson::Value valueStrDecl(rapidjson::kStringType);
+				rapidjson::Value userKey(rapidjson::kStringType);
+				rapidjson::Value userValue(rapidjson::kStringType);
 
-				rapidjson::Value mapValueStr(rapidjson::kStringType);
-				mapValueStr.SetString(*v, v.Length());
+				valueStrDecl.SetString("value", instance->m_Document.GetAllocator());
+				userKey.SetString(k.C_Str(), k.Length(), instance->m_Document.GetAllocator());
+				userValue.SetString(v.C_Str(), v.Length(), instance->m_Document.GetAllocator());
 
-				valueWrapper.AddMember(mapKeyStr, mapValueStr, instance->m_Document.GetAllocator());
+				valueWrapper.AddMember(userKey, userValue, instance->m_Document.GetAllocator());
 
-				obj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
-				obj.AddMember(valueStr, valueWrapper, instance->m_Document.GetAllocator());
-				result.PushBack(obj, instance->m_Document.GetAllocator());
+				currentObj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
+				currentObj.AddMember(valueStrDecl, valueWrapper, instance->m_Document.GetAllocator());
+				result.PushBack(currentObj, instance->m_Document.GetAllocator());
 			}
+
 			return result;
 		});
 	}
 
 	bool JSONWriter::WriteInt32ArrayMap(const HLString &key, const std::map<HLString, int32> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int32, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value result(rapidjson::kArrayType);
+
+			return result;
+		});
 	}
 
 	bool JSONWriter::WriteUInt32ArrayMap(const HLString &key, const std::map<HLString, uint32> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt32, [instance, map]() mutable -> rapidjson::Value
+		{
+			rapidjson::Value result(rapidjson::kArrayType);
+
+			return result;
+		});
 	}
 
 	bool JSONWriter::WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map)

@@ -787,7 +787,7 @@ namespace highlo
 		}
 
 		rapidjson::GenericArray elements = m_Document.GetArray();
-		ParseJSONArray(key, elements, [=](const rapidjson::Value &arrayElement)
+		ParseJSONArray(elements, [=](const rapidjson::Value &arrayElement)
 		{
 
 
@@ -804,15 +804,15 @@ namespace highlo
 			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Document Root was null! [-]");
 			return false;
 		}
-
-		if (!m_Document.IsArray())
+		
+		Optional<rapidjson::GenericArray<false, rapidjson::Value>> elementsWrapper = GetOrFindArrayFormat(m_Document, key);
+		if (!elementsWrapper.HasValue())
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected JSON array format, object format given. [-]");
 			return false;
 		}
-		
-		rapidjson::GenericArray elements = m_Document.GetArray();
-		ParseJSONArray(key, elements, [=](const rapidjson::Value &arrayElement)
+
+		rapidjson::GenericArray elements = *elementsWrapper.Value();
+		ParseJSONArray(elements, [=](const rapidjson::Value &arrayElement)
 		{
 			if (!arrayElement.IsObject())
 			{
@@ -867,38 +867,48 @@ namespace highlo
 		return true;
 	}
 	
-	void JsonReader::ParseJSONArray(const HLString &key, const rapidjson::GenericArray<false, rapidjson::Value> &arrayElements, const std::function<void(const rapidjson::Value&)> &elementFunc)
+	void JsonReader::ParseJSONArray(const rapidjson::GenericArray<false, rapidjson::Value> &arrayElements, const std::function<void(const rapidjson::Value&)> &elementFunc)
 	{
-		bool checkForKey = !key.IsEmpty();
-
 		for (uint32 i = 0; i < arrayElements.Size(); ++i)
 		{
 			if (arrayElements[i].IsArray())
 			{
 				// recursively call the parseArray function, to retrieve the inner array
-				ParseJSONArray(key, arrayElements[i].GetArray(), elementFunc);
+				ParseJSONArray(arrayElements[i].GetArray(), elementFunc);
 			}
 			else
 			{
-				if (checkForKey)
-				{
-					if (arrayElements[i].IsObject())
-					{
-						rapidjson::GenericObject obj = arrayElements[i].GetObject();
-						for (rapidjson::GenericMemberIterator it = obj.MemberBegin(); it != obj.MemberEnd(); ++it)
-						{
-							HLString currentKey = it->name.GetString();
-							if (currentKey == key)
-								elementFunc(arrayElements[i]);
-						}
-					}
-				}
-				else
-				{
-					elementFunc(arrayElements[i]);
-				}
+				elementFunc(arrayElements[i]);
 			}
 		}
+	}
+	
+	Optional<rapidjson::GenericArray<false, rapidjson::Value>> JsonReader::GetOrFindArrayFormat(rapidjson::Document &doc, const HLString &key)
+	{
+		Optional<rapidjson::GenericArray<false, rapidjson::Value>> result;
+
+		if (doc.IsArray())
+		{
+			result = Optional(doc.GetArray());
+			return result;
+		}
+
+		HL_ASSERT(doc.IsObject());
+		auto &it = doc.FindMember(*key);
+		if (it == doc.MemberEnd())
+		{
+			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Could not find key {0} in json format! [-]", *key);
+			return result;
+		}
+
+		if (it->value.IsArray())
+		{
+			result = it->value.GetArray();
+			return result;
+		}
+
+		HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Member of found object (key: {0}) is no array! [-]", *key);
+		return result;
 	}
 }
 

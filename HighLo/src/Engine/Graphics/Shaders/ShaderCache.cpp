@@ -58,14 +58,21 @@ namespace highlo
 	//		HL_CORE_ERROR("Could not write array map!");
 	//	}
 
-		writer->BeginArray();
-		for (auto &[filePath, hash] : shaderCache)
-		{
-			writer->BeginObject();
-			writer->WriteUInt64(filePath, hash);
-			writer->EndObject();
-		}
-		writer->EndArray();
+	//	writer->BeginArray();
+	//	for (auto &[filePath, hash] : shaderCache)
+	//	{
+	//		writer->BeginObject();
+	//		writer->WriteUInt64(filePath, hash);
+	//		writer->EndObject();
+	//	}
+	//	writer->EndArray();
+
+		std::map<HLString, HLString> test = {
+			{ "Hello", "World!" },
+			{ "I", "Groot" },
+		};
+
+		writer->WriteStringArrayMap("test", test);
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);
@@ -90,12 +97,22 @@ namespace highlo
 	//		HL_CORE_ERROR("Could not read file contents!");
 	//	}
 
+	//	bool readSuccess = reader->ReadContents();
+	//	if (readSuccess)
+	//	{
+	//		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
+	//	//	HL_ASSERT(false);
+	//	}
+
+		std::map<HLString, HLString> test;
 		bool readSuccess = reader->ReadContents();
 		if (readSuccess)
 		{
-			bool success = reader->ReadUInt64ArrayMap("", shaderCache);
-		//	HL_ASSERT(false);
+			bool success = reader->ReadStringArrayMap("test", test);
+			HL_ASSERT(success);
 		}
+
+		HL_ASSERT(false);
 	}
 }
 

@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "JsonWriter.h"
 
+#include "JsonHelper.h"
+
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Utils/LoaderUtils.h"
 
@@ -20,24 +22,6 @@
 
 namespace highlo
 {
-	namespace utils
-	{
-		std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
-		{
-			rapidjson::Value keyType(rapidjson::kStringType);
-			keyType.SetString("type", 4, document.GetAllocator());
-
-			rapidjson::Value valType(rapidjson::kStringType);
-			HLString typeStr = utils::DocumentDataTypeToString(type);
-			valType.SetString(typeStr.C_Str(), typeStr.Length(), document.GetAllocator());
-
-			std::pair<rapidjson::Value, rapidjson::Value> result;
-			result.first = keyType;
-			result.second = valType;
-			return result;
-		}
-	}
-
 	JSONWriter::JSONWriter(const FileSystemPath &filePath)
 		: m_FilePath(filePath)
 	{
@@ -603,33 +587,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::String, [instance, map]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value result(rapidjson::kArrayType);
-
-			for (auto &[k, v] : map)
-			{
-				// NOTE: Create strings every iteration (even for valueStrDecl), because rapidjson handles value objects only by reference
-				//       and if the references get added as a member they lose their attributes in the next iteration and rapidjson asserts
-				auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(instance->m_Document, DocumentDataType::String);
-				
-				rapidjson::Value currentObj(rapidjson::kObjectType);
-				rapidjson::Value valueWrapper(rapidjson::kObjectType);
-
-				rapidjson::Value valueStrDecl(rapidjson::kStringType);
-				rapidjson::Value userKey(rapidjson::kStringType);
-				rapidjson::Value userValue(rapidjson::kStringType);
-
-				valueStrDecl.SetString("value", instance->m_Document.GetAllocator());
-				userKey.SetString(k.C_Str(), k.Length(), instance->m_Document.GetAllocator());
-				userValue.SetString(v.C_Str(), v.Length(), instance->m_Document.GetAllocator());
-
-				valueWrapper.AddMember(userKey, userValue, instance->m_Document.GetAllocator());
-
-				currentObj.AddMember(typeKey, typeValue, instance->m_Document.GetAllocator());
-				currentObj.AddMember(valueStrDecl, valueWrapper, instance->m_Document.GetAllocator());
-				result.PushBack(currentObj, instance->m_Document.GetAllocator());
-			}
-
-			return result;
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::String);
 		});
 	}
 

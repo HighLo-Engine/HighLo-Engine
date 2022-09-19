@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Loaders/DocumentType.h"
+#include "Engine/Utils/LoaderUtils.h"
 
 #include <rapidjson/document.h>
 
@@ -19,6 +20,22 @@
 
 namespace highlo::utils
 {
+	static std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
+	{
+		std::pair<rapidjson::Value, rapidjson::Value> result;
+		HLString typeStr = utils::DocumentDataTypeToString(type);
+
+		rapidjson::Value key(rapidjson::kStringType);
+		key.SetString("type", document.GetAllocator());
+
+		rapidjson::Value value(rapidjson::kStringType);
+		value.SetString(*typeStr, typeStr.Length(), document.GetAllocator());
+
+		result.first = key;
+		result.second = value;
+		return result;
+	}
+
 	template<typename T>
 	static rapidjson::Value ConvertStdArrToRapidJsonArr(const std::vector<T> &arr, rapidjson::Document &document)
 	{
@@ -47,22 +64,6 @@ namespace highlo::utils
 			result.PushBack(obj, document.GetAllocator());
 		}
 
-		return result;
-	}
-
-	static std::pair<rapidjson::Value, rapidjson::Value> ConvertDocumentTypeToRenderableFormat(rapidjson::Document &document, DocumentDataType type)
-	{
-		std::pair<rapidjson::Value, rapidjson::Value> result;
-		HLString typeStr = utils::DocumentDataTypeToString(type);
-
-		rapidjson::Value key(rapidjson::kStringType);
-		key.SetString("type", document.GetAllocator());
-
-		rapidjson::Value value(rapidjson::kStringType);
-		value.SetString(*typeStr, typeStr.Length(), document.GetAllocator());
-
-		result.first = key;
-		result.second = value;
 		return result;
 	}
 
@@ -154,6 +155,119 @@ namespace highlo::utils
 		result.PushBack<float>(q.z, document.GetAllocator());
 		return result;
 	}
+
+	template<typename Type>
+	static rapidjson::Value FillUserType(const Type *typeValue, DocumentDataType type, rapidjson::Document &doc)
+	{
+		rapidjson::Value result;
+
+		switch (type)
+		{
+		case DocumentDataType::Bool:
+			result.SetBool(*typeValue);
+			break;
+
+		case DocumentDataType::String:
+			result.SetString(typeValue, (uint32)strlen(typeValue), doc.GetAllocator());
+			break;
+
+		case DocumentDataType::Int32:
+			result.SetInt(*typeValue);
+			break;
+
+		case DocumentDataType::UInt32:
+			result.SetUint(*typeValue);
+			break;
+
+		case DocumentDataType::Int64:
+			result.SetInt64(*typeValue);
+			break;
+
+		case DocumentDataType::UInt64:
+			result.SetUint64(*typeValue);
+			break;
+
+		case DocumentDataType::Float:
+			result.SetFloat(*typeValue);
+			break;
+
+		case DocumentDataType::Double:
+			result.SetDouble(*typeValue);
+			break;
+
+		case DocumentDataType::Vec2:
+			result = utils::Vec2ToJSON(((glm::vec2)*typeValue), doc);
+			break;
+
+		case DocumentDataType::Vec3:
+			result = utils::Vec3ToJSON(((glm::vec3)*typeValue), doc);
+			break;
+
+		case DocumentDataType::Vec4:
+			result = utils::Vec4ToJSON(((glm::vec4)*typeValue), doc);
+			break;
+
+		case DocumentDataType::Mat2:
+			result = utils::Mat2ToJSON(((glm::mat2)*typeValue), doc);
+			break;
+
+		case DocumentDataType::Mat3:
+			result = utils::Mat3ToJSON(((glm::mat3)*typeValue), doc);
+			break;
+
+		case DocumentDataType::Mat4:
+			result = utils::Mat4ToJSON(((glm::mat4)*typeValue), doc);
+			break;
+		}
+
+		return result;
+	}
+
+	template<typename MapValueType>
+	static rapidjson::Value ConvertMapToJsonObject(const std::map<HLString, MapValueType> &map, rapidjson::Document &doc, const DocumentDataType type)
+	{
+		rapidjson::Value result(rapidjson::kArrayType);
+
+		for (auto &[k, v] : map)
+		{
+			// NOTE: Create strings every iteration (even for valueStrDecl), because rapidjson handles value objects only by reference
+			//       and if the references get added as a member they lose their attributes in the next iteration and rapidjson asserts
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(doc, type);
+
+			rapidjson::Value currentObj(rapidjson::kObjectType);
+			rapidjson::Value valueWrapper(rapidjson::kObjectType);
+
+			rapidjson::Value valueStrDecl(rapidjson::kStringType);
+			rapidjson::Value userKey(rapidjson::kStringType);
+
+			rapidjson::Value userValue;
+			if (type == DocumentDataType::Quat)
+			{
+				// we have to handle quaternions differently, because they have the same byte size as vec4's
+				userValue = utils::QuatToJSON((*((glm::quat*)&v[0])), doc);
+			}
+			else
+			{
+				userValue = utils::FillUserType(&v[0], type, doc);
+			}
+
+			valueStrDecl.SetString("value", doc.GetAllocator());
+			userKey.SetString(k.C_Str(), k.Length(), doc.GetAllocator());
+
+			valueWrapper.AddMember(userKey, userValue, doc.GetAllocator());
+
+			currentObj.AddMember(typeKey, typeValue, doc.GetAllocator());
+			currentObj.AddMember(valueStrDecl, valueWrapper, doc.GetAllocator());
+			result.PushBack(currentObj, doc.GetAllocator());
+		}
+
+		return result;
+	}
+
+
+	// ==================================================================================================================================================================
+	// ==================================================================================================================================================================
+	// ==================================================================================================================================================================
 
 	static bool JSONToVec2(const rapidjson::Value &node, glm::vec2 *outVector)
 	{

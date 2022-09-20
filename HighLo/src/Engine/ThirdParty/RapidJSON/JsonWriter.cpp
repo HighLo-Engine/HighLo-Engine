@@ -596,9 +596,7 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int32, [instance, map]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value result(rapidjson::kArrayType);
-
-			return result;
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Int32);
 		});
 	}
 

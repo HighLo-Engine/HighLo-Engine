@@ -156,6 +156,9 @@ namespace highlo::utils
 		return result;
 	}
 
+	// we can safely disable these conversion warnings here, because DocumentDataType assures us, that the conversion will be correct all the time.
+#pragma warning(push)
+#pragma warning(disable : 4244)
 	template<typename Type>
 	static rapidjson::Value FillUserType(const Type *typeValue, DocumentDataType type, rapidjson::Document &doc)
 	{
@@ -168,7 +171,7 @@ namespace highlo::utils
 			break;
 
 		case DocumentDataType::String:
-			result.SetString(typeValue, (uint32)strlen(typeValue), doc.GetAllocator());
+			result.SetString((const char*)typeValue, doc.GetAllocator());
 			break;
 
 		case DocumentDataType::Int32:
@@ -222,6 +225,7 @@ namespace highlo::utils
 
 		return result;
 	}
+#pragma warning(pop)
 
 	template<typename MapValueType>
 	static rapidjson::Value ConvertMapToJsonObject(const std::map<HLString, MapValueType> &map, rapidjson::Document &doc, const DocumentDataType type)
@@ -244,11 +248,25 @@ namespace highlo::utils
 			if (type == DocumentDataType::Quat)
 			{
 				// we have to handle quaternions differently, because they have the same byte size as vec4's
-				userValue = utils::QuatToJSON((*((glm::quat*)&v[0])), doc);
+				if constexpr (std::is_trivial<MapValueType>::value)
+				{
+					userValue = utils::QuatToJSON((*((glm::quat*)&v)), doc);
+				}
+				else
+				{
+					userValue = utils::QuatToJSON((*((glm::quat*)&v[0])), doc);
+				}
 			}
 			else
 			{
-				userValue = utils::FillUserType(&v[0], type, doc);
+				if constexpr (std::is_trivial<MapValueType>::value)
+				{
+					userValue = utils::FillUserType(&v, type, doc);
+				}
+				else
+				{
+					userValue = utils::FillUserType(&v[0], type, doc);
+				}
 			}
 
 			valueStrDecl.SetString("value", doc.GetAllocator());

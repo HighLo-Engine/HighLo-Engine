@@ -67,12 +67,12 @@ namespace highlo
 	//	}
 	//	writer->EndArray();
 
-		std::map<HLString, HLString> test = {
-			{ "Hello", "World!" },
-			{ "I", "Groot" },
+		std::map<HLString, int32> test = {
+			{ "Hello", 10 },
+			{ "I", 20 },
 		};
 
-		writer->WriteStringArrayMap("test", test);
+		writer->WriteInt32ArrayMap("test", test);
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);
@@ -104,11 +104,11 @@ namespace highlo
 	//	//	HL_ASSERT(false);
 	//	}
 
-		std::map<HLString, HLString> test;
+		std::map<HLString, int32> test;
 		bool readSuccess = reader->ReadContents();
 		if (readSuccess)
 		{
-			bool success = reader->ReadStringArrayMap("test", test);
+			bool success = reader->ReadInt32ArrayMap("test", test);
 			HL_ASSERT(success);
 		}
 

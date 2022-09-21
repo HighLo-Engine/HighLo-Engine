@@ -156,49 +156,6 @@ namespace highlo::utils
 		return result;
 	}
 
-	// we can safely disable these conversion warnings here, because DocumentDataType assures us, that the conversion will be correct all the time.
-#pragma warning(push)
-#pragma warning(disable : 4244)
-	template<typename Type>
-	static rapidjson::Value FillUserType(const Type &value, DocumentDataType type, rapidjson::Document &doc)
-	{
-		rapidjson::Value result;
-
-		switch (type)
-		{
-			case DocumentDataType::Bool:
-				result.SetBool(*((bool*)&value));
-				break;
-
-			case DocumentDataType::Int32:
-				result.SetInt(*((int32*)&value));
-				break;
-
-			case DocumentDataType::UInt32:
-				result.SetUint(*((uint32*)&value));
-				break;
-
-			case DocumentDataType::Int64:
-				result.SetInt64(*((int64*)&value));
-				break;
-
-			case DocumentDataType::UInt64:
-				result.SetUint64(*((uint64*)&value));
-				break;
-
-			case DocumentDataType::Float:
-				result.SetFloat(*((float*)&value));
-				break;
-
-			case DocumentDataType::Double:
-				result.SetDouble(*((double*)&value));
-				break;
-		}
-
-		return result;
-	}
-#pragma warning(pop)
-
 	template<typename MapValueType>
 	static rapidjson::Value ConvertMapToJsonObject(const std::map<HLString, MapValueType> &map, rapidjson::Document &doc, const DocumentDataType type)
 	{
@@ -219,14 +176,43 @@ namespace highlo::utils
 			rapidjson::Value userValue;
 			if constexpr (std::is_trivial<MapValueType>::value)
 			{
-				userValue = utils::FillUserType<MapValueType>(v, type, doc);
+				switch (type)
+				{
+					case DocumentDataType::Bool:
+						userValue.SetBool(*((bool*)&v));
+						break;
+
+					case DocumentDataType::Int32:
+						userValue.SetInt(*((int32*)&v));
+						break;
+
+					case DocumentDataType::UInt32:
+						userValue.SetUint(*((uint32*)&v));
+						break;
+
+					case DocumentDataType::Int64:
+						userValue.SetInt64(*((int64*)&v));
+						break;
+
+					case DocumentDataType::UInt64:
+						userValue.SetUint64(*((uint64*)&v));
+						break;
+
+					case DocumentDataType::Float:
+						userValue.SetFloat(*((float*)&v));
+						break;
+
+					case DocumentDataType::Double:
+						userValue.SetDouble(*((double*)&v));
+						break;
+				}
 			}
 			else
 			{
 				switch (type)
 				{
 					case DocumentDataType::String:
-						result.SetString((const char*)v, doc.GetAllocator());
+						userValue.SetString((const char*)v, doc.GetAllocator());
 						break;
 
 					case DocumentDataType::Vec2:

@@ -67,12 +67,12 @@ namespace highlo
 	//	}
 	//	writer->EndArray();
 
-		std::map<HLString, int64> test = {
-			{ "Hello", 10 },
-			{ "I", 20 },
+		std::map<HLString, glm::vec2> test = {
+			{ "Hello", { 2.0f, 5.0f } },
+			{ "I", { 1.5f, 53.5f } },
 		};
 
-		writer->WriteInt64ArrayMap("test", test);
+		writer->WriteVec2ArrayMap("test", test);
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);
@@ -104,15 +104,15 @@ namespace highlo
 	//	//	HL_ASSERT(false);
 	//	}
 
-		std::map<HLString, int64> test;
+		std::map<HLString, glm::vec2> test;
 		bool readSuccess = reader->ReadContents();
 		if (readSuccess)
 		{
-			bool success = reader->ReadInt64ArrayMap("test", test);
+			bool success = reader->ReadVec2ArrayMap("test", test);
 			HL_ASSERT(success);
 		}
 
-		HL_ASSERT(false);
+	//	HL_ASSERT(false);
 	}
 }
 

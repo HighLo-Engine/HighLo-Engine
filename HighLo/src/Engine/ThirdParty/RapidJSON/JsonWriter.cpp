@@ -822,13 +822,13 @@ namespace highlo
 		if (prettify)
 		{
 			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-			writer.SetMaxDecimalPlaces(3);
+			writer.SetMaxDecimalPlaces(4);
 			m_Document.Accept(writer);
 		}
 		else
 		{
 			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-			writer.SetMaxDecimalPlaces(3);
+			writer.SetMaxDecimalPlaces(4);
 			m_Document.Accept(writer);
 		}
 

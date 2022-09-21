@@ -160,67 +160,39 @@ namespace highlo::utils
 #pragma warning(push)
 #pragma warning(disable : 4244)
 	template<typename Type>
-	static rapidjson::Value FillUserType(const Type *typeValue, DocumentDataType type, rapidjson::Document &doc)
+	static rapidjson::Value FillUserType(const Type &value, DocumentDataType type, rapidjson::Document &doc)
 	{
 		rapidjson::Value result;
 
 		switch (type)
 		{
-		case DocumentDataType::Bool:
-			result.SetBool(*typeValue);
-			break;
+			case DocumentDataType::Bool:
+				result.SetBool(*((bool*)&value));
+				break;
 
-		case DocumentDataType::String:
-			result.SetString((const char*)typeValue, doc.GetAllocator());
-			break;
+			case DocumentDataType::Int32:
+				result.SetInt(*((int32*)&value));
+				break;
 
-		case DocumentDataType::Int32:
-			result.SetInt(*typeValue);
-			break;
+			case DocumentDataType::UInt32:
+				result.SetUint(*((uint32*)&value));
+				break;
 
-		case DocumentDataType::UInt32:
-			result.SetUint(*typeValue);
-			break;
+			case DocumentDataType::Int64:
+				result.SetInt64(*((int64*)&value));
+				break;
 
-		case DocumentDataType::Int64:
-			result.SetInt64(*typeValue);
-			break;
+			case DocumentDataType::UInt64:
+				result.SetUint64(*((uint64*)&value));
+				break;
 
-		case DocumentDataType::UInt64:
-			result.SetUint64(*typeValue);
-			break;
+			case DocumentDataType::Float:
+				result.SetFloat(*((float*)&value));
+				break;
 
-		case DocumentDataType::Float:
-			result.SetFloat(*typeValue);
-			break;
-
-		case DocumentDataType::Double:
-			result.SetDouble(*typeValue);
-			break;
-
-		case DocumentDataType::Vec2:
-			result = utils::Vec2ToJSON(((glm::vec2)*typeValue), doc);
-			break;
-
-		case DocumentDataType::Vec3:
-			result = utils::Vec3ToJSON(((glm::vec3)*typeValue), doc);
-			break;
-
-		case DocumentDataType::Vec4:
-			result = utils::Vec4ToJSON(((glm::vec4)*typeValue), doc);
-			break;
-
-		case DocumentDataType::Mat2:
-			result = utils::Mat2ToJSON(((glm::mat2)*typeValue), doc);
-			break;
-
-		case DocumentDataType::Mat3:
-			result = utils::Mat3ToJSON(((glm::mat3)*typeValue), doc);
-			break;
-
-		case DocumentDataType::Mat4:
-			result = utils::Mat4ToJSON(((glm::mat4)*typeValue), doc);
-			break;
+			case DocumentDataType::Double:
+				result.SetDouble(*((double*)&value));
+				break;
 		}
 
 		return result;
@@ -245,27 +217,45 @@ namespace highlo::utils
 			rapidjson::Value userKey(rapidjson::kStringType);
 
 			rapidjson::Value userValue;
-			if (type == DocumentDataType::Quat)
+			if constexpr (std::is_trivial<MapValueType>::value)
 			{
-				// we have to handle quaternions differently, because they have the same byte size as vec4's
-				if constexpr (std::is_trivial<MapValueType>::value)
-				{
-					userValue = utils::QuatToJSON((*((glm::quat*)&v)), doc);
-				}
-				else
-				{
-					userValue = utils::QuatToJSON((*((glm::quat*)&v[0])), doc);
-				}
+				userValue = utils::FillUserType<MapValueType>(v, type, doc);
 			}
 			else
 			{
-				if constexpr (std::is_trivial<MapValueType>::value)
+				switch (type)
 				{
-					userValue = utils::FillUserType(&v, type, doc);
-				}
-				else
-				{
-					userValue = utils::FillUserType(&v[0], type, doc);
+					case DocumentDataType::String:
+						result.SetString((const char*)v, doc.GetAllocator());
+						break;
+
+					case DocumentDataType::Vec2:
+						userValue = utils::Vec2ToJSON((*((glm::vec2*)&v[0])), doc);
+						break;
+
+					case DocumentDataType::Vec3:
+						userValue = utils::Vec3ToJSON((*((glm::vec3*)&v[0])), doc);
+						break;
+
+					case DocumentDataType::Vec4:
+						userValue = utils::Vec4ToJSON((*((glm::vec4*)&v[0])), doc);
+						break;
+
+					case DocumentDataType::Mat2:
+						userValue = utils::Mat2ToJSON((*((glm::mat2*)&v[0])), doc);
+						break;
+
+					case DocumentDataType::Mat3:
+						userValue = utils::Mat3ToJSON((*((glm::mat3*)&v[0])), doc);
+						break;
+
+					case DocumentDataType::Mat4:
+						userValue = utils::Mat4ToJSON((*((glm::mat4*)&v[0])), doc);
+						break;
+
+					case DocumentDataType::Quat:
+						userValue = utils::QuatToJSON((*((glm::quat*)&v[0])), doc);
+						break;
 				}
 			}
 

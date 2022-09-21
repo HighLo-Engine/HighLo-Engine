@@ -605,70 +605,116 @@ namespace highlo
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt32, [instance, map]() mutable -> rapidjson::Value
 		{
-			rapidjson::Value result(rapidjson::kArrayType);
-
-			return result;
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::UInt32);
 		});
 	}
 
 	bool JSONWriter::WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int64, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Int64);
+		});
 	}
 
 	bool JSONWriter::WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt64, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::UInt64);
+		});
 	}
 
 	bool JSONWriter::WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Bool, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Bool);
+		});
 	}
 
 	bool JSONWriter::WriteFloatArrayMap(const HLString &key, const std::map<HLString, float> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Float, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Float);
+		});
 	}
 
 	bool JSONWriter::WriteDoubleArrayMap(const HLString &key, const std::map<HLString, double> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Double, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Double);
+		});
 	}
 
 	bool JSONWriter::WriteVec2ArrayMap(const HLString &key, const std::map<HLString, glm::vec2> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec2, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Vec2);
+		});
 	}
 
 	bool JSONWriter::WriteVec3ArrayMap(const HLString &key, const std::map<HLString, glm::vec3> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec3, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Vec3);
+		});
 	}
 
 	bool JSONWriter::WriteVec4ArrayMap(const HLString &key, const std::map<HLString, glm::vec4> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Vec4, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Vec4);
+		});
 	}
 
 	bool JSONWriter::WriteMat2ArrayMap(const HLString &key, const std::map<HLString, glm::mat2> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat2, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Mat2);
+		});
 	}
 
 	bool JSONWriter::WriteMat3ArrayMap(const HLString &key, const std::map<HLString, glm::mat3> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat3, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Mat3);
+		});
 	}
 
 	bool JSONWriter::WriteMat4ArrayMap(const HLString &key, const std::map<HLString, glm::mat4> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Mat4, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Mat4);
+		});
 	}
 
 	bool JSONWriter::WriteQuaternionArrayMap(const HLString &key, const std::map<HLString, glm::quat> &map)
 	{
-		return false;
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Quat, [instance, map]() mutable -> rapidjson::Value
+		{
+			return utils::ConvertMapToJsonObject(map, instance->m_Document, DocumentDataType::Quat);
+		});
 	}
 
 	bool JSONWriter::WriteStringArrayMap(const HLString &key, const std::unordered_map<HLString, HLString> &map)

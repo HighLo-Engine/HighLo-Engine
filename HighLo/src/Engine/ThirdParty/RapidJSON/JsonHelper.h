@@ -178,13 +178,11 @@ namespace highlo::utils
 			{
 				if (type == DocumentDataType::String)
 				{
-					HL_CORE_TRACE("Trying to store string value...");
 					userValue.SetString(v.C_Str(), v.Length(), doc.GetAllocator());
 				}
 			}
 			else if constexpr (!std::is_class<MapValueType>::value)
 			{
-				HL_CORE_TRACE("Trying to store trivial value...");
 				switch (type)
 				{
 					case DocumentDataType::Bool:
@@ -218,7 +216,6 @@ namespace highlo::utils
 			}
 			else
 			{
-				HL_CORE_TRACE("Trying to store complex value...");
 				switch (type)
 				{
 					case DocumentDataType::Vec2:
@@ -292,30 +289,10 @@ namespace highlo::utils
 
 	static bool JSONToVec2(const rapidjson::Value &node, glm::vec2 *outVector)
 	{
-		if (!node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Vec2);
-		HLString typeStr = typeIterator->value.GetString();
-		if (expectedType != typeStr)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat())
 			return false;
 
@@ -330,30 +307,10 @@ namespace highlo::utils
 
 	static bool JSONToVec3(const rapidjson::Value &node, glm::vec3 *outVector)
 	{
-		if (!node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Vec3);
-		HLString typeStr = typeIterator->value.GetString();
-		if (typeStr != expectedType)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat())
 			return false;
 
@@ -369,30 +326,10 @@ namespace highlo::utils
 
 	static bool JSONToVec4(const rapidjson::Value &node, glm::vec4 *outVector)
 	{
-		if (node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Vec4);
-		HLString typeStr = typeIterator->value.GetString();
-		if (expectedType != typeStr)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat() || !arr[3].IsFloat())
 			return false;
 
@@ -409,30 +346,10 @@ namespace highlo::utils
 
 	static bool JSONToMat2(const rapidjson::Value &node, glm::mat2 *outMatrix)
 	{
-		if (!node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Mat2);
-		HLString typeStr = typeIterator->value.GetString();
-		if (expectedType != typeStr)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat() || !arr[3].IsFloat())
 			return false;
 
@@ -455,30 +372,10 @@ namespace highlo::utils
 
 	static bool JSONToMat3(const rapidjson::Value &node, glm::mat3 *outMatrix)
 	{
-		if (!node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Mat3);
-		HLString typeStr = typeIterator->value.GetString();
-		if (expectedType != typeStr)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat()
 		 || !arr[3].IsFloat() || !arr[4].IsFloat() || !arr[5].IsFloat()
 		 || !arr[6].IsFloat() || !arr[7].IsFloat() || !arr[8].IsFloat())
@@ -517,30 +414,10 @@ namespace highlo::utils
 
 	static bool JSONToMat4(const rapidjson::Value &node, glm::mat4 *outMatrix)
 	{
-		if (!node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Mat4);
-		HLString typeStr = typeIterator->value.GetString();
-		if (expectedType != typeStr)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat() || !arr[3].IsFloat()
 		 || !arr[4].IsFloat() || !arr[5].IsFloat() || !arr[6].IsFloat() || !arr[7].IsFloat()
 		 || !arr[8].IsFloat() || !arr[9].IsFloat() || !arr[10].IsFloat() || !arr[11].IsFloat()
@@ -596,30 +473,10 @@ namespace highlo::utils
 
 	static bool JSONToQuat(const rapidjson::Value &node, glm::quat *outQuaternion)
 	{
-		if (node.IsObject())
+		if (!node.IsArray())
 			return false;
 
-		rapidjson::GenericObject obj = node.GetObject();
-		auto typeIterator = obj.FindMember("type");
-		if (typeIterator == obj.MemberEnd())
-			return false;
-
-		if (!typeIterator->value.IsString())
-			return false;
-
-		HLString expectedType = utils::DocumentDataTypeToString(DocumentDataType::Quat);
-		HLString typeStr = typeIterator->value.GetString();
-		if (expectedType != typeStr)
-			return false;
-
-		auto valueIterator = obj.MemberBegin();
-		if (valueIterator == obj.MemberEnd())
-			return false;
-
-		if (!valueIterator->value.IsArray())
-			return false;
-
-		rapidjson::GenericArray arr = valueIterator->value.GetArray();
+		rapidjson::GenericArray arr = node.GetArray();
 		if (!arr[0].IsFloat() || !arr[1].IsFloat() || !arr[2].IsFloat() || !arr[3].IsFloat())
 			return false;
 

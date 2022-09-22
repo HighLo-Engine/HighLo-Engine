@@ -174,8 +174,17 @@ namespace highlo::utils
 			rapidjson::Value userKey(rapidjson::kStringType);
 
 			rapidjson::Value userValue;
-			if constexpr (std::is_trivial<MapValueType>::value)
+			if constexpr (std::is_same<MapValueType, HLString>::value)
 			{
+				if (type == DocumentDataType::String)
+				{
+					HL_CORE_TRACE("Trying to store string value...");
+					userValue.SetString(v.C_Str(), v.Length(), doc.GetAllocator());
+				}
+			}
+			else if constexpr (!std::is_class<MapValueType>::value)
+			{
+				HL_CORE_TRACE("Trying to store trivial value...");
 				switch (type)
 				{
 					case DocumentDataType::Bool:
@@ -209,39 +218,57 @@ namespace highlo::utils
 			}
 			else
 			{
+				HL_CORE_TRACE("Trying to store complex value...");
 				switch (type)
 				{
-					case DocumentDataType::String:
-						userValue.SetString((const char*)v, doc.GetAllocator());
-						break;
-
 					case DocumentDataType::Vec2:
-						userValue = utils::Vec2ToJSON((*((glm::vec2*)&v[0])), doc);
+					{
+						glm::vec2 vector = (*((glm::vec2*)&v[0]));
+						userValue = utils::Vec2ToJSON(vector, doc);
 						break;
+					}
 
 					case DocumentDataType::Vec3:
-						userValue = utils::Vec3ToJSON((*((glm::vec3*)&v[0])), doc);
+					{
+						glm::vec3 vector = (*((glm::vec3*)&v[0]));
+						userValue = utils::Vec3ToJSON(vector, doc);
 						break;
+					}
 
 					case DocumentDataType::Vec4:
-						userValue = utils::Vec4ToJSON((*((glm::vec4*)&v[0])), doc);
+					{
+						glm::vec4 vector = (*((glm::vec4*)&v[0]));
+						userValue = utils::Vec4ToJSON(vector, doc);
 						break;
+					}
 
 					case DocumentDataType::Mat2:
-						userValue = utils::Mat2ToJSON((*((glm::mat2*)&v[0])), doc);
+					{
+						glm::mat2 matrix = (*((glm::mat2*)&v[0]));
+						userValue = utils::Mat2ToJSON(matrix, doc);
 						break;
+					}
 
 					case DocumentDataType::Mat3:
-						userValue = utils::Mat3ToJSON((*((glm::mat3*)&v[0])), doc);
+					{
+						glm::mat3 matrix = (*((glm::mat3*)&v[0]));
+						userValue = utils::Mat3ToJSON(matrix, doc);
 						break;
+					}
 
 					case DocumentDataType::Mat4:
-						userValue = utils::Mat4ToJSON((*((glm::mat4*)&v[0])), doc);
+					{
+						glm::mat4 matrix = (*((glm::mat4*)&v[0]));
+						userValue = utils::Mat4ToJSON(matrix, doc);
 						break;
+					}
 
 					case DocumentDataType::Quat:
-						userValue = utils::QuatToJSON((*((glm::quat*)&v[0])), doc);
+					{
+						glm::quat quaternion = (*((glm::quat*)&v[0]));
+						userValue = utils::QuatToJSON(quaternion, doc);
 						break;
+					}
 				}
 			}
 

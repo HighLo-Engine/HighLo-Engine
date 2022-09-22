@@ -37,26 +37,19 @@ namespace highlo
 	void ShaderCache::Serialize(const std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
-		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
+		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
 
-	//	if (writer->WriteUInt64ArrayMap("shaderCache", shaderCache))
+	//	writer->BeginArray();
+	//	for (auto &[filePath, hash] : shaderCache)
 	//	{
-	//		bool success = writer->WriteOut();
-	//		HL_ASSERT(success);
+	//		writer->BeginObject();
+	//		writer->WriteUInt64(filePath, hash);
+	//		writer->EndObject();
 	//	}
-	//	else
-	//	{
-	//		HL_CORE_ERROR("Could not write array map!");
-	//	}
+	//	writer->EndArray();
 
-		writer->BeginArray();
-		for (auto &[filePath, hash] : shaderCache)
-		{
-			writer->BeginObject();
-			writer->WriteUInt64(filePath, hash);
-			writer->EndObject();
-		}
-		writer->EndArray();
+		HLString test = "Hello World!";
+		writer->WriteString("test", test);
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);
@@ -65,28 +58,23 @@ namespace highlo
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
-		Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::Json);
+		Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::XML);
 
-
-	//	if (reader->ReadContents())
+	//	bool readSuccess = reader->ReadContents();
+	//	if (readSuccess)
 	//	{
-	//		if (!reader->ReadUInt64ArrayMap("shaderCache", shaderCache))
-	//		{
-	//			HL_CORE_ERROR("Could not read ShaderCache!");
-	//			HL_ASSERT(false);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		HL_CORE_ERROR("Could not read file contents!");
+	//		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
+	//		HL_ASSERT(success);
 	//	}
 
-		bool readSuccess = reader->ReadContents();
-		if (readSuccess)
+		HLString test = "";
+		if (reader->ReadContents())
 		{
-			bool success = reader->ReadUInt64ArrayMap("", shaderCache);
+			bool success = reader->ReadString("test", &test);
 			HL_ASSERT(success);
 		}
+
+		HL_ASSERT(false);
 	}
 }
 

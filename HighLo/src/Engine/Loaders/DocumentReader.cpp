@@ -5,6 +5,7 @@
 
 #include "Engine/ThirdParty/RapidJSON/JsonReader.h"
 #include "Engine/ThirdParty/RapidXML/XMLReader.h"
+#include "Engine/ThirdParty/YamlCPP/YamlReader.h"
 
 namespace highlo
 {
@@ -16,10 +17,10 @@ namespace highlo
 				return Ref<JsonReader>::Create(filePath);
 
 			case DocumentType::XML:
-				break;
+				return Ref<XMLReader>::Create(filePath);
 
 			case DocumentType::Yaml:
-				break;
+				return Ref<YamlReader>::Create(filePath);
 		}
 
 		// Use default parser

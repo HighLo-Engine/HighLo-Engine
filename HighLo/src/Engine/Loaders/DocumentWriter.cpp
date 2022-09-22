@@ -5,6 +5,7 @@
 
 #include "Engine/ThirdParty/RapidJSON/JsonWriter.h"
 #include "Engine/ThirdParty/RapidXML/XMLWriter.h"
+#include "Engine/ThirdParty/YamlCPP/YamlWriter.h"
 
 namespace highlo
 {
@@ -17,6 +18,9 @@ namespace highlo
 
 			case DocumentType::XML:
 				return Ref<XMLWriter>::Create(filePath);
+
+			case DocumentType::Yaml:
+				return Ref<YamlWriter>::Create(filePath);
 		}
 
 		// Use default parser

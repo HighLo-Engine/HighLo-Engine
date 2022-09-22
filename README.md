@@ -2,6 +2,8 @@
   <img src="/HighLo.png" alt="HighLo-Logo" width="1024">
 </p>
 
+[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)
+
 # HighLo-Engine
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.

@@ -39,15 +39,6 @@ namespace highlo
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
 		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
-	//	writer->BeginArray();
-	//	for (auto &[filePath, hash] : shaderCache)
-	//	{
-	//		writer->BeginObject();
-	//		writer->WriteUInt64(filePath, hash);
-	//		writer->EndObject();
-	//	}
-	//	writer->EndArray();
-
 	//	if (writer->WriteUInt64ArrayMap("shaderCache", shaderCache))
 	//	{
 	//		bool success = writer->WriteOut();
@@ -58,21 +49,14 @@ namespace highlo
 	//		HL_CORE_ERROR("Could not write array map!");
 	//	}
 
-	//	writer->BeginArray();
-	//	for (auto &[filePath, hash] : shaderCache)
-	//	{
-	//		writer->BeginObject();
-	//		writer->WriteUInt64(filePath, hash);
-	//		writer->EndObject();
-	//	}
-	//	writer->EndArray();
-
-		std::map<HLString, uint32> test = {
-			{ "Hello", 10 },
-			{ "I", 60 },
-		};
-
-		writer->WriteUInt32ArrayMap("test", test);
+		writer->BeginArray();
+		for (auto &[filePath, hash] : shaderCache)
+		{
+			writer->BeginObject();
+			writer->WriteUInt64(filePath, hash);
+			writer->EndObject();
+		}
+		writer->EndArray();
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);
@@ -97,22 +81,12 @@ namespace highlo
 	//		HL_CORE_ERROR("Could not read file contents!");
 	//	}
 
-	//	bool readSuccess = reader->ReadContents();
-	//	if (readSuccess)
-	//	{
-	//		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
-	//	//	HL_ASSERT(false);
-	//	}
-
-		std::map<HLString, uint32> test;
 		bool readSuccess = reader->ReadContents();
 		if (readSuccess)
 		{
-			bool success = reader->ReadUInt32ArrayMap("test", test);
+			bool success = reader->ReadUInt64ArrayMap("", shaderCache);
 			HL_ASSERT(success);
 		}
-
-	//	HL_ASSERT(false);
 	}
 }
 

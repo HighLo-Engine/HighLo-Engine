@@ -658,6 +658,223 @@ namespace highlo
 			return false;
 		});
 	}
+
+	bool JsonReader::ReadStringArrayMap(const HLString &key, std::unordered_map<HLString, HLString> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::String, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsString())
+			{
+				result.insert({ key, value.GetString() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadInt32ArrayMap(const HLString &key, std::unordered_map<HLString, int32> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Int32, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsInt())
+			{
+				result.insert({ key, value.GetInt() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadUInt32ArrayMap(const HLString &key, std::unordered_map<HLString, uint32> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::UInt32, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsUint())
+			{
+				result.insert({ key, value.GetUint() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadInt64ArrayMap(const HLString &key, std::unordered_map<HLString, int64> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Int64, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsInt64())
+			{
+				result.insert({ key, value.GetInt64() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadUInt64ArrayMap(const HLString &key, std::unordered_map<HLString, uint64> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::UInt64, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsUint64())
+			{
+				result.insert({ key, value.GetUint64() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadBoolArrayMap(const HLString &key, std::unordered_map<HLString, bool> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Bool, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsBool())
+			{
+				result.insert({ key, value.GetBool() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadFloatArrayMap(const HLString &key, std::unordered_map<HLString, float> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Float, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsFloat())
+			{
+				result.insert({ key, value.GetFloat() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadDoubleArrayMap(const HLString &key, std::unordered_map<HLString, double> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Double, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			if (value.IsDouble())
+			{
+				result.insert({ key, value.GetDouble() });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadVec2ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec2> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec2, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::vec2 v;
+			if (utils::JSONToVec2(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadVec3ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec3> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec3, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::vec3 v;
+			if (utils::JSONToVec3(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadVec4ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec4> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec4, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::vec4 v;
+			if (utils::JSONToVec4(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadMat2ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat2> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Mat2, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::mat2 v;
+			if (utils::JSONToMat2(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadMat3ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat3> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Vec2, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::mat3 v;
+			if (utils::JSONToMat3(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadMat4ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat4> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Mat4, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::mat4 v;
+			if (utils::JSONToMat4(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
+
+	bool JsonReader::ReadQuatArrayMap(const HLString &key, std::unordered_map<HLString, glm::quat> &result)
+	{
+		return ReadArrayMap(key, DocumentDataType::Quat, [&result](const HLString &key, const rapidjson::Value &value) -> bool
+		{
+			glm::quat v;
+			if (utils::JSONToQuat(value, &v))
+			{
+				result.insert({ key, v });
+				return true;
+			}
+
+			return false;
+		});
+	}
 	
 	bool JsonReader::ReadContents(const FileSystemPath &filePath)
 	{

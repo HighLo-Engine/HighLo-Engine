@@ -157,7 +157,7 @@ namespace highlo::utils
 	}
 
 	template<typename MapValueType>
-	static rapidjson::Value ConvertMapToJsonObject(const std::map<HLString, MapValueType> &map, rapidjson::Document &doc, const DocumentDataType type)
+	static rapidjson::Value ConvertMapToJsonObject(const std::map<HLString, MapValueType> &map, rapidjson::Document &doc, DocumentDataType type)
 	{
 		rapidjson::Value result(rapidjson::kArrayType);
 
@@ -282,6 +282,131 @@ namespace highlo::utils
 		return result;
 	}
 
+	template<typename MapValueType>
+	static rapidjson::Value ConvertUnorderedMapToJsonObject(const std::unordered_map<HLString, MapValueType> &map, rapidjson::Document &doc, DocumentDataType type)
+	{
+		rapidjson::Value result(rapidjson::kArrayType);
+
+		for (auto &[k, v] : map)
+		{
+			// NOTE: Create strings every iteration (even for valueStrDecl), because rapidjson handles value objects only by reference
+			//       and if the references get added as a member they lose their attributes in the next iteration and rapidjson asserts
+			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(doc, type);
+
+			rapidjson::Value currentObj(rapidjson::kObjectType);
+			rapidjson::Value valueWrapper(rapidjson::kObjectType);
+
+			rapidjson::Value valueStrDecl(rapidjson::kStringType);
+			rapidjson::Value userKey(rapidjson::kStringType);
+
+			rapidjson::Value userValue;
+			if constexpr (std::is_same<MapValueType, HLString>::value)
+			{
+				if (type == DocumentDataType::String)
+				{
+					userValue.SetString(v.C_Str(), v.Length(), doc.GetAllocator());
+				}
+			}
+			else if constexpr (!std::is_class<MapValueType>::value)
+			{
+				switch (type)
+				{
+					case DocumentDataType::Bool:
+						userValue.SetBool(*((bool*)&v));
+						break;
+
+					case DocumentDataType::Int32:
+						userValue.SetInt(*((int32*)&v));
+						break;
+
+					case DocumentDataType::UInt32:
+						userValue.SetUint(*((uint32*)&v));
+						break;
+
+					case DocumentDataType::Int64:
+						userValue.SetInt64(*((int64*)&v));
+						break;
+
+					case DocumentDataType::UInt64:
+						userValue.SetUint64(*((uint64*)&v));
+						break;
+
+					case DocumentDataType::Float:
+						userValue.SetFloat(*((float*)&v));
+						break;
+
+					case DocumentDataType::Double:
+						userValue.SetDouble(*((double*)&v));
+						break;
+				}
+			}
+			else
+			{
+				switch (type)
+				{
+					case DocumentDataType::Vec2:
+					{
+						glm::vec2 vector = (*((glm::vec2*)&v[0]));
+						userValue = utils::Vec2ToJSON(vector, doc);
+						break;
+					}
+
+					case DocumentDataType::Vec3:
+					{
+						glm::vec3 vector = (*((glm::vec3*)&v[0]));
+						userValue = utils::Vec3ToJSON(vector, doc);
+						break;
+					}
+
+					case DocumentDataType::Vec4:
+					{
+						glm::vec4 vector = (*((glm::vec4*)&v[0]));
+						userValue = utils::Vec4ToJSON(vector, doc);
+						break;
+					}
+
+					case DocumentDataType::Mat2:
+					{
+						glm::mat2 matrix = (*((glm::mat2*)&v[0]));
+						userValue = utils::Mat2ToJSON(matrix, doc);
+						break;
+					}
+
+					case DocumentDataType::Mat3:
+					{
+						glm::mat3 matrix = (*((glm::mat3*)&v[0]));
+						userValue = utils::Mat3ToJSON(matrix, doc);
+						break;
+					}
+
+					case DocumentDataType::Mat4:
+					{
+						glm::mat4 matrix = (*((glm::mat4*)&v[0]));
+						userValue = utils::Mat4ToJSON(matrix, doc);
+						break;
+					}
+
+					case DocumentDataType::Quat:
+					{
+						glm::quat quaternion = (*((glm::quat*)&v[0]));
+						userValue = utils::QuatToJSON(quaternion, doc);
+						break;
+					}
+				}
+			}
+
+			valueStrDecl.SetString("value", doc.GetAllocator());
+			userKey.SetString(k.C_Str(), k.Length(), doc.GetAllocator());
+
+			valueWrapper.AddMember(userKey, userValue, doc.GetAllocator());
+
+			currentObj.AddMember(typeKey, typeValue, doc.GetAllocator());
+			currentObj.AddMember(valueStrDecl, valueWrapper, doc.GetAllocator());
+			result.PushBack(currentObj, doc.GetAllocator());
+		}
+
+		return result;
+	}
 
 	// ==================================================================================================================================================================
 	// ==================================================================================================================================================================

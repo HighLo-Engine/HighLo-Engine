@@ -238,6 +238,81 @@ namespace highlo
 	{
 		return false;
 	}
+
+	bool XMLReader::ReadStringArrayMap(const HLString &key, std::unordered_map<HLString, HLString> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadInt32ArrayMap(const HLString &key, std::unordered_map<HLString, int32> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadUInt32ArrayMap(const HLString &key, std::unordered_map<HLString, uint32> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadInt64ArrayMap(const HLString &key, std::unordered_map<HLString, int64> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadUInt64ArrayMap(const HLString &key, std::unordered_map<HLString, uint64> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadBoolArrayMap(const HLString &key, std::unordered_map<HLString, bool> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadFloatArrayMap(const HLString &key, std::unordered_map<HLString, float> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadDoubleArrayMap(const HLString &key, std::unordered_map<HLString, double> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadVec2ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec2> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadVec3ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec3> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadVec4ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec4> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadMat2ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat2> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadMat3ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat3> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadMat4ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat4> &result)
+	{
+		return false;
+	}
+
+	bool XMLReader::ReadQuatArrayMap(const HLString &key, std::unordered_map<HLString, glm::quat> &result)
+	{
+		return false;
+	}
 	
 	bool XMLReader::ReadContents(const FileSystemPath &filePath)
 	{

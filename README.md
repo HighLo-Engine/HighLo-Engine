@@ -2,7 +2,7 @@
   <img src="/HighLo.png" alt="HighLo-Logo" width="1024">
 </p>
 
-[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)
+[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)](https://www.tickgit.com/browse?repo=github.com/HighLo-Engine/HighLo-Engine)
 
 # HighLo-Engine
 

@@ -48,8 +48,13 @@ namespace highlo
 	//	}
 	//	writer->EndArray();
 
-		HLString test = "Hello World!";
-		writer->WriteString("test", test);
+		std::vector<HLString> test = {
+			"Hello",
+			"World",
+			"!"
+		};
+
+		writer->WriteStringArray("test", test);
 
 		bool success = writer->WriteOut();
 		HL_ASSERT(success);
@@ -67,10 +72,10 @@ namespace highlo
 	//		HL_ASSERT(success);
 	//	}
 
-		HLString test = "";
+		std::vector<HLString> test;
 		if (reader->ReadContents())
 		{
-			bool success = reader->ReadString("test", &test);
+			bool success = reader->ReadStringArray("test", test);
 			HL_ASSERT(success);
 		}
 

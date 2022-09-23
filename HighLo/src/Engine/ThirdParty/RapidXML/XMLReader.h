@@ -91,8 +91,17 @@ namespace highlo
 
 	private:
 
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidxml::xml_node<>*)> &insertFunc);
+
+	private:
+
 		FileSystemPath m_FilePath;
-		rapidxml::xml_document<> *m_Document;
+		HLString m_EngineVersion;
+
+		rapidxml::xml_document<> m_Document;
+		rapidxml::xml_node<> *m_RootNode = nullptr;
 	};
 }
 

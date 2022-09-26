@@ -77,3 +77,4 @@ static bool ArrayEquals(T *arr1, uint32 arr1Size, T *arr2, uint32 arr2Size)
 	return true;
 }
 
+#define EXPECT_STRING_EQUALS(str1, str2) EXPECT_EQ(StringEquals(str1, str2), true)

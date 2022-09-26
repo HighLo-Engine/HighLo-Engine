@@ -7,6 +7,8 @@
 #include "Engine/Loaders/DocumentWriter.h"
 #include "Engine/Loaders/DocumentReader.h"
 
+#define SHADER_CACHE_LOG_PREFIX "ShaderCache>  "
+
 namespace highlo
 {
 	static std::map<HLString, uint64> s_ShaderCache;
@@ -37,49 +39,27 @@ namespace highlo
 	void ShaderCache::Serialize(const std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
-		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::XML);
+		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
-	//	writer->BeginArray();
-	//	for (auto &[filePath, hash] : shaderCache)
-	//	{
-	//		writer->BeginObject();
-	//		writer->WriteUInt64(filePath, hash);
-	//		writer->EndObject();
-	//	}
-	//	writer->EndArray();
+		writer->WriteUInt64ArrayMap("shaderCache", shaderCache);
 
-		std::vector<HLString> test = {
-			"Hello",
-			"World",
-			"!"
-		};
-
-		writer->WriteStringArray("test", test);
-
-		bool success = writer->WriteOut();
-		HL_ASSERT(success);
+		bool writeSuccess = writer->WriteOut();
+		HL_ASSERT(writeSuccess);
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
-		Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::XML);
+		Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::Json);
 
-	//	bool readSuccess = reader->ReadContents();
-	//	if (readSuccess)
-	//	{
-	//		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
-	//		HL_ASSERT(success);
-	//	}
-
-		std::vector<HLString> test;
-		if (reader->ReadContents())
+		bool readSuccess = reader->ReadContents();
+		if (readSuccess)
 		{
-			bool success = reader->ReadStringArray("test", test);
-			HL_ASSERT(success);
+			if (!reader->ReadUInt64ArrayMap("shaderCache", shaderCache))
+			{
+				HL_CORE_ERROR(SHADER_CACHE_LOG_PREFIX "[-] Error: Could not read shader cache! [-]");
+			}
 		}
-
-		HL_ASSERT(false);
 	}
 }
 

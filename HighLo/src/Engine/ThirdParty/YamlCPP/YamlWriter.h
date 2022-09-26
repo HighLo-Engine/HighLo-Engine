@@ -9,6 +9,8 @@
 
 #include "Engine/Loaders/DocumentWriter.h"
 
+#include <yaml-cpp/yaml.h>
+
 namespace highlo
 {
 	class YamlWriter : public DocumentWriter
@@ -100,6 +102,7 @@ namespace highlo
 	private:
 
 		FileSystemPath m_FilePath;
+		YAML::Emitter m_Emitter;
 	};
 }
 

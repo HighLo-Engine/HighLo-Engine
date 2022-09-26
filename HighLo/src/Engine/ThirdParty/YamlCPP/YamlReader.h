@@ -9,6 +9,8 @@
 
 #include "Engine/Loaders/DocumentReader.h"
 
+#include <yaml-cpp/yaml.h>
+
 namespace highlo
 {
 	class YamlReader : public DocumentReader
@@ -90,6 +92,7 @@ namespace highlo
 	private:
 
 		FileSystemPath m_FilePath;
+		YAML::Emitter m_Emitter;
 	};
 }
 

@@ -57,7 +57,7 @@ workspace "HighLo"
 	-- check if the command line arguments contain the generateUnitTests flag
 	if _OPTIONS['generate-unit-tests'] == "True" then
 		print('generating the unit tests...')
-		group "tests"
+		group "Tests"
 			include "tests"
 		group ""
 	end

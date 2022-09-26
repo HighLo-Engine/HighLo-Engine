@@ -1,3 +1,10 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
+//
+// version history:
+//     - 1.0 (2022-09-26) initial release
+//
+
 #pragma once
 
 #include <glm/glm.hpp>

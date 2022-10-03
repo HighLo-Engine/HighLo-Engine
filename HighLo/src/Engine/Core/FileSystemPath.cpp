@@ -42,8 +42,7 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator=(const char *str)
 	{
-		HLString s = str;
-		Assign(s);
+		Assign(str);
 		return *this;
 	}
 
@@ -55,6 +54,15 @@ namespace highlo
 
 	void FileSystemPath::Assign(const HLString &source)
 	{
+		// If path is invalid, skip the assignment
+		if (source == "INVALID_PATH" || source.IsEmpty())
+		{
+			m_CurrentAbsolutePath = "";
+			m_CurrentPath = "";
+			std::cout << "Error: Invalid path, skipping FileSystemPath assignment of " << source.C_Str() << std::endl;
+			return;
+		}
+
 		m_CurrentPath = source;
 		if (m_CurrentPath.Contains('\\'))
 			m_CurrentPath = m_CurrentPath.Replace("\\", "/");
@@ -446,21 +454,17 @@ namespace highlo
 	{
 		HLString result;
 		int32 pos = path.FirstIndexOf('/');
-		int32 i = 1;
 
 		while (pos != HLString::NPOS)
 		{
 			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', i);
-			++i;
+			pos = path.FirstIndexOf('/', pos + 1);
 		}
 
-		if (excludeExtension)
+		if (excludeExtension && result.Contains('.'))
 		{
-			if (result.Contains("."))
-			{
-				result = result.Substr(0, result.IndexOf("."));
-			}
+			pos = result.IndexOf('.');
+			result = result.Substr(0, pos);
 		}
 
 		return result;
@@ -470,22 +474,20 @@ namespace highlo
 	{
 		HLString result;
 		int32 pos = path.FirstIndexOf('/');
-		int32 i = 1;
 
 		while (pos != HLString::NPOS)
 		{
 			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', i);
-			++i;
+			pos = path.FirstIndexOf('/', pos + 1);
 		}
 
-		if (!result.Contains("."))
-			return "-1";
+		if (!result.Contains('.'))
+			return path;
 
 		if (excludeDot)
-			result = result.Substr(result.IndexOf(".") + 1);
+			result = result.Substr(result.IndexOf('.') + 1);
 		else
-			result = result.Substr(result.IndexOf("."));
+			result = result.Substr(result.IndexOf('.'));
 
 		return result;
 	}

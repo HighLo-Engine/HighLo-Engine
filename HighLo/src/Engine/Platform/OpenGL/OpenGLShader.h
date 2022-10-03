@@ -77,7 +77,7 @@ namespace highlo
 		HLRendererID m_RendererID = 0;
 		bool m_Loaded = false;
 		bool m_IsCompute = false;
-		FileSystemPath m_AssetPath;
+		FileSystemPath m_AssetPath = "";
 		ShaderLanguage m_Language = ShaderLanguage::None;
 		uint32 m_ConstantBufferOffset = 0;
 

@@ -14,6 +14,7 @@
 #include "Engine/Core/Core.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Defines/BaseTypes.h"
+#include "Engine/Utils/StringUtils.h"
 
 #include <iostream>
 
@@ -29,76 +30,12 @@ namespace highlo
 	using HLString32 = HLStringBase<char32_t>;
 	using HLStringWide = HLStringBase<wchar_t>;
 
-	namespace utils
-	{
-		static char *CopySubStr(const char *str, uint32 pos, uint32 size)
-		{
-			HL_ASSERT(pos < size);
-
-			char *result = new char[size + 1];
-			result[size] = '\0';
-			memcpy(result, str + pos, size);
-
-			return result;
-		}
-
-		static int32 Compare(const char *str1, const char *str2, uint32 size)
-		{
-			return memcmp((const void*)str1, (const void*)str2, (size_t)size);
-		}
-
-		static int32 Compare(const char *str1, uint32 pos1, uint32 size1, const char *str2, uint32 pos2, uint32 size2, uint32 *outLhsSize, uint32 *outRhsSize)
-		{
-			char *str1Copied = utils::CopySubStr(str1, pos1, size1);
-			char *str2Copied = utils::CopySubStr(str2, pos2, size2);
-
-			uint32 str1Len = (uint32)strlen(str1Copied);
-			uint32 str2Len = (uint32)strlen(str2Copied);
-			int32 result = utils::Compare(str1Copied, str2Copied, str1Len <= str2Len ? str1Len : str2Len);
-
-			if (outLhsSize)
-				*outLhsSize = str1Len;
-
-			if (outRhsSize)
-				*outRhsSize = str2Len;
-
-			delete[] str1Copied;
-			delete[] str2Copied;
-
-			return result;
-		}
-
-		HLString32 ToUTF32(const HLString &str);
-		HLString16 ToUTF16(const HLString &str);
-		HLString ToUTF8(const HLString32 &str);
-		HLString ToUTF8(const HLString16 &str);
-
-		template<typename T>
-		static uint32 GetSizeOfUnknownStringType(const T *str)
-		{
-			HL_ASSERT(false, "unknown string type!");
-			return 0;
-		}
-
-		template<>
-		static uint32 GetSizeOfUnknownStringType(const char *str)
-		{
-			return (uint32)strlen(str);
-		}
-
-		template<>
-		static uint32 GetSizeOfUnknownStringType(const wchar_t *str)
-		{
-			return (uint32)wcslen(str);
-		}
-	}
-
 	template<typename StringType>
 	class HLStringBase
 	{
 	private:
 
-		StringType *m_Data = 0;
+		StringType *m_Data = nullptr;
 		StringType m_StaticData[HL_STRING_MAX_STACK_STRING_SIZE] = { 0 };
 		uint32 m_Size = 0;
 
@@ -150,22 +87,16 @@ namespace highlo
 
 		HLAPI HLStringBase(const HLStringBase &other, uint32 start, uint32 end)
 		{
-			Assign(other.C_Str(), end - start, start);
+			Assign(other.C_Str(), end, start);
 		}
 
 		HLAPI HLStringBase(HLStringBase &&other) noexcept
 		{
-			m_Size = other.m_Size;
 			m_Data = other.m_Data;
+			m_Size = other.m_Size;
 
-			// We still need to copy the static data, if there is one
-			if (sizeof(other.m_StaticData) > 0)
-			{
-				for (uint32 i = 0; i < other.m_Size; ++i)
-				{
-					m_StaticData[i] = other.m_StaticData[i];
-				}
-			}
+		//	for (uint32 i = 0; i < m_Size; ++i)
+		//		m_StaticData[i] = other.m_StaticData[i];
 
 			other.m_Size = 0;
 			other.m_Data = nullptr;
@@ -173,37 +104,33 @@ namespace highlo
 
 		HLAPI ~HLStringBase()
 		{
-			delete[] m_Data;
-			m_Data = nullptr;
-			m_Size = 0;
+			Clear();
 		}
 
-		HLAPI HLStringBase &Assign(const StringType *str, uint32 count, uint32 startOffset = 0)
+		HLAPI HLStringBase &Assign(const StringType *str, uint32 size, uint32 startOffset = 0)
 		{
-			// If the size of the string is less than 16, move the data into the stack allocated buffer
-			if ((startOffset < count) && ((count - startOffset) < HL_STRING_MAX_STACK_STRING_SIZE))
-			{
-				m_Size = count - startOffset;
-				
-				for (uint32 i = 0; i < m_Size; ++i)
-				{
-					m_StaticData[i] = str[i + startOffset];
-				}
+			if (size == 0 || startOffset > size)
+				return *this;
 
+			// In either case we need to clear the previous data
+			Clear();
+
+			// If the size of the string is less than 16, move the data into the stack allocated buffer
+			if ((size - startOffset) < HL_STRING_MAX_STACK_STRING_SIZE)
+			{
+				m_Size = size - startOffset;
+				memcpy_s(m_StaticData, HL_STRING_MAX_STACK_STRING_SIZE, str + startOffset, m_Size);
 				m_StaticData[m_Size] = '\0';
+
 				return *this;
 			}
 
-			if (m_Data)
-			{
-				delete[] m_Data;
-				m_Data = nullptr;
-			}
-
-			m_Size = count;
+			m_Size = size - startOffset;
 			m_Data = new StringType[m_Size + 1];
 			m_Data[m_Size] = '\0';
+			
 			memcpy(m_Data, str + startOffset, m_Size);
+
 			return *this;
 		}
 
@@ -221,20 +148,14 @@ namespace highlo
 		{
 			if (this != &other)
 			{
-				m_Size = other.m_Size;
 				m_Data = other.m_Data;
+				m_Size = other.m_Size;
 				
+			//	for (uint32 i = 0; i < m_Size; ++i)
+			//		m_StaticData[i] = other.m_StaticData[i];
+
 				other.m_Size = 0;
 				other.m_Data = nullptr;
-
-				// We still need to copy the static data, if there is one
-				if (sizeof(other.m_StaticData) > 0)
-				{
-					for (uint32 i = 0; i < other.m_Size; ++i)
-					{
-						m_StaticData[i] = other.m_StaticData[i];
-					}
-				}
 			}
 
 			return *this;
@@ -254,6 +175,11 @@ namespace highlo
 
 		HLAPI void Clear()
 		{
+			for (uint32 i = 0; i < m_Size; ++i)
+			{
+				m_StaticData[i] = '\0';
+			}
+
 			delete[] m_Data;
 			m_Data = nullptr;
 			m_Size = 0;
@@ -265,12 +191,21 @@ namespace highlo
 				delete[] m_Data;
 
 			m_Size = size;
-			m_Data = new StringType[size];
+			m_Data = new StringType[size + 1];
+			m_Data[m_Size] = '\0';
 		}
 
 		HLAPI uint32 Length() const
 		{
 			return m_Size;
+		}
+
+		HLAPI StringType *Data()
+		{
+		//	if (m_Size < HL_STRING_MAX_STACK_STRING_SIZE)
+		//		return m_StaticData;
+
+			return m_Data;
 		}
 
 		HLAPI const wchar_t *W_Str() const
@@ -325,10 +260,16 @@ namespace highlo
 				memcpy(new_data, m_Data, m_Size);
 				delete[] m_Data;
 			}
+			else if (m_StaticData)
+			{
+				memcpy(new_data, m_StaticData, m_Size);
+				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					m_StaticData[i] = '\0';
+				}
+			}
 
-			m_Data = new_data;
-			++m_Size;
-
+			Assign(new_data, m_Size + 1);
 			return *this;
 		}
 
@@ -355,15 +296,20 @@ namespace highlo
 				memcpy(new_data, m_Data, m_Size); // copy existing string m_Data
 				delete[] m_Data;
 			}
+			else if (m_StaticData)
+			{
+				memcpy(new_data, m_StaticData, m_Size);
+				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					m_StaticData[i] = '\0';
+				}
+			}
 
 			memcpy((StringType*)(new_data + m_Size), other.m_Data, other.m_Size); // copy appended string m_Data
-			m_Data = new_data;
-			m_Size = new_size;
-
+			Assign(new_data, new_size);
 			return *this;
 		}
 
-		// TODO: add consideration of m_StaticData
 		HLAPI HLStringBase &Remove(const StringType letter)
 		{
 			if (Contains(letter))
@@ -389,16 +335,13 @@ namespace highlo
 						++j;
 					}
 
-					delete[] m_Data;
-					m_Data = new_data;
-					m_Size = new_size;
+					Assign(new_data, new_size);
 				}
 			}
 
 			return *this;
 		}
 
-		// TODO: add consideration of m_StaticData
 		HLAPI HLStringBase &Remove(const HLStringBase &other)
 		{
 			if (Contains(other))
@@ -426,9 +369,7 @@ namespace highlo
 						++j;
 					}
 
-					delete[] m_Data;
-					m_Data = new_data;
-					m_Size = new_size;
+					Assign(new_data, new_size);
 				}
 			}
 
@@ -668,7 +609,6 @@ namespace highlo
 			return result;
 		}
 
-		// TODO: add consideration of m_StaticData
 		HLAPI HLStringBase &Replace(const HLStringBase &find, const HLStringBase &replaceValue, uint32 occurencesToReplace = 0)
 		{
 			// @See https://stackoverflow.com/a/32413923/12873837
@@ -711,10 +651,7 @@ namespace highlo
 					break;
 			}
 
-			delete[] m_Data;
-			m_Size = (uint32)strlen(newString);
-			m_Data = newString;
-
+			Assign(newString, utils::GetSizeOfUnknownStringType<StringType>(newString));
 			return *this;
 		}
 
@@ -731,13 +668,28 @@ namespace highlo
 			return *this;
 		}
 
-		HLAPI HLStringBase Substr(uint32 beginIndex, uint32 endIndex = 0) const
+		HLAPI HLStringBase &Substr(uint32 beginIndex, uint32 endIndex = 0)
 		{
 			if (endIndex == 0)
 				endIndex = m_Size;
 
 			if ((endIndex - beginIndex) > m_Size)
-				return HLStringBase("-1");
+			{
+				std::cout << "Error: " << endIndex - beginIndex << " was larger than " << m_Size << std::endl;
+				return *this;
+			}
+
+			HLStringBase str = SelectDataSource(m_Size);
+			return Assign(str, endIndex, beginIndex);
+		}
+
+		HLAPI const HLStringBase Substr(uint32 beginIndex, uint32 endIndex = 0) const
+		{
+			if (endIndex == 0)
+				endIndex = m_Size;
+
+			if ((endIndex - beginIndex) > m_Size)
+				return *this;
 
 			return HLStringBase(*this, beginIndex, endIndex);
 		}
@@ -940,7 +892,7 @@ namespace highlo
 			uint32 rhsSize = other.Length();
 			const StringType *source = C_Str();
 
-			int32 result = utils::Compare(source, other.C_Str(), lhsSize <= rhsSize ? lhsSize : rhsSize);
+			int32 result = utils::Compare<StringType>(source, other.C_Str(), lhsSize <= rhsSize ? lhsSize : rhsSize);
 
 			if (result != 0)
 				return result;
@@ -966,7 +918,7 @@ namespace highlo
 
 			uint32 newLhsSize;
 			uint32 newRhsSize;
-			int32 result = utils::Compare(source, pos1, lhsSize, other.C_Str(), pos2, rhsSize, &newLhsSize, &newRhsSize);
+			int32 result = utils::Compare<StringType>(source, pos1, lhsSize, other.C_Str(), pos2, rhsSize, &newLhsSize, &newRhsSize);
 
 			if (result != 0)
 				return result;
@@ -1216,18 +1168,6 @@ namespace highlo
 		HLString32 ToUTF32() const
 		{
 			return utils::ToUTF32(*this);
-		}
-
-	private:
-
-		uint16 Pack(unsigned char letter, uint16 encoding = 8)
-		{
-			return (uint16)letter << encoding;
-		}
-
-		unsigned char Unpack(uint16 letter, uint16 encoding = 8)
-		{
-			return (unsigned char)letter >> encoding;
 		}
 	};
 }

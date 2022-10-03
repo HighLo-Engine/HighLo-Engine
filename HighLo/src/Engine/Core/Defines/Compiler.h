@@ -29,7 +29,7 @@
 #define HL_DEPRECATED __declspec(deprecated)
 
 #ifdef HL_DEBUG
-	#define HL_DEBUG_BREAK __debugbreak();
+	#define HL_DEBUG_BREAK __debugbreak()
 #else
 	#define HL_DEBUG_BREAK
 #endif

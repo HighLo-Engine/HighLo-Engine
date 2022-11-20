@@ -43,18 +43,41 @@ namespace highlo
 		HLAPI virtual void BeginFrame() = 0;
 		HLAPI virtual void EndFrame() = 0;
 
-		HLAPI virtual void BeginRenderPass(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear = false) = 0;
+		HLAPI virtual void BeginRenderPass(
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<RenderPass> &renderPass, 
+			bool shouldClear = false) = 0;
+		
 		HLAPI virtual void EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer) = 0;
 
 		HLAPI virtual void ClearScreenColor(const glm::vec4 &color) = 0;
 		HLAPI virtual void ClearScreenBuffers() = 0;
 
 		HLAPI virtual void DrawIndexed(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Triangles) = 0;
-		HLAPI virtual void DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type = PrimitiveType::Triangles, bool depthTest = true, const glm::mat4 &localTransform = glm::mat4(1.0f)) = 0;
-		HLAPI virtual void DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type = PrimitiveType::Triangles) = 0;
-		HLAPI virtual void DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Patch) = 0;
+		HLAPI virtual void DrawIndexed(
+			uint32 indexCount, 
+			Ref<Material> &material, 
+			Ref<UniformBufferSet> &uniformBufferSet, 
+			PrimitiveType type = PrimitiveType::Triangles, 
+			bool depthTest = true, 
+			const glm::mat4 &localTransform = glm::mat4(1.0f)) = 0;
+		
+		HLAPI virtual void DrawInstanced(
+			Ref<VertexArray> &va, 
+			uint32 count, 
+			PrimitiveType type = PrimitiveType::Triangles) = 0;
+		
+		HLAPI virtual void DrawIndexedControlPointPatchList(
+			Ref<VertexArray> &va, 
+			PrimitiveType type = PrimitiveType::Patch) = 0;
 
-		HLAPI virtual void DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform = glm::mat4(1.0f)) = 0;
+		HLAPI virtual void DrawFullscreenQuad(
+			Ref<CommandBuffer> &renderCommandBuffer,
+			Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<Material> &material,
+			const glm::mat4 &transform = glm::mat4(1.0f)) = 0;
 
 		HLAPI virtual void DrawStaticMesh(
 			Ref<CommandBuffer> renderCommandBuffer,
@@ -133,7 +156,11 @@ namespace highlo
 		HLAPI virtual void SetDepthTest(bool bEnabled) = 0;
 		HLAPI virtual void SetLineThickness(float thickness) = 0;
 
-		HLAPI virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) = 0;
+		HLAPI virtual Ref<Environment> CreateEnvironment(
+			const FileSystemPath &filePath,
+			uint32 cubemapSize = 2048,
+			uint32 irradianceMapSize = 32) = 0;
+
 		HLAPI virtual Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination) = 0;
 	};
 }

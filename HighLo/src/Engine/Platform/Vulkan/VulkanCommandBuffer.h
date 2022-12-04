@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/CommandBuffer.h"
 
 #include "Vulkan.h"
@@ -40,4 +42,6 @@ namespace highlo
 		std::vector<PipelineStatistics> m_PipelineStatisticsQueryResults;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

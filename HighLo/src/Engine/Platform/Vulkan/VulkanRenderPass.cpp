@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanRenderPass.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
     VulkanRenderPass::VulkanRenderPass(const RenderPassSpecification &spec)
@@ -14,4 +16,6 @@ namespace highlo
     {
     }
 }
+
+#endif // HIGHLO_API_VULKAN
 

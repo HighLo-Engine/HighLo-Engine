@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/Material.h"
 
 #include "Vulkan.h"
@@ -157,4 +159,6 @@ namespace highlo
 		std::map<uint32, Ref<Texture2D>> m_Texture2Ds;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

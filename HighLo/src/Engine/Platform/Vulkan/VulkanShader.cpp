@@ -3,23 +3,48 @@
 #include "HighLoPch.h"
 #include "VulkanShader.h"
 
+#ifdef HIGHLO_API_VULKAN
+
+#include "Engine/Core/FileSystem.h"
+#include "Engine/Renderer/Renderer.h"
+
+#define VULKAN_SHADER_LOG_PREFIX "Shader>       "
+
 namespace highlo
 {
     VulkanShader::VulkanShader(const FileSystemPath &filePath, bool forceCompile)
         : m_AssetPath(filePath)
     {
+        m_Name = m_AssetPath.Filename();
+        m_Language = ShaderLanguage::None; // TODO
+        HLString source = FileSystem::Get()->ReadTextFile(filePath);
+        Load(source, forceCompile);
     }
 
     VulkanShader::VulkanShader(const HLString &source, const HLString &name, ShaderLanguage language)
     {
+        m_Name = name;
+        m_Language = language;
+        Load(source, true);
     }
     
     VulkanShader::~VulkanShader()
     {
+        Release();
     }
     
     void VulkanShader::Reload(bool forceCompile)
     {
+        HL_CORE_INFO(VULKAN_SHADER_LOG_PREFIX "[+] Reloading shader {0}... [+]", **m_AssetPath);
+        m_Loaded = false; // Reflect current stage: Shader is being reloaded
+
+        HLString source = FileSystem::Get()->ReadTextFile(m_AssetPath);
+        Load(source, forceCompile);
+
+        Renderer::OnShaderReloaded(GetHash());
+
+        for (ShaderReloadedCallback callback : m_ReloadedCallbacks)
+            callback();
     }
     
     void VulkanShader::Release()
@@ -33,20 +58,22 @@ namespace highlo
     
     void VulkanShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
     {
+        m_ReloadedCallbacks.push_back(callback);
     }
     
     const std::unordered_map<HLString, ShaderBuffer> &VulkanShader::GetShaderBuffers() const
     {
-        return {};
+        return m_Buffers;
     }
     
     const std::unordered_map<HLString, ShaderResourceDeclaration> &VulkanShader::GetResources() const
     {
-        return {};
+        return m_Resources;
     }
     
     void VulkanShader::SetMacro(const HLString &name, const HLString &value)
     {
+        m_Macros[name] = value;
     }
 
     // VULKAN-SPECIFIC FUNCS
@@ -126,4 +153,6 @@ namespace highlo
     {
     }
 }
+
+#endif // HIGHLO_API_VULKAN
 

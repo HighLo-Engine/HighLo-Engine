@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/VertexArray.h"
 
 #include "Vulkan.h"
@@ -41,4 +43,6 @@ namespace highlo
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

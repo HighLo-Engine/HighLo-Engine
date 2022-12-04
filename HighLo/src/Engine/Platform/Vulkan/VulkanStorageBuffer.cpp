@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanStorageBuffer.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
 	VulkanStorageBuffer::VulkanStorageBuffer(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout)
@@ -22,4 +24,6 @@ namespace highlo
 	{
 	}
 }
+
+#endif // HIGHLO_API_VULKAN
 

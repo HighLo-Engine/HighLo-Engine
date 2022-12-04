@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanSwapChain.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
 	VulkanSwapChain::VulkanSwapChain()
@@ -45,4 +47,6 @@ namespace highlo
 	{
 	}
 }
+
+#endif // HIGHLO_API_VULKAN
 

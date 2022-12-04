@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/RenderingAPI.h"
 
 #include "Vulkan.h"
@@ -158,4 +160,6 @@ namespace highlo
 		static int32 &GetSelectedDrawCall();
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

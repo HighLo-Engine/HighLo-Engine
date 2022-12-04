@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanVertexBuffer.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
     VulkanVertexBuffer::VulkanVertexBuffer(void *data, uint32 size, VertexBufferUsage usage)
@@ -23,4 +25,6 @@ namespace highlo
     {
     }
 }
+
+#endif // HIGHLO_API_VULKAN
 

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/Texture3D.h"
 
 #include "Vulkan.h"
@@ -45,7 +47,7 @@ namespace highlo
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
 		virtual void GenerateMips(bool readonly = false) override;
-		virtual float GetAspectRatio() const override { return m_Specification.Width / m_Specification.Height; }
+		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
 
 		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
 
@@ -58,4 +60,6 @@ namespace highlo
 		Allocator m_LocalData;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

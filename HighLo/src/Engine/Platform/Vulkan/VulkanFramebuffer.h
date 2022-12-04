@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/Framebuffer.h"
 
 #include "Vulkan.h"
@@ -38,7 +40,7 @@ namespace highlo
 
 		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
 
-		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { HL_ASSERT(attachmentIndex > 0); return m_ColorAttachments[attachmentIndex]; }
+		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { HL_ASSERT(attachmentIndex >= 0); return m_ColorAttachments[attachmentIndex]; }
 		virtual Ref<Texture> GetDepthImage() const override { return m_DepthAttachment; }
 
 		virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
@@ -61,4 +63,6 @@ namespace highlo
 		std::vector<std::function<void(Ref<Framebuffer>)>> m_ResizeCallbacks;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

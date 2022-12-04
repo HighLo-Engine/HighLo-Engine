@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanVertexArray.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
     VulkanVertexArray::VulkanVertexArray(const VertexArraySpecification &spec)
@@ -29,4 +31,6 @@ namespace highlo
         m_IndexBuffer = indexBuffer;
     }
 }
+
+#endif // HIGHLO_API_VULKAN
 

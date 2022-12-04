@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanIndexBuffer.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
 	VulkanIndexBuffer::VulkanIndexBuffer(std::vector<int32> &indices)
@@ -35,4 +37,6 @@ namespace highlo
 
 	}
 }
+
+#endif // HIGHLO_API_VULKAN
 

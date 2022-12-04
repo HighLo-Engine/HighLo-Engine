@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/Shaders/UniformBuffer.h"
 
 #include "Vulkan.h"
@@ -30,4 +32,6 @@ namespace highlo
 
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

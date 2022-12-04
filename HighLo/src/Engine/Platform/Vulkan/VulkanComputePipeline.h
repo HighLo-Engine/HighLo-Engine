@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/ComputePipeline.h"
 
 #include "Vulkan.h"
@@ -32,4 +34,6 @@ namespace highlo
 		Ref<Shader> m_Shader = nullptr;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

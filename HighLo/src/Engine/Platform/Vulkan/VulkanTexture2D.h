@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/Texture2D.h"
 
 #include "Vulkan.h"
@@ -95,4 +97,6 @@ namespace highlo
 		std::map<uint32, VkImageView> m_PerMipImageViews;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

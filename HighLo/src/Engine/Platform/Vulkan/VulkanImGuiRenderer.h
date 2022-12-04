@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/ImGui/ImGuiRenderer.h"
 
 #include "Vulkan.h"
@@ -29,4 +31,6 @@ namespace highlo
 		virtual void RenderDrawData() override;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

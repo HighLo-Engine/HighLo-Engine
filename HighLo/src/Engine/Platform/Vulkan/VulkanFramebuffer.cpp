@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanFrameBuffer.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
 	VulkanFramebuffer::VulkanFramebuffer(const FramebufferSpecification &spec)
@@ -43,4 +45,6 @@ namespace highlo
 		return 0;
 	}
 }
+
+#endif // HIGHLO_API_VULKAN
 

@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanImGuiRenderer.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "VulkanUtils.h"
 #include "VulkanContext.h"
 #include "VulkanSwapChain.h"
@@ -190,4 +192,6 @@ namespace highlo
 #endif
     }
 }
+
+#endif // HIGHLO_API_VULKAN
 

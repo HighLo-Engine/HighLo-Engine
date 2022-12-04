@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/RenderPass.h"
 
 #include "Vulkan.h"
@@ -28,4 +30,6 @@ namespace highlo
 		RenderPassSpecification m_Specification;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

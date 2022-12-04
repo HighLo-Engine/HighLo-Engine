@@ -70,15 +70,15 @@ namespace highlo
 		{
 			switch (format)
 			{
-				case TextureFormat::RED16UI: return width * height * sizeof(uint16);
-				case TextureFormat::RG16F: return width * height * 2 * sizeof(uint16);
-				case TextureFormat::RG32F: return width * height * 2 * sizeof(float);
-				case TextureFormat::RED32F: return width * height * sizeof(float);
-				case TextureFormat::RED8UN: return width * height;
-				case TextureFormat::RED8UI: return width * height;
-				case TextureFormat::RGBA: return width * height * 4;
-				case TextureFormat::RGBA32F: return width * height * 4 * sizeof(float);
-				case TextureFormat::B10R11G11UF: return width * height * sizeof(float);
+				case TextureFormat::RED16UI:		return width * height * sizeof(uint16);
+				case TextureFormat::RG16F:			return width * height * 2 * sizeof(uint16);
+				case TextureFormat::RG32F:			return width * height * 2 * sizeof(float);
+				case TextureFormat::RED32F:			return width * height * sizeof(float);
+				case TextureFormat::RED8UN:			return width * height;
+				case TextureFormat::RED8UI:			return width * height;
+				case TextureFormat::RGBA:			return width * height * 4;
+				case TextureFormat::RGBA32F:		return width * height * 4 * sizeof(float);
+				case TextureFormat::B10R11G11UF:	return width * height * sizeof(float);
 			}
 
 			HL_ASSERT(false);

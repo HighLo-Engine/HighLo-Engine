@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/IndexBuffer.h"
 #include "Engine/Core/Allocator.h"
 
@@ -41,4 +43,6 @@ namespace highlo
 		uint32 m_Count = 0;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

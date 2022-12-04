@@ -49,6 +49,26 @@ namespace highlo
 
 			return result;
 		}
+
+		static HLString BytesToString(uint64 bytes)
+		{
+			constexpr uint64 GB = 1024 * 1024 * 1024;
+			constexpr uint64 MB = 1024 * 1024;
+			constexpr uint64 KB = 1024;
+
+			char buffer[32];
+
+			if (bytes > GB)
+				sprintf_s(buffer, "%.2f GB", (float)bytes / (float)GB);
+			else if (bytes > MB)
+				sprintf_s(buffer, "%.2f MB", (float)bytes / (float)MB);
+			else if (bytes > KB)
+				sprintf_s(buffer, "%.2f KB", (float)bytes / (float)KB);
+			else
+				sprintf_s(buffer, "%.2f bytes", (float)bytes);
+
+			return HLString(buffer);
+		}
 	}
 }
 

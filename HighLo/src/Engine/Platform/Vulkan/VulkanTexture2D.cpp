@@ -3,10 +3,46 @@
 #include "HighLoPch.h"
 #include "VulkanTexture2D.h"
 
+#include <stb_image.h>
+
+#ifdef HIGHLO_API_VULKAN
+
+#include "Engine/Utils/ImageUtils.h"
+
 namespace highlo
 {
-	VulkanTexture2D::VulkanTexture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+	namespace utils
 	{
+		static VkSamplerAddressMode VulkanSamplerWrap(TextureWrap wrap)
+		{
+			switch (wrap)
+			{
+				case TextureWrap::Clamp:   return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+				case TextureWrap::Repeat:  return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			}
+
+			HL_ASSERT(false, "Unknown wrap mode");
+			return (VkSamplerAddressMode)0;
+		}
+
+		static VkFilter VulkanSamplerFilter(TextureFilter filter)
+		{
+			switch (filter)
+			{
+				case TextureFilter::Linear:   return VK_FILTER_LINEAR;
+				case TextureFilter::Nearest:  return VK_FILTER_NEAREST;
+				case TextureFilter::Cubic:   return VK_FILTER_CUBIC_IMG;
+			}
+
+			HL_ASSERT(false, "Unknown filter");
+			return (VkFilter)0;
+		}
+	}
+
+	VulkanTexture2D::VulkanTexture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+		: m_FilePath(filePath)
+	{
+		
 	}
 
 	VulkanTexture2D::VulkanTexture2D(const glm::vec3 &rgb, TextureFormat format)
@@ -127,4 +163,6 @@ namespace highlo
 		return view;
 	}
 }
+
+#endif // HIGHLO_API_VULKAN
 

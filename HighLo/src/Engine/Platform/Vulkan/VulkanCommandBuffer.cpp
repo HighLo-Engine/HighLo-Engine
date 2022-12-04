@@ -3,6 +3,8 @@
 #include "HighLoPch.h"
 #include "VulkanCommandBuffer.h"
 
+#ifdef HIGHLO_API_VULKAN
+
 namespace highlo
 {
 	VulkanCommandBuffer::VulkanCommandBuffer(uint32 count, const HLString &debugName)
@@ -50,4 +52,6 @@ namespace highlo
 		return m_PipelineStatisticsQueryResults[frameIndex];
 	}
 }
+
+#endif // HIGHLO_API_VULKAN
 

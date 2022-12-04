@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/SwapChain.h"
 
 #include "Vulkan.h"
@@ -44,4 +46,6 @@ namespace highlo
 		uint32 m_ImageCount = 0;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Vulkan.h"
 
 namespace highlo
@@ -18,4 +20,6 @@ namespace highlo
 
 	void SetVulkanCheckpoint(VkCommandBuffer commandBuffer, const HLString &data);
 }
+
+#endif // HIGHLO_API_VULKAN
 

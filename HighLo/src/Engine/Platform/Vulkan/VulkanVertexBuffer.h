@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/VertexBuffer.h"
 
 #include "Vulkan.h"
@@ -35,4 +37,6 @@ namespace highlo
 		HLRendererID m_RendererID = 0;
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

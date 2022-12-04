@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HIGHLO_API_VULKAN
+
 #include "Engine/Graphics/Shaders/StorageBuffer.h"
 
 #include "Vulkan.h"
@@ -31,4 +33,6 @@ namespace highlo
 
 	};
 }
+
+#endif // HIGHLO_API_VULKAN
 

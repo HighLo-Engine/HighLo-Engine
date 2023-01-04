@@ -48,11 +48,11 @@ namespace highlo
 		{
 			switch (format)
 			{
-			case TextureFormat::DEPTH32F:
-				return GL_DEPTH_ATTACHMENT;
+				case TextureFormat::DEPTH32F:
+					return GL_DEPTH_ATTACHMENT;
 
-			case TextureFormat::DEPTH24STENCIL8:
-				return GL_DEPTH_STENCIL_ATTACHMENT;
+				case TextureFormat::DEPTH24STENCIL8:
+					return GL_DEPTH_STENCIL_ATTACHMENT;
 			}
 			HL_ASSERT(false, "Unknown format");
 			return 0;

@@ -276,20 +276,21 @@ namespace highlo
 			m_CommandBuffer->Begin();
 
 			// Geometry pass
-			Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryRenderPass);
-			Renderer::EndRenderPass(m_CommandBuffer);
+		//	Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryRenderPass);
+		//	Renderer::EndRenderPass(m_CommandBuffer);
 
 			// Composite pass
 			Renderer::BeginRenderPass(m_CommandBuffer, m_FinalCompositeRenderPass, true);
 
-			auto &geometryFramebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+		//	auto &geometryFramebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+			auto &externalFramebuffer = m_ExternalVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
 			float cameraExposure = m_SceneData.SceneCamera.GetExposure();
-			int32 textureSamples = geometryFramebuffer->GetSpecification().Samples;
+		//	int32 textureSamples = geometryFramebuffer->GetSpecification().Samples;
 
-			m_CompositeMaterial->Set("u_Uniforms.Exposure", cameraExposure);
-			m_CompositeMaterial->Set("u_Texture", geometryFramebuffer->GetImage().As<Texture2D>());
+		//	m_CompositeMaterial->Set("u_Uniforms.Exposure", cameraExposure);
+			m_CompositeMaterial->Set("u_Texture", externalFramebuffer->GetImage().As<Texture2D>());
 
-		//	Renderer::RenderFullscreenQuad(m_CommandBuffer, m_FinalVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
+			Renderer::RenderFullscreenQuad(m_CommandBuffer, m_FinalVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
 			Renderer::EndRenderPass(m_CommandBuffer);
 
 			m_CommandBuffer->End();

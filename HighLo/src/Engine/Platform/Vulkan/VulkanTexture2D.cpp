@@ -29,9 +29,9 @@ namespace highlo
 		{
 			switch (filter)
 			{
-				case TextureFilter::Linear:   return VK_FILTER_LINEAR;
-				case TextureFilter::Nearest:  return VK_FILTER_NEAREST;
-				case TextureFilter::Cubic:   return VK_FILTER_CUBIC_IMG;
+				case TextureFilter::Linear:		return VK_FILTER_LINEAR;
+				case TextureFilter::Nearest:	return VK_FILTER_NEAREST;
+				case TextureFilter::Cubic:		return VK_FILTER_CUBIC_IMG;
 			}
 
 			HL_ASSERT(false, "Unknown filter");

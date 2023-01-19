@@ -24,7 +24,7 @@ cd HighLo-Engine
 
 ```sh
 # generate the solution files for mac or the makefiles for linux or the visual studio solution files for windows
-python scripts/GenerateEngine.py
+python Scripts/GenerateEngine.py
 ```
 
 # Building the engine

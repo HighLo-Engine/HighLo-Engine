@@ -495,6 +495,7 @@ namespace highlo
 	HLString FileSystemPath::ExtractFolderNameFromPath(const HLString &path)
 	{
 		HLString result = path;
+		uint32 tmp = result.LastIndexOf('/') + 1;
 		if (result.EndsWith('/'))
 			result = result.Substr(0, result.LastIndexOf('/'));
 

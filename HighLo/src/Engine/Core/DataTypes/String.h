@@ -175,10 +175,7 @@ namespace highlo
 
 		HLAPI void Clear()
 		{
-			for (uint32 i = 0; i < m_Size; ++i)
-			{
-				m_StaticData[i] = '\0';
-			}
+			memset(m_StaticData, 0, m_Size);
 
 			delete[] m_Data;
 			m_Data = nullptr;
@@ -263,14 +260,9 @@ namespace highlo
 			else if (m_StaticData)
 			{
 				memcpy(new_data, m_StaticData, m_Size);
-				for (uint32 i = 0; i < m_Size; ++i)
-				{
-					m_StaticData[i] = '\0';
-				}
 			}
 
-			Assign(new_data, m_Size + 1);
-			return *this;
+			return Assign(new_data, m_Size + 1);
 		}
 
 		HLAPI HLStringBase &Append(const HLStringBase &other)
@@ -299,15 +291,10 @@ namespace highlo
 			else if (m_StaticData)
 			{
 				memcpy(new_data, m_StaticData, m_Size);
-				for (uint32 i = 0; i < m_Size; ++i)
-				{
-					m_StaticData[i] = '\0';
-				}
 			}
 
 			memcpy((StringType*)(new_data + m_Size), other.m_Data, other.m_Size); // copy appended string m_Data
-			Assign(new_data, new_size);
-			return *this;
+			return Assign(new_data, new_size);
 		}
 
 		HLAPI HLStringBase &Remove(const StringType letter)
@@ -679,8 +666,8 @@ namespace highlo
 				return *this;
 			}
 
-			HLStringBase str = SelectDataSource(m_Size);
-			return Assign(str, endIndex, beginIndex);
+			StringType *str = SelectDataSource(m_Size);
+			return Assign(str, m_Size, beginIndex);
 		}
 
 		HLAPI const HLStringBase Substr(uint32 beginIndex, uint32 endIndex = 0) const
@@ -691,7 +678,7 @@ namespace highlo
 			if ((endIndex - beginIndex) > m_Size)
 				return *this;
 
-			return HLStringBase(*this, beginIndex, endIndex);
+			return HLStringBase(*this, m_Size, endIndex);
 		}
 
 		HLAPI const HLStringBase &ToLowerCase()

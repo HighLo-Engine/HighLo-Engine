@@ -1,4 +1,4 @@
-project "HighLo-C#"
+project "HighLo-CSharp"
 	kind "SharedLib"
 	language "C#"
 	dotnetframework "4.7.2"

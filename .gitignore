@@ -1,7 +1,7 @@
 # Directories
 .vs/
 .vscode/
-scripts/__pycache__/
+Scripts/__pycache__/
 Debug-windows-x86_64/
 Release-windows-x86_64/
 Dist-windows-x86_64/
@@ -33,3 +33,4 @@ HighLoEdit/Resources/Scripts/**.pdb
 lfs/
 hooks/
 __pycache__/
+

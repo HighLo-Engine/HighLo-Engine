@@ -58,7 +58,7 @@ workspace "HighLo"
 	if _OPTIONS['generate-unit-tests'] == "True" then
 		print('generating the unit tests...')
 		group "Tests"
-			include "tests"
+			include "Tests"
 		group ""
 	end
 	

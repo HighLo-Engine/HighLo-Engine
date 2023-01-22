@@ -13,39 +13,67 @@
 
 namespace highlo
 {
+	template<typename T>
+	class HLStringBase;
+
+	using HLString = HLStringBase<char>;
+	using HLString16 = HLStringBase<char16_t>;
+	using HLString32 = HLStringBase<char32_t>;
+	using HLStringWide = HLStringBase<wchar_t>;
+
 	namespace utils
 	{
-		static bool NextLine(int32 index, const std::vector<int32> &lines)
-		{
-			for (int32 line : lines)
-			{
-				if (line == index)
-					return true;
-			}
+		bool NextLine(int32 index, const std::vector<int32> &lines);
+		HLString FillWithLeading(HLString &str, const HLString &leadingCharacter, uint32 count = 1);
 
-			return false;
-		}
-
-		static HLString FillWithLeading(HLString &str, const HLString &leadingCharacter, uint32 count = 1)
-		{
-			HLString leadingString = "";
-			for (uint32 i = 0; i < count; ++i)
-			{
-				leadingString += leadingCharacter;
-			}
-
-			str = leadingString + str;
-			return str;
-		}
-
-		template<typename toType, typename fromType>
-		static toType LexicalCast(fromType const &x)
+		template<typename ToType, typename FromType>
+		static ToType LexicalCast(FromType const &x)
 		{
 			std::stringstream os;
-			toType result;
+			ToType result;
 
 			os << x;
 			os >> result;
+
+			return result;
+		}
+
+		template<typename StringType>
+		static StringType *CopySubStr(const StringType *str, uint32 pos, uint32 size)
+		{
+			HL_ASSERT(pos < size);
+
+			StringType *result = new StringType[size + 1];
+			result[size] = '\0';
+			memcpy(result, str + pos, size);
+
+			return result;
+		}
+
+		template<typename StringType>
+		static int32 Compare(const StringType *str1, const StringType *str2, uint32 size)
+		{
+			return memcmp((const void *)str1, (const void *)str2, (size_t)size);
+		}
+
+		template<typename StringType>
+		static int32 Compare(const StringType *str1, uint32 pos1, uint32 size1, const StringType *str2, uint32 pos2, uint32 size2, uint32 *outLhsSize, uint32 *outRhsSize)
+		{
+			StringType *str1Copied = utils::CopySubStr<StringType>(str1, pos1, size1);
+			StringType *str2Copied = utils::CopySubStr<StringType>(str2, pos2, size2);
+
+			uint32 str1Len = utils::GetSizeOfUnknownStringType<StringType>(str1Copied);
+			uint32 str2Len = utils::GetSizeOfUnknownStringType<StringType>(str2Copied);
+			int32 result = utils::Compare<StringType>(str1Copied, str2Copied, str1Len <= str2Len ? str1Len : str2Len);
+
+			if (outLhsSize)
+				*outLhsSize = str1Len;
+
+			if (outRhsSize)
+				*outRhsSize = str2Len;
+
+			delete[] str1Copied;
+			delete[] str2Copied;
 
 			return result;
 		}

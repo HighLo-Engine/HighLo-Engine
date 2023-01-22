@@ -20,6 +20,7 @@
 #include "Engine/Threading/ThreadRegistry.h"
 #include "Engine/Loaders/AssetImporter.h"
 #include "Engine/Scripting/ScriptEngine.h"
+#include "Engine/Core/FileSystem.h"
 
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&highlo::HLApplication::fn, this, std::placeholders::_1)
 
@@ -138,6 +139,13 @@ namespace highlo
 
 		Logger::Init();
 
+		if (!m_Settings.WorkingDirectory.IsEmpty())
+		{
+			FileSystem::Get()->SetCurrentWorkingDirectory(m_Settings.WorkingDirectory);
+		}
+
+		HL_CORE_TRACE("CWD: {0}", FileSystem::Get()->GetCurrentWorkingDirectory().String().C_Str());
+
 		// Create cache for sin() and cos()
 		Math::CreateCacheSin();
 		Math::CreateCacheCos();
@@ -182,7 +190,9 @@ namespace highlo
 		Service::Sort();
 
 		Translations::Init();
-		ScriptEngine::Init();
+
+		ScriptEngineConfig scriptConfig;
+		ScriptEngine::Init(&scriptConfig);
 
 		m_RenderDebugPanel = UniqueRef<RenderDebugPanel>::Create();
 

@@ -58,6 +58,14 @@ project "HighLo"
 		"%{LibDir.vulkan_sdk_utils}",
 		"%{LibDir.dxc}",
     }
+	
+	if projectDir ~= "False" then
+		debugargs
+		{
+			"--project-path",
+			"%{projectDir}",
+		}
+	end
 
     defines
 	{

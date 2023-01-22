@@ -1,3 +1,5 @@
+// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+
 #include "HighLoPch.h"
 #include "String.h"
 
@@ -22,15 +24,14 @@ namespace highlo::utils
 	HLString ToUTF8(const HLString32 &str)
 	{
 		std::wstring_convert<std::codecvt_utf8<int32>, int32> conv;
-		const int32 *p = reinterpret_cast<const int32 *>(*str);
+		const int32 *p = reinterpret_cast<const int32*>(*str);
 		return conv.to_bytes(p, p + str.Length());
 	}
 
 	HLString ToUTF8(const HLString16 &str)
 	{
 		std::wstring_convert<std::codecvt_utf8<int16>, int16> conv;
-		const int16 *p = reinterpret_cast<const int16 *>(*str);
+		const int16 *p = reinterpret_cast<const int16*>(*str);
 		return conv.to_bytes(p, p + str.Length());
 	}
 }
-

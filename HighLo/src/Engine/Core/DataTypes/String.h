@@ -17,6 +17,7 @@
 #include <iostream>
 
 #define HASH_LENGTH 20
+#define HL_STRING_MAX_STRING_SIZE 16
 
 namespace highlo
 {
@@ -26,6 +27,7 @@ namespace highlo
 	using HLString = HLStringBase<char>;
 	using HLString16 = HLStringBase<char16_t>;
 	using HLString32 = HLStringBase<char32_t>;
+	using HLStringWide = HLStringBase<wchar_t>;
 
 	namespace utils
 	{
@@ -66,6 +68,25 @@ namespace highlo
 			return result;
 		}
 
+		template<typename T>
+		static uint32 GetSizeOfUnknownStringType(const T *str)
+		{
+			HL_ASSERT(false, "unknown string type!");
+			return 0;
+		}
+
+		template<>
+		static uint32 GetSizeOfUnknownStringType(const char *str)
+		{
+			return (uint32)strlen(str);
+		}
+
+		template<>
+		static uint32 GetSizeOfUnknownStringType(const wchar_t *str)
+		{
+			return (uint32)wcslen(str);
+		}
+
 		HLString32 ToUTF32(const HLString &str);
 		HLString16 ToUTF16(const HLString &str);
 		HLString ToUTF8(const HLString32 &str);
@@ -79,99 +100,169 @@ namespace highlo
 
 		static const uint32 NPOS = static_cast<uint32>(-1);
 
-		HLAPI HLStringBase() = default;
+		HLAPI HLStringBase()
+		{
+			Assign("", 0);
+		}
 
 		HLAPI HLStringBase(const StringType *data)
 		{
-			m_Size = (uint32)strlen((const char*)data);
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, data, m_Size);
+			uint32 size = utils::GetSizeOfUnknownStringType<StringType>(data);
+			Assign(data, size);
 		}
 
 		HLAPI HLStringBase(const StringType *data, uint32 length)
 		{
-			m_Size = length;
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, data, m_Size);
-		}
-
-		HLAPI HLStringBase(const wchar_t *data)
-		{
-			m_Size = (uint32)wcslen(data);
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, data, m_Size);
+			Assign(data, length);
 		}
 
 		HLAPI HLStringBase(const std::string &str)
 		{
-			m_Size = (uint32)strlen(str.c_str());
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, str.c_str(), m_Size);
+			Assign(str.c_str(), (uint32)str.size());
 		}
 
 		HLAPI HLStringBase(const std::wstring &wideStr)
 		{
-			m_Size = (uint32) wcslen(wideStr.c_str());
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, wideStr.c_str(), m_Size);
+			Assign(wideStr.c_str(), (uint32)wideStr.size());
 		}
 
 		HLAPI HLStringBase(const HLStringBase &other)
 		{
-			m_Size = other.m_Size;
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, other.m_Data, m_Size);
+			Assign(other.C_Str(), other.Length());
 		}
 
 		HLAPI HLStringBase(const HLStringBase &other, uint32 length)
 		{
-			m_Size = length;
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, other.m_Data, m_Size);
+			Assign(other.C_Str(), length);
 		}
 
 		HLAPI HLStringBase(const HLStringBase &other, uint32 start, uint32 end)
 		{
-			m_Size = end - start;
-			m_Data = new StringType[m_Size + 1];
-			m_Data[m_Size] = '\0';
-			memcpy(m_Data, &other.m_Data[start], m_Size);
+			Assign(other.C_Str(), end, start);
 		}
 
 		HLAPI HLStringBase(HLStringBase &&other) noexcept
 		{
-			m_Size = other.m_Size;
-			m_Data = other.m_Data;
+			m_DataPointer = other.m_DataPointer;
+			m_UsingShortStr = other.m_UsingShortStr;
 
-			other.m_Size = 0;
-			other.m_Data = nullptr;
+			// TODO: potentially leaking memory here
+			other.m_DataPointer = nullptr;
+			other.m_UsingShortStr = true; // Restore default
 		}
 
 		HLAPI ~HLStringBase()
 		{
-			delete[] m_Data;
-			m_Data = nullptr;
-			m_Size = 0;
+			if (!m_UsingShortStr)
+			{
+				LongStringData *data = (LongStringData*)m_DataPointer;
+				delete[] data->Data;
+				data->Data = nullptr;
+			}
+
+			delete m_DataPointer;
+			m_DataPointer = nullptr;
+		}
+
+		HLAPI HLStringBase &Assign(const StringType *str, uint32 size, uint32 startOffset = 0)
+		{
+			HL_ASSERT(str);
+			HL_ASSERT(startOffset <= size);
+
+			uint32 new_size = size - startOffset;
+
+			if (new_size < HL_STRING_MAX_STRING_SIZE)
+			{
+				ShortStringData *data = new ShortStringData();
+				data->Size = new_size;
+				data->Data[data->Size] = '\0';
+
+				if (str)
+				{
+					memcpy_s(data->Data, HL_STRING_MAX_STRING_SIZE, str + startOffset, new_size);
+				}
+
+				// Delete old data, if exists
+				if (!m_UsingShortStr && m_DataPointer)
+				{
+					LongStringData *old_data = (LongStringData*)m_DataPointer;
+					if (old_data->Data)
+					{
+						delete[] old_data->Data;
+						old_data->Data = nullptr;
+					}
+				}
+				else if (m_UsingShortStr && m_DataPointer)
+				{
+					delete m_DataPointer;
+				}
+
+				m_DataPointer = data;
+				m_UsingShortStr = true;
+
+				return *this;
+			}
+
+			LongStringData *data = new LongStringData();
+			data->Data = new StringType[new_size + 1];
+			data->Size = new_size;
+			data->Data[data->Size] = '\0';
+
+			if (str)
+			{
+				memcpy_s(data->Data, data->Size, str + startOffset, new_size);
+			}
+
+			// Delete old data, if exists
+			if (!m_UsingShortStr && m_DataPointer)
+			{
+				LongStringData *old_data = (LongStringData*)m_DataPointer;
+				if (old_data)
+				{
+					delete[] old_data;
+					old_data = nullptr;
+				}
+			}
+			else if (m_UsingShortStr && m_DataPointer)
+			{
+				delete m_DataPointer;
+			}
+
+			m_DataPointer = data;
+			m_UsingShortStr = false;
+
+			return *this;
 		}
 
 		HLAPI HLStringBase &operator=(const HLStringBase &other)
 		{
 			if (this != &other)
 			{
-				if (m_Data)
-					delete[] m_Data;
+				if (other.m_UsingShortStr)
+				{
+					ShortStringData *data = (ShortStringData*)other.m_DataPointer;
+					ShortStringData *new_data = new ShortStringData();
+					new_data->Size = data->Size;
+					
+					new_data->Data[new_data->Size] = '\0';
+					memcpy(new_data->Data, data->Data, data->Size);
 
-				m_Size = other.m_Size;
-				m_Data = new StringType[m_Size + 1];
-				m_Data[m_Size] = '\0';
-				memcpy(m_Data, other.m_Data, m_Size);
+					m_UsingShortStr = true;
+					m_DataPointer = new_data;
+				}
+				else
+				{
+					LongStringData *data = (LongStringData*)other.m_DataPointer;
+					LongStringData *new_data = new LongStringData();
+					new_data->Size = data->Size;
+					new_data->Data = new StringType[data->Size + 1];
+					
+					new_data->Data[new_data->Size] = '\0';
+					memcpy(new_data->Data, data->Data, data->Size);
+					
+					m_UsingShortStr = false;
+					m_DataPointer = new_data;
+				}
 			}
 
 			return *this;
@@ -181,11 +272,11 @@ namespace highlo
 		{
 			if (this != &other)
 			{
-				m_Size = other.m_Size;
-				m_Data = other.m_Data;
+				m_DataPointer = other.m_DataPointer;
+				m_UsingShortStr = other.m_UsingShortStr;
 
-				other.m_Size = 0;
-				other.m_Data = nullptr;
+				other.m_DataPointer = nullptr;
+				other.m_UsingShortStr = true;
 			}
 
 			return *this;
@@ -193,147 +284,158 @@ namespace highlo
 
 		HLAPI StringType *begin()
 		{
-			return m_Data[0];
+			return SelectStringSource()[0];
 		}
 
 		HLAPI StringType *end()
 		{
-			return m_Data[m_Size];
+			return SelectStringSource()[SelectStringSize()];
 		}
 
 		HLAPI void Clear()
 		{
-			delete[] m_Data;
-			m_Data = nullptr;
-			m_Size = 0;
+			if (!m_UsingShortStr)
+			{
+				LongStringData *data = (LongStringData*)m_DataPointer;
+				delete[] data->Data;
+				data->Data = nullptr;
+			}
+
+			delete m_DataPointer;
+			m_DataPointer = nullptr;
+			m_UsingShortStr = true; // Restore default
 		}
 
 		HLAPI void Resize(uint32 size)
 		{
-			if (m_Data)
-				delete[] m_Data;
+			if (!m_DataPointer)
+				return;
 
-			m_Size = size;
-			m_Data = new StringType[size];
+			Clear();
+			if (size < HL_STRING_MAX_STRING_SIZE)
+			{
+				ShortStringData *data = new ShortStringData;
+				data->Size = size;
+				data->Data[data->Size] = '\0';
+				m_DataPointer = data;
+
+				m_UsingShortStr = true;
+				return;
+			}
+
+			LongStringData *data = new LongStringData;
+			data->Data = new StringType[size];
+			data->Size = size;
+			data->Data[data->Size] = '\0';
+			m_DataPointer = data;
+			m_UsingShortStr = false;
 		}
 
 		HLAPI uint32 Length() const
 		{
-			return m_Size;
+			return SelectStringSize();
 		}
 
 		HLAPI wchar_t *W_Str()
 		{
-			wchar_t *result = new wchar_t[m_Size + 1];
-			for (uint32 i = 0; i < m_Size; ++i)
-				result[i] = m_Data[i];
+			wchar_t *result = new wchar_t[SelectStringSize() + 1];
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
+				result[i] = SelectStringSource()[i];
 
-			result[m_Size] = '\0';
+			result[SelectStringSize()] = L'\0';
 			return result;
 		}
 
 		HLAPI const wchar_t *W_Str() const
 		{
-			wchar_t *result = new wchar_t[m_Size + 1];
-			for (uint32 i = 0; i < m_Size; ++i)
-				result[i] = m_Data[i];
+			wchar_t *result = new wchar_t[SelectStringSize() + 1];
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
+				result[i] = SelectStringSource()[i];
 
-			result[m_Size] = '\0';
+			result[SelectStringSize()] = L'\0';
 			return result;
 		}
 
 		HLAPI StringType *C_Str()
 		{
-			return m_Data;
+			return SelectStringSource();
 		}
 
 		HLAPI const StringType *C_Str() const
 		{
-			return m_Data;
+			return SelectStringSource();
 		}
 
-		HLAPI char At(uint32 index)
+		HLAPI StringType At(uint32 index)
 		{
-			if (index < m_Size)
-				return m_Data[index];
+			if (index < SelectStringSize())
+				return SelectStringSource()[index];
 
 			return (char)NPOS;
 		}
 
-		HLAPI const char At(uint32 index) const
+		HLAPI const StringType At(uint32 index) const
 		{
-			if (index < m_Size)
-				return m_Data[index];
+			if (index < SelectStringSize())
+				return SelectStringSource()[index];
 
 			return (char)NPOS;
 		}
 
 		HLAPI HLStringBase &Append(const StringType letter)
 		{
-			StringType *new_data = new StringType[m_Size + 2]; // +1 for a character and another +1 for the null terminator
-			new_data[m_Size] = letter;
-			new_data[m_Size + 1] = '\0';
+			StringType *new_data = new StringType[SelectStringSize() + 2]; // +1 for a character and another +1 for the null terminator
+			new_data[SelectStringSize()] = letter;
+			new_data[SelectStringSize() + 1] = '\0';
 
-			if (m_Data)
+			if (SelectStringSource())
 			{
-				memcpy(new_data, m_Data, m_Size);
-				delete[] m_Data;
+				memcpy(new_data, SelectStringSource(), SelectStringSize());
 			}
 
-			m_Data = new_data;
-			++m_Size;
-
-			return *this;
+			return Assign(new_data, SelectStringSize());
 		}
 
 		HLAPI HLStringBase &Append(const HLStringBase &other)
 		{
-			uint32 new_size = m_Size + other.m_Size;
+			uint32 new_size = SelectStringSize() + other.SelectStringSize();
 			StringType *new_data = new StringType[new_size + 1]; // +1 for the null terminator
 			new_data[new_size] = '\0';
 
-			if (m_Data)
+			if (SelectStringSource())
 			{
-				memcpy(new_data, m_Data, m_Size); // copy existing string m_Data
-				delete[] m_Data;
+				memcpy(new_data, SelectStringSource(), SelectStringSize()); // copy existing string
 			}
 
-			memcpy((StringType*)(new_data + m_Size), other.m_Data, other.m_Size); // copy appended string m_Data
-			m_Data = new_data;
-			m_Size = new_size;
+			memcpy((StringType*)(new_data + SelectStringSize()), other.SelectStringSource(), other.SelectStringSize()); // copy appended string
 
-			return *this;
+			return Assign(new_data, new_size);
 		}
 
 		HLAPI HLStringBase &Remove(const StringType letter)
 		{
-			if (Contains(letter))
+			if (SelectStringSource() && Contains(letter))
 			{
 				uint32 i = 0;
 				uint32 j = 0;
 				uint32 start_pos = IndexOf(letter);
-				uint32 new_size = m_Size - 1;
+				uint32 new_size = SelectStringSize() - 1;
 				StringType *new_data = new StringType[new_size + 1];
 				new_data[new_size] = '\0';
 
-				if (m_Data)
+				if (start_pos > 0)
 				{
-					if (start_pos > 0)
-					{
-						memcpy(new_data, m_Data, start_pos);
-						j = start_pos;
-					}
-
-					for (i = start_pos + 1; i < m_Size; ++i)
-					{
-						new_data[j] = m_Data[i];
-						++j;
-					}
-
-					delete[] m_Data;
-					m_Data = new_data;
-					m_Size = new_size;
+					memcpy(new_data, SelectStringSource(), start_pos);
+					j = start_pos;
 				}
+
+				for (i = start_pos + 1; i < SelectStringSize(); ++i)
+				{
+					new_data[j] = SelectStringSource()[i];
+					++j;
+				}
+
+				return Assign(new_data, new_size);
 			}
 
 			return *this;
@@ -341,35 +443,30 @@ namespace highlo
 
 		HLAPI HLStringBase &Remove(const HLStringBase &other)
 		{
-			if (Contains(other))
+			if (SelectStringSource() && Contains(other))
 			{
 				uint32 i = 0;
 				uint32 j = 0;
 				uint32 start_pos = IndexOf(other);
-				uint32 new_size = m_Size - other.Length();
+				uint32 new_size = SelectStringSize() - other.Length();
 				StringType *new_data = new StringType[new_size + 1];
 				new_data[new_size] = '\0';
 
-				if (m_Data)
+				// copy part before the part to remove
+				if (start_pos > 0)
 				{
-					// copy part before the part to remove
-					if (start_pos > 0)
-					{
-						memcpy(new_data, m_Data, start_pos);
-						j = start_pos;
-					}
-
-					// copy part after the part to remove
-					for (i = start_pos + other.Length(); i < m_Size; ++i)
-					{
-						new_data[j] = m_Data[i];
-						++j;
-					}
-
-					delete[] m_Data;
-					m_Data = new_data;
-					m_Size = new_size;
+					memcpy(new_data, SelectStringSource(), start_pos);
+					j = start_pos;
 				}
+
+				// copy part after the part to remove
+				for (i = start_pos + other.Length(); i < SelectStringSize(); ++i)
+				{
+					new_data[j] = SelectStringSource()[i];
+					++j;
+				}
+
+				return Assign(new_data, new_size);
 			}
 
 			return *this;
@@ -377,9 +474,9 @@ namespace highlo
 
 		HLAPI uint32 FirstIndexOf(const StringType letter, uint32 offset = 0) const
 		{
-			for (uint32 i = offset; i < m_Size; ++i)
+			for (uint32 i = offset; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == letter)
+				if (SelectStringSource()[i] == letter)
 					return i;
 			}
 
@@ -391,11 +488,11 @@ namespace highlo
 			uint32 i = offset;
 			uint32 j = 0;
 
-			while (m_Data[i] != '\0')
+			while (SelectStringSource()[i] != '\0')
 			{
-				if (m_Data[i] == other[j])
+				if (SelectStringSource()[i] == other[j])
 				{
-					while (m_Data[i] == other[j] && other[j] != '\0')
+					while (SelectStringSource()[i] == other[j] && other[j] != '\0')
 					{
 						++j;
 						++i;
@@ -415,9 +512,9 @@ namespace highlo
 
 		HLAPI uint32 IndexOf(const StringType letter, uint32 offset = 0) const
 		{
-			for (uint32 i = offset; i < m_Size; ++i)
+			for (uint32 i = offset; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == letter)
+				if (SelectStringSource()[i] == letter)
 					return i;
 			}
 
@@ -429,11 +526,11 @@ namespace highlo
 			uint32 i = offset;
 			uint32 j = 0;
 
-			while (m_Data[i] != '\0')
+			while (SelectStringSource()[i] != '\0')
 			{
-				if (m_Data[i] == other[j])
+				if (SelectStringSource()[i] == other[j])
 				{
-					while (m_Data[i] == other[j] && other[j] != '\0')
+					while (SelectStringSource()[i] == other[j] && other[j] != '\0')
 					{
 						++j;
 						++i;
@@ -453,16 +550,16 @@ namespace highlo
 
 		HLAPI uint32 LastIndexOf(const StringType letter, uint32 offset = 0) const
 		{
-			HL_ASSERT(offset >= 0 && offset < m_Size, "Offset is out of bounds!");
+			HL_ASSERT(offset >= 0 && offset < SelectStringSize(), "Offset is out of bounds!");
 
 			if (offset == 0)
-				offset = m_Size;
+				offset = SelectStringSize();
 
 			// Count how many times the letter exists
 			uint32 letterCount = 0;
 			for (uint32 i = 0; i < offset; ++i)
 			{
-				if (m_Data[i] == letter)
+				if (SelectStringSource()[i] == letter)
 					++letterCount;
 			}
 
@@ -471,12 +568,12 @@ namespace highlo
 				return NPOS;
 
 			// Get the last letter index
-			for (uint32 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
 			{
-				if (letterCount == 1 && m_Data[i] == letter)
+				if (letterCount == 1 && SelectStringSource()[i] == letter)
 					return i;
 
-				if (m_Data[i] == letter && letterCount > 0)
+				if (SelectStringSource()[i] == letter && letterCount > 0)
 				{
 					--letterCount;
 					continue;
@@ -490,14 +587,14 @@ namespace highlo
 		{
 			if (Contains(other))
 			{
-				uint32 i = m_Size - other.Length();
+				uint32 i = SelectStringSize() - other.Length();
 				uint32 j = 0;
 
-				while (m_Data[i] != '\0')
+				while (SelectStringSource()[i] != '\0')
 				{
-					if (m_Data[i] == other[j])
+					if (SelectStringSource()[i] == other[j])
 					{
-						while (m_Data[i] == other[j] && other[j] != '\0')
+						while (SelectStringSource()[i] == other[j] && other[j] != '\0')
 						{
 							++j;
 							++i;
@@ -520,8 +617,8 @@ namespace highlo
 
 		HLAPI uint32 FirstIndexNotOf(const StringType letter, uint32 offset = 0) const
 		{
-			const int32 len = static_cast<int>(strspn(m_Data + offset, &letter));
-			if (len + offset >= m_Size)
+			const int32 len = static_cast<int32>(strspn(SelectStringSource() + offset, &letter));
+			if (len + offset >= SelectStringSize())
 				return NPOS;
 
 			return len + offset;
@@ -529,8 +626,8 @@ namespace highlo
 
 		HLAPI uint32 FirstIndexNotOf(const HLStringBase &other, uint32 offset = 0) const
 		{
-			const int32 len = static_cast<int>(strspn(m_Data + offset, *other));
-			if (len + offset >= m_Size)
+			const int32 len = static_cast<int32>(strspn(SelectStringSource() + offset, *other));
+			if (len + offset >= SelectStringSize())
 				return NPOS;
 
 			return len + offset;
@@ -543,9 +640,9 @@ namespace highlo
 			uint32 wordBeginIdx = 0;
 			HLStringBase word;
 
-			for (uint32 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == delimiter)
+				if (SelectStringSource()[i] == delimiter)
 					++wordCount;
 			}
 
@@ -553,7 +650,7 @@ namespace highlo
 			for (uint32 i = 0; i < wordCount; ++i)
 			{
 				wordBeginIdx = charIdx;
-				while (m_Data[charIdx] != delimiter && m_Data[charIdx] != '\0')
+				while (SelectStringSource()[charIdx] != delimiter && SelectStringSource()[charIdx] != '\0')
 					++charIdx;
 
 				word = Substr(wordBeginIdx, charIdx);
@@ -571,9 +668,9 @@ namespace highlo
 			uint32 wordBeginIdx = 0;
 			HLStringBase word;
 
-			for (uint32 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == delimiter)
+				if (SelectStringSource()[i] == delimiter)
 					++wordCount;
 			}
 
@@ -581,7 +678,7 @@ namespace highlo
 			for (uint32 i = 0; i < wordCount; ++i)
 			{
 				wordBeginIdx = charIdx;
-				while (m_Data[charIdx] != delimiter && m_Data[charIdx] != '\0')
+				while (SelectStringSource()[charIdx] != delimiter && SelectStringSource()[charIdx] != '\0')
 					++charIdx;
 
 				word = Substr(wordBeginIdx, charIdx);
@@ -599,24 +696,24 @@ namespace highlo
 		{
 			// @See https://stackoverflow.com/a/32413923/12873837
 
-			StringType *newString = new StringType[m_Size + 512];
+			StringType *newString = new StringType[SelectStringSize() + 512 + 1]; // +1 for null termination character
 			StringType *strValuePointer = &newString[0];
-			const StringType *tmp = m_Data;
+			const StringType *tmp = SelectStringSource();
 			uint32 findLength = find.Length();
 			uint32 replaceLength = replaceValue.Length();
 			uint32 occurencesReplaced = 0;
 
-			newString[strlen(newString)] = '\0';
+			newString[SelectStringSize() + 512] = '\0';
 
 			while (true)
 			{
 				const StringType *p = strstr(tmp, find);
-			//	std::cout << "Found substring: " << p << std::endl;
+				//	std::cout << "Found substring: " << p << std::endl;
 
 				// walked past last occurrence of needle; copy remaining part
 				if (!p)
 				{
-				//	std::cout << "last part: " << tmp << std::endl;
+					//	std::cout << "last part: " << tmp << std::endl;
 					strcpy(strValuePointer, tmp);
 					break;
 				}
@@ -637,53 +734,49 @@ namespace highlo
 					break;
 			}
 
-			delete[] m_Data;
-			m_Size = (uint32)strlen(newString);
-			m_Data = newString;
-
-			return *this;
+			return Assign(newString, utils::GetSizeOfUnknownStringType<StringType>(newString));
 		}
 
 		HLAPI HLStringBase &Reverse()
 		{
-			for (uint32 i = 0; i < m_Size / 2; i++)
+			for (uint32 i = 0; i < SelectStringSize() / 2; i++)
 			{
-				StringType temp = m_Data[i];
-				m_Data[i] = m_Data[m_Size - i - 1];
-				m_Data[m_Size - i - 1] = temp;
+				StringType temp = SelectStringSource()[i];
+				SelectStringSource()[i] = SelectStringSource()[SelectStringSize() - i - 1];
+				SelectStringSource()[SelectStringSize() - i - 1] = temp;
 			}
 
 			return *this;
 		}
 
-		HLAPI HLStringBase Substr(uint32 beginIndex, uint32 endIndex = 0) const
+		HLAPI HLStringBase &Substr(uint32 beginIndex, uint32 endIndex = 0)
 		{
 			if (endIndex == 0)
-				endIndex = m_Size;
+				endIndex = SelectStringSize();
 
-			if ((endIndex - beginIndex) > m_Size)
-				return HLStringBase("-1");
+			if ((endIndex - beginIndex) > SelectStringSize())
+				return *this;
 
-			return HLStringBase(*this, beginIndex, endIndex);
+			return Assign(SelectStringSource(), endIndex, beginIndex);
 		}
 
-		HLAPI const HLStringBase &ToLowerCase() const
+		HLAPI HLStringBase &ToLowerCase()
 		{
-			for (uint32 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] >= 'A' && m_Data[i] <= 'Z')
-					m_Data[i] = m_Data[i] - ('A' - 'a');
+				if (SelectStringSource()[i] >= 'A' && SelectStringSource()[i] <= 'Z')
+					SelectStringSource()[i] = SelectStringSource()[i] - ('A' - 'a');
 			}
 
 			return *this;
 		}
 
-		HLAPI const HLStringBase &ToUpperCase() const
+		HLAPI HLStringBase &ToUpperCase()
 		{
-			for (uint32 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] >= 'a' && m_Data[i] <= 'z')
-					m_Data[i] = m_Data[i] + ('A' - 'a');
+				if (SelectStringSource()[i] >= 'a' && SelectStringSource()[i] <= 'z')
+					SelectStringSource()[i] = SelectStringSource()[i] + ('A' - 'a');
 			}
 
 			return *this;
@@ -692,9 +785,9 @@ namespace highlo
 		HLAPI uint32 CountOf(StringType letter) const
 		{
 			uint32 count = 0;
-			for (uint32 i = 0; i < m_Size; ++i)
+			for (uint32 i = 0; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == letter)
+				if (SelectStringSource()[i] == letter)
 					++count;
 			}
 
@@ -705,9 +798,9 @@ namespace highlo
 		{
 			uint32 i;
 			uint64 hash = 2166136261UL;
-			unsigned char *p = (unsigned char*)m_Data;
+			unsigned char *p = (unsigned char*)SelectStringSource();
 
-			for (i = 0; i < m_Size; i++)
+			for (i = 0; i < SelectStringSize(); i++)
 				hash = (hash ^ p[i]) * 16777619;
 
 			return hash;
@@ -715,7 +808,7 @@ namespace highlo
 
 		HLAPI bool IsEmpty() const
 		{
-			return m_Size == 0;
+			return SelectStringSize() == 0;
 		}
 
 		HLAPI bool Contains(const StringType letter, uint32 offset = 0) const
@@ -725,9 +818,9 @@ namespace highlo
 			if (IsEmpty())
 				return false;
 
-			for (uint32 i = offset; i < m_Size; ++i)
+			for (uint32 i = offset; i < SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == letter)
+				if (SelectStringSource()[i] == letter)
 				{
 					hasLetter = true;
 					break;
@@ -738,18 +831,18 @@ namespace highlo
 		}
 
 		HLAPI bool Contains(const HLStringBase &other, uint32 offset = 0) const
-			{
+		{
 			uint32 i = offset;
 			uint32 j = 0;
 
 			if (IsEmpty())
 				return false;
 
-			while (m_Data[i] != '\0')
+			while (SelectStringSource()[i] != '\0')
 			{
-				if (m_Data[i] == other[j])
+				if (SelectStringSource()[i] == other[j])
 				{
-					while (m_Data[i] == other[j] && other[j] != '\0')
+					while (SelectStringSource()[i] == other[j] && other[j] != '\0')
 					{
 						++j;
 						++i;
@@ -769,7 +862,7 @@ namespace highlo
 
 		HLAPI bool StartsWith(const StringType letter) const
 		{
-			if (m_Data[0] == letter)
+			if (SelectStringSource()[0] == letter)
 				return true;
 
 			return false;
@@ -778,13 +871,13 @@ namespace highlo
 		HLAPI bool StartsWith(const HLStringBase &other) const
 		{
 			uint32 equalCount = 0;
-			for (uint32 i = 0; i < other.m_Size; ++i)
+			for (uint32 i = 0; i < other.SelectStringSize(); ++i)
 			{
-				if (m_Data[i] == other[i])
+				if (SelectStringSource()[i] == other[i])
 					++equalCount;
 			}
 
-			if (equalCount == other.m_Size)
+			if (equalCount == other.SelectStringSize())
 				return true;
 
 			return false;
@@ -795,7 +888,7 @@ namespace highlo
 			if (IsEmpty())
 				return false;
 
-			if (m_Data[m_Size - 1] == letter)
+			if (SelectStringSource()[SelectStringSize() - 1] == letter)
 				return true;
 
 			return false;
@@ -804,18 +897,18 @@ namespace highlo
 		HLAPI bool EndsWith(const HLStringBase &other) const
 		{
 			uint32 equalCount = 0;
-			uint32 start_pos = m_Size - other.m_Size;
+			uint32 start_pos = SelectStringSize() - other.SelectStringSize();
 
-			for (uint32 i = start_pos; i < m_Size; ++i)
+			for (uint32 i = start_pos; i < SelectStringSize(); ++i)
 			{
-				for (uint32 j = 0; j < other.m_Size; ++j)
+				for (uint32 j = 0; j < other.SelectStringSize(); ++j)
 				{
-					if (m_Data[i] == other[j])
+					if (SelectStringSource()[i] == other[j])
 						++equalCount;
 				}
 			}
 
-			if (equalCount == other.m_Size)
+			if (equalCount == other.SelectStringSize())
 				return true;
 
 			return false;
@@ -826,7 +919,7 @@ namespace highlo
 			uint32 lhsSize = Length();
 			uint32 rhsSize = other.Length();
 
-			int32 result = utils::Compare(m_Data, other.m_Data, lhsSize <= rhsSize ? lhsSize : rhsSize);
+			int32 result = utils::Compare(SelectStringSource(), other.SelectStringSource(), lhsSize <= rhsSize ? lhsSize : rhsSize);
 
 			if (result != 0)
 				return result;
@@ -850,7 +943,7 @@ namespace highlo
 
 			uint32 newLhsSize;
 			uint32 newRhsSize;
-			int32 result = utils::Compare(m_Data, pos1, lhsSize, other.m_Data, pos2, rhsSize, &newLhsSize, &newRhsSize);
+			int32 result = utils::Compare(SelectStringSource(), pos1, lhsSize, other.SelectStringSource(), pos2, rhsSize, &newLhsSize, &newRhsSize);
 
 			if (result != 0)
 				return result;
@@ -862,6 +955,20 @@ namespace highlo
 				return 1;
 
 			return 0;
+		}
+
+		HLAPI static HLString FromWideString(const wchar_t *str)
+		{
+			std::wstring ws(str);
+			std::string s(ws.begin(), ws.end());
+			return s.c_str();
+		}
+
+		HLAPI static HLStringWide FromCString(const char *str)
+		{
+			std::string s(str);
+			std::wstring ws(s.begin(), s.end());
+			return ws.c_str();
 		}
 
 		template<typename IteratorType1, typename IteratorType2>
@@ -878,22 +985,22 @@ namespace highlo
 
 		HLAPI StringType *operator*()
 		{
-			return m_Data;
+			return SelectStringSource();
 		}
 
 		HLAPI const StringType *operator*() const
 		{
-			return m_Data;
+			return SelectStringSource();
 		}
 
 		HLAPI operator StringType*()
 		{
-			return m_Data;
+			return SelectStringSource();
 		}
 
 		HLAPI operator const StringType*() const
 		{
-			return m_Data;
+			return SelectStringSource();
 		}
 
 		HLAPI bool operator==(const StringType *other) const
@@ -1008,20 +1115,20 @@ namespace highlo
 
 		HLAPI StringType &operator[](uint32 index)
 		{
-			HL_ASSERT(index <= m_Size);
-			return m_Data[index];
+			HL_ASSERT(index <= SelectStringSize());
+			return SelectStringSource()[index];
 		}
 
 		HLAPI const StringType &operator[](uint32 index) const
 		{
-			HL_ASSERT(index <= m_Size);
-			return m_Data[index];
+			HL_ASSERT(index <= SelectStringSize());
+			return SelectStringSource()[index];
 		}
 
 		HLAPI friend std::ostream &operator<<(std::ostream &stream, const HLStringBase &str)
 		{
-			for (uint32 i = 0; i < str.m_Size; ++i)
-				stream << str.m_Data[i];
+			for (uint32 i = 0; i < str.SelectStringSize(); ++i)
+				stream << str.SelectStringSource()[i];
 
 			return stream;
 		}
@@ -1050,17 +1157,17 @@ namespace highlo
 
 		HLAPI int32 ToInt32() const
 		{
-			return atoi(m_Data);
+			return atoi(SelectStringSource());
 		}
 
 		HLAPI uint32 ToUInt32() const
 		{
-			return (uint32)atoi(m_Data);
+			return (uint32)atoi(SelectStringSource());
 		}
 
 		HLAPI bool ToBool() const
 		{
-			return strcmp(m_Data, "1") == 0 || strcmp(m_Data, "true") == 0 || strcmp(m_Data, "TRUE") == 0;
+			return strcmp(SelectStringSource(), "1") == 0 || strcmp(SelectStringSource(), "true") == 0 || strcmp(SelectStringSource(), "TRUE") == 0;
 		}
 
 		HLString ToUTF8() const
@@ -1080,18 +1187,79 @@ namespace highlo
 
 	private:
 
-		uint16 Pack(unsigned char letter, uint16 encoding = 8)
+		HL_FORCE_INLINE StringType *SelectStringSource()
 		{
-			return (uint16)letter << encoding;
+			HL_ASSERT(m_DataPointer);
+
+			if (m_UsingShortStr)
+			{
+				return &(((ShortStringData*)m_DataPointer)->Data)[0];
+			}
+			else
+			{
+				return ((LongStringData*)m_DataPointer)->Data;
+			}
 		}
 
-		unsigned char Unpack(uint16 letter, uint16 encoding = 8)
+		HL_FORCE_INLINE const StringType *SelectStringSource() const
 		{
-			return (unsigned char)letter >> encoding;
+			HL_ASSERT(m_DataPointer);
+
+			if (m_UsingShortStr)
+			{
+				return &(((ShortStringData*)m_DataPointer)->Data)[0];
+			}
+			else
+			{
+				return ((LongStringData*)m_DataPointer)->Data;
+			}
 		}
 
-		StringType *m_Data = 0;
-		uint32 m_Size = 0;
+		HL_FORCE_INLINE uint32 SelectStringSize()
+		{
+			if (!m_DataPointer)
+				return 0;
+
+			if (m_UsingShortStr)
+			{
+				return ((ShortStringData*)m_DataPointer)->Size;
+			}
+			else
+			{
+				return ((LongStringData*)m_DataPointer)->Size;
+			}
+		}
+
+		HL_FORCE_INLINE uint32 SelectStringSize() const
+		{
+			if (!m_DataPointer)
+				return 0;
+
+			if (m_UsingShortStr)
+			{
+				return ((ShortStringData*)m_DataPointer)->Size;
+			}
+			else
+			{
+				return ((LongStringData*)m_DataPointer)->Size;
+			}
+		}
+
+		struct LongStringData
+		{
+			StringType *Data = nullptr;
+			uint32 Size = 0;
+		};
+
+		struct ShortStringData
+		{
+			StringType Data[HL_STRING_MAX_STRING_SIZE];
+			uint32 Size = 0;
+		};
+
+		// Either points to LongStringData or to ShortStringData
+		void *m_DataPointer = nullptr;
+		bool m_UsingShortStr = true; // Determines which string version is currently used
 	};
 }
 
@@ -1124,4 +1292,3 @@ namespace std
 		}
 	};
 }
-

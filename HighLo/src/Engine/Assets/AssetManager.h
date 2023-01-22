@@ -55,7 +55,7 @@ namespace highlo
 		HLAPI AssetHandle GetAssetHandleFromFilePath(const FileSystemPath &path);
 		HLAPI bool IsAssetHandleValid(AssetHandle handle) { return GetMetaData(handle).IsValid(); }
 
-		HLAPI AssetType GetAssetTypeFromExtension(const HLString &extension);
+		HLAPI AssetType GetAssetTypeFromExtension(HLString &extension);
 		HLAPI AssetType GetAssetTypeFromPath(const FileSystemPath &path);
 
 		HLAPI AssetHandle ImportAsset(const FileSystemPath &path);

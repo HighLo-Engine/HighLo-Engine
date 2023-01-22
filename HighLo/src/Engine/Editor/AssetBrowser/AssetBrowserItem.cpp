@@ -152,7 +152,7 @@ namespace highlo
 				ImGui::Spring();
 
 				const AssetMetaData &metaData = AssetManager::Get()->GetMetaData(m_ID);
-				const HLString &assetType = utils::AssetTypeToString(metaData.Type);
+				HLString &assetType = utils::AssetTypeToString(metaData.Type);
 
 				UI::ScopedColor textColor(ImGuiCol_Text, Colors::Theme::TextDarker);
 				ImGui::TextUnformatted(*assetType.ToUpperCase());

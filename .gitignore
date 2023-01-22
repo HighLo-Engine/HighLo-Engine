@@ -1,7 +1,7 @@
 # Directories
 .vs/
 .vscode/
-scripts/__pycache__/
+Scripts/__pycache__/
 Debug-windows-x86_64/
 Release-windows-x86_64/
 Dist-windows-x86_64/
@@ -14,6 +14,9 @@ HighLo/vendor/VulkanSDK/
 HighLoEdit/Resources/Scripts/Intermediates
 HighLoEdit/Resources/Scripts/**.pdb
 !vendor/bin/
+Sandbox/assets
+HighLoEdit/assets
+HighLoEdit/editorconfig.ini
 
 # Visual Studio and IntelliJ files
 **.sln
@@ -33,3 +36,4 @@ HighLoEdit/Resources/Scripts/**.pdb
 lfs/
 hooks/
 __pycache__/
+

@@ -483,9 +483,9 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-	//	return Renderer2D::GetTargetRenderPass();
+		return Renderer2D::GetTargetRenderPass();
 	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
-		return m_CompositeVertexArray->GetSpecification().RenderPass;
+	//	return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
@@ -528,7 +528,7 @@ namespace highlo
 			// Post-processing
 		//	JumpFloodPass();
 		//	BloomCompute();
-			CompositePass();
+		//	CompositePass();
 
 			m_CommandBuffer->End();
 			m_CommandBuffer->Submit();
@@ -1071,7 +1071,7 @@ namespace highlo
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "ExternalCompositing";
 		framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
-		framebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		framebufferSpec.ClearOnLoad = false;
 		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
 		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();

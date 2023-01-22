@@ -17,6 +17,7 @@
 namespace highlo
 {	
 	OpenGLTexture2D::OpenGLTexture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+		: m_FilePath(filePath)
 	{
 		int32 width, height, channels;
 		stbi_set_flip_vertically_on_load(flipOnLoad);
@@ -35,7 +36,7 @@ namespace highlo
 			return;
 		}
 
-		Name = FileSystemPath::ExtractFileNameFromPath(filePath.String());
+		Name = FileSystemPath::ExtractFileNameFromPath(m_FilePath.String());
 		m_Loaded = true;
 		HL_CORE_INFO("{0}[+] Loaded {1} [+]", TEXTURE2D_LOG_PREFIX, *filePath.String());
 

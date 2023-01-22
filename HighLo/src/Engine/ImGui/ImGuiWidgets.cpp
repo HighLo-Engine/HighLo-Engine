@@ -237,7 +237,7 @@ namespace highlo::UI
 						}
 
 						{
-							const HLString &assetType = utils::AssetTypeToString(metadata.Type);
+							HLString &assetType = utils::AssetTypeToString(metadata.Type);
 							ImVec2 textSize = ImGui::CalcTextSize(*assetType);
 							ImVec2 rectSize = ImGui::GetItemRectSize();
 							float paddingX = ImGui::GetStyle().FramePadding.x;

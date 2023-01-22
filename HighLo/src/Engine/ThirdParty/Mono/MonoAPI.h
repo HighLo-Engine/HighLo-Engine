@@ -11,21 +11,40 @@
 
 #ifdef HIGHLO_API_MONO_SCRIPTING
 
+#define DISABLE_AOT
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/exception.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
+
 namespace highlo
 {
+	using AssembliesArray = std::array<Ref<AssemblyInfo>, 2>;
+
 	class MonoAPI : public ScriptingAPI
 	{
 	public:
 
-		virtual void Init() override;
+		virtual void Init(const ScriptEngineConfig *config = nullptr) override;
 		virtual void Shutdown() override;
 
+		virtual bool ReloadAssembly(const FileSystemPath &filePath) override;
+		virtual void UnloadAssembly(Ref<AssemblyInfo> &assemblyInfo) override;
 
+		virtual const Ref<AssemblyInfo> &GetCoreAssemblyInfo() override;
+		virtual const Ref<AssemblyInfo> &GetAppAssemblyInfo() override;
+
+		virtual ScriptEngineConfig &GetConfig() override;
+		virtual const ScriptEngineConfig &GetConfig() const override;
 
 	private:
 
-		void InitMono();
+		void InitMono(const ScriptEngineConfig *config = nullptr);
 		void ShutdownMono();
+
+		bool LoadCoreAssembly();
+		bool LoadAppAssembly(const FileSystemPath &filePath);
 	};
 }
 

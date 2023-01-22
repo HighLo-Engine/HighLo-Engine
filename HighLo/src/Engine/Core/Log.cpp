@@ -8,9 +8,9 @@
 
 namespace highlo
 {
-	std::shared_ptr<spdlog::logger> Logger::s_EngineLogger;
-	std::shared_ptr<spdlog::logger> Logger::s_ClientLogger;
-	std::shared_ptr<spdlog::logger> Logger::s_EditorLogger;
+	static std::shared_ptr<spdlog::logger> s_EngineLogger;
+	static std::shared_ptr<spdlog::logger> s_ClientLogger;
+	static std::shared_ptr<spdlog::logger> s_EditorLogger;
 
 	void Logger::Init()
 	{
@@ -20,71 +20,37 @@ namespace highlo
 			shouldLogToFile = !HLApplication::Get().GetApplicationSettings().NoLog;
 		}
 
-		std::vector<spdlog::sink_ptr> engineSinks;
-		std::vector<spdlog::sink_ptr> appSinks;
+		std::vector<spdlog::sink_ptr> engineSinks = {
+			std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
+			std::make_shared<EditorConsoleSink>(1)
+		};
 
-		if (shouldLogToFile)
-		{
-			engineSinks =
-			{
-				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-				std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/engine.log", true),
-				std::make_shared<EditorConsoleSink>(1)
-			};
-
-			appSinks =
-			{
-				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-				std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/app.log", true),
-				std::make_shared<EditorConsoleSink>(1)
-			};
-		}
-		else
-		{
-			engineSinks =
-			{
-				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-				std::make_shared<EditorConsoleSink>(1)
-			};
-
-			appSinks =
-			{
-				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-				std::make_shared<EditorConsoleSink>(1)
-			};
-		}
-
+		std::vector<spdlog::sink_ptr> appSinks = {
+			std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
+			std::make_shared<EditorConsoleSink>(1)
+		};
+		
 		std::vector<spdlog::sink_ptr> editorConsoleSinks =
 		{
 			std::make_shared<EditorConsoleSink>(1)
 		};
 
-		// Engine patterns
 		engineSinks[0]->set_pattern("%^[%T] %n: %v%$");
-		if (shouldLogToFile)
-		{
-			engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
-			engineSinks[2]->set_pattern("[%T] [%l] %n: %v");
-		}
-		else
-		{
-			engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
-		}
+		engineSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-		// App patterns
 		appSinks[0]->set_pattern("%^[%T] %n: %v%$");
+		appSinks[1]->set_pattern("[%T] [%l] %n: %v");
+
+		editorConsoleSinks[0]->set_pattern("%^[%T] %n: %v%$");
+
 		if (shouldLogToFile)
 		{
-			appSinks[1]->set_pattern("[%T] [%l] %n: %v");
+			engineSinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/engine.log", true));
+			appSinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/app.log", true));
+
+			engineSinks[2]->set_pattern("[%T] [%l] %n: %v");
 			appSinks[2]->set_pattern("%^[%T] %n: %v%$");
 		}
-		else
-		{
-			appSinks[1]->set_pattern("%^[%T] %n: %v%$");
-		}
-
-		// Editor Patterns
-		editorConsoleSinks[0]->set_pattern("%^[%T] %n: %v%$");
 
 		s_EngineLogger = std::make_shared<spdlog::logger>("Engine", engineSinks.begin(), engineSinks.end());
 		s_EngineLogger->set_level(spdlog::level::trace);

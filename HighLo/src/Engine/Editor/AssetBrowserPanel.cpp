@@ -59,6 +59,7 @@ namespace highlo
 		m_AssetIconMap["tga"] = imageTex;
 		m_AssetIconMap["hdr"] = Texture2D::LoadFromFile("assets/Resources/icons/hdr-file-format.png");
 		m_AssetIconMap["ttf"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
+		m_AssetIconMap["cs"] = Texture2D::LoadFromFile("assets/Resources/icons/font-solid.png");
 	//	m_AssetIconMap["hlscene"] = Texture2D::LoadFromFile("assets/Resources/icons/");
 
 		HLString basePath = project->GetAssetDirectory().String();
@@ -177,7 +178,15 @@ namespace highlo
 								}
 
 								if (ImGui::MenuItem((HLString(ICON_FA_FILM) + " " + translation->GetText("asset-browser-right-click-menu-new-scene")).C_Str()))
+								{
 									CreateAssetRepresentation<Scene>("New Scene.hlscene");
+								}
+
+								if (ImGui::MenuItem(HLString(ICON_FA_FILE) + " " + "Script"))
+								{
+									// TODO: Show create dialogue for script creation
+									HL_CORE_TRACE("Trying to create script file in {}", **m_CurrentDirectory->FilePath);
+								}
 
 								ImGui::EndMenu();
 							}
@@ -938,8 +947,11 @@ namespace highlo
 	{
 		std::sort(m_CurrentItems.begin(), m_CurrentItems.end(), [](const Ref<AssetBrowserItem> &item1, const Ref<AssetBrowserItem> &item2)
 		{
+			HLString item1Name = item1->GetName();
+			HLString item2Name = item2->GetName();
+
 			if (item1->GetType() == item2->GetType())
-				return item1->GetName().ToLowerCase() < item2->GetName().ToLowerCase();
+				return item1Name.ToLowerCase() < item2Name.ToLowerCase();
 
 			return (uint16)item1->GetType() < (uint16)item2->GetType();
 		});
@@ -953,11 +965,14 @@ namespace highlo
 	AssetBrowserItemList AssetBrowserPanel::Search(const HLString &query, const Ref<DirectoryInfo> &dirInfo)
 	{
 		AssetBrowserItemList results;
-		HLString queryLower = query.ToLowerCase();
+		HLString queryLower = query;
+		queryLower = queryLower.ToLowerCase();
 		
 		for (auto &[handle, subDir] : dirInfo->SubDirectories)
 		{
-			HLString subDirName = subDir->FilePath.Filename().ToLowerCase();
+			HLString subDirName = subDir->FilePath.Filename();
+			subDirName = subDirName.ToLowerCase();
+
 			if (subDirName.IndexOf(queryLower) != HLString::NPOS)
 				results.Items.push_back(Ref<AssetBrowserDirectory>::Create(subDir, m_FolderIcon));
 
@@ -968,7 +983,8 @@ namespace highlo
 		for (auto &assetHandle : dirInfo->Assets)
 		{
 			auto &asset = AssetManager::Get()->GetMetaData(assetHandle);
-			HLString fileName = asset.FilePath.Filename().ToLowerCase();
+			HLString fileName = asset.FilePath.Filename();
+			fileName = fileName.ToLowerCase();
 
 			if (fileName.IndexOf(queryLower) != HLString::NPOS)
 				results.Items.push_back(Ref<AssetBrowserItem>::Create(asset, m_AssetIconMap.find(asset.FilePath.Extension()) != m_AssetIconMap.end() ? m_AssetIconMap[asset.FilePath.Extension()] : m_FileIcon));

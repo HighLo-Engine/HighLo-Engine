@@ -174,6 +174,34 @@ namespace highlo
         return !(result == INVALID_FILE_ATTRIBUTES && GetLastError() == ERROR_FILE_NOT_FOUND);
     }
 
+    bool FileSystem::SetCurrentWorkingDirectory(const FileSystemPath &path)
+    {
+        return ::SetCurrentDirectoryW(path.String().W_Str());
+    }
+
+    FileSystemPath FileSystem::GetCurrentWorkingDirectory()
+    {
+        CHAR buffer[MAX_PATH];
+        DWORD dwRet;
+
+        dwRet = ::GetCurrentDirectoryA(MAX_PATH, buffer);
+
+        if (dwRet == 0)
+        {
+            HL_CORE_ERROR("GetCurrentDirectory failed {}", GetLastError());
+            return FileSystemPath::INVALID_PATH;
+        }
+
+        if (dwRet >= MAX_PATH)
+        {
+            HL_CORE_ERROR("Buffer too small; need {} characters", dwRet);
+            return FileSystemPath::INVALID_PATH;
+        }
+
+        buffer[dwRet] = '\0';
+        return FileSystemPath(buffer);
+    }
+
     bool FileSystem::FolderExists(const FileSystemPath &path)
     {
         HLString pathStr = path.String();
@@ -215,7 +243,11 @@ namespace highlo
     {
         HANDLE file = utils::OpenFileInternal(path.String());
         if (file == INVALID_HANDLE_VALUE)
+        {
+            const DWORD error = GetLastError();
+            HLString errorText = utils::TranslateErrorCodeIntoHumanReadable(error);
             return -1;
+        }
 
         int64 size = utils::GetFileSizeInternal(file);
         CloseHandle(file);
@@ -308,10 +340,12 @@ namespace highlo
         HANDLE file = utils::OpenFileInternal(path.String());
         uint32 size = (uint32)utils::GetFileSizeInternal(file);
 
-        HLString result;
-        result.Resize(size);
+        char *readBuffer = new char[size + 1];
+        readBuffer[size] = '\0';
+        bool success = utils::ReadFileInternal(file, &readBuffer[0], size);
+        HLString result = HLString(readBuffer);
+        delete[] readBuffer;
 
-        bool success = utils::ReadFileInternal(file, &result[0], size);
         CloseHandle(file);
         return success ? result : "";
     }

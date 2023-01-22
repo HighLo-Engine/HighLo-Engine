@@ -27,10 +27,12 @@ python3 GenerateEngine.py --generate-unit-tests
 
 ## Options
 
-| Name        | Optional | Default | Description     |
-| :---        |  :----:  | :----: |         :--- |
-| --version              |   Yes  |  None  | Show the version of the build system and quit
-| --help                 |   Yes  |  None  | Show the help menu and quit
-| --visual-studio        |   Yes  |  2022  | Set the desired visual studio version to generate (either 2022 or 2019)
-| --generate-unit-tests  |   Yes  |  False  | Enable the Unit tests (they will be included into visual studio as another project in the workspace.)
+| Name                   | Optional | Default | Description           |
+| :---                   |  :----:  | :----:           |         :--- |
+| --version              |   Yes    |  None            | Show the version of the build system and quit
+| --help                 |   Yes    |  None            | Show the help menu and quit
+| --visual-studio        |   Yes    |  2022            | Set the desired visual studio version to generate (either 2022 or 2019)
+| --generate-unit-tests  |   Yes    |  False           | Enable the Unit tests (they will be included into visual studio as another project in the workspace.)
+| --project-name         |   Yes    |  SandboxProject  | Determines the project name of the C# project in the visual studio solution.
+| --project-path         |   No    |                  | Determines the path, where the source files should be and where the visual studio solution should be located. **This option must be provided, if `--project-name` is also present.**
 

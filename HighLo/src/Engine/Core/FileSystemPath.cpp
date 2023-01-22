@@ -59,7 +59,6 @@ namespace highlo
 		{
 			m_CurrentAbsolutePath = "";
 			m_CurrentPath = "";
-			std::cout << "Error: Invalid path, skipping FileSystemPath assignment of " << source.C_Str() << std::endl;
 			return;
 		}
 
@@ -70,7 +69,17 @@ namespace highlo
 		m_Handle = std::filesystem::path(*m_CurrentPath);
 		m_File.ExistsOnHardDrive = Exists();
 		m_File.IsFile = !std::filesystem::is_directory(m_Handle);
-		m_File.Size = Size();
+		m_File.Size = 0;
+
+		if (m_File.IsFile)
+		{
+			m_File.Size = Size();
+			if (m_File.Size == -1)
+			{
+				m_File.ExistsOnHardDrive = false;
+			}
+		}
+
 		m_File.FullPath = std::filesystem::absolute(m_Handle).string();
 
 		if (m_File.FullPath.Contains('\\'))
@@ -80,7 +89,7 @@ namespace highlo
 
 		if (m_File.IsFile)
 		{
-			m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
+			m_File.Name = ExtractFileNameFromPath(m_File.FullPath, false);
 			m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
 			m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
 		}
@@ -450,44 +459,33 @@ namespace highlo
 		return *this;
 	}
 
-	HLString FileSystemPath::ExtractFileNameFromPath(const HLString &path, bool excludeExtension)
+	HLString FileSystemPath::ExtractFileNameFromPath(HLString &path, bool excludeExtension)
 	{
-		HLString result;
-		int32 pos = path.FirstIndexOf('/');
+		HLString result = path;
+		
+		uint32 pos = result.LastIndexOf('/');
+		result = result.Substr(pos + 1);
 
-		while (pos != HLString::NPOS)
+		if (excludeExtension)
 		{
-			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', pos + 1);
-		}
-
-		if (excludeExtension && result.Contains('.'))
-		{
-			pos = result.IndexOf('.');
+			pos = result.LastIndexOf('.');
 			result = result.Substr(0, pos);
 		}
 
 		return result;
 	}
 
-	HLString FileSystemPath::ExtractFileExtensionFromPath(const HLString &path, bool excludeDot)
+	HLString FileSystemPath::ExtractFileExtensionFromPath(HLString &path, bool excludeDot)
 	{
-		HLString result;
-		int32 pos = path.FirstIndexOf('/');
-
-		while (pos != HLString::NPOS)
-		{
-			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', pos + 1);
-		}
-
-		if (!result.Contains('.'))
-			return path;
+		HLString result = path;
+		
+		uint32 pos = result.LastIndexOf('.');
+		result = result.Substr(pos);
 
 		if (excludeDot)
-			result = result.Substr(result.IndexOf('.') + 1);
-		else
-			result = result.Substr(result.IndexOf('.'));
+		{
+			result = result.Substr(1);
+		}
 
 		return result;
 	}
@@ -495,7 +493,6 @@ namespace highlo
 	HLString FileSystemPath::ExtractFolderNameFromPath(const HLString &path)
 	{
 		HLString result = path;
-		uint32 tmp = result.LastIndexOf('/') + 1;
 		if (result.EndsWith('/'))
 			result = result.Substr(0, result.LastIndexOf('/'));
 

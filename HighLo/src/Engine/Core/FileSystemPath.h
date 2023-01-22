@@ -38,8 +38,39 @@ namespace highlo
 		{
 		}
 
-		HLAPI File(const File&) = default;
-		HLAPI File &operator=(const File&) = default;
+		HLAPI File(const File &other)
+		{
+			const char *filename = other.FileName.C_Str();
+			const char *name = other.Name.C_Str();
+			const char *extension = other.Extension.C_Str();
+			const char *fullpath = other.FullPath.C_Str();
+
+			FileName = other.FileName;
+			Name = other.Name;
+			Extension = other.Extension;
+			FullPath = other.FullPath;
+			Size = other.Size;
+			ExistsOnHardDrive = other.ExistsOnHardDrive;
+			IsFile = other.IsFile;
+		}
+
+		HLAPI File &operator=(const File &other)
+		{
+			if (this != &other)
+			{
+				const char *tmp = other.FullPath.C_Str();
+
+				FileName = other.FileName;
+				Name = other.Name;
+				Extension = other.Extension;
+				FullPath = other.FullPath;
+				Size = other.Size;
+				ExistsOnHardDrive = other.ExistsOnHardDrive;
+				IsFile = other.IsFile;
+			}
+
+			return *this;
+		}
 	};
 
 	class FileSystemPath : public IsSharedReference
@@ -123,8 +154,8 @@ namespace highlo
 		HLAPI FileSystemPath &operator+=(const char *path);
 		HLAPI friend FileSystemPath operator/(const FileSystemPath &lhs, const char *path);
 
-		HLAPI static HLString ExtractFileNameFromPath(const HLString &path, bool excludeExtension = false);
-		HLAPI static HLString ExtractFileExtensionFromPath(const HLString &path, bool excludeDot = false);
+		HLAPI static HLString ExtractFileNameFromPath(HLString &path, bool excludeExtension = false);
+		HLAPI static HLString ExtractFileExtensionFromPath(HLString &path, bool excludeDot = false);
 		HLAPI static HLString ExtractFolderNameFromPath(const HLString &path);
 
 		HLAPI friend std::ostream &operator<<(std::ostream &stream, const FileSystemPath &other);

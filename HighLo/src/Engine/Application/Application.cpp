@@ -144,6 +144,8 @@ namespace highlo
 			FileSystem::Get()->SetCurrentWorkingDirectory(m_Settings.WorkingDirectory);
 		}
 
+		HL_CORE_TRACE("CWD: {0}", FileSystem::Get()->GetCurrentWorkingDirectory().String().C_Str());
+
 		// Create cache for sin() and cos()
 		Math::CreateCacheSin();
 		Math::CreateCacheCos();

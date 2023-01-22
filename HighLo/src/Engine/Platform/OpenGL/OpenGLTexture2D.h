@@ -74,6 +74,7 @@ namespace highlo
 		HLRendererID m_SamplerRendererID = 0;
 		GLenum m_InternalFormat, m_DataFormat;
 		TextureSpecification m_Specification;
+		FileSystemPath m_FilePath = "";
 		bool m_Locked = false;
 		bool m_Loaded = false;
 	};

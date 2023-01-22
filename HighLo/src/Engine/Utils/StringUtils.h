@@ -38,15 +38,6 @@ namespace highlo
 			return result;
 		}
 
-		template<typename T>
-		uint32 GetSizeOfUnknownStringType(const T *str);
-
-		template<>
-		uint32 GetSizeOfUnknownStringType(const char *str);
-
-		template<>
-		uint32 GetSizeOfUnknownStringType(const wchar_t *str);
-
 		template<typename StringType>
 		static StringType *CopySubStr(const StringType *str, uint32 pos, uint32 size)
 		{
@@ -86,11 +77,6 @@ namespace highlo
 
 			return result;
 		}
-
-		HLString32 ToUTF32(const HLString &str);
-		HLString16 ToUTF16(const HLString &str);
-		HLString ToUTF8(const HLString32 &str);
-		HLString ToUTF8(const HLString16 &str);
 	}
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLShader.h"
@@ -295,6 +295,16 @@ namespace highlo
 		Release();
 	}
 
+	static void temp_gl_error(const char *source)
+	{
+		GLenum error = glGetError();
+		while (error != GL_NO_ERROR)
+		{
+			HL_CORE_ERROR("GLERROR - source: {0}, error: {1}", source, error);
+			error = glGetError();
+		}
+	}
+
 	void OpenGLShader::Reload(bool forceCompile)
 	{
 		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Reloading shader {0}... [+]", **m_AssetPath);
@@ -324,11 +334,13 @@ namespace highlo
 	void OpenGLShader::Bind() const
 	{
 		glUseProgram(m_RendererID);
+		temp_gl_error("glUseProgram 1");
 	}
 
 	void OpenGLShader::Unbind()
 	{
 		glUseProgram(0);
+		temp_gl_error("glUseProgram 0");
 	}
 
 	void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
@@ -720,9 +732,9 @@ namespace highlo
 	{
 		FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
-		FILE *f;
+		FILE *f = nullptr;
 		errno_t err = fopen_s(&f, **p, "rb");
-		if (err)
+		if (err || !f)
 			return;
 
 		fseek(f, 0, SEEK_END);
@@ -743,18 +755,22 @@ namespace highlo
 		shaderRendererIds.reserve(shaderData.size());
 		
 		GLuint program = glCreateProgram();
+		temp_gl_error("glCreateProgram");
 
 		m_ConstantBufferOffset = 0;
 		for (auto &[stage, data] : shaderData)
 		{
 			GLuint shaderId = glCreateShader(stage);
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
+			temp_gl_error("glShaderBinary");
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
+			temp_gl_error("glSpecializeShader");
 
 			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 
 			GLint isCompiled = 0;
 			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
+			temp_gl_error("glGetShaderiv");
 			if (isCompiled == GL_FALSE)
 			{
 				GLint maxInfoLength = 0;
@@ -785,6 +801,7 @@ namespace highlo
 			}
 
 			glAttachShader(program, shaderId);
+			temp_gl_error("glAttachShader");
 			shaderRendererIds.emplace_back(shaderId);
 		}
 
@@ -793,9 +810,11 @@ namespace highlo
 		
 		HL_ASSERT(program != 0);
 		glLinkProgram(program);
+		temp_gl_error("glLinkProgram");
 
 		GLint isLinked = 0;
 		glGetProgramiv(program, GL_LINK_STATUS, (GLint*)&isLinked);
+		temp_gl_error("glGetProgramiv");
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxInfoLength = 0;
@@ -853,10 +872,13 @@ namespace highlo
 					// Compile success
 					FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
-					FILE *f;
+					FILE *f = nullptr;
 					errno_t fileError = fopen_s(&f, **p, "wb");
-					if (fileError)
+					if (fileError || !f)
+					{
 						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to cache shader binary! [-]");
+						return;
+					}
 
 					fwrite(shaderData[stage].data(), sizeof(uint32), shaderData[stage].size(), f);
 					fclose(f);

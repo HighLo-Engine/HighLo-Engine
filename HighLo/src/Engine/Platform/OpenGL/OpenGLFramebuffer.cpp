@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLFramebuffer.h"
@@ -132,6 +132,16 @@ namespace highlo
 		}
 	}
 
+	static void temp_gl_error(const char *source)
+	{
+		GLenum error = glGetError();
+		while (error != GL_NO_ERROR)
+		{
+			HL_CORE_ERROR("GLERROR - source: {0}, error: {1}", source, error);
+			error = glGetError();
+		}
+	}
+
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification &spec)
 		: m_Specification(spec)
 	{
@@ -231,7 +241,9 @@ namespace highlo
 		}
 
 		glGenFramebuffers(1, &m_RendererID);
+		temp_gl_error("glGenFramebuffers");
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		temp_gl_error("glBindFramebuffer");
 		bool multisampled = m_Specification.Samples > 1;
 
 		if (m_ColorAttachmentFormats.size())
@@ -247,47 +259,58 @@ namespace highlo
 				{
 					case TextureFormat::SRGB:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_SRGB8, GL_SRGB, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("srgb color attachment");
 						break;
 
 					case TextureFormat::RGB:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGB8, GL_RGB, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rgb color attachment");
 						break;
 
 					case TextureFormat::RGBA8:
 					case TextureFormat::RGBA:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rgba/rgba8 color attachment");
 						break;
 
 					case TextureFormat::RG16F:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RG16F, GL_RG, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rg16F color attachment");
 						break;
 
 					case TextureFormat::RGBA16:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA16, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rgba16 color attachment");
 						break;
 
 					case TextureFormat::RGBA16F:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA16F, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rgba16f color attachment");
 						break;
 
 					case TextureFormat::RG32F:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RG32F, GL_RG, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rg32f color attachment");
 						break;
 
 					case TextureFormat::RGBA32:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA32I, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rgba32 color attachment");
 						break;
 
 					case TextureFormat::RGBA32F:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA32F, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("rgba32f color attachment");
 						break;
 
 					case TextureFormat::RED32F:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_R32F, GL_RED, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("red 32f color attachment");
 						break;
 
 					case TextureFormat::RED_INTEGER:
 						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, int32(i));
+						temp_gl_error("red integer color attachment");
 						break;
 				}
 			}
@@ -301,10 +324,12 @@ namespace highlo
 			{
 				case TextureFormat::DEPTH24STENCIL8:
 					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					temp_gl_error("Depth24stencil8 depth attachment");
 					break;
 
 				case TextureFormat::DEPTH32F:
 					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH_COMPONENT32F, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+					temp_gl_error("Depth32F depth attachment");
 					break;
 			}
 		}
@@ -314,11 +339,13 @@ namespace highlo
 			HL_ASSERT(m_ColorAttachments.size() <= 4, "We only support 4 color passes for now");
 			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 			glDrawBuffers((GLsizei)m_ColorAttachments.size(), buffers);
+			temp_gl_error("glDrawBuffers");
 		}
 		else if (m_ColorAttachments.empty())
 		{
 			// Draw only depth-pass
 			glDrawBuffer(GL_NONE);
+			temp_gl_error("glDrawBuffers none");
 		}
 
 		HL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");

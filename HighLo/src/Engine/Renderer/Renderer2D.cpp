@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Renderer2D.h"
@@ -374,7 +374,7 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData->ActiveCommandBuffer->Begin();
-		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass, true);
+		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass);
 
 		FlushQuads();
 		FlushCircles();

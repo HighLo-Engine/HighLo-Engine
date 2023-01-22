@@ -17,15 +17,16 @@ namespace highlo
 	static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
 	static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
 
-	DX11Shader::DX11Shader(const FileSystemPath &filePath, bool forceCompile)
+	DX11Shader::DX11Shader(const FileSystemPath &filePath, bool forceCompile, ShaderLanguage language)
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
+		m_Language = language;
 	}
 
 	DX11Shader::DX11Shader(const HLString &source)
 	{
-m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for all apis, so that the user can still access this shader through the shader library
+		m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for all apis, so that the user can still access this shader through the shader library
 	}
 
 	DX11Shader::~DX11Shader()

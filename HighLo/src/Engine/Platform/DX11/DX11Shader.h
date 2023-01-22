@@ -18,7 +18,7 @@ namespace highlo
 	{
 	public:
 
-		DX11Shader(const FileSystemPath &filePath, bool forceCompile = false);
+		DX11Shader(const FileSystemPath &filePath, bool forceCompile = false, ShaderLanguage language = ShaderLanguage::None);
 		DX11Shader(const HLString &source);
 		virtual ~DX11Shader();
 
@@ -45,6 +45,7 @@ namespace highlo
 		bool m_Loaded = false;
 		bool m_IsCompute = false;
 		FileSystemPath m_AssetPath;
+		ShaderLanguage m_Language = ShaderLanguage::None;
 
 		std::unordered_map<HLString, HLString> m_Macros;
 		std::unordered_set<HLString> m_AcknowledgedMacros;

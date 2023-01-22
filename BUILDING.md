@@ -10,19 +10,19 @@ Our build system already supports all common operating systems. But the code mig
 
 ```sh
 # This builds the visual studio files with default settings (no unit tests and visual studio version 2022)
-python GenerateEngine.py
+python3 GenerateEngine.py
 ```
 
 ## Generate older visual studio versions
 
 ```sh
-python GenerateEngine.py --visual-studio=2019
+python3 GenerateEngine.py --visual-studio=2019
 ```
 
 ## Generate Unit tests
 
 ```sh
-python GenerateEngine.py --generate-unit-tests
+python3 GenerateEngine.py --generate-unit-tests
 ```
 
 ## Options

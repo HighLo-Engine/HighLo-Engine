@@ -2,6 +2,8 @@
   <img src="/HighLo.png" alt="HighLo-Logo" width="1024">
 </p>
 
+[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)](https://www.tickgit.com/browse?repo=github.com/HighLo-Engine/HighLo-Engine)
+
 # HighLo-Engine
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.
@@ -22,7 +24,7 @@ cd HighLo-Engine
 
 ```sh
 # generate the solution files for mac or the makefiles for linux or the visual studio solution files for windows
-python scripts/GenerateEngine.py
+python Scripts/GenerateEngine.py
 ```
 
 # Building the engine

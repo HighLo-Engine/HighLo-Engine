@@ -79,7 +79,7 @@
  * std::vector<uint32> values;
  * reader->ReadUInt32Array("", values);
  *
- * // you can specify a specific subobjects from which you want to retrieve the array, let's say for example we have the json file:
+ * // you can specify specific subobjects from which you want to retrieve the array, let's say for example we have the json file:
  * {
  *   "someKey": "someValue",
  *   "someArray": [
@@ -161,74 +161,59 @@ namespace highlo
 		HLAPI virtual bool WriteMat4(const HLString &key, const glm::mat4 &value) = 0;
 		HLAPI virtual bool WriteQuaternion(const HLString &key, const glm::quat &value) = 0;
 
-		HLAPI virtual bool WriteStringArray(const HLString &key, std::vector<HLString> &value) = 0;
-		HLAPI virtual bool WriteInt32Array(const HLString &key, std::vector<int32> &value) = 0;
-		HLAPI virtual bool WriteUInt32Array(const HLString &key, std::vector<uint32> &value) = 0;
-		HLAPI virtual bool WriteInt64Array(const HLString &key, std::vector<int64> &value) = 0;
-		HLAPI virtual bool WriteUInt64Array(const HLString &key, std::vector<uint64> &value) = 0;
-		HLAPI virtual bool WriteBoolArray(const HLString &key, std::vector<bool> &value) = 0;
-		HLAPI virtual bool WriteFloatArray(const HLString &key, std::vector<float> &value) = 0;
-		HLAPI virtual bool WriteDoubleArray(const HLString &key, std::vector<double> &value) = 0;
-		HLAPI virtual bool WriteVec2Array(const HLString &key, std::vector<glm::vec2> &value) = 0;
-		HLAPI virtual bool WriteVec3Array(const HLString &key, std::vector<glm::vec3> &value) = 0;
-		HLAPI virtual bool WriteVec4Array(const HLString &key, std::vector<glm::vec4> &value) = 0;
-		HLAPI virtual bool WriteMat2Array(const HLString &key, std::vector<glm::mat2> &value) = 0;
-		HLAPI virtual bool WriteMat3Array(const HLString &key, std::vector<glm::mat3> &value) = 0;
-		HLAPI virtual bool WriteMat4Array(const HLString &key, std::vector<glm::mat4> &value) = 0;
-		HLAPI virtual bool WriteQuaternionArray(const HLString &key, std::vector<glm::quat> &value) = 0;
+		HLAPI virtual bool WriteStringArray(const HLString &key, const std::vector<HLString> &value) = 0;
+		HLAPI virtual bool WriteInt32Array(const HLString &key, const std::vector<int32> &value) = 0;
+		HLAPI virtual bool WriteUInt32Array(const HLString &key, const std::vector<uint32> &value) = 0;
+		HLAPI virtual bool WriteInt64Array(const HLString &key, const std::vector<int64> &value) = 0;
+		HLAPI virtual bool WriteUInt64Array(const HLString &key, const std::vector<uint64> &value) = 0;
+		HLAPI virtual bool WriteBoolArray(const HLString &key, const std::vector<bool> &value) = 0;
+		HLAPI virtual bool WriteFloatArray(const HLString &key, const std::vector<float> &value) = 0;
+		HLAPI virtual bool WriteDoubleArray(const HLString &key, const std::vector<double> &value) = 0;
+		HLAPI virtual bool WriteVec2Array(const HLString &key, const std::vector<glm::vec2> &value) = 0;
+		HLAPI virtual bool WriteVec3Array(const HLString &key, const std::vector<glm::vec3> &value) = 0;
+		HLAPI virtual bool WriteVec4Array(const HLString &key, const std::vector<glm::vec4> &value) = 0;
+		HLAPI virtual bool WriteMat2Array(const HLString &key, const std::vector<glm::mat2> &value) = 0;
+		HLAPI virtual bool WriteMat3Array(const HLString &key, const std::vector<glm::mat3> &value) = 0;
+		HLAPI virtual bool WriteMat4Array(const HLString &key, const std::vector<glm::mat4> &value) = 0;
+		HLAPI virtual bool WriteQuaternionArray(const HLString &key, const std::vector<glm::quat> &value) = 0;
 
-		HLAPI virtual bool ReadStringArray(const HLString &key, std::vector<HLString> &value) = 0;
-		HLAPI virtual bool ReadInt32Array(const HLString &key, std::vector<int32> &value) = 0;
-		HLAPI virtual bool ReadUInt32Array(const HLString &key, std::vector<uint32> &value) = 0;
-		HLAPI virtual bool ReadInt64Array(const HLString &key, std::vector<int64> &value) = 0;
-		HLAPI virtual bool ReadUInt64Array(const HLString &key, std::vector<uint64> &value) = 0;
-		HLAPI virtual bool ReadBoolArray(const HLString &key, std::vector<bool> &value) = 0;
-		HLAPI virtual bool ReadFloatArray(const HLString &key, std::vector<float> &value) = 0;
-		HLAPI virtual bool ReadDoubleArray(const HLString &key, std::vector<double> &value) = 0;
-		HLAPI virtual bool ReadVec2Array(const HLString &key, std::vector<glm::vec2> &value) = 0;
-		HLAPI virtual bool ReadVec3Array(const HLString &key, std::vector<glm::vec3> &value) = 0;
-		HLAPI virtual bool ReadVec4Array(const HLString &key, std::vector<glm::vec4> &value) = 0;
-		HLAPI virtual bool ReadMat2Array(const HLString &key, std::vector<glm::mat2> &value) = 0;
-		HLAPI virtual bool ReadMat3Array(const HLString &key, std::vector<glm::mat3> &value) = 0;
-		HLAPI virtual bool ReadMat4Array(const HLString &key, std::vector<glm::mat4> &value) = 0;
-		HLAPI virtual bool ReadQuatArray(const HLString &key, std::vector<glm::quat> &value) = 0;
+		HLAPI virtual bool WriteStringArrayMap(const HLString &key, const std::map<HLString, HLString> &map) = 0;
+		HLAPI virtual bool WriteInt32ArrayMap(const HLString &key, const std::map<HLString, int32> &map) = 0;
+		HLAPI virtual bool WriteUInt32ArrayMap(const HLString &key, const std::map<HLString, uint32> &map) = 0;
+		HLAPI virtual bool WriteInt64ArrayMap(const HLString &key, const std::map<HLString, int64> &map) = 0;
+		HLAPI virtual bool WriteUInt64ArrayMap(const HLString &key, const std::map<HLString, uint64> &map) = 0;
+		HLAPI virtual bool WriteBoolArrayMap(const HLString &key, const std::map<HLString, bool> &map) = 0;
+		HLAPI virtual bool WriteFloatArrayMap(const HLString &key, const std::map<HLString, float> &map) = 0;
+		HLAPI virtual bool WriteDoubleArrayMap(const HLString &key, const std::map<HLString, double> &map) = 0;
 
-		HLAPI virtual bool ReadStringArrayMap(const HLString &key, std::map<HLString, HLString> &value) = 0;
-		HLAPI virtual bool ReadInt32ArrayMap(const HLString &key, std::map<HLString, int32> &value) = 0;
-		HLAPI virtual bool ReadUInt32ArrayMap(const HLString &key, std::map<HLString, uint32> &value) = 0;
-		HLAPI virtual bool ReadInt64ArrayMap(const HLString &key, std::map<HLString, int64> &value) = 0;
-		HLAPI virtual bool ReadUInt64ArrayMap(const HLString &key, std::map<HLString, uint64> &value) = 0;
-		HLAPI virtual bool ReadBoolArrayMap(const HLString &key, std::map<HLString, bool> &value) = 0;
-		HLAPI virtual bool ReadFloatArrayMap(const HLString &key, std::map<HLString, float> &value) = 0;
-		HLAPI virtual bool ReadDoubleArrayMap(const HLString &key, std::map<HLString, double> &value) = 0;
-		HLAPI virtual bool ReadVec2ArrayMap(const HLString &key, std::map<HLString, glm::vec2> &value) = 0;
-		HLAPI virtual bool ReadVec3ArrayMap(const HLString &key, std::map<HLString, glm::vec3> &value) = 0;
-		HLAPI virtual bool ReadVec4ArrayMap(const HLString &key, std::map<HLString, glm::vec4> &value) = 0;
-		HLAPI virtual bool ReadMat2ArrayMap(const HLString &key, std::map<HLString, glm::mat2> &value) = 0;
-		HLAPI virtual bool ReadMat3ArrayMap(const HLString &key, std::map<HLString, glm::mat3> &value) = 0;
-		HLAPI virtual bool ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &value) = 0;
-		HLAPI virtual bool ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &value) = 0;
+		HLAPI virtual bool WriteVec2ArrayMap(const HLString &key, const std::map<HLString, glm::vec2> &map) = 0;
+		HLAPI virtual bool WriteVec3ArrayMap(const HLString &key, const std::map<HLString, glm::vec3> &map) = 0;
+		HLAPI virtual bool WriteVec4ArrayMap(const HLString &key, const std::map<HLString, glm::vec4> &map) = 0;
+		HLAPI virtual bool WriteMat2ArrayMap(const HLString &key, const std::map<HLString, glm::mat2> &map) = 0;
+		HLAPI virtual bool WriteMat3ArrayMap(const HLString &key, const std::map<HLString, glm::mat3> &map) = 0;
+		HLAPI virtual bool WriteMat4ArrayMap(const HLString &key, const std::map<HLString, glm::mat4> &map) = 0;
+		HLAPI virtual bool WriteQuaternionArrayMap(const HLString &key, const std::map<HLString, glm::quat> &map) = 0;
 
-		HLAPI virtual bool ReadFloat(const HLString &key, float *value) = 0;
-		HLAPI virtual bool ReadDouble(const HLString &key, double *value) = 0;
-		HLAPI virtual bool ReadInt32(const HLString &key, int32 *value) = 0;
-		HLAPI virtual bool ReadUInt32(const HLString &key, uint32 *value) = 0;
-		HLAPI virtual bool ReadInt64(const HLString &key, int64 *value) = 0;
-		HLAPI virtual bool ReadUInt64(const HLString &key, uint64 *value) = 0;
-		HLAPI virtual bool ReadBool(const HLString &key, bool *value) = 0;
-		HLAPI virtual bool ReadString(const HLString &key, HLString *value) = 0;
+		HLAPI virtual bool WriteStringArrayMap(const HLString &key, const std::unordered_map<HLString, HLString> &map) = 0;
+		HLAPI virtual bool WriteInt32ArrayMap(const HLString &key, const std::unordered_map<HLString, int32> &map) = 0;
+		HLAPI virtual bool WriteUInt32ArrayMap(const HLString &key, const std::unordered_map<HLString, uint32> &map) = 0;
+		HLAPI virtual bool WriteInt64ArrayMap(const HLString &key, const std::unordered_map<HLString, int64> &map) = 0;
+		HLAPI virtual bool WriteUInt64ArrayMap(const HLString &key, const std::unordered_map<HLString, uint64> &map) = 0;
+		HLAPI virtual bool WriteBoolArrayMap(const HLString &key, const std::unordered_map<HLString, bool> &map) = 0;
+		HLAPI virtual bool WriteFloatArrayMap(const HLString &key, const std::unordered_map<HLString, float> &map) = 0;
+		HLAPI virtual bool WriteDoubleArrayMap(const HLString &key, const std::unordered_map<HLString, double> &map) = 0;
 
-		HLAPI virtual bool ReadVector2(const HLString &key, glm::vec2 *value) = 0;
-		HLAPI virtual bool ReadVector3(const HLString &key, glm::vec3 *value) = 0;
-		HLAPI virtual bool ReadVector4(const HLString &key, glm::vec4 *value) = 0;
-		HLAPI virtual bool ReadMatrix2(const HLString &key, glm::mat2 *value) = 0;
-		HLAPI virtual bool ReadMatrix3(const HLString &key, glm::mat3 *value) = 0;
-		HLAPI virtual bool ReadMatrix4(const HLString &key, glm::mat4 *value) = 0;
-		HLAPI virtual bool ReadQuaternion(const HLString &key, glm::quat *value) = 0;
+		HLAPI virtual bool WriteVec2ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec2> &map) = 0;
+		HLAPI virtual bool WriteVec3ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec3> &map) = 0;
+		HLAPI virtual bool WriteVec4ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::vec4> &map) = 0;
+		HLAPI virtual bool WriteMat2ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat2> &map) = 0;
+		HLAPI virtual bool WriteMat3ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat3> &map) = 0;
+		HLAPI virtual bool WriteMat4ArrayMap(const HLString &key, const std::unordered_map<HLString, glm::mat4> &map) = 0;
+		HLAPI virtual bool WriteQuaternionArrayMap(const HLString &key, const std::unordered_map<HLString, glm::quat> &map) = 0;
 
 		HLAPI virtual bool HasKey(const HLString &key) const = 0;
 		HLAPI virtual bool WriteOut() = 0;
-		HLAPI virtual bool ReadContents(const FileSystemPath &filePath = "") = 0;
+		
 		HLAPI virtual HLString GetContent(bool prettify = false) = 0;
 		HLAPI virtual void SetContent(const HLString &content) = 0;
 

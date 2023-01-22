@@ -3,10 +3,9 @@
 #include "HighLoPch.h"
 #include "DocumentReader.h"
 
-#if 0
-
-#include "Engine/Platform/RapidJSON/JsonReader.h"
-#include "Engine/Platform/RapidXML/XMLReader.h"
+#include "Engine/ThirdParty/RapidJSON/JsonReader.h"
+#include "Engine/ThirdParty/RapidXML/XMLReader.h"
+#include "Engine/ThirdParty/YamlCPP/YamlReader.h"
 
 namespace highlo
 {
@@ -21,7 +20,7 @@ namespace highlo
 				return Ref<XMLReader>::Create(filePath);
 
 			case DocumentType::Yaml:
-				break;
+				return Ref<YamlReader>::Create(filePath);
 		}
 
 		// Use default parser
@@ -29,4 +28,3 @@ namespace highlo
 	}
 }
 
-#endif

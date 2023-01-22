@@ -2,23 +2,23 @@
 
 //
 // version history:
-//     - 1.0 (2022-03-08) initial release
+//     - 1.0 (2022-09-26) initial release
 //
 
 #pragma once
 
 #include "Engine/Loaders/DocumentReader.h"
 
-#include <rapidxml/rapidxml.hpp>
+#include <yaml-cpp/yaml.h>
 
 namespace highlo
 {
-	class XMLReader : public DocumentReader
+	class YamlReader : public DocumentReader
 	{
 	public:
 
-		XMLReader(const FileSystemPath &filePath);
-		virtual ~XMLReader();
+		YamlReader(const FileSystemPath &filePath);
+		virtual ~YamlReader();
 
 		virtual bool ReadFloat(const HLString &key, float *result) override;
 		virtual bool ReadDouble(const HLString &key, double *result) override;
@@ -91,17 +91,8 @@ namespace highlo
 
 	private:
 
-		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
-		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
-		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidxml::xml_node<>*)> &insertFunc);
-
-	private:
-
 		FileSystemPath m_FilePath;
-		HLString m_EngineVersion;
-
-		rapidxml::xml_document<> m_Document;
-		rapidxml::xml_node<> *m_RootNode = nullptr;
+		YAML::Emitter m_Emitter;
 	};
 }
 

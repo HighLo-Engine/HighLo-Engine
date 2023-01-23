@@ -4,6 +4,7 @@
 #include "DX11Shader.h"
 
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Utils/ShaderUtils.h"
 
 /// @note @FlareFlax:
 /// for DirectX we probably need HLSL, but our shaders are only written in glsl. (no problem with SPIR-V ;))
@@ -17,16 +18,20 @@ namespace highlo
 	static std::unordered_map<uint32, ShaderUniformBuffer> s_UniformBuffers;
 	static std::unordered_map<uint32, ShaderStorageBuffer> s_StorageBuffers;
 
-	DX11Shader::DX11Shader(const FileSystemPath &filePath, bool forceCompile, ShaderLanguage language)
+	DX11Shader::DX11Shader(const FileSystemPath &filePath, bool forceCompile)
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
-		m_Language = language;
+		m_Language = utils::ShaderLanguageFromExtension(filePath.Extension());
+		HLString source = FileSystem::Get()->ReadTextFile(filePath);
+	//	Load(source, forceCompile);
 	}
 
-	DX11Shader::DX11Shader(const HLString &source)
+	DX11Shader::DX11Shader(const HLString &source, const HLString &name, ShaderLanguage language)
 	{
-		m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for all apis, so that the user can still access this shader through the shader library
+		m_Name = name;
+		m_Language = language;
+	//	Load(source, true);
 	}
 
 	DX11Shader::~DX11Shader()

@@ -18,8 +18,8 @@ namespace highlo
 	{
 	public:
 
-		DX11Shader(const FileSystemPath &filePath, bool forceCompile = false, ShaderLanguage language = ShaderLanguage::None);
-		DX11Shader(const HLString &source);
+		DX11Shader(const FileSystemPath &filePath, bool forceCompile = false);
+		DX11Shader(const HLString &source, const HLString &name = "undefined", ShaderLanguage language = ShaderLanguage::None);
 		virtual ~DX11Shader();
 
 		virtual void Reload(bool forceCompile = false) override;

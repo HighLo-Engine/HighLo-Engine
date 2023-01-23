@@ -15,4 +15,5 @@
 #include "InputUtils.h"
 #include "LoaderUtils.h"
 #include "StringUtils.h"
+#include "ShaderUtils.h"
 

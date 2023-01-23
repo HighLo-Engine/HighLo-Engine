@@ -14,6 +14,7 @@
 #include <libshaderc_util/file_finder.h>
 
 #include "Engine/Graphics/Shaders/GLSLIncluder.h"
+#include "Engine/Utils/ShaderUtils.h"
 #include "OpenGLUtils.h"
 
 namespace highlo
@@ -154,17 +155,6 @@ namespace highlo
 
 			HL_ASSERT(false);
 			return {};
-		}
-
-		static ShaderLanguage ShaderLanguageFromExtension(const HLString &extension)
-		{
-			if (extension == "glsl")
-				return ShaderLanguage::GLSL;
-
-			if (extension == "hlsl")
-				return ShaderLanguage::HLSL;
-
-			return ShaderLanguage::None;
 		}
 
 		static HLString ShaderStageCachedFileExtension(const GLenum stage)

@@ -229,16 +229,6 @@ namespace highlo
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			instance->m_UniformBufferSet->GetUniform(17, 0, frameIndex)->SetData(&screenData, sizeof(screenData));
 		});
-
-		// Set current scene env
-		// TODO: Uncomment when shadowpasses and pre-depth images are working
-		/*
-		Renderer::SetSceneEnvironment(
-			this,
-			m_SceneData.SceneEnvironment,
-			m_ShadowPassVertexArrays[0]->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>(), 
-			m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>());
-		*/
 	}
 
 	void SceneRenderer::EndScene()
@@ -483,7 +473,6 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-	//	return m_GeometryVertexArray->GetSpecification().RenderPass;
 		return m_CompositeVertexArray->GetSpecification().RenderPass;
 	}
 
@@ -572,22 +561,6 @@ namespace highlo
 		}
 
 		m_SubmeshTransformBuffer->UpdateContents(m_TransformVertexData, offset * sizeof(TransformVertexData));
-
-		m_UniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
-		{
-			uniformBuffer->Bind();
-		});
-
-		/*
-		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-		m_UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind(); // Camera Uniform buffer block
-		m_UniformBufferSet->GetUniform(1, 0, frameIndex)->Bind(); // Shadow Uniform buffer block
-		m_UniformBufferSet->GetUniform(2, 0, frameIndex)->Bind(); // Scene Uniform buffer block
-		m_UniformBufferSet->GetUniform(3, 0, frameIndex)->Bind(); // Renderer Data Uniform buffer block
-		m_UniformBufferSet->GetUniform(4, 0, frameIndex)->Bind(); // PointLights Uniform buffer block
-		m_UniformBufferSet->GetUniform(17, 0, frameIndex)->Bind(); // Screen data Uniform buffer block
-		m_UniformBufferSet->GetUniform(18, 0, frameIndex)->Bind(); // HBAO data Uniform buffer block
-		*/
 	}
 
 	void SceneRenderer::ClearPass()
@@ -681,16 +654,6 @@ namespace highlo
 		// Render normal geometry
 		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
 
-		// First render skybox
-	//	m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
-	//	m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
-	//
-	//	const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
-	//	
-	//	m_SkyboxMaterial->Set("u_Texture", radianceMap);
-	//	
-	//	Renderer::RenderQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
-
 		// Now render static and dynamic meshes
 		for (auto &[mk, dc] : m_StaticDrawList)
 		{
@@ -703,15 +666,6 @@ namespace highlo
 			const auto &transformData = m_MeshTransformMap.at(mk);
 			Renderer::RenderInstancedDynamicMesh(m_CommandBuffer, m_GeometryVertexArray, m_UniformBufferSet, m_StorageBufferSet, dc.Model, dc.SubmeshIndex, dc.Materials ? dc.Materials : dc.Model->GetMaterials(), m_SubmeshTransformBuffer, transformData.TransformOffset, dc.InstanceCount);
 		}
-
-		// Grid
-	//	if (GetOptions().ShowGrid)
-	//	{
-	//		const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f })
-	//			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
-	//
-	//		Renderer::RenderQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
-	//	}
 
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
@@ -731,7 +685,7 @@ namespace highlo
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	
-		m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
+	//	m_CompositeMaterial->Set("u_Uniforms.Exposure", exposure);
 		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
 	
 		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
@@ -938,7 +892,7 @@ namespace highlo
 		frameBufferSpec.DebugName = "Geometry";
 		frameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		frameBufferSpec.Samples = 1;
-		frameBufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+		frameBufferSpec.ClearColor = { 1.0f, 0.1f, 0.1f, 1.0f };
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Geometry";
@@ -1037,7 +991,7 @@ namespace highlo
 	{
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "SceneComposite";
-		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+		framebufferSpec.ClearColor = { 0.1f, 1.0f, 0.1f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
 
 		if (m_Specification.SwapChain)
@@ -1092,7 +1046,9 @@ namespace highlo
 		spec.DepthTest = true;
 		spec.LineWidth = 2.0f;
 		m_GeometryWireframeVertexArray = VertexArray::Create(spec);
+		
 		spec.DepthTest = false;
+		spec.DebugName = "Wireframe-OnTop";
 		m_GeometryWireframeOnTopVertexArray = VertexArray::Create(spec);
 		m_WireframeMaterial = Material::Create(shader, "WireframeMaterial");
 	}

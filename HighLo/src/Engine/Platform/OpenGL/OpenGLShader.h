@@ -62,6 +62,7 @@ namespace highlo
 		// Shader-Reflection
 		void ReflectAllShaderStages(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData);
 		void Reflect(GLenum shaderStage, const std::vector<uint32> &shaderData);
+		void LoadCachedReflectionData();
 
 		// Shader-compilation
 		HLString Compile(std::unordered_map<GLenum, std::vector<uint32>> &outputBinary, const GLenum stage) const;

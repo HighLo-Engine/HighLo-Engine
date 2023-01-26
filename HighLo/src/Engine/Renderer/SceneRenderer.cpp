@@ -727,7 +727,7 @@ namespace highlo
 	void SceneRenderer::CompositePass()
 	{
 		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
-		auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+		auto &framebuffer = m_ExternalCompositingRenderPass->GetSpecification().Framebuffer;
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	

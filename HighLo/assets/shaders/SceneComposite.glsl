@@ -111,10 +111,10 @@ void main()
 	vec3 color = texture(u_Texture, Input.TexCoord).rgb;
 	//color += bloom;
 	//color += bloom * bloomDirt;
-	color *= u_Uniforms.Exposure;
+	//color *= u_Uniforms.Exposure;
 
-	color = ACESTonemap(color);
-	color = GammaCorrect(color.rgb, gamma);
+	//color = ACESTonemap(color);
+	//color = GammaCorrect(color.rgb, gamma);
 	o_Color = vec4(color, 1.0);
 }
 

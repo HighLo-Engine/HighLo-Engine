@@ -137,7 +137,7 @@ namespace highlo
 		glEnable(GL_STENCIL_TEST);
 
 		GLenum error = glGetError();
-		HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
+	//	HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
 		while (error != GL_NO_ERROR)
 		{
 			HL_CORE_ERROR(GL_RENDERING_API_LOG_PREFIX "[-] OpenGL Error: {0} [-]", error);

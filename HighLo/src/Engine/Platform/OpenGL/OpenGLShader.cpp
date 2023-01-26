@@ -671,6 +671,11 @@ namespace highlo
 	#endif // PRINT_DEBUG_OUTPUTS
 	}
 
+	void OpenGLShader::LoadCachedReflectionData()
+	{
+		// TODO
+	}
+
 	void OpenGLShader::ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData)
 	{
 		m_Resources.clear();

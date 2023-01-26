@@ -32,7 +32,6 @@ namespace highlo
 		template<typename T>
 		void Set(const HLString &name, const T &value)
 		{
-			HL_CORE_TRACE("{0}", *name);
 			auto decl = FindUniformDeclaration(name);
 			HL_ASSERT(decl);
 			if (!decl)

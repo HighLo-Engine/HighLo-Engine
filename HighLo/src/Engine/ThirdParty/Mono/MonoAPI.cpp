@@ -205,7 +205,10 @@ namespace highlo
 	bool MonoAPI::LoadCoreAssembly()
 	{
 		if (!s_ScriptingData->Config.CoreAssemblyPath.Exists())
+		{
+			HL_CORE_WARN("Could not find core assembly at path {0}", **s_ScriptingData->Config.CoreAssemblyPath);
 			return false;
+		}
 
 		s_ScriptingData->AppDomain = mono_domain_create_appdomain("HighLoScriptRuntime", nullptr);
 		HL_ASSERT(s_ScriptingData->AppDomain);

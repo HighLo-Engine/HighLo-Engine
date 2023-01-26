@@ -303,11 +303,6 @@ namespace highlo
 	{
 		const auto &shaderBuffers = m_Shader->GetShaderBuffers();
 
-		for (const auto &[n, buffer] : shaderBuffers)
-		{
-			HL_CORE_TRACE("{0}", *n);
-		}
-
 		if (shaderBuffers.size() > 0)
 		{
 			for (const auto &[n, buffer] : shaderBuffers)

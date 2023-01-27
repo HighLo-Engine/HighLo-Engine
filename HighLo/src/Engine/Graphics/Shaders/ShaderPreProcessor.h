@@ -471,6 +471,7 @@ namespace highlo
 			shaderSources[stage] = stageStr;
 		}
 
+		// TODO: Investigate why weird characters are before the #version
 		// Cleanup: make sure nothing is before a #version command
 		for (auto &[stage, source] : shaderSources)
 		{

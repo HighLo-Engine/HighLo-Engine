@@ -109,21 +109,21 @@ namespace highlo
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-	//	GLuint vao;
-	//	glGenVertexArrays(1, &vao);
-	//	glBindVertexArray(vao);
-	//
-	//	// Load Renderer Caps
-	//	auto& caps = Renderer::GetCapabilities();
-	//	caps.Vendor = (const char*)glGetString(GL_VENDOR);
-	//	caps.Device = (const char*)glGetString(GL_RENDERER);
-	//	caps.Version = (const char*)glGetString(GL_VERSION);
-	//	glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
-	//	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
-	//	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &caps.MaxTextures);
-	//	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	
+		// Load Renderer Caps
+		auto& caps = Renderer::GetCapabilities();
+		caps.Vendor = (const char*)glGetString(GL_VENDOR);
+		caps.Device = (const char*)glGetString(GL_RENDERER);
+		caps.Version = (const char*)glGetString(GL_VERSION);
+		glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &caps.MaxTextures);
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
 
-	//	utils::DumpGPUInfos();
+		utils::DumpGPUInfos();
 
 		glEnable(GL_DEPTH_TEST);
 
@@ -137,12 +137,12 @@ namespace highlo
 		glEnable(GL_STENCIL_TEST);
 
 		GLenum error = glGetError();
-	//	HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
+		HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
 		while (error != GL_NO_ERROR)
 		{
 			HL_CORE_ERROR(GL_RENDERING_API_LOG_PREFIX "[-] OpenGL Error: {0} [-]", error);
 			error = glGetError();
-		//	HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
+			HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
 		}
 
 		float x = -1;

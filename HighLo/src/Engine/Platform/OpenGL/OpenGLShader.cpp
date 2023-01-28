@@ -285,16 +285,6 @@ namespace highlo
 		Release();
 	}
 
-	static void temp_gl_error(const char *source)
-	{
-		GLenum error = glGetError();
-		while (error != GL_NO_ERROR)
-		{
-			HL_CORE_ERROR("GLERROR - source: {0}, error: {1}", source, error);
-			error = glGetError();
-		}
-	}
-
 	void OpenGLShader::Reload(bool forceCompile)
 	{
 		HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+] Reloading shader {0}... [+]", **m_AssetPath);
@@ -324,13 +314,11 @@ namespace highlo
 	void OpenGLShader::Bind() const
 	{
 		glUseProgram(m_RendererID);
-		temp_gl_error("glUseProgram 1");
 	}
 
 	void OpenGLShader::Unbind()
 	{
 		glUseProgram(0);
-		temp_gl_error("glUseProgram 0");
 	}
 
 	void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
@@ -749,23 +737,19 @@ namespace highlo
 		std::vector<GLuint> shaderRendererIds;
 		shaderRendererIds.reserve(shaderData.size());
 		
-		GLuint program = glCreateProgram();
-		temp_gl_error("glCreateProgram");
+		m_RendererID = glCreateProgram();
 
 		m_ConstantBufferOffset = 0;
 		for (auto &[stage, data] : shaderData)
 		{
 			GLuint shaderId = glCreateShader(stage);
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
-			temp_gl_error("glShaderBinary");
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
-			temp_gl_error("glSpecializeShader");
 
 			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 
 			GLint isCompiled = 0;
 			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
-			temp_gl_error("glGetShaderiv");
 			if (isCompiled == GL_FALSE)
 			{
 				GLint maxInfoLength = 0;
@@ -781,8 +765,8 @@ namespace highlo
 					for (auto id : shaderRendererIds)
 						glDeleteShader(id);
 
-					glDeleteProgram(program);
-					program = 0;
+					glDeleteProgram(m_RendererID);
+					m_RendererID = 0;
 				}
 				else
 				{
@@ -795,34 +779,31 @@ namespace highlo
 				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 			}
 
-			glAttachShader(program, shaderId);
-			temp_gl_error("glAttachShader");
+			glAttachShader(m_RendererID, shaderId);
 			shaderRendererIds.emplace_back(shaderId);
 		}
 
 		// Link shader program
 		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Linking Shader {0} [+]", **m_AssetPath);
 		
-		HL_ASSERT(program != 0);
-		glLinkProgram(program);
-		temp_gl_error("glLinkProgram");
+		HL_ASSERT(m_RendererID != 0);
+		glLinkProgram(m_RendererID);
 
 		GLint isLinked = 0;
-		glGetProgramiv(program, GL_LINK_STATUS, (GLint*)&isLinked);
-		temp_gl_error("glGetProgramiv");
+		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (GLint*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxInfoLength = 0;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxInfoLength);
+			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxInfoLength);
 
 			if (maxInfoLength > 0)
 			{
 				std::vector<GLchar> infoLog(maxInfoLength);
-				glGetProgramInfoLog(program, maxInfoLength, &maxInfoLength, &infoLog[0]);
+				glGetProgramInfoLog(m_RendererID, maxInfoLength, &maxInfoLength, &infoLog[0]);
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
-				glDeleteProgram(program);
-				program = 0;
+				glDeleteProgram(m_RendererID);
+				m_RendererID = 0;
 				for (auto id : shaderRendererIds)
 					glDeleteShader(id);
 			}
@@ -839,9 +820,6 @@ namespace highlo
 
 		for (auto id : shaderRendererIds)
 			glDetachShader(m_RendererID, id);
-
-		if (program)
-			m_RendererID = program;
 	}
 	
 	void OpenGLShader::CompileOrGetOpenGLBinary(std::unordered_map<uint32, std::vector<uint32>> &shaderData, bool forceCompile)

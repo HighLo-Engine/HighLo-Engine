@@ -8,8 +8,8 @@ namespace highlo
 	void FontManager::Init()
 	{
 		// Load Default fonts
-		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf"));
-		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf"));
+		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf", FontType::TRUE_TYPE_FONT));
+		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf", FontType::TRUE_TYPE_FONT));
 	}
 	
 	void FontManager::Shutdown()
@@ -63,7 +63,9 @@ namespace highlo
 
 	Ref<Font> FontManager::GetDefaultFont()
 	{
-		return GetFonts()[0];
+		auto &fonts = GetFonts();
+		HL_ASSERT(fonts.size() >= 1);
+		return fonts[0];
 	}
 
 	bool FontManager::HasFont(const HLString &fontName) const

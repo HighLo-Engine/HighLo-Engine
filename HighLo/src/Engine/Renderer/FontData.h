@@ -7,6 +7,9 @@
 
 #pragma once
 
+// @DEPRECATED
+#if 0
+
 // undefine Windows constants
 #undef INFINITE
 #include <msdf-atlas-gen.h>
@@ -19,4 +22,6 @@ namespace highlo
 		std::vector<msdf_atlas::GlyphGeometry> Glyphs;
 	};
 }
+
+#endif
 

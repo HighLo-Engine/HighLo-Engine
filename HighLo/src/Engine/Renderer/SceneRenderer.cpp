@@ -892,7 +892,7 @@ namespace highlo
 		frameBufferSpec.DebugName = "Geometry";
 		frameBufferSpec.Attachments = { TextureFormat::RGBA32F, TextureFormat::RGBA16F, TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		frameBufferSpec.Samples = 1;
-		frameBufferSpec.ClearColor = { 1.0f, 0.1f, 0.1f, 1.0f };
+		frameBufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Geometry";
@@ -991,7 +991,7 @@ namespace highlo
 	{
 		FramebufferSpecification framebufferSpec;
 		framebufferSpec.DebugName = "SceneComposite";
-		framebufferSpec.ClearColor = { 0.1f, 1.0f, 0.1f, 1.0f };
+		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		framebufferSpec.SwapChainTarget = m_Specification.SwapChain;
 
 		if (m_Specification.SwapChain)

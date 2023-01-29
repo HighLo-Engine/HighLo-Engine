@@ -27,6 +27,7 @@ project "HighLo"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.assimp}",
         "%{IncludeDir.stb_image}",
+        "%{IncludeDir.stb_truetype}",
 		"%{IncludeDir.openssl}",
 		"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.msdfgen}",

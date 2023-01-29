@@ -729,10 +729,8 @@ namespace highlo
 
 		// TODO: Change this with actual text from parameter
 		HLString rawText = "Hello World!";
-		HLString32 utf32Text = rawText.ToUTF32();
-		uint32 utf32TextLength = utf32Text.Length();
 
-
+#if 0
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);
 
@@ -762,9 +760,9 @@ namespace highlo
 			double y = -fsScale * metrics.ascenderY;
 			int32 lastSpace = -1;
 
-			for (uint32 i = 0; i < utf32TextLength; ++i)
+			for (uint32 i = 0; i < utf8TextLength; ++i)
 			{
-				char32_t ch = utf32Text[i];
+				char32_t ch = (char32_t)utf8Text[i];
 				if (ch == '\n')
 				{
 					x = 0.0;
@@ -806,7 +804,7 @@ namespace highlo
 				}
 
 				double advance = glyph->getAdvance();
-				fontGeometry.getAdvance(advance, ch, utf32Text[i + 1]);
+				fontGeometry.getAdvance(advance, ch, utf8Text[i + 1]);
 				x += fsScale * advance + kerningOffset;
 			}
 		}
@@ -816,9 +814,9 @@ namespace highlo
 			double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 			double y = 0.0;
 
-			for (uint32 i = 0; i < utf32TextLength; ++i)
+			for (uint32 i = 0; i < utf8TextLength; ++i)
 			{
-				char32_t ch = utf32Text[i];
+				char32_t ch = (char32_t)utf8Text[i];
 				if (ch == '\n' || utils::NextLine(i, nextLines))
 				{
 					x = 0.0;
@@ -872,12 +870,13 @@ namespace highlo
 				s_2DData->TextIndexCount += 6;
 
 				double advance = glyph->getAdvance();
-				fontGeometry.getAdvance(advance, ch, utf32Text[i + 1]);
+				fontGeometry.getAdvance(advance, ch, utf8Text[i + 1]);
 				x += fsScale * advance + kerningOffset;
 			}
 		}
 
 		s_2DData->Statistics.TextCount++;
+#endif
 	}
 
 	void Renderer2D::SetTargetRenderPass(const Ref<RenderPass> &renderPass)

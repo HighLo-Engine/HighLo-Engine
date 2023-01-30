@@ -19,22 +19,45 @@ namespace highlo
 {
 	struct FontGlyph
 	{
+		// The representation of a 4-byte UTF8 character.
 		int32 Codepoint;
+
+		// The X position in pixels.
 		uint16 X;
+
+		// The Y position in pixels.
 		uint16 Y;
+
+		// The width of the box, the character is drawn in, in pixels.
 		uint16 Width;
+
+		// The height of the box, the character is drawn in, in pixels.
 		uint16 Height;
-		int16 XOffset;
-		int16 YOffset;
-		int16 XAdvance;
+		
+		// The XOffset.
+		float XOffset;
+
+		// The YOffset.
+		float YOffset;
+
+		// The XAdvance.
+		float XAdvance;
+
+		// The page id, will not be used for now, but here for later refactorings
+		// (at the moment we only support one texture atlas per font).
 		uint8 PageId;
 	};
 
 	struct FontKerning
 	{
+		// The first UTF8 character.
 		int32 Codepoint1;
+
+		// The second UTF8 character.
 		int32 Codepoint2;
-		int16 Amount;
+
+		// The amount of kerning to apply.
+		int32 Amount;
 	};
 
 	enum class FontType
@@ -42,6 +65,21 @@ namespace highlo
 		NONE = 0,
 		BITMAP_FONT = 1,
 		TRUE_TYPE_FONT = 2
+	};
+
+	struct FontData
+	{
+		HLString Face;
+		FontType Type = FontType::NONE;
+		uint16 Size = 0;
+		int32 LineHeight = 0;
+		int32 Baseline = 0;
+		int32 AtlasSizeX = 0;
+		int32 AtlasSizeY = 0;
+		float TabXAdvance = 0.0f;
+		Ref<Texture2D> Atlas = nullptr;
+		uint32 InternalDataSize = 0;
+		void *InternalData = nullptr;
 	};
 
 	class Font : public Asset
@@ -60,13 +98,31 @@ namespace highlo
 		HLAPI std::vector<FontKerning> &GetAllKernings() { return m_Kernings; }
 		HLAPI const std::vector<FontKerning> &GetAllKernings() const { return m_Kernings; }
 
+		HLAPI virtual bool VerifyAtlas(FontData *font, const HLString &text) = 0;
+
 		HLAPI virtual FileSystemPath &GetAssetPath() = 0;
 		HLAPI virtual const FileSystemPath &GetAssetPath() const = 0;
 
 		HLAPI virtual HLString &GetName() = 0;
 		HLAPI virtual const HLString &GetName() const = 0;
 
-		HLAPI static Ref<Font> Create(const FileSystemPath &path, FontType fontType = FontType::NONE);
+		HLAPI virtual FontType GetFontType() const = 0;
+
+		HLAPI virtual const Ref<Texture2D> &GetAtlas() const = 0;
+		HLAPI virtual int32 GetAtlasSizeX() const = 0;
+		HLAPI virtual int32 GetAtlasSizeY() const = 0;
+
+		HLAPI virtual int32 GetLineHeight() const = 0;
+		HLAPI virtual float GetTabXAdvance() const = 0;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="size">For bitmap fonts it is not necessary, because the whole font file is only in one size. But TrueType fonts can be dynamic.</param>
+		/// <param name="fontType"></param>
+		/// <returns></returns>
+		HLAPI static Ref<Font> Create(const FileSystemPath &path, uint16 size, FontType fontType = FontType::NONE);
 
 	protected:
 

@@ -349,7 +349,7 @@ namespace highlo
 		{
 			HLString result = m_CurrentPath;
 			
-			if (result.EndsWith("/"))
+			if (result.EndsWith('/'))
 				result = result.Substr(0, result.LastIndexOf('/'));
 
 			result = result.Substr(0, result.LastIndexOf('/'));

@@ -5,7 +5,7 @@
 
 namespace highlo
 {
-	BitmapFont::BitmapFont(const FileSystemPath &filePath)
+	BitmapFont::BitmapFont(const FileSystemPath &filePath, uint16 size)
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
@@ -13,6 +13,37 @@ namespace highlo
 
 	BitmapFont::~BitmapFont()
 	{
+	}
+	
+	bool BitmapFont::VerifyAtlas(FontData *font, const HLString &text)
+	{
+		// A bitmap font does not need verification
+		return true;
+	}
+
+	const Ref<Texture2D> &BitmapFont::GetAtlas() const
+	{
+		return nullptr;
+	}
+	
+	int32 BitmapFont::GetAtlasSizeX() const
+	{
+		return 0;
+	}
+	
+	int32 BitmapFont::GetAtlasSizeY() const
+	{
+		return 0;
+	}
+	
+	int32 BitmapFont::GetLineHeight() const
+	{
+		return 0;
+	}
+	
+	float BitmapFont::GetTabXAdvance() const
+	{
+		return 0.0f;
 	}
 }
 

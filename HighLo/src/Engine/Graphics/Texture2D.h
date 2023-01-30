@@ -39,6 +39,8 @@ namespace highlo
 
 		HLAPI static AssetType GetStaticType() { return AssetType::Texture; }
 		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
+
+		HLAPI virtual void SetData(void *data, uint32 data_size) = 0;
 	};
 }
 

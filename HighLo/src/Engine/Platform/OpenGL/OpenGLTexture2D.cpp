@@ -70,7 +70,7 @@ namespace highlo
 
 	OpenGLTexture2D::OpenGLTexture2D(const glm::vec3 &rgb, TextureFormat format)
 	{
-		if (format == TextureFormat::RGBA8)
+		if (format == TextureFormat::RGBA8 || format == TextureFormat::RGBA)
 		{
 			Byte data[4];
 			data[0] = (Byte)rgb.x;
@@ -237,6 +237,8 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
+		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
@@ -264,6 +266,8 @@ namespace highlo
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 		Name = "unknown";
 		m_Loaded = true;
+
+		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -294,6 +298,8 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
+		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
@@ -314,6 +320,8 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(spec.Format);
+
+		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -431,8 +439,9 @@ namespace highlo
 	{
 		uint64 idx = (((uint64)row * (uint64)m_Specification.Width) + (uint64)column) * 4;
 		if (idx >= (uint64)m_Specification.Width * (uint64)m_Specification.Height * 4 || idx < 0) return;
+		HL_ASSERT(idx < m_Buffer.Size);
 
-		if (m_Specification.Format == TextureFormat::RGBA8)
+		if (m_Specification.Format == TextureFormat::RGBA8 || m_Specification.Format == TextureFormat::RGBA)
 		{
 			((Byte*)m_Buffer.Data)[idx]	  = (Byte)rgba.r;
 			((Byte*)m_Buffer.Data)[idx + 1] = (Byte)rgba.g;
@@ -441,7 +450,7 @@ namespace highlo
 		}
 		else if (m_Specification.Format == TextureFormat::RGBA16)
 		{
-			((uint16*)m_Buffer.Data)[idx]		= (uint16)rgba.r;
+			((uint16*)m_Buffer.Data)[idx]	  = (uint16)rgba.r;
 			((uint16*)m_Buffer.Data)[idx + 1] = (uint16)rgba.g;
 			((uint16*)m_Buffer.Data)[idx + 2] = (uint16)rgba.b;
 			((uint16*)m_Buffer.Data)[idx + 3] = (uint16)rgba.a;
@@ -502,6 +511,12 @@ namespace highlo
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	
+	void OpenGLTexture2D::SetData(void *data, uint32 data_size)
+	{
+		m_Buffer = Allocator::Copy(data, data_size);
+		Invalidate();
+	}
+
 	void OpenGLTexture2D::Bind(uint32 slot) const
 	{
 		glBindTextureUnit(slot, RendererID);

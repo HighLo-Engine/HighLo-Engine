@@ -8,15 +8,15 @@
 
 namespace highlo
 {
-	Ref<Font> Font::Create(const FileSystemPath &path, FontType fontType)
+	Ref<Font> Font::Create(const FileSystemPath &path, uint16 size, FontType fontType)
 	{
 		switch (fontType)
 		{
 			case FontType::BITMAP_FONT:
-				return Ref<BitmapFont>::Create(path);
+				return Ref<BitmapFont>::Create(path, size);
 
 			case FontType::TRUE_TYPE_FONT:
-				return Ref<TrueTypeFont>::Create(path);
+				return Ref<TrueTypeFont>::Create(path, size);
 		}
 
 		HL_ASSERT(false, "Unknown font type!");

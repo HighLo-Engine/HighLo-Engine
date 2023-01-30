@@ -39,6 +39,12 @@ typedef int32 intptr;
 #define HL_POINTER_SIZE 4
 #endif
 
+// Invalid ids
+#define HL_INVALID_ID_U64 18446744073709551615UL
+#define HL_INVALID_ID 4294967295U
+#define HL_INVALID_ID_U16 65535U
+#define HL_INVALID_ID_U8 255U
+
 // Limits
 #define MIN_UINT8 ((uint8)0x00)
 #define MIN_UINT16 ((uint16)0x0000)

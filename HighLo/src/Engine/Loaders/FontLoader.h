@@ -7,15 +7,34 @@
 
 #pragma once
 
+#include "Engine/Core/FileSystemPath.h"
+
 namespace highlo
 {
+	struct TrueTypeFontFace;
+
+	struct BitmapFontLoaderResult
+	{
+		
+	};
+
+	struct TrueTypeFontLoaderResult
+	{
+		uint32 FontCount;
+		TrueTypeFontFace *Fonts;
+
+		uint64 BinarySize;
+		Byte *FontBinary;
+	};
+
+	/// <summary>
+	/// The FontLoader loads and saves engine specific binary fonts.
+	/// </summary>
 	class FontLoader
 	{
 	public:
 
-
-
-	private:
+		HLAPI static bool LoadTrueTypeFont(const FileSystemPath &filePath, TrueTypeFontLoaderResult *out_result);
 
 
 	};

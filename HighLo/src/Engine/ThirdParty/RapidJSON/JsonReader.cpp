@@ -13,7 +13,7 @@
 #include <rapidjson/prettywriter.h>
 
 #undef GetObject
-#define JSON_LOG_PREFIX "JSONWriter>   "
+#define JSON_LOG_PREFIX "JSONReader>   "
 
 namespace highlo
 {
@@ -997,18 +997,34 @@ namespace highlo
 			return false;
 		}
 
-		if (!m_Document.IsArray())
+		if (m_Document.IsObject())
 		{
-			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Error: Expected JSON array format, object format given. [-]");
-			return false;
+			auto &member = m_Document.FindMember(*key);
+			if (member == m_Document.MemberEnd())
+			{
+				HL_CORE_ERROR("Could not find key {0} in json object!", *key);
+				return false;
+			}
+
+			if (!member->value.IsArray())
+			{
+				HL_CORE_ERROR("Expected element to be array, but was not!");
+				return false;
+			}
+
+			rapidjson::GenericArray elements = member->value.GetArray();
+			ParseJSONArray(elements, [=](const rapidjson::Value &arrayEl)
+			{
+				return insertFunc(arrayEl);
+			});
+
+			return true;
 		}
 
 		rapidjson::GenericArray elements = m_Document.GetArray();
 		ParseJSONArray(elements, [=](const rapidjson::Value &arrayElement)
 		{
-
-
-			return true;
+			return insertFunc(arrayElement);
 		});
 
 		return true;

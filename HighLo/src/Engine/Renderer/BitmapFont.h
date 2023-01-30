@@ -15,7 +15,7 @@ namespace highlo
 	{
 	public:
 
-		BitmapFont(const FileSystemPath &filePath);
+		BitmapFont(const FileSystemPath &filePath, uint16 size);
 		virtual ~BitmapFont();
 
 		virtual FileSystemPath &GetAssetPath() override { return m_AssetPath; }
@@ -23,6 +23,17 @@ namespace highlo
 
 		virtual HLString &GetName() override { return m_Name; }
 		virtual const HLString &GetName() const override { return m_Name; }
+
+		virtual bool VerifyAtlas(FontData *font, const HLString &text) override;
+
+		virtual FontType GetFontType() const override { return FontType::TRUE_TYPE_FONT; }
+
+		virtual const Ref<Texture2D> &GetAtlas() const override;
+		virtual int32 GetAtlasSizeX() const override;
+		virtual int32 GetAtlasSizeY() const override;
+
+		virtual int32 GetLineHeight() const override;
+		virtual float GetTabXAdvance() const override;
 
 	private:
 

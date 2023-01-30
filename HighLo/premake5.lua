@@ -49,6 +49,7 @@ project "HighLo"
     {
         "GLFW",
         "stbimage",
+        "stbtruetype",
 		"msdf-atlas-gen",
         "%{LibDir.assimp}",
 		

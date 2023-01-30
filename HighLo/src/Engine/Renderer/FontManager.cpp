@@ -8,8 +8,8 @@ namespace highlo
 	void FontManager::Init()
 	{
 		// Load Default fonts
-		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf", FontType::TRUE_TYPE_FONT));
-		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf", FontType::TRUE_TYPE_FONT));
+		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf", 16, FontType::TRUE_TYPE_FONT));
+		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf", 16, FontType::TRUE_TYPE_FONT));
 	}
 	
 	void FontManager::Shutdown()
@@ -33,15 +33,15 @@ namespace highlo
 		m_Fonts.insert({ fontName, font });
 	}
 
-	void FontManager::LoadFont(const FileSystemPath &path)
+	void FontManager::LoadFont(const FileSystemPath &path, uint16 size, FontType type)
 	{
-		Ref<Font> font = Font::Create(path);
+		Ref<Font> font = Font::Create(path, size, type);
 		AddFont(font->GetName(), font);
 	}
 
-	void FontManager::LoadFont(const HLString &fontName, const FileSystemPath &path)
+	void FontManager::LoadFont(const HLString &fontName, const FileSystemPath &path, uint16 size, FontType type)
 	{
-		Ref<Font> font = Font::Create(path);
+		Ref<Font> font = Font::Create(path, size, type);
 		AddFont(fontName, font);
 	}
 

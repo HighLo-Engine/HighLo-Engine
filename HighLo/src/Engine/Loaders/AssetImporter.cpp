@@ -19,6 +19,7 @@ namespace highlo
 	bool AssetImporter::TryLoadData(const AssetMetaData &assetInfo, Ref<Asset> &asset)
 	{
 		bool loaded = false;
+		// TODO: introduce a user param, where all custom parameters can be packed into
 
 		switch (assetInfo.Type)
 		{
@@ -52,7 +53,7 @@ namespace highlo
 				break;
 
 			case AssetType::Font:
-				asset = Font::Create(AssetManager::Get()->GetFileSystemPath(assetInfo));
+				asset = Font::Create(AssetManager::Get()->GetFileSystemPath(assetInfo), 16, FontType::TRUE_TYPE_FONT);
 				asset->Handle = assetInfo.Handle;
 				loaded = asset->IsFlagSet(AssetFlag::None);
 				break;

@@ -51,22 +51,22 @@ namespace highlo
 		m_TransformVertexData = new TransformVertexData[transformBufferCount];
 
 		// yea ... we have a lot of render passes to initialize in the future :)
-		InitLightCullingCompute();
-		InitShadowPass();
-		InitPreDepthPass();
+	//	InitLightCullingCompute();
+	//	InitShadowPass();
+	//	InitPreDepthPass();
 		InitGeometryPass();
-		InitBloomCompute();
-		InitDeinterleaving();
-		InitHBAO();
-		InitReinterleaving();
-		InitBlurFirstPass();
-		InitBlurSecondPass();
+	//	InitBloomCompute();
+	//	InitDeinterleaving();
+	//	InitHBAO();
+	//	InitReinterleaving();
+	//	InitBlurFirstPass();
+	//	InitBlurSecondPass();
 		InitCompositePass();
-		InitDOF();
+	//	InitDOF();
 		InitExternalCompositePass();
-		InitJumpFlood();
+	//	InitJumpFlood();
 		InitGrid();
-		InitSkybox();
+	//	InitSkybox();
 
 		m_ResourcesCreated = true;
 	}
@@ -119,7 +119,7 @@ namespace highlo
 		{
 			m_NeedsResize = false;
 			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-			m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+		//	m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 
@@ -155,31 +155,31 @@ namespace highlo
 		const auto &dirLight = m_SceneData.ActiveLight;
 
 		// calculate cascades shadows
-		UniformBufferShadow &shadowData = m_ShadowUniformBuffer;
-		CascadeData cascades[4];
-		CalculateCascades(cascades, m_SceneData.SceneCamera, dirLight.Direction);
+	//	UniformBufferShadow &shadowData = m_ShadowUniformBuffer;
+	//	CascadeData cascades[4];
+	//	CalculateCascades(cascades, m_SceneData.SceneCamera, dirLight.Direction);
+	//
+	//	for (uint32 i = 0; i < 4; ++i)
+	//	{
+	//		m_CascadeSplits[i] = cascades[i].SplitDepth;
+	//		shadowData.ViewProjection[i] = cascades[i].ViewProjection;
+	//	}
 
-		for (uint32 i = 0; i < 4; ++i)
-		{
-			m_CascadeSplits[i] = cascades[i].SplitDepth;
-			shadowData.ViewProjection[i] = cascades[i].ViewProjection;
-		}
+	//	Renderer::Submit([instance, shadowData]() mutable
+	//	{
+	//		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+	//		instance->m_UniformBufferSet->GetUniform(1, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
+	//	});
 
-		Renderer::Submit([instance, shadowData]() mutable
-		{
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(1, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
-		});
-
-		UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
-
-		UpdateHBAOData();
-
-		Renderer::Submit([instance, hbaoData]() mutable
-		{
-			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(18, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
-		});
+	//	UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
+	//
+	//	UpdateHBAOData();
+	//
+	//	Renderer::Submit([instance, hbaoData]() mutable
+	//	{
+	//		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+	//		instance->m_UniformBufferSet->GetUniform(18, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
+	//	});
 
 		UniformBufferScene &sceneData = m_SceneUniformBuffer;
 		UniformBufferPointLights &pointLightData = m_PointLightsUniformBuffer;
@@ -682,6 +682,7 @@ namespace highlo
 	{
 		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
 		auto &framebuffer = m_ExternalCompositingRenderPass->GetSpecification().Framebuffer;
+	//	auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	
@@ -689,6 +690,58 @@ namespace highlo
 		m_CompositeMaterial->Set("u_Texture", framebuffer->GetImage().As<Texture2D>());
 	
 		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
+		Renderer::EndRenderPass(m_CommandBuffer);
+
+		// Grid (TODO: make configurable)
+	//	Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass);
+		const static glm::mat4 transform = 
+			glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) 
+			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+
+		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
+		Renderer::EndRenderPass(m_CommandBuffer);
+
+		// Wireframe (TODO: make configurable)
+		Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
+		
+		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
+		{
+			const auto &transformData = m_MeshTransformMap.at(mk);
+			Renderer::RenderInstancedStaticMeshWithMaterial(
+				m_CommandBuffer,
+				m_GeometryWireframeVertexArray,
+				m_UniformBufferSet,
+				nullptr,
+				dc.Model,
+				dc.SubmeshIndex,
+				m_SubmeshTransformBuffer,
+				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
+				dc.InstanceCount, 
+				m_WireframeMaterial);
+		}
+
+		for (auto &[mk, dc] : m_DynamicSelectedMeshDrawList)
+		{
+			const auto &transformData = m_MeshTransformMap.at(mk);
+			Renderer::RenderInstancedStaticMeshWithMaterial(
+				m_CommandBuffer,
+				m_GeometryWireframeVertexArray,
+				m_UniformBufferSet,
+				nullptr,
+				dc.Model,
+				dc.SubmeshIndex,
+				m_SubmeshTransformBuffer,
+				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
+				dc.InstanceCount,
+				m_WireframeMaterial
+			);
+		}
+
+		Renderer::EndRenderPass(m_CommandBuffer);
+
+		// TODO: draw colliders
+		Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 

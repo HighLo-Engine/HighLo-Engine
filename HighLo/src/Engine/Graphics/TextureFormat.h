@@ -44,7 +44,8 @@ namespace highlo
 		None = 0,
 		Texture,
 		Attachment,
-		Storage
+		Storage,
+		FontAtlas,
 	};
 
 	enum class TextureWrap

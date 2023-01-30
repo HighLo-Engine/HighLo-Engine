@@ -65,6 +65,8 @@ namespace highlo
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 
+		virtual void SetData(void *data, uint32 data_size) override;
+
 		virtual void Bind(uint32 slot) const override;
 		virtual void Unbind(uint32 slot) const override;
 

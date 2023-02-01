@@ -1246,13 +1246,13 @@ namespace highlo
 	{
 	public:
 
-		HLAPI static uint32 UTF8StringLength(int32 *codepoint)
+		HLAPI static uint32 UTF8StringLength(const HLString &str)
 		{
 			uint32 length = 0;
 
 			for (uint32 i = 0; i < MAX_UINT32; ++i, ++length)
 			{
-				int32 c = (int32)codepoint[i];
+				int32 c = (int32)str[i];
 				if (c == 0)
 				{
 					// Hit the null-termination character

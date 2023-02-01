@@ -209,8 +209,6 @@ namespace highlo
 		out_variant->Face = font_name;
 		out_variant->InternalDataSize = sizeof(TrueTypeVariantData);
 		out_variant->InternalData = malloc(out_variant->InternalDataSize);
-
-		TrueTypeVariantData *internal_data = (TrueTypeVariantData*)out_variant->InternalData;
 		
 		TrueTypeVariantData codepoint_data = {};
 		codepoint_data.Scale = 0.0f;
@@ -221,8 +219,6 @@ namespace highlo
 		{
 			codepoint_data.Codepoints[i + 1] = i + 32;
 		}
-
-		internal_data = &codepoint_data;
 
 		TextureSpecification spec;
 		spec.Format = TextureFormat::RGBA;
@@ -238,11 +234,12 @@ namespace highlo
 			return false;
 		}
 
-		internal_data->Scale = stbtt_ScaleForPixelHeight(&data.Info, (float)size);
+		codepoint_data.Scale = stbtt_ScaleForPixelHeight(&data.Info, (float)size);
 		int32 ascent, descent, line_gap;
 		stbtt_GetFontVMetrics(&data.Info, &ascent, &descent, &line_gap);
-		out_variant->LineHeight = (int32)((ascent - descent + line_gap) * internal_data->Scale);
+		out_variant->LineHeight = (int32)((ascent - descent + line_gap) * codepoint_data.Scale);
 
+		out_variant->InternalData = &codepoint_data;
 		return RebuildFontVariantAtlas(data, out_variant);
 	}
 
@@ -300,21 +297,28 @@ namespace highlo
 			m_Glyphs.clear();
 		}
 
-		m_Glyphs.resize(codepoint_count);
-		for (uint16 i = 0; i < (uint16)codepoint_count; ++i)
+		if (codepoint_count > 0)
 		{
-			stbtt_packedchar *pc = &packed_chars[i];
-			FontGlyph &g = m_Glyphs[i];
-			
-			g.Codepoint = internal_data->Codepoints[i];
-			g.PageId = 0; // TODO: Could be extended in the future
-			g.XOffset = pc->xoff;
-			g.YOffset = pc->yoff;
-			g.X = pc->x0;
-			g.Y = pc->y0;
-			g.Width = pc->x1 - pc->x0;
-			g.Height = pc->y1 - pc->y0;
-			g.XAdvance = pc->xadvance;
+			m_Glyphs.resize(codepoint_count);
+			for (uint16 i = 0; i < (uint16)codepoint_count; ++i)
+			{
+				stbtt_packedchar *pc = &packed_chars[i];
+				FontGlyph &g = m_Glyphs[i];
+
+				g.Codepoint = internal_data->Codepoints[i];
+				g.PageId = 0; // TODO: Could be extended in the future
+				g.XOffset = pc->xoff;
+				g.YOffset = pc->yoff;
+				g.X = pc->x0;
+				g.Y = pc->y0;
+				g.Width = pc->x1 - pc->x0;
+				g.Height = pc->y1 - pc->y0;
+				g.XAdvance = pc->xadvance;
+			}
+		}
+		else
+		{
+			HL_CORE_WARN("Could not find any codepoints for font {0}", *m_Name);
 		}
 
 		// Regenerate kernings
@@ -346,6 +350,10 @@ namespace highlo
 
 			free(kerning_table);
 		}
+		else
+		{
+			HL_CORE_WARN("Could not find any kerning for font {0}", *m_Name);
+		}
 
 		return true;
 	}
@@ -375,7 +383,7 @@ namespace highlo
 					continue;
 				}
 
-				uint32 codepoint_count = HLStringUTF8::UTF8StringLength(internal_data->Codepoints.data());
+				uint32 codepoint_count = (uint32)internal_data->Codepoints.size();
 				bool found = false;
 				for (uint32 j = 95; j < codepoint_count; ++j)
 				{

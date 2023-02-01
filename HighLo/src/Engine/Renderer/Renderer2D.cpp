@@ -745,7 +745,7 @@ namespace highlo
 
 		// TODO: Change this with actual text from parameter
 		uint32 charTextLength = text.Length();
-		uint32 textLengthUTF8 = HLStringUTF8::UTF8StringLength((int32*)*text);
+		uint32 textLengthUTF8 = HLStringUTF8::UTF8StringLength(text);
 		const std::vector<FontGlyph> &allGlyphs = font->GetAllGlyphs();
 		const std::vector<FontKerning> &allKernings = font->GetAllKernings();
 
@@ -757,7 +757,6 @@ namespace highlo
 		for (uint32 c = 0, uc = 0; c < charTextLength; ++c)
 		{
 			int32 codepoint = (int32)text.At(c);
-			HL_CORE_TRACE("processing character {0}", text.At(c));
 
 			if (codepoint == '\n')
 			{
@@ -828,31 +827,35 @@ namespace highlo
 					tmaxy = 1.0f - tmaxy;
 				}
 
-				HL_CORE_INFO("Found all required information for text rendering!");
-
-				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, miny, 0.0f, 0.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, miny, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Position = glm::vec3(minx, miny, 0.0f);
 				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tminx, tminy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
-				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, miny, 0.0f, 0.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, miny, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Position = glm::vec3(maxx, miny, 0.0f);
 				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tmaxx, tminy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
-				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, maxy, 0.0f, 0.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, maxy, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Position = glm::vec3(maxx, maxy, 0.0f);
 				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tmaxx, tmaxy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
-				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, maxy, 0.0f, 0.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, maxy, 0.0f, 1.0f);
+				s_2DData->TextVertexBufferPtr->Position = glm::vec3(minx, maxy, 0.0f);
 				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tminx, tmaxy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextIndexCount += 6;
 
 				// Try to find the kerning
 				int32 kerning = 0;
@@ -894,6 +897,7 @@ namespace highlo
 			uc++;
 		}
 
+		s_2DData->Statistics.TextCount++;
 
 #if 0
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();

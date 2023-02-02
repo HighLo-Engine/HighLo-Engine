@@ -15,8 +15,15 @@ namespace highlo
 		const auto &meshMaterials = mesh->GetMaterials();
 		m_Materials = MaterialTable::Create((uint32)meshMaterials.size());
 
-		for (uint32 i = 0; i < meshMaterials.size(); ++i)
-			m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		if (meshMaterials.size() == 0)
+		{
+			m_Materials->SetMaterial(0, MaterialAsset::Create(false));
+		}
+		else
+		{
+			for (uint32 i = 0; i < meshMaterials.size(); ++i)
+				m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		}
 	}
 
 	DynamicModel::DynamicModel(Ref<MeshFile> &mesh, const std::vector<uint32> &submeshIndices)
@@ -27,8 +34,15 @@ namespace highlo
 		const auto &meshMaterials = m_MeshFile->GetMaterials();
 		m_Materials = MaterialTable::Create((uint32)meshMaterials.size());
 
-		for (uint32 i = 0; i < meshMaterials.size(); ++i)
-			m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		if (meshMaterials.size() == 0)
+		{
+			m_Materials->SetMaterial(0, MaterialAsset::Create(false));
+		}
+		else
+		{
+			for (uint32 i = 0; i < meshMaterials.size(); ++i)
+				m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		}
 	}
 
 	DynamicModel::~DynamicModel()

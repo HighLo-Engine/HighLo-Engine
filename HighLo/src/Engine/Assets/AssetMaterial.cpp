@@ -10,15 +10,16 @@ namespace highlo
 	static const HLString s_MetalnessUniform = "u_MaterialUniforms.Metalness";
 	static const HLString s_RoughnessUniform = "u_MaterialUniforms.Roughness";
 	static const HLString s_EmissionUniform = "u_MaterialUniforms.Emission";
+	static const HLString s_TransparencyUniform = "u_MaterialUniforms.Transparency";
 
 	static const HLString s_DiffuseMapUniform = "u_DiffuseTexture";
 	static const HLString s_NormalMapUniform = "u_NormalTexture";
 	static const HLString s_MetalnessMapUniform = "u_MetalnessTexture";
 	static const HLString s_RoughnessMapUniform = "u_RoughnessTexture";
 
-	Ref<MaterialAsset> MaterialAsset::Create()
+	Ref<MaterialAsset> MaterialAsset::Create(bool transparent)
 	{
-		return Ref<MaterialAsset>::Create();
+		return Ref<MaterialAsset>::Create(transparent);
 	}
 
 	Ref<MaterialAsset> MaterialAsset::Create(const Ref<Material> &material)
@@ -26,9 +27,17 @@ namespace highlo
 		return Ref<MaterialAsset>::Create(material);
 	}
 
-	MaterialAsset::MaterialAsset()
+	MaterialAsset::MaterialAsset(bool transparent)
 	{
-		m_Material = Material::Create(Renderer::GetShaderLibrary()->Get("HighLoPBR"));
+		Handle = {}; // Assign a new UUID
+
+		m_Transparent = transparent;
+
+		if (m_Transparent)
+			// TODO: add the shader into the pipeline and fix all shader build errors
+			m_Material = Material::Create(Renderer::GetShaderLibrary()->Get("HighLoPBR_Transparent"));
+		else
+			m_Material = Material::Create(Renderer::GetShaderLibrary()->Get("HighLoPBR"));
 
 		// Set Default values
 		SetDiffuseColor(glm::vec3(0.8f));
@@ -45,6 +54,7 @@ namespace highlo
 	
 	MaterialAsset::MaterialAsset(const Ref<Material> &material)
 	{
+		Handle = {}; // Assign a new UUID
 		m_Material = Material::Copy(material);
 
 		// Set Default values
@@ -172,6 +182,16 @@ namespace highlo
 	void MaterialAsset::ClearRoughnessMap()
 	{
 		m_Material->Set(s_RoughnessMapUniform, Renderer::GetWhiteTexture());
+	}
+	
+	float &MaterialAsset::GetTransparency()
+	{
+		return m_Material->GetFloat(s_TransparencyUniform);
+	}
+
+	void MaterialAsset::SetTransparency(float transparency)
+	{
+		m_Material->Set(s_TransparencyUniform, transparency);
 	}
 }
 

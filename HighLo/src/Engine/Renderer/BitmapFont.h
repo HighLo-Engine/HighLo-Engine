@@ -26,7 +26,8 @@ namespace highlo
 
 		virtual bool VerifyAtlas(FontData *font, const HLString &text) override;
 
-		virtual FontType GetFontType() const override { return FontType::TRUE_TYPE_FONT; }
+		virtual FontType GetFontType() const override { return FontType::BITMAP_FONT; }
+		virtual FontData &GetFontDataOfCodepoint(uint16 codepoint) override;
 
 		virtual const Ref<Texture2D> &GetAtlas() const override;
 		virtual int32 GetAtlasSizeX() const override;
@@ -39,6 +40,8 @@ namespace highlo
 
 		FileSystemPath m_AssetPath;
 		HLString m_Name;
+
+		FontData m_TEMP;
 	};
 }
 

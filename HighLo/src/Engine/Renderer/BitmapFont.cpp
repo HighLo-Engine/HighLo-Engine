@@ -21,6 +21,11 @@ namespace highlo
 		return true;
 	}
 
+	FontData &BitmapFont::GetFontDataOfCodepoint(uint16 codepoint)
+	{
+		return m_TEMP;
+	}
+
 	const Ref<Texture2D> &BitmapFont::GetAtlas() const
 	{
 		return nullptr;

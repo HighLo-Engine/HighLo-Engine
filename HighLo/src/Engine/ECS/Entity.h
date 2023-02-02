@@ -27,7 +27,7 @@ namespace highlo
 		HLAPI Entity() = default;
 		HLAPI Entity(UUID sceneID, const HLString &tag = "Entity");
 		HLAPI Entity(UUID sceneID, UUID entityID);
-		HLAPI Entity(UUID sceneID, UUID entityID, const HLString &tag = "Entity", const Transform &transform = Transform::Identity());
+		HLAPI Entity(UUID sceneID, UUID entityID, const HLString &tag, const Transform &transform);
 		HLAPI Entity(const Entity &other);
 		HLAPI Entity &operator=(const Entity &other);
 

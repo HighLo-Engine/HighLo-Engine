@@ -19,6 +19,7 @@ namespace highlo
 		HLAPI MaterialTable(const Ref<MaterialTable> &other);
 		HLAPI ~MaterialTable() = default;
 
+		HLAPI void Resize(uint32 newMaterialCount = 1);
 		HLAPI bool HasMaterial(uint32 index) const { return m_Materials.find(index) != m_Materials.end(); }
 		
 		HLAPI void SetMaterial(uint32 index, const Ref<MaterialAsset> &material);

@@ -253,16 +253,29 @@ namespace highlo
 
 	void SceneRenderer::SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
+		const auto &submeshes = model->Get()->GetSubmeshes();
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
 		{
-			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
 			glm::mat4 submeshTransform = transform * submeshes[submeshIndex].LocalTransform.GetTransform();
 
-			// If no asset handle is available, the model probably does not have the needed material
-			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : 0;
+			// Select the correct material for the current mesh
+			Ref<MaterialAsset> material = nullptr;
+			if (materials)
+			{
+				material = materials->HasMaterial(materialIndex) 
+					? materials->GetMaterial(materialIndex) 
+					: model->GetMaterials()->GetMaterial(materialIndex);
+			}
+			else
+			{
+				material = model->GetMaterials()->GetMaterial(materialIndex);
+			}
 
-			MeshKey key = { model->Handle, materialHandle, submeshIndex };
+			HL_ASSERT(material);
+			AssetHandle materialHandle = material->Handle;
+
+			MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 			transformStorage.Rows[0] = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
@@ -271,17 +284,9 @@ namespace highlo
 
 			{
 				// Main geometry
-				auto &dc = m_StaticDrawList[key];
-				dc.Model = model;
-				dc.SubmeshIndex = submeshIndex;
-				dc.Materials = materials;
-				dc.OverrideMaterial = overrideMaterial;
-				dc.InstanceCount++;
-			}
-
-			{
-				// Shadow pass
-				auto &dc = m_StaticShadowPassDrawList[key];
+				bool isTransparent = material->IsTransparent();
+				auto &destDrawList = !isTransparent ? m_StaticDrawList : m_StaticTransparentDrawList;
+				auto &dc = destDrawList[key];
 				dc.Model = model;
 				dc.SubmeshIndex = submeshIndex;
 				dc.Materials = materials;
@@ -295,9 +300,24 @@ namespace highlo
 	{
 		const auto &submeshes = model->Get()->GetSubmeshes();
 		uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-		AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
-		MeshKey key = { model->Handle, materialHandle, submeshIndex };
+		// Select the correct material for the current mesh
+		Ref<MaterialAsset> material = nullptr;
+		if (materials)
+		{
+			material = materials->HasMaterial(materialIndex)
+				? materials->GetMaterial(materialIndex)
+				: model->GetMaterials()->GetMaterial(materialIndex);
+		}
+		else
+		{
+			material = model->GetMaterials()->GetMaterial(materialIndex);
+		}
+
+		HL_ASSERT(material);
+		AssetHandle materialHandle = material->Handle;
+
+		MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 		transformStorage.Rows[0] = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
@@ -306,17 +326,9 @@ namespace highlo
 
 		{
 			// Main geometry pass
-			auto &dc = m_DynamicDrawList[key];
-			dc.Model = model;
-			dc.SubmeshIndex = submeshIndex;
-			dc.Materials = materials;
-			dc.OverrideMaterial = overrideMaterial;
-			dc.InstanceCount++;
-		}
-
-		{
-			// Shadow pass
-			auto &dc = m_DynamicShadowPassDrawList[key];
+			bool isTransparent = material->IsTransparent();
+			auto &destDrawList = !isTransparent ? m_DynamicDrawList : m_DynamicTransparentDrawList;
+			auto &dc = destDrawList[key];
 			dc.Model = model;
 			dc.SubmeshIndex = submeshIndex;
 			dc.Materials = materials;
@@ -325,7 +337,7 @@ namespace highlo
 		}
 	}
 
-	void SceneRenderer::SubmitSelectedStaticModel(const Ref<StaticModel> &model, Ref<MaterialTable> materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
+	void SceneRenderer::SubmitSelectedStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
 		const auto &submeshData = model->Get()->GetSubmeshes();
 		for (uint32 submeshIndex : model->GetSubmeshIndices())
@@ -334,9 +346,24 @@ namespace highlo
 
 			const auto &submeshes = model->Get()->GetSubmeshes();
 			uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-			AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
-			MeshKey key = { model->Handle, materialHandle, submeshIndex };
+			// Select the correct material for the current mesh
+			Ref<MaterialAsset> material = nullptr;
+			if (materials)
+			{
+				material = materials->HasMaterial(materialIndex)
+					? materials->GetMaterial(materialIndex)
+					: model->GetMaterials()->GetMaterial(materialIndex);
+			}
+			else
+			{
+				material = model->GetMaterials()->GetMaterial(materialIndex);
+			}
+
+			HL_ASSERT(material);
+			AssetHandle materialHandle = material->Handle;
+
+			MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 			transformStorage.Rows[0] = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
@@ -347,7 +374,9 @@ namespace highlo
 
 			{
 				// Main Geometry pass
-				auto &dc = m_StaticDrawList[key];
+				bool isTransparent = material->IsTransparent();
+				auto &destDrawList = !isTransparent ? m_StaticDrawList : m_StaticTransparentDrawList;
+				auto &dc = destDrawList[key];
 				dc.Model = model;
 				dc.SubmeshIndex = submeshIndex;
 				dc.Materials = materials;
@@ -355,37 +384,31 @@ namespace highlo
 				instanceIndex = dc.InstanceCount;
 				dc.InstanceCount++;
 			}
-
-			{
-				// Selected geometry pass
-				auto &dc = m_StaticSelectedMeshDrawList[key];
-				dc.Model = model;
-				dc.SubmeshIndex = submeshIndex;
-				dc.Materials = materials;
-				dc.OverrideMaterial = overrideMaterial;
-				dc.InstanceCount++;
-				dc.InstanceOffset = instanceIndex;
-			}
-
-			{
-				// Shadow pass
-				auto &dc = m_StaticShadowPassDrawList[key];
-				dc.Model = model;
-				dc.SubmeshIndex = submeshIndex;
-				dc.Materials = materials;
-				dc.OverrideMaterial = overrideMaterial;
-				dc.InstanceCount++;
-			}
 		}
 	}
 
-	void SceneRenderer::SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
+	void SceneRenderer::SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)
 	{
 		const auto &submeshes = model->Get()->GetSubmeshes();
 		uint32 materialIndex = submeshes[submeshIndex].MaterialIndex;
-		AssetHandle materialHandle = materials->HasMaterial(materialIndex) ? materials->GetMaterial(materialIndex)->Handle : model->GetMaterials()->GetMaterial(materialIndex)->Handle;
 
-		MeshKey key = { model->Handle, materialHandle, submeshIndex };
+		// Select the correct material for the current mesh
+		Ref<MaterialAsset> material = nullptr;
+		if (materials)
+		{
+			material = materials->HasMaterial(materialIndex)
+				? materials->GetMaterial(materialIndex)
+				: model->GetMaterials()->GetMaterial(materialIndex);
+		}
+		else
+		{
+			material = model->GetMaterials()->GetMaterial(materialIndex);
+		}
+
+		HL_ASSERT(material);
+		AssetHandle materialHandle = material->Handle;
+
+		MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 		transformStorage.Rows[0] = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
@@ -396,34 +419,15 @@ namespace highlo
 
 		{
 			// Main Geometry Pass
-			auto &dc = m_DynamicDrawList[key];
+			bool isTransparent = material->IsTransparent();
+			auto &destDrawList = !isTransparent ? m_DynamicDrawList : m_DynamicTransparentDrawList;
+			auto &dc = destDrawList[key];
 			dc.Model = model;
 			dc.SubmeshIndex = submeshIndex;
 			dc.Materials = materials;
 			dc.OverrideMaterial = overrideMaterial;
 
 			instanceIndex = dc.InstanceCount;
-			dc.InstanceCount++;
-		}
-
-		{
-			// Selected mesh list
-			auto &dc = m_DynamicSelectedMeshDrawList[key];
-			dc.Model = model;
-			dc.SubmeshIndex = submeshIndex;
-			dc.Materials = materials;
-			dc.OverrideMaterial = overrideMaterial;
-			dc.InstanceCount++;
-			dc.InstanceOffset = instanceIndex;
-		}
-
-		{
-			// Shadow pass
-			auto &dc = m_DynamicShadowPassDrawList[key];
-			dc.Model = model;
-			dc.SubmeshIndex = submeshIndex;
-			dc.Materials = materials;
-			dc.OverrideMaterial = overrideMaterial;
 			dc.InstanceCount++;
 		}
 	}
@@ -436,7 +440,7 @@ namespace highlo
 			glm::mat4 submeshTransform = transform * submeshData[submeshIndex].LocalTransform.GetTransform();
 
 			// TODO: material index 42 does not exist yet
-			MeshKey key = { model->Handle, 42, submeshIndex };
+			MeshKey key = { model->Handle, 42, submeshIndex, false };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 			transformStorage.Rows[0] = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
@@ -453,7 +457,7 @@ namespace highlo
 	void SceneRenderer::SubmitPhysicsDebugDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const glm::mat4 &transform)
 	{
 		// TODO: material index 42 does not exist yet
-		MeshKey key = { model->Handle, 42, submeshIndex };
+		MeshKey key = { model->Handle, 42, submeshIndex, false };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 		transformStorage.Rows[0] = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
@@ -681,8 +685,8 @@ namespace highlo
 	void SceneRenderer::CompositePass()
 	{
 		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
-		auto &framebuffer = m_ExternalCompositingRenderPass->GetSpecification().Framebuffer;
-	//	auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+	//	auto &framebuffer = m_ExternalCompositingRenderPass->GetSpecification().Framebuffer;
+		auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	

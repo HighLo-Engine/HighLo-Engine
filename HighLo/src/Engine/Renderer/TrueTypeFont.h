@@ -64,6 +64,7 @@ namespace highlo
 		virtual bool VerifyAtlas(FontData *font, const HLString &text) override;
 
 		virtual FontType GetFontType() const override { return FontType::TRUE_TYPE_FONT; }
+		virtual FontData &GetFontDataOfCodepoint(uint16 codepoint) override;
 
 		virtual const Ref<Texture2D> &GetAtlas() const override;
 		virtual int32 GetAtlasSizeX() const override;
@@ -91,6 +92,8 @@ namespace highlo
 
 		HashTable<uint16> m_FontIds; // Contains all font ids
 		std::vector<TrueTypeFontData> m_Fonts;
+
+		FontData m_TEMP;
 	};
 }
 

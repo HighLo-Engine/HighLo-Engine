@@ -3,6 +3,7 @@
 #include "HighLoPch.h"
 #include "Scene.h"
 
+#include "Engine/Assets/AssetManager.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
@@ -26,6 +27,13 @@ namespace highlo
 	
 	Scene::~Scene()
 	{
+		std::vector<UUID> entitiesToDestroy;
+		for (auto &[id, entity] : m_EntityIDMap)
+			entitiesToDestroy.push_back(id);
+
+		m_Registry.Clear(entitiesToDestroy);
+		m_EntityIDMap.clear();
+
 		s_ActiveScenes.erase(m_SceneID);
 	}
 
@@ -41,14 +49,27 @@ namespace highlo
 	void Scene::UpdateScene(Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
+
+		// TODO: Update 2D physics, 3D physics, Scripts, Audio here
+
+		if (m_ShouldSimulate)
+		{
+			// Update physics here
+
+			if (m_IsPlaying)
+			{
+				// Call OnSimulate function in C# scripts and lua scripts
+			}
+		}
 	}
 
-	void Scene::OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera &overlayCamera)
+	void Scene::OnRenderOverlay(Ref<SceneRenderer> &renderer, Timestep ts, const Camera &overlayCamera)
 	{
 		HL_PROFILE_FUNCTION();
 
+		renderer->SetScene(this);
 		renderer->BeginScene(overlayCamera);
-
+		
 		Renderer::Submit([=]() mutable
 		{
 			Renderer2D::BeginScene(overlayCamera);
@@ -56,10 +77,10 @@ namespace highlo
 
 			Renderer2D::DrawQuad(Transform::FromPosition({ -0.25f, 0.0f, 0.0f }), glm::vec4(0.941f, 0.502f, 0.502f, 1.0f));
 			Renderer2D::DrawQuad(Transform::FromPosition({ 0.0f, -0.25f, -0.9f }), glm::vec4(0.641f, 0.502f, 0.902f, 1.0f));
-			Renderer2D::DrawTexture(Transform::FromPosition({ 2.0f, 0.5f, 0.0f }), m_DemoTexture, 1.0f, {1.0f, 1.0f, 1.0f, 1.0f});
+			Renderer2D::DrawTexture(Transform::FromPosition({ 2.0f, 0.5f, 0.0f }), m_DemoTexture, 1.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
 			Renderer2D::FillCircle(Transform::FromPosition({ 6.0f, 0.25f, 0.0f }), 1.0f, 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 			Renderer2D::DrawCircle(Transform::FromPosition({ -6.0f, 0.25f, 0.0f }), 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-		//	Renderer2D::DrawLine({ 0.0f, 0.0f }, { 6.0f, 6.0f }, glm::vec4(0.2f, 0.3f, 9.0f, 1.0f));
+			//	Renderer2D::DrawLine({ 0.0f, 0.0f }, { 6.0f, 6.0f }, glm::vec4(0.2f, 0.3f, 9.0f, 1.0f));
 			Renderer2D::DrawText("Hello World!", { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 			Renderer2D::EndScene();
@@ -68,7 +89,7 @@ namespace highlo
 		renderer->EndScene();
 	}
 
-	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts)
+	void Scene::OnRenderRuntime(Ref<SceneRenderer> &renderer, Timestep ts)
 	{
 		HL_PROFILE_FUNCTION();
 
@@ -80,22 +101,177 @@ namespace highlo
 		if (!cameraComp->Primary)
 			return;
 
+		renderer->SetScene(this);
 		renderer->BeginScene(cameraComp->Camera);
+
+		// Static models
+		std::vector<UUID> staticModelIds = m_Registry.View<StaticModelComponent>();
+		for (UUID &uuid : staticModelIds)
+		{
+			StaticModelComponent *component = m_Registry.GetComponent<StaticModelComponent>(uuid);
+			HL_ASSERT(component);
+			Ref<StaticModel> &model = AssetManager::Get()->GetAsset<StaticModel>(component->Model);
+			HL_ASSERT(model);
+
+			if (model && !model->IsFlagSet(AssetFlag::Missing))
+			{
+				Entity &e = FindEntityByUUID(uuid);
+				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
+
+				renderer->SubmitStaticModel(model, component->Materials, transform);
+			}
+		}
+
+		// Dynamic models
+		std::vector<UUID> dynamicModelIds = m_Registry.View<DynamicModelComponent>();
+		for (UUID &uuid : dynamicModelIds)
+		{
+			DynamicModelComponent *component = m_Registry.GetComponent<DynamicModelComponent>(uuid);
+			HL_ASSERT(component);
+			Ref<DynamicModel> &model = AssetManager::Get()->GetAsset<DynamicModel>(component->Model);
+			HL_ASSERT(model);
+
+			if (model && !model->IsFlagSet(AssetFlag::Missing))
+			{
+				model->OnUpdate(ts);
+
+				Entity &e = FindEntityByUUID(uuid);
+				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
+
+				renderer->SubmitDynamicModel(model, component->SubmeshIndex, component->Materials, transform);
+			}
+		}
+
 		renderer->EndScene();
+
+		if (renderer->GetFinalRenderTexture())
+		{
+			Renderer2D::BeginScene(cameraComp->Camera);
+			Renderer2D::SetTargetRenderPass(renderer->GetExternalCompositeRenderPass());
+
+			std::vector<UUID> spriteIds = m_Registry.View<SpriteComponent>();
+			for (UUID &uuid : spriteIds)
+			{
+				Entity &e = FindEntityByUUID(uuid);
+				Transform transform = GetWorldSpaceTransform(e);
+
+				SpriteComponent *component = m_Registry.GetComponent<SpriteComponent>(uuid);
+				
+				if (component->Texture)
+				{
+					Renderer2D::DrawTexture(transform, component->Texture, component->TilingFactor, component->Color, uuid);
+				}
+				else
+				{
+					Renderer2D::DrawQuad(transform, component->Color, uuid);
+				}
+			}
+
+			std::vector<UUID> textIds = m_Registry.View<TextComponent>();
+			for (UUID &uuid : textIds)
+			{
+				Entity &e = FindEntityByUUID(uuid);
+				Transform transform = GetWorldSpaceTransform(e);
+				TextComponent *component = m_Registry.GetComponent<TextComponent>(uuid);
+				Ref<Font> &font = AssetManager::Get()->GetAsset<Font>(component->FontAsset);
+				
+				Renderer2D::DrawText(component->Text, font, transform, component->MaxWidth, component->Color);
+			}
+
+			Renderer2D::EndScene();
+		}
 	}
 	
-	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)
+	void Scene::OnRenderEditor(Ref<SceneRenderer> &renderer, Timestep ts, const EditorCamera &editorCamera)
 	{
 		HL_PROFILE_FUNCTION();
 
+		renderer->SetScene(this);
 		renderer->BeginScene(editorCamera);
+
+		// Static models
+		std::vector<UUID> staticModelIds = m_Registry.View<StaticModelComponent>();
+		for (UUID &uuid : staticModelIds)
+		{
+			StaticModelComponent *component = m_Registry.GetComponent<StaticModelComponent>(uuid);
+			HL_ASSERT(component);
+			Ref<StaticModel> &model = AssetManager::Get()->GetAsset<StaticModel>(component->Model);
+			HL_ASSERT(model);
+
+			if (model && !model->IsFlagSet(AssetFlag::Missing))
+			{
+				Entity &e = FindEntityByUUID(uuid);
+				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
+
+				renderer->SubmitStaticModel(model, component->Materials, transform);
+			}
+		}
+
+		// Dynamic models
+		std::vector<UUID> dynamicModelIds = m_Registry.View<DynamicModelComponent>();
+		for (UUID &uuid : dynamicModelIds)
+		{
+			DynamicModelComponent *component = m_Registry.GetComponent<DynamicModelComponent>(uuid);
+			HL_ASSERT(component);
+			Ref<DynamicModel> &model = AssetManager::Get()->GetAsset<DynamicModel>(component->Model);
+			HL_ASSERT(model);
+
+			if (model && !model->IsFlagSet(AssetFlag::Missing))
+			{
+				model->OnUpdate(ts);
+
+				Entity &e = FindEntityByUUID(uuid);
+				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
+
+				renderer->SubmitDynamicModel(model, component->SubmeshIndex, component->Materials, transform);
+			}
+		}
+
 		renderer->EndScene();
+
+		if (renderer->GetFinalRenderTexture())
+		{
+			Renderer2D::BeginScene(editorCamera);
+			Renderer2D::SetTargetRenderPass(renderer->GetExternalCompositeRenderPass());
+
+			std::vector<UUID> spriteIds = m_Registry.View<SpriteComponent>();
+			for (UUID &uuid : spriteIds)
+			{
+				Entity &e = FindEntityByUUID(uuid);
+				Transform transform = GetWorldSpaceTransform(e);
+
+				SpriteComponent *component = m_Registry.GetComponent<SpriteComponent>(uuid);
+
+				if (component->Texture)
+				{
+					Renderer2D::DrawTexture(transform, component->Texture, component->TilingFactor, component->Color, uuid);
+				}
+				else
+				{
+					Renderer2D::DrawQuad(transform, component->Color, uuid);
+				}
+			}
+
+			std::vector<UUID> textIds = m_Registry.View<TextComponent>();
+			for (UUID &uuid : textIds)
+			{
+				Entity &e = FindEntityByUUID(uuid);
+				Transform transform = GetWorldSpaceTransform(e);
+				TextComponent *component = m_Registry.GetComponent<TextComponent>(uuid);
+				Ref<Font> &font = AssetManager::Get()->GetAsset<Font>(component->FontAsset);
+
+				Renderer2D::DrawText(component->Text, font, transform, component->MaxWidth, component->Color);
+			}
+
+			Renderer2D::EndScene();
+		}
 	}
 	
-	void Scene::OnSimulate(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera)
+	void Scene::OnSimulate(Ref<SceneRenderer> &renderer, Timestep ts, const EditorCamera &editorCamera)
 	{
 		HL_PROFILE_FUNCTION();
 
+		renderer->SetScene(this);
 		renderer->BeginScene(editorCamera);
 		renderer->EndScene();
 	}
@@ -123,12 +299,32 @@ namespace highlo
 	
 	void Scene::SetViewportSize(uint32 width, uint32 height)
 	{
+		if (m_ViewportWidth == width && m_ViewportHeight == height)
+			return; // No resize necessary
+
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
-	}
-	
-	void Scene::SetSkybox(const Ref<Texture3D> &skybox)
-	{
+
+		// Resize all cameras
+		std::vector<UUID> &cameras = m_Registry.View<CameraComponent>();
+		for (UUID &uuid : cameras)
+		{
+			CameraComponent *component = m_Registry.GetComponent<CameraComponent>(uuid);
+			if (!component)
+			{
+				// should never be triggered...
+				HL_CORE_ERROR("Found an component with an invalid pointer in the entity registry!");
+				HL_ASSERT(false); // on debug builds trigger a breakpoint
+				continue;
+			}
+
+			// If no resize is allowed, skip the resize
+			if (component->FixedAspectRatio)
+				continue;
+
+			// Do the actual resize
+			component->Camera.SetViewportSize(width, height);
+		}
 	}
 	
 	Entity Scene::FindEntityByUUID(UUID id)
@@ -357,7 +553,7 @@ namespace highlo
 		PointLightComponent *plc = dest.AddOrReplace<PointLightComponent>(src);				// HL_ASSERT(plc);
 		SkyLightComponent *slc = dest.AddOrReplace<SkyLightComponent>(src);					// HL_ASSERT(slc);
 		TextComponent *tc = dest.AddOrReplace<TextComponent>(src);							// HL_ASSERT(tc);
-
+		ScriptComponent *scriptComp = dest.AddOrReplace<ScriptComponent>(src);				// HL_ASSERT(scriptComp);
 	}
 	
 	void Scene::AddEntity(Entity &entity)
@@ -375,8 +571,7 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		auto entity = Entity(m_SceneID, name);
-
+		Entity entity = Entity(m_SceneID, name);
 		entity.AddComponent<RelationshipComponent>();
 		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
@@ -387,13 +582,12 @@ namespace highlo
 	Entity Scene::CreateEntityWithUUID(UUID uuid, const HLString &name)
 	{
 		HL_PROFILE_FUNCTION();
+		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end(), fmt::format("Entity with UUID {0} already exists in scene {1}", uuid, m_SceneID));
 
-		auto entity = Entity(m_SceneID, name);
-
+		Entity entity = Entity(m_SceneID, name);
 		entity.AddComponent<RelationshipComponent>();
 		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
-		HL_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());
 		m_EntityIDMap[uuid] = entity;
 		return entity;
 	}
@@ -409,7 +603,7 @@ namespace highlo
 
 		if (!excludeChildren)
 		{
-			for (uint64 i = 0; i < entity.Children().size(); ++i)
+			for (uint32 i = 0; i < (uint32)entity.Children().size(); ++i)
 			{
 				auto childId = entity.Children()[i];
 				Entity child = FindEntityByUUID(childId);

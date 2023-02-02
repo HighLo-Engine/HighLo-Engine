@@ -13,10 +13,21 @@ namespace highlo
 		SetSubmeshIndices({});
 
 		const auto &meshMaterials = mesh->GetMaterials();
+
+		// it does not matter, if meshMaterials.size() == 0,
+		// because if we add a new material it will be automatically resize to the new amount of materials
 		m_Materials = MaterialTable::Create((uint32)meshMaterials.size());
 
-		for (uint32 i = 0; i < meshMaterials.size(); ++i)
-			m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		if (meshMaterials.size() == 0)
+		{
+			// Make sure, that the model always has a default material
+			m_Materials->SetMaterial(0, MaterialAsset::Create(false)); // TODO: forward castShadows from constructor parameter
+		}
+		else
+		{
+			for (uint32 i = 0; i < meshMaterials.size(); ++i)
+				m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		}
 	}
 
 	StaticModel::StaticModel(Ref<MeshFile> &mesh, const std::vector<uint32> &subMeshIndices)
@@ -25,10 +36,19 @@ namespace highlo
 		SetSubmeshIndices(subMeshIndices);
 
 		const auto &meshMaterials = mesh->GetMaterials();
+
+		// Same as above here
 		m_Materials = MaterialTable::Create((uint32)meshMaterials.size());
 
-		for (uint32 i = 0; i < meshMaterials.size(); ++i)
-			m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		if (meshMaterials.size() == 0)
+		{
+			m_Materials->SetMaterial(0, MaterialAsset::Create(false));
+		}
+		else
+		{
+			for (uint32 i = 0; i < meshMaterials.size(); ++i)
+				m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+		}
 	}
 
 	StaticModel::~StaticModel()

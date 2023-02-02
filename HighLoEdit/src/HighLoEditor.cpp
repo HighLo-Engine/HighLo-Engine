@@ -187,9 +187,9 @@ void HighLoEditor::OnInitialize()
 	GetWindow().SetMenuBar(m_MenuBar);
 
 	// Temp: Try to create a new asset and submit it for rendering
-//	AssetHandle cubeHandle = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
-//	Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(cubeHandle);
-//	m_ViewportRenderer->SubmitStaticModel(model, model->GetMaterials());
+	Entity modelEntity = m_CurrentScene->CreateEntity("CubeModel");
+	StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
+	comp->Model = AssetFactory::CreateCube({ 5.0f, 5.0f, 5.0f });
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
@@ -208,10 +208,10 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			m_EditorScene->UpdateScene(ts);
 
 			// Render scene content
-			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
+			m_EditorScene->OnRenderEditor(m_ViewportRenderer, ts, m_EditorCamera);
 
 			// Render overlay
-			m_EditorScene->OnUpdateOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
+			m_EditorScene->OnRenderOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
 			break;
 		}
 
@@ -221,7 +221,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			m_RuntimeScene->UpdateScene(ts);
 
 			// Render scene content
-			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
+			m_RuntimeScene->OnRenderRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 
@@ -231,7 +231,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			UI::SetMouseEnabled(true);
 			
 			// Render last scene content without updating any transforms or attributes
-			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
+			m_RuntimeScene->OnRenderRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 

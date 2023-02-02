@@ -827,30 +827,32 @@ namespace highlo
 					tmaxy = 1.0f - tmaxy;
 				}
 
+				// The third component of the position will control the zIndex, but for now we don't support that
+				// the fourth component will get stripped away, but has to be 1 in order for the matrix multiplication to not be affected.
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, miny, 0.0f, 1.0f);
 			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(minx, miny, 0.0f);
-				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tminx, tminy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, miny, 0.0f, 1.0f);
 			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(maxx, miny, 0.0f);
-				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tmaxx, tminy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, maxy, 0.0f, 1.0f);
 			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(maxx, maxy, 0.0f);
-				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tmaxx, tmaxy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;
 
 				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, maxy, 0.0f, 1.0f);
 			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(minx, maxy, 0.0f);
-				s_2DData->TextVertexBufferPtr->Color = glm::vec4(1.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
 				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tminx, tmaxy);
 				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
 				s_2DData->TextVertexBufferPtr++;

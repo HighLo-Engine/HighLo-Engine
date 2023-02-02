@@ -155,6 +155,7 @@ layout(push_constant) uniform Material
 	float Metalness;
 	float Roughness;
 	float Emission;
+	float Transparency;
 
 	float EnvMapRotation;
 	
@@ -167,6 +168,7 @@ layout(binding = 100, std140) uniform Material
 	float Metalness;
 	float Roughness;
 	float Emission;
+	float Transparency;
 
 	float EnvMapRotation;
 	

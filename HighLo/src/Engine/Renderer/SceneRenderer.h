@@ -78,9 +78,10 @@ namespace highlo
 		AssetHandle MeshHandle;
 		AssetHandle MaterialHandle;
 		uint32 SubmeshIndex;
+		bool IsSelected;
 
-		HLAPI MeshKey(AssetHandle meshHandle, AssetHandle materialHandle, uint32 index)
-			: MeshHandle(meshHandle), MaterialHandle(materialHandle), SubmeshIndex(index)
+		HLAPI MeshKey(AssetHandle meshHandle, AssetHandle materialHandle, uint32 index, bool isSelected)
+			: MeshHandle(meshHandle), MaterialHandle(materialHandle), SubmeshIndex(index), IsSelected(isSelected)
 		{
 		}
 
@@ -88,11 +89,23 @@ namespace highlo
 		{
 			if (MeshHandle < other.MeshHandle)
 				return true;
+			
+			if (MeshHandle > other.MeshHandle)
+				return false;
 
-			if ((MeshHandle == other.MeshHandle) && (SubmeshIndex < other.SubmeshIndex))
+			if (SubmeshIndex < other.SubmeshIndex)
 				return true;
+		
+			if (SubmeshIndex > other.SubmeshIndex)
+				return false;
 
-			return (MeshHandle == other.MeshHandle) && (SubmeshIndex == other.SubmeshIndex) && (MaterialHandle < other.MaterialHandle);
+			if (MaterialHandle < other.MaterialHandle)
+				return true;
+			
+			if (MaterialHandle > other.MaterialHandle)
+				return false;
+
+			return IsSelected < other.IsSelected;
 		}
 	};
 
@@ -124,11 +137,11 @@ namespace highlo
 		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
-		HLAPI void SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
-		HLAPI void SubmitDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
 
-		HLAPI void SubmitSelectedStaticModel(const Ref<StaticModel> &model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
-		HLAPI void SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
 
 		HLAPI void SubmitPhysicsDebugStaticModel(const Ref<StaticModel> &model, const glm::mat4 &transform = glm::mat4(1.0f));
 		HLAPI void SubmitPhysicsDebugDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const glm::mat4 &transform = glm::mat4(1.0f));
@@ -209,10 +222,12 @@ namespace highlo
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicDrawList;
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicSelectedMeshDrawList;
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicShadowPassDrawList;
+		std::map<MeshKey, DynamicDrawCommand> m_DynamicTransparentDrawList;
 
 		std::map<MeshKey, StaticDrawCommand> m_StaticDrawList;
 		std::map<MeshKey, StaticDrawCommand> m_StaticSelectedMeshDrawList;
 		std::map<MeshKey, StaticDrawCommand> m_StaticShadowPassDrawList;
+		std::map<MeshKey, StaticDrawCommand> m_StaticTransparentDrawList;
 
 		// Debug draw lists
 		std::map<MeshKey, StaticDrawCommand> m_StaticColliderDrawList;

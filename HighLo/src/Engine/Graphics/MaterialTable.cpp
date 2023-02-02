@@ -19,6 +19,11 @@ namespace highlo
 			SetMaterial(index, materialAsset);
 		}
 	}
+
+	void MaterialTable::Resize(uint32 newMaterialCount)
+	{
+		m_MaterialCount = newMaterialCount;
+	}
 	
 	void MaterialTable::SetMaterial(uint32 index, const Ref<MaterialAsset> &material)
 	{

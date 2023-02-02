@@ -301,6 +301,24 @@ namespace highlo
 			return result;
 		}
 
+		/// <summary>
+		/// Clears all entites of a scene, the caller has to construct the entity UUID's himself.
+		/// </summary>
+		/// <param name="entitiesToDestroy">The entity ids to destory.</param>
+		HLAPI void Clear(const std::vector<UUID> &entitiesToDestroy)
+		{
+			for (auto &[entityId, component] : m_EntityComponents)
+			{
+				for (auto &currentId : entitiesToDestroy)
+				{
+					if (entityId == currentId)
+					{
+						m_EntityComponents.erase(entityId);
+					}
+				}
+			}
+		}
+
 	private:
 
 		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;		// Component Type -> { Component ID, Component }

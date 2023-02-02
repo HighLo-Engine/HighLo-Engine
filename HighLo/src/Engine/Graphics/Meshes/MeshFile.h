@@ -108,7 +108,7 @@ namespace highlo
 		friend class Scene;
 		friend class SceneRenderer;
 		friend class DynamicModel;
-		friend class OpenGLRenderingAPI;
+		friend class StaticModel;
 	};
 }
 

@@ -21,7 +21,8 @@ namespace highlo
 		None		= HL_BIT(0),
 		DepthTest	= HL_BIT(1),
 		Blend		= HL_BIT(2),
-		TwoSided	= HL_BIT(3)
+		TwoSided	= HL_BIT(3),
+		DisableShadowCasting = HL_BIT(4),
 	};
 
 	class Material : public IsSharedReference

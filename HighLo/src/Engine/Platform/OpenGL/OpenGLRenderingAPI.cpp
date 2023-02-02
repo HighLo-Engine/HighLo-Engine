@@ -229,7 +229,7 @@ namespace highlo
 		if (!depthTest)
 			SetDepthTest(false);
 
-		material->UpdateForRendering();
+		material->UpdateForRendering(uniformBufferSet);
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
 
 		if (!depthTest)
@@ -256,13 +256,16 @@ namespace highlo
 		{
 			material->UpdateForRendering(uniformBufferSet);
 
-			if (material->GetFlag(MaterialFlag::DepthTest))
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
+			SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 		}
 
 		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+		// Reverse the state
+		if (material)
+		{
+			SetDepthTest(!material->GetFlag(MaterialFlag::DepthTest));
+		}
 	}
 
 	void OpenGLRenderingAPI::DrawStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
@@ -274,21 +277,27 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
-			if (material)
+			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			if (!material)
 			{
-				material->UpdateForRendering();
-				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+				HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+				HL_ASSERT(material);
 			}
 
-			if (model->Get()->m_IsAnimated)
+			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			HL_ASSERT(glMaterial);
+
+			glMaterial->UpdateForRendering(uniformBufferSet);
+			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
+
+			if (model->IsAnimated())
 			{
 				AnimatedBoneTransformUniformBuffer buffer;
-				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
 				{
-					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]"); // unused, can go away if not needed for debug print
-					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
+					buffer.BoneTransform[i] = boneTransforms[i];
 				}
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
@@ -297,6 +306,9 @@ namespace highlo
 			}
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
+
+			// Reverse the state
+			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
 		}
 	}
 
@@ -309,21 +321,27 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
-			if (material)
+			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			if (!material)
 			{
-				material->UpdateForRendering();
-				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+				HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+				HL_ASSERT(material);
 			}
 
-			if (model->Get()->m_IsAnimated)
+			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			HL_ASSERT(glMaterial);
+
+			glMaterial->UpdateForRendering(uniformBufferSet);
+			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
+
+			if (model->IsAnimated())
 			{
 				AnimatedBoneTransformUniformBuffer buffer;
-				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
 				{
-					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
+					buffer.BoneTransform[i] = boneTransforms[i];
 				}
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
@@ -332,6 +350,9 @@ namespace highlo
 			}
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
+
+			// Reverse the state
+			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
 		}
 	}
 
@@ -344,21 +365,27 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
-			if (material)
-			{				
-				material->UpdateForRendering();
-				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			if (!material)
+			{
+				HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+				HL_ASSERT(material);
 			}
 
-			if (model->Get()->m_IsAnimated)
+			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			HL_ASSERT(glMaterial);
+
+			glMaterial->UpdateForRendering(uniformBufferSet);
+			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
+
+			if (model->IsAnimated())
 			{
 				AnimatedBoneTransformUniformBuffer buffer;
-				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
 				{
-					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
+					buffer.BoneTransform[i] = boneTransforms[i];
 				}
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
@@ -367,6 +394,9 @@ namespace highlo
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+
+			// Reverse the state
+			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
 		}
 	}
 
@@ -379,21 +409,27 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			auto material = materials->GetMaterial(submesh.MaterialIndex).As<OpenGLMaterial>();
-			// TODO: This if is temporary because we do not have the material system setup yet
-			if (material)
+			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			if (!material)
 			{
-				material->UpdateForRendering();
-				SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
+				HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+				HL_ASSERT(material);
 			}
 
-			if (model->Get()->m_IsAnimated)
+			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			HL_ASSERT(glMaterial);
+
+			glMaterial->UpdateForRendering(uniformBufferSet);
+			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
+
+			if (model->IsAnimated())
 			{
 				AnimatedBoneTransformUniformBuffer buffer;
-				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
 				{
-					HLString uniformName = HLString("u_BoneTransforms[") + HLString::ToString(i) + HLString("]");
-					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
+					buffer.BoneTransform[i] = boneTransforms[i];
 				}
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
@@ -402,6 +438,9 @@ namespace highlo
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+
+			// Reverse the state
+			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
 		}
 	}
 
@@ -414,15 +453,16 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh &submesh : submeshes)
 		{
-			overrideMaterial->UpdateForRendering();
+			overrideMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			if (model->Get()->m_IsAnimated)
+			if (model->IsAnimated())
 			{
 				AnimatedBoneTransformUniformBuffer buffer;
-				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
 				{
-					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
+					buffer.BoneTransform[i] = boneTransforms[i];
 				}
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22);
@@ -431,6 +471,9 @@ namespace highlo
 			}
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+
+			// Reverse the state
+			SetDepthTest(!overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 		}
 	}
 
@@ -443,15 +486,16 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh &submesh : submeshes)
 		{
-			overrideMaterial->UpdateForRendering();
+			overrideMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			if (model->Get()->m_IsAnimated)
+			if (model->IsAnimated())
 			{
 				AnimatedBoneTransformUniformBuffer buffer;
-				for (uint64 i = 0; model->Get()->m_BoneTransforms.size(); ++i)
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
 				{
-					buffer.BoneTransform[i] = model->Get()->m_BoneTransforms[i];
+					buffer.BoneTransform[i] = boneTransforms[i];
 				}
 
 				// Upload the bone transform
@@ -462,7 +506,7 @@ namespace highlo
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 
-			// Reset states
+			// Reverse the state
 			SetDepthTest(!overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 		}
 	}

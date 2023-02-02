@@ -58,6 +58,11 @@ namespace highlo
 		return false;
 	}
 
+	FontData &TrueTypeFont::GetFontDataOfCodepoint(uint16 codepoint)
+	{
+		return m_TEMP;
+	}
+
 	bool TrueTypeFont::LoadFont(uint32 default_size)
 	{
 		TrueTypeFontLoaderResult font_data = {};

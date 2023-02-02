@@ -98,6 +98,8 @@ namespace highlo
 		HLAPI std::vector<FontKerning> &GetAllKernings() { return m_Kernings; }
 		HLAPI const std::vector<FontKerning> &GetAllKernings() const { return m_Kernings; }
 
+		HLAPI FontGlyph &GetGlyphOfCodepoint(uint16 codepoint) { return m_Glyphs.at(codepoint); }
+
 		HLAPI virtual bool VerifyAtlas(FontData *font, const HLString &text) = 0;
 
 		HLAPI virtual FileSystemPath &GetAssetPath() = 0;
@@ -107,6 +109,7 @@ namespace highlo
 		HLAPI virtual const HLString &GetName() const = 0;
 
 		HLAPI virtual FontType GetFontType() const = 0;
+		HLAPI virtual FontData &GetFontDataOfCodepoint(uint16 codepoint) = 0;
 
 		HLAPI virtual const Ref<Texture2D> &GetAtlas() const = 0;
 		HLAPI virtual int32 GetAtlasSizeX() const = 0;

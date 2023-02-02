@@ -11,13 +11,13 @@ namespace highlo
 	void ShaderLibrary::Add(const Ref<Shader> &shader)
 	{
 		auto &name = shader->GetName();
-		HL_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+		HL_ASSERT(m_Shaders.find(name) == m_Shaders.end(), fmt::format("Shader {0} already exists!", *name).c_str());
 		m_Shaders[name] = shader;
 	}
 	
 	void ShaderLibrary::Add(const HLString &name, const Ref<Shader> &shader)
 	{
-		HL_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+		HL_ASSERT(m_Shaders.find(name) == m_Shaders.end(), fmt::format("Shader {0} already exists!", *name).c_str());
 		m_Shaders[name] = shader;
 	}
 
@@ -71,7 +71,7 @@ namespace highlo
 
 	void ShaderLibrary::ReloadShader(const HLString &name)
 	{
-		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end(), fmt::format("Could not find shader {0}", *name).c_str());
 		m_Shaders[name]->Reload();
 	}
 
@@ -85,14 +85,14 @@ namespace highlo
 
 	void ShaderLibrary::Remove(const HLString &name)
 	{
-		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end(), fmt::format("Could not find shader {0}", *name).c_str());
 		m_Shaders[name]->Release();
 		m_Shaders.erase(name);
 	}
 	
 	const Ref<Shader> &ShaderLibrary::Get(const HLString &name)
 	{
-		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+		HL_ASSERT(m_Shaders.find(name) != m_Shaders.end(), fmt::format("Could not find shader {0}", *name).c_str());
 		return m_Shaders[name];
 	}
 }

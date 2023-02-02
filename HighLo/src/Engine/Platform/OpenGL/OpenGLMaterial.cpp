@@ -255,6 +255,10 @@ namespace highlo
 				uniformBuffer->Bind();
 			});
 		}
+		else
+		{
+			HL_CORE_WARN("Missing uniform buffer set! Please check your UpdateForRendering() call!");
+		}
 
 		for (uint32 i = 0; i < (uint32)m_Textures.size(); ++i)
 		{

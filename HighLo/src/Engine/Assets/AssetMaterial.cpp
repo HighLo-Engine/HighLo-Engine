@@ -40,7 +40,7 @@ namespace highlo
 			m_Material = Material::Create(Renderer::GetShaderLibrary()->Get("HighLoPBR"));
 
 		// Set Default values
-		SetDiffuseColor(glm::vec3(0.8f));
+		SetDiffuseColor(glm::vec3(1.0f));
 		SetEmission(0.0f);
 		SetUsingNormalMap(false);
 		SetMetalness(0.0f);

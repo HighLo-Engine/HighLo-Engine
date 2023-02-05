@@ -54,77 +54,90 @@ namespace highlo
 		HLAPI virtual void DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type = PrimitiveType::Triangles) = 0;
 		HLAPI virtual void DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Patch) = 0;
 
-		HLAPI virtual void DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform = glm::mat4(1.0f)) = 0;
+		HLAPI virtual void DrawFullscreenQuad(
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<VertexArray> &va, 
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			Ref<Material> &material, 
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		) = 0;
 
 		HLAPI virtual void DrawStaticMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<StaticModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<StaticModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
-			uint32 transformBufferOffset) = 0;
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
+			uint32 transformBufferOffset
+		) = 0;
 
 		HLAPI virtual void DrawDynamicMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
-			uint32 transformBufferOffset) = 0;
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
+			uint32 transformBufferOffset
+		) = 0;
 
 		HLAPI virtual void DrawInstancedStaticMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<StaticModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<StaticModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
-			uint32 instanceCount) = 0;
+			uint32 instanceCount
+		) = 0;
 
 		HLAPI virtual void DrawInstancedDynamicMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
-			uint32 instanceCount) = 0;
+			uint32 instanceCount
+		) = 0;
 
 		HLAPI virtual void DrawInstancedStaticMeshWithMaterial(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<StaticModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<StaticModel> &model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
-			Ref<Material> overrideMaterial) = 0;
+			Ref<Material> &overrideMaterial
+		) = 0;
 
 		HLAPI virtual void DrawInstancedDynamicMeshWithMaterial(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
-			Ref<Material> overrideMaterial) = 0;
+			Ref<Material> &overrideMaterial
+		) = 0;
 
 		HLAPI virtual void SetWireframe(bool wf) = 0;
 		HLAPI virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;

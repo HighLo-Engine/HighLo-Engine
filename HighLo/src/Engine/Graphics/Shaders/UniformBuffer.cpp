@@ -56,8 +56,16 @@ namespace highlo
 
 	void UniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
-		// TODO: this could be potentially dangerous, if size is less the m_DataSize, because then we would not have the complete m_DataSize space filled with actual data
-		memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), m_DataSize);
+		HL_ASSERT(offset < size);
+
+		uint32 elementSize = m_DataSize;
+		if (m_DataSize < size)
+		{
+			HL_CORE_WARN("UniformBuffer::SetData - the copied buffer is larger than expected! Going to resize the buffer");
+			HL_ASSERT(false);
+		}
+
+		memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), elementSize);
 		UploadToShader();
 	}
 
@@ -69,9 +77,8 @@ namespace highlo
 			uint32 size = entry->second.first;
 			uint32 offset = entry->second.second;
 			memcpy_s((void*)((char*)m_Data + offset), size, value, size);
+			UploadToShader();
 		}
-
-		UploadToShader();
 	}
 	
 	void *UniformBuffer::GetVariable(const HLString &name)

@@ -190,6 +190,14 @@ void HighLoEditor::OnInitialize()
 	Entity modelEntity = m_CurrentScene->CreateEntity("CubeModel");
 	StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
 	comp->Model = AssetFactory::CreateCube({ 5.0f, 5.0f, 5.0f });
+
+	//Entity modelEntity = m_CurrentScene->CreateEntity("SphereModel");
+	//StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
+	//comp->Model = AssetFactory::CreateSphere(2.0f);
+
+	//Entity modelEntity = m_CurrentScene->CreateEntity("CapsuleModel");
+	//StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
+	//comp->Model = AssetFactory::CreateCapsule(2.0f, 5.0f);
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)

@@ -144,32 +144,32 @@ layout(binding = 11) uniform sampler2D u_BRDFLUTTexture;
 layout(binding = 12) uniform sampler2DArray u_ShadowMapTexture;
 
 #ifdef __VULKAN__
-layout(push_constant) uniform Material
-{
-	layout(offset = 16) vec3 DiffuseColor;
-	float Metalness;
-	float Roughness;
-	float Emission;
-	float Transparency;
+	layout(push_constant) uniform Material
+	{
+		vec3 DiffuseColor;
+		float Metalness;
+		float Roughness;
+		float Emission;
+		float Transparency;
 
-	float EnvMapRotation;
+		float EnvMapRotation;
 	
-	bool UseNormalMap;
-} u_MaterialUniforms;
+		bool UseNormalMap;
+	} u_MaterialUniforms;
 #else
-layout(binding = 100, std140) uniform Material
-{
-	layout(offset = 16) vec3 DiffuseColor;
-	float Metalness;
-	float Roughness;
-	float Emission;
-	float Transparency;
+	layout(std140, binding = 13) uniform Material
+	{
+		vec3 DiffuseColor;
+		float Roughness;
+		float Metalness;
+		float Emission;
+		float Transparency;
 
-	float EnvMapRotation;
+		float EnvMapRotation;
 	
-	bool UseNormalMap;
-} u_MaterialUniforms;
-#endif // __VULKAN__
+		bool UseNormalMap;
+	} u_MaterialUniforms;
+#endif
 
 vec3 IBL(vec3 F0, vec3 Lr)
 {

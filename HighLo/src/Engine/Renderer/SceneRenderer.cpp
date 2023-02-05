@@ -734,6 +734,7 @@ namespace highlo
 		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_CompositeVertexArray, m_UniformBufferSet, nullptr, m_CompositeMaterial);
 		Renderer::EndRenderPass(m_CommandBuffer);
 
+		/*
 		// Grid (TODO: make configurable)
 	//	Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
 		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass);
@@ -785,6 +786,7 @@ namespace highlo
 		// TODO: draw colliders
 		Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
 		Renderer::EndRenderPass(m_CommandBuffer);
+		*/
 	}
 
 	void SceneRenderer::UpdateStatistics()

@@ -159,11 +159,11 @@ namespace highlo
 				
 				if (component->Texture)
 				{
-					Renderer2D::DrawTexture(transform, component->Texture, component->TilingFactor, component->Color, uuid);
+					Renderer2D::DrawTexture(transform, component->Texture, component->TilingFactor, component->Color, (int32)uuid);
 				}
 				else
 				{
-					Renderer2D::DrawQuad(transform, component->Color, uuid);
+					Renderer2D::DrawQuad(transform, component->Color, (int32)uuid);
 				}
 			}
 
@@ -244,11 +244,11 @@ namespace highlo
 
 				if (component->Texture)
 				{
-					Renderer2D::DrawTexture(transform, component->Texture, component->TilingFactor, component->Color, uuid);
+					Renderer2D::DrawTexture(transform, component->Texture, component->TilingFactor, component->Color, (int32)uuid);
 				}
 				else
 				{
-					Renderer2D::DrawQuad(transform, component->Color, uuid);
+					Renderer2D::DrawQuad(transform, component->Color, (int32)uuid);
 				}
 			}
 

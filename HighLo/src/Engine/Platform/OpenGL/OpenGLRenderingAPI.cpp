@@ -246,7 +246,13 @@ namespace highlo
 		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRenderingAPI::DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform)
+	void OpenGLRenderingAPI::DrawFullscreenQuad(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<Material> &material, 
+		const glm::mat4 &transform)
 	{
 		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
 		va->Bind();
@@ -269,14 +275,14 @@ namespace highlo
 	}
 
 	void OpenGLRenderingAPI::DrawStaticMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
@@ -328,14 +334,14 @@ namespace highlo
 	}
 
 	void OpenGLRenderingAPI::DrawDynamicMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va,
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model,
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
@@ -387,14 +393,14 @@ namespace highlo
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer,
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
@@ -447,14 +453,14 @@ namespace highlo
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedDynamicMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va,
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
@@ -507,16 +513,16 @@ namespace highlo
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMeshWithMaterial(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
-		TransformVertexData *transformBuffer, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
-		Ref<Material> overrideMaterial)
+		Ref<Material> &overrideMaterial)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
@@ -556,16 +562,16 @@ namespace highlo
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedDynamicMeshWithMaterial(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		TransformVertexData *transformBuffer, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
-		Ref<Material> overrideMaterial)
+		Ref<Material> &overrideMaterial)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();

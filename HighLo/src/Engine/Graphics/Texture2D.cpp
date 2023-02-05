@@ -15,16 +15,16 @@
 
 namespace highlo
 {
-	Ref<Texture2D> Texture2D::LoadFromFile(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+	Ref<Texture2D> Texture2D::LoadFromFile(const FileSystemPath &filePath, bool flipOnLoad)
 	{
 	#ifdef HIGHLO_API_OPENGL
-		return Ref<OpenGLTexture2D>::Create(filePath, format, flipOnLoad);
+		return Ref<OpenGLTexture2D>::Create(filePath, flipOnLoad);
 	#elif HIGHLO_API_DX11
-		return Ref<DX11Texture2D>::Create(filePath, format, flipOnLoad);
+		return Ref<DX11Texture2D>::Create(filePath, flipOnLoad);
 	#elif HIGHLO_API_DX12
-		return Ref<DX12Texture2D>::Create(filePath, format, flipOnLoad);
+		return Ref<DX12Texture2D>::Create(filePath, flipOnLoad);
 	#elif HIGHLO_API_VULKAN
-		return Ref<VulkanTexture2D>::Create(filePath, format, flipOnLoad);
+		return Ref<VulkanTexture2D>::Create(filePath, flipOnLoad);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

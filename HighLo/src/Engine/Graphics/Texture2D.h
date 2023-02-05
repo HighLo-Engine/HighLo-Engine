@@ -24,7 +24,7 @@ namespace highlo
 		HLAPI virtual uint32 GetDimensions() const override { return 2; };
 		HLAPI virtual TextureType GetType() const override { return TextureType::Texture2D; }
 
-		HLAPI static Ref<Texture2D> LoadFromFile(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = false);
+		HLAPI static Ref<Texture2D> LoadFromFile(const FileSystemPath &filePath, bool flipOnLoad = false);
 		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture2D> CreateFromColor(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		HLAPI static Ref<Texture2D> Create(TextureFormat format, uint32 width, uint32 height);

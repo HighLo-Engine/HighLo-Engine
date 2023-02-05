@@ -568,7 +568,8 @@ namespace highlo
 		Ref<Texture3D> envFiltered = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
 		Ref<Texture3D> irradianceMap = Texture3D::Create(TextureFormat::RGBA32F, irradianceMapSize, irradianceMapSize);
 
-		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(filePath, TextureFormat::RGBA32F);
+		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(filePath);
+		envEquirect->GetSpecification().Format = TextureFormat::RGBA32F;
 		HL_ASSERT(envEquirect->GetFormat() == TextureFormat::RGBA32F, "Texture is not a HDR Texture!");
 
 		equirectangularConversionShader->Bind();

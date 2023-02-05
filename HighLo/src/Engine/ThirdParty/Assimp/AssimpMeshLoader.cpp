@@ -283,7 +283,8 @@ namespace highlo
 						HL_CORE_TRACE("Loading Diffuse Map: {0}", *texturePath);
 
 						// SRGB Texture
-						Ref<Texture2D> tex = Texture2D::LoadFromFile(texturePath, TextureFormat::SRGB);
+						Ref<Texture2D> tex = Texture2D::LoadFromFile(texturePath);
+						tex->GetSpecification().Format = TextureFormat::SRGB;
 						if (tex->IsLoaded())
 						{
 							m_Textures[i] = tex;

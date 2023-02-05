@@ -23,7 +23,7 @@ namespace highlo
 	{
 	public:
 
-		OpenGLTexture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
+		OpenGLTexture2D(const FileSystemPath &filePath, bool flipOnLoad = true);
 		OpenGLTexture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		OpenGLTexture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		OpenGLTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);

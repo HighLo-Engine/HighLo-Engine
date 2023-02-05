@@ -24,8 +24,10 @@ namespace highlo
 			switch (format)
 			{
 				case TextureFormat::RGB:
-				case TextureFormat::SRGB:
 					return GL_RGB;
+
+				case TextureFormat::SRGB:
+					return GL_SRGB;
 
 				case TextureFormat::RGBA:
 				case TextureFormat::RGBA8:
@@ -85,6 +87,9 @@ namespace highlo
 
 				case TextureFormat::DEPTH32FSTENCIL8UINT:
 					return GL_DEPTH32F_STENCIL8;
+
+				case TextureFormat::RG8:
+					return GL_RG8;
 			}
 
 			HL_ASSERT(false);

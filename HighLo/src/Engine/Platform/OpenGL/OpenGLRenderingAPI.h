@@ -37,7 +37,14 @@ namespace highlo
 		virtual void DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type = PrimitiveType::Triangles) override;
 		virtual void DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Patch) override;
 
-		virtual void DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform = glm::mat4(1.0f)) override;
+		virtual void DrawFullscreenQuad(
+			Ref<CommandBuffer> &renderCommandBuffer, 
+			Ref<VertexArray> &va, 
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			Ref<Material> &material, 
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		) override;
 		
 		virtual void DrawStaticMesh(
 			Ref<CommandBuffer> renderCommandBuffer,
@@ -47,7 +54,7 @@ namespace highlo
 			Ref<StaticModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset) override;
 
 		virtual void DrawDynamicMesh(
@@ -58,7 +65,7 @@ namespace highlo
 			Ref<DynamicModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset) override;
 
 		virtual void DrawInstancedStaticMesh(
@@ -69,7 +76,7 @@ namespace highlo
 			Ref<StaticModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount) override;
 
@@ -81,7 +88,7 @@ namespace highlo
 			Ref<DynamicModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount) override;
 
@@ -92,7 +99,7 @@ namespace highlo
 			Ref<StorageBufferSet> storageBufferSet,
 			Ref<StaticModel> model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
 			Ref<Material> overrideMaterial) override;
@@ -104,7 +111,7 @@ namespace highlo
 			Ref<StorageBufferSet> storageBufferSet,
 			Ref<DynamicModel> model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
 			Ref<Material> overrideMaterial) override;

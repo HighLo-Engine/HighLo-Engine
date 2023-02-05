@@ -96,9 +96,44 @@ namespace highlo
 	std::vector<UniformVariable> UniformLayout::GetPointLightDataLayout()
 	{
 		return {
-			// TODO:											make this uint
-			{ "u_PointLights.LightCount", UniformLayoutDataType::Int, 1, 0 },
+			{ "u_PointLights.LightCount", UniformLayoutDataType::UInt, 1, 0 },
 			{ "u_PointLights.Lights", UniformLayoutDataType::Float4, 3, sizeof(uint32) }, // again custom struct, but this time it is 3 * vec4
+		};
+	}
+
+	std::vector<UniformVariable> UniformLayout::GetTransformBufferLayout()
+	{
+		return {
+			{ "u_ObjectTransformation.Row0", UniformLayoutDataType::Float4, 1, 0 },
+			{ "u_ObjectTransformation.Row1", UniformLayoutDataType::Float4, 1, sizeof(glm::vec4) },
+			{ "u_ObjectTransformation.Row2", UniformLayoutDataType::Float4, 1, sizeof(glm::vec4) * 2 },
+		};
+	}
+
+	std::vector<UniformVariable> UniformLayout::GetAnimatedBoneTransformBufferLayout()
+	{
+		return {
+			{ "r_BoneTransforms.BoneTransform", UniformLayoutDataType::Mat4, 100, 0 },
+		};
+	}
+
+	std::vector<UniformVariable> UniformLayout::GetBoneTransformIndexLayout()
+	{
+		return {
+			{ "u_BoneTransformIndex.Base", UniformLayoutDataType::UInt, 1, 0 },
+		};
+	}
+
+	std::vector<UniformVariable> UniformLayout::GetMaterialLayout()
+	{
+		return {
+			{ "u_MaterialUniforms.DiffuseColor", UniformLayoutDataType::Float3, 1, 0 },
+			{ "u_MaterialUniforms.Metalness", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) },
+			{ "u_MaterialUniforms.Roughness", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + sizeof(float) },
+			{ "u_MaterialUniforms.Emission", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 2) },
+			{ "u_MaterialUniforms.Transparency", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 3) },
+			{ "u_MaterialUniforms.EnvMapRotation", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 4) },
+			{ "u_MaterialUniforms.UseNormalMap", UniformLayoutDataType::Bool, 1, sizeof(glm::vec3) + (sizeof(float) * 5) },
 		};
 	}
 

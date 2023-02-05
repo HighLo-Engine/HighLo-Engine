@@ -109,11 +109,6 @@ namespace highlo
 		}
 	};
 
-	struct TransformVertexData
-	{
-		glm::vec4 Rows[3];
-	};
-
 	struct TransformMapData
 	{
 		std::vector<TransformVertexData> Transforms;
@@ -234,7 +229,6 @@ namespace highlo
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicColliderDrawList;
 		std::map<MeshKey, TransformMapData> m_MeshTransformMap;
 
-		Ref<VertexBuffer> m_SubmeshTransformBuffer;
 		TransformVertexData *m_TransformVertexData = nullptr;
 
 		// Bloom

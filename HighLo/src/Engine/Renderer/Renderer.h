@@ -113,7 +113,14 @@ namespace highlo
 		HLAPI static void SetGlobalMacroInShaders(const HLString &name, const HLString &value = "");
 
 		HLAPI static void WaitAndRender();
-		HLAPI static void RenderFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform = glm::mat4(1.0f));
+		HLAPI static void RenderFullscreenQuad(
+			Ref<CommandBuffer> &renderCommandBuffer, 
+			Ref<VertexArray> &va, 
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			Ref<Material> &material, 
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		);
 
 		HLAPI static void RenderDynamicMesh(
 			Ref<CommandBuffer> renderCommandBuffer,
@@ -123,7 +130,7 @@ namespace highlo
 			Ref<DynamicModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset);
 
 		HLAPI static void RenderStaticMesh(
@@ -134,7 +141,7 @@ namespace highlo
 			Ref<StaticModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset);
 
 		HLAPI static void RenderInstancedDynamicMesh(
@@ -145,7 +152,7 @@ namespace highlo
 			Ref<DynamicModel> model,
 			uint32 submeshIndex,
 			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount);
 
@@ -157,7 +164,7 @@ namespace highlo
 			Ref<StaticModel> model, 
 			uint32 submeshIndex, 
 			Ref<MaterialTable> materials, 
-			Ref<VertexBuffer> transformBuffer, 
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset, 
 			uint32 instanceCount);
 
@@ -168,7 +175,7 @@ namespace highlo
 			Ref<StorageBufferSet> storageBufferSet,
 			Ref<StaticModel> model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
 			Ref<Material> overrideMaterial);
@@ -180,7 +187,7 @@ namespace highlo
 			Ref<StorageBufferSet> storageBufferSet,
 			Ref<DynamicModel> model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
 			Ref<Material> overrideMaterial);

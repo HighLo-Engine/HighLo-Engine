@@ -256,7 +256,8 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+	//	m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+	//	m_Buffer.ZeroInitialize();
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -289,8 +290,6 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
-
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
@@ -322,7 +321,8 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+	//	m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+	//	m_Buffer.ZeroInitialize();
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -348,7 +348,8 @@ namespace highlo
 
 		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
-		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+	//	m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
+	//	m_Buffer.ZeroInitialize();
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -395,18 +396,19 @@ namespace highlo
 		GLenum glInternalFormat = utils::OpenGLTextureInternalFormat(m_Specification.Format);
 		GLenum glFormat = utils::OpenGLTextureFormat(m_Specification.Format);
 		GLenum glType = utils::OpenGLFormatDataType(m_Specification.Format);
-		uint32 mipCount = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
-		glTexStorage2D(GL_TEXTURE_2D, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
-
-		if (m_Buffer)
+	
+		if (m_Buffer.Data)
 		{
-			glTextureSubImage2D(RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, glFormat, glType, m_Buffer.Data);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat, m_Specification.Width, m_Specification.Height, 0, glFormat, glType, m_Buffer.Data);
 			m_Loaded = true;
 		}
+
+		if (m_Specification.Properties.GenerateMips)
+			glGenerateMipmap(GL_TEXTURE_2D);
+	
 	}
 
 	void OpenGLTexture2D::Resize(const glm::uvec2 &size)

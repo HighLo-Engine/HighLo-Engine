@@ -110,6 +110,9 @@ namespace highlo
 				case TextureFormat::RGBA16F:
 				case TextureFormat::RGBA32F:
 					return GL_FLOAT;
+
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
+					return GL_UNSIGNED_BYTE;
 			}
 
 			HL_ASSERT(false);

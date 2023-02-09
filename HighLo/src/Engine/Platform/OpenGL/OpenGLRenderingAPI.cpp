@@ -704,12 +704,42 @@ namespace highlo
 
 	void OpenGLRenderingAPI::SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow)
 	{
+		// TODO: Remove this if, when we got the shadow implementation
+		if (!shadow)
+			return;
+
 		if (!environment)
 		{
 			environment = Renderer::GetEmptyEnvironment();
 		}
 
+		const Ref<Shader> &shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
 
+		// TODO: Fill all these shader fields, when present
+		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		{
+			Ref<Texture3D> radianceMap = environment->GetRadianceMap();
+			glBindTextureUnit(resource->GetRegister(), radianceMap->GetRendererID());
+		}
+
+		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		{
+			Ref<Texture3D> irrandianceMap = environment->GetIrradianceMap();
+			glBindTextureUnit(resource->GetRegister(), irrandianceMap->GetRendererID());
+		}
+
+		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		{
+			Ref<Texture2D> brdfLutTexture = Renderer::GetBRDFLutTexture();
+			glBindSampler(resource->GetRegister(), brdfLutTexture->GetSamplerRendererID());
+			glBindTextureUnit(resource->GetRegister(), brdfLutTexture->GetRendererID());
+		}
+
+		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		{
+			glBindSampler(resource->GetRegister(), shadow->GetSamplerRendererID());
+			glBindTextureUnit(resource->GetRegister(), shadow->GetRendererID());
+		}
 	}
 
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)

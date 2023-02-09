@@ -331,6 +331,16 @@ namespace highlo
 		m_Macros[name] = value;
 	}
 	
+	const ShaderResourceDeclaration *OpenGLShader::GetResource(const HLString &name) const
+	{
+		if (m_Resources.find(name) == m_Resources.end())
+		{
+			return nullptr;
+		}
+
+		return &m_Resources.at(name);
+	}
+
 	void OpenGLShader::ClearUniformBuffers()
 	{
 		s_UniformBuffers.clear();

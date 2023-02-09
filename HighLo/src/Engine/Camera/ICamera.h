@@ -20,7 +20,7 @@ namespace highlo
 		HLAPI ICamera() = default;
 		HLAPI virtual ~ICamera() = default;
 
-		HLAPI virtual void Update() = 0;
+		HLAPI virtual void Update(Timestep ts) = 0;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) = 0;
 		HLAPI virtual void OnEvent(Event &e) = 0;
 

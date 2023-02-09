@@ -51,7 +51,7 @@ namespace highlo
 		HLAPI bool IsPerspective() const { return m_ProjectionType == ProjectionType::Perspective; }
 		HLAPI bool IsOrthographic() const { return m_ProjectionType == ProjectionType::Orthographic; }
 
-		HLAPI virtual void Update() override {}
+		HLAPI virtual void Update(Timestep ts) override {}
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) override;
 		HLAPI virtual void OnEvent(Event &e) override {}
 

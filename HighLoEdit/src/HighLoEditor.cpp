@@ -209,7 +209,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		case SceneState::Edit:
 		{
 			m_EditorCamera.SetActive(m_AllowViewportCameraEvents);
-			m_EditorCamera.Update();
+			m_EditorCamera.Update(ts);
 			UI::SetMouseEnabled(true);
 
 			// Update Scene entities
@@ -235,7 +235,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 
 		case SceneState::Pause:
 		{
-			m_EditorCamera.Update();
+			m_EditorCamera.Update(ts);
 			UI::SetMouseEnabled(true);
 			
 			// Render last scene content without updating any transforms or attributes
@@ -245,7 +245,7 @@ void HighLoEditor::OnUpdate(Timestep ts)
 
 		case SceneState::Simulate:
 		{
-			m_EditorCamera.Update();
+			m_EditorCamera.Update(ts);
 
 			// Render scene content
 			m_SimulationScene->UpdateScene(ts);

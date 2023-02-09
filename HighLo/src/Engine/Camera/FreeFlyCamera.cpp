@@ -37,10 +37,8 @@ namespace highlo
 	
 	FreeFlyCamera::~FreeFlyCamera() {}
 	
-	void FreeFlyCamera::Update()
+	void FreeFlyCamera::Update(Timestep ts)
 	{
-		Timestep ts = Time::GetTimestep();
-
 		// Move up
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT) && Input::IsKeyPressed(HL_KEY_SPACE))
 		{

@@ -19,7 +19,7 @@ namespace highlo
 		HLAPI FreeFlyCamera(const glm::mat4 &projectionMatrix);
 		HLAPI virtual ~FreeFlyCamera();
 
-		HLAPI void Update() override;
+		HLAPI void Update(Timestep ts) override;
 		HLAPI void OnEvent(Event &e) override {}
 		HLAPI void OnWindowResize(uint32 width, uint32 height) override;
 		HLAPI void SetViewportSize(uint32 width, uint32 height);

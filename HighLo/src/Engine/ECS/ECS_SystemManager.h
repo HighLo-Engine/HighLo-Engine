@@ -35,7 +35,7 @@ namespace highlo
 				return nullptr;
 		}
 
-		HLAPI void Update();
+		HLAPI void Update(Timestep ts);
 		HLAPI void Shutdown();
 
 	private:

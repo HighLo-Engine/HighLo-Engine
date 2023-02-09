@@ -14,6 +14,7 @@
 #include "Engine/Events/Events.h"
 #include "Engine/ImGui/ImGui.h"
 #include "Engine/Core/Input.h"
+#include "Engine/Core/Time.h"
 
 namespace highlo
 {
@@ -406,6 +407,11 @@ namespace highlo
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Focused = (bool) focused;
 		});
+	}
+
+	float GetTime()
+	{
+		return (float)glfwGetTime();
 	}
 }
 

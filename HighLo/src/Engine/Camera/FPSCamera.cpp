@@ -35,10 +35,8 @@ namespace highlo
 		UpdateCameraView();
 	}
 	
-	void FPSCamera::Update()
+	void FPSCamera::Update(Timestep ts)
 	{
-		Timestep ts = Time::GetTimestep();
-
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT) && Input::IsKeyPressed(HL_KEY_W))
 		{
 			m_Position += GetForwardDirection() * RunningSpeed() * ts;

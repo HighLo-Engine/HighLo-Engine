@@ -59,6 +59,16 @@ namespace highlo
 
 	private:
 
+		void Init();
+		void Shutdown();
+
+		bool OnWindowClose(WindowCloseEvent &e);
+		bool OnWindowReisze(WindowResizeEvent &e);
+
+		void InternalEventHandler(Event &e);
+
+	private:
+
 		static HLApplication *s_Instance;
 		ApplicationSettings m_Settings;
 
@@ -74,15 +84,12 @@ namespace highlo
 		ECS_SystemManager m_ECS_SystemManager;
 		ApplicationLayerStack m_LayerStack;
 
-		void Init();
-		void Shutdown();
+		float m_CPUTime = 0.0f;
+		float m_LastFrameTime = 0.0f;
+		uint32 m_FPS = 0;
 
-		bool OnWindowClose(WindowCloseEvent &e);
-		bool OnWindowReisze(WindowResizeEvent &e);
-
-	private:
-
-		void InternalEventHandler(Event &e);
+		Timestep m_Frametime;
+		Timestep m_TimeStep;
 	};
 
 	// this will be implemented by the client application

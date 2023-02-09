@@ -17,6 +17,7 @@
 #include "Engine/Core/Defines/KeyCodes.h"
 #include "Engine/Core/Defines/MouseButtonCodes.h"
 #include "Engine/Utils/InputUtils.h"
+#include "Engine/Core/Time.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static bool s_IsMenubarSet = false;
@@ -616,6 +617,12 @@ namespace highlo
 		}
 
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
+
+	// TODO
+	float GetTime()
+	{
+		return 0.0f;
 	}
 }
 

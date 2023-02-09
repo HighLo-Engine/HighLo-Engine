@@ -34,7 +34,7 @@ namespace highlo
 		}
 	}
 
-	void EditorCamera::Update()
+	void EditorCamera::Update(Timestep ts)
 	{
 		const glm::vec2 &mouse = { Input::GetMouseX(), Input::GetMouseY() };
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;

@@ -146,6 +146,7 @@ namespace highlo
 		HLAPI virtual void SetDepthTest(bool bEnabled) = 0;
 		HLAPI virtual void SetLineThickness(float thickness) = 0;
 
+		HLAPI virtual void SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow) = 0;
 		HLAPI virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) = 0;
 		HLAPI virtual Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination) = 0;
 	};

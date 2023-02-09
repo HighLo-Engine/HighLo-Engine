@@ -229,6 +229,13 @@ namespace highlo
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 			instance->m_UniformBufferSet->GetUniform(17, 0, frameIndex)->SetData(&screenData, sizeof(screenData));
 		});
+
+		Renderer::SetSceneEnvironment(
+			this,
+			m_SceneData.SceneEnvironment,
+			nullptr
+		//	m_ShadowPassVertexArrays[0]->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage()
+		);
 	}
 
 	void SceneRenderer::EndScene()
@@ -282,11 +289,36 @@ namespace highlo
 			transformStorage.Row1 = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
 			transformStorage.Row2 = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
 
+			uint32 instanceIndex = 0;
+
 			{
 				// Main geometry
 				bool isTransparent = material->IsTransparent();
 				auto &destDrawList = !isTransparent ? m_StaticDrawList : m_StaticTransparentDrawList;
 				auto &dc = destDrawList[key];
+				dc.Model = model;
+				dc.SubmeshIndex = submeshIndex;
+				dc.Materials = materials;
+				dc.OverrideMaterial = overrideMaterial;
+
+				instanceIndex = dc.InstanceCount;
+				dc.InstanceCount++;
+			}
+
+			{
+				// Selected mesh draw list
+				auto &dc = m_StaticSelectedMeshDrawList[key];
+				dc.Model = model;
+				dc.SubmeshIndex = submeshIndex;
+				dc.Materials = materials;
+				dc.OverrideMaterial = overrideMaterial;
+				dc.InstanceCount++;
+				dc.InstanceOffset = instanceIndex;
+			}
+
+			if (material->IsShadowCasting())
+			{
+				auto &dc = m_StaticShadowPassDrawList[key];
 				dc.Model = model;
 				dc.SubmeshIndex = submeshIndex;
 				dc.Materials = materials;
@@ -708,6 +740,12 @@ namespace highlo
 				transformData.TransformOffset, 
 				dc.InstanceCount);
 		}
+
+		// TEMP: Grid
+		const static glm::mat4 transform = 
+			glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) 
+			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
 
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}

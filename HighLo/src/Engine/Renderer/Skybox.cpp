@@ -9,7 +9,7 @@
 
 namespace highlo
 {
-// TODO: Needs Refactor
+	// TODO: Needs Refactor
 
 	static constexpr uint32 SKYBOX_SIZE = 2048;
 
@@ -20,7 +20,7 @@ namespace highlo
 	
 	Skybox::Skybox()
 	{
-	//	m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
+		m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
 		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
 	}
 

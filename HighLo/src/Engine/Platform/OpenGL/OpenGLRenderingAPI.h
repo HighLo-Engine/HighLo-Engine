@@ -123,6 +123,7 @@ namespace highlo
 		virtual void SetDepthTest(bool bEnabled) override;
 		virtual void SetLineThickness(float thickness) override;
 
+		virtual void SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow) override;
 		virtual Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32) override;
 		virtual Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination) override;
 	};

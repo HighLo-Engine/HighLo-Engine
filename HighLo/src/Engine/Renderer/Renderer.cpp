@@ -460,9 +460,12 @@ namespace highlo
 		return s_RenderingAPI->CreatePreethamSky(turbidity, azimuth, inclination);
 	}
 
-	void Renderer::SetSceneEnvironment(Ref<SceneRenderer> sceneRenderer, Ref<Environment> environment, Ref<Texture2D> shadow, Ref<Texture2D> linearDepth)
+	void Renderer::SetSceneEnvironment(
+		const Ref<SceneRenderer> &sceneRenderer, 
+		Ref<Environment> &environment, 
+		const Ref<Texture2D> &shadow)
 	{
-		// TODO
+		s_RenderingAPI->SetSceneEnvironment(sceneRenderer, environment, shadow);
 	}
 
 	Ref<RenderingContext> Renderer::GetContext()

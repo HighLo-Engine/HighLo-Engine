@@ -210,7 +210,10 @@ namespace highlo
 
 		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
 		HLAPI static Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination);
-		HLAPI static void SetSceneEnvironment(Ref<SceneRenderer> sceneRenderer, Ref<Environment> environment, Ref<Texture2D> shadow, Ref<Texture2D> linearDepth);
+		HLAPI static void SetSceneEnvironment(
+			const Ref<SceneRenderer> &sceneRenderer, 
+			Ref<Environment> &environment, 
+			const Ref<Texture2D> &shadow);
 
 		HLAPI static Ref<RenderingContext> GetContext();
 

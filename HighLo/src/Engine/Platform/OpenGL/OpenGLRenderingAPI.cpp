@@ -702,6 +702,16 @@ namespace highlo
 		glLineWidth(thickness);
 	}
 
+	void OpenGLRenderingAPI::SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow)
+	{
+		if (!environment)
+		{
+			environment = Renderer::GetEmptyEnvironment();
+		}
+
+
+	}
+
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)

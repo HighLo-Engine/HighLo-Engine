@@ -187,9 +187,9 @@ void HighLoEditor::OnInitialize()
 	GetWindow().SetMenuBar(m_MenuBar);
 
 	// Temp: Try to create a new asset and submit it for rendering
-	Entity modelEntity = m_CurrentScene->CreateEntity("CubeModel");
-	StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
-	comp->Model = AssetFactory::CreateCube({ 5.0f, 5.0f, 5.0f });
+	//Entity modelEntity = m_CurrentScene->CreateEntity("CubeModel");
+	//StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
+	//comp->Model = AssetFactory::CreateCube({ 5.0f, 5.0f, 5.0f });
 
 	//Entity modelEntity = m_CurrentScene->CreateEntity("SphereModel");
 	//StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();

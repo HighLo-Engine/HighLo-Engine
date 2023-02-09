@@ -110,10 +110,10 @@ layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
 		float Roughness;
 		float Emission;
 		float Transparency;
-
 		float EnvMapRotation;
 	
 		bool UseNormalMap;
+		bool Padding1;
 	} u_MaterialUniforms;
 #else
 	layout(std140, binding = 13) uniform Material
@@ -123,10 +123,10 @@ layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
 		float Metalness;
 		float Emission;
 		float Transparency;
-
 		float EnvMapRotation;
 	
 		bool UseNormalMap;
+		bool Padding1;
 	} u_MaterialUniforms;
 #endif
 

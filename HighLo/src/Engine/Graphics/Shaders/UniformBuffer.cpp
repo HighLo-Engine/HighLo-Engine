@@ -61,7 +61,7 @@ namespace highlo
 		uint32 elementSize = m_DataSize;
 		if (m_DataSize < size)
 		{
-			HL_CORE_WARN("UniformBuffer::SetData - the copied buffer is larger than expected! Going to resize the buffer");
+			HL_CORE_WARN("UniformBuffer::SetData - the copied buffer is larger than expected!");
 			HL_ASSERT(false);
 		}
 

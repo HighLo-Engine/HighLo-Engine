@@ -134,6 +134,7 @@ namespace highlo
 			{ "u_MaterialUniforms.Transparency", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 3) },
 			{ "u_MaterialUniforms.EnvMapRotation", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 4) },
 			{ "u_MaterialUniforms.UseNormalMap", UniformLayoutDataType::Bool, 1, sizeof(glm::vec3) + (sizeof(float) * 5) },
+			{ "u_MaterialUniforms.Padding1", UniformLayoutDataType::Bool, 1, sizeof(glm::vec3) + (sizeof(float) * 5) + sizeof(bool) },
 		};
 	}
 

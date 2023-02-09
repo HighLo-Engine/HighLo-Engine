@@ -67,21 +67,21 @@ namespace highlo
 
 			switch (Type)
 			{
-				case UniformLayoutDataType::Float:		return TypeCount * 4;
-				case UniformLayoutDataType::Float2:		return TypeCount * 4 * 2;
-				case UniformLayoutDataType::Float3:		return TypeCount * 4 * 3;
-				case UniformLayoutDataType::Float4:		return TypeCount * 4 * 4;
-				case UniformLayoutDataType::Mat3:		return TypeCount * 4 * 3 * 3;
-				case UniformLayoutDataType::Mat4:		return TypeCount * 4 * 4 * 4;
-				case UniformLayoutDataType::Int:		return TypeCount * 4;
-				case UniformLayoutDataType::UInt:		return TypeCount * 4;
-				case UniformLayoutDataType::Int2:		return TypeCount * 4 * 2;
-				case UniformLayoutDataType::UInt2:		return TypeCount * 4 * 2;
-				case UniformLayoutDataType::Int3:		return TypeCount * 4 * 3;
-				case UniformLayoutDataType::UInt3:		return TypeCount * 4 * 3;
-				case UniformLayoutDataType::Int4:		return TypeCount * 4 * 4;
-				case UniformLayoutDataType::UInt4:		return TypeCount * 4 * 4;
-				case UniformLayoutDataType::Bool:		return TypeCount * 1;
+				case UniformLayoutDataType::Float:		return TypeCount * sizeof(float);
+				case UniformLayoutDataType::Float2:		return TypeCount * sizeof(float) * 2;
+				case UniformLayoutDataType::Float3:		return TypeCount * sizeof(float) * 3;
+				case UniformLayoutDataType::Float4:		return TypeCount * sizeof(float) * 4;
+				case UniformLayoutDataType::Mat3:		return TypeCount * sizeof(float) * 3 * 3;
+				case UniformLayoutDataType::Mat4:		return TypeCount * sizeof(float) * 4 * 4;
+				case UniformLayoutDataType::Int:		return TypeCount * sizeof(int32);
+				case UniformLayoutDataType::Int2:		return TypeCount * sizeof(int32) * 2;
+				case UniformLayoutDataType::Int3:		return TypeCount * sizeof(int32) * 3;
+				case UniformLayoutDataType::Int4:		return TypeCount * sizeof(int32) * 4;
+				case UniformLayoutDataType::UInt:		return TypeCount * sizeof(uint32);
+				case UniformLayoutDataType::UInt2:		return TypeCount * sizeof(uint32) * 2;
+				case UniformLayoutDataType::UInt3:		return TypeCount * sizeof(uint32) * 3;
+				case UniformLayoutDataType::UInt4:		return TypeCount * sizeof(uint32) * 4;
+				case UniformLayoutDataType::Bool:		return TypeCount * sizeof(bool) * 2; // TODO: check why *2 is necessary
 			}
 
 			return 0;

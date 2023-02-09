@@ -83,9 +83,10 @@ namespace highlo
 		float Roughness;
 		float Emission;
 		float Transparency;
-		
 		float EnvMapRotation;
+		
 		bool UseNormalMap;
+		bool Padding1;
 	};
 }
 

@@ -196,8 +196,8 @@ namespace highlo
 	}
 
 	void Renderer::RenderFullscreenQuad(
-		Ref<CommandBuffer> &renderCommandBuffer, 
-		Ref<VertexArray> &va, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
 		const Ref<UniformBufferSet> &uniformBufferSet, 
 		const Ref<StorageBufferSet> &storageBufferSet, 
 		Ref<Material> &material, 
@@ -207,42 +207,42 @@ namespace highlo
 	}
 
 	void Renderer::RenderDynamicMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va,
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer,
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer,
 		uint32 transformBufferOffset)
 	{
 		s_RenderingAPI->DrawDynamicMesh(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset);
 	}
 
 	void Renderer::RenderStaticMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset)
 	{
 		s_RenderingAPI->DrawStaticMesh(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset);
 	}
 
 	void Renderer::RenderInstancedDynamicMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va,
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
@@ -250,14 +250,14 @@ namespace highlo
 	}
 
 	void Renderer::RenderInstancedStaticMesh(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
-		Ref<MaterialTable> materials, 
-		TransformVertexData *transformBuffer, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
@@ -265,31 +265,31 @@ namespace highlo
 	}
 
 	void Renderer::RenderInstancedStaticMeshWithMaterial(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va,
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<StaticModel> model,
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va,
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model,
 		uint32 submeshIndex, 
-		TransformVertexData *transformBuffer, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
-		Ref<Material> overrideMaterial)
+		Ref<Material> &overrideMaterial)
 	{
 		s_RenderingAPI->DrawInstancedStaticMeshWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformBufferOffset, instanceCount, overrideMaterial);
 	}
 
 	void Renderer::RenderInstancedDynamicMeshWithMaterial(
-		Ref<CommandBuffer> renderCommandBuffer, 
-		Ref<VertexArray> va, 
-		Ref<UniformBufferSet> uniformBufferSet, 
-		Ref<StorageBufferSet> storageBufferSet, 
-		Ref<DynamicModel> model, 
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		TransformVertexData *transformBuffer, 
+		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
-		Ref<Material> overrideMaterial)
+		Ref<Material> &overrideMaterial)
 	{
 		s_RenderingAPI->DrawInstancedDynamicMeshWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformBufferOffset, instanceCount, overrideMaterial);
 	}

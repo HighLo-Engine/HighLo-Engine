@@ -89,10 +89,10 @@ struct VertexOutput
 		float Roughness;
 		float Emission;
 		float Transparency;
-
 		float EnvMapRotation;
 	
 		bool UseNormalMap;
+		bool Padding1;
 	} u_MaterialUniforms;
 #else
 	layout(std140, binding = 13) uniform Material
@@ -102,10 +102,10 @@ struct VertexOutput
 		float Metalness;
 		float Emission;
 		float Transparency;
-
 		float EnvMapRotation;
 	
 		bool UseNormalMap;
+		bool Padding1;
 	} u_MaterialUniforms;
 #endif
 

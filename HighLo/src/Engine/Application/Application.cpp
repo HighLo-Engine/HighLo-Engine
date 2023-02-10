@@ -109,7 +109,7 @@ namespace highlo
 			if (!m_Settings.Headless)
 				m_Window->Update();
 
-			HL_CORE_TRACE("FRAME TIME: {}", m_Frametime * 1000.0f);
+		//	HL_CORE_TRACE("FRAME TIME: {}", m_Frametime * 1000.0f);
 			float time = GetTime();
 			m_Frametime = time - m_LastFrameTime;
 			m_TimeStep = glm::min<float>(m_Frametime, 0.0333f);

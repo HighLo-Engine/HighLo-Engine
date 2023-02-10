@@ -458,7 +458,7 @@ namespace highlo
 			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
 			if (!material)
 			{
-				HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
 				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
 				HL_ASSERT(material);
 			}

@@ -5,7 +5,7 @@
 
 layout(binding = 0, rgba16f) restrict writeonly uniform imageCube o_Cubemap;
 
-#ifdef __VULKAN__
+#ifdef __GPU_IS_DEDICATED__
 	layout(binding = 1) uniform sampler2D u_EquirectangularTexture;
 #else
 	uniform sampler2D u_EquirectangularTexture;

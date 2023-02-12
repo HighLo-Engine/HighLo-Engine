@@ -11,7 +11,7 @@
 
 layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture[NUM_MIP_LEVELS];
 
-#ifdef __VULKAN__
+#ifdef __GPU_IS_DEDICATED__
 	layout(binding = 1) uniform samplerCube inputTexture;
 #else
 	uniform samplerCube inputTexture;
@@ -23,7 +23,7 @@ layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture[
 		float Roughness;
 	} u_Uniforms;
 #else
-	layout(binding = 2, std140) uniform Uniforms
+	layout(binding = 31, std140) uniform Uniforms
 	{
 		float Roughness;
 	} u_Uniforms;

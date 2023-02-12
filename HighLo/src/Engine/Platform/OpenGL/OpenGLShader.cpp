@@ -938,6 +938,7 @@ namespace highlo
 				options.AddMacroDefinition("__HLSL__");
 
 			options.AddMacroDefinition("__OPENGL__");
+			options.AddMacroDefinition("__GPU_IS_DEDICATED__"); // TODO: make configurable via Renderer::Options
 			options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
 
 			for (auto &[name, value] : m_Macros)

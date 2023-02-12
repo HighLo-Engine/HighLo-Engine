@@ -5,7 +5,7 @@
 
 layout(binding = 0, rgba32f) restrict writeonly uniform imageCube o_IrradianceMap;
 
-#ifdef __VULKAN__
+#ifdef __GPU_IS_DEDICATED__
 	layout(binding = 1) uniform samplerCube u_RadianceMap;
 #else
 	uniform samplerCube u_RadianceMap;

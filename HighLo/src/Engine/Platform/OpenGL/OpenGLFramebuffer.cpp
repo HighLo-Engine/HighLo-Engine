@@ -394,8 +394,9 @@ namespace highlo
 					continue;
 
 				// Only destroy deinterleaved image once and prevent clearing layer views on second framebuffer invalidation
-				if (image->GetSpecification().Layers == 1 || attachmentIndex == 0) // && !image->GetLayerImageView(0)) // TODO
-					image->Release();
+				// TODO
+			//	if (image->GetSpecification().Layers == 1 || attachmentIndex == 0 && !image->GetLayerImageView(0)) // TODO
+			//		image->Release();
 				attachmentIndex++;
 			}
 
@@ -410,7 +411,7 @@ namespace highlo
 
 	void OpenGLFramebuffer::Resize(uint32 width, uint32 height, bool forceRecreate)
 	{
-		if (!forceRecreate && (m_Specification.Width == width && m_Specification.Height == height) && m_Specification.NoResize)
+		if (!forceRecreate || (m_Specification.Width == width && m_Specification.Height == height) || m_Specification.NoResize)
 			return;
 
 		m_Specification.Width = width * (uint32)m_Specification.Scale;

@@ -785,10 +785,20 @@ namespace highlo
 			glBindImageTexture(0, envFiltered->GetRendererID(), level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
 			// Upload Roughness to Shader
-			float value = (float)level * deltaRoughness;
-			const GLint roughnessShaderLocation = glGetUniformLocation(envFilteringShader->GetRendererID(), "u_Uniforms.Roughness");
-			HL_ASSERT(roughnessShaderLocation != -1);
-			glUniform1f(roughnessShaderLocation, value);
+			struct EnvironmentMipFilterUniformBuffer
+			{
+				float Roughness;
+			};
+
+			Ref<UniformBuffer> roughnessBuffer = UniformBuffer::Create(sizeof(EnvironmentMipFilterUniformBuffer), 31, { 
+				{ "u_Uniforms.Roughness", UniformLayoutDataType::Float, 1, 0 },
+			});
+
+			EnvironmentMipFilterUniformBuffer ub;
+			ub.Roughness = (float)level * deltaRoughness;
+
+			roughnessBuffer->SetData(&ub, sizeof(ub));
+			roughnessBuffer->Bind();
 
 			const GLuint numGroups = glm::max(1u, size / 32);
 			glDispatchCompute(numGroups, numGroups, 6);

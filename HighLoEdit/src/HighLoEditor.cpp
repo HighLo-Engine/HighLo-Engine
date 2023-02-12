@@ -195,8 +195,8 @@ void HighLoEditor::OnInitialize()
 	StaticModelComponent *sphereComp = sphereEntity.AddComponent<StaticModelComponent>();
 	sphereComp->Model = AssetFactory::CreateSphere(2.0f);
 
-	Ref<Environment> env = Environment::Create("assets/textures/PBR_Scene_Arena.hdr");
-	m_CurrentScene->SetEnvironment(env);
+	//Ref<Environment> env = Environment::Create("assets/textures/PBR_Scene_Arena.hdr");
+	//m_CurrentScene->SetEnvironment(env);
 
 	//Entity modelEntity = m_CurrentScene->CreateEntity("CapsuleModel");
 	//StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();

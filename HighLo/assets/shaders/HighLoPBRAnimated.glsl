@@ -171,49 +171,6 @@ layout(binding = 12) uniform sampler2DArray u_ShadowMapTexture;
 	} u_MaterialUniforms;
 #endif
 
-vec3 IBL(vec3 F0, vec3 Lr)
-{
-	vec3 irradiance = texture(u_EnvIrradianceTex, m_Params.Normal).rgb;
-	vec3 F = FresnelSchlickRoughness(F0, m_Params.NdotV, m_Params.Roughness);
-	vec3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
-	vec3 diffuseIBL = m_Params.Diffuse * irradiance;
-
-	int envRadianceTexLevels = textureQueryLevels(u_EnvRadianceTex);
-	float NoV = clamp(m_Params.NdotV, 0.0, 1.0);
-	vec3 R = 2.0 * dot(m_Params.View, m_Params.Normal) * m_Params.Normal - m_Params.View;
-	vec3 specularIrradiance = textureLod(u_EnvRadianceTex, Rotate(u_MaterialUniforms.EnvMapRotation, Lr), (m_Params.Roughness) * envRadianceTexLevels).rgb;
-	//specularIrradiance = vec3(Convert_sRGB_FromLinear(specularIrradiance.r), Convert_sRGB_FromLinear(specularIrradiance.g), Convert_sRGB_FromLinear(specularIrradiance.b));
-
-	// Sample BRDF Lut, 1.0 - roughness for y-coord because texture was generated for gloss model
-	vec2 specularBRDF = texture(u_BRDFLUTTexture, vec2(m_Params.NdotV, 1.0 - m_Params.Roughness)).rg;
-	vec3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
-
-	return kd * diffuseIBL + specularIBL;
-}
-
-vec3 GetGradient(float value)
-{
-	vec3 zero = vec3(0.0, 0.0, 0.0);
-	vec3 white = vec3(0.0, 0.1, 0.9);
-	vec3 red = vec3(0.2, 0.9, 0.4);
-	vec3 blue = vec3(0.8, 0.8, 0.3);
-	vec3 green = vec3(0.9, 0.2, 0.3);
-
-	float step0 = 0.0f;
-	float step1 = 2.0f;
-	float step2 = 4.0f;
-	float step3 = 8.0f;
-	float step4 = 16.0f;
-
-	vec3 color = mix(zero, white, smoothstep(step0, step1, value));
-	color = mix(color, white, smoothstep(step1, step2, value));
-	color = mix(color, red, smoothstep(step1, step2, value));
-	color = mix(color, blue, smoothstep(step2, step3, value));
-	color = mix(color, green, smoothstep(step3, step4, value));
-
-	return color;
-}
-
 void main()
 {
 	// Standard PBR inputs
@@ -319,7 +276,8 @@ void main()
 	lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
 
 	// Indirect lighting
-	vec3 iblContribution = IBL(F0, Lr) * u_Scene.EnvironmentMapIntensity;
+	vec3 iblContribution = IBL(F0, Lr, u_EnvRadianceTex, u_EnvIrradianceTex, u_BRDFLUTTexture, u_MaterialUniforms.EnvMapRotation, m_Params.NdotV, m_Params.Roughness, m_Params.Metalness, m_Params.Diffuse, m_Params.Normal, m_Params.View);
+	iblContribution *= u_Scene.EnvironmentMapIntensity;
 
 	o_Color = vec4(iblContribution + lightContribution, 1.0);
 }

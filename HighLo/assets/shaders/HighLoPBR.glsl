@@ -117,7 +117,7 @@ layout(location = 0) out vec4 o_Color;
 //layout(location = 1) out vec4 o_ViewNormalsLuminance;
 //layout(location = 2) out vec4 o_MetalnessRoughness;
 
-#ifdef __VULKAN__
+#ifdef __GPU_IS_DEDICATED__
 	// PBR texture inputs
 	layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
 	layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;

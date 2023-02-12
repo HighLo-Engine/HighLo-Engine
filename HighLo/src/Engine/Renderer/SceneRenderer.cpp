@@ -14,6 +14,18 @@ namespace highlo
 	// Temp until we can use our own thread implementation
 	static std::vector<std::thread> s_ThreadPool;
 
+	enum Binding : uint32
+	{
+		CameraBinding = 0,
+		ShadowBinding = 1,
+		SceneBinding = 2,
+		RendererBinding = 3,
+		PointLightsBinding = 4,
+		ScreenBinding = 17,
+		HBAOBinding = 18,
+		MaterialBinding = 13,
+	};
+
 	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
 		: m_Scene(scene), m_Specification(specification)
 	{
@@ -34,14 +46,14 @@ namespace highlo
 
 		uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 		m_UniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout()); // Camera Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferShadow), 1, UniformLayout::GetShadowDataLayout()); // Shadow Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScene), 2, UniformLayout::GetSceneDataLayout()); // Scene Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferRendererData), 3, UniformLayout::GetRendererDataLayout()); // Renderer Data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), 4, UniformLayout::GetPointLightDataLayout()); // PointLights Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), 17, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), 18, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout()); // Material Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), CameraBinding, UniformLayout::GetCameraLayout()); // Camera Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferShadow), ShadowBinding, UniformLayout::GetShadowDataLayout()); // Shadow Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScene), SceneBinding, UniformLayout::GetSceneDataLayout()); // Scene Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferRendererData), RendererBinding, UniformLayout::GetRendererDataLayout()); // Renderer Data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), PointLightsBinding, UniformLayout::GetPointLightDataLayout()); // PointLights Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), ScreenBinding, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), HBAOBinding, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferMaterial), MaterialBinding, UniformLayout::GetMaterialLayout()); // Material Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway
@@ -131,7 +143,8 @@ namespace highlo
 			m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
 			m_RendererDataUniformBuffer.TilesCountX = m_LightCullingWorkGroups.x;
 
-			m_StorageBufferSet->Resize(14, 0, m_LightCullingWorkGroups.x * m_LightCullingWorkGroups.y * 4096);
+			// ?
+		//	m_StorageBufferSet->Resize(14, 0, m_LightCullingWorkGroups.x * m_LightCullingWorkGroups.y * 4096);
 		}
 
 		auto &sceneCamera = m_SceneData.SceneCamera;
@@ -149,7 +162,7 @@ namespace highlo
 		Renderer::Submit([instance, cameraData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraData, sizeof(cameraData));
+			instance->m_UniformBufferSet->GetUniform(CameraBinding, 0, frameIndex)->SetData(&cameraData, sizeof(cameraData));
 		});
 
 		const auto &dirLight = m_SceneData.ActiveLight;
@@ -168,7 +181,7 @@ namespace highlo
 	//	Renderer::Submit([instance, shadowData]() mutable
 	//	{
 	//		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-	//		instance->m_UniformBufferSet->GetUniform(1, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
+	//		instance->m_UniformBufferSet->GetUniform(ShadowBinding, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
 	//	});
 
 	//	UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
@@ -178,7 +191,7 @@ namespace highlo
 	//	Renderer::Submit([instance, hbaoData]() mutable
 	//	{
 	//		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-	//		instance->m_UniformBufferSet->GetUniform(18, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
+	//		instance->m_UniformBufferSet->GetUniform(HBAOBinding, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
 	//	});
 
 		UniformBufferScene &sceneData = m_SceneUniformBuffer;
@@ -193,7 +206,7 @@ namespace highlo
 		Renderer::Submit([instance, &pointLightData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(4, 0, frameIndex)->SetData(&pointLightData, (sizeof(PointLight) * pointLightData.LightCount) + 16ull);
+			instance->m_UniformBufferSet->GetUniform(PointLightsBinding, 0, frameIndex)->SetData(&pointLightData, (sizeof(PointLight) * pointLightData.LightCount) + 16ull);
 		});
 
 		const auto &directionalLight = m_SceneData.SceneLightEnvironment.DirectionalLights;
@@ -206,7 +219,7 @@ namespace highlo
 		Renderer::Submit([instance, sceneData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(2, 0, frameIndex)->SetData(&sceneData, sizeof(sceneData));
+			instance->m_UniformBufferSet->GetUniform(SceneBinding, 0, frameIndex)->SetData(&sceneData, sizeof(sceneData));
 		});
 
 		UniformBufferRendererData &rendererData = m_RendererDataUniformBuffer;
@@ -215,7 +228,7 @@ namespace highlo
 		Renderer::Submit([instance, rendererData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(3, 0, frameIndex)->SetData(&rendererData, sizeof(rendererData));
+			instance->m_UniformBufferSet->GetUniform(RendererBinding, 0, frameIndex)->SetData(&rendererData, sizeof(rendererData));
 		});
 
 		UniformBufferScreenData &screenData = m_ScreenDataUniformBuffer;
@@ -227,7 +240,7 @@ namespace highlo
 		Renderer::Submit([instance, screenData]() mutable
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			instance->m_UniformBufferSet->GetUniform(17, 0, frameIndex)->SetData(&screenData, sizeof(screenData));
+			instance->m_UniformBufferSet->GetUniform(ScreenBinding, 0, frameIndex)->SetData(&screenData, sizeof(screenData));
 		});
 
 		Renderer::SetSceneEnvironment(

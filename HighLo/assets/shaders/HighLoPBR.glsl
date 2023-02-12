@@ -66,6 +66,8 @@ void main()
 #include <Lighting.glslh>
 #include <ShadowMapping.glslh>
 
+//const vec3 Fdielectric = vec3(0.04);
+
 struct VertexOutput
 {
 	vec3 WorldPosition;
@@ -112,9 +114,89 @@ struct VertexOutput
 layout(location = 0) in VertexOutput Input;
 
 layout(location = 0) out vec4 o_Color;
+//layout(location = 1) out vec4 o_ViewNormalsLuminance;
+//layout(location = 2) out vec4 o_MetalnessRoughness;
+
+#ifdef __VULKAN__
+	// PBR texture inputs
+	layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
+	layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
+	layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
+	layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
+
+	// Environment maps
+	layout(set = 1, binding = 9) uniform samplerCube u_EnvRadianceTex;
+	layout(set = 1, binding = 10) uniform samplerCube u_EnvIrradianceTex;
+
+	// BRDF LUT
+	layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
+
+	// Shadow maps
+	layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+	layout(set = 1, binding = 21) uniform sampler2D u_SpotShadowTexture;
+#else
+	// PBR texture inputs
+	uniform sampler2D u_DiffuseTexture;
+	//uniform sampler2D u_NormalTexture;
+	//uniform sampler2D u_MetalnessTexture;
+	//uniform sampler2D u_RoughnessTexture;
+
+	// Environment maps
+	//uniform samplerCube u_EnvRadianceTex;
+	//uniform samplerCube u_EnvIrradianceTex;
+
+	// BRDF LUT
+	//uniform sampler2D u_BRDFLUTTexture;
+
+	// Shadow maps
+	//uniform sampler2DArray u_ShadowMapTexture;
+	//uniform sampler2D u_SpotShadowTexture;
+#endif
 
 void main()
 {
+	// Standard PBR inputs
+//	vec4 diffuseTexColor = texture(u_DiffuseTexture, Input.TexCoord);
+//	m_Params.Diffuse = diffuseTexColor.rgb * u_MaterialUniforms.DiffuseColor;
+//	float alpha = diffuseTexColor.a;
+//
+//	m_Params.Metalness = texture(u_MetalnessTexture, Input.TexCoord).r * u_MaterialUniforms.Metalness;
+//	m_Params.Roughness = texture(u_RoughnessTexture, Input.TexCoord).r * u_MaterialUniforms.Roughness;
+//	o_MetalnessRoughness = vec4(m_Params.Metalness, m_Params.Roughness, 0.f, 1.f);
+//	m_Params.Roughness = max(m_Params.Roughness, 0.05); // Minimum roughness of 0.05 to keep specular highlight
+//
+//	// Normals (either from vertex or map)
+//	m_Params.Normal = normalize(Input.Normal);
+//	if (u_MaterialUniforms.UseNormalMap)
+//	{
+//		m_Params.Normal = normalize(texture(u_NormalTexture, Input.TexCoord).rgb * 2.0f - 1.0f);
+//		m_Params.Normal = normalize(Input.WorldNormals * m_Params.Normal);
+//	}
+//	// View normals
+//	o_ViewNormalsLuminance.xyz = Input.CameraView * m_Params.Normal;
+//
+//	m_Params.View = normalize(u_Scene.CameraPosition - Input.WorldPosition);
+//	m_Params.NdotV = max(dot(m_Params.Normal, m_Params.View), 0.0);
+//
+//	// Specular reflection vector
+//	vec3 Lr = 2.0 * m_Params.NdotV * m_Params.Normal - m_Params.View;
+//
+//	// Fresnel reflectance, metals use diffuse
+//	vec3 F0 = mix(Fdielectric, m_Params.Diffuse, m_Params.Metalness);
+//
+//	// Direct lighting
+//	vec3 lightContribution = CalculateDirLights(F0);
+//	lightContribution += CalculatePointLights(F0, Input.WorldPosition);
+//	lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
+//
+//	// Indirect lighting
+//	vec3 iblContribution = IBL(F0, Lr, u_EnvRadianceTex, u_EnvIrradianceTex, u_BRDFLUTTexture, u_MaterialUniforms.EnvMapRotation, m_Params.NdotV, m_Params.Roughness, m_Params.Metalness, m_Params.Diffuse, m_Params.Normal, m_Params.View);
+//	iblContribution *= u_Scene.EnvironmentMapIntensity;
+
+	// Final color
+//	o_Color = vec4(iblContribution + lightContribution, 1.0);	
+	
+	vec4 tex = texture(u_DiffuseTexture, Input.TexCoord);
 	o_Color = vec4(u_MaterialUniforms.DiffuseColor, 1.0);
 }
 

@@ -58,6 +58,9 @@ namespace highlo
 
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
 
+		HLAPI void SetEnvironment(const Ref<Environment> &env) { m_Environment = env; }
+		HLAPI const Ref<Environment> &GetEnvironment() const { return m_Environment; }
+
 		HLAPI DirectionalLight &GetLight() { return m_Light; }
 		HLAPI const DirectionalLight &GetLight() const { return m_Light; }
 

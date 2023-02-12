@@ -283,13 +283,11 @@ namespace highlo
 			AssetHandle materialHandle = material->Handle;
 
 			MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
-			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
+			TransformVertexData &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
 			transformStorage.Row0 = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
 			transformStorage.Row1 = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
 			transformStorage.Row2 = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
-
-			uint32 instanceIndex = 0;
 
 			{
 				// Main geometry
@@ -300,8 +298,6 @@ namespace highlo
 				dc.SubmeshIndex = submeshIndex;
 				dc.Materials = materials;
 				dc.OverrideMaterial = overrideMaterial;
-
-				instanceIndex = dc.InstanceCount;
 				dc.InstanceCount++;
 			}
 
@@ -313,7 +309,6 @@ namespace highlo
 				dc.Materials = materials;
 				dc.OverrideMaterial = overrideMaterial;
 				dc.InstanceCount++;
-				dc.InstanceOffset = instanceIndex;
 			}
 
 			if (material->IsShadowCasting())
@@ -569,14 +564,15 @@ namespace highlo
 		UpdateStatistics();
 
 		m_DynamicDrawList.clear();
+		m_DynamicTransparentDrawList.clear();
 		m_DynamicSelectedMeshDrawList.clear();
 		m_DynamicShadowPassDrawList.clear();
+		m_DynamicColliderDrawList.clear();
 
 		m_StaticDrawList.clear();
+		m_StaticTransparentDrawList.clear();
 		m_StaticSelectedMeshDrawList.clear();
 		m_StaticShadowPassDrawList.clear();
-
-		m_DynamicColliderDrawList.clear();
 		m_StaticColliderDrawList.clear();
 
 		m_SceneData = {};

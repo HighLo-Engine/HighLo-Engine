@@ -4,7 +4,12 @@
 #include <EnvironmentMapping.glslh>
 
 layout(binding = 0, rgba16f) restrict writeonly uniform imageCube o_Cubemap;
-layout(binding = 1) uniform sampler2D u_EquirectangularTexture;
+
+#ifdef __VULKAN__
+	layout(binding = 1) uniform sampler2D u_EquirectangularTexture;
+#else
+	uniform sampler2D u_EquirectangularTexture;
+#endif
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 void main()

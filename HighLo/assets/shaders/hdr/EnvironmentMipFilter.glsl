@@ -10,18 +10,23 @@
 #define INVERSE_NUM_SAMPLES (1.0 / float(NUM_SAMPLES))
 
 layout(binding = 0, rgba32f) restrict writeonly uniform imageCube outputTexture[NUM_MIP_LEVELS];
-layout(binding = 1) uniform samplerCube inputTexture;
 
 #ifdef __VULKAN__
-layout (push_constant) uniform Uniforms
-{
-	float Roughness;
-} u_Uniforms;
+	layout(binding = 1) uniform samplerCube inputTexture;
 #else
-layout(binding = 2, std140) uniform Uniforms
-{
-	float Roughness;
-} u_Uniforms;
+	uniform samplerCube inputTexture;
+#endif
+
+#ifdef __VULKAN__
+	layout (push_constant) uniform Uniforms
+	{
+		float Roughness;
+	} u_Uniforms;
+#else
+	layout(binding = 2, std140) uniform Uniforms
+	{
+		float Roughness;
+	} u_Uniforms;
 #endif
 
 #define PARAM_ROUGHNESS u_Uniforms.Roughness
@@ -36,7 +41,8 @@ void main(void)
 {
 	// Make sure we won't write past output when computing higher mipmap levels.
 	ivec2 outputSize = imageSize(outputTexture[PARAM_LEVEL]);
-	if(gl_GlobalInvocationID.x >= outputSize.x || gl_GlobalInvocationID.y >= outputSize.y) {
+	if(gl_GlobalInvocationID.x >= outputSize.x || gl_GlobalInvocationID.y >= outputSize.y)
+	{
 		return;
 	}
 	
@@ -57,7 +63,7 @@ void main(void)
 
 	// Convolve environment map using GGX NDF importance sampling.
 	// Weight by cosine term since Epic claims it generally improves quality.
-	for(uint i = 0; i < NUM_SAMPLES; i++)
+	for (uint i = 0; i < NUM_SAMPLES; i++)
 	{
 		vec2 u = SampleHammersley(i);
 		vec3 Lh = TangentToWorld(SampleGGX(u.x, u.y, PARAM_ROUGHNESS), N, S, T);

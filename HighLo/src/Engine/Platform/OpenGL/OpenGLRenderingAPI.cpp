@@ -705,8 +705,8 @@ namespace highlo
 	void OpenGLRenderingAPI::SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow)
 	{
 		// TODO: Remove this if, when we got the shadow implementation
-		if (!shadow)
-			return;
+	//	if (!shadow)
+	//		return;
 
 		if (!environment)
 		{
@@ -716,30 +716,33 @@ namespace highlo
 		const Ref<Shader> &shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
 
 		// TODO: Fill all these shader fields, when present
-		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		if (const ShaderResourceDeclaration *resource = shader->GetResource("u_EnvRadianceTex"))
 		{
 			Ref<Texture3D> radianceMap = environment->GetRadianceMap();
+			HL_ASSERT(radianceMap);
 			glBindTextureUnit(resource->GetRegister(), radianceMap->GetRendererID());
 		}
 
-		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		if (const ShaderResourceDeclaration *resource = shader->GetResource("u_EnvIrradianceTex"))
 		{
 			Ref<Texture3D> irrandianceMap = environment->GetIrradianceMap();
+			HL_ASSERT(irrandianceMap);
 			glBindTextureUnit(resource->GetRegister(), irrandianceMap->GetRendererID());
 		}
 
-		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
+		if (const ShaderResourceDeclaration *resource = shader->GetResource("u_BRDFLUTTexture"))
 		{
 			Ref<Texture2D> brdfLutTexture = Renderer::GetBRDFLutTexture();
+			HL_ASSERT(brdfLutTexture);
 			glBindSampler(resource->GetRegister(), brdfLutTexture->GetSamplerRendererID());
 			glBindTextureUnit(resource->GetRegister(), brdfLutTexture->GetRendererID());
 		}
 
-		if (const ShaderResourceDeclaration *resource = shader->GetResource(""))
-		{
-			glBindSampler(resource->GetRegister(), shadow->GetSamplerRendererID());
-			glBindTextureUnit(resource->GetRegister(), shadow->GetRendererID());
-		}
+	//	if (const ShaderResourceDeclaration *resource = shader->GetResource("u_ShadowMapTexture"))
+	//	{
+	//		glBindSampler(resource->GetRegister(), shadow->GetSamplerRendererID());
+	//		glBindTextureUnit(resource->GetRegister(), shadow->GetRendererID());
+	//	}
 	}
 
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)

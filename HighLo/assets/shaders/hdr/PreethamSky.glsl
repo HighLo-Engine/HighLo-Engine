@@ -9,15 +9,15 @@
 layout(binding = 0, rgba32f) restrict writeonly uniform imageCube o_CubeMap;
 
 #ifdef __VULKAN__
-layout (push_constant) uniform Uniforms
-{
-	vec3 TurbidityAzimuthInclination;
-} u_Uniforms;
+	layout (push_constant) uniform Uniforms
+	{
+		vec3 TurbidityAzimuthInclination;
+	} u_Uniforms;
 #else
-layout(binding = 1, std140) uniform Uniforms
-{
-	vec3 TurbidityAzimuthInclination;
-} u_Uniforms;
+	layout(binding = 1, std140) uniform Uniforms
+	{
+		vec3 TurbidityAzimuthInclination;
+	} u_Uniforms;
 #endif
 
 vec3 GetCubeMapTexCoord()

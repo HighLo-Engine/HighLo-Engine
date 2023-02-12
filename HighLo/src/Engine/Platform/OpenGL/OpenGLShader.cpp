@@ -909,6 +909,19 @@ namespace highlo
 		std::unordered_map<GLenum, HLString> glShaderSources = utils::ConvertShaderTypeToOpenGLStage(shaderSources);
 		shaderc::Compiler compiler;
 
+		// If any shader source is compute and the shader source count is 1, the whole shader is considered a compute shader
+		if (shaderSources.size() == 1)
+		{
+			for (auto &[type, shaderSource] : shaderSources)
+			{
+				if (type == ShaderType::Compute)
+				{
+					m_IsCompute = true;
+					break;
+				}
+			}
+		}
+
 		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Pre-processing GLSL: {0} [+]", **m_AssetPath);
 
 		shaderc_util::FileFinder fileFinder;
@@ -918,7 +931,12 @@ namespace highlo
 		for (auto &[stage, shaderSource] : glShaderSources)
 		{
 			shaderc::CompileOptions options;
-			options.AddMacroDefinition("__GLSL__");
+
+			if (m_Language == ShaderLanguage::GLSL)
+				options.AddMacroDefinition("__GLSL__");
+			else if (m_Language == ShaderLanguage::HLSL)
+				options.AddMacroDefinition("__HLSL__");
+
 			options.AddMacroDefinition("__OPENGL__");
 			options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
 
@@ -933,6 +951,7 @@ namespace highlo
 			if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
 			{
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to pre-process Shader {0} with error {1} [-]", **m_AssetPath, preProcessingResult.GetErrorMessage());
+				HL_ASSERT(false);
 			}
 
 			m_StagesMetaData[stage].HashValue = shaderSource.Hash();

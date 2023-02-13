@@ -366,10 +366,7 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		Renderer::Submit([]()
-		{
-			Flush();
-		});
+		Flush();
 	}
 
 	void Renderer2D::Flush()

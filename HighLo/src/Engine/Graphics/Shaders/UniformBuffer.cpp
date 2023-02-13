@@ -54,7 +54,7 @@ namespace highlo
 			free(m_Data);
 	}
 
-	void UniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
+	void UniformBuffer::SetData(const void *data, uint32 size, uint32 offset, bool uploadToGPU)
 	{
 		HL_ASSERT(offset < size);
 
@@ -66,10 +66,12 @@ namespace highlo
 		}
 
 		memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), elementSize);
-		UploadToShader();
+
+		if (uploadToGPU)
+			UploadToShader();
 	}
 
-	void UniformBuffer::SetVariable(const HLString &name, void *value)
+	void UniformBuffer::SetVariable(const HLString &name, void *value, bool uploadToGPU)
 	{
 		auto &entry = m_UniformVariables.find(name);
 		if (entry != m_UniformVariables.end())
@@ -77,7 +79,8 @@ namespace highlo
 			uint32 size = entry->second.first;
 			uint32 offset = entry->second.second;
 			memcpy_s((void*)((char*)m_Data + offset), size, value, size);
-			UploadToShader();
+			if (uploadToGPU)
+				UploadToShader();
 		}
 	}
 	

@@ -313,19 +313,12 @@ namespace highlo
 
 	void OpenGLShader::Bind() const
 	{
-		GLuint rendererID = m_RendererID;
-		Renderer::Submit([rendererID]()
-		{
-			glUseProgram(rendererID);
-		});
+		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind()
 	{
-		Renderer::Submit([]()
-		{
-			glUseProgram(0);
-		});
+		glUseProgram(0);
 	}
 
 	void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
@@ -753,7 +746,7 @@ namespace highlo
 
 		std::vector<GLuint> shaderRendererIds;
 		shaderRendererIds.reserve(shaderData.size());
-
+		
 		m_RendererID = glCreateProgram();
 
 		m_ConstantBufferOffset = 0;
@@ -802,7 +795,7 @@ namespace highlo
 
 		// Link shader program
 		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Linking Shader {0} [+]", **m_AssetPath);
-
+		
 		HL_ASSERT(m_RendererID != 0);
 		glLinkProgram(m_RendererID);
 
@@ -826,7 +819,7 @@ namespace highlo
 			}
 			else
 			{
-				//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+			//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
 				HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Linking failed but no infolog was accessible! [-]");
 			}
 		}

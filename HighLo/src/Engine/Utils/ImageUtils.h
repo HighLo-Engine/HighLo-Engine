@@ -35,7 +35,7 @@ namespace highlo
 					return 2 * 4;
 
 				case TextureFormat::RGBA32F:
-					return 4;
+					return 4 * 4;
 
 				case TextureFormat::RED32F:
 					return 4;

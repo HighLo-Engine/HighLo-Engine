@@ -23,7 +23,7 @@ namespace highlo
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void UploadToShader(bool now = false) override;
+		virtual void UploadToShader() override;
 
 	private:
 

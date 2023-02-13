@@ -263,7 +263,11 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#else
-		FlushDrawList();
+		Ref<SceneRenderer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			instance->FlushDrawList();
+		});
 	#endif
 	}
 

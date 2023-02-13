@@ -68,24 +68,25 @@ namespace highlo
 			{
 				// Update Entities and Client Application
 				m_ECS_SystemManager.Update(m_TimeStep);
-				
-				// Update all services
-				Service::OnUpdate();
-
 				OnUpdate(m_TimeStep);
 
 				// Update all layers pushed by the Client Application
 				for (ApplicationLayer *layer : m_LayerStack)
 					layer->OnUpdate(m_TimeStep);
 
+				// Update all services
+				Service::OnUpdate();
+
 				// Render all submitted objects to the screen
 				Renderer::BeginFrame();
 				m_Window->GetSwapChain()->BeginFrame();
 				Renderer::WaitAndRender();
-				m_Window->GetSwapChain()->EndFrame();
 				Renderer::EndFrame();
+			}
 
-				// Update UI (render this after everything else to render it on top of the actual rendering)
+			// Update UI (render this after everything else to render it on top of the actual rendering)
+			if (!m_Minimized && !m_Settings.Headless)
+			{
 				UI::BeginScene();
 
 				OnUIRender(m_TimeStep);
@@ -98,7 +99,7 @@ namespace highlo
 #else
 				bool showDebugPanel = false;
 #endif
-
+				
 				m_RenderDebugPanel->OnUIRender(&showDebugPanel, m_Frametime * 1000.0f, m_FPS, m_LastFrameTime);
 
 				UI::EndScene();
@@ -108,12 +109,14 @@ namespace highlo
 			if (!m_Settings.Headless)
 				m_Window->Update();
 
+		//	HL_CORE_TRACE("FRAME TIME: {}", m_Frametime * 1000.0f);
 			float time = GetTime();
 			m_Frametime = time - m_LastFrameTime;
 			m_TimeStep = glm::min<float>(m_Frametime, 0.0333f);
 			m_LastFrameTime = time;
 
-			++frameCounter;
+			frameCounter++;
+
 			if (time - previousTime >= 1.0f)
 			{
 				m_FPS = frameCounter;
@@ -264,23 +267,19 @@ namespace highlo
 		}
 
 		m_Minimized = false;
-
-		auto &window = m_Window;
-		Renderer::Submit([&window, width, height]()
-		{
-			window->GetSwapChain()->OnResize(width, height);
-		});
-
+		m_Window->GetSwapChain()->OnResize(width, height);
+		
 		OnResize(width, height);
+
 		for (ApplicationLayer *layer : m_LayerStack)
 			layer->OnResize(width, height);
 
-	//	auto &fbs = FramebufferPool::GetGlobal()->GetAll();
-	//	for (auto &fb : fbs)
-	//	{
-	//		if (!fb->GetSpecification().NoResize)
-	//			fb->Resize(width, height);
-	//	}
+		auto &fbs = FramebufferPool::GetGlobal()->GetAll();
+		for (auto &fb : fbs)
+		{
+			if (!fb->GetSpecification().NoResize)
+				fb->Resize(width, height);
+		}
 
 		return true;
 	}

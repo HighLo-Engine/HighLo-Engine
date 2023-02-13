@@ -34,7 +34,6 @@ namespace highlo
 
 		HLAPI virtual void Release() = 0;
 		HLAPI virtual void Invalidate() = 0;
-		HLAPI virtual void RT_Invalidate() = 0;
 		HLAPI virtual bool IsLoaded() const = 0;
 
 		HLAPI virtual void Resize(const glm::uvec2 &size) = 0;

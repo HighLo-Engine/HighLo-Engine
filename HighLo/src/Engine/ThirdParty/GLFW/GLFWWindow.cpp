@@ -56,7 +56,7 @@ namespace highlo
 
 		// The swapchain now takes care of swapping the buffers in the context
 		//m_Context->SwapBuffers();
-		//m_SwapChain->Present();
+		m_SwapChain->Present();
 	}
 
 	void GLFWWindow::SetWindowIcon(const HLString &path, bool flip)

@@ -59,40 +59,37 @@ namespace highlo
 			return;
 		}
 
-		Ref<const OpenGLVertexArray> instance = this;
-		Renderer::Submit([instance]()
+		uint32 attribIndex = 0;
+		const auto &layout = m_Specification.Layout;
+		for (const auto &element : layout)
 		{
-			uint32 attribIndex = 0;
-			const auto &layout = instance->m_Specification.Layout;
-			for (const auto &element : layout)
-			{
-				GLenum glBaseType = utils::ShaderDataTypeToOpenGLBaseType(element.Type);
-				glEnableVertexAttribArray(attribIndex);
+			GLenum glBaseType = utils::ShaderDataTypeToOpenGLBaseType(element.Type);
+			glEnableVertexAttribArray(attribIndex);
 
-				if (glBaseType == GL_INT)
-				{
-					glVertexAttribIPointer(attribIndex,
-										   element.GetComponentCount(),
-										   glBaseType,
-										   layout.GetStride(),
-										   (const void*)(intptr_t)element.Offset);
-				}
-				else
-				{
-					glVertexAttribPointer(attribIndex,
-										  element.GetComponentCount(),
-										  glBaseType,
-										  element.Normalized,
-										  layout.GetStride(),
-										  (const void*)(intptr_t)element.Offset);
-				}
-				++attribIndex;
+			if (glBaseType == GL_INT)
+			{
+				glVertexAttribIPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  layout.GetStride(),
+									  (const void*)(intptr_t)element.Offset);
 			}
-		});
+			else
+			{
+				glVertexAttribPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  element.Normalized,
+									  layout.GetStride(),
+									  (const void*)(intptr_t)element.Offset);
+			}
+			++attribIndex;
+		}
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
+	//	glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::Invalidate()

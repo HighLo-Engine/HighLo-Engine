@@ -9,8 +9,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Engine/Renderer/Renderer.h"
-
 namespace highlo
 {
 	OpenGLMaterial::OpenGLMaterial(const Ref<Shader> &shader, const HLString &name)
@@ -268,27 +266,19 @@ namespace highlo
 			if (texture)
 			{
 				HL_ASSERT(texture->GetType() == TextureType::Texture3D);
-				Renderer::Submit([i, texture]()
-				{
-					Ref<OpenGLTexture3D> glTexture = texture.As<OpenGLTexture3D>();
-					glBindTextureUnit(i, glTexture->GetRendererID());
-				});
+				Ref<OpenGLTexture3D> glTexture = texture.As<OpenGLTexture3D>();
+				glBindTextureUnit(i, glTexture->GetRendererID());
 			}
 		}
 
-		for (auto [slot, texture] : m_Texture2Ds)
+		for (auto &[textureSlot, texture] : m_Texture2Ds)
 		{
 			if (texture)
 			{
-				uint32 textureSlot = slot;
 				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-				Renderer::Submit([textureSlot, glTexture]()
-				{
-					if (glTexture->GetSamplerRendererID() > 0)
-						glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
-
-					glBindTextureUnit(textureSlot, glTexture->GetRendererID());
-				});
+				if (glTexture->GetSamplerRendererID() != 0)
+					glBindSampler(textureSlot, glTexture->GetSamplerRendererID());
+				glBindTextureUnit(textureSlot, glTexture->GetRendererID());
 			}
 		}
 	}

@@ -105,48 +105,45 @@ namespace highlo
 	{
 		s_GLRendererData = new GLRendererData();
 
-		Renderer::Submit([]()
-		{
-			glDebugMessageCallback(utils::OpenGLLogMessage, nullptr);
-			glEnable(GL_DEBUG_OUTPUT);
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(utils::OpenGLLogMessage, nullptr);
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-			GLuint vao;
-			glGenVertexArrays(1, &vao);
-			glBindVertexArray(vao);
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 	
-			// Load Renderer Caps
-			auto& caps = Renderer::GetCapabilities();
-			caps.Vendor = (const char*)glGetString(GL_VENDOR);
-			caps.Device = (const char*)glGetString(GL_RENDERER);
-			caps.Version = (const char*)glGetString(GL_VERSION);
-			glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
-			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
-			glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &caps.MaxTextures);
-			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
+		// Load Renderer Caps
+		auto& caps = Renderer::GetCapabilities();
+		caps.Vendor = (const char*)glGetString(GL_VENDOR);
+		caps.Device = (const char*)glGetString(GL_RENDERER);
+		caps.Version = (const char*)glGetString(GL_VERSION);
+		glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &caps.MaxTextureUnits);
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &caps.MaxTextures);
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
 
-			utils::DumpGPUInfos();
+		utils::DumpGPUInfos();
 
-			glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 
-			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // for seamless cube maps
-			glFrontFace(GL_CCW);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // for seamless cube maps
+		glFrontFace(GL_CCW);
 
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			glEnable(GL_MULTISAMPLE);
-			glEnable(GL_STENCIL_TEST);
+		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_STENCIL_TEST);
 
-			GLenum error = glGetError();
+		GLenum error = glGetError();
+		HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
+		while (error != GL_NO_ERROR)
+		{
+			HL_CORE_ERROR(GL_RENDERING_API_LOG_PREFIX "[-] OpenGL Error: {0} [-]", error);
+			error = glGetError();
 			HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
-			while (error != GL_NO_ERROR)
-			{
-				HL_CORE_ERROR(GL_RENDERING_API_LOG_PREFIX "[-] OpenGL Error: {0} [-]", error);
-				error = glGetError();
-				HL_ASSERT(error == GL_NO_ERROR, fmt::format("OpenGL Error: {}", error).c_str());
-			}
-		});
+		}
 
 		float x = -1;
 		float y = -1;
@@ -198,12 +195,9 @@ namespace highlo
 		s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Bind();
 		if (shouldClear)
 		{
-			Renderer::Submit([]()
-			{
-				const glm::vec4 &clearColor = s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
-				glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			});
+			const glm::vec4 &clearColor = s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
+			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 	}
 
@@ -217,26 +211,17 @@ namespace highlo
 
 	void OpenGLRenderingAPI::ClearScreenColor(const glm::vec4 &color)
 	{
-		Renderer::Submit([color]()
-		{
-			glClearColor(color.r, color.g, color.b, color.a);
-		});
+		glClearColor(color.r, color.g, color.b, color.a);
 	}
 
 	void OpenGLRenderingAPI::ClearScreenBuffers()
 	{
-		Renderer::Submit([]()
-		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		});
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void OpenGLRenderingAPI::DrawIndexed(Ref<VertexArray> &va, PrimitiveType type)
 	{
-		Renderer::Submit([type, va]() mutable
-		{
-			glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-		});
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRenderingAPI::DrawIndexed(uint32 indexCount, Ref<Material> &material, Ref<UniformBufferSet> &uniformBufferSet, PrimitiveType type, bool depthTest, const glm::mat4 &localTransform)
@@ -245,11 +230,7 @@ namespace highlo
 			SetDepthTest(false);
 
 		material->UpdateForRendering(uniformBufferSet);
-
-		Renderer::Submit([type, indexCount]()
-		{
-			glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
-		});
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
 
 		if (!depthTest)
 			SetDepthTest(true);
@@ -257,18 +238,12 @@ namespace highlo
 
 	void OpenGLRenderingAPI::DrawInstanced(Ref<VertexArray> &va, uint32 count, PrimitiveType type)
 	{
-		Renderer::Submit([type, va, count]() mutable
-		{
-			glDrawElementsInstanced(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
-		});
+		glDrawElementsInstanced(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, count);
 	}
 
 	void OpenGLRenderingAPI::DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type)
 	{
-		Renderer::Submit([type, va]() mutable
-		{
-			glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-		});
+		glDrawElements(utils::ConvertToOpenGLPrimitiveType(type), va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRenderingAPI::DrawFullscreenQuad(
@@ -290,10 +265,7 @@ namespace highlo
 			SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
 		}
 
-		Renderer::Submit([]()
-		{
-			glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
-		});
+		glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 		// Reverse the state
 		if (material)
@@ -335,6 +307,7 @@ namespace highlo
 
 			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 			objUB->SetData(&objTransform, sizeof(objTransform));
+			objUB->Bind();
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
@@ -346,6 +319,7 @@ namespace highlo
 			ubMaterial.EnvMapRotation = 0.0f;
 			ubMaterial.UseNormalMap = false;
 			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+			materialUB->Bind();
 
 			glMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -364,10 +338,7 @@ namespace highlo
 				ub->Bind();
 			}
 
-			Renderer::Submit([submesh]()
-			{
-				glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
-			});
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
 
 			// Reverse the state
 			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -407,6 +378,7 @@ namespace highlo
 
 			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 			objUB->SetData(&objTransform, sizeof(objTransform));
+			objUB->Bind();
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
@@ -418,6 +390,7 @@ namespace highlo
 			ubMaterial.EnvMapRotation = 0.0f;
 			ubMaterial.UseNormalMap = false;
 			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+			materialUB->Bind();
 
 			glMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -433,12 +406,10 @@ namespace highlo
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 				ub->SetData(&buffer, sizeof(buffer));
+				ub->Bind();
 			}
 
-			Renderer::Submit([submesh]()
-			{
-				glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
-			});
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
 
 			// Reverse the state
 			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -465,6 +436,7 @@ namespace highlo
 
 		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 		objUB->SetData(&objTransform, sizeof(objTransform));
+		objUB->Bind();
 
 		if (model->IsAnimated())
 		{
@@ -477,6 +449,7 @@ namespace highlo
 
 			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 			ub->SetData(&buffer, sizeof(buffer));
+			ub->Bind();
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
@@ -503,14 +476,12 @@ namespace highlo
 			ubMaterial.EnvMapRotation = 0.0f;
 			ubMaterial.UseNormalMap = false;
 			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+			materialUB->Bind();
 
 			glMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Renderer::Submit([submesh, instanceCount]()
-			{
-				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 
 			// Reverse the state
 			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -537,6 +508,7 @@ namespace highlo
 
 		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 		objUB->SetData(&objTransform, sizeof(objTransform));
+		objUB->Bind();
 
 		if (model->IsAnimated())
 		{
@@ -549,6 +521,7 @@ namespace highlo
 
 			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 			ub->SetData(&buffer, sizeof(buffer));
+			ub->Bind();
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
@@ -580,10 +553,7 @@ namespace highlo
 			glMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Renderer::Submit([submesh, instanceCount]()
-			{
-				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 
 			// Reverse the state
 			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -610,6 +580,7 @@ namespace highlo
 
 		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 		objUB->SetData(&objTransform, sizeof(objTransform));
+		objUB->Bind();
 
 		if (model->IsAnimated())
 		{
@@ -622,6 +593,7 @@ namespace highlo
 
 			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 			ub->SetData(&buffer, sizeof(buffer));
+			ub->Bind();
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
@@ -630,10 +602,7 @@ namespace highlo
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Renderer::Submit([submesh, instanceCount]()
-			{
-				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 
 			// Reverse the state
 			SetDepthTest(!overrideMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -659,6 +628,7 @@ namespace highlo
 		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
 		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 		objUB->SetData(&objTransform, sizeof(objTransform));
+		objUB->Bind();
 
 		if (model->IsAnimated())
 		{
@@ -672,6 +642,7 @@ namespace highlo
 			// Upload the bone transform
 			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 			ub->SetData(&buffer, sizeof(buffer));
+			ub->Bind();
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
@@ -680,10 +651,7 @@ namespace highlo
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Renderer::Submit([submesh, instanceCount]()
-			{
-				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 
 			// Reverse the state
 			SetDepthTest(!overrideMaterial->GetFlag(MaterialFlag::DepthTest));
@@ -692,106 +660,89 @@ namespace highlo
 
 	void OpenGLRenderingAPI::SetWireframe(bool wf)
 	{
-		Renderer::Submit([wf]()
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, wf ? GL_LINE : GL_FILL);
-		});
+		glPolygonMode(GL_FRONT_AND_BACK, wf ? GL_LINE : GL_FILL);
 	}
 
 	void OpenGLRenderingAPI::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
 	{
-		Renderer::Submit([x, y, width, height]()
-		{
-			glViewport(x, y, width, height);
-		});
+		glViewport(x, y, width, height);
 	}
 
 	void OpenGLRenderingAPI::SetBlendMode(bool bEnabled)
 	{
-		Renderer::Submit([bEnabled]()
+		if (bEnabled)
 		{
-			if (bEnabled)
-			{
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			}
-			else
-			{
-				glDisable(GL_BLEND);
-			}
-		});
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+		}
 	}
 
 	void OpenGLRenderingAPI::SetMultiSample(bool bEnabled)
 	{
-		Renderer::Submit([bEnabled]()
-		{
-			if (bEnabled)
-				glEnable(GL_MULTISAMPLE);
-			else
-				glDisable(GL_MULTISAMPLE);
-		});
+		if (bEnabled)
+			glEnable(GL_MULTISAMPLE);
+		else
+			glDisable(GL_MULTISAMPLE);
 	}
 
 	void OpenGLRenderingAPI::SetDepthTest(bool bEnabled)
 	{
-		Renderer::Submit([bEnabled]()
-		{
-			if (bEnabled)
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
-		});
+		if (bEnabled)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
 	}
 
 	void OpenGLRenderingAPI::SetLineThickness(float thickness)
 	{
-		Renderer::Submit([thickness]()
-		{
-			glLineWidth(thickness);
-		});
+		glLineWidth(thickness);
 	}
 
 	void OpenGLRenderingAPI::SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow)
 	{
+		// TODO: Remove this if, when we got the shadow implementation
+	//	if (!shadow)
+	//		return;
+
 		if (!environment)
 		{
 			environment = Renderer::GetEmptyEnvironment();
 		}
 
-		Renderer::Submit([environment, shadow]()
+		const Ref<Shader> &shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
+
+		// TODO: Fill all these shader fields, when present
+		if (const ShaderResourceDeclaration *resource = shader->GetResource("u_EnvRadianceTex"))
 		{
-			const Ref<Shader> &shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
+			Ref<Texture3D> radianceMap = environment->GetRadianceMap();
+			HL_ASSERT(radianceMap);
+			glBindTextureUnit(resource->GetRegister(), radianceMap->GetRendererID());
+		}
 
-			// TODO: Fill all these shader fields, when present
-			if (const ShaderResourceDeclaration *resource = shader->GetResource("u_EnvRadianceTex"))
-			{
-				Ref<Texture3D> radianceMap = environment->GetRadianceMap();
-				HL_ASSERT(radianceMap);
-				glBindTextureUnit(resource->GetRegister(), radianceMap->GetRendererID());
-			}
+		if (const ShaderResourceDeclaration *resource = shader->GetResource("u_EnvIrradianceTex"))
+		{
+			Ref<Texture3D> irrandianceMap = environment->GetIrradianceMap();
+			HL_ASSERT(irrandianceMap);
+			glBindTextureUnit(resource->GetRegister(), irrandianceMap->GetRendererID());
+		}
 
-			if (const ShaderResourceDeclaration *resource = shader->GetResource("u_EnvIrradianceTex"))
-			{
-				Ref<Texture3D> irrandianceMap = environment->GetIrradianceMap();
-				HL_ASSERT(irrandianceMap);
-				glBindTextureUnit(resource->GetRegister(), irrandianceMap->GetRendererID());
-			}
+		if (const ShaderResourceDeclaration *resource = shader->GetResource("u_BRDFLUTTexture"))
+		{
+			Ref<Texture2D> brdfLutTexture = Renderer::GetBRDFLutTexture();
+			HL_ASSERT(brdfLutTexture);
+			glBindSampler(resource->GetRegister(), brdfLutTexture->GetSamplerRendererID());
+			glBindTextureUnit(resource->GetRegister(), brdfLutTexture->GetRendererID());
+		}
 
-			if (const ShaderResourceDeclaration *resource = shader->GetResource("u_BRDFLUTTexture"))
-			{
-				Ref<Texture2D> brdfLutTexture = Renderer::GetBRDFLutTexture();
-				HL_ASSERT(brdfLutTexture);
-				glBindSampler(resource->GetRegister(), brdfLutTexture->GetSamplerRendererID());
-				glBindTextureUnit(resource->GetRegister(), brdfLutTexture->GetRendererID());
-			}
-
-		//	if (const ShaderResourceDeclaration *resource = shader->GetResource("u_ShadowMapTexture"))
-		//	{
-		//		glBindSampler(resource->GetRegister(), shadow->GetSamplerRendererID());
-		//		glBindTextureUnit(resource->GetRegister(), shadow->GetRendererID());
-		//	}
-		});
+	//	if (const ShaderResourceDeclaration *resource = shader->GetResource("u_ShadowMapTexture"))
+	//	{
+	//		glBindSampler(resource->GetRegister(), shadow->GetSamplerRendererID());
+	//		glBindTextureUnit(resource->GetRegister(), shadow->GetRendererID());
+	//	}
 	}
 
 	Ref<Environment> OpenGLRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
@@ -814,59 +765,54 @@ namespace highlo
 		equirectangularConversionShader->Bind();
 		envEquirect->Bind(1);
 
-		Renderer::Submit([envUnfiltered, cubemapSize]()
-		{
-			// Create unfiltered environment map
-			glBindImageTexture(0, envUnfiltered->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-			glDispatchCompute(cubemapSize / 32, cubemapSize / 32, 6);
-			glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-			glGenerateTextureMipmap(envUnfiltered->GetRendererID());
-		});
+		// Create unfiltered environment map
+		glBindImageTexture(0, envUnfiltered->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		glDispatchCompute(cubemapSize / 32, cubemapSize / 32, 6);
+		glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		glGenerateTextureMipmap(envUnfiltered->GetRendererID());
 
-		Renderer::Submit([envUnfiltered, envFiltered]()
-		{
-			// Create filtered environment map
-			glCopyImageSubData(envUnfiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
-				envFiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
-				envFiltered->GetWidth(), envFiltered->GetHeight(), 6);
-		});
+		// Create filtered environment map
+		glCopyImageSubData(envUnfiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
+			envFiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
+			envFiltered->GetWidth(), envFiltered->GetHeight(), 6);
 
 		envFilteringShader->Bind();
 		envUnfiltered->Bind(1);
 
-		Ref<UniformBuffer> roughnessBuffer = UniformBuffer::Create(sizeof(float), 31, {
-			{ "u_Uniforms.Roughness", UniformLayoutDataType::Float, 1, 0 },
-	   });
-
-		Renderer::Submit([envFiltered, cubemapSize, roughnessBuffer]() mutable
+		const float deltaRoughness = 1.0f / glm::max((float)(envFiltered->GetMipLevelCount() - 1u), 1.0f);
+		for (uint32 level = 1, size = cubemapSize / 2; level < envFiltered->GetMipLevelCount(); ++level, size /= 2)
 		{
-			const float deltaRoughness = 1.0f / glm::max((float)(envFiltered->GetMipLevelCount() - 1u), 1.0f);
-			for (uint32 level = 1, size = cubemapSize / 2; level < envFiltered->GetMipLevelCount(); ++level, size /= 2)
+			glBindImageTexture(0, envFiltered->GetRendererID(), level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+			// Upload Roughness to Shader
+			struct EnvironmentMipFilterUniformBuffer
 			{
-				glBindImageTexture(0, envFiltered->GetRendererID(), level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+				float Roughness;
+			};
 
-				// Upload Roughness to Shader
-				float value = (float)level * deltaRoughness;
-				roughnessBuffer->SetData(&value, sizeof(float), 0, false);
-				roughnessBuffer->UploadToShader(true);
+			Ref<UniformBuffer> roughnessBuffer = UniformBuffer::Create(sizeof(EnvironmentMipFilterUniformBuffer), 31, { 
+				{ "u_Uniforms.Roughness", UniformLayoutDataType::Float, 1, 0 },
+			});
 
-				const GLuint numGroups = glm::max(1u, size / 32);
-				glDispatchCompute(numGroups, numGroups, 6);
-				glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-			}
-		});
+			EnvironmentMipFilterUniformBuffer ub;
+			ub.Roughness = (float)level * deltaRoughness;
+
+			roughnessBuffer->SetData(&ub, sizeof(ub));
+			roughnessBuffer->Bind();
+
+			const GLuint numGroups = glm::max(1u, size / 32);
+			glDispatchCompute(numGroups, numGroups, 6);
+			glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		}
 
 		envIrradianceShader->Bind();
 		envFiltered->Bind(1);
 
-		Renderer::Submit([irradianceMap]()
-		{
-			// Create irradiance map
-			glBindImageTexture(0, irradianceMap->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-			glDispatchCompute(irradianceMap->GetWidth() / 32, irradianceMap->GetHeight() / 32, 6);
-			glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-			glGenerateTextureMipmap(irradianceMap->GetRendererID());
-		});
+		// Create irradiance map
+		glBindImageTexture(0, irradianceMap->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		glDispatchCompute(irradianceMap->GetWidth() / 32, irradianceMap->GetHeight() / 32, 6);
+		glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		glGenerateTextureMipmap(irradianceMap->GetRendererID());
 
 		return Ref<Environment>::Create(filePath, envUnfiltered, envFiltered, irradianceMap);
 	}
@@ -875,31 +821,12 @@ namespace highlo
 	{
 		const uint32 cubemapSize = Renderer::GetConfig().EnvironmentMapResolution;
 		Ref<Texture3D> envMap = Texture3D::Create(TextureFormat::RGBA32F, cubemapSize, cubemapSize);
+		glm::vec3 params = { turbidity, azimuth, inclination };
+
 		Ref<OpenGLShader> preethamSkyShader = Renderer::GetShaderLibrary()->Get("PreethamSky").As<OpenGLShader>();
-		
 		preethamSkyShader->Bind();
-		envMap->Bind(1);
-
-		// TODO: change binding
-		Ref<UniformBuffer> preethamSkyBuffer = UniformBuffer::Create(sizeof(float) * 3, 31, {
-			{ "u_Uniforms.Turbidity", UniformLayoutDataType::Float, 1, 0 },
-			{ "u_Uniforms.Azimuth", UniformLayoutDataType::Float, 1, sizeof(float) },
-			{ "u_Uniforms.Inclination", UniformLayoutDataType::Float, 1, 2 * sizeof(float) },
-		});
-
-		Renderer::Submit([turbidity, azimuth, inclination, envMap, cubemapSize, preethamSkyBuffer]() mutable
-		{
-			preethamSkyBuffer->SetData(&turbidity, sizeof(float), 0, false);
-			preethamSkyBuffer->SetData(&azimuth, sizeof(float), sizeof(float), false);
-			preethamSkyBuffer->SetData(&inclination, sizeof(float), sizeof(float) * 2, false);
-			preethamSkyBuffer->UploadToShader(true);
-
-			// Create preetham sky output
-			glBindImageTexture(0, envMap->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-			glDispatchCompute(cubemapSize / 32, cubemapSize / 32, 6);
-			glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-			glGenerateTextureMipmap(envMap->GetRendererID());
-		});
+		// TODO: use Uniform buffers instead (for reference see SceneRenderer.cpp)
+	//	preethamSkyShader->SetUniform("u_Uniforms.TurbidityAzimuthInclination", params);
 
 		return envMap;
 	}

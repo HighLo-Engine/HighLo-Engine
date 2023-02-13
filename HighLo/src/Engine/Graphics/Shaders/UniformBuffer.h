@@ -23,11 +23,11 @@ namespace highlo
 		HLAPI virtual void Unbind() const = 0;
 		HLAPI uint32 GetBinding() const { return m_Binding; }
 
-		HLAPI void SetData(const void *data, uint32 size, uint32 offset = 0);
-		HLAPI void SetVariable(const HLString &name, void *value);
+		HLAPI void SetData(const void *data, uint32 size, uint32 offset = 0, bool uploadToGPU = true);
+		HLAPI void SetVariable(const HLString &name, void *value, bool uploadToGPU = true);
 		HLAPI void *GetVariable(const HLString &name);
 
-		HLAPI virtual void UploadToShader() = 0;
+		HLAPI virtual void UploadToShader(bool now = false) = 0;
 
 		HLAPI static Ref<UniformBuffer> Create(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout = std::vector<UniformVariable>());
 

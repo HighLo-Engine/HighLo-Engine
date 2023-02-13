@@ -34,34 +34,51 @@ namespace highlo
 	{
 		m_LocalData = Allocator::Copy(data, size);
 
-		glCreateBuffers(1, &m_ID);
-		Bind();
-
-		glNamedBufferData(m_ID, m_Size, m_LocalData.Data, utils::ConvertUsageToOpenGL(m_Usage));
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			glCreateBuffers(1, &instance->m_ID);
+			glBindBuffer(GL_ARRAY_BUFFER, instance->m_ID);
+			glNamedBufferData(instance->m_ID, instance->m_Size, instance->m_LocalData.Data, utils::ConvertUsageToOpenGL(instance->m_Usage));
+		});
 	}
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 size, VertexBufferUsage usage)
 		: m_Usage(usage), m_Size(size)
 	{
-		glCreateBuffers(1, &m_ID);
-		Bind();
-		
-		glNamedBufferData(m_ID, m_Size, nullptr, utils::ConvertUsageToOpenGL(m_Usage));
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			glCreateBuffers(1, &instance->m_ID);
+			glBindBuffer(GL_ARRAY_BUFFER, instance->m_ID);
+			glNamedBufferData(instance->m_ID, instance->m_Size, nullptr, utils::ConvertUsageToOpenGL(instance->m_Usage));
+		});
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
-		glDeleteBuffers(1, &m_ID);
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance]()
+		{
+			glDeleteBuffers(1, &instance->m_ID);
+		});
 	}
 
 	void OpenGLVertexBuffer::Bind() const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
+		GLuint rendererID = m_ID;
+		Renderer::Submit([rendererID]()
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, rendererID);
+		});
 	}
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		Renderer::Submit([]()
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		});
 	}
 	
 	void OpenGLVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
@@ -74,7 +91,11 @@ namespace highlo
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.Data);
+		Ref<OpenGLVertexBuffer> instance = this;
+		Renderer::Submit([instance, offset]()
+		{
+			glNamedBufferSubData(instance->m_ID, offset, instance->m_Size, instance->m_LocalData.Data);
+		});
 	}
 }
 

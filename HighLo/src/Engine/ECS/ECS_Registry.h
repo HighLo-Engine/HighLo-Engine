@@ -319,6 +319,11 @@ namespace highlo
 			}
 		}
 
+		HLAPI void Sort(const std::function<bool(const UUID &lhs, const UUID &rhs)> &comp)
+		{
+			// TODO
+		}
+
 	private:
 
 		std::unordered_map<std::type_index, std::vector<std::pair<UUID, std::any>>> m_Components;		// Component Type -> { Component ID, Component }

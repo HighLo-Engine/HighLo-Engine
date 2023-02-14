@@ -510,8 +510,14 @@ namespace highlo
 		target->m_SkyboxShader = m_SkyboxShader;
 		target->m_SkyboxLod = m_SkyboxLod;
 
-		// 
+		// TODO: Copy all components
 
+		target->SortEntities();
+
+		target->m_ViewportWidth = m_ViewportWidth;
+		target->m_ViewportHeight = m_ViewportHeight;
+
+		target->m_IsEditorScene = false;
 	}
 	
 	Ref<Scene> Scene::GetScene(UUID uuid)
@@ -555,6 +561,16 @@ namespace highlo
 		TextComponent *tc = dest.AddOrReplace<TextComponent>(src);							// HL_ASSERT(tc);
 		ScriptComponent *scriptComp = dest.AddOrReplace<ScriptComponent>(src);				// HL_ASSERT(scriptComp);
 	}
+
+	void Scene::SortEntities()
+	{
+		m_Registry.Sort([&](const UUID &lhs, const UUID &rhs)
+		{
+			auto &lhsEntity = m_EntityIDMap.find(lhs);
+			auto &rhsEntity = m_EntityIDMap.find(rhs);
+			return static_cast<uint32>(lhsEntity->second) < static_cast<uint32>(rhsEntity->second);
+		});
+	}
 	
 	void Scene::AddEntity(Entity &entity)
 	{
@@ -576,6 +592,8 @@ namespace highlo
 		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
 		m_EntityIDMap[entity.GetUUID()] = entity;
+		SortEntities();
+
 		return entity;
 	}
 	
@@ -589,6 +607,8 @@ namespace highlo
 		entity.SetTransform(Transform::FromPosition({ 0.0f, 0.0f, 0.0f }));
 
 		m_EntityIDMap[uuid] = entity;
+		SortEntities();
+
 		return entity;
 	}
 	
@@ -612,13 +632,18 @@ namespace highlo
 			}
 		}
 
+		UUID id = entity.GetUUID();
+
 		if (first)
 		{
 			if (entity.HasParent())
 				entity.GetParent().RemoveChild(entity);
 		}
 
-		m_Registry.DestroyAllByEntityId(entity.GetUUID());
+		m_Registry.DestroyAllByEntityId(id);
+		m_EntityIDMap.erase(id);
+
+		SortEntities();
 	}
 	
 	Entity Scene::DuplicateEntity(Entity &entity)

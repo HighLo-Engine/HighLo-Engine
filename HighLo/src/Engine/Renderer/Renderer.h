@@ -208,7 +208,7 @@ namespace highlo
 		HLAPI static void SetLineWidth(float width);
 		HLAPI static float GetCurrentLineWidth();
 
-		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
+		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32);
 		HLAPI static Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination);
 		HLAPI static void SetSceneEnvironment(
 			const Ref<SceneRenderer> &sceneRenderer, 

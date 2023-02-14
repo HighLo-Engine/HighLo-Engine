@@ -450,9 +450,9 @@ namespace highlo
 		return s_MainRendererData->LineWidth;
 	}
 
-	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath)
+	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
-		return s_RenderingAPI->CreateEnvironment(filePath);
+		return s_RenderingAPI->CreateEnvironment(filePath, cubemapSize, irradianceMapSize);
 	}
 
 	Ref<Texture3D> Renderer::CreatePreethamSky(float turbidity, float azimuth, float inclination)

@@ -339,6 +339,11 @@ namespace highlo
 		}
 	}
 
+	void WindowsWindow::SetResizable(bool bEnabled)
+	{
+		// TODO
+	}
+
 	void WindowsWindow::ShowCursor()
 	{
 		m_Properties.CursorVisible = true;

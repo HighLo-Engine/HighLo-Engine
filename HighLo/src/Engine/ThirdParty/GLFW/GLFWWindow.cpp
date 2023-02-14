@@ -184,6 +184,11 @@ namespace highlo
 		}
 	}
 
+	void GLFWWindow::SetResizable(bool bEnabled)
+	{
+		glfwSetWindowAttrib(m_NativeHandle, GLFW_RESIZABLE, bEnabled ? GLFW_TRUE : GLFW_FALSE);
+	}
+
 	void GLFWWindow::ShowCursor()
 	{
 		m_Properties.CursorVisible = true;

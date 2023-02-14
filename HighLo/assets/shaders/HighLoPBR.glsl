@@ -87,8 +87,8 @@ struct VertexOutput
 	layout(push_constant) uniform Material
 	{
 		vec3 DiffuseColor;
-		float Metalness;
 		float Roughness;
+		float Metalness;
 		float Emission;
 		float Transparency;
 		float EnvMapRotation;
@@ -100,8 +100,8 @@ struct VertexOutput
 	layout(std140, binding = 13) uniform Material
 	{
 		vec3 DiffuseColor;
-		float Roughness;
 		float Metalness;
+		float Roughness;
 		float Emission;
 		float Transparency;
 		float EnvMapRotation;

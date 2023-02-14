@@ -775,10 +775,9 @@ namespace highlo
 
 		// Grid (TODO: make configurable)
 		Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
-	//	Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass);
 		const static glm::mat4 transform = 
 			glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) 
-			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+		  * glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
 
 		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
 		Renderer::EndRenderPass(m_CommandBuffer);

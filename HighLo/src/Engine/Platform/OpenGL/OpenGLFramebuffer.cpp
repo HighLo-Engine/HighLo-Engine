@@ -411,7 +411,7 @@ namespace highlo
 
 	void OpenGLFramebuffer::Resize(uint32 width, uint32 height, bool forceRecreate)
 	{
-		if (!forceRecreate || (m_Specification.Width == width && m_Specification.Height == height) || m_Specification.NoResize)
+		if ((!forceRecreate && (m_Specification.Width == width && m_Specification.Height == height)) || m_Specification.NoResize)
 			return;
 
 		m_Specification.Width = width * (uint32)m_Specification.Scale;

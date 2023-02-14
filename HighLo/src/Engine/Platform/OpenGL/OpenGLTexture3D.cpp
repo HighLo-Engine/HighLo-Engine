@@ -18,7 +18,7 @@ namespace highlo
 {
 	OpenGLTexture3D::OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad)
 	{
-		m_Specification.Format = TextureFormat::RGBA;
+		m_Specification.Format = TextureFormat::RGBA32F;
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
@@ -33,6 +33,13 @@ namespace highlo
 			m_Buffer = Allocator::Copy(data, width * height * 4 * sizeof(float));
 			m_Loaded = true;
 			stbi_image_free(data);
+
+			uint32 levels = utils::CalculateMipCount(width, height);
+			m_Specification.Width = width;
+			m_Specification.Height = height;
+
+			glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
+			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.Data);
 		}
 		else
 		{
@@ -52,7 +59,6 @@ namespace highlo
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		m_Specification.Format = format;
-		m_Loaded = true;
 
 		uint32 levels = utils::CalculateMipCount(width, height);
 
@@ -64,6 +70,7 @@ namespace highlo
 		{
 			m_Buffer = Allocator::Copy(data, width * height * 4 * 6); // Six Layers
 			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.Data);
+			m_Loaded = true;
 		}
 
 		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, levels > 1));

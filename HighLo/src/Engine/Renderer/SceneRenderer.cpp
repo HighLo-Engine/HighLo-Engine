@@ -23,7 +23,6 @@ namespace highlo
 		PointLightsBinding = 4,
 		ScreenBinding = 17,
 		HBAOBinding = 18,
-		MaterialBinding = 13,
 	};
 
 	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
@@ -53,7 +52,6 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), PointLightsBinding, UniformLayout::GetPointLightDataLayout()); // PointLights Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), ScreenBinding, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), HBAOBinding, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferMaterial), MaterialBinding, UniformLayout::GetMaterialLayout()); // Material Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway

@@ -250,7 +250,7 @@ namespace highlo
 
 		if (uniformBufferSet)
 		{
-			uniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
+			uniformBufferSet->ForEach([](const Ref<UniformBuffer> &uniformBuffer)
 			{
 				uniformBuffer->Bind();
 			});
@@ -270,6 +270,106 @@ namespace highlo
 				glBindTextureUnit(i, glTexture->GetRendererID());
 			}
 		}
+
+		/*
+		const auto &shaderBuffers = GetShader()->GetShaderBuffers();
+		if (shaderBuffers.size() > 0)
+		{
+			auto &shader = m_Shader.As<OpenGLShader>();
+
+			for (auto &[bufferName, buffer] : shaderBuffers)
+			{
+				for (auto &[name, uniform] : buffer.Uniforms)
+				{
+					switch (uniform.GetType())
+					{
+						case ShaderUniformType::Bool:
+						case ShaderUniformType::Uint:
+						{
+							const uint32 value = m_LocalData.Read<uint32>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Int:
+						{
+							const int32 value = m_LocalData.Read<int32>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::IVec2:
+						{
+							const glm::ivec2 &value = m_LocalData.Read<glm::ivec2>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::IVec3:
+						{
+							const glm::ivec3 &value = m_LocalData.Read<glm::ivec3>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::IVec4:
+						{
+							const glm::ivec4 &value = m_LocalData.Read<glm::ivec4>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Float:
+						{
+							const float value = m_LocalData.Read<float>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Vec2:
+						{
+							const glm::vec2 &value = m_LocalData.Read<glm::vec2>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Vec3:
+						{
+							const glm::vec3 &value = m_LocalData.Read<glm::vec3>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Vec4:
+						{
+							const glm::vec4 &value = m_LocalData.Read<glm::vec4>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Mat2:
+						{
+							const glm::mat2 &value = m_LocalData.Read<glm::mat2>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Mat3:
+						{
+							const glm::mat3 &value = m_LocalData.Read<glm::mat3>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Mat4:
+						{
+							const glm::mat4 &value = m_LocalData.Read<glm::mat4>(uniform.GetOffset());
+							shader->SetUniform(name, value);
+							break;
+						}
+						case ShaderUniformType::Struct:
+						{
+							break;
+						}
+						default:
+						{
+							HL_ASSERT(false);
+							break;
+						}
+					}
+				}
+			}
+		}
+		*/
 
 		for (auto &[textureSlot, texture] : m_Texture2Ds)
 		{

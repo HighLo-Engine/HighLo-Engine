@@ -81,7 +81,7 @@ namespace highlo
 			Renderer2D::FillCircle(Transform::FromPosition({ 6.0f, 0.25f, 0.0f }), 1.0f, 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 			Renderer2D::DrawCircle(Transform::FromPosition({ -6.0f, 0.25f, 0.0f }), 1.0f, glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
 			//	Renderer2D::DrawLine({ 0.0f, 0.0f }, { 6.0f, 6.0f }, glm::vec4(0.2f, 0.3f, 9.0f, 1.0f));
-			Renderer2D::DrawText("Hello World!", { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
+			//Renderer2D::DrawText("Hello World!", { 0.0f, 2.0f, 0.0f }, 100.0f, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 			Renderer2D::EndScene();
 		});

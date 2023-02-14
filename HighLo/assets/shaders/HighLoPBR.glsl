@@ -118,22 +118,41 @@ layout(location = 0) out vec4 o_Color;
 //layout(location = 2) out vec4 o_MetalnessRoughness;
 
 #ifdef __GPU_IS_DEDICATED__
-	// PBR texture inputs
-	layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
-	layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
-	layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
-	layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
+	#ifdef __VULKAN__
+		// PBR texture inputs
+		layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
+		layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
+		layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
+		layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
 
-	// Environment maps
-	layout(set = 1, binding = 9) uniform samplerCube u_EnvRadianceTex;
-	layout(set = 1, binding = 10) uniform samplerCube u_EnvIrradianceTex;
+		// Environment maps
+		layout(set = 1, binding = 9) uniform samplerCube u_EnvRadianceTex;
+		layout(set = 1, binding = 10) uniform samplerCube u_EnvIrradianceTex;
 
-	// BRDF LUT
-	layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
+		// BRDF LUT
+		layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
 
-	// Shadow maps
-	layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
-	layout(set = 1, binding = 21) uniform sampler2D u_SpotShadowTexture;
+		// Shadow maps
+		layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+		layout(set = 1, binding = 21) uniform sampler2D u_SpotShadowTexture;
+	#else
+		// PBR texture inputs
+		layout(binding = 5) uniform sampler2D u_DiffuseTexture;
+		layout(binding = 6) uniform sampler2D u_NormalTexture;
+		layout(binding = 7) uniform sampler2D u_MetalnessTexture;
+		layout(binding = 8) uniform sampler2D u_RoughnessTexture;
+
+		// Environment maps
+		layout(binding = 9) uniform samplerCube u_EnvRadianceTex;
+		layout(binding = 10) uniform samplerCube u_EnvIrradianceTex;
+
+		// BRDF LUT
+		layout(binding = 11) uniform sampler2D u_BRDFLUTTexture;
+
+		// Shadow maps
+		layout(binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+		layout(binding = 21) uniform sampler2D u_SpotShadowTexture;
+	#endif
 #else
 	// PBR texture inputs
 	uniform sampler2D u_DiffuseTexture;

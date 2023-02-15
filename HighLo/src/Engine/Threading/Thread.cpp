@@ -24,7 +24,7 @@ namespace highlo
 		result = Ref<WindowsThread>::Create(runnable, name, priority);
 	#endif // HL_PLATFORM_WINDOWS
 
-		if (result->Start(stackSize))
+		if (!result->Start(stackSize))
 			result = nullptr;
 
 		return result;

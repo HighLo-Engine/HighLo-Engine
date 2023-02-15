@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Core/Core.h"
+#include "ThreadLocker.h"
 
 namespace highlo
 {
@@ -51,6 +52,7 @@ namespace highlo
 
 		bool m_AutoDelete;
 		RunnableCallback m_CallbackFn;
+		Ref<ThreadLocker> m_Locker = nullptr;
 	};
 }
 

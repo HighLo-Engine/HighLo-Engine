@@ -11,7 +11,7 @@
 
 namespace highlo
 {
-	class ThreadLocker
+	class ThreadLocker : public IsSharedReference
 	{
 	public:
 

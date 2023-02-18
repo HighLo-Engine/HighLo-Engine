@@ -8,8 +8,10 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11VertexArray.h"
 #elif HIGHLO_API_DX12
+#include "Engine/Platform/DX12/DX12VertexArray.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanVertexArray.h"
+#elif HIGHLO_API_METAL
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -21,10 +23,12 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexArray>::Create(spec);
 	#elif HIGHLO_API_DX12
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX12VertexArray>::Create(spec);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanVertexArray>::Create(spec);
+	#elif HIGHLO_API_METAL
+		HL_ASSERT(false);
+		return nullptr;
 	#else
 		HL_ASSERT(false);
 		return nullptr;

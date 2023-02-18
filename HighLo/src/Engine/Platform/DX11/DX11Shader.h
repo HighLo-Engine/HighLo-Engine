@@ -37,6 +37,7 @@ namespace highlo
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
+		virtual const ShaderResourceDeclaration *GetResource(const HLString &name) const override;
 
 	private:
 

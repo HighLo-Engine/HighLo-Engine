@@ -6,6 +6,7 @@
 #ifdef HIGHLO_API_DX11
 
 #include "Engine/Platform/DX11/DX11Resources.h"
+#include "Engine/Renderer/SceneRenderer.h"
 
 namespace highlo
 {
@@ -73,31 +74,95 @@ namespace highlo
 		DX11Resources::s_DeviceContext->DrawIndexed(va->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
-	void DX11RenderingAPI::DrawFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform)
+	void DX11RenderingAPI::DrawFullscreenQuad(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<Material> &material, 
+		const glm::mat4 &transform)
 	{
 	}
 
-	void DX11RenderingAPI::DrawStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
+	void DX11RenderingAPI::DrawStaticMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferOffset)
 	{
 	}
 
-	void DX11RenderingAPI::DrawDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset)
+	void DX11RenderingAPI::DrawDynamicMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferOffset)
 	{
 	}
 
-	void DX11RenderingAPI::DrawInstancedStaticMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	void DX11RenderingAPI::DrawInstancedStaticMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferOffset, 
+		uint32 instanceCount)
 	{
 	}
 
-	void DX11RenderingAPI::DrawInstancedDynamicMesh(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<MaterialTable> materials, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	void DX11RenderingAPI::DrawInstancedDynamicMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferOffset, 
+		uint32 instanceCount)
 	{
 	}
 
-	void DX11RenderingAPI::DrawInstancedStaticMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<StaticModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
+	void DX11RenderingAPI::DrawInstancedStaticMeshWithMaterial(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferOffset, 
+		uint32 instanceCount, 
+		Ref<Material> &overrideMaterial)
 	{
 	}
 
-	void DX11RenderingAPI::DrawInstancedDynamicMeshWithMaterial(Ref<CommandBuffer> renderCommandBuffer, Ref<VertexArray> va, Ref<UniformBufferSet> uniformBufferSet, Ref<StorageBufferSet> storageBufferSet, Ref<DynamicModel> model, uint32 submeshIndex, Ref<VertexBuffer> transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> overrideMaterial)
+	void DX11RenderingAPI::DrawInstancedDynamicMeshWithMaterial(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferOffset, 
+		uint32 instanceCount, 
+		Ref<Material> &overrideMaterial)
 	{
 	}
 
@@ -145,6 +210,10 @@ namespace highlo
 	}
 
 	void DX11RenderingAPI::SetLineThickness(float thickness)
+	{
+	}
+
+	void DX11RenderingAPI::SetSceneEnvironment(const Ref<SceneRenderer> &sceneRenderer, Ref<Environment> &environment, const Ref<Texture2D> &shadow)
 	{
 	}
 

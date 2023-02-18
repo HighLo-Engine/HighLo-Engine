@@ -56,7 +56,7 @@ namespace highlo
 
 		virtual void UpdateResourceData() override;
 		virtual void UpdateResourceData(void *data) override;
-		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
+		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;

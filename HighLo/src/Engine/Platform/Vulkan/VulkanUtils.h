@@ -294,7 +294,8 @@ namespace highlo::utils
 
 	static VkShaderStageFlagBits ShaderStageFromString(const HLString &str)
 	{
-		HLString type = str.ToLowerCase();
+		HLString type = str;
+		type = type.ToLowerCase();
 
 		if (type == "vertex")
 			return VK_SHADER_STAGE_VERTEX_BIT;
@@ -319,7 +320,8 @@ namespace highlo::utils
 
 	static HLString ShaderStageStringToMacro(const HLString &str)
 	{
-		HLString type = str.ToLowerCase();
+		HLString type = str;
+		type = type.ToLowerCase();
 
 		if (type == "vertex")
 			return "__VERTEX_STAGE__";

@@ -23,7 +23,7 @@ namespace highlo
 	public:
 
 		VulkanShader(const FileSystemPath &filePath, bool forceCompile = false);
-		VulkanShader(const HLString &source);
+		VulkanShader(const HLString &source, const HLString &name = "undefined", ShaderLanguage language = ShaderLanguage::GLSL);
 		virtual ~VulkanShader();
 
 		virtual void Reload(bool forceCompile = false) override;
@@ -39,6 +39,7 @@ namespace highlo
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
+		virtual const ShaderResourceDeclaration *GetResource(const HLString &name) const override;
 
 		virtual void SetMacro(const HLString &name, const HLString &value) override;
 

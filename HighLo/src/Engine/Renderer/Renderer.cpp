@@ -13,6 +13,8 @@
 #include "Engine/Platform/DX12/DX12RenderingAPI.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanRenderingAPI.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalRenderingAPI.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo

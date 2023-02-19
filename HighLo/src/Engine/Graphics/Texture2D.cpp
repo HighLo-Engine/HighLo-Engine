@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12Texture2D.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanTexture2D.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalTexture2D.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX12Texture2D>::Create(filePath, flipOnLoad);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(filePath, flipOnLoad);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture2D>::Create(filePath, flipOnLoad);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -41,6 +45,8 @@ namespace highlo
 		return Ref<DX12Texture2D>::Create(rgb, format);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(rgb, format);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture2D>::Create(rgb, format);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -57,6 +63,8 @@ namespace highlo
 		return Ref<DX12Texture2D>::Create(rgb, width, height, format);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(rgb, width, height, format);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture2D>::Create(rgb, width, height, format);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -73,6 +81,8 @@ namespace highlo
 		return Ref<DX12Texture2D>::Create(format, width, height);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(format, width, height);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture2D>::Create(format, width, height);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -89,6 +99,8 @@ namespace highlo
 		return Ref<DX12Texture2D>::Create(format, width, height, data, props);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(format, width, height, data, props);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture2D>::Create(format, width, height, data, props);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -105,6 +117,8 @@ namespace highlo
 		return Ref<DX12Texture2D>::Create(specification);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture2D>::Create(specification);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture2D>::Create(specification);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

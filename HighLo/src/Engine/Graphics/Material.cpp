@@ -12,6 +12,7 @@
 #elif HIGHLO_API_DX12
 #include "Engine/Platform/DX12/DX12Material.h"
 #elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalMaterial.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -27,8 +28,7 @@ namespace highlo
 #elif HIGHLO_API_DX12
 		return Ref<DX12Material>::Create(shader, name);
 #elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalMaterial>::Create(shader, name);
 #else
 		HL_ASSERT(false);
 		return nullptr;
@@ -46,8 +46,7 @@ namespace highlo
 #elif HIGHLO_API_DX12
 		return Ref<DX12Material>::Create(other, name);
 #elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalMaterial>::Create(other, name);
 #else
 		HL_ASSERT(false);
 		return nullptr;

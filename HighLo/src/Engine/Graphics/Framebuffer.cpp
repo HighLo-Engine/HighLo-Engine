@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12Framebuffer.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanFramebuffer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalFramebuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -27,6 +29,8 @@ namespace highlo
 		return Ref<DX12Framebuffer>::Create(spec);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanFramebuffer>::Create(spec);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalFramebuffer>::Create(spec);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

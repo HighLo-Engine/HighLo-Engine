@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12ComputePipeline.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanComputePipeline.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalComputePipeline.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX11ComputePipeline>::Create(computeShader);
 	#elif HIGHLO_API_DX12
 		return Ref<DX12ComputePipeline>::Create(computeShader);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalComputePipeline>::Create(computeShader);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

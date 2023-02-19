@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12CommandBuffer.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanCommandBuffer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalCommandBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX11CommandBuffer>::Create(debugName, true);
 	#elif HIGHLO_API_DX12
 		return Ref<DX12CommandBuffer>::Create(debugName, true);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalCommandBuffer>::Create(debugName, true);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -41,6 +45,8 @@ namespace highlo
 		return Ref<DX11CommandBuffer>::Create(count, debugName);
 	#elif HIGHLO_API_DX12
 		return Ref<DX12CommandBuffer>::Create(count, debugName);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalCommandBuffer>::Create(count, debugName);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

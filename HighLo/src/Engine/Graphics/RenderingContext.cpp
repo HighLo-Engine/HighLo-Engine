@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX11/DX11Context.h"
 #elif HIGHLO_API_DX12
 #include "Engine/Platform/DX12/DX12Context.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalContext.h"
 #endif // HIGHLO_API_OPENGL
 
 
@@ -26,6 +28,8 @@ namespace highlo
 		return Ref<DX12Context>::Create(handle, data);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanContext>::Create(handle, data);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalContext>::Create(handle, data);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

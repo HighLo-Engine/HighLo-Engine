@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX11/DX11ImGuiRenderer.h"
 #elif HIGHLO_API_DX12
 #include "Engine/Platform/DX12/DX12ImGuiRenderer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalImGuiRenderer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX12ImGuiRenderer>::Create();
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanImGuiRenderer>::Create();
+	#elif HIGHLO_API_METAL
+		return Ref<MetalImGuiRenderer>::Create();
 	#else
 		HL_ASSERT(false);
 		return nullptr;

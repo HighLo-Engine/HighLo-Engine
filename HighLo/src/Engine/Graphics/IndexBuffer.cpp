@@ -12,6 +12,7 @@
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanIndexBuffer.h"
 #elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalIndexBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -28,8 +29,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanIndexBuffer>::Create(indices);
 	#elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalIndexBuffer>::Create(indices);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -48,8 +48,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanIndexBuffer>::Create(data, size);
 	#elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalIndexBuffer>::Create(data, size);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -68,8 +67,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanIndexBuffer>::Create(size);
 	#elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalIndexBuffer>::Create(size);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

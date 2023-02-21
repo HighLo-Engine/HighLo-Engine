@@ -12,6 +12,7 @@
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanVertexBuffer.h"
 #elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalVertexBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -27,8 +28,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanVertexBuffer>::Create(data, size, usage);
 	#elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalVertexBuffer>::Create(data, size, usage);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -46,8 +46,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanVertexBuffer>::Create(size, usage);
 	#elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalVertexBuffer>::Create(size, usage);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

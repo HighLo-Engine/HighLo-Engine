@@ -12,6 +12,7 @@
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanVertexArray.h"
 #elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalVertexArray.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -27,8 +28,7 @@ namespace highlo
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanVertexArray>::Create(spec);
 	#elif HIGHLO_API_METAL
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<MetalVertexArray>::Create(spec);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

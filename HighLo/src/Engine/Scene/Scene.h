@@ -122,6 +122,9 @@ namespace highlo
 
 		HLAPI void CopyAllComponents(Entity &dest, const Entity &src);
 
+		HLAPI void SetEntityDestroyedCallback(const std::function<void(Entity)> &callback) { m_OnEntityDestroyedCallback = callback; }
+
+
 	private:
 
 		void SortEntities();
@@ -136,6 +139,8 @@ namespace highlo
 
 		EntityMap m_EntityIDMap;
 		ECS_Registry m_Registry;
+
+		std::function<void(Entity)> m_OnEntityDestroyedCallback;
 
 		DirectionalLight m_Light;
 		float m_LightMultiplier = 0.3f;

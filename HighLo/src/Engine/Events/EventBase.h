@@ -29,8 +29,7 @@ namespace highlo
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoves, FileMenu, FileMenuChanged, FileSystemChanged,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
-		ThreadStarting, ThreadEnding,
-		SelectionChanged,
+		ThreadStarting, ThreadEnding
 	};
 
 	enum EventCategory
@@ -41,8 +40,6 @@ namespace highlo
 		EventCategoryKeyboard = HL_BIT(2),
 		EventCategoryMouse = HL_BIT(3),
 		EventCategoryMouseButton = HL_BIT(4),
-		EventCategoryScene = HL_BIT(5),
-		EventCategoryEditor = HL_BIT(6),
 	};
 
 	enum class FileSystemAction
@@ -54,9 +51,9 @@ namespace highlo
 	template<typename T>
 	using EventFn = std::function<bool(T&)>;
 
-	#define REGISTER_EVENT_CLASS_TYPE(type) HLAPI static EventType GetStaticType() { return EventType::##type; }\
-	HLAPI virtual EventType GetEventType() const override { return GetStaticType(); }\
-	HLAPI virtual const char *GetName() const override { return #type; }
+	#define REGISTER_EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
+	virtual EventType GetEventType() const override { return GetStaticType(); }\
+	virtual const char *GetName() const override { return #type; }
 
 	#define REGISTER_EVENT_CLASS_CATEGORY(type) virtual int GetCategoryFlags() const override { return type; }
 

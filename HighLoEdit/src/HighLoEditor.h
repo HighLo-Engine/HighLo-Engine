@@ -28,7 +28,8 @@ class HighLoEditor : public HLApplication
 		virtual void OnResize(uint32 width, uint32 height) override;
 
 		void UpdateUIFlags();
-		void UI_DrawGuizmos(const EditorCamera &camera);
+
+		void SelectEntity(Entity &entity);
 
 		void UpdateWindowTitle(const HLString &sceneName, bool sceneIsSaved = true);
 		void NewScene(FileMenu *menu, MenuItem *item);
@@ -74,7 +75,7 @@ class HighLoEditor : public HLApplication
 		bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent &e);
 		void OnFileMenuPressed(FileMenu *menu, MenuItem *item);
 
-		void OnSelected(SelectedMesh &selectionContext);
+		void OnSelected(const SelectedMesh &selectionContext);
 		void OnEntityAdded(Entity &e);
 		void OnEntityDeleted(Entity &e);
 		void OnEntityChanged(Entity &e);
@@ -133,6 +134,9 @@ class HighLoEditor : public HLApplication
 		SceneState m_SceneState = SceneState::Edit;
 		SelectionMode m_SelectionMode = SelectionMode::Entity;
 
+		std::vector<SelectedMesh> m_SelectionContext;
+		glm::mat4 *m_RelativeTransform = nullptr;
+		glm::mat4 *m_CurrentlySelectedTransform = nullptr;
 		glm::vec2 m_ViewportBounds[2];
 
 		// Main displayable scenes

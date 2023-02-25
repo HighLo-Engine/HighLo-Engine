@@ -64,8 +64,6 @@ namespace highlo
 				break;
 #endif
 
-			ProcessEvents();
-
 			if (!m_Minimized && !m_Settings.Headless)
 			{
 				// Update Entities and Client Application
@@ -305,34 +303,7 @@ namespace highlo
 			(*it)->OnEvent(e);
 		}
 
-		if (e.m_Handled)
-			return;
-
 		// Notify the main client application of the event
 		OnEvent(e);
-
-		if (e.m_Handled)
-			return;
-
-		for (auto &eventCallback : m_EventCallbacks)
-		{
-			eventCallback(e);
-
-			if (e.m_Handled)
-				break;
-		}
-	}
-	
-	void HLApplication::ProcessEvents()
-	{
-		std::scoped_lock<std::mutex> lock(m_EventQueueMutex);
-
-		// Process custom event queue
-		while (m_EventQueue.size() > 0)
-		{
-			auto &func = m_EventQueue.front();
-			func();
-			m_EventQueue.pop();
-		}
 	}
 }

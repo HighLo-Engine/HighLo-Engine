@@ -14,16 +14,9 @@
 
 namespace highlo
 {
-	SelectionContext SceneHierarchyPanel::s_ActiveSelectionContext = SelectionContext::Scene;
-	static ImRect s_WindowBounds;
-	static bool s_ActivateSearchWidget = false;
-
-	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene> &scene, bool isWindow, SelectionContext context)
-		: m_Scene(scene), m_IsWindow(isWindow), m_SelectionContext(context)
+	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene> &scene, bool isWindow)
+		: m_Scene(scene), m_IsWindow(isWindow)
 	{
-		if (m_Scene)
-			m_Scene->SetEntityDestroyedCallback([this](Entity entity) { OnExternalEntityDestroyed(entity); });
-
 		m_TreeNodeRoot = Texture2D::LoadFromFile("assets/Resources/Icons/treeNode_root.png");
 		m_TreeNodeChildren = Texture2D::LoadFromFile("assets/Resources/Icons/treeNode_with_children.png");
 		m_TreeNodeChildrenOpened = Texture2D::LoadFromFile("assets/Resources/Icons/treeNode_with_children_opened.png");
@@ -32,159 +25,313 @@ namespace highlo
 	void SceneHierarchyPanel::SetContext(const Ref<Scene> &scene)
 	{
 		m_Scene = scene;
-		if (m_Scene)
-			m_Scene->SetEntityDestroyedCallback([this](Entity entity) { OnExternalEntityDestroyed(entity); });
+		m_SelectedEntity = {};
+	}
+
+	void SceneHierarchyPanel::SetSelected(Entity entity)
+	{
+		m_SelectedEntity = entity;
+		if (m_SelectionChangedCallback)
+			m_SelectionChangedCallback(entity);
 	}
 
 	void SceneHierarchyPanel::OnUIRender(bool *pOpen)
 	{
+		Translation *translation = HLApplication::Get().GetActiveTranslation();
+
 		if (m_IsWindow)
 		{
 			UI::ScopedStyle padding(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-			ImGui::Begin("Scene Hierarchy", pOpen);
+			ImGui::Begin(translation->GetText("scene-hierarchy-window-title"), pOpen);
 		}
 
-		s_ActiveSelectionContext = m_SelectionContext;
-		m_IsWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 		ImRect windowRect = { ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax() };
 
+		if (m_Scene)
 		{
-			const float edgeOffset = 4.0f;
-			UI::ShiftCursorX(edgeOffset * 3.0f);
-			UI::ShiftCursorY(edgeOffset * 2.0f);
-
-			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - edgeOffset * 3.0f);
-
-			static HLString searchedString;
-
-			if (s_ActivateSearchWidget)
 			{
-				ImGui::SetKeyboardFocusHere();
-				s_ActivateSearchWidget = false;
-			}
+				const float edgeOffset = 4.0f;
+				static HLString searchedString = "";
+				UI::ShiftCursorX(edgeOffset * 3.0f);
+				UI::ShiftCursorY(edgeOffset * 2.0f);
 
-			UI::Widgets::SearchWidget(searchedString);
+				// ===============================================================================================
+				// =========================================  Search bar  ========================================
+				// ===============================================================================================
 
-			ImGui::Spacing();
-			ImGui::Spacing();
+				ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - edgeOffset * 3.0f);
+				UI::Widgets::SearchWidget(searchedString);
 
-			// Entity list
-			//------------
+				ImGui::Spacing();
+				ImGui::Spacing();
 
-			UI::ScopedStyle cellPadding(ImGuiStyleVar_CellPadding, ImVec2(4.0f, 0.0f));
+				// ===============================================================================================
+				// =====================================  Entity List  ===========================================
+				// ===============================================================================================
 
-			// Alt row colour
-			const ImU32 colRowAlt = UI::ColorWithMultipliedValue(Colors::Theme::BackgroundDark, 1.3f);
-			UI::ScopedColor tableBGAlt(ImGuiCol_TableRowBgAlt, colRowAlt);
+				UI::ScopedStyle cellPadding(ImGuiStyleVar_CellPadding, ImVec2(4.0f, 0.0f));
 
-			// Table
-			{
-				// Scrollable Table uses child window internally
-				UI::ScopedColor tableBg(ImGuiCol_ChildBg, Colors::Theme::BackgroundDark);
+				const ImU32 colRowAlt = UI::ColorWithMultipliedValue(Colors::Theme::BackgroundDark, 1.3f);
+				UI::ScopedColor tableBGAlt(ImGuiCol_TableRowBgAlt, colRowAlt);
 
-				ImGuiTableFlags flags = ImGuiTableFlags_NoPadInnerX
-					| ImGuiTableFlags_Resizable
-					| ImGuiTableFlags_ScrollY
-					| ImGuiTableFlags_RowBg
-					| ImGuiTableFlags_NoBordersInBody;
-
-				const int32 numColumns = 3;
-				if (ImGui::BeginTable("##SceneHierarchy-Table", numColumns, flags, ImVec2(ImGui::GetContentRegionAvail())))
+				// Table
 				{
-					// If the user clicks anywhere on the scene hierarchy panel (except on a entity itself), deselect the currently selected entity
-					if (m_SelectedEntityID > 0 && m_IsWindowFocused && !ImGui::IsAnyItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+					UI::ScopedColor tableBg(ImGuiCol_ChildBg, Colors::Theme::BackgroundDark);
+
+					ImGuiTableFlags flags = ImGuiTableFlags_NoPadInnerX
+										  | ImGuiTableFlags_Resizable
+										  | ImGuiTableFlags_ScrollY
+										  | ImGuiTableFlags_RowBg
+										  | ImGuiTableFlags_NoBordersInBody;
+
+					const int32 numCols = 3;
+					if (ImGui::BeginTable(UI::GenerateID(), numCols, flags, ImVec2(ImGui::GetContentRegionAvail())))
 					{
-						SelectionManager::Deselect(s_ActiveSelectionContext, m_SelectedEntityID);
-						m_SelectedEntityID = 0;
-					}
-
-					ImGuiTableFlags columnFlags = ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort;
-					ImGui::TableSetupColumn("", columnFlags); // Label
-					ImGui::TableSetupColumn("", columnFlags); // Visibilty
-					ImGui::TableSetupColumn("", columnFlags); // Materials and other extra settings
-
-					// Headers
-					{
-						const ImU32 colActive = UI::ColorWithMultipliedValue(Colors::Theme::GroupHeader, 1.2f);
-						UI::ScopedColorStack headerColours(ImGuiCol_HeaderHovered, colActive,
-															ImGuiCol_HeaderActive, colActive);
-
-						ImGui::TableSetupScrollFreeze(ImGui::TableGetColumnCount(), 1);
-
-						ImGui::TableNextRow(ImGuiTableRowFlags_Headers, 22.0f);
-						for (int32 column = 0; column < ImGui::TableGetColumnCount(); column++)
+						// If the user clicks anywhere on the scene hierarchy panel (except on a entity itself), deselect the currently selected entity
+						if (m_SelectedEntity && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 						{
-							ImGui::TableSetColumnIndex(column);
-							const char *column_name = ImGui::TableGetColumnName(column);
-							UI::ScopedID columnID(column);
-
-							UI::ShiftCursor(edgeOffset * 3.0f, edgeOffset * 2.0f);
-							ImGui::TableHeader(column_name);
-							UI::ShiftCursor(-edgeOffset * 3.0f, -edgeOffset * 2.0f);
+							SetSelected({});
 						}
 
-						ImGui::SetCursorPosX(ImGui::GetCurrentTable()->OuterRect.Min.x);
-						UI::DrawUnderline(true, 0.0f, 5.0f);
-					}
+						ImGuiTableFlags columnFlags = ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoReorder | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoSort;
+						ImGui::TableSetupColumn("", columnFlags); // Label
+						ImGui::TableSetupColumn("", columnFlags); // Visibilty
+						ImGui::TableSetupColumn("", columnFlags); // Materials and other extra settings
 
-					// List
-					{
-						UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE,
-															 ImGuiCol_HeaderHovered, IM_COL32_DISABLE,
-															 ImGuiCol_HeaderActive, IM_COL32_DISABLE);
-
-						auto &view = m_Scene->m_Registry.View<RelationshipComponent>();
-						for (UUID entityId : view)
+						// Headers
 						{
-							Entity e = m_Scene->FindEntityByUUID(entityId);
-							if (!e)
-								continue;
+							const ImU32 colorActive = UI::ColorWithMultipliedValue(Colors::Theme::GroupHeader, 1.2f);
+							UI::ScopedColorStack headerColors(ImGuiCol_HeaderHovered, colorActive, ImGuiCol_HeaderActive, colorActive);
 
-							// If the parent UUID is 0, there is no parent -> this node is a root node
-							if (e.GetParentUUID() == 0)
-								DrawEntityNode(e, searchedString);
+							ImGui::TableSetupScrollFreeze(ImGui::TableGetColumnCount(), 1);
+
+							ImGui::TableNextRow(ImGuiTableRowFlags_Headers, 22.0f);
+							for (int32 column = 0; column < ImGui::TableGetColumnCount(); ++column)
+							{
+								ImGui::TableSetColumnIndex(column);
+								const char *columnName = ImGui::TableGetColumnName(column);
+								UI::ScopedID columnId(column);
+
+								UI::ShiftCursor(edgeOffset * 3.0f, edgeOffset * 2.0f);
+								ImGui::TableHeader(columnName);
+								UI::ShiftCursor(-edgeOffset * 3.0f, -edgeOffset * 2.0f);
+							}
+
+							ImGui::SetCursorPosX(ImGui::GetCurrentTable()->OuterRect.Min.x);
+							UI::DrawUnderline(true, 0.0f, 5.0f);
 						}
+
+						// List
+						{
+							UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
+
+							auto &view = m_Scene->m_Registry.View<RelationshipComponent>();
+
+							for (UUID entityId : view)
+							{
+								Entity e = m_Scene->FindEntityByUUID(entityId);
+
+								if (!e)
+									continue;
+
+								// If the parent UUID is 0, there is no parent -> this node is a root node
+								if (e.GetParentUUID() == 0)
+									DrawEntityNode(e, searchedString);
+							}
+						}
+
+						if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+						{
+							if (ImGui::BeginMenu(translation->GetText("scene-hierarchy-right-click-menu-new")))
+							{
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-null-object")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-null-object"));
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-camera")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-camera"));
+									newEntity.AddComponent<CameraComponent>();
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								ImGui::Separator();
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-cube")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cube"));
+									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+									component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-sphere")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-sphere"));
+									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+									component->Model = AssetFactory::CreateSphere(4.0f);
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-capsule")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-capsule"));
+									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+									component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-cylinder")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cylinder"));
+									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
+									// TODO: Add Cylinders to AssetFactory and MeshFactory
+								//	component->Model = AssetFactory::CreateCylinder();
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								ImGui::Separator();
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-directional-light")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-directional-light"));
+									newEntity.AddComponent<DirectionalLightComponent>();
+									newEntity.Transform().FromRotation({ 80.0f, 10.0f, 0.0f });
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-point-light")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-point-light"));
+									newEntity.AddComponent<PointLightComponent>();
+									newEntity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-sky-light")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-sky-light"));
+									newEntity.AddComponent<SkyLightComponent>();
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								ImGui::Separator();
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-c#-script")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-c#-script"));
+									newEntity.AddComponent<ScriptComponent>();
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-lua-script")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-lua-script"));
+									// TODO: Add Lua script component here
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								ImGui::EndMenu();
+							}
+
+							ImGui::EndPopup();
+						}
+
+						// Hide selected entity
+						if (ImGui::IsWindowFocused() && m_SelectedEntity && ImGui::IsKeyPressed(HL_KEY_H))
+						{
+							if (m_SelectedEntity.IsHidden())
+								m_SelectedEntity.Show();
+							else
+								m_SelectedEntity.Hide();
+
+							m_SelectionChangedCallback(m_SelectedEntity);
+						}
+
+						if (ImGui::IsWindowFocused() && (Input::IsKeyPressed(HL_KEY_DELETE) || Input::IsKeyPressed(HL_KEY_BACKSPACE)) && m_SelectedEntity)
+							DeleteEntity(m_SelectedEntity);
+
+						ImGui::EndTable();
 					}
-
-					if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
-					{
-						DrawEntityCreateMenu({});
-						ImGui::EndPopup();
-					}
-
-
-					ImGui::EndTable();
 				}
 			}
 
-			s_WindowBounds = ImGui::GetCurrentWindow()->Rect();
+			if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetCurrentWindow()->ID))
+			{
+				const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("scene_entity_hierarchy", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+				if (payload)
+				{
+					UUID &entityId = *(UUID*)payload->Data;
+					Scene *currentScene = Scene::GetActiveScene();
+					HL_ASSERT(currentScene);
+
+					Entity &e = currentScene->FindEntityByUUID(entityId);
+					m_Scene->UnparentEntity(e);
+				}
+
+				ImGui::EndDragDropTarget();
+			}
 		}
 
 		if (m_IsWindow)
-		{
 			ImGui::End();
-		}
 	}
 
-	void SceneHierarchyPanel::OnExternalEntityDestroyed(Entity entity)
-	{
-		if (m_EntityDeletedCallback)
-			m_EntityDeletedCallback(entity);
-	}
-
-	void SceneHierarchyPanel::DrawEntityCreateMenu(Entity parent)
-	{
-	}
-	
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity, const HLString &searchFilter)
 	{
-		HLString name = entity.Tag();
+		const char *name = entity.Tag().C_Str();
 
-		const uint32 maxSearchDepth = 10;
-		bool hasChildMatchingSearch = false;
+		const bool hasChildMatchingSearch = [&]
+		{
+			if (searchFilter.IsEmpty())
+				return false;
 
-		// TODO
-	//	bool hasChildMatchingSearch = TagSearchRecursive(entity, searchFilter, maxSearchDepth);
+			for (auto child : entity.Children())
+			{
+				Entity e = m_Scene->FindEntityByUUID(child);
+				if (UI::IsMatchingSearch(e.Tag(), searchFilter))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}();
 
 		if (!UI::IsMatchingSearch(name, searchFilter) && !hasChildMatchingSearch)
 			return;
@@ -192,27 +339,21 @@ namespace highlo
 		const float edgeOffset = 4.0f;
 		const float rowHeight = 21.0f;
 
-		// ImGui item height tweaks
 		auto *window = ImGui::GetCurrentWindow();
 		window->DC.CurrLineSize.y = rowHeight;
-		//---------------------------------------------
 		ImGui::TableNextRow(0, rowHeight);
 
-		// Label column
-		//-------------
-
 		ImGui::TableNextColumn();
-
 		window->DC.CurrLineTextBaseOffset = 3.0f;
 
 		const ImVec2 rowAreaMin = ImGui::TableGetCellBgRect(ImGui::GetCurrentTable(), 0).Min;
-		const ImVec2 rowAreaMax = { ImGui::TableGetCellBgRect(ImGui::GetCurrentTable(), ImGui::TableGetColumnCount() - 1).Max.x - 20,
-									rowAreaMin.y + rowHeight };
+		const ImVec2 rowAreaMax = {
+			ImGui::TableGetCellBgRect(ImGui::GetCurrentTable(), ImGui::TableGetColumnCount() - 1).Max.x,
+			rowAreaMin.y + rowHeight
+		};
 
-		const bool isSelected = SelectionManager::IsSelected(s_ActiveSelectionContext, entity.GetUUID());
-
-		ImGuiTreeNodeFlags flags = (isSelected ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+		const bool isSelected = entity == m_SelectedEntity;
+		ImGuiTreeNodeFlags flags = (isSelected ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		if (hasChildMatchingSearch)
 			flags |= ImGuiTreeNodeFlags_DefaultOpen;
@@ -220,35 +361,28 @@ namespace highlo
 		if (entity.Children().empty())
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
-
-		const HLString strID = fmt::format("{0}{1}", name, (uint64)entity.GetUUID());
+		const HLString strId = HLString(name) + HLString::ToString((uint64)entity.GetUUID());
 
 		ImGui::PushClipRect(rowAreaMin, rowAreaMax, false);
-		bool isRowHovered, held;
-		bool isRowClicked = ImGui::ButtonBehavior(ImRect(rowAreaMin, rowAreaMax), ImGui::GetID(*strID),
-												  &isRowHovered, &held, ImGuiButtonFlags_AllowItemOverlap | ImGuiButtonFlags_PressedOnClickRelease | ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
-		bool wasRowRightClicked = ImGui::IsMouseReleased(ImGuiMouseButton_Right);
-
+		bool isRowHovered;
+		bool held;
+		bool isRowClicked = ImGui::ButtonBehavior(ImRect(rowAreaMin, rowAreaMax), ImGui::GetID(strId.C_Str()), &isRowHovered, &held, ImGuiButtonFlags_AllowItemOverlap |ImGuiButtonFlags_PressedOnClickRelease);
 		ImGui::SetItemAllowOverlap();
-
 		ImGui::PopClipRect();
 
 		const bool isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
-		// Row colouring
-		//--------------
-
-		// Fill with light selection colour if any of the child entities selected
-		auto isAnyDescendantSelected = [&](Entity ent, auto isAnyDescendantSelected) -> bool
+		// Row coloring
+		auto isAnyDescendantSelected = [&](Entity e, auto isAnyDescendantSelected) -> bool
 		{
-			if (SelectionManager::IsSelected(s_ActiveSelectionContext, ent.GetUUID()))
+			if (e == m_SelectedEntity)
 				return true;
 
-			if (!ent.Children().empty())
+			if (!e.Children().empty())
 			{
-				for (auto &childEntityID : ent.Children())
+				for (auto &child : e.Children())
 				{
-					Entity childEntity = m_Scene->FindEntityByUUID(childEntityID);
+					Entity childEntity = m_Scene->FindEntityByUUID(child);
 					if (isAnyDescendantSelected(childEntity, isAnyDescendantSelected))
 						return true;
 				}
@@ -257,266 +391,219 @@ namespace highlo
 			return false;
 		};
 
-		auto fillRowWithColour = [](const ImColor &colour)
+		auto fillRowWithColor = [&](const ImColor &color)
 		{
-			for (int column = 0; column < ImGui::TableGetColumnCount(); column++)
-				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, colour, column);
+			for (int32 column = 0; column < ImGui::TableGetColumnCount(); ++column)
+			{
+				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, color, column);
+			}
 		};
 
 		if (isSelected)
 		{
 			if (isWindowFocused || UI::NavigatedTo())
-				fillRowWithColour(Colors::Theme::Selection);
+			{
+				fillRowWithColor(Colors::Theme::Selection);
+			}
 			else
 			{
 				const ImColor col = UI::ColorWithMultipliedValue(Colors::Theme::Selection, 0.9f);
-				fillRowWithColour(UI::ColorWithMultipliedSaturation(col, 0.7f));
+				fillRowWithColor(col);
 			}
 		}
 		else if (isRowHovered)
 		{
-			fillRowWithColour(Colors::Theme::GroupHeader);
+			fillRowWithColor(Colors::Theme::GroupHeader);
 		}
 		else if (isAnyDescendantSelected(entity, isAnyDescendantSelected))
 		{
-			fillRowWithColour(Colors::Theme::SelectionMuted);
+			fillRowWithColor(Colors::Theme::SelectionMuted);
 		}
 
-		// Text colouring
-		//---------------
 
+		bool isPrefab = entity.HasComponent<PrefabComponent>();
+
+		// Text coloring
 		if (isSelected)
 			ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
 
-		const bool missingMesh = 
-			// static model
-			(entity.HasComponent<StaticModelComponent>() 
-			&& (AssetManager::Get()->IsAssetHandleValid(entity.GetComponent<StaticModelComponent>()->Model)
-			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model) 
-			&& AssetManager::Get()->GetAsset<StaticModel>(entity.GetComponent<StaticModelComponent>()->Model)->IsFlagSet(AssetFlag::Missing)))
-			// Dynamic model
-			|| (entity.HasComponent<DynamicModelComponent>()
-			&& (AssetManager::Get()->IsAssetHandleValid(entity.GetComponent<DynamicModelComponent>()->Model)
-				&& AssetManager::Get()->GetAsset<DynamicModel>(entity.GetComponent<DynamicModelComponent>()->Model)
-				&& AssetManager::Get()->GetAsset<DynamicModel>(entity.GetComponent<DynamicModelComponent>()->Model)->IsFlagSet(AssetFlag::Missing)));
-
-		if (missingMesh)
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4f, 0.3f, 1.0f));
-
-		bool isPrefab = entity.HasComponent<PrefabComponent>();
-		if (isPrefab)
-		{
-			isPrefab = AssetManager::Get()->IsAssetHandleValid(entity.GetComponent<PrefabComponent>()->PrefabID);
-			if (!isPrefab)
-				entity.RemoveComponent<PrefabComponent>();
-		}
-
-		if (isPrefab && !isSelected)
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.32f, 0.7f, 0.87f, 1.0f));
-
-		// Tree node
-		//----------
-		// TODO: clean up this mess
 		ImGuiContext &g = *GImGui;
 		auto &style = ImGui::GetStyle();
-		const ImVec2 label_size = ImGui::CalcTextSize(*strID, nullptr, false);
+		const ImVec2 labelSize = ImGui::CalcTextSize(strId.C_Str(), nullptr, false);
 		const ImVec2 padding = ((flags & ImGuiTreeNodeFlags_FramePadding)) ? style.FramePadding : ImVec2(style.FramePadding.x, ImMin(window->DC.CurrLineTextBaseOffset, style.FramePadding.y));
-		const float text_offset_x = g.FontSize + padding.x * 2;           // Collapser arrow width + Spacing
-		const float text_offset_y = ImMax(padding.y, window->DC.CurrLineTextBaseOffset);                    // Latch before ItemSize changes it
-		const float text_width = g.FontSize + (label_size.x > 0.0f ? label_size.x + padding.x * 2 : 0.0f);  // Include collapser
-		ImVec2 text_pos(window->DC.CursorPos.x + text_offset_x, window->DC.CursorPos.y + text_offset_y);
-		const float arrow_hit_x1 = (text_pos.x - text_offset_x) - style.TouchExtraPadding.x;
-		const float arrow_hit_x2 = (text_pos.x - text_offset_x) + (g.FontSize + padding.x * 2.0f) + style.TouchExtraPadding.x;
-		const bool is_mouse_x_over_arrow = (g.IO.MousePos.x >= arrow_hit_x1 && g.IO.MousePos.x < arrow_hit_x2);
+		const float textOffsetX = g.FontSize + padding.x * 2.0f;
+		const float textOffsetY = ImMax(padding.y, window->DC.CurrLineTextBaseOffset);
+		const float textWidth = g.FontSize + (labelSize.x > 0.0f ? labelSize.x + padding.x * 2.0f : 0.0f);
+		ImVec2 textPos(window->DC.CursorPos.x + textOffsetX, window->DC.CursorPos.y + textOffsetY);
 
-		bool previousState = ImGui::TreeNodeBehaviorIsOpen(ImGui::GetID(*strID));
+		const float arrowHitX1 = (textPos.x - textOffsetX) - style.TouchExtraPadding.x;
+		const float arrowHitX2 = (textPos.x - textOffsetX) + (g.FontSize + padding.x * 2.0f) + style.TouchExtraPadding.x;
+		const bool isMouseXOverArrow = (g.IO.MousePos.x >= arrowHitX1 && g.IO.MousePos.y < arrowHitX2);
+		bool prevState = ImGui::TreeNodeBehaviorIsOpen(ImGui::GetID(strId.C_Str()));
 
-		if (is_mouse_x_over_arrow && isRowClicked)
-			ImGui::SetNextItemOpen(!previousState);
+		if (isMouseXOverArrow && isRowClicked)
+			ImGui::SetNextItemOpen(!prevState);
 
-		if (!isSelected && isAnyDescendantSelected(entity, isAnyDescendantSelected))
-			ImGui::SetNextItemOpen(true);
-
-		const bool opened = UI::TreeNodeWithIcon(nullptr, ImGui::GetID(*strID), flags, name, nullptr);
-
-		int32_t rowIndex = ImGui::TableGetRowIndex();
-		if (rowIndex >= m_FirstSelectedRow && rowIndex <= m_LastSelectedRow && !SelectionManager::IsSelected(entity.GetUUID()))
-		{
-			SelectionManager::Select(s_ActiveSelectionContext, entity.GetUUID());
-			m_SelectedEntityID = entity.GetUUID();
-		}
-
-		const std::string rightClickPopupID = fmt::format("{0}-ContextMenu", strID);
-
+		const bool opened = UI::TreeNodeWithIcon(nullptr, ImGui::GetID(strId.C_Str()), flags, name, nullptr);
 		bool entityDeleted = false;
-		if (ImGui::BeginPopupContextItem(rightClickPopupID.c_str()))
+		if (ImGui::BeginPopupContextItem())
 		{
+			Translation *translation = HLApplication::Get().GetActiveTranslation();
+
 			{
-				UI::ScopedColor colText(ImGuiCol_Text, Colors::Theme::Text);
-				UI::ScopedColorStack entitySelection(ImGuiCol_Header, Colors::Theme::GroupHeader,
-													  ImGuiCol_HeaderHovered, Colors::Theme::GroupHeader,
-													  ImGuiCol_HeaderActive, Colors::Theme::GroupHeader);
+				UI::ScopedColor colorText(ImGuiCol_Text, Colors::Theme::Text);
+				UI::ScopedColorStack entitySelection(ImGuiCol_Header, Colors::Theme::GroupHeader, ImGuiCol_HeaderHovered, Colors::Theme::GroupHeader, ImGuiCol_HeaderActive, Colors::Theme::GroupHeader);
 
-				if (!isSelected)
+				if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-duplicate-entity")))
 				{
-					if (!Input::IsKeyPressed(HL_KEY_LEFT_CONTROL))
-						SelectionManager::DeselectAll();
+					Entity newEntity = m_Scene->DuplicateEntity(m_SelectedEntity);
+					m_Scene->AddEntity(newEntity);
+					SetSelected(newEntity);
+				}
 
-					SelectionManager::Select(s_ActiveSelectionContext, entity.GetUUID());
-					m_SelectedEntityID = entity.GetUUID();
+				if (entity.IsHidden())
+				{
+					if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-show-entity")))
+					{
+						m_SelectedEntity.Show();
+						m_SelectionChangedCallback(m_SelectedEntity);
+					}
+				}
+				else
+				{
+					if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-hide-entity")))
+					{
+						m_SelectedEntity.Hide();
+						m_SelectionChangedCallback(m_SelectedEntity);
+					}
 				}
 
 				if (isPrefab)
 				{
-					if (ImGui::MenuItem("Update Prefab"))
+					if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-update-prefab")))
 					{
 						AssetHandle prefabAssetHandle = entity.GetComponent<PrefabComponent>()->PrefabID;
 						Ref<Prefab> prefab = AssetManager::Get()->GetAsset<Prefab>(prefabAssetHandle);
 						if (prefab)
 							prefab->Create(entity);
 						else
-							HL_CORE_ERROR("Prefab has invalid asset handle: {0}", prefabAssetHandle);
+							HL_CORE_ERROR("Error: Prefab has invalid asset handle! {0}", prefabAssetHandle);
 					}
 				}
 
-				DrawEntityCreateMenu(entity);
-
-				if (ImGui::MenuItem("Delete"))
+				if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-remove-entity")))
 					entityDeleted = true;
 			}
 
 			ImGui::EndPopup();
 		}
 
-		// Type column
-		//------------
 		if (isRowClicked)
 		{
-			if (wasRowRightClicked)
-			{
-				ImGui::OpenPopup(rightClickPopupID.c_str());
-			}
-			else
-			{
-				if (!Input::IsKeyPressed(HL_KEY_LEFT_CONTROL) && !Input::IsKeyPressed(HL_KEY_LEFT_SHIFT))
-				{
-					SelectionManager::DeselectAll();
-					SelectionManager::Select(s_ActiveSelectionContext, entity.GetUUID());
-					m_SelectedEntityID = entity.GetUUID();
-					m_FirstSelectedRow = rowIndex;
-					m_LastSelectedRow = -1;
-				}
-				else if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT) && SelectionManager::GetSelectionCount(s_ActiveSelectionContext) > 0)
-				{
-					if (rowIndex < m_FirstSelectedRow)
-					{
-						m_LastSelectedRow = m_FirstSelectedRow;
-						m_FirstSelectedRow = rowIndex;
-					}
-					else
-					{
-						m_LastSelectedRow = rowIndex;
-					}
-				}
-				else
-				{
-					if (isSelected)
-					{
-						SelectionManager::Deselect(s_ActiveSelectionContext, entity.GetUUID());
-					}
-					else
-					{
-						SelectionManager::Select(s_ActiveSelectionContext, entity.GetUUID());
-						m_SelectedEntityID = entity.GetUUID();
-					}
-				}
-			}
-
+			SetSelected(entity);
 			ImGui::FocusWindow(ImGui::GetCurrentWindow());
 		}
-
-		if (missingMesh)
-			ImGui::PopStyleColor();
 
 		if (isSelected)
 			ImGui::PopStyleColor();
 
-
-		// Drag & Drop
-		//------------
+		// Drag && drop
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 		{
-			const auto &selectedEntities = SelectionManager::GetSelections(s_ActiveSelectionContext);
-			UUID entityID = entity.GetUUID();
-
-			if (!SelectionManager::IsSelected(s_ActiveSelectionContext, entityID))
-			{
-				ImGui::TextUnformatted(*entity.Tag());
-				ImGui::SetDragDropPayload("scene_entity_hierarchy", &entityID, 1 * sizeof(UUID));
-			}
-			else
-			{
-				for (const auto &selectedEntity : selectedEntities)
-				{
-					Entity e = m_Scene->FindEntityByUUID(selectedEntity);
-					ImGui::TextUnformatted(*e.Tag());
-				}
-
-				ImGui::SetDragDropPayload("scene_entity_hierarchy", selectedEntities.data(), selectedEntities.size() * sizeof(UUID));
-			}
-
+			ImGui::Text(entity.Tag().C_Str());
+			ImGui::SetDragDropPayload("scene_entity_hierarchy", &entity.GetUUID(), sizeof(UUID));
 			ImGui::EndDragDropSource();
 		}
 
 		if (ImGui::BeginDragDropTarget())
 		{
 			const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("scene_entity_hierarchy", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
-
 			if (payload)
 			{
-				size_t count = payload->DataSize / sizeof(UUID);
+				UUID &droppedEntityID = *(UUID*)payload->Data;
+				Entity &droppedEntity = m_Scene->FindEntityByUUID(droppedEntityID);
+				HL_CORE_TRACE("DROPPED ENTITY {0}", *droppedEntity.Tag());
 
-				for (size_t i = 0; i < count; i++)
-				{
-					UUID droppedEntityID = *(((UUID *)payload->Data) + i);
-					Entity droppedEntity = m_Scene->FindEntityByUUID(droppedEntityID);
-					m_Scene->ParentEntity(droppedEntity, entity);
-				}
+				m_Scene->ParentEntity(droppedEntity, entity);
 			}
 
 			ImGui::EndDragDropTarget();
 		}
 
-
 		ImGui::TableNextColumn();
-		if (isPrefab)
+
+		if (entity.IsHidden())
 		{
-			UI::ShiftCursorX(edgeOffset * 3.0f);
-
-			if (isSelected)
-				ImGui::PushStyleColor(ImGuiCol_Text, Colors::Theme::BackgroundDark);
-
-			ImGui::TextUnformatted("Prefab");
-			ImGui::PopStyleColor();
+			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
+		//	ImVec2 calculatedSize = UI::CenteredText(ICON_FA_EYE);
+			UI::DrawText(ICON_FA_EYE);
+		}
+		else
+		{
+			UI::ScopedColor textColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+		//	ImVec2 calculatedSize = UI::CenteredText(ICON_FA_EYE_SLASH);
+			UI::DrawText(ICON_FA_EYE_SLASH);
 		}
 
-		// Draw children
-		//--------------
+		ImGui::TableNextColumn();
 
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+		if (m_SelectedEntity.HasComponent<StaticModelComponent>())
+		{
+			StaticModelComponent *component = m_SelectedEntity.GetComponent<StaticModelComponent>();
+			if (component->Materials->HasAnyMaterial())
+			{
+				if (ImGui::Button(ICON_FA_CIRCLE))
+				{
+					// TODO: Show material properties of this specific model
+				}
+			}
+		}
+		else if (m_SelectedEntity.HasComponent<DynamicModelComponent>())
+		{
+			DynamicModelComponent *component = m_SelectedEntity.GetComponent<DynamicModelComponent>();
+			if (component->Materials->HasAnyMaterial())
+			{
+				if (ImGui::Button(ICON_FA_CIRCLE))
+				{
+					// TODO: Show material properties of this specific model
+				}
+			}
+		}
+
+		ImGui::PopStyleVar();
+
+		//UI::DrawText("CHECKED 2");
+
+		// Draw all children
 		if (opened)
 		{
 			for (auto child : entity.Children())
-				DrawEntityNode(m_Scene->FindEntityByUUID(child), searchFilter);
+			{
+				Entity e = m_Scene->FindEntityByUUID(child);
+				if (e)
+					DrawEntityNode(e, searchFilter);
+			}
 
 			ImGui::TreePop();
 		}
 
-		// Defer deletion until end of node UI
 		if (entityDeleted)
+			DeleteEntity(entity);
+	}
+	
+	void SceneHierarchyPanel::DeleteEntity(Entity entity)
+	{
+		if (m_EntityDeletedCallback)
+			m_EntityDeletedCallback(entity);
+
+		m_Scene->DestroyEntity(entity);
+		if (entity == m_SelectedEntity)
 		{
-			auto selectedEntities = SelectionManager::GetSelections(s_ActiveSelectionContext);
-			for (auto entityID : selectedEntities)
-				m_Scene->DestroyEntity(m_Scene->FindEntityByUUID(entityID));
+			if (m_SelectionChangedCallback)
+				m_SelectionChangedCallback({});
+
+			m_SelectedEntity = {};
 		}
 	}
 }

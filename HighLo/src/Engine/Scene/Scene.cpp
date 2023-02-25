@@ -621,9 +621,6 @@ namespace highlo
 
 		}
 
-		if (m_OnEntityDestroyedCallback)
-			m_OnEntityDestroyedCallback(entity);
-
 		if (!excludeChildren)
 		{
 			for (uint32 i = 0; i < (uint32)entity.Children().size(); ++i)

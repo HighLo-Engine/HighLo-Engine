@@ -29,8 +29,6 @@ project "HighLo"
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.stb_truetype}",
 		"%{IncludeDir.openssl}",
-		"%{IncludeDir.msdf_atlas_gen}",
-		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.rapidXML}",
 		"%{IncludeDir.rapidJSON}",
 		"%{IncludeDir.IconFontCppHeaders}",
@@ -50,7 +48,6 @@ project "HighLo"
         "GLFW",
         "stbimage",
         "stbtruetype",
-		"msdf-atlas-gen",
         "%{LibDir.assimp}",
 		
 		"%{LibDir.openssl_libssl}",

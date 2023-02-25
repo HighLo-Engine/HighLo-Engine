@@ -88,10 +88,8 @@ void HighLoEditor::OnInitialize()
 
 	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
 
-	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create(m_CurrentScene, true);
+	m_SceneHierarchyPanel = UniqueRef<SceneHierarchyPanel>::Create(m_CurrentScene, true, SelectionContext::Scene);
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&HighLoEditor::OnEntityDeleted, this, std::placeholders::_1));
-	m_SceneHierarchyPanel->SetSelectionChangedCallback(std::bind(&HighLoEditor::SelectEntity, this, std::placeholders::_1));
-	m_SceneHierarchyPanel->SetEntityAddedCallback(std::bind(&HighLoEditor::OnEntityAdded, this, std::placeholders::_1));
 	//m_SceneHierarchyPanel->SetInvalidAssetMetaDataCallback(std::bind(&HighLoEditor::OnInvalidMetaData, this, std::placeholders::_1));
 
 	m_ObjectPropertiesPanel = UniqueRef<ObjectPropertiesPanel>::Create(m_CurrentScene, true);
@@ -193,7 +191,7 @@ void HighLoEditor::OnInitialize()
 
 	// change the color of the cube to red
 	Ref<StaticModel> &cubeModel = AssetManager::Get()->GetAsset<StaticModel>(comp->Model);
-	cubeModel->GetMaterials()->GetMaterial(0)->SetDiffuseColor({ 1.0f, 0.0f, 0.0f });
+	cubeModel->GetMaterials()->GetMaterial(0)->SetDiffuseColor({ 0.2f, 0.3f, 0.8f });
 
 	//Entity sphereEntity = m_CurrentScene->CreateEntity("SphereModel");
 	//StaticModelComponent *sphereComp = sphereEntity.AddComponent<StaticModelComponent>();
@@ -302,6 +300,75 @@ void HighLoEditor::UpdateUIFlags()
 	UpdateWindowTitle(m_SceneName, m_SceneIsSaved);
 }
 
+void HighLoEditor::UI_DrawGuizmos(const EditorCamera &camera)
+{
+	auto &selections = SelectionManager::GetSelections(SelectionContext::Scene);
+	if (selections.size() == 0)
+		return;
+
+	auto &selection = selections[0];
+	if (m_GizmoType == -1)
+		return;
+
+	float rw = ImGui::GetWindowWidth();
+	float rh = ImGui::GetWindowHeight();
+
+	ImGuizmo::SetOrthographic(false);
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, rw, rh);
+
+	bool snap = Input::IsKeyPressed(HL_KEY_LEFT_CONTROL);
+
+	float snapValue = GetSnapValue();
+	float snapValues[] = { snapValue, snapValue, snapValue };
+
+	if (m_SelectionMode == SelectionMode::Entity)
+	{
+		Entity &entity = m_CurrentScene->FindEntityByUUID(selection);
+		Transform &entityTransform = entity.Transform();
+		glm::mat4 transform = m_CurrentScene->GetWorldSpaceTransformMatrix(entity);
+
+		ImGuizmo::Manipulate(glm::value_ptr(camera.GetViewMatrix()),
+							 glm::value_ptr(camera.GetProjection()),
+							 (ImGuizmo::OPERATION)m_GizmoType,
+							 ImGuizmo::LOCAL,
+							 glm::value_ptr(transform),
+							 nullptr,
+							 snap ? snapValues : nullptr);
+
+		if (ImGuizmo::IsUsing())
+		{
+			Entity parent = m_CurrentScene->FindEntityByUUID(entity.GetParentUUID());
+
+			if (parent)
+			{
+				glm::mat4 parentTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(parent);
+				transform = glm::inverse(parentTransform) * transform;
+
+				glm::vec3 translation, rotation, scale;
+				Math::Decompose(transform, translation, rotation, scale);
+
+				glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
+				entityTransform.SetPosition(translation);
+				entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
+				entityTransform.SetScale(scale);
+				entity.SetTransform(entityTransform);
+			}
+			else
+			{
+				glm::vec3 translation, rotation, scale;
+				Math::Decompose(transform, translation, rotation, scale);
+
+				glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
+				entityTransform.SetPosition(translation);
+				entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
+				entityTransform.SetScale(scale);
+				entity.SetTransform(entityTransform);
+			}
+		}
+	}
+}
+
 void HighLoEditor::OnShutdown()
 {
 	FileSystemWatcher::Get()->Stop();
@@ -376,86 +443,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	// TODO: Add Guizmo Toolbar to be able to select the current guizmo type
 
 	// Draw gizmo on top of viewport image
-	if (m_GizmoType != -1 && m_SelectionContext.size())
-	{
-		auto &selection = m_SelectionContext[0];
-
-		float width = ImGui::GetWindowWidth();
-		float height = ImGui::GetWindowHeight();
-
-		ImGuizmo::SetOrthographic(false);
-		ImGuizmo::SetDrawlist();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
-		bool snap = Input::IsKeyPressed(HL_KEY_LEFT_CONTROL);
-
-		Transform &entityTransform = selection.Entity.Transform();
-		glm::mat4 rawTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(selection.Entity);
-
-		float snapValue = GetSnapValue();
-		float snapValues[3] = { snapValue, snapValue, snapValue };
-
-		if (m_SelectionMode == SelectionMode::Entity)
-		{
-			ImGuizmo::Manipulate(
-				glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-				glm::value_ptr(m_EditorCamera.GetProjection()), 
-				(ImGuizmo::OPERATION)m_GizmoType, 
-				ImGuizmo::LOCAL, 
-				glm::value_ptr(rawTransform), 
-				nullptr, 
-				snap ? snapValues : nullptr);
-
-			if (ImGuizmo::IsUsing())
-			{
-				Entity parent = m_CurrentScene->FindEntityByUUID(selection.Entity.GetParentUUID());
-				if (parent)
-				{
-					glm::mat4 parentTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(parent);
-					rawTransform = glm::inverse(parentTransform) * rawTransform;
-
-					glm::vec3 translation, rotation, scale;
-					Math::Decompose(rawTransform, translation, scale, rotation);
-
-					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
-					entityTransform.SetPosition(translation);
-					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
-					entityTransform.SetScale(scale);
-					selection.Entity.SetTransform(entityTransform);
-					SelectEntity(selection.Entity);
-				}
-				else
-				{
-					glm::vec3 translation, rotation, scale;
-					Math::Decompose(rawTransform, translation, scale, rotation);
-
-					glm::vec3 deltaRotation = rotation - entityTransform.GetRotation();
-					entityTransform.SetPosition(translation);
-					entityTransform.SetRotation(entityTransform.GetRotation() + deltaRotation);
-					entityTransform.SetScale(scale);
-					selection.Entity.SetTransform(entityTransform);
-					SelectEntity(selection.Entity);
-				}
-			}
-		}
-		else
-		{
-			glm::mat4 transformBase = rawTransform * selection.Mesh->LocalTransform.GetTransform();
-			ImGuizmo::Manipulate(
-				glm::value_ptr(m_EditorCamera.GetViewMatrix()), 
-				glm::value_ptr(m_EditorCamera.GetProjection()), 
-				(ImGuizmo::OPERATION)m_GizmoType, 
-				ImGuizmo::LOCAL, 
-				glm::value_ptr(transformBase), 
-				nullptr, 
-				snap ? snapValues : nullptr);
-
-			Transform newTransform;
-			newTransform.SetTransform(glm::inverse(rawTransform) * transformBase);
-			selection.Mesh->LocalTransform = newTransform;
-			selection.Entity.SetTransform(entityTransform);
-			SelectEntity(selection.Entity);
-		}
-	}
+	UI_DrawGuizmos(m_EditorCamera);
 
 	if (ImGui::BeginDragDropTarget())
 	{
@@ -538,46 +526,6 @@ void HighLoEditor::OnResize(uint32 width, uint32 height)
 	m_OverlayCamera.OnWindowResize(width, height);
 	m_EditorCamera.OnWindowResize(width, height);
 	m_ViewportRenderer->SetViewportSize(width, height);
-}
-
-void HighLoEditor::SelectEntity(Entity &entity)
-{
-	if (!entity)
-	{
-		// Invalid entity, de-select everything
-		m_SelectionContext.clear();
-		m_CurrentScene->SetSelectedEntity({});
-		m_ObjectPropertiesPanel->SetSelected({});
-		return;
-	}
-
-	SelectedMesh selection;
-	if (entity.HasComponent<DynamicModelComponent>())
-	{
-		DynamicModelComponent *meshComp = entity.GetComponent<DynamicModelComponent>();
-		Ref<DynamicModel> model = AssetManager::Get()->GetAsset<DynamicModel>(meshComp->Model);
-		if (model && !model->IsFlagSet(AssetFlag::Missing))
-			selection.Mesh = &model->Get()->GetSubmeshes()[0];
-
-		selection.MeshIndex = meshComp->SubmeshIndex;
-	}
-	else if (entity.HasComponent<StaticModelComponent>())
-	{
-		StaticModelComponent *meshComp = entity.GetComponent<StaticModelComponent>();
-		Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(meshComp->Model);
-		if (model && !model->IsFlagSet(AssetFlag::Missing))
-			selection.Mesh = &model->Get()->GetSubmeshes()[0];
-
-		selection.MeshIndex = 0;
-	}
-
-	selection.Entity = entity;
-	m_SelectionContext.clear();
-	m_SelectionContext.push_back(selection);
-
-	m_EditorScene->SetSelectedEntity(entity);
-	m_ObjectPropertiesPanel->SetSelected(entity);
-	m_CurrentScene = m_EditorScene;
 }
 
 void HighLoEditor::UpdateWindowTitle(const HLString &sceneName, bool sceneIsSaved)
@@ -665,12 +613,12 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 			{
 			case HL_KEY_F:
 			{
-				if (m_SelectionContext.size() == 0)
+				if (SelectionManager::GetSelectionCount(SelectionContext::Scene) == 0)
 					break;
 
-				Entity selectedEntity = m_SelectionContext[0].Entity;
+				UUID selectedEntityID = SelectionManager::GetSelections(SelectionContext::Scene).front();
+				Entity selectedEntity = m_CurrentScene->FindEntityByUUID(selectedEntityID);
 				m_EditorCamera.Focus(selectedEntity.Transform().GetPosition());
-				break;
 			}
 
 			case HL_KEY_Q:
@@ -755,12 +703,14 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 
 			case HL_KEY_D:
 			{
-				// duplicate selected entity
-				if (m_SelectionContext.size() == 0)
-					break;
-
-				Entity selectedEntity = m_SelectionContext[0].Entity;
-				// TODO
+				auto selectedEntities = SelectionManager::GetSelections(SelectionContext::Scene);
+				for (const auto &entityID : selectedEntities)
+				{
+					Entity entity = m_CurrentScene->FindEntityByUUID(entityID);
+					Entity duplicate = m_CurrentScene->DuplicateEntity(entity);
+					SelectionManager::Deselect(SelectionContext::Scene, entity.GetUUID());
+					SelectionManager::Select(SelectionContext::Scene, duplicate.GetUUID());
+				}
 				break;
 			}
 		}
@@ -943,9 +893,8 @@ void HighLoEditor::OnFileMenuPressed(FileMenu *menu, MenuItem *item)
 	}
 }
 
-void HighLoEditor::OnSelected(const SelectedMesh &selectionContext)
+void HighLoEditor::OnSelected(SelectedMesh &selectionContext)
 {
-	m_SceneHierarchyPanel->SetSelected(selectionContext.Entity);
 	m_ObjectPropertiesPanel->SetSelected(selectionContext.Entity);
 	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
 }
@@ -958,25 +907,18 @@ void HighLoEditor::OnEntityAdded(Entity &e)
 void HighLoEditor::OnEntityDeleted(Entity &e)
 {
 	m_SceneIsSaved = false;
-
-	if (m_SelectionContext.size() > 0 && m_SelectionContext[0].Entity == e)
-	{
-		m_SelectionContext.clear();
-		m_EditorScene->SetSelectedEntity({});
-		m_ObjectPropertiesPanel->SetSelected({});
-	}
+	SelectionManager::Deselect(SelectionContext::Scene, e.GetUUID());
 }
 
 void HighLoEditor::OnEntityChanged(Entity &e)
 {
 	m_SceneIsSaved = false;
 	m_EditorScene->SetSelectedEntity(e);
-	m_SceneHierarchyPanel->SetSelected(e);
 }
 
 void HighLoEditor::OnScenePlay()
 {
-	m_SelectionContext.clear();
+	SelectionManager::DeselectAll();
 
 	m_SceneState = SceneState::Play;
 	UI::SetMouseEnabled(true);
@@ -996,20 +938,21 @@ void HighLoEditor::OnScenePlay()
 
 void HighLoEditor::OnSceneStop()
 {
+	SelectionManager::DeselectAll();
+
 	m_RuntimeScene->OnRuntimeStop();
 	m_SceneState = SceneState::Edit;
 
 	// Unload runtime scene
 	m_RuntimeScene = nullptr;
 
-	m_SelectionContext.clear();
 	m_SceneHierarchyPanel->SetContext(m_EditorScene);
 	m_CurrentScene = m_EditorScene;
 }
 
 void HighLoEditor::OnSceneStartSimulation()
 {
-	m_SelectionContext.clear();
+	SelectionManager::DeselectAll();
 
 	m_SceneState = SceneState::Simulate;
 
@@ -1024,12 +967,13 @@ void HighLoEditor::OnSceneStartSimulation()
 
 void HighLoEditor::OnSceneEndSimulation()
 {
+	SelectionManager::DeselectAll();
+
 	m_SimulationScene->OnSimulationStop();
 	m_SceneState = SceneState::Edit;
 
 	m_SimulationScene = nullptr;
 
-	m_SelectionContext.clear();
 	m_SceneHierarchyPanel->SetContext(m_EditorScene);
 	m_CurrentScene = m_EditorScene;
 }
@@ -1049,6 +993,7 @@ float HighLoEditor::GetSnapValue()
 
 void HighLoEditor::DeleteEntity(Entity entity)
 {
+#if 0
 	auto children = entity.Children();
 	for (auto childId : children)
 		DeleteEntity(m_EditorScene->FindEntityByUUID(childId));
@@ -1056,5 +1001,9 @@ void HighLoEditor::DeleteEntity(Entity entity)
 	m_EditorScene->UnparentEntity(entity);
 	m_EditorScene->DestroyEntity(entity);
 	m_SceneIsSaved = false;
+#endif
+
+	SelectionManager::Deselect(SelectionContext::Scene, entity.GetUUID());
+	m_EditorScene->DestroyEntity(entity);
 }
 

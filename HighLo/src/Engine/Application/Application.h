@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <queue>
+
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Time.h"
 #include "ApplicationLayerStack.h"
@@ -25,6 +27,8 @@ namespace highlo
 	class HLApplication
 	{
 	public:
+
+		using EventCallbackFn = std::function<void(Event&)>;
 
 		HLAPI HLApplication();
 		HLAPI HLApplication(const ApplicationSettings &settings);
@@ -57,6 +61,33 @@ namespace highlo
 		HLAPI Translations &GetTranslations() { return m_Translations; }
 		HLAPI Translation *GetActiveTranslation();
 
+		HLAPI void AddEventCallback(const EventCallbackFn &eventCallback) { m_EventCallbacks.push_back(eventCallback); }
+
+		template<typename Func>
+		HLAPI void QueueEvent(Func &&func)
+		{
+			m_EventQueue.push(func);
+		}
+
+		/// Creates & Dispatches an event either immediately, or adds it to an event queue which will be proccessed at the end of each frame
+		template<typename TEvent, bool DispatchImmediately = false, typename... TEventArgs>
+		HLAPI void DispatchEvent(TEventArgs&&... args)
+		{
+			static_assert(std::is_assignable_v<Event, TEvent>);
+
+			std::shared_ptr<TEvent> event = std::make_shared<TEvent>(std::forward<TEventArgs>(args)...);
+			if constexpr (DispatchImmediately)
+			{
+				OnEvent(*event);
+			}
+			else
+			{
+				std::scoped_lock<std::mutex> lock(m_EventQueueMutex);
+				m_EventQueue.push([event]() { HLApplication::Get().OnEvent(*event); });
+			}
+		}
+
+
 	private:
 
 		void Init();
@@ -66,6 +97,7 @@ namespace highlo
 		bool OnWindowReisze(WindowResizeEvent &e);
 
 		void InternalEventHandler(Event &e);
+		void ProcessEvents();
 
 	private:
 
@@ -83,6 +115,10 @@ namespace highlo
 		ECS_Registry m_ECS_Registry;
 		ECS_SystemManager m_ECS_SystemManager;
 		ApplicationLayerStack m_LayerStack;
+
+		std::mutex m_EventQueueMutex;
+		std::queue<std::function<void()>> m_EventQueue;
+		std::vector<EventCallbackFn> m_EventCallbacks;
 
 		float m_CPUTime = 0.0f;
 		float m_LastFrameTime = 0.0f;

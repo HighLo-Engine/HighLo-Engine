@@ -83,6 +83,9 @@ namespace highlo
 	OpenGLTexture3D::~OpenGLTexture3D()
 	{
 		Release();
+
+		if (m_Buffer)
+			m_Buffer.Release();
 	}
 
 	Allocator OpenGLTexture3D::GetData()

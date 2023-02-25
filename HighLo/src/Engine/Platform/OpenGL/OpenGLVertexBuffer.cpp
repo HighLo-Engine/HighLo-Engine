@@ -52,6 +52,8 @@ namespace highlo
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
 		glDeleteBuffers(1, &m_ID);
+
+		m_LocalData.Release();
 	}
 
 	void OpenGLVertexBuffer::Bind() const

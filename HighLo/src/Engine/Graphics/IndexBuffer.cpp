@@ -41,8 +41,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLIndexBuffer>::Create(data, size);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11IndexBuffer>::Create(data, size);
 	#elif HIGHLO_API_DX12
 		return Ref<DX12IndexBuffer>::Create(data, size);
 	#elif HIGHLO_API_VULKAN
@@ -60,8 +59,7 @@ namespace highlo
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLIndexBuffer>::Create(size);
 	#elif HIGHLO_API_DX11
-		HL_ASSERT(false);
-		return nullptr;
+		return Ref<DX11IndexBuffer>::Create(size);
 	#elif HIGHLO_API_DX12
 		return Ref<DX12IndexBuffer>::Create(size);
 	#elif HIGHLO_API_VULKAN

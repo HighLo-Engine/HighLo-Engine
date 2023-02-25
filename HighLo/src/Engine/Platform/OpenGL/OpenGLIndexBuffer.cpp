@@ -49,6 +49,8 @@ namespace highlo
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
 		glDeleteBuffers(1, &m_ID);
+
+		m_LocalData.Release();
 	}
 
 	void OpenGLIndexBuffer::Bind() const

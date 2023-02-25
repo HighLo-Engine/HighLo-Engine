@@ -48,6 +48,9 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		m_VertexBuffers.clear();
+		m_VertexBuffers.shrink_to_fit();
+		m_IndexBuffer = nullptr;
 	}
 
 	void OpenGLVertexArray::Bind() const

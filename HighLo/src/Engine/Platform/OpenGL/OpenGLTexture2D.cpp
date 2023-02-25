@@ -256,9 +256,6 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-	//	m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
-	//	m_Buffer.ZeroInitialize();
-
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
@@ -321,9 +318,6 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 
-	//	m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
-	//	m_Buffer.ZeroInitialize();
-
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
@@ -347,9 +341,6 @@ namespace highlo
 		m_DataFormat = utils::OpenGLTextureFormat(spec.Format);
 
 		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
-
-	//	m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * sizeof(Byte));
-	//	m_Buffer.ZeroInitialize();
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);

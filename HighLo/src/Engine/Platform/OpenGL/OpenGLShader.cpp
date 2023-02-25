@@ -283,6 +283,26 @@ namespace highlo
 	OpenGLShader::~OpenGLShader()
 	{
 		Release();
+
+		m_Loaded = false;
+		m_IsCompute = false;
+		m_Name.Clear();
+		m_AssetPath = "";
+		m_Language = ShaderLanguage::None;
+		m_ConstantBufferOffset = 0;
+
+		m_Macros.clear();
+		m_UniformLocations.clear();
+		m_AcknowledgedMacros.clear();
+		m_ShaderDescriptorSets.clear();
+		m_PushConstantRanges.clear();
+
+		m_ShaderSources.clear();
+		m_Buffers.clear();
+		m_Resources.clear();
+		m_ReloadedCallbacks.clear();
+
+		m_StagesMetaData.clear();
 	}
 
 	void OpenGLShader::Reload(bool forceCompile)

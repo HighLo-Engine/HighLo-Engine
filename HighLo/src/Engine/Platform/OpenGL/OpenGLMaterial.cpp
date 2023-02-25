@@ -34,6 +34,14 @@ namespace highlo
 
 	OpenGLMaterial::~OpenGLMaterial()
 	{
+		m_Name.Clear();
+		m_Shader = nullptr;
+		m_Flags = 0;
+
+		m_LocalData.Release();
+
+		m_Textures.clear();
+		m_Texture2Ds.clear();
 	}
 	
 	void OpenGLMaterial::Invalidate()

@@ -72,7 +72,7 @@ public class Main
 
             int totalLineCount = counter.getTotalLineCount();
             int totalFileCount = counter.getTotalFileCount();
-            int totalDirCount = counter.getTotalDirectoyCount();
+            int totalDirCount = counter.getTotalDirectoryCount();
 
             System.out.println("Total Lines: " + totalLineCount);
             System.out.println("Total Files: " + totalFileCount);

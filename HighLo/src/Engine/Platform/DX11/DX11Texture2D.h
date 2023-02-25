@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -21,12 +21,13 @@ namespace highlo
 
 	public:
 
-		DX11Texture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = false);
+		DX11Texture2D(const FileSystemPath &filePath, bool flipOnLoad = true);
 		DX11Texture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		DX11Texture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
-		DX11Texture2D(TextureFormat format, uint32 width, uint32 height);
+		DX11Texture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
 		DX11Texture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
-		DX11Texture2D(const TextureSpecification &specification);
+		DX11Texture2D(TextureFormat format, uint32 width, uint32 height);
+		DX11Texture2D(const TextureSpecification &spec);
 		virtual ~DX11Texture2D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }
@@ -59,6 +60,8 @@ namespace highlo
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
+
+		virtual void SetData(void *data, uint32 data_size) override;
 
 		// Texture2D specific
 

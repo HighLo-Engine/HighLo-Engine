@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -20,7 +20,7 @@ namespace highlo
 		HLAPI ICamera() = default;
 		HLAPI virtual ~ICamera() = default;
 
-		HLAPI virtual void Update() = 0;
+		HLAPI virtual void Update(Timestep ts) = 0;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) = 0;
 		HLAPI virtual void OnEvent(Event &e) = 0;
 

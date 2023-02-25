@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VulkanTexture2D.h"
@@ -17,14 +17,14 @@ namespace highlo
 {
     static std::map<VkImage, WeakRef<VulkanTexture2D>> s_ImageReferences;
 
-    VulkanTexture2D::VulkanTexture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+    VulkanTexture2D::VulkanTexture2D(const FileSystemPath &filePath, bool flipOnLoad)
         : m_FilePath(filePath)
     {
         // Load the actual image
-        int32 width, height, channels;
+        int32 width, height;
         HL_ASSERT(!stbi_is_hdr(**filePath), "Texture is not allowed to be a HDR Texture! Please use Texture3D instead.");
 
-        m_Buffer.Data = (Byte*)stbi_load(**filePath, &width, &height, &channels, 4);
+        m_Buffer.Data = (Byte*)stbi_load(**filePath, &width, &height, nullptr, 4);
         m_Buffer.Size = width * height * 4;
 
         if (!m_Buffer.Data)
@@ -41,7 +41,7 @@ namespace highlo
 
         m_Specification.Width = width;
         m_Specification.Height = height;
-        m_Specification.Format = format;
+        m_Specification.Format = TextureFormat::RGBA;
         m_Specification.Properties = TextureProperties();
         m_Specification.Usage = TextureUsage::Texture;
         m_Specification.Mips = utils::CalculateMipCount(width, height);
@@ -590,6 +590,12 @@ namespace highlo
                                         subresourceRange);
 
         device->FlushCommandBuffer(blitCmd);
+    }
+
+    void VulkanTexture2D::SetData(void *data, uint32 data_size)
+    {
+        m_Buffer = Allocator::Copy(data, data_size);
+        Invalidate();
     }
 
     // Vulkan-specific

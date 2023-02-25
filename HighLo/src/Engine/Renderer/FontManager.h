@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -23,8 +23,8 @@ namespace highlo
 		HLAPI void AddFont(const Ref<Font> &font);
 		HLAPI void AddFont(const HLString &fontName, const Ref<Font> &font);
 
-		HLAPI void LoadFont(const FileSystemPath &path);
-		HLAPI void LoadFont(const HLString &fontName, const FileSystemPath &path);
+		HLAPI void LoadFont(const FileSystemPath &path, uint16 size, FontType type = FontType::NONE);
+		HLAPI void LoadFont(const HLString &fontName, const FileSystemPath &path, uint16 size, FontType type = FontType::NONE);
 
 		HLAPI std::vector<Ref<Font>> GetFonts();
 		HLAPI Ref<Font> GetFont(const HLString &fontName);

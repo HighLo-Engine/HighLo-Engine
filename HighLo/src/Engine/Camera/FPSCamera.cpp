@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "FPSCamera.h"
@@ -35,10 +35,8 @@ namespace highlo
 		UpdateCameraView();
 	}
 	
-	void FPSCamera::Update()
+	void FPSCamera::Update(Timestep ts)
 	{
-		Timestep ts = Time::GetTimestep();
-
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT) && Input::IsKeyPressed(HL_KEY_W))
 		{
 			m_Position += GetForwardDirection() * RunningSpeed() * ts;

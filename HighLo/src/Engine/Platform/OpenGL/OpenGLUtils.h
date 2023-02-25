@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -24,8 +24,10 @@ namespace highlo
 			switch (format)
 			{
 				case TextureFormat::RGB:
-				case TextureFormat::SRGB:
 					return GL_RGB;
+
+				case TextureFormat::SRGB:
+					return GL_SRGB;
 
 				case TextureFormat::RGBA:
 				case TextureFormat::RGBA8:
@@ -85,6 +87,9 @@ namespace highlo
 
 				case TextureFormat::DEPTH32FSTENCIL8UINT:
 					return GL_DEPTH32F_STENCIL8;
+
+				case TextureFormat::RG8:
+					return GL_RG8;
 			}
 
 			HL_ASSERT(false);
@@ -105,6 +110,9 @@ namespace highlo
 				case TextureFormat::RGBA16F:
 				case TextureFormat::RGBA32F:
 					return GL_FLOAT;
+
+				case TextureFormat::DEPTH32FSTENCIL8UINT:
+					return GL_UNSIGNED_BYTE;
 			}
 
 			HL_ASSERT(false);

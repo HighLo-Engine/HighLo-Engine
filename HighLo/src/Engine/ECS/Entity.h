@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -27,7 +27,7 @@ namespace highlo
 		HLAPI Entity() = default;
 		HLAPI Entity(UUID sceneID, const HLString &tag = "Entity");
 		HLAPI Entity(UUID sceneID, UUID entityID);
-		HLAPI Entity(UUID sceneID, UUID entityID, const HLString &tag = "Entity", const Transform &transform = Transform::Identity());
+		HLAPI Entity(UUID sceneID, UUID entityID, const HLString &tag, const Transform &transform);
 		HLAPI Entity(const Entity &other);
 		HLAPI Entity &operator=(const Entity &other);
 
@@ -108,6 +108,7 @@ namespace highlo
 		HLAPI bool operator!=(const Entity &other) const { return !(*this == other); }
 		HLAPI operator bool() const { return m_Initialized; }
 		HLAPI operator uint64() const { return (uint64)m_ID; }
+		HLAPI operator uint32() const { return (uint32)m_ID; }
 
 	private:
 

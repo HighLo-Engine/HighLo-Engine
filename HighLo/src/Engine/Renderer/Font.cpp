@@ -1,11 +1,30 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Font.h"
 
-#include "FontData.h"
-#include "Engine/Core/FileSystem.h"
-#include "Engine/Core/Allocator.h"
+#include "Engine/Renderer/BitmapFont.h"
+#include "Engine/Renderer/TrueTypeFont.h"
+
+namespace highlo
+{
+	Ref<Font> Font::Create(const FileSystemPath &path, uint16 size, FontType fontType)
+	{
+		switch (fontType)
+		{
+			case FontType::BITMAP_FONT:
+				return Ref<BitmapFont>::Create(path, size);
+
+			case FontType::TRUE_TYPE_FONT:
+				return Ref<TrueTypeFont>::Create(path, size);
+		}
+
+		HL_ASSERT(false, "Unknown font type!");
+		return nullptr;
+	}
+}
+
+#if 0
 
 #define HL_FONT_DEFAULT_ANGLE_THRESHOLD 3.0
 #define HL_FONT_DEFAULT_MITER_LIMIT 1.0
@@ -430,4 +449,6 @@ namespace highlo
 		return Ref<Font>::Create(path);
 	}
 }
+
+#endif
 

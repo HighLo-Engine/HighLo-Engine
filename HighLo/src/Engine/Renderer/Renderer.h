@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -113,77 +113,84 @@ namespace highlo
 		HLAPI static void SetGlobalMacroInShaders(const HLString &name, const HLString &value = "");
 
 		HLAPI static void WaitAndRender();
-		HLAPI static void RenderFullscreenQuad(Ref<CommandBuffer> &renderCommandBuffer, Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<Material> &material, const glm::mat4 &transform = glm::mat4(1.0f));
+		HLAPI static void RenderFullscreenQuad(
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<VertexArray> &va, 
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			Ref<Material> &material, 
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		);
 
 		HLAPI static void RenderDynamicMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset);
 
 		HLAPI static void RenderStaticMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<StaticModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<StaticModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset);
 
 		HLAPI static void RenderInstancedDynamicMesh(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			Ref<MaterialTable> materials,
-			Ref<VertexBuffer> transformBuffer,
+			const Ref<MaterialTable> &materials,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount);
 
 		HLAPI static void RenderInstancedStaticMesh(
-			Ref<CommandBuffer> renderCommandBuffer, 
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet, 
-			Ref<StorageBufferSet> storageBufferSet, 
-			Ref<StaticModel> model, 
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			Ref<StaticModel> &model, 
 			uint32 submeshIndex, 
-			Ref<MaterialTable> materials, 
-			Ref<VertexBuffer> transformBuffer, 
+			const Ref<MaterialTable> &materials, 
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset, 
 			uint32 instanceCount);
 
 		HLAPI static void RenderInstancedStaticMeshWithMaterial(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<StaticModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<StaticModel> &model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
-			Ref<Material> overrideMaterial);
+			Ref<Material> &overrideMaterial);
 
 		HLAPI static void RenderInstancedDynamicMeshWithMaterial(
-			Ref<CommandBuffer> renderCommandBuffer,
-			Ref<VertexArray> va,
-			Ref<UniformBufferSet> uniformBufferSet,
-			Ref<StorageBufferSet> storageBufferSet,
-			Ref<DynamicModel> model,
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			Ref<VertexBuffer> transformBuffer,
+			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
-			Ref<Material> overrideMaterial);
+			Ref<Material> &overrideMaterial);
 
 		HLAPI static void OnShaderReloaded(uint64 hash);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);
@@ -201,9 +208,12 @@ namespace highlo
 		HLAPI static void SetLineWidth(float width);
 		HLAPI static float GetCurrentLineWidth();
 
-		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath);
+		HLAPI static Ref<Environment> CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32);
 		HLAPI static Ref<Texture3D> CreatePreethamSky(float turbidity, float azimuth, float inclination);
-		HLAPI static void SetSceneEnvironment(Ref<SceneRenderer> sceneRenderer, Ref<Environment> environment, Ref<Texture2D> shadow, Ref<Texture2D> linearDepth);
+		HLAPI static void SetSceneEnvironment(
+			const Ref<SceneRenderer> &sceneRenderer, 
+			Ref<Environment> &environment, 
+			const Ref<Texture2D> &shadow);
 
 		HLAPI static Ref<RenderingContext> GetContext();
 

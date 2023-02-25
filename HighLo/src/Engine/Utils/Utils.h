@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -15,4 +15,5 @@
 #include "InputUtils.h"
 #include "LoaderUtils.h"
 #include "StringUtils.h"
+#include "ShaderUtils.h"
 

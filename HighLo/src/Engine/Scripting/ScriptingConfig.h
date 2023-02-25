@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -17,7 +17,7 @@ namespace highlo
 		/// Determines the path to the main C# scripting dll. 
 		/// The main scripting dll contains the C# library which can be accessed through own C# projects
 		/// </summary>
-		FileSystemPath CoreAssemblyPath = "Resources/Scripts/HighLo-C#.dll";
+		FileSystemPath CoreAssemblyPath = "Resources/Scripts/HighLo-CSharp.dll";
 
 		/// <summary>
 		/// Determines the path to the Sandbox C# scripting dll.

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -31,7 +31,7 @@ namespace highlo
 
 		virtual void BindTexture(uint32 attachmentIndex = 0, uint32 slot = 0) const override;
 
-		inline virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { return m_ColorAttachments[attachmentIndex]; }
+		inline virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { HL_ASSERT(attachmentIndex < m_ColorAttachments.size()); return m_ColorAttachments[attachmentIndex]; }
 		inline virtual Ref<Texture> GetDepthImage() const override { return m_DepthAttachment; }
 
 		inline virtual uint32 GetWidth() const override { return m_Specification.Width; }

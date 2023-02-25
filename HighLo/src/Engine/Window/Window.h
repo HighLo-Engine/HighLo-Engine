@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -98,6 +98,7 @@ namespace highlo
 		HLAPI virtual void SetVisible(bool bVisible) = 0;
 		HLAPI virtual void SetFocus(bool bEnabled) = 0;
 		HLAPI virtual void SetFullscreen(bool bEnabled) = 0;
+		HLAPI virtual void SetResizable(bool bEnabled) = 0;
 		HLAPI virtual void ShowCursor() = 0;
 		HLAPI virtual void HideCursor() = 0;
 		HLAPI virtual void Maximize() = 0;

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -6,6 +6,9 @@
 //
 
 #pragma once
+
+// @DEPRECATED
+#if 0
 
 // undefine Windows constants
 #undef INFINITE
@@ -19,4 +22,6 @@ namespace highlo
 		std::vector<msdf_atlas::GlyphGeometry> Glyphs;
 	};
 }
+
+#endif
 

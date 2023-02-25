@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "FreeFlyCamera.h"
@@ -37,10 +37,8 @@ namespace highlo
 	
 	FreeFlyCamera::~FreeFlyCamera() {}
 	
-	void FreeFlyCamera::Update()
+	void FreeFlyCamera::Update(Timestep ts)
 	{
-		Timestep ts = Time::GetTimestep();
-
 		// Move up
 		if (Input::IsKeyPressed(HL_KEY_LEFT_SHIFT) && Input::IsKeyPressed(HL_KEY_SPACE))
 		{

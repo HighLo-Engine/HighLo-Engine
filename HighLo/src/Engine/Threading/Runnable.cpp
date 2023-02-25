@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Runnable.h"
@@ -46,6 +46,7 @@ namespace highlo
 	Runnable::Runnable(const RunnableCallback &callback, bool autoDelete)
 		: m_AutoDelete(autoDelete), m_CallbackFn(callback)
 	{
+		m_Locker = ThreadLocker::Create();
 	}
 
 	int32 Runnable::Run()
@@ -58,7 +59,10 @@ namespace highlo
 	void Runnable::AfterExit(bool wasKilled)
 	{
 		if (m_AutoDelete)
+		{
+			m_Locker = nullptr;
 			delete this;
+		}
 	}
 	
 	void Runnable::SetCallback(const RunnableCallback &callback)

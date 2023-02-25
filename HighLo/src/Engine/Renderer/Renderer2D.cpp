@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Renderer2D.h"
@@ -187,13 +187,13 @@ namespace highlo
 		offset = 0;
 		for (uint32 i = 0; i < s_2DData->MaxIndices; ++i)
 		{
-			textIndices.push_back(offset + 0);
+			textIndices.push_back(offset + 2);
 			textIndices.push_back(offset + 1);
-			textIndices.push_back(offset + 2);
+			textIndices.push_back(offset + 0);
 
-			textIndices.push_back(offset + 2);
 			textIndices.push_back(offset + 3);
 			textIndices.push_back(offset + 0);
+			textIndices.push_back(offset + 1);
 
 			offset += 4;
 		}
@@ -366,7 +366,10 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		Flush();
+		Renderer::Submit([]()
+		{
+			Flush();
+		});
 	}
 
 	void Renderer2D::Flush()
@@ -374,7 +377,7 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		s_2DData->ActiveCommandBuffer->Begin();
-		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass, true);
+		Renderer::BeginRenderPass(s_2DData->ActiveCommandBuffer, s_2DData->ActiveRenderPass);
 
 		FlushQuads();
 		FlushCircles();
@@ -726,13 +729,182 @@ namespace highlo
 			return;
 
 		float textureIndex = 0.0f;
+		const Ref<Texture2D> &texture = font->GetAtlas();
+		for (uint32 i = 1; i < s_2DData->FontTextureSlotIndex; ++i)
+		{
+			if (*s_2DData->FontTextureSlots[i].Get() == *texture.Get())
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			textureIndex = (float)s_2DData->FontTextureSlotIndex;
+			s_2DData->FontTextureSlots[s_2DData->FontTextureSlotIndex] = texture;
+			s_2DData->FontTextureSlotIndex++;
+		}
 
 		// TODO: Change this with actual text from parameter
-		HLString rawText = "Hello World!";
-		HLString32 utf32Text = rawText.ToUTF32();
-		uint32 utf32TextLength = utf32Text.Length();
+		uint32 charTextLength = text.Length();
+		uint32 textLengthUTF8 = HLStringUTF8::UTF8StringLength(text);
+		const std::vector<FontGlyph> &allGlyphs = font->GetAllGlyphs();
+		const std::vector<FontKerning> &allKernings = font->GetAllKernings();
 
+		if (textLengthUTF8 < 1)
+			return;
 
+		float x = 0.0f;
+		float y = 0.0f;
+		for (uint32 c = 0, uc = 0; c < charTextLength; ++c)
+		{
+			int32 codepoint = (int32)text.At(c);
+
+			if (codepoint == '\n')
+			{
+				x = 0;
+				y += font->GetLineHeight();
+				uc++;
+				continue;
+			}
+
+			if (codepoint == '\t')
+			{
+				x += font->GetTabXAdvance();
+				uc++;
+				continue;
+			}
+
+			uint8 advance = 0;
+			if (!HLStringUTF8::FromString(text, c, &codepoint, &advance))
+			{
+				HL_CORE_WARN("Could not convert character {0} to codepoint! Falling back to -1", text.At(c));
+				codepoint = -1;
+			}
+
+			FontGlyph *g = nullptr;
+			for (uint32 i = 0; i < allGlyphs.size(); ++i)
+			{
+				FontGlyph glyph = allGlyphs[i];
+				if (glyph.Codepoint == codepoint)
+				{
+					g = &glyph;
+					break;
+				}
+			}
+
+			// If no codepoint was found, try -1 codepoint
+			if (!g)
+			{
+				HL_CORE_WARN("Could not convert character {0} to codepoint! Falling back to -1", text.At(c));
+
+				codepoint = -1;
+				for (uint32 i = 0; i < allGlyphs.size(); ++i)
+				{
+					FontGlyph glyph = allGlyphs[i];
+					if (glyph.Codepoint == codepoint)
+					{
+						g = &glyph;
+						break;
+					}
+				}
+			}
+
+			if (g)
+			{
+				// Found the glyph. generate points.
+				float minx = x + g->XOffset;
+				float miny = y + g->YOffset;
+				float maxx = minx + g->Width;
+				float maxy = miny + g->Height;
+				float tminx = (float)g->X / font->GetAtlasSizeX();
+				float tmaxx = (float)(g->X + g->Width) / font->GetAtlasSizeX();
+				float tminy = (float)g->Y / font->GetAtlasSizeY();
+				float tmaxy = (float)(g->Y + g->Height) / font->GetAtlasSizeY();
+				
+				// Flip the y axis for true type fonts
+				if (font->GetFontType() == FontType::TRUE_TYPE_FONT)
+				{
+					tminy = 1.0f - tminy;
+					tmaxy = 1.0f - tmaxy;
+				}
+
+				// The third component of the position will control the zIndex, but for now we don't support that
+				// the fourth component will get stripped away, but has to be 1 in order for the matrix multiplication to not be affected.
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, miny, 0.0f, 1.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(minx, miny, 0.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tminx, tminy);
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, miny, 0.0f, 1.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(maxx, miny, 0.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tmaxx, tminy);
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(maxx, maxy, 0.0f, 1.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(maxx, maxy, 0.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tmaxx, tmaxy);
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextVertexBufferPtr->Position = transform.GetTransform() * glm::vec4(minx, maxy, 0.0f, 1.0f);
+			//	s_2DData->TextVertexBufferPtr->Position = glm::vec3(minx, maxy, 0.0f);
+				s_2DData->TextVertexBufferPtr->Color = color;
+				s_2DData->TextVertexBufferPtr->TexCoord = glm::vec2(tminx, tmaxy);
+				s_2DData->TextVertexBufferPtr->TexIndex = textureIndex;
+				s_2DData->TextVertexBufferPtr++;
+
+				s_2DData->TextIndexCount += 6;
+
+				// Try to find the kerning
+				int32 kerning = 0;
+				uint32 offsetOfNextChar = c + advance;
+				if (offsetOfNextChar < textLengthUTF8 - 1)
+				{
+					int32 nextCodepoint = 0;
+					uint8 nextAdvance = 0;
+
+					if (!HLStringUTF8::FromString(text, offsetOfNextChar, &nextCodepoint, &nextAdvance))
+					{
+						HL_CORE_WARN("Could not convert character {0} to codepoint! Falling back to -1", text.At(offsetOfNextChar));
+						nextCodepoint = -1;
+					}
+					else
+					{
+						for (uint32 i = 0; i < allKernings.size(); ++i)
+						{
+							FontKerning currentKerning = allKernings[i];
+							if (currentKerning.Codepoint1 == codepoint && currentKerning.Codepoint2 == nextCodepoint)
+							{
+								kerning = currentKerning.Amount;
+								break;
+							}
+						}
+					}
+				}
+
+				x += g->XAdvance + kerning;
+			}
+			else
+			{
+				HL_CORE_ERROR("Could not find any matching glyph for character {0}. Skipping.", text.At(c));
+				++uc;
+				continue;
+			}
+
+			c += advance - 1;
+			uc++;
+		}
+
+		s_2DData->Statistics.TextCount++;
+
+#if 0
 		Ref<Texture2D> fontAtlas = font->GetTextureAtlas();
 		HL_ASSERT(fontAtlas);
 
@@ -762,9 +934,9 @@ namespace highlo
 			double y = -fsScale * metrics.ascenderY;
 			int32 lastSpace = -1;
 
-			for (uint32 i = 0; i < utf32TextLength; ++i)
+			for (uint32 i = 0; i < utf8TextLength; ++i)
 			{
-				char32_t ch = utf32Text[i];
+				char32_t ch = (char32_t)utf8Text[i];
 				if (ch == '\n')
 				{
 					x = 0.0;
@@ -806,7 +978,7 @@ namespace highlo
 				}
 
 				double advance = glyph->getAdvance();
-				fontGeometry.getAdvance(advance, ch, utf32Text[i + 1]);
+				fontGeometry.getAdvance(advance, ch, utf8Text[i + 1]);
 				x += fsScale * advance + kerningOffset;
 			}
 		}
@@ -816,9 +988,9 @@ namespace highlo
 			double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 			double y = 0.0;
 
-			for (uint32 i = 0; i < utf32TextLength; ++i)
+			for (uint32 i = 0; i < utf8TextLength; ++i)
 			{
-				char32_t ch = utf32Text[i];
+				char32_t ch = (char32_t)utf8Text[i];
 				if (ch == '\n' || utils::NextLine(i, nextLines))
 				{
 					x = 0.0;
@@ -872,12 +1044,13 @@ namespace highlo
 				s_2DData->TextIndexCount += 6;
 
 				double advance = glyph->getAdvance();
-				fontGeometry.getAdvance(advance, ch, utf32Text[i + 1]);
+				fontGeometry.getAdvance(advance, ch, utf8Text[i + 1]);
 				x += fsScale * advance + kerningOffset;
 			}
 		}
 
 		s_2DData->Statistics.TextCount++;
+#endif
 	}
 
 	void Renderer2D::SetTargetRenderPass(const Ref<RenderPass> &renderPass)

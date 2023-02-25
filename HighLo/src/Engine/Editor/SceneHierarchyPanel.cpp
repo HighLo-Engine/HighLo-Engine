@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "SceneHierarchyPanel.h"
@@ -203,7 +203,7 @@ namespace highlo
 									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cylinder"));
 									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 									// TODO: Add Cylinders to AssetFactory and MeshFactory
-																//	component->Model = AssetFactory::CreateCylinder();
+								//	component->Model = AssetFactory::CreateCylinder();
 									SetSelected(newEntity);
 
 									if (m_EntityAddedCallback)

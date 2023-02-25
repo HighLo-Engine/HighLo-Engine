@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -22,7 +22,7 @@ namespace highlo
 		HLAPI bool GetActive() const { return m_Active; }
 
 		HLAPI void Focus(const glm::vec3 &focusPoint);
-		HLAPI virtual void Update() override;
+		HLAPI virtual void Update(Timestep ts) override;
 		HLAPI virtual void OnWindowResize(uint32 width, uint32 height) override;
 		HLAPI virtual void OnEvent(Event &e) override;
 

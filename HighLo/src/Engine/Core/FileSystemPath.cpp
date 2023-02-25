@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "FileSystemPath.h"
@@ -349,7 +349,7 @@ namespace highlo
 		{
 			HLString result = m_CurrentPath;
 			
-			if (result.EndsWith("/"))
+			if (result.EndsWith('/'))
 				result = result.Substr(0, result.LastIndexOf('/'));
 
 			result = result.Substr(0, result.LastIndexOf('/'));

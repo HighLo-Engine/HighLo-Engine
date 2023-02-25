@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Skybox.h"
@@ -9,7 +9,7 @@
 
 namespace highlo
 {
-// TODO: Needs Refactor
+	// TODO: Needs Refactor
 
 	static constexpr uint32 SKYBOX_SIZE = 2048;
 
@@ -20,7 +20,7 @@ namespace highlo
 	
 	Skybox::Skybox()
 	{
-	//	m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE });
+		m_Mesh = MeshFactory::CreateCube({ (float)SKYBOX_SIZE, (float)SKYBOX_SIZE, (float)SKYBOX_SIZE }).As<StaticModel>();
 		m_Shader = Renderer::GetShaderLibrary()->Get("SkyboxShader");
 	}
 

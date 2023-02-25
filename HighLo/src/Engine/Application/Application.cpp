@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Application.h"
@@ -51,25 +51,28 @@ namespace highlo
 		OnInitialize();
 		Service::OnInit();
 
+		float initialTime = GetTime();
+		float previousTime = initialTime;
+
 		// Main Rendering Thread
 		while (m_Running)
 		{
-			Time::TimeUpdate();
+			static uint32 frameCounter = 0;
 
-		#ifdef HL_DEBUG
+#ifdef HL_DEBUG
 			if (Input::IsKeyPressed(HL_KEY_ESCAPE))
 				break;
-		#endif
+#endif
 
 			if (!m_Minimized && !m_Settings.Headless)
 			{
 				// Update Entities and Client Application
-				m_ECS_SystemManager.Update();
-				OnUpdate(Time::GetTimestep());
+				m_ECS_SystemManager.Update(m_TimeStep);
+				OnUpdate(m_TimeStep);
 
 				// Update all layers pushed by the Client Application
 				for (ApplicationLayer *layer : m_LayerStack)
-					layer->OnUpdate(Time::GetTimestep());
+					layer->OnUpdate(m_TimeStep);
 
 				// Update all services
 				Service::OnUpdate();
@@ -86,13 +89,18 @@ namespace highlo
 			{
 				UI::BeginScene();
 
-				OnUIRender(Time::GetTimestep());
+				OnUIRender(m_TimeStep);
 
 				for (ApplicationLayer *layer : m_LayerStack)
-					layer->OnUIRender(Time::GetTimestep());
+					layer->OnUIRender(m_TimeStep);
 
+#if HL_DEBUG
 				bool showDebugPanel = true;
-				m_RenderDebugPanel->OnUIRender(&showDebugPanel);
+#else
+				bool showDebugPanel = false;
+#endif
+				
+				m_RenderDebugPanel->OnUIRender(&showDebugPanel, m_Frametime * 1000.0f, m_FPS, m_LastFrameTime);
 
 				UI::EndScene();
 			}
@@ -101,7 +109,20 @@ namespace highlo
 			if (!m_Settings.Headless)
 				m_Window->Update();
 
-			Time::FrameUpdate();
+		//	HL_CORE_TRACE("FRAME TIME: {}", m_Frametime * 1000.0f);
+			float time = GetTime();
+			m_Frametime = time - m_LastFrameTime;
+			m_TimeStep = glm::min<float>(m_Frametime, 0.0333f);
+			m_LastFrameTime = time;
+
+			frameCounter++;
+
+			if (time - previousTime >= 1.0f)
+			{
+				m_FPS = frameCounter;
+				frameCounter = 0;
+				previousTime = GetTime();
+			}
 		}
 
 		OnShutdown();

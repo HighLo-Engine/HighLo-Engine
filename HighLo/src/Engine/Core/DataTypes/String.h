@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -86,11 +86,6 @@ namespace highlo
 		{
 			return (uint32)wcslen(str);
 		}
-
-		HLString32 ToUTF32(const HLString &str);
-		HLString16 ToUTF16(const HLString &str);
-		HLString ToUTF8(const HLString32 &str);
-		HLString ToUTF8(const HLString16 &str);
 	}
 
 	template<typename StringType>
@@ -1170,22 +1165,7 @@ namespace highlo
 			return strcmp(SelectStringSource(), "1") == 0 || strcmp(SelectStringSource(), "true") == 0 || strcmp(SelectStringSource(), "TRUE") == 0;
 		}
 
-		HLString ToUTF8() const
-		{
-			return utils::ToUTF8(*this);
-		}
-
-		HLString16 ToUTF16() const
-		{
-			return utils::ToUTF16(*this);
-		}
-
-		HLString32 ToUTF32() const
-		{
-			return utils::ToUTF32(*this);
-		}
-
-	private:
+	protected:
 
 		HL_FORCE_INLINE StringType *SelectStringSource()
 		{
@@ -1253,13 +1233,112 @@ namespace highlo
 
 		struct ShortStringData
 		{
-			StringType Data[HL_STRING_MAX_STRING_SIZE];
+			StringType Data[HL_STRING_MAX_STRING_SIZE] = { 0 };
 			uint32 Size = 0;
 		};
 
 		// Either points to LongStringData or to ShortStringData
 		void *m_DataPointer = nullptr;
 		bool m_UsingShortStr = true; // Determines which string version is currently used
+	};
+
+	class HLStringUTF8 : public HLStringBase<char>
+	{
+	public:
+
+		HLAPI static uint32 UTF8StringLength(const HLString &str)
+		{
+			uint32 length = 0;
+
+			for (uint32 i = 0; i < MAX_UINT32; ++i, ++length)
+			{
+				int32 c = (int32)str[i];
+				if (c == 0)
+				{
+					// Hit the null-termination character
+					break;
+				}
+
+				if (c >= 0 && c < 127)
+				{
+					// normal 1-byte character
+					// this is not necessary, but just for clarification
+					i += 0;
+				}
+				else if ((c & 0xE0) == 0xC0)
+				{
+					// 2-byte character
+					i += 1;
+				}
+				else if ((c & 0xF0) == 0xE0)
+				{
+					// 3-byte character
+					i += 2;
+				}
+				else if ((c & 0xF8) == 0xF0)
+				{
+					// 4-byte character
+					i += 3;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+
+			return length;
+		}
+
+		HLAPI static bool FromString(const HLString &text, uint32 offset, int32 *out_codepoint, unsigned char *out_advance)
+		{
+			HL_ASSERT(offset < text.Length());
+			const char *bytes = *text;
+			int32 codepoint = (int32)bytes[offset];
+
+			if (codepoint >= 0 && codepoint < 0x7F)
+			{
+				// Normal single-byte ascii character.
+				*out_advance = 1;
+				*out_codepoint = codepoint;
+				return true;
+			}
+			else if ((codepoint & 0xE0) == 0xC0)
+			{
+				// Double-byte character
+				codepoint = ((bytes[offset + 0] & 0b00011111) << 6) +
+					(bytes[offset + 1] & 0b00111111);
+				*out_advance = 2;
+				*out_codepoint = codepoint;
+				return true;
+			}
+			else if ((codepoint & 0xF0) == 0xE0)
+			{
+				// Triple-byte character
+				codepoint = ((bytes[offset + 0] & 0b00001111) << 12) +
+					((bytes[offset + 1] & 0b00111111) << 6) +
+					(bytes[offset + 2] & 0b00111111);
+				*out_advance = 3;
+				*out_codepoint = codepoint;
+				return true;
+			}
+			else if ((codepoint & 0xF8) == 0xF0)
+			{
+				// 4-byte character
+				codepoint = ((bytes[offset + 0] & 0b00000111) << 18) +
+					((bytes[offset + 1] & 0b00111111) << 12) +
+					((bytes[offset + 2] & 0b00111111) << 6) +
+					(bytes[offset + 3] & 0b00111111);
+				*out_advance = 4;
+				*out_codepoint = codepoint;
+				return true;
+			}
+
+			// NOTE: Not supporting 5 and 6-byte characters; return as invalid UTF-8.
+			*out_advance = 0;
+			*out_codepoint = 0;
+			HL_CORE_ERROR("Not supporting 5 and 6-byte characters; Invalid UTF-8.");
+			return false;
+		}
 	};
 }
 
@@ -1291,4 +1370,23 @@ namespace std
 			return hash<uint64>()(str.Hash());
 		}
 	};
+
+	template<>
+	struct hash<highlo::HLStringWide>
+	{
+		std::size_t operator()(const highlo::HLStringWide &str) const
+		{
+			return hash<uint64>()(str.Hash());
+		}
+	};
+
+	template<>
+	struct hash<highlo::HLStringUTF8>
+	{
+		std::size_t operator()(const highlo::HLStringUTF8 &str) const
+		{
+			return hash<uint64>()(str.Hash());
+		}
+	};
 }
+

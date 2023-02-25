@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -41,6 +41,7 @@ namespace highlo
 	{
 		Camera Camera;
 		bool Primary = true;
+		bool FixedAspectRatio = false;
 	};
 
 	struct SpriteComponent
@@ -113,5 +114,25 @@ namespace highlo
 		std::vector<uint32> Fields;
 		bool ScriptInitialized = false;
 	};
+
+	template<typename... Component>
+	struct ComponentGroup
+	{
+	};
+
+	// This has to be extended for every newly added component!!
+	using AllComponents = ComponentGroup<
+		RelationshipComponent,
+		PrefabComponent,
+		SceneComponent,
+		CameraComponent,
+		SpriteComponent,
+		StaticModelComponent,
+		DynamicModelComponent,
+		DirectionalLightComponent,
+		PointLightComponent,
+		SkyLightComponent,
+		TextComponent,
+		ScriptComponent>;
 }
 

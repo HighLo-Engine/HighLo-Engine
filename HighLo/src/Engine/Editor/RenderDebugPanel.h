@@ -11,7 +11,7 @@ namespace highlo
 		HLAPI RenderDebugPanel();
 		HLAPI virtual ~RenderDebugPanel();
 
-		HLAPI void OnUIRender(bool *show);
+		HLAPI void OnUIRender(bool *show, float frameTime, uint32 fps, float elapsedTime);
 		HLAPI void OnEvent(Event &e);
 	};
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -17,7 +17,7 @@ namespace highlo
 	{
 	public:
 
-		DX12Texture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
+		DX12Texture2D(const FileSystemPath &filePath, bool flipOnLoad = true);
 		DX12Texture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		DX12Texture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		DX12Texture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
@@ -56,6 +56,8 @@ namespace highlo
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }
 
+		virtual void SetData(void *data, uint32 data_size) override;
+
 		// Texture2D-specific
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
 
@@ -68,6 +70,7 @@ namespace highlo
 		HLRendererID m_RendererID = 0;
 		HLRendererID m_SamplerRendererID = 0;
 		TextureSpecification m_Specification;
+		Allocator m_Buffer;
 
 		bool m_Loaded = false;
 		bool m_Locked = false;

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VulkanShader.h"
@@ -169,9 +169,10 @@ namespace highlo
         Load(source, forceCompile);
     }
 
-    VulkanShader::VulkanShader(const HLString &source)
+    VulkanShader::VulkanShader(const HLString &source, const HLString &name, ShaderLanguage language)
     {
-        m_Name = "undefined";
+        m_Name = name;
+        m_Language = language;
         Load(source, true);
     }
     
@@ -223,6 +224,16 @@ namespace highlo
         m_ReloadedCallbacks.push_back(callback);
     }
     
+    const ShaderResourceDeclaration *VulkanShader::GetResource(const HLString &name) const
+    {
+        if (m_Resources.find(name) == m_Resources.end())
+        {
+            return nullptr;
+        }
+
+        return &m_Resources.at(name);
+    }
+
     void VulkanShader::SetMacro(const HLString &name, const HLString &value)
     {
         m_Macros[name] = value;

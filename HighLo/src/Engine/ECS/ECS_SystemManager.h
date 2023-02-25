@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -35,7 +35,7 @@ namespace highlo
 				return nullptr;
 		}
 
-		HLAPI void Update();
+		HLAPI void Update(Timestep ts);
 		HLAPI void Shutdown();
 
 	private:

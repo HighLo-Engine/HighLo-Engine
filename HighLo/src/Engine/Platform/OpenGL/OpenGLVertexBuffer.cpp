@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLVertexBuffer.h"
@@ -52,6 +52,8 @@ namespace highlo
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
 		glDeleteBuffers(1, &m_ID);
+
+		m_LocalData.Release();
 	}
 
 	void OpenGLVertexBuffer::Bind() const

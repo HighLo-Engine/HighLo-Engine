@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "RenderPass.h"
@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12RenderPass.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanRenderPass.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalRenderPass.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX12RenderPass>::Create(spec);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanRenderPass>::Create(spec);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalRenderPass>::Create(spec);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

@@ -14,7 +14,7 @@ namespace highlo
 	{
 	}
 
-	void RenderDebugPanel::OnUIRender(bool *show)
+	void RenderDebugPanel::OnUIRender(bool *show, float frameTime, uint32 fps, float elapsedTime)
 	{
 		if (!(*show))
 			return;
@@ -26,13 +26,11 @@ namespace highlo
 
 		ImGui::Begin("Renderer Debugger", show, ImGuiWindowFlags_NoTitleBar);
 		
-		ImGui::Text("FPS: %03d", Time::GetFPS());
+		ImGui::Text("FPS: %04d", fps);
 		ImGui::SameLine();
-	//	ImGui::Text("Frame Time: %.3fms", Time::GetFrameTime());
-	//	ImGui::SameLine();
-		ImGui::Text("Time Scale: %.3f", Time::GetTimeScale());
+		ImGui::Text("Frame Time: %05.1fms", frameTime);
 		ImGui::SameLine();
-		ImGui::Text("Elapsed Time since start: %.3fs", Time::GetElapsedTime());
+		ImGui::Text("Elapsed Time since start: %04.1fs", elapsedTime);
 		ImGui::SameLine();
 
 		ImGui::End();

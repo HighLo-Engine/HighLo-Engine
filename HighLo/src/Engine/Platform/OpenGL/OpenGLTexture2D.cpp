@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLTexture2D.h"
@@ -9,6 +9,7 @@
 
 #include "Engine/Utils/ImageUtils.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Core/FileSystem.h"
 
 #include "OpenGLUtils.h"
 
@@ -16,13 +17,13 @@
 
 namespace highlo
 {	
-	OpenGLTexture2D::OpenGLTexture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+	OpenGLTexture2D::OpenGLTexture2D(const FileSystemPath &filePath, bool flipOnLoad)
 		: m_FilePath(filePath)
 	{
 		int32 width, height, channels;
 		stbi_set_flip_vertically_on_load(flipOnLoad);
 
-		if (*filePath.Absolute() == nullptr)
+		if (!FileSystem::Get()->FileExists(filePath))
 		{
 			HL_CORE_ERROR("{0}[-] Failed to load Texture2D: {1} [-]", TEXTURE2D_LOG_PREFIX, *filePath.String());
 			return;
@@ -40,16 +41,28 @@ namespace highlo
 		m_Loaded = true;
 		HL_CORE_INFO("{0}[+] Loaded {1} [+]", TEXTURE2D_LOG_PREFIX, *filePath.String());
 
-		m_Buffer = Allocator::Copy(data, width * height * 4); // 4 byte per pixel
-		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
-		m_DataFormat = channels == 4 ? GL_RGBA : GL_RGB;
+		if (channels == 4)
+		{
+			m_Buffer = Allocator::Copy(data, width * height * 4); // 4 byte per pixel
+			m_InternalFormat = utils::OpenGLTextureInternalFormat(TextureFormat::RGBA);
+			m_Specification.Format = TextureFormat::RGBA;
+			m_DataFormat = GL_RGBA;
+		}
+		else if (channels == 3)
+		{
+			m_Buffer = Allocator::Copy(data, width * height * 3); // 3 byte per pixel
+			m_InternalFormat = utils::OpenGLTextureInternalFormat(TextureFormat::RGB);
+			m_Specification.Format = TextureFormat::RG8;
+			m_DataFormat = GL_RGB;
+		}
+
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
 		// Clean up loaded data because it has been copied into our own allocator
 		stbi_image_free(data);
 
 		m_Specification.Width = width;
 		m_Specification.Height = height;
-		m_Specification.Format = format;
 		m_Specification.Properties = TextureProperties();
 		m_Specification.Usage = TextureUsage::Texture;
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
@@ -57,7 +70,7 @@ namespace highlo
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_Buffer.Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Specification.Width, m_Specification.Height, 0, m_DataFormat, GL_UNSIGNED_BYTE, m_Buffer.Data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
@@ -70,7 +83,7 @@ namespace highlo
 
 	OpenGLTexture2D::OpenGLTexture2D(const glm::vec3 &rgb, TextureFormat format)
 	{
-		if (format == TextureFormat::RGBA8)
+		if (format == TextureFormat::RGBA8 || format == TextureFormat::RGBA)
 		{
 			Byte data[4];
 			data[0] = (Byte)rgb.x;
@@ -112,8 +125,10 @@ namespace highlo
 		m_Specification.Mips = utils::CalculateMipCount(1, 1);
 
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
-		m_DataFormat = GL_RGBA;
+		m_DataFormat = utils::OpenGLTextureFormat(format);
 		m_Loaded = true;
+
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -205,8 +220,10 @@ namespace highlo
 		m_Specification.Mips = utils::CalculateMipCount(width, height);
 
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
-		m_DataFormat = GL_RGBA;
+		m_DataFormat = utils::OpenGLTextureFormat(format);
 		m_Loaded = true;
+
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -226,7 +243,9 @@ namespace highlo
 	{
 		m_Buffer = Allocator::Copy(img_data, width * height * 4); // 4 byte per pixel
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
-		m_DataFormat = GL_RGBA;
+		m_DataFormat = utils::OpenGLTextureFormat(format);
+
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
 		m_Specification.Width = width;
 		m_Specification.Height = height;
@@ -254,6 +273,9 @@ namespace highlo
 	OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props)
 	{
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
+		m_DataFormat = utils::OpenGLTextureFormat(format);
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
+
 		m_Buffer = Allocator::Copy(data, width * height * 4);
 
 		m_Specification.Width = width;
@@ -283,7 +305,9 @@ namespace highlo
 	{
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(format);
 		m_Buffer.Allocate(width * height * 4); // * 4 channels (RGBA)
-		m_DataFormat = GL_RGBA;
+		m_DataFormat = utils::OpenGLTextureFormat(format);
+
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
 		m_Specification.Width = width;
 		m_Specification.Height = height;
@@ -314,6 +338,9 @@ namespace highlo
 		Name = "unknown";
 		m_Loaded = true;
 		m_InternalFormat = utils::OpenGLTextureInternalFormat(spec.Format);
+		m_DataFormat = utils::OpenGLTextureFormat(spec.Format);
+
+		HL_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
@@ -360,18 +387,19 @@ namespace highlo
 		GLenum glInternalFormat = utils::OpenGLTextureInternalFormat(m_Specification.Format);
 		GLenum glFormat = utils::OpenGLTextureFormat(m_Specification.Format);
 		GLenum glType = utils::OpenGLFormatDataType(m_Specification.Format);
-		uint32 mipCount = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 
 		glGenTextures(1, &RendererID);
 		glBindTexture(GL_TEXTURE_2D, RendererID);
-		glTexStorage2D(GL_TEXTURE_2D, mipCount, glInternalFormat, m_Specification.Width, m_Specification.Height);
-
-		if (m_Buffer)
+	
+		if (m_Buffer.Data)
 		{
-			glTextureSubImage2D(RendererID, 0, 0, 0, m_Specification.Width, m_Specification.Height, glFormat, glType, m_Buffer.Data);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat, m_Specification.Width, m_Specification.Height, 0, glFormat, glType, m_Buffer.Data);
 			m_Loaded = true;
 		}
+
+		if (m_Specification.Properties.GenerateMips)
+			glGenerateMipmap(GL_TEXTURE_2D);
+	
 	}
 
 	void OpenGLTexture2D::Resize(const glm::uvec2 &size)
@@ -431,8 +459,9 @@ namespace highlo
 	{
 		uint64 idx = (((uint64)row * (uint64)m_Specification.Width) + (uint64)column) * 4;
 		if (idx >= (uint64)m_Specification.Width * (uint64)m_Specification.Height * 4 || idx < 0) return;
+		HL_ASSERT(idx < m_Buffer.Size);
 
-		if (m_Specification.Format == TextureFormat::RGBA8)
+		if (m_Specification.Format == TextureFormat::RGBA8 || m_Specification.Format == TextureFormat::RGBA)
 		{
 			((Byte*)m_Buffer.Data)[idx]	  = (Byte)rgba.r;
 			((Byte*)m_Buffer.Data)[idx + 1] = (Byte)rgba.g;
@@ -441,7 +470,7 @@ namespace highlo
 		}
 		else if (m_Specification.Format == TextureFormat::RGBA16)
 		{
-			((uint16*)m_Buffer.Data)[idx]		= (uint16)rgba.r;
+			((uint16*)m_Buffer.Data)[idx]	  = (uint16)rgba.r;
 			((uint16*)m_Buffer.Data)[idx + 1] = (uint16)rgba.g;
 			((uint16*)m_Buffer.Data)[idx + 2] = (uint16)rgba.b;
 			((uint16*)m_Buffer.Data)[idx + 3] = (uint16)rgba.a;
@@ -502,6 +531,12 @@ namespace highlo
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	
+	void OpenGLTexture2D::SetData(void *data, uint32 data_size)
+	{
+		m_Buffer = Allocator::Copy(data, data_size);
+		Invalidate();
+	}
+
 	void OpenGLTexture2D::Bind(uint32 slot) const
 	{
 		glBindTextureUnit(slot, RendererID);

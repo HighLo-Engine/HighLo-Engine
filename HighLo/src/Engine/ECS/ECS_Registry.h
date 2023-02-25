@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -299,6 +299,29 @@ namespace highlo
 			}
 
 			return result;
+		}
+
+		/// <summary>
+		/// Clears all entites of a scene, the caller has to construct the entity UUID's himself.
+		/// </summary>
+		/// <param name="entitiesToDestroy">The entity ids to destory.</param>
+		HLAPI void Clear(const std::vector<UUID> &entitiesToDestroy)
+		{
+			for (auto &[entityId, component] : m_EntityComponents)
+			{
+				for (auto &currentId : entitiesToDestroy)
+				{
+					if (entityId == currentId)
+					{
+						m_EntityComponents.erase(entityId);
+					}
+				}
+			}
+		}
+
+		HLAPI void Sort(const std::function<bool(const UUID &lhs, const UUID &rhs)> &comp)
+		{
+			// TODO
 		}
 
 	private:

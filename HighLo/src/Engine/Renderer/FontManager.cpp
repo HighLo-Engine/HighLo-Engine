@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "FontManager.h"
@@ -8,8 +8,8 @@ namespace highlo
 	void FontManager::Init()
 	{
 		// Load Default fonts
-		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf"));
-		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf"));
+		AddFont("BarlowSemiCondensed-Black", Font::Create("assets/fonts/BarlowSemiCondensedFontFamily/BarlowSemiCondensed-Black.ttf", 16, FontType::TRUE_TYPE_FONT));
+		//AddFont("OpenSans", Font::Create("assets/fonts/opensans/OpenSans-Bold.ttf", 16, FontType::TRUE_TYPE_FONT));
 	}
 	
 	void FontManager::Shutdown()
@@ -33,15 +33,15 @@ namespace highlo
 		m_Fonts.insert({ fontName, font });
 	}
 
-	void FontManager::LoadFont(const FileSystemPath &path)
+	void FontManager::LoadFont(const FileSystemPath &path, uint16 size, FontType type)
 	{
-		Ref<Font> font = Font::Create(path);
+		Ref<Font> font = Font::Create(path, size, type);
 		AddFont(font->GetName(), font);
 	}
 
-	void FontManager::LoadFont(const HLString &fontName, const FileSystemPath &path)
+	void FontManager::LoadFont(const HLString &fontName, const FileSystemPath &path, uint16 size, FontType type)
 	{
-		Ref<Font> font = Font::Create(path);
+		Ref<Font> font = Font::Create(path, size, type);
 		AddFont(fontName, font);
 	}
 
@@ -63,7 +63,9 @@ namespace highlo
 
 	Ref<Font> FontManager::GetDefaultFont()
 	{
-		return GetFonts()[0];
+		auto &fonts = GetFonts();
+		HL_ASSERT(fonts.size() >= 1);
+		return fonts[0];
 	}
 
 	bool FontManager::HasFont(const HLString &fontName) const

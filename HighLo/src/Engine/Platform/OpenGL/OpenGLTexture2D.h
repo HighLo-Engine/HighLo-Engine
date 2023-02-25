@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -23,7 +23,7 @@ namespace highlo
 	{
 	public:
 
-		OpenGLTexture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
+		OpenGLTexture2D(const FileSystemPath &filePath, bool flipOnLoad = true);
 		OpenGLTexture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		OpenGLTexture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		OpenGLTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
@@ -56,7 +56,7 @@ namespace highlo
 
 		virtual void UpdateResourceData() override;
 		virtual void UpdateResourceData(void *data) override;
-		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4& rgba) override;
+		virtual void WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba) override;
 		virtual glm::ivec4 ReadPixel(uint32 row, uint32 column) override;
 		virtual uint32 GetMipLevelCount() override;
 		virtual std::pair<uint32, uint32> GetMipSize(uint32 mip) override;
@@ -64,6 +64,8 @@ namespace highlo
 		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
 
 		virtual HLRendererID GetSamplerRendererID() const override { return m_SamplerRendererID; }
+
+		virtual void SetData(void *data, uint32 data_size) override;
 
 		virtual void Bind(uint32 slot) const override;
 		virtual void Unbind(uint32 slot) const override;

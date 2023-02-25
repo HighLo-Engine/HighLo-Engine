@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -36,16 +36,16 @@ namespace highlo
 		HLAPI void UpdateScene(Timestep ts);
 
 		// Renders the static overlay that gets rendered on top of the scene (optional).
-		HLAPI void OnUpdateOverlay(Ref<SceneRenderer> renderer, Timestep ts, const Camera &overlayCamera);
+		HLAPI void OnRenderOverlay(Ref<SceneRenderer> &renderer, Timestep ts, const Camera &overlayCamera);
 
 		// Renders the scene at actual runtime of the game.
-		HLAPI void OnUpdateRuntime(Ref<SceneRenderer> renderer, Timestep ts);
+		HLAPI void OnRenderRuntime(Ref<SceneRenderer> &renderer, Timestep ts);
 
 		// Renders the scene in the editor viewport.
-		HLAPI void OnUpdateEditor(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera);
+		HLAPI void OnRenderEditor(Ref<SceneRenderer> &renderer, Timestep ts, const EditorCamera &editorCamera);
 
 		// Renders the scene in the physics simulation.
-		HLAPI void OnSimulate(Ref<SceneRenderer> renderer, Timestep ts, const EditorCamera &editorCamera);
+		HLAPI void OnSimulate(Ref<SceneRenderer> &renderer, Timestep ts, const EditorCamera &editorCamera);
 
 		// Handles engine and game events.
 		HLAPI void OnEvent(Event &e);
@@ -58,8 +58,8 @@ namespace highlo
 
 		HLAPI void SetViewportSize(uint32 width, uint32 height);
 
-		HLAPI const Ref<Environment> &GetEnvironment() const {}
-		HLAPI void SetSkybox(const Ref<Texture3D> &skybox);
+		HLAPI void SetEnvironment(const Ref<Environment> &env) { m_Environment = env; }
+		HLAPI const Ref<Environment> &GetEnvironment() const { return m_Environment; }
 
 		HLAPI DirectionalLight &GetLight() { return m_Light; }
 		HLAPI const DirectionalLight &GetLight() const { return m_Light; }
@@ -112,6 +112,8 @@ namespace highlo
 		HLAPI ECS_Registry &GetRegistry() { return m_Registry; }
 		HLAPI const ECS_Registry &GetRegistry() const { return m_Registry; }
 
+		HLAPI const UUID &GetSceneID() const { return m_SceneID; }
+
 		// TODO: Only in editor
 		HLAPI void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 
@@ -119,6 +121,10 @@ namespace highlo
 		HLAPI static Scene *GetActiveScene();
 
 		HLAPI void CopyAllComponents(Entity &dest, const Entity &src);
+
+	private:
+
+		void SortEntities();
 
 	private:
 

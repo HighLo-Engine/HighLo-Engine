@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Texture3D.h"
@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12Texture3D.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanTexture3D.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalTexture3D.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX12Texture3D>::Create(filepath, flipOnLoad);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture3D>::Create(filepath, flipOnLoad);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture3D>::Create(filepath, flipOnLoad);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -41,6 +45,8 @@ namespace highlo
 		return Ref<DX12Texture3D>::Create(format, width, height, data);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanTexture3D>::Create(format, width, height, data);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalTexture3D>::Create(format, width, height, data);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

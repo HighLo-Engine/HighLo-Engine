@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -21,7 +21,7 @@ namespace highlo
 		HLAPI FPSCamera();
 		HLAPI FPSCamera(const glm::mat4 &projectionMatrix);
 
-		HLAPI void Update() override;
+		HLAPI void Update(Timestep ts) override;
 		HLAPI void OnEvent(Event &e) override {}
 		HLAPI void OnWindowResize(uint32 width, uint32 height) override;
 		HLAPI void SetViewportSize(uint32 width, uint32 height);

@@ -19,6 +19,7 @@ HighLoEdit/Resources/Scripts/HighLo-C#.dll
 Sandbox/assets
 HighLoEdit/assets
 HighLoEdit/editorconfig.ini
+Makefile
 
 # Visual Studio and IntelliJ files
 **.sln

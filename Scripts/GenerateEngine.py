@@ -41,17 +41,21 @@ print('Your detected System is: ' + platform.system())
 if 'Scripts' in os.getcwd():
     os.chdir('../')
 
-if (not Vulkan.CheckVulkanSDK()):
-    exit(1)
-    
-if (not Vulkan.CheckVulkanSDKDebugLibs()):
-    exit(1)
-
 # If the user runs the script for the first time, make sure all dependencies exist
+isFirstInstall=False
 if (not os.path.exists('HighLo/bin')):
+    isFirstInstall=True
     print('Running the installer for the first time, making sure all lfs data is up-to-date...')
     subprocess.call(["git", "lfs", "pull"])
     subprocess.call(["git", "submodule", "update", "--init", "--recursive"])
+
+if (not Vulkan.CheckVulkanSDK(isFirstInstall)):
+    print('Skipped Vulkan installation. Stop.')
+    exit(1)
+    
+if (not Vulkan.CheckVulkanSDKDebugLibs()):
+    print('Could not find the SDK debug libs for Vulkan. Stop.')
+    exit(1)
 
 print("Running premake...")
 

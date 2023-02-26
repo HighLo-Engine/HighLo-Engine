@@ -67,6 +67,8 @@
 
 #elif defined(__GNUC__)
 
+#include <signal.h>
+
 #define HL_DLL_EXPORT __declspec(dllexport)
 #define HL_DLL_IMPORT /* NOTHING */
 #define HL_INLINE inline
@@ -83,7 +85,7 @@
 #define HL_DEPRECATED __attribute__((deprecated))
 
 #ifdef HL_DEBUG
-	#define HL_DEBUG_BREAK ??
+	#define HL_DEBUG_BREAK raise(SIGTRAP)
 #else
 	#define HL_DEBUG_BREAK
 #endif

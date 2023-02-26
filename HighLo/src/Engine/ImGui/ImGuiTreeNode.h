@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "imgui.h"
+#include "ImGui.h"
 
 namespace highlo::UI
 {

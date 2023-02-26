@@ -76,13 +76,13 @@ namespace highlo
 		}
 
 		template<>
-		static uint32 GetSizeOfUnknownStringType(const char *str)
+		uint32 GetSizeOfUnknownStringType(const char *str)
 		{
 			return (uint32)strlen(str);
 		}
 
 		template<>
-		static uint32 GetSizeOfUnknownStringType(const wchar_t *str)
+		uint32 GetSizeOfUnknownStringType(const wchar_t *str)
 		{
 			return (uint32)wcslen(str);
 		}

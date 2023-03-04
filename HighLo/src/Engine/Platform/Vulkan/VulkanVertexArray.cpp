@@ -9,6 +9,7 @@
 
 #include "VulkanContext.h"
 #include "VulkanFramebuffer.h"
+#include "VulkanUniformBuffer.h"
 
 namespace highlo
 {
@@ -96,7 +97,7 @@ namespace highlo
 		Renderer::Submit([instance]() mutable
 		{
 			VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
-		//	Ref<VulkanShader> vulkanShader = instance->m_Specification.Shader.As<VulkanShader>();
+			Ref<VulkanShader> vulkanShader = instance->m_Specification.Shader.As<VulkanShader>();
 			Ref<VulkanFramebuffer> framebuffer = instance->m_Specification.RenderPass->GetSpecification().Framebuffer.As<VulkanFramebuffer>();
 
 			auto descriptorSetLayouts = vulkanShader->GetAllDescriptorSetLayouts();
@@ -109,7 +110,7 @@ namespace highlo
 				const auto &pushConstantRange = pushConstantRanges[i];
 				auto &vulkanPushConstantRange = vulkanPushConstantRanges[i];
 
-				vulkanPushConstantRange.stageFlags = pushConstantRange.ShaderStage;
+				vulkanPushConstantRange.stageFlags = pushConstantRange.Stage;
 				vulkanPushConstantRange.offset = pushConstantRange.Offset;
 				vulkanPushConstantRange.size = pushConstantRange.Size;
 			}
@@ -219,7 +220,7 @@ namespace highlo
 
 			VkPipelineColorBlendStateCreateInfo colorBlendState = {};
 			colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-			colorBlendState.attachmentCount = (uint32_t)blendAttachmentStates.size();
+			colorBlendState.attachmentCount = (uint32)blendAttachmentStates.size();
 			colorBlendState.pAttachments = blendAttachmentStates.data();
 
 			// Viewport state sets the number of viewports and scissor used in this pipeline
@@ -242,7 +243,7 @@ namespace highlo
 			VkPipelineDynamicStateCreateInfo dynamicState = {};
 			dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 			dynamicState.pDynamicStates = dynamicStateEnables.data();
-			dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
+			dynamicState.dynamicStateCount = static_cast<uint32>(dynamicStateEnables.size());
 
 			// Depth and stencil state containing depth and stencil compare and test operations
 			// We only use depth tests and want depth tests and writes to be enabled and compare with less or equal
@@ -367,8 +368,6 @@ namespace highlo
 	
 	void VulkanVertexArray::RT_SetUniformBuffer(const Ref<UniformBuffer> &uniformBuffer, uint32 binding, uint32 set)
 	{
-		// TODO
-		/*
 		Ref<VulkanShader> vulkanShader = m_Specification.Shader.As<VulkanShader>();
 		Ref<VulkanUniformBuffer> vulkanUniformBuffer = uniformBuffer.As<VulkanUniformBuffer>();
 
@@ -385,7 +384,6 @@ namespace highlo
 		HL_CORE_WARN("VulkanPipeline - Updating descriptor set (VulkanPipeline::SetUniformBuffer)");
 		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
 		vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, nullptr);
-		*/
 	}
 }
 

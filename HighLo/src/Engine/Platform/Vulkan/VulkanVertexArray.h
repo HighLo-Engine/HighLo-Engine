@@ -11,6 +11,7 @@
 
 #include "Engine/Graphics/VertexArray.h"
 #include "Vulkan.h"
+#include "VulkanShader.h"
 
 namespace highlo
 {
@@ -50,7 +51,7 @@ namespace highlo
 		VkPipeline m_VulkanPipeline = nullptr;
 		VkPipelineCache m_PipelineCache = nullptr;
 	
-	//	VulkanShader::ShaderMaterialDescriptorSet m_DescriptorSets;
+		VkShaderMaterialDescriptorSet m_DescriptorSets;
 	};
 }
 

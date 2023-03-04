@@ -8,6 +8,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "VulkanContext.h"
 #include "VulkanCommandBuffer.h"
+#include "VulkanShader.h"
 
 namespace highlo
 {
@@ -163,18 +164,16 @@ namespace highlo
 	
 	void VulkanComputePipeline::RT_CreatePipeline()
 	{
-		// TODO
-		/*
 		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
-
-		auto descriptorSetLayouts = m_Shader->GetAllDescriptorSetLayouts();
+		Ref<VulkanShader> shader = m_Shader.As<VulkanShader>();
+		auto &descriptorSetLayouts = shader->GetAllDescriptorSetLayouts();
 
 		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
 		pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutCreateInfo.setLayoutCount = (uint32)descriptorSetLayouts.size();
 		pipelineLayoutCreateInfo.pSetLayouts = descriptorSetLayouts.data();
 
-		const auto &pushConstantRanges = m_Shader->GetPushConstantRanges();
+		const auto &pushConstantRanges = shader->GetPushConstantRanges();
 		std::vector<VkPushConstantRange> vulkanPushConstantRanges(pushConstantRanges.size());
 		if (pushConstantRanges.size())
 		{
@@ -184,7 +183,7 @@ namespace highlo
 				const auto &pushConstantRange = pushConstantRanges[i];
 				auto &vulkanPushConstantRange = vulkanPushConstantRanges[i];
 
-				vulkanPushConstantRange.stageFlags = pushConstantRange.ShaderStage;
+				vulkanPushConstantRange.stageFlags = pushConstantRange.Stage;
 				vulkanPushConstantRange.offset = pushConstantRange.Offset;
 				vulkanPushConstantRange.size = pushConstantRange.Size;
 			}
@@ -199,7 +198,7 @@ namespace highlo
 		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 		computePipelineCreateInfo.layout = m_ComputePipelineLayout;
 		computePipelineCreateInfo.flags = 0;
-		const auto &shaderStages = m_Shader->GetPipelineShaderStageCreateInfos();
+		const auto &shaderStages = shader->GetPipelineShaderStageCreateInfos();
 		computePipelineCreateInfo.stage = shaderStages[0];
 
 		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
@@ -209,7 +208,6 @@ namespace highlo
 		VK_CHECK_RESULT(vkCreateComputePipelines(device, m_PipelineCache, 1, &computePipelineCreateInfo, nullptr, &m_ComputePipeline));
 
 		utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_PIPELINE, m_Shader->GetName(), m_ComputePipeline);
-		*/
 	}
 }
 

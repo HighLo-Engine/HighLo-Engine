@@ -252,7 +252,6 @@ namespace highlo
 	void SceneRenderer::EndScene()
 	{
 		HL_ASSERT(m_Active);
-		m_Active = false;
 
 	#if USE_MULTI_THREADED_RENDERER
 		Ref<SceneRenderer> instance = this;
@@ -267,6 +266,8 @@ namespace highlo
 			instance->FlushDrawList();
 		});
 	#endif
+
+		m_Active = false;
 	}
 
 	void SceneRenderer::SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform, const Ref<Material> &overrideMaterial)

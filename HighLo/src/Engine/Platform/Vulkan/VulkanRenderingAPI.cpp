@@ -258,7 +258,7 @@ namespace highlo
 			{
 				const uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
 				s_VKRendererData->RendererDescriptorSet[sceneRenderer.Get()].resize(framesInFlight);
-				for (uint32_t i = 0; i < framesInFlight; i++)
+				for (uint32 i = 0; i < framesInFlight; i++)
 					s_VKRendererData->RendererDescriptorSet.at(sceneRenderer.Get())[i] = pbrShader->CreateDescriptorSets(1);
 
 			}

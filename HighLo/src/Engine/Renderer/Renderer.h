@@ -218,6 +218,7 @@ namespace highlo
 		HLAPI static Ref<RenderingContext> GetContext();
 
 		HLAPI static uint32 GetCurrentFrameIndex();
+		HLAPI static uint32 RT_GetCurrentFrameIndex();
 		HLAPI static RenderCommandQueue &GetRenderResourceReleaseQueue(uint32 index);
 		HLAPI static RenderCommandQueue &GetRenderCommandQueue();
 

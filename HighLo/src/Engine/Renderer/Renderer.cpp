@@ -477,6 +477,12 @@ namespace highlo
 
 	uint32 Renderer::GetCurrentFrameIndex()
 	{
+		return HLApplication::Get().GetCurrentBufferIndex();
+	}
+
+	uint32 Renderer::RT_GetCurrentFrameIndex()
+	{
+		// Swapchain owns the Render Thread frame index
 		return HLApplication::Get().GetWindow().GetSwapChain()->GetCurrentBufferIndex();
 	}
 

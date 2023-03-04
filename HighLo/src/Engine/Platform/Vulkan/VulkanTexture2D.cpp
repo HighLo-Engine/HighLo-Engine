@@ -776,7 +776,7 @@ namespace highlo
 
 		// Copy data from staging buffer
 		uint8 *srcData = allocator.MapMemory<uint8>(stagingBufferAllocation);
-		buffer.Allocate(bufferSize);
+		buffer.Allocate((uint32)bufferSize);
 		memcpy(buffer.Data, srcData, bufferSize);
 		allocator.UnmapMemory(stagingBufferAllocation);
 

@@ -121,8 +121,8 @@ namespace highlo
 		std::vector<VmaBudget> budgets(memoryProps.memoryHeapCount);
 		vmaGetBudget(s_VkAllocatorData->Allocator, budgets.data());
 
-		uint64_t usage = 0;
-		uint64_t budget = 0;
+		uint64 usage = 0;
+		uint64 budget = 0;
 
 		for (VmaBudget &b : budgets)
 		{

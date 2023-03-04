@@ -57,6 +57,8 @@ namespace highlo
 		HLAPI Translations &GetTranslations() { return m_Translations; }
 		HLAPI Translation *GetActiveTranslation();
 
+		HLAPI uint32 GetCurrentBufferIndex() const { return m_CurrentFrameIndex; }
+
 	private:
 
 		void Init();
@@ -87,6 +89,7 @@ namespace highlo
 		float m_CPUTime = 0.0f;
 		float m_LastFrameTime = 0.0f;
 		uint32 m_FPS = 0;
+		uint32 m_CurrentFrameIndex = 0;
 
 		Timestep m_Frametime;
 		Timestep m_TimeStep;

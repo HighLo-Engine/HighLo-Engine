@@ -123,6 +123,8 @@ namespace highlo
 				frameCounter = 0;
 				previousTime = GetTime();
 			}
+
+			m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % Renderer::GetConfig().FramesInFlight;
 		}
 
 		OnShutdown();

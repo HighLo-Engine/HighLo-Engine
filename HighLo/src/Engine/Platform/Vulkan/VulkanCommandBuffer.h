@@ -1,17 +1,17 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
-#ifdef HIGHLO_API_VULKAN
-
 #include "Engine/Graphics/CommandBuffer.h"
 
-#include "Vulkan.h"
+#ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
 
 namespace highlo
 {
@@ -34,12 +34,30 @@ namespace highlo
 
 		virtual const PipelineStatistics &GetPipelineStatistics(uint32 frameIndex) const override;
 
+		// Vulkan-specific
+		VkCommandBuffer GetCommandBuffer(uint32 frameIndex) const
+		{
+			HL_ASSERT(frameIndex < m_CommandBuffers.size());
+			return m_CommandBuffers[frameIndex];
+		}
+
 	private:
 
 		HLString m_DebugName;
-		bool m_SwapChain = false;
-		uint32 m_Count = 0;
+		bool m_OwnedBySwapchain = false;
+		uint32 m_PipelineQueryCount = 0;
 		std::vector<PipelineStatistics> m_PipelineStatisticsQueryResults;
+
+		VkCommandPool m_CommandPool = nullptr;
+		std::vector<VkCommandBuffer> m_CommandBuffers;
+		std::vector<VkFence> m_WaitFences;
+
+		uint32 m_TimestampQueryCount = 0;
+		uint32 m_TimestampNextAvailQuery = 0;
+		std::vector<VkQueryPool> m_TimestampQueryPools;
+		std::vector<VkQueryPool> m_PipelineStatisticsQueryPools;
+		std::vector<std::vector<uint32>> m_TimestampQueryResults;
+		std::vector<std::vector<float>> m_ExecutionGPUTimes;
 	};
 }
 

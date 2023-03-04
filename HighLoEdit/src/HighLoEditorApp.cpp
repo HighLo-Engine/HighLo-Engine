@@ -7,7 +7,9 @@
 
 highlo::HLApplication *highlo::CreateApp(int argc, char *argv[])
 {
+	highlo::FileSystem::Get()->SetCurrentWorkingDirectory("../../../");
 	highlo::utils::CommandLineHelper cmdHelper(argc, argv);
-	return new HighLoEditor(cmdHelper.GetAppSettings());
+	highlo::ApplicationSettings &settings = cmdHelper.GetAppSettings();
+	return new HighLoEditor(settings);
 }
 

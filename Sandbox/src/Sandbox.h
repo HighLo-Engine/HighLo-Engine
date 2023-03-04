@@ -7,6 +7,8 @@ class Sandbox : public HLApplication
 {
 public:
 
+	Sandbox(highlo::ApplicationSettings &settings);
+
 	void OnInitialize() override;
 	void OnUpdate(Timestep timestep) override;
 	void OnShutdown() override;

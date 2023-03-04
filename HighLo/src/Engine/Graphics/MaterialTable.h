@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -19,6 +19,7 @@ namespace highlo
 		HLAPI MaterialTable(const Ref<MaterialTable> &other);
 		HLAPI ~MaterialTable() = default;
 
+		HLAPI void Resize(uint32 newMaterialCount = 1);
 		HLAPI bool HasMaterial(uint32 index) const { return m_Materials.find(index) != m_Materials.end(); }
 		
 		HLAPI void SetMaterial(uint32 index, const Ref<MaterialAsset> &material);

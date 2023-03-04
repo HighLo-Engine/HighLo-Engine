@@ -1,7 +1,8 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
+//     - 1.3 (2022-09-03) Added Script component
 //     - 1.2 (2021-09-19) Added Prefab Component
 //     - 1.1 (2021-09-15) Changed ID Types to UUID, Removed TagComponent
 //     - 1.0 (2021-09-14) initial release
@@ -15,6 +16,7 @@
 #include "Engine/Graphics/MaterialTable.h"
 #include "Engine/Camera/Camera.h"
 #include "Engine/Core/UUID.h"
+#include "Engine/Scripting/ScriptType.h"
 
 namespace highlo
 {
@@ -39,6 +41,7 @@ namespace highlo
 	{
 		Camera Camera;
 		bool Primary = true;
+		bool FixedAspectRatio = false;
 	};
 
 	struct SpriteComponent
@@ -104,5 +107,32 @@ namespace highlo
 		float MaxWidth = 10.0f;
 	};
 
+	struct ScriptComponent
+	{
+		AssetHandle ScriptClass = 0;
+		ScriptType Type = ScriptType::None;
+		std::vector<uint32> Fields;
+		bool ScriptInitialized = false;
+	};
 
+	template<typename... Component>
+	struct ComponentGroup
+	{
+	};
+
+	// This has to be extended for every newly added component!!
+	using AllComponents = ComponentGroup<
+		RelationshipComponent,
+		PrefabComponent,
+		SceneComponent,
+		CameraComponent,
+		SpriteComponent,
+		StaticModelComponent,
+		DynamicModelComponent,
+		DirectionalLightComponent,
+		PointLightComponent,
+		SkyLightComponent,
+		TextComponent,
+		ScriptComponent>;
 }
+

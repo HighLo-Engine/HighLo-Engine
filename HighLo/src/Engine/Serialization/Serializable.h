@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -13,21 +13,19 @@
 #define HL_DESERIALIZE(name)
 #define HL_DESERIALIZE_MEMBER(name, member)
 
-// Helpers for bit fields
-#define HL_SERIALIZE_BIT(name)
-#define HL_SERIALIZE_BIT_MEMBER(name, member)
-
-#define HL_DESERIALIZE_BIT(name)
-#define HL_DESERIALIZE_BIT_MEMBER(name, member)
-
 namespace highlo
 {
-	class Serializable
+	class Serializer;
+
+	class Serializable : public IsSharedReference
 	{
 	public:
 
-		HLAPI virtual void Serialize() = 0;
-		HLAPI virtual void Deserialize() = 0;
+		HLAPI Serializable();
+		HLAPI virtual ~Serializable();
+
+		HLAPI virtual void Serialize(const Ref<Serializer> &serializer) = 0;
+		HLAPI virtual void Deserialize(const Ref<Serializer> &serializer) = 0;
 
 	};
 }

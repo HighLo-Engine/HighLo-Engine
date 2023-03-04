@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -19,7 +19,7 @@ namespace highlo
 	public:
 
 		DX11Shader(const FileSystemPath &filePath, bool forceCompile = false);
-		DX11Shader(const HLString &source);
+		DX11Shader(const HLString &source, const HLString &name = "undefined", ShaderLanguage language = ShaderLanguage::None);
 		virtual ~DX11Shader();
 
 		virtual void Reload(bool forceCompile = false) override;
@@ -37,6 +37,7 @@ namespace highlo
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
+		virtual const ShaderResourceDeclaration *GetResource(const HLString &name) const override;
 
 	private:
 
@@ -45,6 +46,7 @@ namespace highlo
 		bool m_Loaded = false;
 		bool m_IsCompute = false;
 		FileSystemPath m_AssetPath;
+		ShaderLanguage m_Language = ShaderLanguage::None;
 
 		std::unordered_map<HLString, HLString> m_Macros;
 		std::unordered_set<HLString> m_AcknowledgedMacros;

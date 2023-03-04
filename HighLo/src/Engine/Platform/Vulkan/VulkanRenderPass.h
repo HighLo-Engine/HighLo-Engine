@@ -1,17 +1,15 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
-#ifdef HIGHLO_API_VULKAN
-
 #include "Engine/Graphics/RenderPass.h"
 
-#include "Vulkan.h"
+#ifdef HIGHLO_API_VULKAN
 
 namespace highlo
 {

@@ -66,7 +66,7 @@ static void InitGermanTranslations()
 
 static void InitEnglishTranslations()
 {
-	Translation *english = HLApplication::Get().GetTranslations().GetTranslation("en-EN");
+	Translation *english = HLApplication::Get().GetTranslations().GetTranslation("en-US");
 	if (english)
 	{
 		english->AddText("file-menu", "File");

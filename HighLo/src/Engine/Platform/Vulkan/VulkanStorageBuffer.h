@@ -1,17 +1,18 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
-#ifdef HIGHLO_API_VULKAN
-
 #include "Engine/Graphics/Shaders/StorageBuffer.h"
 
-#include "Vulkan.h"
+#ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 namespace highlo
 {
@@ -28,9 +29,22 @@ namespace highlo
 		virtual void UploadToShader() override;
 		virtual void Resize(uint32 size) override;
 
+		// Vulkan-specific
+		const VkDescriptorBufferInfo &GetDescriptorBufferInfo() const { return m_DescriptorBufferInfo; }
+
 	private:
 
+		// TODO: Make this part of the api
+		void Release();
+		void Invalidate();
 
+	private:
+
+		uint32 m_Size;
+
+		VmaAllocation m_MemoryAllocation = nullptr;
+		VkBuffer m_Buffer = {};
+		VkDescriptorBufferInfo m_DescriptorBufferInfo = {};
 	};
 }
 

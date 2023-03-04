@@ -3,6 +3,8 @@
 
 highlo::HLApplication *highlo::CreateApp(int argc, char *argv[])
 {
-	return new Sandbox();
+	highlo::ApplicationSettings settings;
+	settings.WorkingDirectory = "../../../";
+	return new Sandbox(settings);
 }
 

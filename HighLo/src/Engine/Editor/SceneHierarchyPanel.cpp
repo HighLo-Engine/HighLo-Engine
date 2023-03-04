@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "SceneHierarchyPanel.h"
@@ -146,7 +146,7 @@ namespace highlo
 							{
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-null-object")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-null-object"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-null-object"));
 									SetSelected(newEntity);
 
 									if (m_EntityAddedCallback)
@@ -155,7 +155,7 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-camera")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-camera"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-camera"));
 									newEntity.AddComponent<CameraComponent>();
 									SetSelected(newEntity);
 
@@ -167,7 +167,7 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-cube")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cube"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cube"));
 									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 									component->Model = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
 									SetSelected(newEntity);
@@ -178,7 +178,7 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-sphere")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-sphere"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-sphere"));
 									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 									component->Model = AssetFactory::CreateSphere(4.0f);
 									SetSelected(newEntity);
@@ -189,7 +189,7 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-capsule")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-capsule"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-capsule"));
 									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 									component->Model = AssetFactory::CreateCapsule(4.0f, 8.0f);
 									SetSelected(newEntity);
@@ -200,10 +200,10 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-cylinder")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cylinder"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-cylinder"));
 									StaticModelComponent *component = newEntity.AddComponent<StaticModelComponent>();
 									// TODO: Add Cylinders to AssetFactory and MeshFactory
-																//	component->Model = AssetFactory::CreateCylinder();
+								//	component->Model = AssetFactory::CreateCylinder();
 									SetSelected(newEntity);
 
 									if (m_EntityAddedCallback)
@@ -214,7 +214,7 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-directional-light")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-directional-light"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-directional-light"));
 									newEntity.AddComponent<DirectionalLightComponent>();
 									newEntity.Transform().FromRotation({ 80.0f, 10.0f, 0.0f });
 									SetSelected(newEntity);
@@ -225,7 +225,7 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-point-light")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-point-light"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-point-light"));
 									newEntity.AddComponent<PointLightComponent>();
 									newEntity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
 									SetSelected(newEntity);
@@ -236,8 +236,30 @@ namespace highlo
 
 								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-sky-light")))
 								{
-									auto newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-sky-light"));
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-sky-light"));
 									newEntity.AddComponent<SkyLightComponent>();
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								ImGui::Separator();
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-c#-script")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-c#-script"));
+									newEntity.AddComponent<ScriptComponent>();
+									SetSelected(newEntity);
+
+									if (m_EntityAddedCallback)
+										m_EntityAddedCallback(newEntity);
+								}
+
+								if (ImGui::MenuItem(translation->GetText("scene-hierarchy-right-click-menu-new-lua-script")))
+								{
+									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-lua-script"));
+									// TODO: Add Lua script component here
 									SetSelected(newEntity);
 
 									if (m_EntityAddedCallback)

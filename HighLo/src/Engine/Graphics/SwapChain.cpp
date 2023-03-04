@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "SwapChain.h"
@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX12/DX12SwapChain.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanSwapChain.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalSwapChain.h"
 #endif// HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,11 @@ namespace highlo
 		return Ref<DX12SwapChain>::Create();
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanSwapChain>::Create();
+	#elif HIGHLO_API_METAL
+		return Ref<MetalSwapChain>::Create();
+	#else
+		HL_ASSERT(false);
+		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
 }

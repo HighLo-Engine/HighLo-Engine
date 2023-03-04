@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -16,6 +16,11 @@ namespace highlo
 {
 	struct ApplicationSettings
 	{
+		/// <summary>
+		/// Determines the current working directory, HighLo should start with.
+		/// </summary>
+		FileSystemPath WorkingDirectory = "";
+
 		/// <summary>
 		/// Determines whether the engine should launch without a rendering window (useful for game-servers)
 		/// </summary>
@@ -95,13 +100,28 @@ namespace highlo
 		/// <summary>
 		/// Determines the default language the engine should start with.
 		/// </summary>
-		HLString ActiveTranslationLanguageCode = "en-EN";
+		HLString ActiveTranslationLanguageCode = "en-US";
 	//	HLString ActiveTranslationLanguageCode = "de-DE";
 
 		/// <summary>
 		/// Determines the path to the startup project for the Editor.
 		/// </summary>
 		FileSystemPath ProjectPath = "";
+
+		/// <summary>
+		/// Determines the path, where the client C# project files can be found.
+		/// </summary>
+		FileSystemPath CSharpProjectPath = "";
+
+		/// <summary>
+		/// Determines the path, where the client lua project files can be found.
+		/// </summary>
+		FileSystemPath LuaProjectPath = "";
+
+		/// <summary>
+		/// Determines the path, where the native (C++) scripting files can be found.
+		/// </summary>
+		FileSystemPath NativeProjectPath = "";
 
 		/// <summary>
 		/// Determines the current Version String.

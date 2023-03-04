@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -17,6 +17,16 @@
 
 namespace highlo
 {
+	/// <summary>
+	/// Represents the object local transform in shaders
+	/// </summary>
+	struct TransformVertexData
+	{
+		glm::vec4 Row0;
+		glm::vec4 Row1;
+		glm::vec4 Row2;
+	};
+
 	class Transform
 	{
 	public:

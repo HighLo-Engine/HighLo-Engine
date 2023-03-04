@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -38,12 +38,47 @@ namespace highlo
 		{
 		}
 
-		HLAPI File(const File&) = default;
-		HLAPI File &operator=(const File&) = default;
+		HLAPI File(const File &other)
+		{
+			const char *filename = other.FileName.C_Str();
+			const char *name = other.Name.C_Str();
+			const char *extension = other.Extension.C_Str();
+			const char *fullpath = other.FullPath.C_Str();
+
+			FileName = other.FileName;
+			Name = other.Name;
+			Extension = other.Extension;
+			FullPath = other.FullPath;
+			Size = other.Size;
+			ExistsOnHardDrive = other.ExistsOnHardDrive;
+			IsFile = other.IsFile;
+		}
+
+		HLAPI File &operator=(const File &other)
+		{
+			if (this != &other)
+			{
+				const char *tmp = other.FullPath.C_Str();
+
+				FileName = other.FileName;
+				Name = other.Name;
+				Extension = other.Extension;
+				FullPath = other.FullPath;
+				Size = other.Size;
+				ExistsOnHardDrive = other.ExistsOnHardDrive;
+				IsFile = other.IsFile;
+			}
+
+			return *this;
+		}
 	};
 
 	class FileSystemPath : public IsSharedReference
 	{
+	public:
+
+		static const FileSystemPath INVALID_PATH;
+
 	public:
 
 		HLAPI FileSystemPath() = default;
@@ -55,6 +90,7 @@ namespace highlo
 
 		HLAPI FileSystemPath &operator=(const FileSystemPath &other);
 		HLAPI FileSystemPath &operator=(const HLString &str);
+		HLAPI FileSystemPath &operator=(const char *str);
 		HLAPI FileSystemPath &operator=(const File &file);
 
 		HLAPI void Assign(const HLString &source);
@@ -70,6 +106,9 @@ namespace highlo
 
 		HLAPI std::vector<File> GetFileList() const;
 		HLAPI uint32 GetFileCount() const;
+
+		HLAPI std::vector<File> FilterFileListByName(const HLString &name) const;
+		HLAPI std::vector<File> FilterFileListByExtension(const HLString &extension) const;
 
 		HLAPI bool Exists() const;
 		HLAPI int64 Size() const;
@@ -115,8 +154,8 @@ namespace highlo
 		HLAPI FileSystemPath &operator+=(const char *path);
 		HLAPI friend FileSystemPath operator/(const FileSystemPath &lhs, const char *path);
 
-		HLAPI static HLString ExtractFileNameFromPath(const HLString &path, bool excludeExtension = false);
-		HLAPI static HLString ExtractFileExtensionFromPath(const HLString &path, bool excludeDot = false);
+		HLAPI static HLString ExtractFileNameFromPath(HLString &path, bool excludeExtension = false);
+		HLAPI static HLString ExtractFileExtensionFromPath(HLString &path, bool excludeDot = false);
 		HLAPI static HLString ExtractFolderNameFromPath(const HLString &path);
 
 		HLAPI friend std::ostream &operator<<(std::ostream &stream, const FileSystemPath &other);

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ImGuiWidgets.h"
@@ -237,7 +237,7 @@ namespace highlo::UI
 						}
 
 						{
-							const HLString &assetType = utils::AssetTypeToString(metadata.Type);
+							HLString &assetType = utils::AssetTypeToString(metadata.Type);
 							ImVec2 textSize = ImGui::CalcTextSize(*assetType);
 							ImVec2 rectSize = ImGui::GetItemRectSize();
 							float paddingX = ImGui::GetStyle().FramePadding.x;

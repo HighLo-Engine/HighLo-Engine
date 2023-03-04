@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -24,14 +24,20 @@ namespace highlo
 
 		HLAPI Optional(T *ptr)
 		{
-			m_HasValue = true;
-			m_Data = ptr;
+			if (ptr)
+			{
+				m_HasValue = true;
+				m_Data = ptr;
+			}
 		}
 
 		HLAPI Optional(T &ref)
 		{
-			m_HasValue = true;
-			m_Data = &ref;
+			if (&ref != nullptr)
+			{
+				m_HasValue = true;
+				m_Data = &ref;
+			}
 		}
 
 		HLAPI Optional<T> &operator=(const Optional<T> &other)
@@ -43,13 +49,19 @@ namespace highlo
 
 		HLAPI Optional<T> &operator=(T &value)
 		{
-			m_Data = &value;
-			m_HasValue = true;
+			if (&value != nullptr)
+			{
+				m_Data = &value;
+				m_HasValue = true;
+			}
+
 			return *this;
 		}
 
 		HLAPI ~Optional()
 		{
+			m_HasValue = false;
+			m_Data = nullptr; // This class should not be responsible for deleting the pointer
 		}
 
 		HLAPI const T *operator*() const

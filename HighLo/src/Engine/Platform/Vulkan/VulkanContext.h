@@ -1,18 +1,19 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
-#ifdef HIGHLO_API_VULKAN
-
 #include "Engine/Graphics/RenderingContext.h"
 #include "Engine/Renderer/Renderer.h"
 
-#include "Vulkan.h"
+#ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
+
 #include "VulkanDevice.h"
 #include "VulkanPhysicalDevice.h"
 #include "VulkanSwapChain.h"
@@ -23,6 +24,7 @@ namespace highlo
 	{
 	public:
 
+		VulkanContext();
 		VulkanContext(void *handle, WindowData &data);
 		virtual ~VulkanContext();
 
@@ -34,23 +36,24 @@ namespace highlo
 		virtual void *GetCurrentContext() override;
 
 		// Vulkan-specific
-		Ref<VulkanDevice> GetVulkanDevice() { return m_Device; }
-		Ref<VulkanPhysicalDevice> GetVulkanPhysicalDevice() { return m_PhysicalDevice; }
+		static VkInstance GetInstance() { return s_VulkanInstance; }
 
-		static VkInstance GetVulkanCurrentInstance() { return s_VulkanInstance; }
-		static Ref<VulkanContext> GetVulkanCurrentContext() { return Ref<VulkanContext>(Renderer::GetContext()); }
-		static Ref<VulkanDevice> GetVulkanCurrentDevice() { return GetVulkanCurrentContext()->GetVulkanDevice(); }
+		Ref<VulkanDevice> GetDevice() { return m_Device; }
+
+		static Ref<VulkanContext> Get() { return Ref<VulkanContext>(Renderer::GetContext()); }
+		static Ref<VulkanDevice> GetCurrentDevice() { return Get()->GetDevice(); }
 
 	private:
 
-		void *m_NativeWindowHandle = nullptr;
+		void *m_VulkanWindowHandle = nullptr;
+		WindowData m_WindowData;
 
+		Ref<VulkanPhysicalDevice> m_PhysicalDevice = nullptr;
+		Ref<VulkanDevice> m_Device = nullptr;
 		VulkanSwapChain m_SwapChain;
 
-		Ref<VulkanDevice> m_Device = nullptr;
-		Ref<VulkanPhysicalDevice> m_PhysicalDevice = nullptr;
-
 		inline static VkInstance s_VulkanInstance;
+
 		VkDebugUtilsMessengerEXT m_DebugUtilsMessenger = VK_NULL_HANDLE;
 		VkPipelineCache m_PipelineCache = nullptr;
 	};

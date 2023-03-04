@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "Engine/Core/Core.h"
 #include "Engine/Assets/Asset.h"
 
 namespace highlo
@@ -16,7 +17,10 @@ namespace highlo
 	public:
 
 		HLAPI ScriptAsset() = default;
-		HLAPI ScriptAsset(uint32 classID);
+		HLAPI ScriptAsset(uint32 classID)
+			: m_ClassID(classID)
+		{
+		}
 
 		HLAPI uint32 GetClassID() const { return m_ClassID; }
 

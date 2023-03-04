@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Engine/Core/Core.h"
+#include "ThreadLocker.h"
 
 namespace highlo
 {
@@ -51,6 +52,7 @@ namespace highlo
 
 		bool m_AutoDelete;
 		RunnableCallback m_CallbackFn;
+		Ref<ThreadLocker> m_Locker = nullptr;
 	};
 }
 

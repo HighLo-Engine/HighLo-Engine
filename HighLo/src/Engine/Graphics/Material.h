@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -21,7 +21,8 @@ namespace highlo
 		None		= HL_BIT(0),
 		DepthTest	= HL_BIT(1),
 		Blend		= HL_BIT(2),
-		TwoSided	= HL_BIT(3)
+		TwoSided	= HL_BIT(3),
+		DisableShadowCasting = HL_BIT(4),
 	};
 
 	class Material : public IsSharedReference

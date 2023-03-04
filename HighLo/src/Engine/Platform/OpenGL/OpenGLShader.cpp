@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLShader.h"
@@ -14,6 +14,7 @@
 #include <libshaderc_util/file_finder.h>
 
 #include "Engine/Graphics/Shaders/GLSLIncluder.h"
+#include "Engine/Utils/ShaderUtils.h"
 #include "OpenGLUtils.h"
 
 namespace highlo
@@ -156,17 +157,6 @@ namespace highlo
 			return {};
 		}
 
-		static ShaderLanguage ShaderLanguageFromExtension(const HLString &extension)
-		{
-			if (extension == "glsl")
-				return ShaderLanguage::GLSL;
-
-			if (extension == "hlsl")
-				return ShaderLanguage::HLSL;
-
-			return ShaderLanguage::None;
-		}
-
 		static HLString ShaderStageCachedFileExtension(const GLenum stage)
 		{
 			switch (stage)
@@ -293,6 +283,26 @@ namespace highlo
 	OpenGLShader::~OpenGLShader()
 	{
 		Release();
+
+		m_Loaded = false;
+		m_IsCompute = false;
+		m_Name.Clear();
+		m_AssetPath = "";
+		m_Language = ShaderLanguage::None;
+		m_ConstantBufferOffset = 0;
+
+		m_Macros.clear();
+		m_UniformLocations.clear();
+		m_AcknowledgedMacros.clear();
+		m_ShaderDescriptorSets.clear();
+		m_PushConstantRanges.clear();
+
+		m_ShaderSources.clear();
+		m_Buffers.clear();
+		m_Resources.clear();
+		m_ReloadedCallbacks.clear();
+
+		m_StagesMetaData.clear();
 	}
 
 	void OpenGLShader::Reload(bool forceCompile)
@@ -341,9 +351,147 @@ namespace highlo
 		m_Macros[name] = value;
 	}
 	
+	const ShaderResourceDeclaration *OpenGLShader::GetResource(const HLString &name) const
+	{
+		if (m_Resources.find(name) == m_Resources.end())
+		{
+			return nullptr;
+		}
+
+		return &m_Resources.at(name);
+	}
+
 	void OpenGLShader::ClearUniformBuffers()
 	{
 		s_UniformBuffers.clear();
+	}
+
+	int32 OpenGLShader::GetUniformLocation(const HLString &name)
+	{
+		if (m_UniformLocations.find(name) == m_UniformLocations.end())
+		{
+			// Cache miss
+			int32 location = glGetUniformLocation(m_RendererID, *name);
+			if (location != -1)
+			{
+				m_UniformLocations[name] = location;
+			}
+			else
+			{
+				HL_CORE_WARN("Could not find uniform location {0}", *name);
+				return -1;
+			}
+		}
+
+		return m_UniformLocations.at(name);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, int32 value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, uint32 value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform1ui(location, value);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, float value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform1f(location, value);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::vec2 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform2f(location, value.x, value.y);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::vec3 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform3f(location, value.x, value.y, value.z);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::vec4 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::mat2 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::mat3 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::mat4 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+	
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::ivec2 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform2i(location, value.x, value.y);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::ivec3 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform3i(location, value.x, value.y, value.z);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::ivec4 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform4i(location, value.x, value.y, value.z, value.w);
 	}
 	
 	void OpenGLShader::Load(const HLString &source, bool forceCompile)
@@ -669,6 +817,11 @@ namespace highlo
 	#endif // PRINT_DEBUG_OUTPUTS
 	}
 
+	void OpenGLShader::LoadCachedReflectionData()
+	{
+		// TODO
+	}
+
 	void OpenGLShader::ReflectAllShaderStages(const std::unordered_map<uint32, std::vector<uint32>> &shaderData)
 	{
 		m_Resources.clear();
@@ -720,9 +873,9 @@ namespace highlo
 	{
 		FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
-		FILE *f;
+		FILE *f = nullptr;
 		errno_t err = fopen_s(&f, **p, "rb");
-		if (err)
+		if (err || !f)
 			return;
 
 		fseek(f, 0, SEEK_END);
@@ -742,7 +895,7 @@ namespace highlo
 		std::vector<GLuint> shaderRendererIds;
 		shaderRendererIds.reserve(shaderData.size());
 		
-		GLuint program = glCreateProgram();
+		m_RendererID = glCreateProgram();
 
 		m_ConstantBufferOffset = 0;
 		for (auto &[stage, data] : shaderData)
@@ -770,8 +923,8 @@ namespace highlo
 					for (auto id : shaderRendererIds)
 						glDeleteShader(id);
 
-					glDeleteProgram(program);
-					program = 0;
+					glDeleteProgram(m_RendererID);
+					m_RendererID = 0;
 				}
 				else
 				{
@@ -784,31 +937,31 @@ namespace highlo
 				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
 			}
 
-			glAttachShader(program, shaderId);
+			glAttachShader(m_RendererID, shaderId);
 			shaderRendererIds.emplace_back(shaderId);
 		}
 
 		// Link shader program
 		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Linking Shader {0} [+]", **m_AssetPath);
 		
-		HL_ASSERT(program != 0);
-		glLinkProgram(program);
+		HL_ASSERT(m_RendererID != 0);
+		glLinkProgram(m_RendererID);
 
 		GLint isLinked = 0;
-		glGetProgramiv(program, GL_LINK_STATUS, (GLint*)&isLinked);
+		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (GLint*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxInfoLength = 0;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxInfoLength);
+			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxInfoLength);
 
 			if (maxInfoLength > 0)
 			{
 				std::vector<GLchar> infoLog(maxInfoLength);
-				glGetProgramInfoLog(program, maxInfoLength, &maxInfoLength, &infoLog[0]);
+				glGetProgramInfoLog(m_RendererID, maxInfoLength, &maxInfoLength, &infoLog[0]);
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
 
-				glDeleteProgram(program);
-				program = 0;
+				glDeleteProgram(m_RendererID);
+				m_RendererID = 0;
 				for (auto id : shaderRendererIds)
 					glDeleteShader(id);
 			}
@@ -825,9 +978,6 @@ namespace highlo
 
 		for (auto id : shaderRendererIds)
 			glDetachShader(m_RendererID, id);
-
-		if (program)
-			m_RendererID = program;
 	}
 	
 	void OpenGLShader::CompileOrGetOpenGLBinary(std::unordered_map<uint32, std::vector<uint32>> &shaderData, bool forceCompile)
@@ -853,10 +1003,13 @@ namespace highlo
 					// Compile success
 					FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
-					FILE *f;
+					FILE *f = nullptr;
 					errno_t fileError = fopen_s(&f, **p, "wb");
-					if (fileError)
+					if (fileError || !f)
+					{
 						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to cache shader binary! [-]");
+						return;
+					}
 
 					fwrite(shaderData[stage].data(), sizeof(uint32), shaderData[stage].size(), f);
 					fclose(f);
@@ -904,6 +1057,19 @@ namespace highlo
 		std::unordered_map<GLenum, HLString> glShaderSources = utils::ConvertShaderTypeToOpenGLStage(shaderSources);
 		shaderc::Compiler compiler;
 
+		// If any shader source is compute and the shader source count is 1, the whole shader is considered a compute shader
+		if (shaderSources.size() == 1)
+		{
+			for (auto &[type, shaderSource] : shaderSources)
+			{
+				if (type == ShaderType::Compute)
+				{
+					m_IsCompute = true;
+					break;
+				}
+			}
+		}
+
 		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Pre-processing GLSL: {0} [+]", **m_AssetPath);
 
 		shaderc_util::FileFinder fileFinder;
@@ -913,8 +1079,14 @@ namespace highlo
 		for (auto &[stage, shaderSource] : glShaderSources)
 		{
 			shaderc::CompileOptions options;
-			options.AddMacroDefinition("__GLSL__");
+
+			if (m_Language == ShaderLanguage::GLSL)
+				options.AddMacroDefinition("__GLSL__");
+			else if (m_Language == ShaderLanguage::HLSL)
+				options.AddMacroDefinition("__HLSL__");
+
 			options.AddMacroDefinition("__OPENGL__");
+			options.AddMacroDefinition("__GPU_IS_DEDICATED__"); // TODO: make configurable via Renderer::Options
 			options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
 
 			for (auto &[name, value] : m_Macros)
@@ -928,6 +1100,7 @@ namespace highlo
 			if (preProcessingResult.GetCompilationStatus() != shaderc_compilation_status_success)
 			{
 				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to pre-process Shader {0} with error {1} [-]", **m_AssetPath, preProcessingResult.GetErrorMessage());
+				HL_ASSERT(false);
 			}
 
 			m_StagesMetaData[stage].HashValue = shaderSource.Hash();

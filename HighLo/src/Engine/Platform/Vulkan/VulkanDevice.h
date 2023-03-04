@@ -1,17 +1,19 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
+#include "Engine/Graphics/Device.h"
+#include "Engine/Graphics/PhysicalDevice.h"
+
 #ifdef HIGHLO_API_VULKAN
 
-#include "Engine/Graphics/Device.h"
+#include <vulkan/vulkan.h>
 
-#include "Vulkan.h"
 #include "VulkanPhysicalDevice.h"
 
 namespace highlo
@@ -26,27 +28,29 @@ namespace highlo
 		virtual void Destroy() override;
 
 		// Vulkan-specific
-
 		void InitDevice(VkPhysicalDeviceFeatures enabledFeatures);
 
 		VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
 		VkQueue GetComputeQueue() { return m_ComputeQueue; }
 
-		VkCommandBuffer GetCommandBuffer(bool begin, bool compute = false);
+		// TODO: Maybe extract the begin parameter into a new function like CreateAndStartCommandBuffer? 
+		VkCommandBuffer CreateCommandBuffer(bool begin, bool compute = false);
+		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName = "") const;
+
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer);
 		void FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);
 
-		VkCommandBuffer CreateSecondaryCommandBuffer(const HLString &debugName) const;
-
-		const Ref<VulkanPhysicalDevice> &GetVulkanPhysicalDevice() const { return m_PhysicalDevice; }
-		VkDevice GetNativeDevice() const { return m_LogicalDevice; }
+		const Ref<VulkanPhysicalDevice> &GetPhysicalDevice() const { return m_PhysicalDevice; }
+		VkDevice GetNativeDevice() const { return m_Device; }
 
 	private:
 
-		Ref<VulkanPhysicalDevice> m_PhysicalDevice = nullptr;
-		VkDevice m_LogicalDevice = nullptr;
-		VkPhysicalDeviceFeatures m_EnabledFeatures;
-		VkCommandPool m_CommandPool = nullptr, m_ComputeCommandPool = nullptr;
+		VkDevice m_Device = nullptr;
+		Ref<VulkanPhysicalDevice> m_PhysicalDevice;
+		VkPhysicalDeviceFeatures m_EnabledFeatures; // TODO: Move this into physical device?
+
+		VkCommandPool m_CommandPool = nullptr;
+		VkCommandPool m_ComputeCommandPool = nullptr;
 
 		VkQueue m_GraphicsQueue = nullptr;
 		VkQueue m_ComputeQueue = nullptr;

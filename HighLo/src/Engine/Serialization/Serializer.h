@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -9,14 +9,19 @@
 
 #include "Serializable.h"
 
+#include "Engine/Core/FileSystemPath.h"
+
 namespace highlo
 {
-	class Serializer
+	class Serializer : public IsSharedReference
 	{
 	public:
 
-		HLAPI static void Serialize(const HLString &path, const Serializable &object);
-		HLAPI static void Deserialize(const HLString &path, Serializable &object);
+		HLAPI static void Serialize(const FileSystemPath &filePath);
+		HLAPI static void Deserialize(const FileSystemPath &filePath);
+
+		HLAPI static void RegisterSerializable(const Ref<Serializable> &obj);
+		HLAPI static void UnregisterSerializable(const Ref<Serializable> &obj);
 	};
 }
 

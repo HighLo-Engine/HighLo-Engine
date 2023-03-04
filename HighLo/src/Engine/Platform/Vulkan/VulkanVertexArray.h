@@ -1,17 +1,19 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
-#ifdef HIGHLO_API_VULKAN
-
 #include "Engine/Graphics/VertexArray.h"
 
-#include "Vulkan.h"
+#ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
+
+#include "VulkanShaderDefs.h"
 
 namespace highlo
 {
@@ -36,11 +38,27 @@ namespace highlo
 		virtual VertexArraySpecification &GetSpecification() override { return m_Specification; }
 		virtual const VertexArraySpecification &GetSpecification() const override { return m_Specification; }
 
+		// Vulkan-specific
+		VkPipeline GetVulkanPipeline() { return m_Pipeline; }
+		VkPipelineLayout GetVulkanPipelineLayout() { return m_PipelineLayout; }
+		VkDescriptorSet GetDescriptorSet(uint32 set = 0)
+		{
+			HL_ASSERT(m_Descriptors.Descriptors.size() > set);
+			return m_Descriptors.Descriptors[set];
+		}
+
+		const std::vector<VkDescriptorSet> &GetDescriptorSets() const { return m_Descriptors.Descriptors; }
+
 	private:
 
-		VertexArraySpecification m_Specification;
-		Ref<IndexBuffer> m_IndexBuffer = nullptr;
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
+		Ref<IndexBuffer> m_IndexBuffer = nullptr;
+		VertexArraySpecification m_Specification;
+
+		VkPipelineLayout m_PipelineLayout = nullptr;
+		VkPipeline m_Pipeline = nullptr;
+		VkPipelineCache m_PipelineCache = nullptr;
+		VulkanShaderMaterialDescriptorSet m_Descriptors;
 	};
 }
 

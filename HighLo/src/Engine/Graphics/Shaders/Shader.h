@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -54,6 +54,7 @@ namespace highlo
 
 		HLAPI virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const = 0;
 		HLAPI virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const = 0;
+		HLAPI virtual const ShaderResourceDeclaration *GetResource(const HLString &name) const = 0;
 
 		HLAPI virtual void SetMacro(const HLString &name, const HLString &value) = 0;
 

@@ -1,17 +1,19 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
+#include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Core/Allocator.h"
+
 #ifdef HIGHLO_API_VULKAN
 
-#include "Engine/Graphics/VertexBuffer.h"
-
-#include "Vulkan.h"
+#include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 namespace highlo
 {
@@ -31,10 +33,18 @@ namespace highlo
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }
 		virtual VertexBufferUsage GetUsage() override { return m_Usage; }
 
+		// Vulkan-specific
+		VkBuffer GetVulkanBuffer() const { return m_VulkanBuffer; }
+
 	private:
 
-		VertexBufferUsage m_Usage = VertexBufferUsage::None;
 		HLRendererID m_RendererID = 0;
+		uint32 m_Size = 0;
+		VertexBufferUsage m_Usage;
+		Allocator m_LocalData;
+
+		VkBuffer m_VulkanBuffer = nullptr;
+		VmaAllocation m_MemoryAllocation;
 	};
 }
 

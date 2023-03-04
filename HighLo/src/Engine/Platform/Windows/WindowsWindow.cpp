@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "WindowsWindow.h"
@@ -17,6 +17,7 @@
 #include "Engine/Core/Defines/KeyCodes.h"
 #include "Engine/Core/Defines/MouseButtonCodes.h"
 #include "Engine/Utils/InputUtils.h"
+#include "Engine/Core/Time.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static bool s_IsMenubarSet = false;
@@ -338,6 +339,11 @@ namespace highlo
 		}
 	}
 
+	void WindowsWindow::SetResizable(bool bEnabled)
+	{
+		// TODO
+	}
+
 	void WindowsWindow::ShowCursor()
 	{
 		m_Properties.CursorVisible = true;
@@ -616,6 +622,12 @@ namespace highlo
 		}
 
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
+
+	// TODO
+	float GetTime()
+	{
+		return 0.0f;
 	}
 }
 

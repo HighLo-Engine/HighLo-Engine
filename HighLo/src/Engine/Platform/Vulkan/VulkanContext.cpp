@@ -1,14 +1,14 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VulkanContext.h"
 
-#include "Engine/Window/Window.h"
+#define VULKAN_CONTEXT_LOG_PREFIX "Context>      "
+#define VK_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
 
 #ifdef HIGHLO_API_VULKAN
 
-#define VULKAN_CONTEXT_LOG_PREFIX "Context>      "
-#define VULKAN_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
+#include "VulkanUtils.h"
 
 #ifdef HIGHLO_API_GLFW
 #include <GLFW/glfw3.h>
@@ -16,11 +16,11 @@
 
 namespace highlo
 {
-#ifdef HL_DEBUG
+#if HL_DEBUG
     static bool s_Validate = true;
 #else
     static bool s_Validate = false;
-#endif
+#endif // HL_DEBUG
 
     namespace utils
     {
@@ -70,7 +70,7 @@ namespace highlo
                 for (uint32 i = 0; i < pCallbackData->objectCount; ++i)
                 {
                     const auto &object = pCallbackData->pObjects[i];
-                    objects.Append(fmt::format("\t\t- Object[{0}] name: {1}, type: {2}, handle: {3:#x}\n", i, object.pObjectName ? object.pObjectName : "NULL", VkObjectTypeToString(object.objectType), object.objectHandle).c_str());
+                    objects.Append(fmt::format("\t\t- Object[{0}] name: {1}, type: {2}, handle: {3:#x}\n", i, object.pObjectName ? object.pObjectName : "NULL", utils::VulkanObjectTypeToString(object.objectType), object.objectHandle).c_str());
                 }
             }
 
@@ -81,14 +81,18 @@ namespace highlo
         }
     }
 
+    VulkanContext::VulkanContext()
+    {
+    }
+    
     VulkanContext::VulkanContext(void *handle, WindowData &data)
-        : m_NativeWindowHandle(handle)
+        : m_VulkanWindowHandle(handle), m_WindowData(data)
     {
     }
 
     VulkanContext::~VulkanContext()
     {
-        VkDevice device = VulkanContext::GetVulkanCurrentDevice()->GetNativeDevice();
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
         vkDestroyPipelineCache(device, m_PipelineCache, nullptr);
 
         m_Device->Destroy();
@@ -100,10 +104,10 @@ namespace highlo
     void VulkanContext::Init()
     {
         HL_CORE_INFO(VULKAN_CONTEXT_LOG_PREFIX "[+] VulkanContext::Init [+]");
-
-#ifdef HIGHLO_API_GLFW
+        
+    #ifdef HIGHLO_API_GLFW
         HL_ASSERT(glfwVulkanSupported(), "GLFW must support Vulkan!");
-#endif // HIGHLO_API_GLFW
+    #endif // HIGHLO_API_GLFW
 
         // Check driver api version support
         uint32 instanceVersion;
@@ -120,12 +124,12 @@ namespace highlo
         appInfo.pEngineName = "HighLo";
         appInfo.apiVersion = VK_API_VERSION_1_3;
 
-        std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME, VULKAN_KHR_WIN32_SURFACE_EXTENSION_NAME };
-#ifdef HL_DEBUG
+        std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+    #ifdef HL_DEBUG
         instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
         instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-#endif // HL_DEBUG
+    #endif // HL_DEBUG
 
         VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT };
         VkValidationFeaturesEXT features = {};
@@ -176,7 +180,7 @@ namespace highlo
 
         // Instance and surface creation
         VK_CHECK_RESULT(vkCreateInstance(&instanceCreation, nullptr, &s_VulkanInstance));
-        VulkanLoadDebugUtilsExtensions(s_VulkanInstance);
+        utils::LoadDebugExtensions(s_VulkanInstance);
 
         if (s_Validate)
         {
@@ -185,14 +189,14 @@ namespace highlo
 
             VkDebugUtilsMessengerCreateInfoEXT debugUtilsCreateInfo = {};
             debugUtilsCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-            debugUtilsCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-                | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+            debugUtilsCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT 
+                | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT 
                 | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
             debugUtilsCreateInfo.pfnUserCallback = utils::VulkanDebugUtilsMessengerCallback;
-            debugUtilsCreateInfo.messageSeverity =
+            debugUtilsCreateInfo.messageSeverity = 
                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT /*|
-                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT    |
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT /*| 
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT    | 
                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT*/;
 
             VK_CHECK_RESULT(vkCreateDebugUtilsMessengerEXT(s_VulkanInstance, &debugUtilsCreateInfo, nullptr, &m_DebugUtilsMessenger));
@@ -208,7 +212,7 @@ namespace highlo
         enabledFeatures.fillModeNonSolid = true;
         enabledFeatures.independentBlend = true;
         enabledFeatures.pipelineStatisticsQuery = true;
-
+        
         // TODO: If we move the enabled Features into the physical device,
         // we can delete this InitDevice function entirely and move its content into the constructor
         Ref<Device> device = Device::Create(physicalDevice);
@@ -225,18 +229,22 @@ namespace highlo
     // All of this below is handled by the SwapChain implementation
     void VulkanContext::SwapBuffers()
     {
+        // TODO
     }
     
     void VulkanContext::MakeCurrent()
     {
+        // TODO
     }
     
     void VulkanContext::SetSwapInterval(bool bEnabled)
     {
+        // TODO
     }
     
     void *VulkanContext::GetCurrentContext()
     {
+        // TODO
         return nullptr;
     }
 }

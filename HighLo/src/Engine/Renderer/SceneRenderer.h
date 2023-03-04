@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -78,9 +78,10 @@ namespace highlo
 		AssetHandle MeshHandle;
 		AssetHandle MaterialHandle;
 		uint32 SubmeshIndex;
+		bool IsSelected;
 
-		HLAPI MeshKey(AssetHandle meshHandle, AssetHandle materialHandle, uint32 index)
-			: MeshHandle(meshHandle), MaterialHandle(materialHandle), SubmeshIndex(index)
+		HLAPI MeshKey(AssetHandle meshHandle, AssetHandle materialHandle, uint32 index, bool isSelected)
+			: MeshHandle(meshHandle), MaterialHandle(materialHandle), SubmeshIndex(index), IsSelected(isSelected)
 		{
 		}
 
@@ -88,17 +89,24 @@ namespace highlo
 		{
 			if (MeshHandle < other.MeshHandle)
 				return true;
+			
+			if (MeshHandle > other.MeshHandle)
+				return false;
 
-			if ((MeshHandle == other.MeshHandle) && (SubmeshIndex < other.SubmeshIndex))
+			if (SubmeshIndex < other.SubmeshIndex)
 				return true;
+		
+			if (SubmeshIndex > other.SubmeshIndex)
+				return false;
 
-			return (MeshHandle == other.MeshHandle) && (SubmeshIndex == other.SubmeshIndex) && (MaterialHandle < other.MaterialHandle);
+			if (MaterialHandle < other.MaterialHandle)
+				return true;
+			
+			if (MaterialHandle > other.MaterialHandle)
+				return false;
+
+			return IsSelected < other.IsSelected;
 		}
-	};
-
-	struct TransformVertexData
-	{
-		glm::vec4 Rows[3];
 	};
 
 	struct TransformMapData
@@ -107,6 +115,27 @@ namespace highlo
 		uint32 TransformOffset = 0;
 	};
 
+	/// <summary>
+	/// Currently, the SceneRenderer is designed to be a Forward/Forward+ Renderer.
+	/// This means, that all meshes and light objects are deeply connected with each other, 
+	/// in pseudo code you will find something like:
+	/// for mesh in meshes:
+	///     for light in lights:
+	///         render(mesh, light)
+	/// 
+	/// (actually in our real implementation, all lights are uploaded via a uniform buffer directly to the gpu, 
+	///  but you will find the loop that iterates over the lights in the shader assets/shaders/Include/GLSL/Lighting.glslh)
+	/// 
+	/// We will provide another class in the future, that does the same job (rendering a scene) but in a more efficient way (deferred rendering).
+	/// But this will also mean, that we will need to write new shaders in the future as well, while keeping all "old" shaders to still support forward rendering.
+	/// 
+	/// TODO: The addition of other renderers also means, that we should provide a general SceneRenderer interface, 
+	///       that lets the user add models to the renderer and other standard methods, like Flush and Resize as well.
+	///       In that case renderers would be exchangable as well, and a combination of multiple renderers could be used, 
+	///       to gain back transparency in the case of the deferred renderer for example, like GTA V does it.
+	/// 
+	/// @See: For detailed information to deferred and forward rendering see https://www.youtube.com/watch?v=n5OiqJP2f7w
+	/// </summary>
 	class SceneRenderer : public IsSharedReference
 	{
 	public:
@@ -124,11 +153,11 @@ namespace highlo
 		HLAPI void BeginScene(const Camera &camera);
 		HLAPI void EndScene();
 
-		HLAPI void SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
-		HLAPI void SubmitDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
 
-		HLAPI void SubmitSelectedStaticModel(const Ref<StaticModel> &model, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
-		HLAPI void SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, Ref<MaterialTable> materials, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedStaticModel(const Ref<StaticModel> &model, const Ref<MaterialTable> &materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
+		HLAPI void SubmitSelectedDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials = nullptr, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<Material> &overrideMaterial = nullptr);
 
 		HLAPI void SubmitPhysicsDebugStaticModel(const Ref<StaticModel> &model, const glm::mat4 &transform = glm::mat4(1.0f));
 		HLAPI void SubmitPhysicsDebugDynamicModel(const Ref<DynamicModel> &model, uint32 submeshIndex, const glm::mat4 &transform = glm::mat4(1.0f));
@@ -209,17 +238,18 @@ namespace highlo
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicDrawList;
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicSelectedMeshDrawList;
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicShadowPassDrawList;
+		std::map<MeshKey, DynamicDrawCommand> m_DynamicTransparentDrawList;
 
 		std::map<MeshKey, StaticDrawCommand> m_StaticDrawList;
 		std::map<MeshKey, StaticDrawCommand> m_StaticSelectedMeshDrawList;
 		std::map<MeshKey, StaticDrawCommand> m_StaticShadowPassDrawList;
+		std::map<MeshKey, StaticDrawCommand> m_StaticTransparentDrawList;
 
 		// Debug draw lists
 		std::map<MeshKey, StaticDrawCommand> m_StaticColliderDrawList;
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicColliderDrawList;
 		std::map<MeshKey, TransformMapData> m_MeshTransformMap;
 
-		Ref<VertexBuffer> m_SubmeshTransformBuffer;
 		TransformVertexData *m_TransformVertexData = nullptr;
 
 		// Bloom

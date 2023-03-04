@@ -13,7 +13,12 @@ builds/
 HighLo/vendor/VulkanSDK/
 HighLoEdit/Resources/Scripts/Intermediates
 HighLoEdit/Resources/Scripts/**.pdb
+!HighLoEdit/Resources/Scripts/HighLo-CSharp.dll
+HighLoEdit/Resources/Scripts/HighLo-C#.dll
 !vendor/bin/
+Sandbox/assets
+HighLoEdit/assets
+HighLoEdit/editorconfig.ini
 
 # Visual Studio and IntelliJ files
 **.sln

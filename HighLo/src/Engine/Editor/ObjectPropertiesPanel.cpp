@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ObjectPropertiesPanel.h"
@@ -177,7 +177,7 @@ namespace highlo
 		const char *addText = " ADD NEW COMPONENT            ";
 		if (translation->GetLanguageCode() == "de-DE")
 		{
-			addText = u8" Komponent hinzuf�gen            ";
+			addText = u8" Komponent hinzufügen            ";
 		}
 
 		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
@@ -299,6 +299,15 @@ namespace highlo
 					if (ImGui::MenuItem(translation->GetText("object-properties-sky-light-component")))
 					{
 						entity.AddComponent<SkyLightComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				if (!entity.HasComponent<ScriptComponent>())
+				{
+					if (ImGui::MenuItem(translation->GetText("object-properties-script-c#-component")))
+					{
+						entity.AddComponent<ScriptComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -641,6 +650,21 @@ namespace highlo
 			}
 
 			UI::EndPropertyGrid();
+		}, m_SettingsIcon);
+
+		DrawComponent<ScriptComponent>(translation->GetText("object-properties-script-c#-component"), entity, [&](ScriptComponent &component)
+		{
+			std::vector<HLString> options = {
+				"Test",
+				"Test2"
+			};
+
+			int32 selection = 0;
+			if (UI::DrawDropdown("Script", options, &selection))
+			{
+
+			}
+
 		}, m_SettingsIcon);
 	}
 }

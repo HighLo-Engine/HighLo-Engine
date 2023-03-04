@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VulkanPhysicalDevice.h"
@@ -7,6 +7,7 @@
 
 #ifdef HIGHLO_API_VULKAN
 
+#include "VulkanUtils.h"
 #include "VulkanContext.h"
 
 namespace highlo
@@ -36,7 +37,7 @@ namespace highlo
 
     VulkanPhysicalDevice::VulkanPhysicalDevice()
     {
-        auto instance = VulkanContext::GetVulkanCurrentInstance();
+        auto instance = VulkanContext::GetInstance();
 
         // Get the GPU count
         uint32 gpuCount = 0;
@@ -56,7 +57,7 @@ namespace highlo
         {
             HL_CORE_WARN(VULKAN_PHYSICAL_DEVICE_LOG_PREFIX "[-] Could not find a discrete GPU! Trying to select an integrated GPU. [-]");
             selectedPhysicalDevice = utils::SelectGPU(physicalDevices, VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU);
-
+            
             if (!selectedPhysicalDevice)
             {
                 HL_CORE_WARN(VULKAN_PHYSICAL_DEVICE_LOG_PREFIX "[-] Could not find an integrated GPU. Trying to select a CPU. [-]");
@@ -82,7 +83,7 @@ namespace highlo
         }
 
         // we have a huge problem if selectedPhysicalDevice is still nullptr, as of there are no registered gpus on the system then...
-        HL_ASSERT(selectedPhysicalDevice, "You should never get here, but if you do you probably don't have any hardware you can render on!");
+        HL_ASSERT(selectedPhysicalDevice, "You should never come here, but if you do you probably don't have any hardware you can render on!");
 
         // Get the properties of the selected gpu
         m_PhysicalDevice = selectedPhysicalDevice;
@@ -182,6 +183,7 @@ namespace highlo
         return UINT32_MAX;
     }
 
+    // Since all depth formats may be optional, we need to find a suitable depth format to use
     VkFormat VulkanPhysicalDevice::FindDepthFormat() const
     {
         // Start with the highest precision packed format

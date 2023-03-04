@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11IndexBuffer.h"
@@ -55,7 +55,7 @@ namespace highlo
 
 	DX11IndexBuffer::DX11IndexBuffer(uint32 size)
 	{
-// TODO: dynamic index buffer
+		// TODO: dynamic index buffer
 	}
 
 	DX11IndexBuffer::~DX11IndexBuffer()
@@ -79,3 +79,4 @@ namespace highlo
 }
 
 #endif // HIGHLO_API_DX11
+

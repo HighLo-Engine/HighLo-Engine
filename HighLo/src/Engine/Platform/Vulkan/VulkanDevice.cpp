@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VulkanDevice.h"
@@ -9,29 +9,27 @@
 
 namespace highlo
 {
-	VulkanDevice::VulkanDevice(const Ref<PhysicalDevice> &physicalDevice)
-		: m_PhysicalDevice(physicalDevice)
-	{
-	}
+    VulkanDevice::VulkanDevice(const Ref<PhysicalDevice> &physicalDevice)
+        : m_PhysicalDevice(physicalDevice.As<VulkanPhysicalDevice>())
+    {
+    }
 
-	VulkanDevice::~VulkanDevice()
-	{
-		Destroy();
-	}
+    VulkanDevice::~VulkanDevice()
+    {
+    }
+    
+    void VulkanDevice::Destroy()
+    {
+        vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+        vkDestroyCommandPool(m_Device, m_ComputeCommandPool, nullptr);
 
-	void VulkanDevice::Destroy()
-	{
-		vkDestroyCommandPool(m_LogicalDevice, m_CommandPool, nullptr);
-		vkDestroyCommandPool(m_LogicalDevice, m_ComputeCommandPool, nullptr);
+        vkDeviceWaitIdle(m_Device);
+        vkDestroyDevice(m_Device, nullptr);
+    }
 
-		vkDeviceWaitIdle(m_LogicalDevice);
-		vkDestroyDevice(m_LogicalDevice, nullptr);
-		m_LogicalDevice = nullptr;
-	}
-
-	void VulkanDevice::InitDevice(VkPhysicalDeviceFeatures enabledFeatures)
-	{
-		        m_EnabledFeatures = enabledFeatures;
+    void VulkanDevice::InitDevice(VkPhysicalDeviceFeatures enabledFeatures)
+    {
+        m_EnabledFeatures = enabledFeatures;
 
         const bool enableAftermath = true;
 
@@ -85,96 +83,95 @@ namespace highlo
             deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
         }
 
-        VkResult result = vkCreateDevice(m_PhysicalDevice->GetNativeDevice(), &deviceCreateInfo, nullptr, &m_LogicalDevice);
+        VkResult result = vkCreateDevice(m_PhysicalDevice->GetNativeDevice(), &deviceCreateInfo, nullptr, &m_Device);
         HL_ASSERT(result == VK_SUCCESS);
 
         VkCommandPoolCreateInfo cmdPoolInfo = {};
         cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         cmdPoolInfo.queueFamilyIndex = m_PhysicalDevice->m_QueueFamilyIndices.Graphics;
         cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        VK_CHECK_RESULT(vkCreateCommandPool(m_LogicalDevice, &cmdPoolInfo, nullptr, &m_CommandPool));
+        VK_CHECK_RESULT(vkCreateCommandPool(m_Device, &cmdPoolInfo, nullptr, &m_CommandPool));
 
         cmdPoolInfo.queueFamilyIndex = m_PhysicalDevice->m_QueueFamilyIndices.Compute;
-        VK_CHECK_RESULT(vkCreateCommandPool(m_LogicalDevice, &cmdPoolInfo, nullptr, &m_ComputeCommandPool));
+        VK_CHECK_RESULT(vkCreateCommandPool(m_Device, &cmdPoolInfo, nullptr, &m_ComputeCommandPool));
 
         // Get a graphics queue from the device
-        vkGetDeviceQueue(m_LogicalDevice, m_PhysicalDevice->m_QueueFamilyIndices.Graphics, 0, &m_GraphicsQueue);
-        vkGetDeviceQueue(m_LogicalDevice, m_PhysicalDevice->m_QueueFamilyIndices.Compute, 0, &m_ComputeQueue);
-	}
+        vkGetDeviceQueue(m_Device, m_PhysicalDevice->m_QueueFamilyIndices.Graphics, 0, &m_GraphicsQueue);
+        vkGetDeviceQueue(m_Device, m_PhysicalDevice->m_QueueFamilyIndices.Compute, 0, &m_ComputeQueue);
+    }
+    
+    VkCommandBuffer VulkanDevice::CreateCommandBuffer(bool begin, bool compute)
+    {
+        VkCommandBuffer result;
 
-	// Vulkan specific
+        VkCommandBufferAllocateInfo cmdBufAllocateInfo = {};
+        cmdBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        cmdBufAllocateInfo.commandPool = compute ? m_ComputeCommandPool : m_CommandPool;
+        cmdBufAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        cmdBufAllocateInfo.commandBufferCount = 1;
 
-	VkCommandBuffer VulkanDevice::GetCommandBuffer(bool begin, bool compute)
-	{
-		VkCommandBuffer result;
+        VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &cmdBufAllocateInfo, &result));
 
-		VkCommandBufferAllocateInfo allocInfo = {};
-		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocInfo.commandPool = compute ? m_ComputeCommandPool : m_CommandPool;
-		allocInfo.commandBufferCount = 1;
-		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        // If requested, also start the new command buffer
+        if (begin)
+        {
+            VkCommandBufferBeginInfo cmdBufferBeginInfo{};
+            cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            VK_CHECK_RESULT(vkBeginCommandBuffer(result, &cmdBufferBeginInfo));
+        }
 
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(m_LogicalDevice, &allocInfo, &result));
+        return result;
+    }
+    
+    VkCommandBuffer VulkanDevice::CreateSecondaryCommandBuffer(const HLString &debugName) const
+    {
+        VkCommandBuffer result;
 
-		if (begin)
-		{
-			VkCommandBufferBeginInfo beginInfo = {};
-			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			VK_CHECK_RESULT(vkBeginCommandBuffer(result, &beginInfo));
-		}
+        VkCommandBufferAllocateInfo cmdBufAllocateInfo = {};
+        cmdBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        cmdBufAllocateInfo.commandPool = m_CommandPool;
+        cmdBufAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+        cmdBufAllocateInfo.commandBufferCount = 1;
 
-		return result;
-	}
+        VK_CHECK_RESULT(vkAllocateCommandBuffers(m_Device, &cmdBufAllocateInfo, &result));
+        utils::SetDebugUtilsObjectName(m_Device, VK_OBJECT_TYPE_COMMAND_BUFFER, debugName, result);
 
-	void VulkanDevice::FlushCommandBuffer(VkCommandBuffer commandBuffer)
-	{
-		FlushCommandBuffer(commandBuffer, m_GraphicsQueue);
-	}
+        return result;
+    }
+    
+    void VulkanDevice::FlushCommandBuffer(VkCommandBuffer commandBuffer)
+    {
+        FlushCommandBuffer(commandBuffer, m_GraphicsQueue);
+    }
+    
+    void VulkanDevice::FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue)
+    {
+        const uint64 DEFAULT_FENCE_TIMEOUT = 100000000000;
 
-	void VulkanDevice::FlushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue)
-	{
-		const uint64 DEFAULT_FENCE_TIMEOUT = 100000000000;
-		
-		HL_ASSERT(commandBuffer != VK_NULL_HANDLE);
-		VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
+        HL_ASSERT(commandBuffer != VK_NULL_HANDLE);
 
-		// First create the fence
-		VkFenceCreateInfo fenceCreateInfo = {};
-		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		fenceCreateInfo.flags = 0;
+        VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
 
-		VkFence fence;
-		VK_CHECK_RESULT(vkCreateFence(m_LogicalDevice, &fenceCreateInfo, nullptr, &fence));
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
 
-		// Then the submit information about the command buffer
-		VkSubmitInfo submitInfo = {};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &commandBuffer;
+        // Create fence to ensure that the command buffer has finished executing
+        VkFenceCreateInfo fenceCreateInfo = {};
+        fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceCreateInfo.flags = 0;
+        VkFence fence;
+        VK_CHECK_RESULT(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &fence));
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, fence));
-		VK_CHECK_RESULT(vkWaitForFences(m_LogicalDevice, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
+        // Submit to the queue
+        VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, fence));
+        // Wait for the fence to signal that command buffer has finished executing
+        VK_CHECK_RESULT(vkWaitForFences(m_Device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
 
-		// don't forget to cleanup the fence and the command buffer
-		vkDestroyFence(m_LogicalDevice, fence, nullptr);
-		vkFreeCommandBuffers(m_LogicalDevice, m_CommandPool, 1, &commandBuffer);
-	}
-
-	VkCommandBuffer VulkanDevice::CreateSecondaryCommandBuffer(const HLString &debugName) const
-	{
-		VkCommandBuffer result;
-
-		VkCommandBufferAllocateInfo allocInfo = {};
-		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocInfo.commandPool = m_CommandPool;
-		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
-		allocInfo.commandBufferCount = 1;
-
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(m_LogicalDevice, &allocInfo, &result));
-		utils::SetDebugUtilsObjectName(m_LogicalDevice, VK_OBJECT_TYPE_COMMAND_BUFFER, debugName, result);
-
-		return result;
-	}
+        vkDestroyFence(m_Device, fence, nullptr);
+        vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &commandBuffer);
+    }
 }
 
 #endif // HIGHLO_API_VULKAN

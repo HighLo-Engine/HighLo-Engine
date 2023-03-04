@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLVertexArray.h"
@@ -48,6 +48,9 @@ namespace highlo
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		m_VertexBuffers.clear();
+		m_VertexBuffers.shrink_to_fit();
+		m_IndexBuffer = nullptr;
 	}
 
 	void OpenGLVertexArray::Bind() const

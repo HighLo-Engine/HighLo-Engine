@@ -1,17 +1,18 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2022-04-22) initial release
 //
 
 #pragma once
 
-#ifdef HIGHLO_API_VULKAN
-
 #include "Engine/Graphics/Texture2D.h"
 
-#include "Vulkan.h"
+#ifdef HIGHLO_API_VULKAN
+
+#include <vulkan/vulkan.h>
+#include <vk_mem_alloc.h>
 
 namespace highlo
 {
@@ -27,19 +28,19 @@ namespace highlo
 	{
 	public:
 
-		VulkanTexture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
+		VulkanTexture2D(const FileSystemPath &filePath, bool flipOnLoad = true);
 		VulkanTexture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		VulkanTexture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		VulkanTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
 		VulkanTexture2D(TextureFormat format, uint32 width, uint32 height, const void *data, TextureProperties props = TextureProperties());
 		VulkanTexture2D(TextureFormat format, uint32 width, uint32 height);
 		VulkanTexture2D(const TextureSpecification &spec);
-		~VulkanTexture2D();
+		virtual ~VulkanTexture2D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; };
 		virtual uint32 GetHeight() const override { return m_Specification.Height; };
 		virtual TextureFormat GetFormat() override { return m_Specification.Format; }
-		virtual Allocator GetData() override { return m_LocalData; }
+		virtual Allocator GetData() override;
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
@@ -72,6 +73,8 @@ namespace highlo
 		virtual void Bind(uint32 slot) const override {}
 		virtual void Unbind(uint32 slot) const override {}
 
+		virtual void SetData(void *data, uint32 data_size) override;
+
 		// Vulkan-specific
 		const VkDescriptorImageInfo &GetDescriptorInfo() const { return m_DescriptorImageInfo; }
 
@@ -83,7 +86,13 @@ namespace highlo
 
 	private:
 
-		Allocator m_LocalData;
+		void InvalidateTextureInfo(TextureFormat format, TextureUsage usage, uint32 width, uint32 height, uint32 mips);
+		void ReleaseTextureInfo();
+		void UpdateDescriptor();
+
+	private:
+
+		Allocator m_Buffer;
 		FileSystemPath m_FilePath;
 		HLRendererID m_SamplerRendererID = 0;
 		TextureSpecification m_Specification;

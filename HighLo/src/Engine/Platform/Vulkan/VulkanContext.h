@@ -24,11 +24,11 @@ namespace highlo
 		virtual ~VulkanContext();
 
 		virtual void Init() override;
-		virtual void SwapBuffers() override;
-		virtual void MakeCurrent() override;
-		virtual void SetSwapInterval(bool bEnabled) override;
+		virtual void SwapBuffers() override {}
+		virtual void MakeCurrent() override {}
+		virtual void SetSwapInterval(bool bEnabled) override {}
 
-		virtual void *GetCurrentContext() override;
+		virtual void *GetCurrentContext() override { return nullptr; }
 
 		// Vulkan-specific
 		Ref<VulkanDevice> GetDevice() { return m_Device; }
@@ -51,7 +51,7 @@ namespace highlo
 	private:
 
 		// Devices
-		Ref<VulkanPhysicalDevice> m_PhysicalDevice = nullptr;
+		Ref<PhysicalDevice> m_PhysicalDevice = nullptr;
 		Ref<VulkanDevice> m_Device = nullptr;
 
 		// Vulkan instance

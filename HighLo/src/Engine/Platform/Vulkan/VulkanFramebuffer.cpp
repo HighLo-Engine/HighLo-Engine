@@ -39,7 +39,8 @@ namespace highlo
 	
 	int32 VulkanFramebuffer::ReadPixel(uint32 attachmentIndex, int32 x, int32 y)
 	{
-		return int32();
+		// TODO
+		return 0;
 	}
 }
 

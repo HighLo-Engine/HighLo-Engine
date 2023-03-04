@@ -42,6 +42,7 @@ namespace highlo
 	public:
 
 		VulkanDevice(const Ref<PhysicalDevice> &physicalDevice);
+		VulkanDevice(const Ref<PhysicalDevice> &physicalDevice, VkPhysicalDeviceFeatures enabledFeatures);
 		virtual ~VulkanDevice();
 
 		virtual void Destroy() override;
@@ -61,6 +62,7 @@ namespace highlo
 	
 	private:
 		
+		void Init();
 		Ref<VulkanCommandPool> GetThreadLocalCommandPool();
 		Ref<VulkanCommandPool> GetOrCreateThreadLocalCommandPool();
 

@@ -6,24 +6,38 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Graphics/RendererCapabilities.h"
+
+#include "VulkanContext.h"
 
 namespace highlo
 {
+	namespace utils
+	{
+		static const char *VulkanVendorIDToString(uint32 vendorID)
+		{
+			switch (vendorID)
+			{
+				case 0x10DE: return "NVIDIA";
+				case 0x1002: return "AMD";
+				case 0x8086: return "INTEL";
+				case 0x13B5: return "ARM";
+			}
+
+			return "Unknown";
+		}
+	}
+
 	struct VulkanRendererData
 	{
-		RendererCapabilities RenderCaps;
-
-		Ref<Texture2D> BRDFLut = nullptr;
 		Ref<VertexBuffer> FullscreenQuadVertexBuffer = nullptr;
 		Ref<IndexBuffer> FullscreenQuadIndexBuffer = nullptr;
+		//VulkanShader::ShaderMaterialDescriptorSet FullscreenQuadDescriptorSet;
 		
-		//VulkanShader::ShaderMaterialDescriptorSet QuadDescriptorSet;
 		//std::unordered_map<SceneRenderer*, std::vector<VulkanShader::ShaderMaterialDescriptorSet>> RendererDescriptorSet;
 		
 		VkDescriptorSet ActiveRendererDescriptorSet = nullptr;
 		std::vector<VkDescriptorPool> DescriptorPools;
-		std::vector<uint32_t> DescriptorPoolAllocationCount;
+		std::vector<uint32> DescriptorPoolAllocationCount;
 
 		// UniformBufferSet -> Shader Hash -> Frame -> WriteDescriptor
 		std::unordered_map<UniformBufferSet*, std::unordered_map<uint64, std::vector<std::vector<VkWriteDescriptorSet>>>> UniformBufferWriteDescriptorCache;
@@ -55,6 +69,50 @@ namespace highlo
 	{
 		s_VKRendererData = new VulkanRendererData();
 
+		const auto &config = Renderer::GetConfig();
+		s_VKRendererData->DescriptorPools.resize(config.FramesInFlight);
+		s_VKRendererData->DescriptorPoolAllocationCount.resize(config.FramesInFlight);
+
+		auto &caps = Renderer::GetCapabilities();
+		auto &properties = VulkanContext::GetCurrentDevice()->GetPhysicalDevice()->GetProperties();
+		caps.Vendor = utils::VulkanVendorIDToString(properties.vendorID);
+		caps.Device = properties.deviceName;
+		caps.Version = std::to_string(properties.driverVersion);
+
+		utils::DumpGPUInfos();
+
+		// TODO: when moving to mt, surround with Renderer::Submit()
+		// Create Descriptor Pool
+		VkDescriptorPoolSize pool_sizes[] =
+		{
+			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+		};
+
+		VkDescriptorPoolCreateInfo pool_info = {};
+		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+		pool_info.maxSets = 100000;
+		pool_info.poolSizeCount = (uint32)IM_ARRAYSIZE(pool_sizes);
+		pool_info.pPoolSizes = pool_sizes;
+
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+		uint32 framesInFlight = config.FramesInFlight;
+		for (uint32 i = 0; i < framesInFlight; i++)
+		{
+			VK_CHECK_RESULT(vkCreateDescriptorPool(device, &pool_info, nullptr, &s_VKRendererData->DescriptorPools[i]));
+			s_VKRendererData->DescriptorPoolAllocationCount[i] = 0;
+		}
+
 		float x = -1;
 		float y = -1;
 		float width = 2, height = 2;
@@ -85,6 +143,9 @@ namespace highlo
 
 	void VulkanRenderingAPI::Shutdown()
 	{
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+		vkDeviceWaitIdle(device);
+
 		delete s_VKRendererData;
 		s_VKRendererData = nullptr;
 	}
@@ -186,7 +247,54 @@ namespace highlo
 		if (!environment)
 			environment = Renderer::GetEmptyEnvironment();
 
+		/*
+		Renderer::Submit([sceneRenderer, environment, shadow]() mutable
+		{
+			const auto shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
+			Ref<VulkanShader> pbrShader = shader.As<VulkanShader>();
+			const uint32 bufferIndex = Renderer::RT_GetCurrentFrameIndex();
 
+			if (s_VKRendererData->RendererDescriptorSet.find(sceneRenderer.Get()) == s_VKRendererData->RendererDescriptorSet.end())
+			{
+				const uint32 framesInFlight = Renderer::GetConfig().FramesInFlight;
+				s_VKRendererData->RendererDescriptorSet[sceneRenderer.Get()].resize(framesInFlight);
+				for (uint32_t i = 0; i < framesInFlight; i++)
+					s_VKRendererData->RendererDescriptorSet.at(sceneRenderer.Get())[i] = pbrShader->CreateDescriptorSets(1);
+
+			}
+
+			VkDescriptorSet descriptorSet = s_VKRendererData->RendererDescriptorSet.at(sceneRenderer.Get())[bufferIndex].DescriptorSets[0];
+			s_VKRendererData->ActiveRendererDescriptorSet = descriptorSet;
+
+			std::array<VkWriteDescriptorSet, 4> writeDescriptors;
+
+			Ref<VulkanTexture3D> radianceMap = environment->GetRadianceMap().As<VulkanTexture3D>();
+			Ref<VulkanTexture3D> irradianceMap = environment->GetIrradianceMap().As<VulkanTexture3D>();
+
+			const auto &radianceMapImageInfo = radianceMap->GetVulkanDescriptorInfo();
+			writeDescriptors[0] = *pbrShader->GetDescriptorSet("u_EnvRadianceTex", 1);
+			writeDescriptors[0].dstSet = descriptorSet;
+			writeDescriptors[0].pImageInfo = &radianceMapImageInfo;
+
+			const auto &irradianceMapImageInfo = irradianceMap->GetVulkanDescriptorInfo();
+			writeDescriptors[1] = *pbrShader->GetDescriptorSet("u_EnvIrradianceTex", 1);
+			writeDescriptors[1].dstSet = descriptorSet;
+			writeDescriptors[1].pImageInfo = &irradianceMapImageInfo;
+
+			const auto &brdfLutImageInfo = Renderer::GetBRDFLutTexture().As<VulkanTexture2D>()->GetVulkanDescriptorInfo();
+			writeDescriptors[2] = *pbrShader->GetDescriptorSet("u_BRDFLUTTexture", 1);
+			writeDescriptors[2].dstSet = descriptorSet;
+			writeDescriptors[2].pImageInfo = &brdfLutImageInfo;
+
+			const auto &shadowImageInfo = shadow.As<VulkanTexture2D>()->GetDescriptorInfo();
+			writeDescriptors[3] = *pbrShader->GetDescriptorSet("u_ShadowMapTexture", 1);
+			writeDescriptors[3].dstSet = descriptorSet;
+			writeDescriptors[3].pImageInfo = &shadowImageInfo;
+
+			const auto vulkanDevice = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+			vkUpdateDescriptorSets(vulkanDevice, (uint32)writeDescriptors.size(), writeDescriptors.data(), 0, nullptr);
+		});
+		*/
 	}
 	
 	Ref<Environment> VulkanRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
@@ -201,22 +309,70 @@ namespace highlo
 
 	VkDescriptorSet VulkanRenderingAPI::AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo)
 	{
-		return VkDescriptorSet();
+		uint32 bufferIndex = Renderer::GetCurrentFrameIndex();
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+
+		allocInfo.descriptorPool = s_VKRendererData->DescriptorPools[bufferIndex];
+
+		VkDescriptorSet result = { 0 };
+		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &result));
+		s_VKRendererData->DescriptorPoolAllocationCount[bufferIndex] += allocInfo.descriptorSetCount;
+		return result;
 	}
 	
 	VkSampler VulkanRenderingAPI::GetClampSampler()
 	{
-		return VkSampler();
+		if (s_VKRendererData->SamplerClamp)
+			return s_VKRendererData->SamplerClamp;
+
+		VkSamplerCreateInfo samplerCreateInfo = {};
+		samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerCreateInfo.maxAnisotropy = 1.0f;
+		samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
+		samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
+		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerCreateInfo.addressModeV = samplerCreateInfo.addressModeU;
+		samplerCreateInfo.addressModeW = samplerCreateInfo.addressModeU;
+		samplerCreateInfo.mipLodBias = 0.0f;
+		samplerCreateInfo.maxAnisotropy = 1.0f;
+		samplerCreateInfo.minLod = 0.0f;
+		samplerCreateInfo.maxLod = 100.0f;
+		samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+		VK_CHECK_RESULT(vkCreateSampler(device, &samplerCreateInfo, nullptr, &s_VKRendererData->SamplerClamp));
+		return s_VKRendererData->SamplerClamp;
 	}
 	
 	VkSampler VulkanRenderingAPI::GetPointSampler()
 	{
-		return VkSampler();
+		if (s_VKRendererData->SamplerPoint)
+			return s_VKRendererData->SamplerPoint;
+
+		VkSamplerCreateInfo samplerCreateInfo = {};
+		samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerCreateInfo.maxAnisotropy = 1.0f;
+		samplerCreateInfo.magFilter = VK_FILTER_NEAREST;
+		samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
+		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+		samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerCreateInfo.addressModeV = samplerCreateInfo.addressModeU;
+		samplerCreateInfo.addressModeW = samplerCreateInfo.addressModeU;
+		samplerCreateInfo.mipLodBias = 0.0f;
+		samplerCreateInfo.maxAnisotropy = 1.0f;
+		samplerCreateInfo.minLod = 0.0f;
+		samplerCreateInfo.maxLod = 100.0f;
+		samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+
+		VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+		VK_CHECK_RESULT(vkCreateSampler(device, &samplerCreateInfo, nullptr, &s_VKRendererData->SamplerPoint));
+		return s_VKRendererData->SamplerPoint;
 	}
 	
 	uint32 VulkanRenderingAPI::GetDescriptorAllocationCount(uint32 frameIndex)
 	{
-		return 0;
+		return s_VKRendererData->DescriptorPoolAllocationCount[frameIndex];
 	}
 	
 	int32 &VulkanRenderingAPI::GetSelectedDrawCall()

@@ -71,7 +71,6 @@ namespace highlo
 
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		Ref<RenderingContext> m_CurrentContext = nullptr;
-		void *m_NativeWindowHandle = nullptr;
 		Ref<VulkanDevice> m_Device = nullptr;
 		bool m_VSync = false;
 

@@ -2,16 +2,15 @@
 
 //
 // version history:
-//     - 1.0 (2022-04-22) initial release
+//     - 1.0 (2023-03-04) initial release
 //
 
 #pragma once
 
-#include "Engine/ImGui/ImGuiRenderer.h"
-
 #ifdef HIGHLO_API_VULKAN
 
-#include <vulkan/vulkan.h>
+#include "Engine/ImGui/ImGuiRenderer.h"
+#include "Vulkan.h"
 
 namespace highlo
 {

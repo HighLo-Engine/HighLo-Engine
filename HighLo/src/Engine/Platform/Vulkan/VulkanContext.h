@@ -2,20 +2,16 @@
 
 //
 // version history:
-//     - 1.0 (2022-04-22) initial release
+//     - 1.0 (2023-03-04) initial release
 //
 
 #pragma once
 
-#include "Engine/Graphics/RenderingContext.h"
-#include "Engine/Renderer/Renderer.h"
-
 #ifdef HIGHLO_API_VULKAN
 
-#include <vulkan/vulkan.h>
-
+#include "Engine/Graphics/RenderingContext.h"
+#include "Vulkan.h"
 #include "VulkanDevice.h"
-#include "VulkanPhysicalDevice.h"
 #include "VulkanSwapChain.h"
 
 namespace highlo
@@ -24,7 +20,6 @@ namespace highlo
 	{
 	public:
 
-		VulkanContext();
 		VulkanContext(void *handle, WindowData &data);
 		virtual ~VulkanContext();
 
@@ -36,26 +31,36 @@ namespace highlo
 		virtual void *GetCurrentContext() override;
 
 		// Vulkan-specific
-		static VkInstance GetInstance() { return s_VulkanInstance; }
-
 		Ref<VulkanDevice> GetDevice() { return m_Device; }
 
+		static VkInstance GetInstance() { return s_VulkanInstance; }
+
+		/// <summary>
+		/// Creates a new VulkanContext based on the existing global RenderingContext.
+		/// You can also call `Renderer::GetContext()` to retrieve the global rendering context directly and then call `.As<VulkanContext>()` on the retrieved value.
+		/// </summary>
+		/// <returns>Returns the current global rendering context, implicitly casted to a Vulkan context.</returns>
 		static Ref<VulkanContext> Get() { return Ref<VulkanContext>(Renderer::GetContext()); }
+		
+		/// <summary>
+		/// Retrieves the current vulkan device, attached to the global rendering context.
+		/// </summary>
+		/// <returns>Returns the current vulkan device</returns>
 		static Ref<VulkanDevice> GetCurrentDevice() { return Get()->GetDevice(); }
 
 	private:
 
-		void *m_VulkanWindowHandle = nullptr;
-		WindowData m_WindowData;
-
+		// Devices
 		Ref<VulkanPhysicalDevice> m_PhysicalDevice = nullptr;
 		Ref<VulkanDevice> m_Device = nullptr;
-		VulkanSwapChain m_SwapChain;
 
+		// Vulkan instance
 		inline static VkInstance s_VulkanInstance;
 
 		VkDebugUtilsMessengerEXT m_DebugUtilsMessenger = VK_NULL_HANDLE;
 		VkPipelineCache m_PipelineCache = nullptr;
+
+		VulkanSwapChain m_SwapChain;
 	};
 }
 

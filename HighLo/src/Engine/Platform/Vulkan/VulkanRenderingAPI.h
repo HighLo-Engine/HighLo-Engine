@@ -2,19 +2,15 @@
 
 //
 // version history:
-//     - 1.0 (2022-04-22) initial release
+//     - 1.0 (2023-03-04) initial release
 //
 
 #pragma once
 
-#include "Engine/Graphics/RenderingAPI.h"
-#include "Engine/Graphics/VertexArray.h"
-
 #ifdef HIGHLO_API_VULKAN
 
-#include <vulkan/vulkan.h>
-
-#include "VulkanMaterial.h"
+#include "Engine/Graphics/RenderingAPI.h"
+#include "Vulkan.h"
 
 namespace highlo
 {
@@ -40,11 +36,11 @@ namespace highlo
 		virtual void DrawIndexedControlPointPatchList(Ref<VertexArray> &va, PrimitiveType type = PrimitiveType::Patch) override;
 
 		virtual void DrawFullscreenQuad(
-			const Ref<CommandBuffer> &renderCommandBuffer, 
-			const Ref<VertexArray> &va, 
-			const Ref<UniformBufferSet> &uniformBufferSet, 
-			const Ref<StorageBufferSet> &storageBufferSet, 
-			Ref<Material> &material, 
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			Ref<Material> &material,
 			const glm::mat4 &transform = glm::mat4(1.0f)
 		) override;
 
@@ -57,7 +53,8 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
-			uint32 transformBufferOffset) override;
+			uint32 transformBufferOffset
+		) override;
 
 		virtual void DrawDynamicMesh(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -68,7 +65,8 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
-			uint32 transformBufferOffset) override;
+			uint32 transformBufferOffset
+		) override;
 
 		virtual void DrawInstancedStaticMesh(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -80,7 +78,8 @@ namespace highlo
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
-			uint32 instanceCount) override;
+			uint32 instanceCount
+		) override;
 
 		virtual void DrawInstancedDynamicMesh(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -92,7 +91,8 @@ namespace highlo
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
-			uint32 instanceCount) override;
+			uint32 instanceCount
+		) override;
 
 		virtual void DrawInstancedStaticMeshWithMaterial(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -104,7 +104,8 @@ namespace highlo
 			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
-			Ref<Material> &overrideMaterial) override;
+			Ref<Material> &overrideMaterial
+		) override;
 
 		virtual void DrawInstancedDynamicMeshWithMaterial(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -116,7 +117,8 @@ namespace highlo
 			const TransformVertexData *transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
-			Ref<Material> &overrideMaterial) override;
+			Ref<Material> &overrideMaterial
+		) override;
 
 		virtual void SetWireframe(bool wf) override;
 		virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
@@ -132,13 +134,17 @@ namespace highlo
 		// Vulkan-specific
 		static VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo);
 
-		static void UpdateMaterialForRendering(Ref<VulkanMaterial> &material, Ref<UniformBufferSet> &uniformBufferSet, Ref<StorageBufferSet> &storageBufferSet);
+		// TODO: move this to vulkan material
+	//	static void UpdateMaterialForRendering(Ref<VulkanMaterial> &material, Ref<UniformBufferSet> &uniformBufferSet, Ref<StorageBufferSet> &storageBufferSet);
+		
 		static VkSampler GetClampSampler();
 		static VkSampler GetPointSampler();
 
 		static uint32 GetDescriptorAllocationCount(uint32 frameIndex = 0);
 		static int32 &GetSelectedDrawCall();
 	};
+
+
 }
 
 #endif // HIGHLO_API_VULKAN

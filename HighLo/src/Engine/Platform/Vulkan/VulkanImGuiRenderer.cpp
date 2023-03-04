@@ -5,7 +5,6 @@
 
 #ifdef HIGHLO_API_VULKAN
 
-#include "VulkanUtils.h"
 #include "VulkanContext.h"
 
 #ifdef HIGHLO_API_GLFW
@@ -21,19 +20,20 @@
 
 namespace highlo
 {
-    static std::vector<VkCommandBuffer> s_ImGuiCommandBuffers;
+	static std::vector<VkCommandBuffer> s_ImGuiCommandBuffers;
 
-    VulkanImGuiRenderer::VulkanImGuiRenderer()
-    {
-    }
+	VulkanImGuiRenderer::VulkanImGuiRenderer()
+	{
+	}
 
-    VulkanImGuiRenderer::~VulkanImGuiRenderer()
-    {
-    }
+	VulkanImGuiRenderer::~VulkanImGuiRenderer()
+	{
+	}
+	
+	void VulkanImGuiRenderer::Init(Window *window)
+	{
 
-    void VulkanImGuiRenderer::Init(Window *window)
-    {
-        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
         Ref<VulkanSwapChain> swapChain = HLApplication::Get().GetWindow().GetSwapChain().As<VulkanSwapChain>();
         VkDescriptorPoolSize poolSizes[] =
         {
@@ -56,19 +56,19 @@ namespace highlo
         poolInfo.maxSets = 100 * (uint32)IM_ARRAYSIZE(poolSizes);
         poolInfo.poolSizeCount = (uint32)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
-        
+
         VkDescriptorPool descriptorPool;
         VK_CHECK_RESULT(vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool));
 
-    #ifdef HIGHLO_API_GLFW
+#ifdef HIGHLO_API_GLFW
         ImGui_ImplGlfw_InitForVulkan((GLFWwindow *)window->GetNativeHandle(), true);
-    #else
+#else
         ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
-    #endif // HIGHLO_API_GLFW
+#endif // HIGHLO_API_GLFW
 
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = VulkanContext::GetInstance();
-        initInfo.PhysicalDevice = VulkanContext::GetCurrentDevice()->GetPhysicalDevice()->GetNativeDevice();
+        initInfo.PhysicalDevice = VulkanContext::GetCurrentDevice()->GetPhysicalDevice()->GetVulkanPhysicalDevice();
         initInfo.Device = device;
         initInfo.QueueFamily = VulkanContext::GetCurrentDevice()->GetPhysicalDevice()->GetQueueFamilyIndices().Graphics;
         initInfo.Queue = VulkanContext::GetCurrentDevice()->GetGraphicsQueue();
@@ -82,10 +82,10 @@ namespace highlo
         ImGui_ImplVulkan_Init(&initInfo, swapChain->GetRenderPass());
 
         // Upload fonts
-        VkCommandBuffer commandBuffer = VulkanContext::GetCurrentDevice()->CreateCommandBuffer(true);
+        VkCommandBuffer commandBuffer = VulkanContext::GetCurrentDevice()->GetCommandBuffer(true);
         ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
         VulkanContext::GetCurrentDevice()->FlushCommandBuffer(commandBuffer);
-        
+
         VK_CHECK_RESULT(vkDeviceWaitIdle(device));
         ImGui_ImplVulkan_DestroyFontUploadObjects();
 
@@ -93,29 +93,30 @@ namespace highlo
         s_ImGuiCommandBuffers.resize(framesInFlight);
         for (uint32 i = 0; i < framesInFlight; ++i)
             s_ImGuiCommandBuffers[i] = VulkanContext::GetCurrentDevice()->CreateSecondaryCommandBuffer();
-    }
-
-    void VulkanImGuiRenderer::Shutdown()
-    {
-        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+	}
+	
+	void VulkanImGuiRenderer::Shutdown()
+	{
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
         VK_CHECK_RESULT(vkDeviceWaitIdle(device));
         ImGui_ImplVulkan_Shutdown();
-    }
-
-    void VulkanImGuiRenderer::NewFrame()
-    {
-        ImGui_ImplVulkan_NewFrame();
-    }
-
-    void VulkanImGuiRenderer::Render()
-    {
-        ImGui::Render();
-    }
-
-    void VulkanImGuiRenderer::RenderDrawData()
-    {
-        VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
+	}
+	
+	void VulkanImGuiRenderer::NewFrame()
+	{
+		ImGui_ImplVulkan_NewFrame();
+	}
+	
+	void VulkanImGuiRenderer::Render()
+	{
+		ImGui::Render();
+	}
+	
+	void VulkanImGuiRenderer::RenderDrawData()
+	{
+        VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
         Ref<VulkanSwapChain> swapChain = HLApplication::Get().GetWindow().GetSwapChain().As<VulkanSwapChain>();
+
         uint32 width = swapChain->GetWidth();
         uint32 height = swapChain->GetHeight();
         uint32 commandBufferIndex = swapChain->GetCurrentBufferIndex();
@@ -129,7 +130,7 @@ namespace highlo
         drawCmdBufferInfo.pNext = nullptr;
         drawCmdBufferInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-        VkCommandBuffer drawCommandBuffer = swapChain->GetCurrentCommandbuffer();
+        VkCommandBuffer drawCommandBuffer = swapChain->GetCurrentDrawCommandBuffer();
         VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffer, &drawCmdBufferInfo));
 
         VkRenderPassBeginInfo renderPassBeginInfo = {};
@@ -180,10 +181,10 @@ namespace highlo
         std::vector<VkCommandBuffer> commandBuffers;
         commandBuffers.push_back(s_ImGuiCommandBuffers[commandBufferIndex]);
         vkCmdExecuteCommands(drawCommandBuffer, (uint32)commandBuffers.size(), commandBuffers.data());
-        
+
         vkCmdEndRenderPass(drawCommandBuffer);
         VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffer));
-    }
+	}
 }
 
 #endif // HIGHLO_API_VULKAN

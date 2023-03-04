@@ -1,8 +1,8 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
-//     - 1.0 (2022-11-19) initial release
+//     - 1.0 (2023-03-04) initial release
 //
 
 #pragma once
@@ -10,7 +10,6 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include <vulkan/vulkan.h>
-#include <vk_mem_alloc.h>
 
 #include "Engine/Renderer/Renderer.h"
 
@@ -19,17 +18,11 @@ inline PFN_vkCmdBeginDebugUtilsLabelEXT fpCmdBeginDebugUtilsLabelEXT;
 inline PFN_vkCmdEndDebugUtilsLabelEXT fpCmdEndDebugUtilsLabelEXT;
 inline PFN_vkCmdInsertDebugUtilsLabelEXT fpCmdInsertDebugUtilsLabelEXT;
 
-inline PFN_vkCmdSetCheckpointNV fpCmdSetCheckpointNV;
-
-// We do have this function inside vulkan, but as of this "https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open"
-// it seems that the function is not part of the exported library files
-inline PFN_vkGetQueueCheckpointDataNV fpGetQueueCheckpointDataNV;
-
-namespace highlo
+namespace highlo::utils
 {
 	void VulkanLoadDebugUtilsExtensions(VkInstance instance);
 
-	inline const char *VKResultToString(VkResult result)
+	inline const char *VulkanResultToString(VkResult result)
 	{
 		switch (result)
 		{
@@ -73,11 +66,10 @@ namespace highlo
 			case VK_PIPELINE_COMPILE_REQUIRED_EXT: return "VK_PIPELINE_COMPILE_REQUIRED_EXT";
 		}
 
-		HL_ASSERT(false);
-		return nullptr;
+		return "VK_RESULT_UNKNOWN";
 	}
 
-	inline const char *VkObjectTypeToString(const VkObjectType type)
+	inline const char *VulkanObjectTypeToString(const VkObjectType type)
 	{
 		switch (type)
 		{
@@ -125,37 +117,44 @@ namespace highlo
 			case VK_OBJECT_TYPE_MAX_ENUM: return "VK_OBJECT_TYPE_MAX_ENUM";
 		}
 
-		HL_ASSERT(false);
-		return "";
+		return "VK_OBJECT_TYPE_UNKNOWN";
 	}
 
-	void RetrieveDiagnosticCheckpoints();
 
 	inline void VulkanCheckResult(VkResult result)
 	{
-		if (result == VK_SUCCESS)
-			return;
-
-		HL_CORE_ERROR("VkResult is '{0}' in {1}:{2}", ::highlo::VKResultToString(result), __FILE__, __LINE__);
-
-		if (result == VK_ERROR_DEVICE_LOST)
+		if (result != VK_SUCCESS)
 		{
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(3s);
-			::highlo::RetrieveDiagnosticCheckpoints();
-			::highlo::utils::DumpGPUInfos();
+			HL_CORE_ERROR("VulkanResult was {0} in {1}:{2}", utils::VulkanResultToString(result), __FILE__, __LINE__);
+			if (result == VK_ERROR_DEVICE_LOST)
+			{
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(3s);
+				::highlo::utils::DumpGPUInfos();
+			}
 		}
-
-		HL_ASSERT(result == VK_SUCCESS);
 	}
+}
 
 #define VK_CHECK_RESULT(f)\
 {\
 	VkResult res = (f);\
-	::highlo::VulkanCheckResult(res);\
+	::highlo::utils::VulkanCheckResult(res);\
 }
 
+namespace highlo::utils
+{
+	inline static void SetDebugUtilsObjectName(const VkDevice device, const VkObjectType objectType, const HLString &name, const void *handle)
+	{
+		VkDebugUtilsObjectNameInfoEXT nameInfo = { 0 };
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		nameInfo.objectType = objectType;
+		nameInfo.objectHandle = (uint64)handle;
+		nameInfo.pObjectName = *name;
+		nameInfo.pNext = VK_NULL_HANDLE;
 
+		VK_CHECK_RESULT(fpSetDebugUtilsObjectNameEXT(device, &nameInfo));
+	}
 }
 
 #endif // HIGHLO_API_VULKAN

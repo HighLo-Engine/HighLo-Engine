@@ -4,7 +4,7 @@
 #include "PhysicalDevice.h"
 
 #ifdef HIGHLO_API_VULKAN
-#include "Engine/Platform/Vulkan/VulkanPhysicalDevice.h"
+#include "Engine/Platform/Vulkan/VulkanDevice.h"
 #endif // HIGHLO_API_VULKAN
 
 namespace highlo

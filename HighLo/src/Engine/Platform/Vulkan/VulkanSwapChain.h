@@ -2,47 +2,26 @@
 
 //
 // version history:
-//     - 1.0 (2022-04-22) initial release
+//     - 1.0 (2023-03-04) initial release
 //
 
 #pragma once
 
-#include "Engine/Graphics/SwapChain.h"
-
 #ifdef HIGHLO_API_VULKAN
 
-#include <vulkan/vulkan.h>
-#include <vk_mem_alloc.h>
-
+#include "Engine/Graphics/SwapChain.h"
+#include "Vulkan.h"
 #include "VulkanDevice.h"
+
+#include <vk_mem_alloc.h>
 
 namespace highlo
 {
-	struct VulkanSwapChainBuffer
-	{
-		VkImage Image;
-		VkImageView View;
-	};
-
-	struct VulkanDepthStencil
-	{
-		VkImage Image;
-		VmaAllocation Allocation;
-		VkImageView View;
-	};
-
-	struct VulkanSemaphore
-	{
-		VkSemaphore PresentComplete;
-		VkSemaphore RenderComplete;
-	};
-
 	class VulkanSwapChain : public SwapChain
 	{
 	public:
 
-		VulkanSwapChain() {}
-		virtual ~VulkanSwapChain() {}
+		VulkanSwapChain() = default;
 
 		virtual void Init(const Ref<RenderingContext> &context) override;
 		virtual void InitSurface(void *windowHandle) override;
@@ -61,54 +40,90 @@ namespace highlo
 		virtual uint32 GetCurrentBufferIndex() const override { return m_CurrentBufferIndex; }
 
 		// Vulkan-specific
-		VkFramebuffer GetFramebuffer(uint32 index);
-		VkCommandBuffer GetDrawCommandbuffer(uint32 index);
-
 		VkRenderPass GetRenderPass() { return m_RenderPass; }
+
 		VkFramebuffer GetCurrentFramebuffer() { return GetFramebuffer(m_CurrentImageIndex); }
-		VkCommandBuffer GetCurrentCommandbuffer() { return GetDrawCommandbuffer(m_CurrentBufferIndex); }
+		VkCommandBuffer GetCurrentDrawCommandBuffer() { return GetDrawCommandBuffer(m_CurrentBufferIndex); }
+
 		VkFormat GetColorFormat() { return m_ColorFormat; }
+
+		VkFramebuffer GetFramebuffer(uint32 index)
+		{
+			HL_ASSERT(index < m_Framebuffers.size());
+			return m_Framebuffers[index];
+		}
+
+		VkCommandBuffer GetDrawCommandBuffer(uint32 index)
+		{
+			HL_ASSERT(index < m_CommandBuffers.size());
+			return m_CommandBuffers[index].CommandBuffer;
+		}
+
 		VkSemaphore GetRenderCompleteSemaphore() { return m_Semaphores.RenderComplete; }
+		void SetVSync(const bool enabled) { m_VSync = enabled; }
 
 	private:
-
-		VkResult AcquireNextImage(VkSemaphore presenComplete, uint32 *imageIndex);
-		VkResult QueuePresent(VkQueue queue, uint32 imageIndex, VkSemaphore waitSemaphore = VK_NULL_HANDLE);
-
-		void CreateFramebuffer();
-		void CreateDepthStencil();
+		
+		uint32 AcquireNextImage();
 		void FindImageFormatAndColorSpace();
 
 	private:
 
+		VkInstance m_Instance = VK_NULL_HANDLE;
+		Ref<RenderingContext> m_CurrentContext = nullptr;
+		void *m_NativeWindowHandle = nullptr;
 		Ref<VulkanDevice> m_Device = nullptr;
-
-		uint32 m_Width = 0;
-		uint32 m_Height = 0;
-		uint32 m_CurrentBufferIndex = 0;
-		uint32 m_CurrentImageIndex = 0;
-		uint32 m_QueueNodeIndex = UINT32_MAX;
-		uint32 m_ImageCount = 0;
 		bool m_VSync = false;
 
-		std::vector<VulkanSwapChainBuffer> m_Buffers;
-		VulkanDepthStencil m_DepthStencil;
-		VulkanSemaphore m_Semaphores;
-
-		std::vector<VkFramebuffer> m_Framebuffers;
-		std::vector<VkCommandBuffer> m_Commandbuffers;
-		VkCommandPool m_CommandPool = nullptr;
-
-		VkSwapchainKHR m_SwapChain = nullptr;
-		std::vector<VkImage> m_Images;
-		std::vector<VkFence> m_WaitFences;
-		VkRenderPass m_RenderPass;
 		VkFormat m_ColorFormat;
 		VkColorSpaceKHR m_ColorSpace;
 
-		VkSurfaceKHR m_Surface = nullptr;
+		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
+		uint32 m_ImageCount = 0;
+		std::vector<VkImage> m_VulkanImages;
+
+		struct SwapchainImage
+		{
+			VkImage Image = nullptr;
+			VkImageView ImageView = nullptr;
+		};
+		std::vector<SwapchainImage> m_Images;
+
+		struct
+		{
+			VkImage Image = nullptr;
+			VmaAllocation MemoryAlloc = nullptr;
+			VkImageView ImageView = nullptr;
+		} m_DepthStencil;
+
+		std::vector<VkFramebuffer> m_Framebuffers;
+
+		struct SwapchainCommandBuffer
+		{
+			VkCommandPool CommandPool = nullptr;
+			VkCommandBuffer CommandBuffer = nullptr;
+		};
+		std::vector<SwapchainCommandBuffer> m_CommandBuffers;
+
+		struct
+		{
+			// Swap chain
+			VkSemaphore PresentComplete = nullptr;
+			// Command buffer
+			VkSemaphore RenderComplete = nullptr;
+		} m_Semaphores;
 		VkSubmitInfo m_SubmitInfo;
-		VkInstance m_Instance;
+
+		std::vector<VkFence> m_WaitFences;
+
+		VkRenderPass m_RenderPass = nullptr;
+		uint32 m_CurrentBufferIndex = 0;
+		uint32 m_CurrentImageIndex = 0;
+
+		uint32 m_QueueNodeIndex = UINT32_MAX;
+		uint32 m_Width = 0, m_Height = 0;
+
+		VkSurfaceKHR m_Surface;
 
 		friend class VulkanContext;
 	};

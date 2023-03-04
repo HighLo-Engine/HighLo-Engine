@@ -2,16 +2,15 @@
 
 //
 // version history:
-//     - 1.0 (2022-04-22) initial release
+//     - 1.0 (2023-03-04) initial release
 //
 
 #pragma once
 
-#include "Engine/Graphics/Framebuffer.h"
-
 #ifdef HIGHLO_API_VULKAN
 
-#include <vulkan/vulkan.h>
+#include "Engine/Graphics/Framebuffer.h"
+#include "Vulkan.h"
 
 namespace highlo
 {
@@ -40,27 +39,22 @@ namespace highlo
 
 		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
 
-		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override;
-		virtual Ref<Texture> GetDepthImage() const override;
+		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { HL_ASSERT(attachmentIndex < m_ColorAttachments.size()); return m_ColorAttachments[attachmentIndex]; }
+		virtual Ref<Texture> GetDepthImage() const override { return m_DepthAttachment; }
 
 		virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }
 		virtual const FramebufferSpecification &GetSpecification() const override { return m_Specification; }
 
-		virtual uint64 GetColorAttachmentCount() const override { return m_Specification.SwapChainTarget ? 1 : m_AttachmentImages.size(); }
-		virtual bool HasDepthAttachment() const override { return (bool)m_DepthImage; }
-
-		// Vulkan-specific
-		VkRenderPass GetRenderPass() const { return m_RenderPass; }
-		VkFramebuffer GetFramebuffer() const { return m_Framebuffer; }
-		const std::vector<VkClearValue> &GetClearValues() const { return m_ClearValues; }
+		virtual uint64 GetColorAttachmentCount() const override { return m_ColorAttachments.size(); }
+		virtual bool HasDepthAttachment() const override { return (bool)m_DepthAttachment; }
 
 	private:
 
 		HLRendererID m_RendererID = 0;
 		FramebufferSpecification m_Specification;
 
-		std::vector<Ref<Texture2D>> m_AttachmentImages;
-		Ref<Texture2D> m_DepthImage;
+		std::vector<Ref<Texture>> m_ColorAttachments;
+		Ref<Texture> m_DepthAttachment;
 
 		std::vector<VkClearValue> m_ClearValues;
 

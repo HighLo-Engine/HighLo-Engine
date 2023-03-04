@@ -46,6 +46,7 @@ namespace highlo
 		Attachment,
 		Storage,
 		FontAtlas,
+		HostRead,
 	};
 
 	enum class TextureWrap
@@ -91,6 +92,9 @@ namespace highlo
 		uint32 Mips = 1;
 		uint32 Layers = 1;
 		bool Deinterleaved = false;
+
+		// Will it be used for transfer ops?
+		bool Transfer = false;
 
 		HLString DebugName = "";
 	};

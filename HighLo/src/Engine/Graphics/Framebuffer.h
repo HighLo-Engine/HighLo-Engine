@@ -68,6 +68,9 @@ namespace highlo
 		bool NoResize = false;
 		bool SwapChainTarget = false;
 
+		// Will it be used for transfer ops?
+		bool Transfer = false;
+
 		bool Blend = true;
 		FramebufferBlendMode BlendMode = FramebufferBlendMode::None;
 

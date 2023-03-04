@@ -48,6 +48,11 @@ namespace highlo
 		virtual uint64 GetColorAttachmentCount() const override { return m_ColorAttachments.size(); }
 		virtual bool HasDepthAttachment() const override { return (bool)m_DepthAttachment; }
 
+		// Vulkan-specific
+		VkRenderPass GetRenderPass() const { return m_RenderPass; }
+		VkFramebuffer GetVulkanFramebuffer() const { return m_Framebuffer; }
+		const std::vector<VkClearValue> &GetVulkanClearValues() const { return m_ClearValues; }
+
 	private:
 
 		HLRendererID m_RendererID = 0;

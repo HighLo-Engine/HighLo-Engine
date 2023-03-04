@@ -27,8 +27,10 @@ namespace highlo
 	enum class PrimitiveType
 	{
 		None = 0,
+		Points,
 		Triangles,
 		TriangleStrip,
+		TriangleFan,
 		Lines,
 		LineStrip,
 		Patch

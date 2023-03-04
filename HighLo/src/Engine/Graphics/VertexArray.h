@@ -35,6 +35,7 @@ namespace highlo
 		Ref<RenderPass> RenderPass;
 		BufferLayout Layout;
 		BufferLayout InstanceLayout;
+		BufferLayout BoneInfluenceLayout;
 
 		bool BackfaceCulling = true;
 		bool DepthTest = true;

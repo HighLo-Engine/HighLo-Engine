@@ -463,7 +463,41 @@ namespace highlo
 
 	HLString VulkanShader::Compile(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outputBinary, const VkShaderStageFlagBits stage) const
 	{
-		return HLString();
+		const HLString &stageSource = m_ShaderSources.at(stage);
+		HL_CORE_TRACE("Compiling the shader from source...");
+
+		if (m_Language == ShaderLanguage::GLSL)
+		{
+			shaderc::Compiler compiler;
+			shaderc::CompileOptions options;
+			options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
+			options.SetWarningsAsErrors();
+			options.SetGenerateDebugInfo();
+
+			bool optimize = false;
+#ifdef HL_RELEASE
+			optimize = true;
+#endif // HL_RELEASE
+
+			if (optimize)
+				options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+			// Compile shader
+			const shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(*stageSource, utils::VulkanShaderStageToShaderC(stage), **m_FilePath, options);
+
+			if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+				return fmt::format("Shader compilation error: {} ({})", result.GetErrorMessage(), **m_FilePath).c_str();
+
+			outputBinary[stage] = std::vector<uint32>(result.begin(), result.end());
+			return "";
+		}
+		else if (m_Language == ShaderLanguage::HLSL)
+		{
+			// TODO
+			return "";
+		}
+
+		return "unknown Language!";
 	}
 
 	void VulkanShader::CompileOrGetVulkanBinary(std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> &outBinary, bool forceCompile)
@@ -523,12 +557,16 @@ namespace highlo
 		FILE *f;
 		errno_t err = fopen_s(&f, **p, "rb");
 		if (err)
+		{
+			HL_CORE_ERROR("Error opening the file {0}", **p);
 			return;
+		}
 
 		fseek(f, 0, SEEK_END);
 		uint64 size = ftell(f);
 		fseek(f, 0, SEEK_SET);
 
+		HL_CORE_INFO("Loading cached binary");
 		outBinary[stage] = std::vector<uint32>(size / sizeof(uint32));
 		fread(outBinary[stage].data(), sizeof(uint32), outBinary[stage].size(), f);
 		fclose(f);
@@ -810,7 +848,7 @@ namespace highlo
 			else if (m_Language == ShaderLanguage::HLSL)
 				options.AddMacroDefinition("__HLSL__");
 
-			options.AddMacroDefinition("__OPENGL__");
+			options.AddMacroDefinition("__VULKAN__");
 			options.AddMacroDefinition("__GPU_IS_DEDICATED__"); // TODO: make configurable via Renderer::Options
 			options.AddMacroDefinition(utils::ShaderStageToMacro(stage).C_Str());
 

@@ -51,8 +51,8 @@ namespace highlo
 	void VulkanSwapChain::Init(const Ref<RenderingContext> &context)
 	{
 		m_CurrentContext = context;
-		m_Instance = VulkanContext::GetInstance();
-		m_Device = VulkanContext::GetCurrentDevice();
+		m_Instance = context.As<VulkanContext>()->GetInstance();
+		m_Device = context.As<VulkanContext>()->GetDevice();
 		VkDevice vulkanDevice = m_Device->GetVulkanDevice();
 
 		HL_GET_DEVICE_PROC_ADDR(vulkanDevice, CreateSwapchainKHR);

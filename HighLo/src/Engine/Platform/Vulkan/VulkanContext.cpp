@@ -118,7 +118,7 @@ namespace highlo
 	{
 		HL_ASSERT(glfwVulkanSupported(), "GLFW must support Vulkan!");
 
-		if (!utils::CheckDriverAPIVersionSupport(VK_API_VERSION_1_3))
+		if (!utils::CheckDriverAPIVersionSupport(VK_API_VERSION_1_2))
 		{
 			HL_ASSERT(false);
 		}
@@ -130,7 +130,7 @@ namespace highlo
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		appInfo.pApplicationName = HLApplication::Get().GetApplicationSettings().WindowTitle; // TODO: Replace this with new name property
 		appInfo.pEngineName = "HighLo";
-		appInfo.apiVersion = VK_API_VERSION_1_3;
+		appInfo.apiVersion = VK_API_VERSION_1_2;
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Extensions and Validation

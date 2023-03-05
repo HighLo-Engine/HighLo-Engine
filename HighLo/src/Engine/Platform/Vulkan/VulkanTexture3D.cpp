@@ -57,6 +57,13 @@ namespace highlo
 		Invalidate();
 	}
 
+	VulkanTexture3D::VulkanTexture3D(const TextureSpecification &spec)
+		: m_Specification(spec)
+	{
+		m_Buffer.Allocate(m_Specification.Width * m_Specification.Height * 4 * sizeof(float));
+		Invalidate();
+	}
+
 	VulkanTexture3D::~VulkanTexture3D()
 	{
 		Release();

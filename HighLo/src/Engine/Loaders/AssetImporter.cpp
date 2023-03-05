@@ -47,7 +47,7 @@ namespace highlo
 			}
 
 			case AssetType::EnvMap:
-				asset = Texture3D::LoadFromFiles(AssetManager::Get()->GetFileSystemPath(assetInfo));
+				asset = Texture3D::LoadFromFile(AssetManager::Get()->GetFileSystemPath(assetInfo));
 				asset->Handle = assetInfo.Handle;
 				loaded = asset->IsFlagSet(AssetFlag::None) && asset.As<Texture3D>()->IsLoaded();
 				break;

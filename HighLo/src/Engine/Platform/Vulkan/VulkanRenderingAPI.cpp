@@ -6,8 +6,15 @@
 #ifdef HIGHLO_API_VULKAN
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Utils/ImageUtils.h"
 
 #include "VulkanContext.h"
+#include "VulkanCommandBuffer.h"
+#include "VulkanFramebuffer.h"
+#include "VulkanComputePipeline.h"
+#include "VulkanShader.h"
+#include "VulkanTexture2D.h"
+#include "VulkanTexture3D.h"
 
 namespace highlo
 {
@@ -152,6 +159,18 @@ namespace highlo
 	
 	void VulkanRenderingAPI::BeginFrame()
 	{
+		Renderer::Submit([]()
+		{
+			Ref<VulkanSwapChain> swapChain = HLApplication::Get().GetWindow().GetSwapChain();
+
+			// Reset descriptor pools here
+			VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+			uint32 bufferIndex = swapChain->GetCurrentBufferIndex();
+			vkResetDescriptorPool(device, s_VKRendererData->DescriptorPools[bufferIndex], 0);
+			memset(s_VKRendererData->DescriptorPoolAllocationCount.data(), 0, s_VKRendererData->DescriptorPoolAllocationCount.size() * sizeof(uint32));
+
+			s_VKRendererData->DrawCallCount = 0;
+		});
 	}
 	
 	void VulkanRenderingAPI::EndFrame()
@@ -160,10 +179,137 @@ namespace highlo
 	
 	void VulkanRenderingAPI::BeginRenderPass(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<RenderPass> &renderPass, bool shouldClear)
 	{
+		Renderer::Submit([renderCommandBuffer, renderPass, shouldClear]()
+		{
+			uint32 frameIndex = Renderer::RT_GetCurrentFrameIndex();
+			VkCommandBuffer commandBuffer = renderCommandBuffer.As<VulkanCommandBuffer>()->GetActiveCommandBuffer();
+
+			VkDebugUtilsLabelEXT debugLabel{};
+			debugLabel.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+			memcpy(&debugLabel.color, glm::value_ptr(renderPass->GetSpecification().DebugMarkerColor), sizeof(float) * 4);
+			debugLabel.pLabelName = *renderPass->GetSpecification().DebugName;
+			fpCmdBeginDebugUtilsLabelEXT(commandBuffer, &debugLabel);
+
+			auto fb = renderPass->GetSpecification().Framebuffer;
+			Ref<VulkanFramebuffer> framebuffer = fb.As<VulkanFramebuffer>();
+			const auto &fbSpec = framebuffer->GetSpecification();
+
+			uint32 width = framebuffer->GetWidth();
+			uint32 height = framebuffer->GetHeight();
+
+			VkViewport viewport = {};
+			viewport.minDepth = 0.0f;
+			viewport.maxDepth = 1.0f;
+
+			VkRenderPassBeginInfo renderPassBeginInfo = {};
+			renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassBeginInfo.pNext = nullptr;
+			renderPassBeginInfo.renderPass = framebuffer->GetRenderPass();
+			renderPassBeginInfo.renderArea.offset.x = 0;
+			renderPassBeginInfo.renderArea.offset.y = 0;
+			renderPassBeginInfo.renderArea.extent.width = width;
+			renderPassBeginInfo.renderArea.extent.height = height;
+			if (framebuffer->GetSpecification().SwapChainTarget)
+			{
+				Ref<VulkanSwapChain> swapChain = HLApplication::Get().GetWindow().GetSwapChain();
+				width = swapChain->GetWidth();
+				height = swapChain->GetHeight();
+				renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				renderPassBeginInfo.pNext = nullptr;
+				renderPassBeginInfo.renderPass = framebuffer->GetRenderPass();
+				renderPassBeginInfo.renderArea.offset.x = 0;
+				renderPassBeginInfo.renderArea.offset.y = 0;
+				renderPassBeginInfo.renderArea.extent.width = width;
+				renderPassBeginInfo.renderArea.extent.height = height;
+				renderPassBeginInfo.framebuffer = swapChain->GetCurrentFramebuffer();
+
+				viewport.x = 0.0f;
+				viewport.y = (float)height;
+				viewport.width = (float)width;
+				viewport.height = -(float)height;
+			}
+			else
+			{
+				width = framebuffer->GetWidth();
+				height = framebuffer->GetHeight();
+				renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				renderPassBeginInfo.pNext = nullptr;
+				renderPassBeginInfo.renderPass = framebuffer->GetRenderPass();
+				renderPassBeginInfo.renderArea.offset.x = 0;
+				renderPassBeginInfo.renderArea.offset.y = 0;
+				renderPassBeginInfo.renderArea.extent.width = width;
+				renderPassBeginInfo.renderArea.extent.height = height;
+				renderPassBeginInfo.framebuffer = framebuffer->GetVulkanFramebuffer();
+
+				viewport.x = 0.0f;
+				viewport.y = 0.0f;
+				viewport.width = (float)width;
+				viewport.height = (float)height;
+			}
+
+			// TODO: Does our framebuffer have a depth attachment?
+			const auto &clearValues = framebuffer->GetVulkanClearValues();
+			renderPassBeginInfo.clearValueCount = (uint32)clearValues.size();
+			renderPassBeginInfo.pClearValues = clearValues.data();
+
+			vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			if (shouldClear)
+			{
+				const uint32 colorAttachmentCount = (uint32)framebuffer->GetColorAttachmentCount();
+				const uint32 totalAttachmentCount = colorAttachmentCount + (framebuffer->HasDepthAttachment() ? 1 : 0);
+				HL_ASSERT(clearValues.size() == totalAttachmentCount);
+
+				std::vector<VkClearAttachment> attachments(totalAttachmentCount);
+				std::vector<VkClearRect> clearRects(totalAttachmentCount);
+				for (uint32 i = 0; i < colorAttachmentCount; i++)
+				{
+					attachments[i].aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+					attachments[i].colorAttachment = i;
+					attachments[i].clearValue = clearValues[i];
+
+					clearRects[i].rect.offset = { (int32)0, (int32)0 };
+					clearRects[i].rect.extent = { width, height };
+					clearRects[i].baseArrayLayer = 0;
+					clearRects[i].layerCount = 1;
+				}
+
+				if (framebuffer->HasDepthAttachment())
+				{
+					attachments[colorAttachmentCount].aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+					attachments[colorAttachmentCount].clearValue = clearValues[colorAttachmentCount];
+					clearRects[colorAttachmentCount].rect.offset = { (int32)0, (int32)0 };
+					clearRects[colorAttachmentCount].rect.extent = { width, height };
+					clearRects[colorAttachmentCount].baseArrayLayer = 0;
+					clearRects[colorAttachmentCount].layerCount = 1;
+				}
+
+				vkCmdClearAttachments(commandBuffer, totalAttachmentCount, attachments.data(), totalAttachmentCount, clearRects.data());
+			}
+
+			// Update dynamic viewport state
+			vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+			// Update dynamic scissor state
+			VkRect2D scissor = {};
+			scissor.extent.width = width;
+			scissor.extent.height = height;
+			scissor.offset.x = 0;
+			scissor.offset.y = 0;
+			vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+		});
 	}
 	
 	void VulkanRenderingAPI::EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer)
 	{
+		Renderer::Submit([renderCommandBuffer]()
+		{
+			uint32 frameIndex = Renderer::RT_GetCurrentFrameIndex();
+			VkCommandBuffer commandBuffer = renderCommandBuffer.As<VulkanCommandBuffer>()->GetActiveCommandBuffer();
+
+			vkCmdEndRenderPass(commandBuffer);
+			fpCmdEndDebugUtilsLabelEXT(commandBuffer);
+		});
 	}
 	
 	void VulkanRenderingAPI::ClearScreenColor(const glm::vec4 &color)
@@ -299,12 +445,170 @@ namespace highlo
 	
 	Ref<Environment> VulkanRenderingAPI::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
-		return Ref<Environment>();
+		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
+			return Renderer::GetEmptyEnvironment();
+
+		Ref<Texture2D> envEquirect = Texture2D::LoadFromFile(filePath);
+		HL_ASSERT(envEquirect->GetFormat() == TextureFormat::RGBA32F, "Texture is not HDR!");
+
+		TextureSpecification cubemapSpec;
+		cubemapSpec.Format = TextureFormat::RGBA32F;
+		cubemapSpec.Width = cubemapSize;
+		cubemapSpec.Height = cubemapSize;
+
+		Ref<Texture3D> envUnfiltered = Texture3D::CreateFromSpecification(cubemapSpec);
+		Ref<Texture3D> envFiltered = Texture3D::CreateFromSpecification(cubemapSpec);
+
+		// Convert equirectangular to cubemap
+		Ref<Shader> equirectangularConversionShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCubeMap");
+		Ref<VulkanComputePipeline> equirectangularConversionPipeline = Ref<VulkanComputePipeline>::Create(equirectangularConversionShader);
+
+		Renderer::Submit([equirectangularConversionPipeline, envEquirect, envUnfiltered, cubemapSize]() mutable
+		{
+			VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+			Ref<VulkanShader> shader = equirectangularConversionPipeline->GetShader();
+
+			std::array<VkWriteDescriptorSet, 2> writeDescriptors;
+			auto descriptorSet = shader->CreateDescriptorSets();
+			Ref<VulkanTexture3D> envUnfilteredCubemap = envUnfiltered.As<VulkanTexture3D>();
+			writeDescriptors[0] = *shader->GetDescriptorSet("o_CubeMap");
+			writeDescriptors[0].dstSet = descriptorSet.DescriptorSets[0]; // Should this be set inside the shader?
+			writeDescriptors[0].pImageInfo = &envUnfilteredCubemap->GetDescriptorInfo();
+
+			Ref<VulkanTexture2D> envEquirectVK = envEquirect.As<VulkanTexture2D>();
+			writeDescriptors[1] = *shader->GetDescriptorSet("u_EquirectangularTex");
+			writeDescriptors[1].dstSet = descriptorSet.DescriptorSets[0]; // Should this be set inside the shader?
+			writeDescriptors[1].pImageInfo = &envEquirectVK->GetDescriptorInfo();
+
+			vkUpdateDescriptorSets(device, (uint32)writeDescriptors.size(), writeDescriptors.data(), 0, NULL);
+			equirectangularConversionPipeline->Execute(descriptorSet.DescriptorSets.data(), (uint32)descriptorSet.DescriptorSets.size(), cubemapSize / 32, cubemapSize / 32, 6);
+
+			envUnfilteredCubemap->GenerateMips(true);
+		});
+
+		Ref<Shader> environmentMipFilterShader = Renderer::GetShaderLibrary()->Get("EnvironmentMipFilter");
+		Ref<VulkanComputePipeline> environmentMipFilterPipeline = Ref<VulkanComputePipeline>::Create(environmentMipFilterShader);
+
+		Renderer::Submit([environmentMipFilterPipeline, envUnfiltered, envFiltered, cubemapSize]() mutable
+		{
+			VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+			Ref<VulkanShader> shader = environmentMipFilterPipeline->GetShader();
+
+			Ref<VulkanTexture3D> envFilteredCubemap = envFiltered.As<VulkanTexture3D>();
+			VkDescriptorImageInfo imageInfo = envFilteredCubemap->GetDescriptorInfo();
+
+			uint32 mipCount = utils::CalculateMipCount(cubemapSize, cubemapSize);
+
+			std::vector<VkWriteDescriptorSet> writeDescriptors(mipCount * 2);
+			std::vector<VkDescriptorImageInfo> mipImageInfos(mipCount);
+			auto descriptorSet = shader->CreateDescriptorSets(0, 12);
+			for (uint32 i = 0; i < mipCount; i++)
+			{
+				VkDescriptorImageInfo &mipImageInfo = mipImageInfos[i];
+				mipImageInfo = imageInfo;
+				mipImageInfo.imageView = envFilteredCubemap->CreateImageViewSingleMip(i);
+
+				writeDescriptors[i * 2 + 0] = *shader->GetDescriptorSet("outputTexture");
+				writeDescriptors[i * 2 + 0].dstSet = descriptorSet.DescriptorSets[i]; // Should this be set inside the shader?
+				writeDescriptors[i * 2 + 0].pImageInfo = &mipImageInfo;
+
+				Ref<VulkanTexture3D> envUnfilteredCubemap = envUnfiltered.As<VulkanTexture3D>();
+				writeDescriptors[i * 2 + 1] = *shader->GetDescriptorSet("inputTexture");
+				writeDescriptors[i * 2 + 1].dstSet = descriptorSet.DescriptorSets[i]; // Should this be set inside the shader?
+				writeDescriptors[i * 2 + 1].pImageInfo = &envUnfilteredCubemap->GetDescriptorInfo();
+			}
+
+			vkUpdateDescriptorSets(device, (uint32)writeDescriptors.size(), writeDescriptors.data(), 0, NULL);
+
+			environmentMipFilterPipeline->Begin(); // begin compute pass
+			const float deltaRoughness = 1.0f / glm::max((float)envFiltered->GetMipLevelCount() - 1.0f, 1.0f);
+			for (uint32 i = 0, size = cubemapSize; i < mipCount; i++, size /= 2)
+			{
+				uint32 numGroups = glm::max(1u, size / 32);
+				float roughness = i * deltaRoughness;
+				roughness = glm::max(roughness, 0.05f);
+				environmentMipFilterPipeline->SetPushConstants(&roughness, sizeof(float));
+				environmentMipFilterPipeline->Dispatch(descriptorSet.DescriptorSets[i], numGroups, numGroups, 6);
+			}
+			environmentMipFilterPipeline->End();
+		});
+
+		Ref<Shader> environmentIrradianceShader = Renderer::GetShaderLibrary()->Get("EnvironmentIrradiance");
+		Ref<VulkanComputePipeline> environmentIrradiancePipeline = Ref<VulkanComputePipeline>::Create(environmentIrradianceShader);
+
+		cubemapSpec.Width = irradianceMapSize;
+		cubemapSpec.Height = irradianceMapSize;
+		Ref<Texture3D> irradianceMap = Texture3D::CreateFromSpecification(cubemapSpec);
+
+		Renderer::Submit([environmentIrradiancePipeline, irradianceMap, envFiltered]() mutable
+		{
+			VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+			Ref<VulkanShader> shader = environmentIrradiancePipeline->GetShader();
+
+			Ref<VulkanTexture3D> envFilteredCubemap = envFiltered.As<VulkanTexture3D>();
+			Ref<VulkanTexture3D> irradianceCubemap = irradianceMap.As<VulkanTexture3D>();
+			auto descriptorSet = shader->CreateDescriptorSets();
+
+			std::array<VkWriteDescriptorSet, 2> writeDescriptors;
+			writeDescriptors[0] = *shader->GetDescriptorSet("o_IrradianceMap");
+			writeDescriptors[0].dstSet = descriptorSet.DescriptorSets[0];
+			writeDescriptors[0].pImageInfo = &irradianceCubemap->GetDescriptorInfo();
+
+			writeDescriptors[1] = *shader->GetDescriptorSet("u_RadianceMap");
+			writeDescriptors[1].dstSet = descriptorSet.DescriptorSets[0];
+			writeDescriptors[1].pImageInfo = &envFilteredCubemap->GetDescriptorInfo();
+
+			vkUpdateDescriptorSets(device, (uint32)writeDescriptors.size(), writeDescriptors.data(), 0, NULL);
+			environmentIrradiancePipeline->Begin();
+			environmentIrradiancePipeline->SetPushConstants(&Renderer::GetConfig().IrradianceMapComputeSamples, sizeof(uint32));
+			environmentIrradiancePipeline->Dispatch(descriptorSet.DescriptorSets[0], irradianceMap->GetWidth() / 32, irradianceMap->GetHeight() / 32, 6);
+			environmentIrradiancePipeline->End();
+
+			irradianceCubemap->GenerateMips();
+		});
+
+		return Ref<Environment>::Create(filePath, envUnfiltered, envFiltered, irradianceMap);
 	}
 	
 	Ref<Texture3D> VulkanRenderingAPI::CreatePreethamSky(float turbidity, float azimuth, float inclination)
 	{
-		return Ref<Texture3D>();
+		const uint32 cubemapSize = Renderer::GetConfig().EnvironmentMapResolution;
+		const uint32 irradianceMapSize = 32;
+
+		TextureSpecification cubemapSpec;
+		cubemapSpec.Format = TextureFormat::RGBA32F;
+		cubemapSpec.Width = cubemapSize;
+		cubemapSpec.Height = cubemapSize;
+
+		Ref<Texture3D> environmentMap = Texture3D::CreateFromSpecification(cubemapSpec);
+
+		Ref<Shader> preethamSkyShader = Renderer::GetShaderLibrary()->Get("PreethamSky");
+		Ref<VulkanComputePipeline> preethamSkyComputePipeline = Ref<VulkanComputePipeline>::Create(preethamSkyShader);
+
+		glm::vec3 params = { turbidity, azimuth, inclination };
+		Renderer::Submit([preethamSkyComputePipeline, environmentMap, cubemapSize, params]() mutable
+		{
+			VkDevice device = VulkanContext::GetCurrentDevice()->GetVulkanDevice();
+			Ref<VulkanShader> shader = preethamSkyComputePipeline->GetShader();
+
+			std::array<VkWriteDescriptorSet, 1> writeDescriptors;
+			auto descriptorSet = shader->CreateDescriptorSets();
+			Ref<VulkanTexture3D> envUnfilteredCubemap = environmentMap.As<VulkanTexture3D>();
+			writeDescriptors[0] = *shader->GetDescriptorSet("o_CubeMap");
+			writeDescriptors[0].dstSet = descriptorSet.DescriptorSets[0]; // Should this be set inside the shader?
+			writeDescriptors[0].pImageInfo = &envUnfilteredCubemap->GetDescriptorInfo();
+
+			vkUpdateDescriptorSets(device, (uint32)writeDescriptors.size(), writeDescriptors.data(), 0, NULL);
+
+			preethamSkyComputePipeline->Begin();
+			preethamSkyComputePipeline->SetPushConstants(&params, sizeof(glm::vec3));
+			preethamSkyComputePipeline->Dispatch(descriptorSet.DescriptorSets[0], cubemapSize / 32, cubemapSize / 32, 6);
+			preethamSkyComputePipeline->End();
+
+			envUnfilteredCubemap->GenerateMips(true);
+		});
+
+		return environmentMap;
 	}
 
 	VkDescriptorSet VulkanRenderingAPI::AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo)

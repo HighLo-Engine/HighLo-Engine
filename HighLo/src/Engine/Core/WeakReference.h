@@ -38,6 +38,14 @@ namespace highlo
 		HLAPI bool IsValid() const { return m_Instance ? SharedReferenceManager::Get()->IsSharedRefAlive((void*)m_Instance) : false; }
 		HLAPI operator bool() const { return IsValid(); }
 
+		HLAPI SharedReference<T> Lock()
+		{
+			if (!IsValid())
+				return nullptr;
+
+			return SharedReference<T>(m_Instance);
+		}
+
 	private:
 
 		T *m_Instance = nullptr;

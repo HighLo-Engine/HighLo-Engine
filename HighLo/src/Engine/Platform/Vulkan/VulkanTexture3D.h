@@ -21,6 +21,7 @@ namespace highlo
 
 		VulkanTexture3D(const FileSystemPath &filePath, bool flipOnLoad = false);
 		VulkanTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
+		VulkanTexture3D(const TextureSpecification &spec);
 		virtual ~VulkanTexture3D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }
@@ -54,7 +55,7 @@ namespace highlo
 		virtual void Unbind(uint32 slot) const override {}
 
 		// Vulkan-specific
-		const VkDescriptorImageInfo &GetVulkanDescriptorInfo() const { return m_DescriptorImageInfo; }
+		const VkDescriptorImageInfo &GetDescriptorInfo() const { return m_DescriptorImageInfo; }
 		VkImageView CreateImageViewSingleMip(uint32 mip);
 
 		void CopyToHostBuffer(Allocator &buffer);

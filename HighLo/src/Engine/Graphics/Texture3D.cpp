@@ -17,7 +17,7 @@
 
 namespace highlo
 {
-	Ref<Texture3D> Texture3D::LoadFromFiles(const FileSystemPath &filepath, bool flipOnLoad)
+	Ref<Texture3D> Texture3D::LoadFromFile(const FileSystemPath &filepath, bool flipOnLoad)
 	{
 	#ifdef HIGHLO_API_OPENGL
 		return Ref<OpenGLTexture3D>::Create(filepath, flipOnLoad);
@@ -51,6 +51,24 @@ namespace highlo
 		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
+	}
+	
+	Ref<Texture3D> Texture3D::CreateFromSpecification(const TextureSpecification &spec)
+	{
+#ifdef HIGHLO_API_OPENGL
+		return Ref<OpenGLTexture3D>::Create(spec);
+#elif HIGHLO_API_DX11
+		return Ref<DX11Texture3D>::Create(spec);
+#elif HIGHLO_API_DX12
+		return Ref<DX12Texture3D>::Create(spec);
+#elif HIGHLO_API_VULKAN
+		return Ref<VulkanTexture3D>::Create(spec);
+#elif HIGHLO_API_METAL
+		return Ref<MetalTexture3D>::Create(spec);
+#else
+		HL_ASSERT(false);
+		return nullptr;
+#endif // HIGHLO_API_OPENGL
 	}
 }
 

@@ -80,6 +80,22 @@ namespace highlo
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 	}
 
+	OpenGLTexture3D::OpenGLTexture3D(const TextureSpecification &spec)
+		: m_Specification(spec)
+	{
+		uint32 levels = utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
+
+		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
+		glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
+
+		glTextureParameteri(RendererID, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, levels > 1));
+		glTextureParameteri(RendererID, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+	}
+
 	OpenGLTexture3D::~OpenGLTexture3D()
 	{
 		Release();

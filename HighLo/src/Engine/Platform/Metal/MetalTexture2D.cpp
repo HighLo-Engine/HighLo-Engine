@@ -5,9 +5,12 @@
 
 #ifdef HIGHLO_API_METAL
 
+#include "Engine/Utils/ImageUtils.h"
+
 namespace highlo
 {
 	MetalTexture2D::MetalTexture2D(const FileSystemPath &filePath, bool flipOnLoad)
+		: m_FilePath(filePath)
 	{
 	}
 
@@ -40,7 +43,8 @@ namespace highlo
 	{
 		Release();
 
-		m_Buffer.Release();
+		if (m_Buffer)
+			m_Buffer.Release();
 	}
 	
 	Allocator MetalTexture2D::GetData()
@@ -59,18 +63,27 @@ namespace highlo
 	
 	void MetalTexture2D::Resize(const glm::uvec2 &size)
 	{
+		Resize(size.x, size.y);
 	}
 	
 	void MetalTexture2D::Resize(const uint32 width, const uint32 height)
 	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		Invalidate();
 	}
 	
 	void MetalTexture2D::Lock()
 	{
+		HL_ASSERT(!m_Locked);
+		m_Locked = true;
 	}
 	
 	void MetalTexture2D::Unlock()
 	{
+		HL_ASSERT(m_Locked);
+		m_Locked = false;
+		Invalidate();
 	}
 	
 	void MetalTexture2D::CreatePerLayerImageViews()
@@ -87,10 +100,18 @@ namespace highlo
 	
 	void MetalTexture2D::UpdateResourceData()
 	{
+		if (!m_Buffer)
+			return;
+
+		UpdateResourceData(m_Buffer.Data);
 	}
 	
 	void MetalTexture2D::UpdateResourceData(void *data)
 	{
+		if (!data)
+			return;
+
+		// TODO
 	}
 	
 	void MetalTexture2D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
@@ -104,12 +125,12 @@ namespace highlo
 	
 	uint32 MetalTexture2D::GetMipLevelCount()
 	{
-		return 0;
+		return utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
 	}
 	
 	std::pair<uint32, uint32> MetalTexture2D::GetMipSize(uint32 mip)
 	{
-		return { 0, 0 };
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 	
 	void MetalTexture2D::GenerateMips(bool readonly)
@@ -118,6 +139,9 @@ namespace highlo
 	
 	void MetalTexture2D::SetData(void *data, uint32 data_size)
 	{
+		if (m_Buffer)
+			m_Buffer.Release();
+
 		m_Buffer = Allocator::Copy(data, data_size);
 		Invalidate();
 	}

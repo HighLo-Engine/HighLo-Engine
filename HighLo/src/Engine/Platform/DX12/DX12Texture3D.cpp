@@ -17,15 +17,24 @@ namespace highlo
 	DX12Texture3D::DX12Texture3D(TextureFormat format, uint32 width, uint32 height, const void *data)
 	{
 	}
+
+	DX12Texture3D::DX12Texture3D(const TextureSpecification &spec)
+		: m_Specification(spec)
+	{
+	}
 	
 	DX12Texture3D::~DX12Texture3D()
 	{
 		Release();
+
+		if (m_Buffer)
+			m_Buffer.Release();
 	}
 	
 	Allocator DX12Texture3D::GetData()
 	{
-		return Allocator();
+		HL_ASSERT(m_Locked);
+		return m_Buffer;
 	}
 	
 	void DX12Texture3D::Bind(uint32 slot) const
@@ -58,27 +67,42 @@ namespace highlo
 	
 	void DX12Texture3D::Lock()
 	{
+		HL_ASSERT(!m_Locked);
+		m_Locked = true;
 	}
 	
 	void DX12Texture3D::Unlock()
 	{
+		HL_ASSERT(m_Locked);
+		m_Locked = false;
+		Invalidate();
 	}
 	
 	void DX12Texture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
+		// TODO
 	}
 	
 	glm::ivec4 DX12Texture3D::ReadPixel(uint32 row, uint32 column)
 	{
+		// TODO
 		return glm::ivec4();
 	}
 	
 	void DX12Texture3D::UpdateResourceData(void *data)
 	{
+		if (!data)
+			return;
+
+		// TODO
 	}
 	
 	void DX12Texture3D::UpdateResourceData()
 	{
+		if (!m_Buffer)
+			return;
+
+		UpdateResourceData(m_Buffer.Data);
 	}
 	
 	uint32 DX12Texture3D::GetMipLevelCount()

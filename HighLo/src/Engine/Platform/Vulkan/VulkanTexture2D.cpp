@@ -604,17 +604,7 @@ namespace highlo
 	
 	std::pair<uint32, uint32> VulkanTexture2D::GetMipSize(uint32 mip)
 	{
-		uint32 width = m_Specification.Width;
-		uint32 height = m_Specification.Height;
-
-		while (mip != 0)
-		{
-			width /= 2;
-			height /= 2;
-			mip--;
-		}
-
-		return { width, height };
+		return utils::GetMipSize(mip, m_Specification.Width, m_Specification.Height);
 	}
 	
 	void VulkanTexture2D::GenerateMips(bool readonly)
@@ -700,6 +690,9 @@ namespace highlo
 	
 	void VulkanTexture2D::SetData(void *data, uint32 data_size)
 	{
+		if (m_Buffer)
+			m_Buffer.Release();
+
 		m_Buffer = Allocator::Copy(data, data_size);
 		Invalidate();
 	}

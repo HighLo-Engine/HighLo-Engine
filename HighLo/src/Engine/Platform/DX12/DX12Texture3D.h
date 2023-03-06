@@ -19,6 +19,7 @@ namespace highlo
 
 		DX12Texture3D(const FileSystemPath &filePath, bool flipOnLoad = false);
 		DX12Texture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
+		DX12Texture3D(const TextureSpecification &spec);
 		virtual ~DX12Texture3D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }
@@ -55,6 +56,7 @@ namespace highlo
 
 		HLRendererID m_SamplerRendererID = 0;
 		TextureSpecification m_Specification;
+		Allocator m_Buffer;
 
 		bool m_Loaded = false;
 		bool m_Locked = false;

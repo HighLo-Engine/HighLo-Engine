@@ -19,6 +19,7 @@ namespace highlo
 
 		DX11Texture3D(const FileSystemPath &filepath, bool flipOnLoad = false);
 		DX11Texture3D(TextureFormat format, uint32 width, uint32 height, const void *data = nullptr);
+		DX11Texture3D(const TextureSpecification &spec);
 		virtual ~DX11Texture3D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }
@@ -54,6 +55,7 @@ namespace highlo
 
 	private:
 
+		FileSystemPath m_FilePath;
 		Allocator m_Buffer;
 		TextureSpecification m_Specification;
 		bool m_Locked = false;

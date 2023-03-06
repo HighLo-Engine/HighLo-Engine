@@ -35,16 +35,22 @@ namespace highlo
 	}
 	
 	DX12Texture2D::DX12Texture2D(const TextureSpecification &spec)
+		: m_Specification(spec)
 	{
 	}
 	
 	DX12Texture2D::~DX12Texture2D()
 	{
+		Release();
+
+		if (m_Buffer)
+			m_Buffer.Release();
 	}
 	
 	Allocator DX12Texture2D::GetData()
 	{
-		return Allocator();
+		HL_ASSERT(m_Locked);
+		return m_Buffer;
 	}
 	
 	void DX12Texture2D::Bind(uint32 slot) const
@@ -77,27 +83,42 @@ namespace highlo
 	
 	void DX12Texture2D::Lock()
 	{
+		HL_ASSERT(!m_Locked);
+		m_Locked = true;
 	}
 	
 	void DX12Texture2D::Unlock()
 	{
+		HL_ASSERT(m_Locked);
+		m_Locked = false;
+		Invalidate();
 	}
 	
 	void DX12Texture2D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
+		// TODO
 	}
 	
 	glm::ivec4 DX12Texture2D::ReadPixel(uint32 row, uint32 column)
 	{
+		// TODO
 		return glm::ivec4();
 	}
 	
 	void DX12Texture2D::UpdateResourceData(void *data)
 	{
+		if (!data)
+			return;
+
+		// TODO
 	}
 	
 	void DX12Texture2D::UpdateResourceData()
 	{
+		if (!m_Buffer)
+			return;
+
+		UpdateResourceData(m_Buffer.Data);
 	}
 	
 	uint32 DX12Texture2D::GetMipLevelCount()
@@ -116,6 +137,9 @@ namespace highlo
 	
 	void DX12Texture2D::SetData(void *data, uint32 data_size)
 	{
+		if (m_Buffer)
+			m_Buffer.Release();
+
 		m_Buffer = Allocator::Copy(data, data_size);
 		Invalidate();
 	}

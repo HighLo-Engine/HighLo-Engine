@@ -21,6 +21,7 @@ namespace highlo
 
 		OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad = false);
 		OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data);
+		OpenGLTexture3D(const TextureSpecification &spec);
 		virtual ~OpenGLTexture3D();
 
 		virtual uint32 GetWidth() const override { return m_Specification.Width; }

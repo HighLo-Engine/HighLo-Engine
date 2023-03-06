@@ -11,6 +11,7 @@
 namespace highlo
 {
 	DX11Texture2D::DX11Texture2D(const FileSystemPath &filePath, bool flipOnLoad)
+		: m_FilePath(filePath)
 	{
 	}
 
@@ -35,11 +36,16 @@ namespace highlo
 	}
 
 	DX11Texture2D::DX11Texture2D(const TextureSpecification &specification)
+		: m_Specification(specification)
 	{
 	}
 	
 	DX11Texture2D::~DX11Texture2D()
 	{
+		Release();
+
+		if (m_Buffer)
+			m_Buffer.Release();
 	}
 	
 	Allocator DX11Texture2D::GetData()
@@ -78,27 +84,42 @@ namespace highlo
 	
 	void DX11Texture2D::Lock()
 	{
+		HL_ASSERT(!m_Locked);
+		m_Locked = true;
 	}
 	
 	void DX11Texture2D::Unlock()
 	{
+		HL_ASSERT(m_Locked);
+		m_Locked = false;
+		Invalidate();
 	}
 	
 	void DX11Texture2D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
+		// TODO
 	}
 	
 	glm::ivec4 DX11Texture2D::ReadPixel(uint32 row, uint32 column)
 	{
+		// TODO
 		return glm::ivec4();
 	}
 	
 	void DX11Texture2D::UpdateResourceData(void *data)
 	{
+		if (!data)
+			return;
+
+		// TODO
 	}
 	
 	void DX11Texture2D::UpdateResourceData()
 	{
+		if (!m_Buffer)
+			return;
+
+		UpdateResourceData(m_Buffer.Data);
 	}
 	
 	uint32 DX11Texture2D::GetMipLevelCount()
@@ -117,6 +138,9 @@ namespace highlo
 	
 	void DX11Texture2D::SetData(void *data, uint32 data_size)
 	{
+		if (m_Buffer)
+			m_Buffer.Release();
+
 		m_Buffer = Allocator::Copy(data, data_size);
 		Invalidate();
 	}

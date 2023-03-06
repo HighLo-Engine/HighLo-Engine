@@ -533,6 +533,9 @@ namespace highlo
 	
 	void OpenGLTexture2D::SetData(void *data, uint32 data_size)
 	{
+		if (m_Buffer)
+			m_Buffer.Release();
+
 		m_Buffer = Allocator::Copy(data, data_size);
 		Invalidate();
 	}

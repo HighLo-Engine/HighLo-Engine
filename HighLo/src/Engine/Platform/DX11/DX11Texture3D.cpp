@@ -10,16 +10,26 @@
 
 namespace highlo
 {
+	DX11Texture3D::DX11Texture3D(const FileSystemPath &filepath, bool flipOnLoad)
+		: m_FilePath(filepath)
+	{
+	}
+
 	DX11Texture3D::DX11Texture3D(TextureFormat format, uint32 width, uint32 height, const void *data)
 	{
 	}
 
-	DX11Texture3D::DX11Texture3D(const FileSystemPath &filepath, bool flipOnLoad)
+	DX11Texture3D::DX11Texture3D(const TextureSpecification &spec)
+		: m_Specification(spec)
 	{
 	}
 
 	DX11Texture3D::~DX11Texture3D()
 	{
+		Release();
+
+		if (m_Buffer)
+			m_Buffer.Release();
 	}
 
 	Allocator DX11Texture3D::GetData()
@@ -58,27 +68,42 @@ namespace highlo
 
 	void DX11Texture3D::Lock()
 	{
+		HL_ASSERT(!m_Locked);
+		m_Locked = true;
 	}
 
 	void DX11Texture3D::Unlock()
 	{
+		HL_ASSERT(m_Locked);
+		m_Locked = false;
+		Invalidate();
 	}
 
 	void DX11Texture3D::WritePixel(uint32 row, uint32 column, const glm::ivec4 &rgba)
 	{
+		// TODO
 	}
 
 	glm::ivec4 DX11Texture3D::ReadPixel(uint32 row, uint32 column)
 	{
+		// TODO
 		return glm::ivec4();
 	}
 
 	void DX11Texture3D::UpdateResourceData(void *data)
 	{
+		if (!data)
+			return;
+
+		// TODO
 	}
 
 	void DX11Texture3D::UpdateResourceData()
 	{
+		if (!m_Buffer)
+			return;
+
+		UpdateResourceData(m_Buffer.Data);
 	}
 
 	uint32 DX11Texture3D::GetMipLevelCount()

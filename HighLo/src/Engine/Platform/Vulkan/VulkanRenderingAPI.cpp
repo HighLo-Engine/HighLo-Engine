@@ -223,6 +223,10 @@ namespace highlo
 		caps.Vendor = utils::VulkanVendorIDToString(properties.vendorID);
 		caps.Device = properties.deviceName;
 		caps.Version = std::to_string(properties.driverVersion);
+		caps.MaxTextures = properties.limits.maxDescriptorSetSampledImages;
+		caps.MaxTextureUnits = properties.limits.maxDescriptorSetSampledImages;
+		caps.MaxAnisotropy = properties.limits.maxSamplerAnisotropy;
+		caps.MaxSamples = properties.limits.maxDescriptorSetSamplers;
 
 		utils::DumpGPUInfos();
 

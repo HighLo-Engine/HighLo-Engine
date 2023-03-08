@@ -13,6 +13,17 @@ namespace highlo
 {
 	static std::map<HLString, uint64> s_ShaderCache;
 
+	namespace utils
+	{
+		static void PrintShaderCache()
+		{
+			for (auto &[name, hash] : s_ShaderCache)
+			{
+				HL_CORE_TRACE("Name: {0}, Hash: {1}", *name, hash);
+			}
+		}
+	}
+
 	void ShaderCache::Init()
 	{
 		Deserialize(s_ShaderCache);

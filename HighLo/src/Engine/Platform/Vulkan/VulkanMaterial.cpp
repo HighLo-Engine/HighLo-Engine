@@ -428,6 +428,7 @@ namespace highlo
 	void VulkanMaterial::Init()
 	{
 		AllocateStorage();
+		m_Shader->AddShaderReloadedCallback(std::bind(&VulkanMaterial::OnShaderReloaded, this));
 
 		m_Flags |= (uint32)MaterialFlag::DepthTest;
 		m_Flags |= (uint32)MaterialFlag::Blend;
@@ -514,6 +515,7 @@ namespace highlo
 
 	void VulkanMaterial::SetVulkanDescriptor(const HLString &name, const Ref<Texture2D> &texture)
 	{
+		HL_CORE_TRACE("Trying to read {0} from shader {1}", *name, *m_Shader->GetName());
 		const ShaderResourceDeclaration *resource = FindResourceDeclaration(name);
 		HL_ASSERT(resource);
 

@@ -40,6 +40,16 @@ namespace highlo
 		void SetUniformBuffer(const Ref<UniformBuffer> &uniformBuffer, uint32 binding, uint32 set = 0);
 		void RT_SetUniformBuffer(const Ref<UniformBuffer> &uniformBuffer, uint32 binding, uint32 set = 0);
 
+		VkPipeline GetVulkanPipeline() { return m_VulkanPipeline; }
+		VkPipelineLayout GetVulkanPipelineLayout() { return m_PipelineLayout; }
+		VkDescriptorSet GetDescriptorSet(uint32 set = 0)
+		{
+			HL_ASSERT(m_DescriptorSets.DescriptorSets.size() > set);
+			return m_DescriptorSets.DescriptorSets[set];
+		}
+
+		const std::vector<VkDescriptorSet> &GetDescriptorSets() const { return m_DescriptorSets.DescriptorSets; }
+
 	private:
 
 		VertexArraySpecification m_Specification;

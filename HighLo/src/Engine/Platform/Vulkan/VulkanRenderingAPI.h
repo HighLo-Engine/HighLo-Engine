@@ -134,9 +134,6 @@ namespace highlo
 		// Vulkan-specific
 		static VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetAllocateInfo &allocInfo);
 
-		// TODO: move this to vulkan material
-	//	static void UpdateMaterialForRendering(Ref<VulkanMaterial> &material, Ref<UniformBufferSet> &uniformBufferSet, Ref<StorageBufferSet> &storageBufferSet);
-		
 		static VkSampler GetClampSampler();
 		static VkSampler GetPointSampler();
 

@@ -47,7 +47,7 @@ namespace highlo
 
 		virtual void Reload(bool forceCompile = false) override;
 		virtual void Release() override;
-		virtual uint64 GetHash() const override { return m_FilePath.Absolute().Hash(); }
+		virtual uint64 GetHash() const override { return m_FilePath.Hash(); }
 
 		virtual void Bind() const override {}
 		virtual void Unbind() override {}

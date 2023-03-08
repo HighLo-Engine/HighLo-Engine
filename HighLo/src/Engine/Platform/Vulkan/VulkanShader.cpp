@@ -20,6 +20,8 @@
 
 #include "Engine/Graphics/Shaders/GLSLIncluder.h"
 
+#define PRINT_DEBUG_OUTPUTS 1
+
 namespace highlo
 {
 	namespace utils
@@ -113,12 +115,12 @@ namespace highlo
 		{
 			switch (stage)
 			{
-				case VK_SHADER_STAGE_VERTEX_BIT:					return ".cached_opengl.vert";
-				case VK_SHADER_STAGE_FRAGMENT_BIT:					return ".cached_opengl.frag";
-				case VK_SHADER_STAGE_COMPUTE_BIT:					return ".cached_opengl.comp";
-				case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:		return ".cached_opengl.tessconn";
-				case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:	return ".cached_opengl.tessval";
-				case VK_SHADER_STAGE_GEOMETRY_BIT:					return ".cached_opengl.geo";
+				case VK_SHADER_STAGE_VERTEX_BIT:					return ".cached_vulkan.vert";
+				case VK_SHADER_STAGE_FRAGMENT_BIT:					return ".cached_vulkan.frag";
+				case VK_SHADER_STAGE_COMPUTE_BIT:					return ".cached_vulkan.comp";
+				case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:		return ".cached_vulkan.tessconn";
+				case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:	return ".cached_vulkan.tessval";
+				case VK_SHADER_STAGE_GEOMETRY_BIT:					return ".cached_vulkan.geo";
 			}
 
 			HL_ASSERT(false);
@@ -444,13 +446,14 @@ namespace highlo
 		{
 			HL_CORE_TRACE("[+] Trying to create shader {0}... [+]", **m_FilePath);
 
+			m_ShaderSources = PreProcess(source);
 			bool shaderCacheHasChanged = ShaderCache::HasChanged(m_FilePath, source);
 
-			m_ShaderSources = PreProcess(source);
 			std::unordered_map<VkShaderStageFlagBits, std::vector<uint32>> shaderData;
 			CompileOrGetVulkanBinary(shaderData, forceCompile || shaderCacheHasChanged);
 			LoadAndCreateShaders(shaderData);
 			ReflectAllShaderStages(shaderData);
+			CreateDescriptors();
 
 			HL_CORE_INFO("[+] Shader {0} loaded [+]", **m_FilePath);
 			m_Loaded = true;
@@ -474,9 +477,12 @@ namespace highlo
 			options.SetWarningsAsErrors();
 			options.SetGenerateDebugInfo();
 
-			bool optimize = false;
 #ifdef HL_RELEASE
-			optimize = true;
+			bool optimize = true;
+#elif HL_DISTRIBUTE
+			bool optimize = true;
+#else
+			bool optimize = false;
 #endif // HL_RELEASE
 
 			if (optimize)
@@ -509,9 +515,8 @@ namespace highlo
 			if (source.IsEmpty())
 				continue;
 
-			bool shaderCacheHasChanged = ShaderCache::HasChanged(m_FilePath, source);
 			const HLString &extension = utils::ShaderStageCachedFileExtension(stage);
-			if (!forceCompile && !shaderCacheHasChanged)
+			if (!forceCompile)
 			{
 				TryGetVulkanCachedBinary(cacheDirectory, extension, outBinary, stage);
 			}
@@ -566,7 +571,7 @@ namespace highlo
 		uint64 size = ftell(f);
 		fseek(f, 0, SEEK_SET);
 
-		HL_CORE_INFO("Loading cached binary");
+		HL_CORE_TRACE("Loading cached binary from {0}...", **p);
 		outBinary[stage] = std::vector<uint32>(size / sizeof(uint32));
 		fread(outBinary[stage].data(), sizeof(uint32), outBinary[stage].size(), f);
 		fclose(f);
@@ -697,6 +702,12 @@ namespace highlo
 				layoutBinding.stageFlags = imageSampler.Stage;
 				layoutBinding.pImmutableSamplers = nullptr;
 				layoutBinding.binding = binding;
+
+				if (shaderDescriptorSet.UniformBuffers.find(binding) != shaderDescriptorSet.UniformBuffers.end())
+				{
+					auto &name = shaderDescriptorSet.UniformBuffers.at(binding).Name;
+					HL_CORE_WARN("Found another binding set at {0}, but tried to store {1}", *name, *imageSampler.Name);
+				}
 
 				HL_ASSERT(shaderDescriptorSet.UniformBuffers.find(binding) == shaderDescriptorSet.UniformBuffers.end(), "Binding is already present!");
 				HL_ASSERT(shaderDescriptorSet.StorageBuffers.find(binding) == shaderDescriptorSet.StorageBuffers.end(), "Binding is already present!");

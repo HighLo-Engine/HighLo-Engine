@@ -22,7 +22,8 @@ namespace highlo
 
 		HLAPI void CreateStorage(uint32 size, uint32 binding, const std::vector<UniformVariable> &layout);
 
-		HLAPI Ref<StorageBuffer> GetStorage(uint32 binding, uint32 set = 0, uint32 frame = 0);
+		HLAPI Ref<StorageBuffer> &GetStorage(uint32 binding, uint32 set = 0, uint32 frame = 0);
+		HLAPI const Ref<StorageBuffer> &GetStorage(uint32 binding, uint32 set = 0, uint32 frame = 0) const;
 		HLAPI void SetStorage(const Ref<StorageBuffer> &storageBuffer, uint32 set = 0, uint32 frame = 0);
 		HLAPI void Resize(uint32 binding, uint32 set, uint32 size);
 

@@ -23,7 +23,16 @@ namespace highlo
 		}
 	}
 	
-	Ref<UniformBuffer> UniformBufferSet::GetUniform(uint32 binding, uint32 set, uint32 frame)
+	Ref<UniformBuffer> &UniformBufferSet::GetUniform(uint32 binding, uint32 set, uint32 frame)
+	{
+		HL_ASSERT(m_UniformBuffers.find(frame) != m_UniformBuffers.end());
+		HL_ASSERT(m_UniformBuffers.at(frame).find(set) != m_UniformBuffers.at(frame).end());
+		HL_ASSERT(m_UniformBuffers.at(frame).at(set).find(binding) != m_UniformBuffers.at(frame).at(set).end());
+
+		return m_UniformBuffers.at(frame).at(set).at(binding);
+	}
+
+	const Ref<UniformBuffer> &UniformBufferSet::GetUniform(uint32 binding, uint32 set, uint32 frame) const
 	{
 		HL_ASSERT(m_UniformBuffers.find(frame) != m_UniformBuffers.end());
 		HL_ASSERT(m_UniformBuffers.at(frame).find(set) != m_UniformBuffers.at(frame).end());

@@ -14,8 +14,13 @@ layout(location = 2) in vec3 a_Normal;
 layout(location = 3) in vec3 a_Tangent;
 layout(location = 4) in vec3 a_Binormal;
 
-layout(location = 5) in ivec4 a_BoneIndices;
-layout(location = 6) in vec4 a_BoneWeights;
+// Transform buffer
+layout(location = 5) in vec4 a_MRow0;
+layout(location = 6) in vec4 a_MRow1;
+layout(location = 7) in vec4 a_MRow2;
+
+layout(location = 8) in ivec4 a_BoneIndices;
+layout(location = 9) in vec4 a_BoneWeights;
 
 invariant gl_Position;
 
@@ -61,10 +66,10 @@ layout(binding = 19, std140) uniform BoneTransformIndex
 void main()
 {
 	mat4 transform = mat4(
-		vec4(u_ObjectTransformation.Row0.x, u_ObjectTransformation.Row1.x, u_ObjectTransformation.Row2.x, 0.0),
-		vec4(u_ObjectTransformation.Row0.y, u_ObjectTransformation.Row1.y, u_ObjectTransformation.Row2.y, 0.0),
-		vec4(u_ObjectTransformation.Row0.z, u_ObjectTransformation.Row1.z, u_ObjectTransformation.Row2.z, 0.0),
-		vec4(u_ObjectTransformation.Row0.w, u_ObjectTransformation.Row1.w, u_ObjectTransformation.Row2.w, 1.0)
+		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),
+		vec4(a_MRow0.y, a_MRow1.y, a_MRow2.y, 0.0),
+		vec4(a_MRow0.z, a_MRow1.z, a_MRow2.z, 0.0),
+		vec4(a_MRow0.w, a_MRow1.w, a_MRow2.w, 1.0)
 	);
 
 #ifdef __VULKAN__
@@ -153,6 +158,24 @@ layout(location = 0) out vec4 o_Color;
 	//	bool UseNormalMap;
 	//	bool Padding1;
 	} u_MaterialUniforms;
+#endif
+
+#ifdef __VULKAN__
+	// PBR texture inputs
+	layout(set = 0, binding = 5) uniform sampler2D u_DiffuseTexture;
+	layout(set = 0, binding = 6) uniform sampler2D u_NormalTexture;
+	layout(set = 0, binding = 7) uniform sampler2D u_MetalnessTexture;
+	layout(set = 0, binding = 8) uniform sampler2D u_RoughnessTexture;
+
+	// Environment maps
+	layout(set = 1, binding = 9) uniform samplerCube u_EnvRadianceTex;
+	layout(set = 1, binding = 10) uniform samplerCube u_EnvIrradianceTex;
+
+	// BRDF LUT
+	layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
+
+	// Shadow maps
+	layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
 #endif
 
 void main()
@@ -265,6 +288,10 @@ void main()
 //
 //	o_Color = vec4(iblContribution + lightContribution, 1.0);
 
+	vec4 tex = texture(u_DiffuseTexture, Input.TexCoord);
+	vec4 normalTex = texture(u_NormalTexture, Input.TexCoord);
+	vec4 metalTex = texture(u_MetalnessTexture, Input.TexCoord);
+	vec4 roughnessTex = texture(u_RoughnessTexture, Input.TexCoord);
 	o_Color = vec4(u_MaterialUniforms.DiffuseColor, 1.0);
 }
 

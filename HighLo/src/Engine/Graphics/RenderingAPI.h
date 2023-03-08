@@ -75,7 +75,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
-			uint32 transformBufferOffset
+			uint32 transformBufferLength,
+			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset
 		) = 0;
 
 		HLAPI virtual void DrawDynamicMesh(
@@ -87,7 +89,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
-			uint32 transformBufferOffset
+			uint32 transformBufferLength,
+			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset
 		) = 0;
 
 		HLAPI virtual void DrawInstancedStaticMesh(
@@ -99,7 +103,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount
 		) = 0;
 
@@ -112,7 +118,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount
 		) = 0;
 
@@ -124,7 +132,9 @@ namespace highlo
 			Ref<StaticModel> &model,
 			uint32 submeshIndex,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial
 		) = 0;
@@ -137,7 +147,9 @@ namespace highlo
 			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial
 		) = 0;

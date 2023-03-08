@@ -131,7 +131,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
-			uint32 transformBufferOffset);
+			uint32 transformBufferLength,
+			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset);
 
 		HLAPI static void RenderStaticMesh(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -142,7 +144,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
-			uint32 transformBufferOffset);
+			uint32 transformBufferLength,
+			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset);
 
 		HLAPI static void RenderInstancedDynamicMesh(
 			const Ref<CommandBuffer> &renderCommandBuffer,
@@ -153,7 +157,9 @@ namespace highlo
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount);
 
 		HLAPI static void RenderInstancedStaticMesh(
@@ -165,7 +171,9 @@ namespace highlo
 			uint32 submeshIndex, 
 			const Ref<MaterialTable> &materials, 
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength, 
 			uint32 transformBufferOffset, 
+			uint32 transformBufferInstanceOffset, 
 			uint32 instanceCount);
 
 		HLAPI static void RenderInstancedStaticMeshWithMaterial(
@@ -176,7 +184,9 @@ namespace highlo
 			Ref<StaticModel> &model,
 			uint32 submeshIndex,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial);
 
@@ -188,7 +198,9 @@ namespace highlo
 			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
 			const TransformVertexData *transformBuffer,
+			uint32 transformBufferLength,
 			uint32 transformBufferOffset,
+			uint32 transformBufferInstanceOffset,
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial);
 

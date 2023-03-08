@@ -251,6 +251,7 @@ namespace highlo
 		std::map<MeshKey, TransformMapData> m_MeshTransformMap;
 
 		TransformVertexData *m_TransformVertexData = nullptr;
+		uint32 m_TransformVertexDataCount = 0;
 
 		// Bloom
 		Ref<Shader> m_BloomBlurShader = nullptr;

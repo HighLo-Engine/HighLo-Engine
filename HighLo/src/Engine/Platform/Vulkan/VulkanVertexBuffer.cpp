@@ -115,6 +115,19 @@ namespace highlo
 		memcpy(pData, (uint8*)data + offset, size);
 		allocator.UnmapMemory(m_MemoryAllocation);
 	}
+	
+	void VulkanVertexBuffer::SetData(void *data, uint32 size)
+	{
+		HL_ASSERT(size < m_Buffer.Size);
+
+		m_Size = size;
+		memcpy(m_Buffer.Data, (uint8*)data, size);
+
+		VulkanAllocator allocator("VulkanVertexBuffer");
+		uint8 *pData = allocator.MapMemory<uint8>(m_MemoryAllocation);
+		memcpy(pData, (uint8*)data, size);
+		allocator.UnmapMemory(m_MemoryAllocation);
+	}
 }
 
 #endif // HIGHLO_API_VULKAN

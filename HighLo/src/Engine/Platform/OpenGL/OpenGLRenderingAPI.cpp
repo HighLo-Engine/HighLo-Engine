@@ -283,7 +283,9 @@ namespace highlo
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
 		const TransformVertexData *transformBuffer, 
-		uint32 transformBufferOffset)
+		uint32 transformBufferLength,
+		uint32 transformBufferOffset,
+		uint32 transformBufferInstanceOffset)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
@@ -303,9 +305,17 @@ namespace highlo
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
-			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-			objUB->SetData(&objTransform, sizeof(objTransform));
+			// The transform buffer will always follow the standard layout, that's why we can calculate the offset this way.
+			// In the vertex buffer, the transform buffer data will be placed at the end.
+			auto &vaLayout = va->GetSpecification().Layout.GetElements();
+			uint32 vaTransformBufferOffset = 0;
+			for (auto &layout : vaLayout)
+			{
+				vaTransformBufferOffset += layout.Size;
+			}
+
+			const TransformVertexData &currentTransformBuffer = transformBuffer[transformBufferOffset];
+			model->Get()->GetVertexBuffer()->UpdateContents((void*)&currentTransformBuffer, sizeof(TransformVertexData), vaTransformBufferOffset);
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
@@ -351,7 +361,9 @@ namespace highlo
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
 		const TransformVertexData *transformBuffer, 
-		uint32 transformBufferOffset)
+		uint32 transformBufferLength,
+		uint32 transformBufferOffset,
+		uint32 transformBufferInstanceOffset)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
@@ -371,10 +383,17 @@ namespace highlo
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
-			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+			// The transform buffer will always follow the standard layout, that's why we can calculate the offset this way.
+			// In the vertex buffer, the transform buffer data will be placed at the end.
+			auto &vaLayout = va->GetSpecification().Layout.GetElements();
+			uint32 vaTransformBufferOffset = 0;
+			for (auto &layout : vaLayout)
+			{
+				vaTransformBufferOffset += layout.Size;
+			}
 
-			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-			objUB->SetData(&objTransform, sizeof(objTransform));
+			const TransformVertexData &currentTransformBuffer = transformBuffer[transformBufferOffset];
+			model->Get()->GetVertexBuffer()->UpdateContents((void *)&currentTransformBuffer, sizeof(TransformVertexData), vaTransformBufferOffset);
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
@@ -419,17 +438,26 @@ namespace highlo
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
 		const TransformVertexData *transformBuffer,
+		uint32 transformBufferLength, 
 		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
 		uint32 instanceCount)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+		// The transform buffer will always follow the standard layout, that's why we can calculate the offset this way.
+		// In the vertex buffer, the transform buffer data will be placed at the end.
+		auto &vaLayout = va->GetSpecification().Layout.GetElements();
+		uint32 vaTransformBufferOffset = 0;
+		for (auto &layout : vaLayout)
+		{
+			vaTransformBufferOffset += layout.Size;
+		}
 
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
+		const TransformVertexData &currentTransformBuffer = transformBuffer[transformBufferOffset];
+		model->Get()->GetVertexBuffer()->UpdateContents((void *)&currentTransformBuffer, sizeof(TransformVertexData), vaTransformBufferOffset);
 
 		if (model->IsAnimated())
 		{
@@ -488,17 +516,26 @@ namespace highlo
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
 		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
 		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
 		uint32 instanceCount)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+		// The transform buffer will always follow the standard layout, that's why we can calculate the offset this way.
+		// In the vertex buffer, the transform buffer data will be placed at the end.
+		auto &vaLayout = va->GetSpecification().Layout.GetElements();
+		uint32 vaTransformBufferOffset = 0;
+		for (auto &layout : vaLayout)
+		{
+			vaTransformBufferOffset += layout.Size;
+		}
 
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
+		const TransformVertexData &currentTransformBuffer = transformBuffer[transformBufferOffset];
+		model->Get()->GetVertexBuffer()->UpdateContents((void *)&currentTransformBuffer, sizeof(TransformVertexData), vaTransformBufferOffset);
 
 		if (model->IsAnimated())
 		{
@@ -556,7 +593,9 @@ namespace highlo
 		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
 		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
 		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
 	{
@@ -564,10 +603,17 @@ namespace highlo
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
 
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+		// The transform buffer will always follow the standard layout, that's why we can calculate the offset this way.
+		// In the vertex buffer, the transform buffer data will be placed at the end.
+		auto &vaLayout = va->GetSpecification().Layout.GetElements();
+		uint32 vaTransformBufferOffset = 0;
+		for (auto &layout : vaLayout)
+		{
+			vaTransformBufferOffset += layout.Size;
+		}
 
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
+		const TransformVertexData &currentTransformBuffer = transformBuffer[transformBufferOffset];
+		model->Get()->GetVertexBuffer()->UpdateContents((void *)&currentTransformBuffer, sizeof(TransformVertexData), vaTransformBufferOffset);
 
 		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 		if (model->IsAnimated())
@@ -601,7 +647,6 @@ namespace highlo
 			mat.UseNormalMap = (bool)material->GetNormalMap();
 			materialUB->SetData(&mat, sizeof(mat));
 
-			objUB->Bind();
 			animatedUB->Bind();
 			materialUB->Bind();
 
@@ -620,7 +665,9 @@ namespace highlo
 		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
 		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
 		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
 	{

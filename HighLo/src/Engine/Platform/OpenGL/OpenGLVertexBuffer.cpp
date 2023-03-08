@@ -68,6 +68,16 @@ namespace highlo
 	
 	void OpenGLVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
 	{
+		HL_ASSERT(size < m_Size);
+		HL_ASSERT((size + offset) < m_Size);
+
+		Bind();
+		memcpy(m_LocalData.Data + offset, data, size);
+		glNamedBufferSubData(m_ID, offset, size, data);
+	}
+
+	void OpenGLVertexBuffer::SetData(void *data, uint32 size)
+	{
 		Bind();
 
 		// Free existing memory
@@ -76,7 +86,7 @@ namespace highlo
 		m_Size = size;
 		m_LocalData = Allocator::Copy(data, size);
 
-		glNamedBufferSubData(m_ID, offset, m_Size, m_LocalData.Data);
+		glNamedBufferSubData(m_ID, 0, m_Size, m_LocalData.Data);
 	}
 }
 

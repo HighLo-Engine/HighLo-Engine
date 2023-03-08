@@ -28,6 +28,7 @@ namespace highlo
 		virtual void Unbind() const override {}
 
 		virtual void UpdateContents(void *data, uint32 size, uint32 offset = 0) override;
+		virtual void SetData(void *data, uint32 size) override;
 
 		virtual HLRendererID GetRendererID() override { return m_RendererID; }
 		virtual VertexBufferUsage GetUsage() override { return m_Usage; }

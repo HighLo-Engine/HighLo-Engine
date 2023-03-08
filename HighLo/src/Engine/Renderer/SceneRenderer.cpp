@@ -593,12 +593,14 @@ namespace highlo
 	void SceneRenderer::PreRender()
 	{
 		uint32 offset = 0;
+		m_TransformVertexDataCount = 0;
 		for (auto &[key, transformData] : m_MeshTransformMap)
 		{
 			transformData.TransformOffset = offset * sizeof(TransformVertexData);
 			for (const auto &transform : transformData.Transforms)
 			{
 				m_TransformVertexData[offset] = transform;
+				++m_TransformVertexDataCount;
 				++offset;
 			}
 		}
@@ -689,6 +691,8 @@ namespace highlo
 				dc.Model, 
 				dc.SubmeshIndex, 
 				m_TransformVertexData,
+				m_TransformVertexDataCount,
+				transformData.TransformOffset,
 				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
 				dc.InstanceCount, 
 				m_SelectedGeometryMaterial);
@@ -705,6 +709,8 @@ namespace highlo
 				dc.Model, 
 				dc.SubmeshIndex, 
 				m_TransformVertexData,
+				m_TransformVertexDataCount,
+				transformData.TransformOffset,
 				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), 
 				dc.InstanceCount, 
 				m_SelectedGeometryMaterial);
@@ -728,7 +734,9 @@ namespace highlo
 				dc.SubmeshIndex, 
 				dc.Materials ? dc.Materials : dc.Model->GetMaterials(),
 				m_TransformVertexData,
+				m_TransformVertexDataCount,
 				transformData.TransformOffset, 
+				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
 				dc.InstanceCount);
 		}
 	
@@ -744,7 +752,9 @@ namespace highlo
 				dc.SubmeshIndex, 
 				dc.Materials ? dc.Materials : dc.Model->GetMaterials(), 
 				m_TransformVertexData,
+				m_TransformVertexDataCount,
 				transformData.TransformOffset, 
+				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
 				dc.InstanceCount);
 		}
 

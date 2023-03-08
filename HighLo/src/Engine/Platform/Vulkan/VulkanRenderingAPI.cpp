@@ -172,7 +172,7 @@ namespace highlo
 		return s_VKRendererData->StorageBufferWriteDescriptorCache[storageBufferSet.Get()][shaderHash];
 	}
 
-	static VkBuffer TransformBufferToVulkanBuffer(const TransformVertexData *vertex_data, uint32 size)
+	static VkBuffer TransformBufferToVulkanBuffer(const TransformVertexData *vertex_data, uint32 size, uint32 offset)
 	{
 		VulkanAllocator allocator("TransformBuffer");
 		Ref<VulkanDevice> device = VulkanContext::GetCurrentDevice().As<VulkanDevice>();
@@ -188,7 +188,7 @@ namespace highlo
 
 		// Copy data to staging buffer
 		uint8 *destData = allocator.MapMemory<uint8>(stagingBufferAllocation);
-		memcpy(destData, vertex_data, size);
+		memcpy(destData, vertex_data + offset, size);
 		allocator.UnmapMemory(stagingBufferAllocation);
 
 		VkBufferCreateInfo vertexBufferCreateInfo = {};
@@ -538,9 +538,20 @@ namespace highlo
 		});
 	}
 	
-	void VulkanRenderingAPI::DrawStaticMesh(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<StaticModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials, const TransformVertexData *transformBuffer, uint32 transformBufferOffset)
+	void VulkanRenderingAPI::DrawStaticMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength,
+		uint32 transformBufferOffset,
+		uint32 transformBufferInstanceOffset)
 	{
-		Renderer::Submit([renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset]() mutable
+		Renderer::Submit([renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset, transformBufferInstanceOffset]() mutable
 		{
 			if (s_VKRendererData->SelectedDrawCall != -1 && s_VKRendererData->DrawCallCount > s_VKRendererData->SelectedDrawCall)
 				return;
@@ -554,8 +565,8 @@ namespace highlo
 			VkDeviceSize offsets[1] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vbMeshBuffer, offsets);
 
-			VkDeviceSize instanceOffsets[1] = { transformBufferOffset };
-			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer));
+			VkDeviceSize instanceOffsets[1] = { transformBufferInstanceOffset };
+			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer), transformBufferOffset);
 			HL_ASSERT(vbTransformBuffer);
 			vkCmdBindVertexBuffers(commandBuffer, 1, 1, &vbTransformBuffer, instanceOffsets);
 
@@ -614,7 +625,18 @@ namespace highlo
 		});
 	}
 	
-	void VulkanRenderingAPI::DrawDynamicMesh(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<DynamicModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials, const TransformVertexData *transformBuffer, uint32 transformBufferOffset)
+	void VulkanRenderingAPI::DrawDynamicMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength,
+		uint32 transformBufferOffset,
+		uint32 transformBufferInstanceOffset)
 	{
 		// TODO
 		Renderer::Submit([]() mutable
@@ -626,9 +648,21 @@ namespace highlo
 		});
 	}
 	
-	void VulkanRenderingAPI::DrawInstancedStaticMesh(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<StaticModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials, const TransformVertexData *transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	void VulkanRenderingAPI::DrawInstancedStaticMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
+		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
+		uint32 instanceCount)
 	{
-		Renderer::Submit([renderCommandBuffer, va, model, uniformBufferSet, storageBufferSet, submeshIndex, materials, transformBuffer, transformBufferOffset, instanceCount]() mutable
+		Renderer::Submit([renderCommandBuffer, va, model, uniformBufferSet, storageBufferSet, submeshIndex, materials, transformBuffer, transformBufferOffset, transformBufferInstanceOffset, instanceCount]() mutable
 		{
 			if (s_VKRendererData->SelectedDrawCall != -1 && s_VKRendererData->DrawCallCount > s_VKRendererData->SelectedDrawCall)
 				return;
@@ -642,8 +676,8 @@ namespace highlo
 			VkDeviceSize offsets[1] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vbMeshBuffer, offsets);
 
-			VkDeviceSize instanceOffsets[1] = { transformBufferOffset };
-			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer));
+			VkDeviceSize instanceOffsets[1] = { transformBufferInstanceOffset };
+			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer), transformBufferOffset);
 			HL_ASSERT(vbTransformBuffer);
 			vkCmdBindVertexBuffers(commandBuffer, 1, 1, &vbTransformBuffer, instanceOffsets);
 
@@ -714,15 +748,51 @@ namespace highlo
 		});
 	}
 	
-	void VulkanRenderingAPI::DrawInstancedDynamicMesh(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<DynamicModel> &model, uint32 submeshIndex, const Ref<MaterialTable> &materials, const TransformVertexData *transformBuffer, uint32 transformBufferOffset, uint32 instanceCount)
+	void VulkanRenderingAPI::DrawInstancedDynamicMesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materials, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
+		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
+		uint32 instanceCount)
 	{
 	}
 	
-	void VulkanRenderingAPI::DrawInstancedStaticMeshWithMaterial(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<StaticModel> &model, uint32 submeshIndex, const TransformVertexData *transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> &overrideMaterial)
+	void VulkanRenderingAPI::DrawInstancedStaticMeshWithMaterial(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
+		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
+		uint32 instanceCount, 
+		Ref<Material> &overrideMaterial)
 	{
 	}
 	
-	void VulkanRenderingAPI::DrawInstancedDynamicMeshWithMaterial(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<VertexArray> &va, const Ref<UniformBufferSet> &uniformBufferSet, const Ref<StorageBufferSet> &storageBufferSet, Ref<DynamicModel> &model, uint32 submeshIndex, const TransformVertexData *transformBuffer, uint32 transformBufferOffset, uint32 instanceCount, Ref<Material> &overrideMaterial)
+	void VulkanRenderingAPI::DrawInstancedDynamicMeshWithMaterial(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const TransformVertexData *transformBuffer, 
+		uint32 transformBufferLength, 
+		uint32 transformBufferOffset, 
+		uint32 transformBufferInstanceOffset, 
+		uint32 instanceCount, 
+		Ref<Material> &overrideMaterial)
 	{
 	}
 	
@@ -773,7 +843,7 @@ namespace highlo
 			VkDescriptorSet descriptorSet = s_VKRendererData->RendererDescriptorSet.at(sceneRenderer.Get())[bufferIndex].DescriptorSets[0];
 			s_VKRendererData->ActiveRendererDescriptorSet = descriptorSet;
 
-			std::array<VkWriteDescriptorSet, 4> writeDescriptors;
+		//	std::array<VkWriteDescriptorSet, 4> writeDescriptors;
 
 			Ref<VulkanTexture3D> radianceMap = environment->GetRadianceMap().As<VulkanTexture3D>();
 			Ref<VulkanTexture3D> irradianceMap = environment->GetIrradianceMap().As<VulkanTexture3D>();

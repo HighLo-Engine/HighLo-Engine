@@ -172,7 +172,7 @@ namespace highlo
 		return s_VKRendererData->StorageBufferWriteDescriptorCache[storageBufferSet.Get()][shaderHash];
 	}
 
-	static VkBuffer TransformBufferToVulkanBuffer(const TransformVertexData *vertex_data, uint32 size, VkDeviceSize device_size)
+	static VkBuffer TransformBufferToVulkanBuffer(const TransformVertexData *vertex_data, uint32 size)
 	{
 		VulkanAllocator allocator("TransformBuffer");
 		Ref<VulkanDevice> device = VulkanContext::GetCurrentDevice().As<VulkanDevice>();
@@ -555,7 +555,7 @@ namespace highlo
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vbMeshBuffer, offsets);
 
 			VkDeviceSize instanceOffsets[1] = { transformBufferOffset };
-			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer), *instanceOffsets);
+			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer));
 			HL_ASSERT(vbTransformBuffer);
 			vkCmdBindVertexBuffers(commandBuffer, 1, 1, &vbTransformBuffer, instanceOffsets);
 
@@ -643,7 +643,7 @@ namespace highlo
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vbMeshBuffer, offsets);
 
 			VkDeviceSize instanceOffsets[1] = { transformBufferOffset };
-			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer), *instanceOffsets);
+			VkBuffer vbTransformBuffer = TransformBufferToVulkanBuffer(transformBuffer, sizeof(transformBuffer));
 			HL_ASSERT(vbTransformBuffer);
 			vkCmdBindVertexBuffers(commandBuffer, 1, 1, &vbTransformBuffer, instanceOffsets);
 

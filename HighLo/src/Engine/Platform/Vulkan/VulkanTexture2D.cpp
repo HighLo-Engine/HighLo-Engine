@@ -820,7 +820,7 @@ namespace highlo
 			imageViewCreateInfo.image = m_Info.Image;
 
 			VK_CHECK_RESULT(vkCreateImageView(device, &imageViewCreateInfo, nullptr, &m_PerMipImageViews[mip]));
-			utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("{} image view mip: {}", m_Specification.DebugName, mip), m_PerMipImageViews[mip]);
+			utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("{} image view mip: {}", *m_Specification.DebugName, mip), m_PerMipImageViews[mip]);
 		}
 
 		return m_PerMipImageViews.at(mip);
@@ -860,6 +860,21 @@ namespace highlo
 			usage |= VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		}
 
+		if (m_Specification.Usage == TextureUsage::Attachment && utils::IsDepthFormat(m_Specification.Format))
+		{
+			if (!(usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT))
+			{
+				HL_ASSERT(false, "Texture usage is missing");
+			}
+		}
+		else if (m_Specification.Usage == TextureUsage::Attachment && !utils::IsDepthFormat(m_Specification.Format))
+		{
+			if (!(usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
+			{
+				HL_ASSERT(false, "Texture usage is missing");
+			}
+		}
+
 		VkImageAspectFlags aspectMask = utils::IsDepthFormat(m_Specification.Format) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
 		if (m_Specification.Format == TextureFormat::DEPTH24STENCIL8)
 			aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
@@ -882,7 +897,7 @@ namespace highlo
 		imageCreateInfo.usage = usage;
 		m_Info.MemoryAlloc = allocator.AllocateImage(imageCreateInfo, memoryUsage, m_Info.Image, &m_GPUAllocationSize);
 		s_ImageReferences[m_Info.Image] = this;
-		utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE, m_Specification.DebugName, m_Info.Image);
+		utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE, *m_Specification.DebugName, m_Info.Image);
 
 		// Create a default image view
 		VkImageViewCreateInfo imageViewCreateInfo = {};
@@ -898,7 +913,7 @@ namespace highlo
 		imageViewCreateInfo.subresourceRange.layerCount = m_Specification.Layers;
 		imageViewCreateInfo.image = m_Info.Image;
 		VK_CHECK_RESULT(vkCreateImageView(device, &imageViewCreateInfo, nullptr, &m_Info.ImageView));
-		utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("{} default image view", m_Specification.DebugName), m_Info.ImageView);
+		utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("{} default image view", *m_Specification.DebugName), m_Info.ImageView);
 
 		// TODO: Renderer should contain some kind of sampler cache
 		VkSamplerCreateInfo samplerCreateInfo = {};

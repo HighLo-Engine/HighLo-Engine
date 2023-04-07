@@ -84,39 +84,38 @@ namespace highlo
 
 				Renderer::BeginFrame();
 				
-				HLApplication *instance = this;
 				Renderer::Submit([&]()
 				{
 					m_Window->GetSwapChain()->BeginFrame();
 				});
 				
-				Renderer::Submit([&]()
-				{
-					OnUpdate(m_TimeStep);
-
-					// Update all layers pushed by the Client Application
-					for (ApplicationLayer *layer : m_LayerStack)
-						layer->OnUpdate(m_TimeStep);
-				});
+				// Update all layers pushed by the Client Application
+				OnUpdate(m_TimeStep);
+				for (ApplicationLayer *layer : m_LayerStack)
+					layer->OnUpdate(m_TimeStep);
 
 				// Update UI (render this after everything else to render it on top of the actual rendering)
-				Renderer::Submit([instance]() mutable
+				HLApplication *instance = this;
+				Renderer::Submit([instance]()
 				{
 					UI::BeginScene();
 
+					// update UI of the game application
 					instance->OnUIRender(instance->m_TimeStep);
-
 					for (ApplicationLayer *layer : instance->m_LayerStack)
 						layer->OnUIRender(instance->m_TimeStep);
 
+					// Draw debug panel
 #if HL_DEBUG
 					bool showDebugPanel = true;
 #else
 					bool showDebugPanel = false;
 #endif
-
 					instance->m_RenderDebugPanel->OnUIRender(&showDebugPanel, instance->m_Frametime * 1000.0f, instance->m_FPS, instance->m_LastFrameTime);
+				});
 
+				Renderer::Submit([=]()
+				{
 					UI::EndScene();
 				});
 

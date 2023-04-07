@@ -196,15 +196,16 @@ namespace highlo
 		s_GLRendererData->ActiveRenderPass = renderPass;
 	
 		s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Bind();
-		if (shouldClear)
+
+		Renderer::Submit([renderPass, shouldClear]()
 		{
-			Renderer::Submit([]()
+			if (shouldClear)
 			{
-				const glm::vec4 &clearColor = s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
+				const glm::vec4 &clearColor = renderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
 				glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			});
-		}
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::EndRenderPass(const Ref<CommandBuffer> &renderCommandBuffer)
@@ -279,27 +280,33 @@ namespace highlo
 		Ref<Material> &material, 
 		const glm::mat4 &transform)
 	{
-		s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
-		va->Bind();
-		s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
-		
-		if (material)
+		Renderer::Submit([va, material, uniformBufferSet]() mutable
 		{
-			material->UpdateForRendering(uniformBufferSet);
+			s_GLRendererData->FullscreenQuadVertexBuffer->Bind();
+			va->Bind();
+			s_GLRendererData->FullscreenQuadIndexBuffer->Bind();
 
-			SetDepthTest(material->GetFlag(MaterialFlag::DepthTest));
-		}
+			if (material)
+			{
+				material->UpdateForRendering(uniformBufferSet);
 
-		Renderer::Submit([]()
-		{
+				if (material->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+
 			glDrawElements(GL_TRIANGLES, s_GLRendererData->FullscreenQuadIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
-		});
 
-		// Reverse the state
-		if (material)
-		{
-			SetDepthTest(!material->GetFlag(MaterialFlag::DepthTest));
-		}
+			// Reverse the state
+			if (material)
+			{
+				if (!material->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::DrawStaticMesh(
@@ -313,63 +320,70 @@ namespace highlo
 		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
-		va->Bind();
-		model->Get()->GetIndexBuffer()->Bind();
-
-		auto &submeshes = model->Get()->GetSubmeshes();
-		for (Mesh submesh : submeshes)
+		Renderer::Submit([model, va, materials, transformBuffer, transformBufferOffset, uniformBufferSet]() mutable
 		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
-			if (!material)
+			model->Get()->GetVertexBuffer()->Bind();
+			va->Bind();
+			model->Get()->GetIndexBuffer()->Bind();
+
+			auto &submeshes = model->Get()->GetSubmeshes();
+			for (Mesh submesh : submeshes)
 			{
-			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
-				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
-				HL_ASSERT(material);
-			}
-
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
-			HL_ASSERT(glMaterial);
-
-			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-			objUB->SetData(&objTransform, sizeof(objTransform));
-
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-
-			glMaterial->UpdateForRendering(uniformBufferSet);
-			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
-
-			if (model->IsAnimated())
-			{
-				AnimatedBoneTransformUniformBuffer buffer;
-				auto &boneTransforms = model->GetBoneTransforms();
-				for (uint64 i = 0; boneTransforms.size(); ++i)
+				Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+				if (!material)
 				{
-					buffer.BoneTransform[i] = boneTransforms[i];
+					//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+					material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+					HL_ASSERT(material);
 				}
 
-				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-				ub->SetData(&buffer, sizeof(buffer));
-			}
+				Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+				HL_ASSERT(glMaterial);
 
-			Renderer::Submit([submesh]()
-			{
+				TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+				Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
+				objUB->SetData(&objTransform, sizeof(objTransform));
+
+				Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+				UniformBufferMaterial ubMaterial = {};
+				ubMaterial.DiffuseColor = material->GetDiffuseColor();
+				ubMaterial.Emission = material->GetEmission();
+				ubMaterial.Metalness = material->GetMetalness();
+				ubMaterial.Roughness = material->GetRoughness();
+				ubMaterial.Transparency = material->GetTransparency();
+				ubMaterial.EnvMapRotation = 0.0f;
+				ubMaterial.UseNormalMap = false;
+				materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+
+				glMaterial->UpdateForRendering(uniformBufferSet);
+
+				if (glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+
+				if (model->IsAnimated())
+				{
+					AnimatedBoneTransformUniformBuffer buffer;
+					auto &boneTransforms = model->GetBoneTransforms();
+					for (uint64 i = 0; boneTransforms.size(); ++i)
+					{
+						buffer.BoneTransform[i] = boneTransforms[i];
+					}
+
+					Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+					ub->SetData(&buffer, sizeof(buffer));
+				}
+
 				glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
-			});
 
-			// Reverse the state
-			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
-		}
+				// Reverse the state
+				if (!glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::DrawDynamicMesh(
@@ -383,64 +397,70 @@ namespace highlo
 		const TransformVertexData *transformBuffer, 
 		uint32 transformBufferOffset)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
-		va->Bind();
-		model->Get()->GetIndexBuffer()->Bind();
-
-		auto &submeshes = model->Get()->GetSubmeshes();
-		for (Mesh submesh : submeshes)
+		Renderer::Submit([model, va, materials, uniformBufferSet, transformBuffer, transformBufferOffset]() mutable
 		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
-			if (!material)
+			model->Get()->GetVertexBuffer()->Bind();
+			va->Bind();
+			model->Get()->GetIndexBuffer()->Bind();
+
+			auto &submeshes = model->Get()->GetSubmeshes();
+			for (Mesh submesh : submeshes)
 			{
-			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
-				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
-				HL_ASSERT(material);
-			}
-
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
-			HL_ASSERT(glMaterial);
-
-			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-			objUB->SetData(&objTransform, sizeof(objTransform));
-
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-
-			glMaterial->UpdateForRendering(uniformBufferSet);
-			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
-
-			if (model->IsAnimated())
-			{
-				AnimatedBoneTransformUniformBuffer buffer;
-				auto &boneTransforms = model->GetBoneTransforms();
-				for (uint64 i = 0; boneTransforms.size(); ++i)
+				Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+				if (!material)
 				{
-					buffer.BoneTransform[i] = boneTransforms[i];
+					//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+					material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+					HL_ASSERT(material);
 				}
 
-				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-				ub->SetData(&buffer, sizeof(buffer));
-			}
+				Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+				HL_ASSERT(glMaterial);
 
-			Renderer::Submit([submesh]()
-			{
+				TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+
+				Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
+				objUB->SetData(&objTransform, sizeof(objTransform));
+
+				Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+				UniformBufferMaterial ubMaterial = {};
+				ubMaterial.DiffuseColor = material->GetDiffuseColor();
+				ubMaterial.Emission = material->GetEmission();
+				ubMaterial.Metalness = material->GetMetalness();
+				ubMaterial.Roughness = material->GetRoughness();
+				ubMaterial.Transparency = material->GetTransparency();
+				ubMaterial.EnvMapRotation = 0.0f;
+				ubMaterial.UseNormalMap = false;
+				materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+
+				glMaterial->UpdateForRendering(uniformBufferSet);
+				if (glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+
+				if (model->IsAnimated())
+				{
+					AnimatedBoneTransformUniformBuffer buffer;
+					auto &boneTransforms = model->GetBoneTransforms();
+					for (uint64 i = 0; boneTransforms.size(); ++i)
+					{
+						buffer.BoneTransform[i] = boneTransforms[i];
+					}
+
+					Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+					ub->SetData(&buffer, sizeof(buffer));
+				}
+
 				glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), submesh.BaseVertex);
-			});
 
-			// Reverse the state
-			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
-		}
+				// Reverse the state
+				if (!glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMesh(
@@ -455,64 +475,70 @@ namespace highlo
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
-		va->Bind();
-		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
-
-		if (model->IsAnimated())
+		Renderer::Submit([model, va, transformBuffer, transformBufferOffset, uniformBufferSet, materials, instanceCount]() mutable
 		{
-			AnimatedBoneTransformUniformBuffer buffer;
-			auto &boneTransforms = model->GetBoneTransforms();
-			for (uint64 i = 0; boneTransforms.size(); ++i)
+			model->Get()->GetVertexBuffer()->Bind();
+			va->Bind();
+			model->Get()->GetIndexBuffer()->Bind();
+
+			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+
+			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
+			objUB->SetData(&objTransform, sizeof(objTransform));
+
+			if (model->IsAnimated())
 			{
-				buffer.BoneTransform[i] = boneTransforms[i];
+				AnimatedBoneTransformUniformBuffer buffer;
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
+				{
+					buffer.BoneTransform[i] = boneTransforms[i];
+				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+				ub->SetData(&buffer, sizeof(buffer));
 			}
 
-			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-			ub->SetData(&buffer, sizeof(buffer));
-		}
-
-		auto &submeshes = model->Get()->GetSubmeshes();
-		for (Mesh submesh : submeshes)
-		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
-			if (!material)
+			auto &submeshes = model->Get()->GetSubmeshes();
+			for (Mesh submesh : submeshes)
 			{
-			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
-				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
-				HL_ASSERT(material);
-			}
+				Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+				if (!material)
+				{
+					//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+					material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+					HL_ASSERT(material);
+				}
 
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
-			HL_ASSERT(glMaterial);
+				Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+				HL_ASSERT(glMaterial);
 
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+				Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+				UniformBufferMaterial ubMaterial = {};
+				ubMaterial.DiffuseColor = material->GetDiffuseColor();
+				ubMaterial.Emission = material->GetEmission();
+				ubMaterial.Metalness = material->GetMetalness();
+				ubMaterial.Roughness = material->GetRoughness();
+				ubMaterial.Transparency = material->GetTransparency();
+				ubMaterial.EnvMapRotation = 0.0f;
+				ubMaterial.UseNormalMap = false;
+				materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
 
-			glMaterial->UpdateForRendering(uniformBufferSet);
-			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
+				glMaterial->UpdateForRendering(uniformBufferSet);
+				if (glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
 
-			Renderer::Submit([submesh, instanceCount]()
-			{
 				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
 
-			// Reverse the state
-			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
-		}
+				// Reverse the state
+				if (!glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedDynamicMesh(
@@ -527,64 +553,70 @@ namespace highlo
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
-		va->Bind();
-		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
-
-		if (model->IsAnimated())
+		Renderer::Submit([model, va, transformBuffer, transformBufferOffset, uniformBufferSet, materials, instanceCount]() mutable
 		{
-			AnimatedBoneTransformUniformBuffer buffer;
-			auto &boneTransforms = model->GetBoneTransforms();
-			for (uint64 i = 0; boneTransforms.size(); ++i)
+			model->Get()->GetVertexBuffer()->Bind();
+			va->Bind();
+			model->Get()->GetIndexBuffer()->Bind();
+
+			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+
+			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
+			objUB->SetData(&objTransform, sizeof(objTransform));
+
+			if (model->IsAnimated())
 			{
-				buffer.BoneTransform[i] = boneTransforms[i];
+				AnimatedBoneTransformUniformBuffer buffer;
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
+				{
+					buffer.BoneTransform[i] = boneTransforms[i];
+				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+				ub->SetData(&buffer, sizeof(buffer));
 			}
 
-			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-			ub->SetData(&buffer, sizeof(buffer));
-		}
-
-		auto &submeshes = model->Get()->GetSubmeshes();
-		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-		for (Mesh submesh : submeshes)
-		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
-			if (!material)
+			auto &submeshes = model->Get()->GetSubmeshes();
+			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+			for (Mesh submesh : submeshes)
 			{
-			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
-				material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
-				HL_ASSERT(material);
-			}
+				Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+				if (!material)
+				{
+				//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
+					material = model->GetMaterials()->GetMaterial(submesh.MaterialIndex);
+					HL_ASSERT(material);
+				}
 
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
+				UniformBufferMaterial ubMaterial = {};
+				ubMaterial.DiffuseColor = material->GetDiffuseColor();
+				ubMaterial.Emission = material->GetEmission();
+				ubMaterial.Metalness = material->GetMetalness();
+				ubMaterial.Roughness = material->GetRoughness();
+				ubMaterial.Transparency = material->GetTransparency();
+				ubMaterial.EnvMapRotation = 0.0f;
+				ubMaterial.UseNormalMap = false;
+				materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
 
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
-			HL_ASSERT(glMaterial);
+				Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+				HL_ASSERT(glMaterial);
 
-			glMaterial->UpdateForRendering(uniformBufferSet);
-			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
+				glMaterial->UpdateForRendering(uniformBufferSet);
+				if (glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
 
-			Renderer::Submit([submesh, instanceCount]()
-			{
 				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
 
-			// Reverse the state
-			SetDepthTest(!glMaterial->GetFlag(MaterialFlag::DepthTest));
-		}
+				// Reverse the state
+				if (!glMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedStaticMeshWithMaterial(
@@ -599,46 +631,52 @@ namespace highlo
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
-		va->Bind();
-		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
-
-		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-		if (model->IsAnimated())
+		Renderer::Submit([model, va, transformBuffer, transformBufferOffset, uniformBufferSet, overrideMaterial, instanceCount]() mutable
 		{
-			AnimatedBoneTransformUniformBuffer buffer;
-			auto &boneTransforms = model->GetBoneTransforms();
-			for (uint64 i = 0; boneTransforms.size(); ++i)
+			model->Get()->GetVertexBuffer()->Bind();
+			va->Bind();
+			model->Get()->GetIndexBuffer()->Bind();
+
+			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+
+			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
+			objUB->SetData(&objTransform, sizeof(objTransform));
+
+			Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+			if (model->IsAnimated())
 			{
-				buffer.BoneTransform[i] = boneTransforms[i];
+				AnimatedBoneTransformUniformBuffer buffer;
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
+				{
+					buffer.BoneTransform[i] = boneTransforms[i];
+				}
+
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+				ub->SetData(&buffer, sizeof(buffer));
 			}
 
-			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-			ub->SetData(&buffer, sizeof(buffer));
-		}
 
-
-		auto &submeshes = model->Get()->GetSubmeshes();
-		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-		Ref<MaterialTable> &allMaterials = model->GetMaterials();
-		for (Mesh &submesh : submeshes)
-		{
-			overrideMaterial->UpdateForRendering(uniformBufferSet);
-			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
-
-			Renderer::Submit([submesh, instanceCount]()
+			auto &submeshes = model->Get()->GetSubmeshes();
+			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+			Ref<MaterialTable> &allMaterials = model->GetMaterials();
+			for (Mesh &submesh : submeshes)
 			{
-				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
+				overrideMaterial->UpdateForRendering(uniformBufferSet);
+				if (overrideMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
 
-			// Reverse the state
-			SetDepthTest(!overrideMaterial->GetFlag(MaterialFlag::DepthTest));
-		}
+				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+
+				// Reverse the state
+				if (!overrideMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::DrawInstancedDynamicMeshWithMaterial(
@@ -653,45 +691,51 @@ namespace highlo
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
 	{
-		model->Get()->GetVertexBuffer()->Bind();
-		va->Bind();
-		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
-
-		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-		if (model->IsAnimated())
+		Renderer::Submit([model, va, transformBuffer, transformBufferOffset, uniformBufferSet, overrideMaterial, instanceCount]() mutable
 		{
-			AnimatedBoneTransformUniformBuffer buffer;
-			auto &boneTransforms = model->GetBoneTransforms();
-			for (uint64 i = 0; boneTransforms.size(); ++i)
+			model->Get()->GetVertexBuffer()->Bind();
+			va->Bind();
+			model->Get()->GetIndexBuffer()->Bind();
+
+			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
+			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
+			objUB->SetData(&objTransform, sizeof(objTransform));
+
+			Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+			if (model->IsAnimated())
 			{
-				buffer.BoneTransform[i] = boneTransforms[i];
+				AnimatedBoneTransformUniformBuffer buffer;
+				auto &boneTransforms = model->GetBoneTransforms();
+				for (uint64 i = 0; boneTransforms.size(); ++i)
+				{
+					buffer.BoneTransform[i] = boneTransforms[i];
+				}
+
+				// Upload the bone transform
+				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
+				ub->SetData(&buffer, sizeof(buffer));
 			}
 
-			// Upload the bone transform
-			Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
-			ub->SetData(&buffer, sizeof(buffer));
-		}
-
-		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-		auto &submeshes = model->Get()->GetSubmeshes();
-		Ref<MaterialTable> &allMaterials = model->GetMaterials();
-		for (Mesh &submesh : submeshes)
-		{
-			overrideMaterial->UpdateForRendering(uniformBufferSet);
-			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
-
-			Renderer::Submit([submesh, instanceCount]()
+			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+			auto &submeshes = model->Get()->GetSubmeshes();
+			Ref<MaterialTable> &allMaterials = model->GetMaterials();
+			for (Mesh &submesh : submeshes)
 			{
-				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
-			});
+				overrideMaterial->UpdateForRendering(uniformBufferSet);
+				if (overrideMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
 
-			// Reverse the state
-			SetDepthTest(!overrideMaterial->GetFlag(MaterialFlag::DepthTest));
-		}
+				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
+
+				// Reverse the state
+				if (!overrideMaterial->GetFlag(MaterialFlag::DepthTest))
+					glEnable(GL_DEPTH_TEST);
+				else
+					glDisable(GL_DEPTH_TEST);
+			}
+		});
 	}
 
 	void OpenGLRenderingAPI::SetWireframe(bool wf)
@@ -786,7 +830,11 @@ namespace highlo
 			{
 				Ref<Texture2D> brdfLutTexture = Renderer::GetBRDFLutTexture();
 				HL_ASSERT(brdfLutTexture);
-				glBindSampler(resource->GetRegister(), brdfLutTexture->GetSamplerRendererID());
+				if (brdfLutTexture->GetSamplerRendererID() > 0)
+				{
+					glBindSampler(resource->GetRegister(), brdfLutTexture->GetSamplerRendererID());
+				}
+
 				glBindTextureUnit(resource->GetRegister(), brdfLutTexture->GetRendererID());
 			}
 

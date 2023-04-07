@@ -194,6 +194,15 @@ namespace highlo
 
 	void OpenGLFramebuffer::Invalidate()
 	{
+		Ref<OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance]() mutable
+		{
+			instance->RT_Invalidate();
+		});
+	}
+
+	void OpenGLFramebuffer::RT_Invalidate()
+	{
 		Release();
 
 		Ref<OpenGLFramebuffer> instance = this;
@@ -386,7 +395,7 @@ namespace highlo
 	void OpenGLFramebuffer::Release()
 	{
 		Ref<OpenGLFramebuffer> instance = this;
-		Renderer::Submit([instance]() mutable
+		Renderer::SubmitWithoutResources([instance]() mutable
 		{
 			glDeleteFramebuffers(1, &instance->m_RendererID);
 			instance->m_RendererID = 0;
@@ -422,17 +431,21 @@ namespace highlo
 		if ((!forceRecreate && (m_Specification.Width == width && m_Specification.Height == height)) || m_Specification.NoResize)
 			return;
 
-		m_Specification.Width = width * (uint32)m_Specification.Scale;
-		m_Specification.Height = height * (uint32)m_Specification.Scale;
+		Ref<OpenGLFramebuffer> instance = this;
+		Renderer::Submit([instance, width, height]() mutable
+		{
+			instance->m_Specification.Width = width * (uint32)instance->m_Specification.Scale;
+			instance->m_Specification.Height = height * (uint32)instance->m_Specification.Scale;
 
-		if (!m_Specification.SwapChainTarget)
-		{
-			Invalidate();
-		}
-		else
-		{
-			// we do not need to re-create the framebuffer
-		}
+			if (!instance->m_Specification.SwapChainTarget)
+			{
+				instance->RT_Invalidate();
+			}
+			else
+			{
+				// we do not need to re-create the framebuffer
+			}
+		});
 
 		for (auto &callback : m_ResizeCallbacks)
 			callback(this);

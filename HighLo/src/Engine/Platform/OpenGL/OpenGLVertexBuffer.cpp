@@ -57,10 +57,10 @@ namespace highlo
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
-		Ref<OpenGLVertexBuffer> instance = this;
-		Renderer::Submit([instance]()
+		GLuint rendererID = m_ID;
+		Renderer::SubmitWithoutResources([rendererID]()
 		{
-			glDeleteBuffers(1, &instance->m_ID);
+			glDeleteBuffers(1, &rendererID);
 		});
 	}
 

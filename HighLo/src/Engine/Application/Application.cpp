@@ -82,36 +82,52 @@ namespace highlo
 				// Update all services
 				Service::OnUpdate();
 
-				OnUpdate(m_TimeStep);
-
-				// Update all layers pushed by the Client Application
-				for (ApplicationLayer *layer : m_LayerStack)
-					layer->OnUpdate(m_TimeStep);
-
-				// Render all submitted objects to the screen
 				Renderer::BeginFrame();
-				m_Window->GetSwapChain()->BeginFrame();
-				Renderer::WaitAndRender();
-				m_Window->GetSwapChain()->EndFrame();
-				Renderer::EndFrame();
+				
+				HLApplication *instance = this;
+				Renderer::Submit([&]()
+				{
+					m_Window->GetSwapChain()->BeginFrame();
+				});
+				
+				Renderer::Submit([&]()
+				{
+					OnUpdate(m_TimeStep);
+
+					// Update all layers pushed by the Client Application
+					for (ApplicationLayer *layer : m_LayerStack)
+						layer->OnUpdate(m_TimeStep);
+				});
 
 				// Update UI (render this after everything else to render it on top of the actual rendering)
-				UI::BeginScene();
+				Renderer::Submit([instance]() mutable
+				{
+					UI::BeginScene();
 
-				OnUIRender(m_TimeStep);
+					instance->OnUIRender(instance->m_TimeStep);
 
-				for (ApplicationLayer *layer : m_LayerStack)
-					layer->OnUIRender(m_TimeStep);
+					for (ApplicationLayer *layer : instance->m_LayerStack)
+						layer->OnUIRender(instance->m_TimeStep);
 
 #if HL_DEBUG
-				bool showDebugPanel = true;
+					bool showDebugPanel = true;
 #else
-				bool showDebugPanel = false;
+					bool showDebugPanel = false;
 #endif
 
-				m_RenderDebugPanel->OnUIRender(&showDebugPanel, m_Frametime * 1000.0f, m_FPS, m_LastFrameTime);
+					instance->m_RenderDebugPanel->OnUIRender(&showDebugPanel, instance->m_Frametime * 1000.0f, instance->m_FPS, instance->m_LastFrameTime);
 
-				UI::EndScene();
+					UI::EndScene();
+				});
+
+				// Render all submitted objects to the screen
+				Renderer::WaitAndRender();
+
+				Renderer::Submit([&]()
+				{
+					m_Window->GetSwapChain()->EndFrame();
+				});
+				Renderer::EndFrame();
 			}
 			
 			// Swap Window Buffers (Double buffer)

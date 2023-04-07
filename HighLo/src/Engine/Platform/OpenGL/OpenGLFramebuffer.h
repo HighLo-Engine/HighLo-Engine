@@ -50,6 +50,10 @@ namespace highlo
 
 	private:
 
+		void RT_Invalidate();
+
+	private:
+
 		FramebufferSpecification m_Specification;
 		HLRendererID m_RendererID = 0;
 

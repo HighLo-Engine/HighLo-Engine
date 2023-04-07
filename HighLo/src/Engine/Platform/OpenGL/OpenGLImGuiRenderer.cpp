@@ -14,6 +14,8 @@
 #include "Engine/ImGui/ImGui/imgui_internal.h"
 #include "Engine/ImGui/ImGui/backends/imgui_impl_opengl3.h"
 
+#include "Engine/Renderer/Renderer.h"
+
 namespace highlo
 {
 	OpenGLImGuiRenderer::OpenGLImGuiRenderer()
@@ -26,18 +28,24 @@ namespace highlo
 
 	void OpenGLImGuiRenderer::Init(Window *window)
 	{
-	#ifdef HIGHLO_API_GLFW
-		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->GetNativeHandle(), true);
-	#else
-		ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
-	#endif // HIGHLO_API_GLFW
+		Renderer::Submit([window]()
+		{
+#ifdef HIGHLO_API_GLFW
+			ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)window->GetNativeHandle(), true);
+#else
+			ImGui_ImplWin32_Init(window->GetNativeHandle(), window->GetNativeContext());
+#endif // HIGHLO_API_GLFW
 
-		ImGui_ImplOpenGL3_Init("#version 450");
+			ImGui_ImplOpenGL3_Init("#version 450");
+		});
 	}
 
 	void OpenGLImGuiRenderer::Shutdown()
 	{
-		ImGui_ImplOpenGL3_Shutdown();
+		Renderer::Submit([]()
+		{
+			ImGui_ImplOpenGL3_Shutdown();
+		});
 	}
 
 	void OpenGLImGuiRenderer::NewFrame()

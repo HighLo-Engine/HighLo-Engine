@@ -125,8 +125,17 @@ namespace highlo
 		s_RenderingAPI->Shutdown();
 		UI::ShutdownImGui();
 
+		for (uint32 i = 0; i < Renderer::GetConfig().FramesInFlight; ++i)
+		{
+			auto &queue = Renderer::GetRenderResourceReleaseQueue(i);
+			queue.Execute();
+		}
+
 		delete s_CommandQueue;
+		s_CommandQueue = nullptr;
+
 		delete s_MainRendererData;
+		s_MainRendererData = nullptr;
 	}
 
 	void Renderer::BeginFrame()

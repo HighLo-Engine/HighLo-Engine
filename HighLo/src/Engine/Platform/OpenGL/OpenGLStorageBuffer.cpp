@@ -24,10 +24,10 @@ namespace highlo
 
 	OpenGLStorageBuffer::~OpenGLStorageBuffer()
 	{
-		Ref<OpenGLStorageBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
+		GLuint rendererID = m_RendererID;
+		Renderer::SubmitWithoutResources([rendererID]() mutable
 		{
-			glDeleteBuffers(1, &instance->m_RendererID);
+			glDeleteBuffers(1, &rendererID);
 		});
 	}
 

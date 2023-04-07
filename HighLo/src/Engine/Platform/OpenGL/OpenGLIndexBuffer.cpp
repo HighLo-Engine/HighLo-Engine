@@ -57,10 +57,10 @@ namespace highlo
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
-		Ref<OpenGLIndexBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
+		GLuint rendererID = m_ID;
+		Renderer::SubmitWithoutResources([rendererID]()
 		{
-			glDeleteBuffers(1, &instance->m_ID);
+			glDeleteBuffers(1, &rendererID);
 		});
 	}
 

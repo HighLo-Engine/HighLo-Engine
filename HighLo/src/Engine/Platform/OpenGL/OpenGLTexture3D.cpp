@@ -79,14 +79,14 @@ namespace highlo
 
 	void OpenGLTexture3D::Release()
 	{
-		Ref<OpenGLTexture3D> instance = this;
-		Renderer::Submit([instance]() mutable
+		GLuint rendererID = RendererID;
+		m_Loaded = false;
+		
+		Renderer::SubmitWithoutResources([rendererID]()
 		{
-			if (instance->RendererID)
+			if (rendererID)
 			{
-				glDeleteTextures(1, &instance->RendererID);
-				instance->RendererID = 0;
-				instance->m_Loaded = false;
+				glDeleteTextures(1, &rendererID);
 			}
 		});
 	}

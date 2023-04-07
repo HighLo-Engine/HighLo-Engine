@@ -57,12 +57,11 @@ namespace highlo
 	
 	OpenGLCommandBuffer::~OpenGLCommandBuffer()
 	{
-		Ref<OpenGLCommandBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
+		Renderer::SubmitWithoutResources([&]()
 		{
-			for (uint32 i = 0; i < instance->m_TimestampQueryCount; ++i)
+			for (uint32 i = 0; i < m_TimestampQueryCount; ++i)
 			{
-				glDeleteQueries(1, &instance->m_TimestampQueryPool[i]);
+				glDeleteQueries(1, &m_TimestampQueryPool[i]);
 			}
 		});
 	}

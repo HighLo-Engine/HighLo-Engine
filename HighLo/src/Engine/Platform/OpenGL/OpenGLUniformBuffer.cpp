@@ -15,21 +15,22 @@ namespace highlo
 		: UniformBuffer(binding, layout), m_Size(size)
 	{
 		Ref<OpenGLUniformBuffer> instance = this;
-		Renderer::Submit([instance, binding]() mutable
+		Renderer::Submit([instance, binding, size]() mutable
 		{
 			glGenBuffers(1, &instance->m_RendererID);
 			glBindBuffer(GL_UNIFORM_BUFFER, instance->m_RendererID);
+			//glBindBufferBase(GL_UNIFORM_BUFFER, binding, instance->m_RendererID);
 			glBufferData(GL_UNIFORM_BUFFER, instance->m_Size, instance->m_Data, GL_DYNAMIC_DRAW);
-			glBindBufferBase(GL_UNIFORM_BUFFER, binding, instance->m_RendererID);
+			glBindBufferRange(GL_UNIFORM_BUFFER, binding, instance->m_RendererID, 0, size);
 		});
 	}
 
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
 	{
-		Ref<OpenGLUniformBuffer> instance = this;
-		Renderer::Submit([instance]() mutable
+		GLuint rendererID = m_RendererID;
+		Renderer::SubmitWithoutResources([rendererID]() mutable
 		{
-			glDeleteBuffers(1, &instance->m_RendererID);
+			glDeleteBuffers(1, &rendererID);
 		});
 	}
 

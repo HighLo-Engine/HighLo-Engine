@@ -9,7 +9,6 @@
 
 #ifdef HL_PLATFORM_WINDOWS
 
-#include <Windows.h>
 #include "Engine/Window/FileMenu.h"
 
 namespace highlo

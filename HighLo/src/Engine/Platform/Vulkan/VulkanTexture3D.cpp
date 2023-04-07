@@ -232,6 +232,10 @@ namespace highlo
         utils::SetDebugUtilsObjectName(vulkanDevice, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("Texture 3D image view {}", *m_Specification.DebugName), m_DescriptorImageInfo.imageView);
     }
 
+    void VulkanTexture3D::RT_Invalidate()
+    {
+    }
+
     void VulkanTexture3D::Resize(const glm::uvec2 &size)
     {
         Resize(size.x, size.y);

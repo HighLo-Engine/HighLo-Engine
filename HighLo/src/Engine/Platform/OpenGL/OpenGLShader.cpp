@@ -321,9 +321,13 @@ namespace highlo
 
 	void OpenGLShader::Release()
 	{
-		glUseProgram(0);
-		glDeleteProgram(m_RendererID);
+		GLuint rendererID = m_RendererID;
 		m_RendererID = 0;
+		Renderer::SubmitWithoutResources([rendererID]()
+		{
+			glUseProgram(0);
+			glDeleteProgram(rendererID);
+		});
 	}
 
 	uint64 OpenGLShader::GetHash() const
@@ -896,95 +900,100 @@ namespace highlo
 
 	void OpenGLShader::LoadAndCreateShaders(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData)
 	{
-		if (m_RendererID)
-			glDeleteProgram(m_RendererID);
-
-		std::vector<GLuint> shaderRendererIds;
-		shaderRendererIds.reserve(shaderData.size());
-
-		m_RendererID = glCreateProgram();
-
-		m_ConstantBufferOffset = 0;
-		for (auto &[stage, data] : shaderData)
+		Ref<OpenGLShader> instance = this;
+		Renderer::Submit([instance, shaderData]() mutable
 		{
-			GLuint shaderId = glCreateShader(stage);
-			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
-			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
+			if (instance->m_RendererID)
+				glDeleteProgram(instance->m_RendererID);
 
-			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
+			std::vector<GLuint> shaderRendererIds;
+			shaderRendererIds.reserve(shaderData.size());
 
-			GLint isCompiled = 0;
-			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
-			if (isCompiled == GL_FALSE)
+			instance->m_RendererID = glCreateProgram();
+
+			instance->m_ConstantBufferOffset = 0;
+			for (auto &[stage, data] : shaderData)
+			{
+				GLuint shaderId = glCreateShader(stage);
+				glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, data.data(), uint32(data.size() * sizeof(uint32)));
+				glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
+
+				HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Compiling {0} shader ({1}) [+]", *utils::ShaderStageToString(stage), **instance->m_AssetPath);
+
+				GLint isCompiled = 0;
+				glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
+				if (isCompiled == GL_FALSE)
+				{
+					GLint maxInfoLength = 0;
+					glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxInfoLength);
+
+					if (maxInfoLength > 0)
+					{
+						std::vector<GLchar> infoLog(maxInfoLength);
+						glGetShaderInfoLog(shaderId, maxInfoLength, &maxInfoLength, &infoLog[0]);
+						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Compilation failed ({0}):\n{1} [-]", **instance->m_AssetPath, &infoLog[0]);
+
+						glDeleteShader(shaderId);
+						for (auto id : shaderRendererIds)
+							glDeleteShader(id);
+
+						glDeleteProgram(instance->m_RendererID);
+						instance->m_RendererID = 0;
+					}
+					else
+					{
+						HL_ASSERT(false, "Compilation failed but no infoLog accessible!");
+						HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Compilation failed but no infoLog accessible! [-]");
+					}
+				}
+				else
+				{
+					HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **instance->m_AssetPath);
+				}
+
+				glAttachShader(instance->m_RendererID, shaderId);
+				shaderRendererIds.emplace_back(shaderId);
+			}
+
+			// Link shader program
+			HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Linking Shader {0} [+]", **instance->m_AssetPath);
+
+			HL_ASSERT(instance->m_RendererID != 0);
+			glLinkProgram(instance->m_RendererID);
+
+			GLint isLinked = 0;
+			glGetProgramiv(instance->m_RendererID, GL_LINK_STATUS, (GLint*)&isLinked);
+			if (isLinked == GL_FALSE)
 			{
 				GLint maxInfoLength = 0;
-				glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxInfoLength);
+				glGetProgramiv(instance->m_RendererID, GL_INFO_LOG_LENGTH, &maxInfoLength);
 
 				if (maxInfoLength > 0)
 				{
 					std::vector<GLchar> infoLog(maxInfoLength);
-					glGetShaderInfoLog(shaderId, maxInfoLength, &maxInfoLength, &infoLog[0]);
-					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Compilation failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
+					glGetProgramInfoLog(instance->m_RendererID, maxInfoLength, &maxInfoLength, &infoLog[0]);
+					HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Linking failed ({0}):\n{1} [-]", **instance->m_AssetPath, &infoLog[0]);
 
-					glDeleteShader(shaderId);
+					glDeleteProgram(instance->m_RendererID);
+					instance->m_RendererID = 0;
 					for (auto id : shaderRendererIds)
 						glDeleteShader(id);
-
-					glDeleteProgram(m_RendererID);
-					m_RendererID = 0;
 				}
 				else
 				{
-					HL_ASSERT(false, "Compilation failed but no infoLog accessible!");
-					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Compilation failed but no infoLog accessible! [-]");
+					//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
+					HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Linking failed but no infolog was accessible! [-]");
 				}
 			}
 			else
 			{
-				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     {0} shader has been successfully compiled! ({1}) [+]", *utils::ShaderStageToString(stage), **m_AssetPath);
+				HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     Shader has been successfully linked! [+]");
 			}
 
-			glAttachShader(m_RendererID, shaderId);
-			shaderRendererIds.emplace_back(shaderId);
-		}
+			for (auto id : shaderRendererIds)
+				glDetachShader(instance->m_RendererID, id);
+		});
 
-		// Link shader program
-		HL_CORE_TRACE(GL_SHADER_LOG_PREFIX "[+]     Linking Shader {0} [+]", **m_AssetPath);
-
-		HL_ASSERT(m_RendererID != 0);
-		glLinkProgram(m_RendererID);
-
-		GLint isLinked = 0;
-		glGetProgramiv(m_RendererID, GL_LINK_STATUS, (GLint*)&isLinked);
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxInfoLength = 0;
-			glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxInfoLength);
-
-			if (maxInfoLength > 0)
-			{
-				std::vector<GLchar> infoLog(maxInfoLength);
-				glGetProgramInfoLog(m_RendererID, maxInfoLength, &maxInfoLength, &infoLog[0]);
-				HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Shader Linking failed ({0}):\n{1} [-]", **m_AssetPath, &infoLog[0]);
-
-				glDeleteProgram(m_RendererID);
-				m_RendererID = 0;
-				for (auto id : shaderRendererIds)
-					glDeleteShader(id);
-			}
-			else
-			{
-				//	HL_ASSERT(false, "Linking failed but no infoLog accessible!");
-				HL_CORE_WARN(GL_SHADER_LOG_PREFIX "[-]     Linking failed but no infolog was accessible! [-]");
-			}
-		}
-		else
-		{
-			HL_CORE_INFO(GL_SHADER_LOG_PREFIX "[+]     Shader has been successfully linked! [+]");
-		}
-
-		for (auto id : shaderRendererIds)
-			glDetachShader(m_RendererID, id);
 	}
 	
 	void OpenGLShader::CompileOrGetOpenGLBinary(std::unordered_map<uint32, std::vector<uint32>> &shaderData, bool forceCompile)

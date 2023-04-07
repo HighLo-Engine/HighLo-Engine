@@ -30,6 +30,8 @@
 #include "Engine/Graphics/RenderPass.h"
 #include "Engine/Graphics/Texture.h"
 
+#include "Engine/Threading/RenderThread.h"
+
 namespace highlo
 {
 	class Window;
@@ -47,6 +49,7 @@ namespace highlo
 	{
 	public:
 
+		HLAPI static void PreInit();
 		HLAPI static void Init(Window *window);
 		HLAPI static void Shutdown();
 
@@ -112,7 +115,12 @@ namespace highlo
 		HLAPI static void SetMacroInShader(Ref<Shader> &shader, const HLString &name, const HLString &value = "");
 		HLAPI static void SetGlobalMacroInShaders(const HLString &name, const HLString &value = "");
 
-		HLAPI static void WaitAndRender();
+		HLAPI static void WaitAndRender(RenderThread *renderThread);
+		HLAPI static void SwapQueues();
+		HLAPI static void RenderThreadFunc(RenderThread *renderThread);
+		HLAPI static uint32 GetRenderQueueIndex();
+		HLAPI static uint32 GetRenderQueueSubmissionIndex();
+
 		HLAPI static void RenderFullscreenQuad(
 			const Ref<CommandBuffer> &renderCommandBuffer, 
 			const Ref<VertexArray> &va, 

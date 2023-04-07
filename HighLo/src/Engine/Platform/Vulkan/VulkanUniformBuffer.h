@@ -26,7 +26,7 @@ namespace highlo
 		virtual void Bind() const override {}
 		virtual void Unbind() const override {}
 
-		virtual void UploadToShader() override;
+		virtual void UploadToShader(bool now = false) override;
 
 		// Vulkan-specific
 		const VkDescriptorBufferInfo &GetDescriptorBufferInfo() const { return m_DescriptorBufferInfo; }

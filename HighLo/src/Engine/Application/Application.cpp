@@ -30,12 +30,13 @@ namespace highlo
 	HLApplication *HLApplication::s_Instance = nullptr;
 
 	HLApplication::HLApplication()
+		: m_RenderThread(RenderThreadPolicy::MultiThreaded)
 	{
 		Init();
 	}
 
 	HLApplication::HLApplication(const ApplicationSettings &settings)
-		: m_Settings(settings)
+		: m_Settings(settings), m_RenderThread(RenderThreadPolicy::MultiThreaded)
 	{
 		Init();
 	}
@@ -66,6 +67,8 @@ namespace highlo
 		{
 			static uint32 frameCounter = 0;
 
+			m_RenderThread.BlockUntilRenderComplete();
+
 			// Reset the frame allocator on every frame
 			frameAllocator.FreeAll();
 
@@ -73,6 +76,9 @@ namespace highlo
 			if (Input::IsKeyPressed(HL_KEY_ESCAPE))
 				break;
 #endif
+
+			m_RenderThread.NextFrame();
+			m_RenderThread.Kick();
 
 			if (!m_Minimized && !m_Settings.Headless)
 			{
@@ -83,11 +89,7 @@ namespace highlo
 				Service::OnUpdate();
 
 				Renderer::BeginFrame();
-				
-				Renderer::Submit([&]()
-				{
-					m_Window->GetSwapChain()->BeginFrame();
-				});
+				Renderer::Submit([&]() { m_Window->GetSwapChain()->BeginFrame(); });
 				
 				// Update all layers pushed by the Client Application
 				OnUpdate(m_TimeStep);
@@ -95,43 +97,36 @@ namespace highlo
 					layer->OnUpdate(m_TimeStep);
 
 				// Update UI (render this after everything else to render it on top of the actual rendering)
-				HLApplication *instance = this;
-				Renderer::Submit([instance]()
+				if (m_Settings.EnableDearImGui)
 				{
-					UI::BeginScene();
+					HLApplication *instance = this;
+					Renderer::Submit([instance]()
+					{
+						UI::BeginScene();
 
-					// update UI of the game application
-					instance->OnUIRender(instance->m_TimeStep);
-					for (ApplicationLayer *layer : instance->m_LayerStack)
-						layer->OnUIRender(instance->m_TimeStep);
+						// update UI of the game application
+						instance->OnUIRender(instance->m_TimeStep);
+						for (ApplicationLayer *layer : instance->m_LayerStack)
+							layer->OnUIRender(instance->m_TimeStep);
 
-					// Draw debug panel
+						// Draw debug panel
 #if HL_DEBUG
-					bool showDebugPanel = true;
+						bool showDebugPanel = true;
 #else
-					bool showDebugPanel = false;
+						bool showDebugPanel = false;
 #endif
-					instance->m_RenderDebugPanel->OnUIRender(&showDebugPanel, instance->m_Frametime * 1000.0f, instance->m_FPS, instance->m_LastFrameTime);
-				});
+						instance->m_RenderDebugPanel->OnUIRender(&showDebugPanel, instance->m_Frametime * 1000.0f, instance->m_FPS, instance->m_LastFrameTime);
+					});
 
-				Renderer::Submit([=]()
-				{
-					UI::EndScene();
-				});
+					Renderer::Submit([=]() { UI::EndScene(); });
+				}
 
-				// Render all submitted objects to the screen
-				Renderer::WaitAndRender();
-
-				Renderer::Submit([&]()
-				{
-					m_Window->GetSwapChain()->EndFrame();
-				});
+				Renderer::Submit([&]() { m_Window->GetSwapChain()->EndFrame(); });
 				Renderer::EndFrame();
+
+				// Swap the window buffer
+				Renderer::Submit([&]() { m_Window->Update(); });
 			}
-			
-			// Swap Window Buffers (Double buffer)
-			if (!m_Settings.Headless)
-				m_Window->Update();
 
 			float time = GetTime();
 			m_Frametime = time - m_LastFrameTime;
@@ -181,6 +176,9 @@ namespace highlo
 		HL_ASSERT(!s_Instance, "Only one application can be executed at a time!");
 		s_Instance = this;
 		m_Settings.MainThreadID = Thread::GetCurrentThreadID();
+		Renderer::PreInit();
+
+		m_RenderThread.Run();
 
 		Logger::Init();
 
@@ -214,7 +212,8 @@ namespace highlo
 
 			// Init Renderer
 			Renderer::Init(m_Window.Get());
-			Renderer::WaitAndRender();
+
+			m_RenderThread.Pump();
 		}
 
 		m_ECS_SystemManager.RegisterSystem<RenderSystem>("RenderSystem");
@@ -246,6 +245,8 @@ namespace highlo
 
 	void HLApplication::Shutdown()
 	{
+		m_RenderThread.Terminate();
+
 		ScriptEngine::Shutdown();
 		Translations::Shutdown();
 

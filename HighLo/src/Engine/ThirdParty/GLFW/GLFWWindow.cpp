@@ -54,9 +54,7 @@ namespace highlo
 		glfwPollEvents();
 		Input::Update();
 
-		// The swapchain now takes care of swapping the buffers in the context
-		//m_Context->SwapBuffers();
-		//m_SwapChain->Present();
+		m_Context->SwapBuffers();
 	}
 
 	void GLFWWindow::SetWindowIcon(const HLString &path, bool flip)
@@ -244,6 +242,7 @@ namespace highlo
 		
 		if (!s_GLFWInitialized)
 		{
+			s_GLFWInitialized = true;
 			glfwInit();
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}

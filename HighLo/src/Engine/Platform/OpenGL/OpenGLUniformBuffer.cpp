@@ -19,8 +19,7 @@ namespace highlo
 		{
 			glGenBuffers(1, &instance->m_RendererID);
 			glBindBuffer(GL_UNIFORM_BUFFER, instance->m_RendererID);
-			//glBindBufferBase(GL_UNIFORM_BUFFER, binding, instance->m_RendererID);
-			glBufferData(GL_UNIFORM_BUFFER, instance->m_Size, instance->m_Data, GL_DYNAMIC_DRAW);
+			glBufferData(GL_UNIFORM_BUFFER, size, instance->m_Data, GL_DYNAMIC_DRAW);
 			glBindBufferRange(GL_UNIFORM_BUFFER, binding, instance->m_RendererID, 0, size);
 		});
 	}

@@ -20,7 +20,7 @@ namespace highlo
         Release();
     }
 
-    void VulkanUniformBuffer::UploadToShader()
+    void VulkanUniformBuffer::UploadToShader(bool now)
     {
         uint8 *dst = utils::MapMemory<uint8>(m_MemoryAllocation);
         memcpy(dst, m_Data, m_DataSize);

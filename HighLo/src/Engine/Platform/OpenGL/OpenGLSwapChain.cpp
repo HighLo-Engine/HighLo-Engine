@@ -50,10 +50,11 @@ namespace highlo
 	
 	void OpenGLSwapChain::Present()
 	{
-		m_Context->SwapBuffers();
-
-		const auto &config = Renderer::GetConfig();
-		m_CurrentBufferIndex = (m_CurrentBufferIndex + 1) % config.FramesInFlight;
+		Renderer::Submit([&]()
+		{
+			const auto &config = Renderer::GetConfig();
+			m_CurrentBufferIndex = (m_CurrentBufferIndex + 1) % config.FramesInFlight;
+		});
 	}
 }
 

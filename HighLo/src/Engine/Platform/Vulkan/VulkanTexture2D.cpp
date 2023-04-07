@@ -383,6 +383,10 @@ namespace highlo
             GenerateMips();
     }
 
+    void VulkanTexture2D::RT_Invalidate()
+    {
+    }
+
     void VulkanTexture2D::Resize(const glm::uvec2 &size)
     {
         Resize(size.x, size.y);
@@ -475,6 +479,10 @@ namespace highlo
             VK_CHECK_RESULT(vkCreateImageView(device, &imageView, nullptr, &m_PerLayerImageViews[layer]));
             utils::SetDebugUtilsObjectName(device, VK_OBJECT_TYPE_IMAGE_VIEW, fmt::format("{} image view layer: {}", *m_Specification.DebugName, layer), m_PerLayerImageViews[layer]);
         }
+    }
+
+    void VulkanTexture2D::DestroySampler()
+    {
     }
     
     void VulkanTexture2D::UpdateResourceData()

@@ -44,6 +44,7 @@ namespace highlo
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
+		virtual void RT_Invalidate() override;
 		virtual bool IsLoaded() const override { return m_Loaded; }
 
 		virtual void Resize(const glm::uvec2 &size) override;
@@ -55,6 +56,7 @@ namespace highlo
 		virtual void CreatePerLayerImageViews() override;
 		virtual void CreateSampler(TextureProperties properties) override;
 		virtual void CreatePerSpecificLayerImageViews(const std::vector<uint32> &layerIndices) override;
+		virtual void DestroySampler() override;
 
 		virtual TextureSpecification &GetSpecification() override { return m_Specification; }
 		virtual const TextureSpecification &GetSpecification() const override { return m_Specification; }

@@ -31,6 +31,7 @@ namespace highlo
 
 		virtual void Release() override;
 		virtual void Invalidate() override;
+		virtual void RT_Invalidate() override;
 		virtual bool IsLoaded() const override { return m_Loaded; }
 
 		virtual void Resize(const glm::uvec2 &size) override;

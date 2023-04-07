@@ -5,6 +5,8 @@
 
 #ifdef HL_PLATFORM_WINDOWS
 
+#include <Windows.h>
+
 namespace highlo
 {
 	WindowsFileMenu::WindowsFileMenu(const HLString &name)

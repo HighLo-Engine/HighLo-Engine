@@ -7,6 +7,8 @@
 
 #ifdef HL_PLATFORM_WINDOWS
 
+#include <Windows.h>
+
 namespace highlo
 {
 	WindowsMenuBar::WindowsMenuBar()

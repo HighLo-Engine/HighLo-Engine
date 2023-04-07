@@ -9,10 +9,10 @@
 
 #ifdef HL_PLATFORM_WINDOWS
 
+#include "Engine/Window/FileDialogue.h"
+
 #include <Windows.h>
 #include <ShObjIdl.h>
-
-#include "Engine/Window/FileDialogue.h"
 
 namespace highlo
 {

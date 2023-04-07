@@ -5,6 +5,8 @@
 
 #ifndef HIGHLO_API_GLFW
 
+#include <Windows.h>
+#include <shobjidl_core.h>
 #include <windowsx.h>
 
 #ifdef HIGHLO_API_DX11

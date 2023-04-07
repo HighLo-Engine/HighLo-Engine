@@ -59,17 +59,24 @@ namespace highlo
 	};
 
 	static GlobalShaderInfo s_GlobalShaderInfo;
+	constexpr static uint32 s_RenderCommandQueueCount = 2;
 
 	static RendererData *s_MainRendererData = nullptr;
-	static RenderCommandQueue *s_CommandQueue = nullptr;
+	static RenderCommandQueue *s_CommandQueue[s_RenderCommandQueueCount];
 	static RenderCommandQueue s_ResourceFreeQueue[3];
+
+	static std::atomic<uint32> s_RenderCommandQueueSubmissionIndex = 0;
+
+	void Renderer::PreInit()
+	{
+		s_MainRendererData = new RendererData();
+		s_CommandQueue[0] = new RenderCommandQueue();
+		s_CommandQueue[1] = new RenderCommandQueue();
+		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
+	}
 
 	void Renderer::Init(Window *window)
 	{
-		s_MainRendererData = new RendererData();
-		s_CommandQueue = new RenderCommandQueue();
-		s_MainRendererData->ShaderLib = Ref<ShaderLibrary>::Create();
-
 		// Load 3D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
@@ -114,7 +121,7 @@ namespace highlo
 		s_MainRendererData->EmptyEnvironment = Ref<Environment>::Create(s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture, s_MainRendererData->BlackCubeTexture);
 
 		// Make sure the queue is empty after the renderer is initialized
-		Renderer::WaitAndRender();
+		HLApplication::Get().GetRenderThread().Pump();
 
 		Renderer2D::Init();
 	}
@@ -131,8 +138,8 @@ namespace highlo
 			queue.Execute();
 		}
 
-		delete s_CommandQueue;
-		s_CommandQueue = nullptr;
+		delete s_CommandQueue[0];
+		delete s_CommandQueue[1];
 
 		delete s_MainRendererData;
 		s_MainRendererData = nullptr;
@@ -200,10 +207,38 @@ namespace highlo
 		}
 	}
 
-	void Renderer::WaitAndRender()
+	void Renderer::WaitAndRender(RenderThread *renderThread)
 	{
-		HL_PROFILE_FUNCTION();
-		s_CommandQueue->Execute();
+		// Wait for kick, then set render thread to busy
+		renderThread->WaitAndSet(RenderThread::State::Kick, RenderThread::State::Busy);
+
+		s_CommandQueue[Renderer::GetRenderQueueIndex()]->Execute();
+
+		// Rendering has completed, set state to idle
+		renderThread->Set(RenderThread::State::Idle);
+	}
+
+	void Renderer::SwapQueues()
+	{
+		s_RenderCommandQueueSubmissionIndex = (s_RenderCommandQueueSubmissionIndex + 1) % s_RenderCommandQueueCount;
+	}
+
+	uint32 Renderer::GetRenderQueueIndex()
+	{
+		return (s_RenderCommandQueueSubmissionIndex + 1) % s_RenderCommandQueueCount;
+	}
+
+	uint32 Renderer::GetRenderQueueSubmissionIndex()
+	{
+		return s_RenderCommandQueueSubmissionIndex;
+	}
+
+	void Renderer::RenderThreadFunc(RenderThread *renderThread)
+	{
+		while (renderThread->IsRunning())
+		{
+			WaitAndRender(renderThread);
+		}
 	}
 
 	void Renderer::RenderFullscreenQuad(
@@ -497,6 +532,6 @@ namespace highlo
 	
 	RenderCommandQueue &Renderer::GetRenderCommandQueue()
 	{
-		return *s_CommandQueue;
+		return *s_CommandQueue[s_RenderCommandQueueSubmissionIndex];
 	}
 }

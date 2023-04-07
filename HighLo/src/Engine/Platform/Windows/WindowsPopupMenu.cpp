@@ -5,6 +5,8 @@
 
 #ifdef HL_PLATFORM_WINDOWS
 
+#include <Windows.h>
+
 #include "Engine/Core/Input.h"
 
 namespace highlo

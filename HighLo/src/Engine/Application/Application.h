@@ -20,6 +20,8 @@
 
 #include "ApplicationSettings.h"
 
+#include "Engine/Threading/RenderThread.h"
+
 namespace highlo
 {
 	class HLApplication
@@ -57,6 +59,8 @@ namespace highlo
 		HLAPI Translations &GetTranslations() { return m_Translations; }
 		HLAPI Translation *GetActiveTranslation();
 
+		HLAPI RenderThread &GetRenderThread() { return m_RenderThread; }
+
 	private:
 
 		void Init();
@@ -90,6 +94,8 @@ namespace highlo
 
 		Timestep m_Frametime;
 		Timestep m_TimeStep;
+
+		RenderThread m_RenderThread;
 	};
 
 	// this will be implemented by the client application

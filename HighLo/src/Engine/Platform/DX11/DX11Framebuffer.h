@@ -40,7 +40,7 @@ namespace highlo
 
 		virtual HLRendererID GetRendererID() const override { return m_RendererID; }
 
-		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { return m_ColorAttachments[attachmentIndex]; }
+		virtual Ref<Texture> GetImage(uint32 attachmentIndex = 0) const override { HL_ASSERT(attachmentIndex < m_ColorAttachments.size()); return m_ColorAttachments[attachmentIndex]; }
 		virtual Ref<Texture> GetDepthImage() const override { return m_DepthAttachment; }
 
 		virtual FramebufferSpecification &GetSpecification() override { return m_Specification; }

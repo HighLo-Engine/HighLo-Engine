@@ -11,7 +11,8 @@
 #include "Engine/Platform/DX11/DX11StorageBuffer.h"
 #elif HIGHLO_API_DX12
 #include "Engine/Platform/DX12/DX12StorageBuffer.h"
-#include "Engine/Platform/DX11/DX11StorageBuffer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalStorageBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -26,6 +27,11 @@ namespace highlo
 		return Ref<DX12StorageBuffer>::Create(size, binding, layout);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanStorageBuffer>::Create(size, binding, layout);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalStorageBuffer>::Create(size, binding, layout);
+	#else
+		HL_ASSERT(false);
+		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
 

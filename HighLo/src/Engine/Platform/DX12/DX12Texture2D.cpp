@@ -10,7 +10,7 @@
 
 namespace highlo
 {
-	DX12Texture2D::DX12Texture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+	DX12Texture2D::DX12Texture2D(const FileSystemPath &filePath, bool flipOnLoad)
 	{
 	}
 	
@@ -114,6 +114,12 @@ namespace highlo
 	{
 	}
 	
+	void DX12Texture2D::SetData(void *data, uint32 data_size)
+	{
+		m_Buffer = Allocator::Copy(data, data_size);
+		Invalidate();
+	}
+
 	void DX12Texture2D::CreatePerLayerImageViews()
 	{
 	}

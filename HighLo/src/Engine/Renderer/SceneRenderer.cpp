@@ -23,7 +23,6 @@ namespace highlo
 		PointLightsBinding = 4,
 		ScreenBinding = 17,
 		HBAOBinding = 18,
-		MaterialBinding = 13,
 	};
 
 	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
@@ -53,7 +52,6 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), PointLightsBinding, UniformLayout::GetPointLightDataLayout()); // PointLights Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), ScreenBinding, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), HBAOBinding, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
-		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferMaterial), MaterialBinding, UniformLayout::GetMaterialLayout()); // Material Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway
@@ -773,10 +771,9 @@ namespace highlo
 
 		// Grid (TODO: make configurable)
 		Renderer::BeginRenderPass(m_CommandBuffer, m_ExternalCompositingRenderPass);
-	//	Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass);
 		const static glm::mat4 transform = 
 			glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) 
-			* glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
+		  * glm::scale(glm::mat4(1.0f), glm::vec3(8.0f));
 
 		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_GridVertexArray, m_UniformBufferSet, nullptr, m_GridMaterial, transform);
 		Renderer::EndRenderPass(m_CommandBuffer);

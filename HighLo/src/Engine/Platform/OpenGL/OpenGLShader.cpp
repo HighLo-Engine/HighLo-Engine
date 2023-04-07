@@ -283,6 +283,26 @@ namespace highlo
 	OpenGLShader::~OpenGLShader()
 	{
 		Release();
+
+		m_Loaded = false;
+		m_IsCompute = false;
+		m_Name.Clear();
+		m_AssetPath = "";
+		m_Language = ShaderLanguage::None;
+		m_ConstantBufferOffset = 0;
+
+		m_Macros.clear();
+		m_UniformLocations.clear();
+		m_AcknowledgedMacros.clear();
+		m_ShaderDescriptorSets.clear();
+		m_PushConstantRanges.clear();
+
+		m_ShaderSources.clear();
+		m_Buffers.clear();
+		m_Resources.clear();
+		m_ReloadedCallbacks.clear();
+
+		m_StagesMetaData.clear();
 	}
 
 	void OpenGLShader::Reload(bool forceCompile)
@@ -351,6 +371,134 @@ namespace highlo
 	void OpenGLShader::ClearUniformBuffers()
 	{
 		s_UniformBuffers.clear();
+	}
+
+	int32 OpenGLShader::GetUniformLocation(const HLString &name)
+	{
+		if (m_UniformLocations.find(name) == m_UniformLocations.end())
+		{
+			// Cache miss
+			int32 location = glGetUniformLocation(m_RendererID, *name);
+			if (location != -1)
+			{
+				m_UniformLocations[name] = location;
+			}
+			else
+			{
+				HL_CORE_WARN("Could not find uniform location {0}", *name);
+				return -1;
+			}
+		}
+
+		return m_UniformLocations.at(name);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, int32 value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, uint32 value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform1ui(location, value);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, float value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform1f(location, value);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::vec2 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform2f(location, value.x, value.y);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::vec3 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform3f(location, value.x, value.y, value.z);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::vec4 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::mat2 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::mat3 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::mat4 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+	
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::ivec2 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform2i(location, value.x, value.y);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::ivec3 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform3i(location, value.x, value.y, value.z);
+	}
+
+	void OpenGLShader::SetUniform(const HLString &name, const glm::ivec4 &value)
+	{
+		int32 location = GetUniformLocation(name);
+		if (location == -1)
+			return;
+
+		glUniform4i(location, value.x, value.y, value.z, value.w);
 	}
 	
 	void OpenGLShader::Load(const HLString &source, bool forceCompile)

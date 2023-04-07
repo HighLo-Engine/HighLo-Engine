@@ -108,6 +108,7 @@ namespace highlo
 		HLAPI bool operator!=(const Entity &other) const { return !(*this == other); }
 		HLAPI operator bool() const { return m_Initialized; }
 		HLAPI operator uint64() const { return (uint64)m_ID; }
+		HLAPI operator uint32() const { return (uint32)m_ID; }
 
 	private:
 

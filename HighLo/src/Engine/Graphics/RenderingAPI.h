@@ -22,6 +22,7 @@
 namespace highlo
 {
 	class VertexArray;
+	class SceneRenderer;
 
 	enum class PrimitiveType
 	{

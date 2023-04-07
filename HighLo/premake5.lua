@@ -29,8 +29,6 @@ project "HighLo"
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.stb_truetype}",
 		"%{IncludeDir.openssl}",
-		"%{IncludeDir.msdf_atlas_gen}",
-		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.rapidXML}",
 		"%{IncludeDir.rapidJSON}",
 		"%{IncludeDir.IconFontCppHeaders}",
@@ -50,7 +48,6 @@ project "HighLo"
         "GLFW",
         "stbimage",
         "stbtruetype",
-		"msdf-atlas-gen",
         "%{LibDir.assimp}",
 		
 		"%{LibDir.openssl_libssl}",
@@ -398,7 +395,25 @@ project "HighLo"
 		
 		links
 		{
-		
+			"%{LibDir.gtest_debug}",
+			"%{LibDir.gtest_main_debug}",
+			"%{LibDir.gmock_debug}",
+			"%{LibDir.gmock_main_debug}",
+			
+			"%{LibDir.shaderc_debug}",
+			"%{LibDir.shaderc_util_debug}",
+		--	"%{LibDir.glsl_Debug}",
+
+		--	"%{LibDir.SPIRV_Debug}",
+			"%{LibDir.SPIRV_Cross_Debug}",
+			"%{LibDir.SPIRV_Cross_GLSL_Debug}",
+			"%{LibDir.SPIRV_Tools_Debug}",
+
+		--	"%{LibDir.SPIRV_Cross_util_Debug}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Debug}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Debug}",
+		--	"%{LibDir.SpvRemapper_Debug}",
+			"%{LibDir.yamlCpp_debug}",
 		}
 	
 	filter "configurations:Release-Metal"
@@ -413,7 +428,25 @@ project "HighLo"
 		
 		links
 		{
-		
+			"%{LibDir.gtest_release}",
+			"%{LibDir.gtest_main_release}",
+			"%{LibDir.gmock_release}",
+			"%{LibDir.gmock_main_release}",
+			
+			
+			"%{LibDir.shaderc_release}",
+			"%{LibDir.shaderc_util_release}",
+		--	"%{LibDir.glsl_Release}",
+			
+		--	"%{LibDir.SPIRV_Release}",
+			"%{LibDir.SPIRV_Cross_Release}",
+			"%{LibDir.SPIRV_Cross_GLSL_Release}",
+			
+		--	"%{LibDir.SPIRV_Cross_util_Release}",
+		--	"%{LibDir.SPIRV_Cross_cpp_Release}",
+		--	"%{LibDir.SPIRV_Cross_reflect_Release}",
+		--	"%{LibDir.SpvRemapper_Release}",
+			"%{LibDir.yamlCpp}",
 		}
 		
 		

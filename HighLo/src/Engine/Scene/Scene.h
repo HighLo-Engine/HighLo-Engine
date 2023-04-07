@@ -124,6 +124,10 @@ namespace highlo
 
 	private:
 
+		void SortEntities();
+
+	private:
+
 		UUID m_SceneID = UUID();
 		HLString m_Name = "Untitled Scene";
 		HLString m_DebugName;

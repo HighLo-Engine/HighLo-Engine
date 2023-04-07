@@ -115,6 +115,27 @@ namespace highlo
 		uint32 TransformOffset = 0;
 	};
 
+	/// <summary>
+	/// Currently, the SceneRenderer is designed to be a Forward/Forward+ Renderer.
+	/// This means, that all meshes and light objects are deeply connected with each other, 
+	/// in pseudo code you will find something like:
+	/// for mesh in meshes:
+	///     for light in lights:
+	///         render(mesh, light)
+	/// 
+	/// (actually in our real implementation, all lights are uploaded via a uniform buffer directly to the gpu, 
+	///  but you will find the loop that iterates over the lights in the shader assets/shaders/Include/GLSL/Lighting.glslh)
+	/// 
+	/// We will provide another class in the future, that does the same job (rendering a scene) but in a more efficient way (deferred rendering).
+	/// But this will also mean, that we will need to write new shaders in the future as well, while keeping all "old" shaders to still support forward rendering.
+	/// 
+	/// TODO: The addition of other renderers also means, that we should provide a general SceneRenderer interface, 
+	///       that lets the user add models to the renderer and other standard methods, like Flush and Resize as well.
+	///       In that case renderers would be exchangable as well, and a combination of multiple renderers could be used, 
+	///       to gain back transparency in the case of the deferred renderer for example, like GTA V does it.
+	/// 
+	/// @See: For detailed information to deferred and forward rendering see https://www.youtube.com/watch?v=n5OiqJP2f7w
+	/// </summary>
 	class SceneRenderer : public IsSharedReference
 	{
 	public:

@@ -36,6 +36,14 @@ namespace highlo
 
 	OpenGLMaterial::~OpenGLMaterial()
 	{
+		m_Name.Clear();
+		m_Shader = nullptr;
+		m_Flags = 0;
+
+		m_LocalData.Release();
+
+		m_Textures.clear();
+		m_Texture2Ds.clear();
 	}
 	
 	void OpenGLMaterial::Invalidate()
@@ -252,7 +260,7 @@ namespace highlo
 
 		if (uniformBufferSet)
 		{
-			uniformBufferSet->ForEach([=](const Ref<UniformBuffer> &uniformBuffer)
+			uniformBufferSet->ForEach([](const Ref<UniformBuffer> &uniformBuffer)
 			{
 				uniformBuffer->Bind();
 			});

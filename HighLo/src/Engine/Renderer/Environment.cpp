@@ -26,9 +26,9 @@ namespace highlo
 		m_BRDFMap = Renderer::GetBRDFLutTexture();
 	}
 
-	Ref<Environment> Environment::Create(const FileSystemPath &path)
+	Ref<Environment> Environment::Create(const FileSystemPath &path, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
-		return Renderer::CreateEnvironment(path);
+		return Renderer::CreateEnvironment(path, cubemapSize, irradianceMapSize);
 	}
 }
 

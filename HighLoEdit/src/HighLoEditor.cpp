@@ -191,9 +191,17 @@ void HighLoEditor::OnInitialize()
 	StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
 	comp->Model = AssetFactory::CreateCube({ 5.0f, 5.0f, 5.0f });
 
-	Entity sphereEntity = m_CurrentScene->CreateEntity("SphereModel");
-	StaticModelComponent *sphereComp = sphereEntity.AddComponent<StaticModelComponent>();
-	sphereComp->Model = AssetFactory::CreateSphere(2.0f);
+	// change the color of the cube to red
+	Ref<StaticModel> &cubeModel = AssetManager::Get()->GetAsset<StaticModel>(comp->Model);
+	cubeModel->GetMaterials()->GetMaterial(0)->SetDiffuseColor({ 1.0f, 0.0f, 0.0f });
+
+	//Entity sphereEntity = m_CurrentScene->CreateEntity("SphereModel");
+	//StaticModelComponent *sphereComp = sphereEntity.AddComponent<StaticModelComponent>();
+	//sphereComp->Model = AssetFactory::CreateSphere(2.0f);
+	//
+	//// change the color of the sphere to red
+	//Ref<StaticModel> &sphereModel = AssetManager::Get()->GetAsset<StaticModel>(sphereComp->Model);
+	//sphereModel->GetMaterials()->GetMaterial(0)->SetDiffuseColor({ 1.0f, 0.0f, 0.0f });
 
 	//Ref<Environment> env = Environment::Create("assets/textures/PBR_Scene_Arena.hdr");
 	//m_CurrentScene->SetEnvironment(env);
@@ -372,8 +380,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	{
 		auto &selection = m_SelectionContext[0];
 
-		float width = (float)ImGui::GetWindowWidth();
-		float height = (float)ImGui::GetWindowHeight();
+		float width = ImGui::GetWindowWidth();
+		float height = ImGui::GetWindowHeight();
 
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();

@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX11/DX11UniformBuffer.h"
 #elif HIGHLO_API_DX12
 #include "Engine/Platform/DX12/DX12UniformBuffer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalUniformBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX12UniformBuffer>::Create(size, binding, layout);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanUniformBuffer>::Create(size, binding, layout);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalUniformBuffer>::Create(size, binding, layout);
 	#else
 		HL_ASSERT(false);
 		return nullptr;

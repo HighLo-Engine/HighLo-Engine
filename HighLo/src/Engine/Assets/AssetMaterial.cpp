@@ -45,6 +45,7 @@ namespace highlo
 		SetUsingNormalMap(false);
 		SetMetalness(0.0f);
 		SetRoughness(0.4f);
+		SetTransparency(0.0f);
 
 		SetDiffuseMap(Renderer::GetWhiteTexture());
 		SetNormalMap(Renderer::GetWhiteTexture());
@@ -63,6 +64,7 @@ namespace highlo
 		SetUsingNormalMap(false);
 		SetMetalness(0.0f);
 		SetRoughness(0.4f);
+		SetTransparency(0.0f);
 
 		SetDiffuseMap(Renderer::GetWhiteTexture());
 		SetNormalMap(Renderer::GetWhiteTexture());
@@ -131,7 +133,7 @@ namespace highlo
 	
 	Ref<Texture2D> MaterialAsset::GetNormalMap()
 	{
-		return m_Material->GetTexture2D(s_NormalMapUniform);
+		return m_Material->TryGetTexture2D(s_NormalMapUniform);
 	}
 	
 	void MaterialAsset::SetNormalMap(const Ref<Texture2D> &texture)

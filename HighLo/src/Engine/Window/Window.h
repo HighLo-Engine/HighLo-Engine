@@ -98,6 +98,7 @@ namespace highlo
 		HLAPI virtual void SetVisible(bool bVisible) = 0;
 		HLAPI virtual void SetFocus(bool bEnabled) = 0;
 		HLAPI virtual void SetFullscreen(bool bEnabled) = 0;
+		HLAPI virtual void SetResizable(bool bEnabled) = 0;
 		HLAPI virtual void ShowCursor() = 0;
 		HLAPI virtual void HideCursor() = 0;
 		HLAPI virtual void Maximize() = 0;

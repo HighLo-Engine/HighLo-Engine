@@ -57,6 +57,7 @@ namespace highlo
 		virtual void SetVisible(bool bVisible) override;
 		virtual void SetFocus(bool bEnabled) override;
 		virtual void SetFullscreen(bool bEnabled) override;
+		virtual void SetResizable(bool bEnabled) override;
 		virtual void ShowCursor() override;
 		virtual void HideCursor() override;
 		virtual void Maximize() override;

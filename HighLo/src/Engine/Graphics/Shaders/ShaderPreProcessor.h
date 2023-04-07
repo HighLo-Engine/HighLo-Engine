@@ -377,6 +377,11 @@ namespace highlo
 
 		uint64 startOfStage = 0;
 		uint64 pos = newSource.find('#');
+		if (pos == std::string::npos)
+		{
+			HL_CORE_FATAL("[-] Could not find any '#' symbol. Aborting. [-]");
+			return shaderSources;
+		}
 
 		// Check first #version
 		if (Lang == ShaderLanguage::GLSL)

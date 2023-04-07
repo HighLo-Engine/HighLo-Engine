@@ -51,6 +51,20 @@ namespace highlo
 		// OpenGL-specific
 		static void ClearUniformBuffers();
 
+		int32 GetUniformLocation(const HLString &name);
+		void SetUniform(const HLString &name, int32 value);
+		void SetUniform(const HLString &name, uint32 value);
+		void SetUniform(const HLString &name, float value);
+		void SetUniform(const HLString &name, const glm::vec2 &value);
+		void SetUniform(const HLString &name, const glm::vec3 &value);
+		void SetUniform(const HLString &name, const glm::vec4 &value);
+		void SetUniform(const HLString &name, const glm::mat2 &value);
+		void SetUniform(const HLString &name, const glm::mat3 &value);
+		void SetUniform(const HLString &name, const glm::mat4 &value);
+		void SetUniform(const HLString &name, const glm::ivec2 &value);
+		void SetUniform(const HLString &name, const glm::ivec3 &value);
+		void SetUniform(const HLString &name, const glm::ivec4 &value);
+
 	private:
 
 		void Load(const HLString &source, bool forceCompile);
@@ -84,6 +98,7 @@ namespace highlo
 		uint32 m_ConstantBufferOffset = 0;
 
 		std::unordered_map<HLString, HLString> m_Macros;
+		std::unordered_map<HLString, int32> m_UniformLocations;
 		std::unordered_set<HLString> m_AcknowledgedMacros;
 		std::vector<OpenGLShaderDescriptorSet> m_ShaderDescriptorSets;
 		std::vector<OpenGLShaderPushConstantRange> m_PushConstantRanges;

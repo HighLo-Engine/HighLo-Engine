@@ -28,7 +28,7 @@ namespace highlo
 	{
 	public:
 
-		VulkanTexture2D(const FileSystemPath &filePath, TextureFormat format = TextureFormat::RGBA8, bool flipOnLoad = true);
+		VulkanTexture2D(const FileSystemPath &filePath, bool flipOnLoad = true);
 		VulkanTexture2D(const glm::vec3 &rgb, TextureFormat format = TextureFormat::RGBA8);
 		VulkanTexture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format = TextureFormat::RGBA8);
 		VulkanTexture2D(void *imgData, uint32 width, uint32 height, TextureFormat format);
@@ -72,6 +72,8 @@ namespace highlo
 
 		virtual void Bind(uint32 slot) const override {}
 		virtual void Unbind(uint32 slot) const override {}
+
+		virtual void SetData(void *data, uint32 data_size) override;
 
 		// Vulkan-specific
 		const VkDescriptorImageInfo &GetDescriptorInfo() const { return m_DescriptorImageInfo; }

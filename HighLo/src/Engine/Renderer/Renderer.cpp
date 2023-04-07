@@ -13,6 +13,8 @@
 #include "Engine/Platform/DX12/DX12RenderingAPI.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanRenderingAPI.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalRenderingAPI.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -450,9 +452,9 @@ namespace highlo
 		return s_MainRendererData->LineWidth;
 	}
 
-	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath)
+	Ref<Environment> Renderer::CreateEnvironment(const FileSystemPath &filePath, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
-		return s_RenderingAPI->CreateEnvironment(filePath);
+		return s_RenderingAPI->CreateEnvironment(filePath, cubemapSize, irradianceMapSize);
 	}
 
 	Ref<Texture3D> Renderer::CreatePreethamSky(float turbidity, float azimuth, float inclination)

@@ -332,7 +332,6 @@ namespace highlo
 			HL_ASSERT(glMaterial);
 
 			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
 			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 			objUB->SetData(&objTransform, sizeof(objTransform));
 
@@ -361,7 +360,6 @@ namespace highlo
 
 				Ref<UniformBuffer> ub = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 				ub->SetData(&buffer, sizeof(buffer));
-				ub->Bind();
 			}
 
 			Renderer::Submit([submesh]()
@@ -552,6 +550,7 @@ namespace highlo
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
+		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		for (Mesh submesh : submeshes)
 		{
 			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
@@ -562,7 +561,6 @@ namespace highlo
 				HL_ASSERT(material);
 			}
 
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
 			ubMaterial.DiffuseColor = material->GetDiffuseColor();
 			ubMaterial.Emission = material->GetEmission();
@@ -572,7 +570,6 @@ namespace highlo
 			ubMaterial.EnvMapRotation = 0.0f;
 			ubMaterial.UseNormalMap = false;
 			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-			materialUB->Bind();
 
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
@@ -611,6 +608,7 @@ namespace highlo
 		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 		objUB->SetData(&objTransform, sizeof(objTransform));
 
+		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 		if (model->IsAnimated())
 		{
 			AnimatedBoneTransformUniformBuffer buffer;
@@ -624,7 +622,10 @@ namespace highlo
 			ub->SetData(&buffer, sizeof(buffer));
 		}
 
+
 		auto &submeshes = model->Get()->GetSubmeshes();
+		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
+		Ref<MaterialTable> &allMaterials = model->GetMaterials();
 		for (Mesh &submesh : submeshes)
 		{
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
@@ -660,6 +661,7 @@ namespace highlo
 		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
 		objUB->SetData(&objTransform, sizeof(objTransform));
 
+		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 		if (model->IsAnimated())
 		{
 			AnimatedBoneTransformUniformBuffer buffer;
@@ -674,7 +676,9 @@ namespace highlo
 			ub->SetData(&buffer, sizeof(buffer));
 		}
 
+		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		auto &submeshes = model->Get()->GetSubmeshes();
+		Ref<MaterialTable> &allMaterials = model->GetMaterials();
 		for (Mesh &submesh : submeshes)
 		{
 			overrideMaterial->UpdateForRendering(uniformBufferSet);

@@ -10,7 +10,7 @@
 
 namespace highlo
 {
-	DX11Texture2D::DX11Texture2D(const FileSystemPath &filePath, TextureFormat format, bool flipOnLoad)
+	DX11Texture2D::DX11Texture2D(const FileSystemPath &filePath, bool flipOnLoad)
 	{
 	}
 
@@ -19,6 +19,10 @@ namespace highlo
 	}
 	
 	DX11Texture2D::DX11Texture2D(const glm::vec3 &rgb, uint32 width, uint32 height, TextureFormat format)
+	{
+	}
+
+	DX11Texture2D::DX11Texture2D(void *imgData, uint32 width, uint32 height, TextureFormat format)
 	{
 	}
 	
@@ -111,6 +115,12 @@ namespace highlo
 	{
 	}
 	
+	void DX11Texture2D::SetData(void *data, uint32 data_size)
+	{
+		m_Buffer = Allocator::Copy(data, data_size);
+		Invalidate();
+	}
+
 	void DX11Texture2D::CreatePerLayerImageViews()
 	{
 	}

@@ -146,7 +146,7 @@ namespace highlo::utils
 {
 	inline static void SetDebugUtilsObjectName(const VkDevice device, const VkObjectType objectType, const HLString &name, const void *handle)
 	{
-		VkDebugUtilsObjectNameInfoEXT nameInfo = { 0 };
+		VkDebugUtilsObjectNameInfoEXT nameInfo = {};
 		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		nameInfo.objectType = objectType;
 		nameInfo.objectHandle = (uint64)handle;

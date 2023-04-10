@@ -114,6 +114,7 @@ namespace highlo
 		HLAPI static std::vector<UniformVariable> GetAnimatedBoneTransformBufferLayout();
 		HLAPI static std::vector<UniformVariable> GetBoneTransformIndexLayout();
 		HLAPI static std::vector<UniformVariable> GetMaterialLayout();
+		HLAPI static std::vector<UniformVariable> GetSkyboxLayout();
 
 		HLAPI std::vector<HLString> GetNames();
 		HLAPI uint32 GetStride() const { return m_Stride; }

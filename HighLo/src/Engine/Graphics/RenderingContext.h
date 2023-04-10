@@ -22,6 +22,7 @@ namespace highlo
 		HLAPI virtual void Init() = 0;
 		HLAPI virtual void SwapBuffers() = 0;
 		HLAPI virtual void MakeCurrent() = 0;
+		HLAPI virtual void ForgetContext() = 0;
 		HLAPI virtual void SetSwapInterval(bool bEnabled) = 0;
 
 		HLAPI virtual void *GetCurrentContext() = 0;

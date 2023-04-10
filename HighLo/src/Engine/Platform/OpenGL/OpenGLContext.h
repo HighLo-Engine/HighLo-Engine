@@ -24,6 +24,7 @@ namespace highlo
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
 		virtual void MakeCurrent() override;
+		virtual void ForgetContext() override;
 		virtual void SetSwapInterval(bool bEnabled) override;
 
 		virtual void *GetCurrentContext() override;

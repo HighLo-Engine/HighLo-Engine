@@ -138,6 +138,14 @@ namespace highlo
 		};
 	}
 
+	std::vector<UniformVariable> UniformLayout::GetSkyboxLayout()
+	{
+		return {
+			{ "u_SkyboxUniform.TextureLod", UniformLayoutDataType::Float, 1, 0 },
+			{ "u_SkyboxUniform.Intensity", UniformLayoutDataType::Float, 1, sizeof(float) },
+		};
+	}
+
 	std::vector<HLString> UniformLayout::GetNames()
 	{
 		std::vector<HLString> result;

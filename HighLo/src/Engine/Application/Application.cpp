@@ -21,7 +21,6 @@
 #include "Engine/Loaders/AssetImporter.h"
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Core/FileSystem.h"
-#include "Engine/Core/LinearAllocator.h"
 
 #define BIND_APPLICATION_EVENT_FN(fn) std::bind(&highlo::HLApplication::fn, this, std::placeholders::_1)
 
@@ -59,8 +58,7 @@ namespace highlo
 		// The linear allocator should provide a fast and easy way to allocate memory, 
 		// if the user does not care about the data being freed all at once.
 		// This is potentially very good for systems, that need to stay available during the life time of the engine itself.
-		LinearAllocator frameAllocator;
-		frameAllocator.Init(10 * 1024 * 1024); // TODO: make the max size configurable, 10MB for now
+		m_FrameAllocator.Init(10 * 1024 * 1024); // TODO: make the max size configurable, 10MB for now
 
 		// Main Rendering Thread
 		while (m_Running)
@@ -70,12 +68,15 @@ namespace highlo
 			m_RenderThread.BlockUntilRenderComplete();
 
 			// Reset the frame allocator on every frame
-			frameAllocator.FreeAll();
+			m_FrameAllocator.FreeAll();
 
 #ifdef HL_DEBUG
 			if (Input::IsKeyPressed(HL_KEY_ESCAPE))
 				break;
 #endif
+
+			// activate the context in the render thread
+		//	Renderer::Submit([]() { Renderer::GetContext()->MakeCurrent(); });
 
 			m_RenderThread.NextFrame();
 			m_RenderThread.Kick();
@@ -142,7 +143,7 @@ namespace highlo
 			}
 		}
 
-		frameAllocator.Shutdown();
+		m_FrameAllocator.Shutdown();
 
 		OnShutdown();
 		Service::OnExit();

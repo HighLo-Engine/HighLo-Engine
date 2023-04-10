@@ -105,8 +105,13 @@ namespace highlo
 	{
 		s_GLRendererData = new GLRendererData();
 
+		// Forget the context in the main thread
+		Renderer::GetContext()->ForgetContext();
 		Renderer::Submit([]()
 		{
+			// and make the context current in the render thread
+			Renderer::GetContext()->MakeCurrent();
+
 			glDebugMessageCallback(utils::OpenGLLogMessage, nullptr);
 			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

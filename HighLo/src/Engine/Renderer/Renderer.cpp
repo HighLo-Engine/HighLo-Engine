@@ -77,6 +77,8 @@ namespace highlo
 
 	void Renderer::Init(Window *window)
 	{
+		s_RenderingAPI->Init();
+
 		// Load 3D Shaders
 		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBRAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/HighLoPBR.glsl");
@@ -84,8 +86,8 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Grid.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SelectedGeometry.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMap.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMapAnimated.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMap.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/ShadowMapAnimated.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/Wireframe.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/SceneComposite.glsl");
 		Renderer::GetShaderLibrary()->Load("assets/shaders/PreDepth.glsl");
@@ -99,12 +101,11 @@ namespace highlo
 		Renderer::GetShaderLibrary()->Load("assets/shaders/2D/Renderer2DText.glsl");
 	
 		// Load Compute Shaders
-		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EquirectangularToCubeMap.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentMipFilter.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
-		Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/PreethamSky.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EquirectangularToCubeMap.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentMipFilter.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/EnvironmentIrradiance.glsl");
+	//	Renderer::GetShaderLibrary()->Load("assets/shaders/hdr/PreethamSky.glsl");
 
-		s_RenderingAPI->Init();
 		UI::InitImGui(window, UI::ImGuiWindowStyle::Dark);
 
 		uint32 blackTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };

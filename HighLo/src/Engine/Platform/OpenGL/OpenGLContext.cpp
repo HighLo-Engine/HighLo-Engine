@@ -26,6 +26,11 @@ namespace highlo
 		glfwMakeContextCurrent((GLFWwindow*)m_OpenGLWindowHandle);
 	}
 
+	void OpenGLContext::ForgetContext()
+	{
+		glfwMakeContextCurrent(nullptr);
+	}
+
 	void OpenGLContext::Init()
 	{
 		glfwMakeContextCurrent((GLFWwindow*)m_OpenGLWindowHandle);

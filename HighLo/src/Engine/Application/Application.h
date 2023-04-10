@@ -20,6 +20,7 @@
 
 #include "ApplicationSettings.h"
 
+#include "Engine/Core/LinearAllocator.h"
 #include "Engine/Threading/RenderThread.h"
 
 namespace highlo
@@ -59,6 +60,7 @@ namespace highlo
 		HLAPI Translations &GetTranslations() { return m_Translations; }
 		HLAPI Translation *GetActiveTranslation();
 
+		HLAPI LinearAllocator &GetFrameAllocator() { return m_FrameAllocator; }
 		HLAPI RenderThread &GetRenderThread() { return m_RenderThread; }
 
 	private:
@@ -95,6 +97,7 @@ namespace highlo
 		Timestep m_Frametime;
 		Timestep m_TimeStep;
 
+		LinearAllocator m_FrameAllocator;
 		RenderThread m_RenderThread;
 	};
 

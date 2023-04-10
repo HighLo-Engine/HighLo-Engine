@@ -23,6 +23,7 @@ namespace highlo
 		PointLightsBinding = 4,
 		ScreenBinding = 17,
 		HBAOBinding = 18,
+		SkyboxBinding = 31,
 	};
 
 	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
@@ -52,6 +53,7 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferPointLights), PointLightsBinding, UniformLayout::GetPointLightDataLayout()); // PointLights Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferScreenData), ScreenBinding, UniformLayout::GetScreenDataLayout()); // Screen data Uniform block
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), HBAOBinding, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
+		m_UniformBufferSet->CreateUniform(sizeof(UniformSkyboxData), SkyboxBinding, UniformLayout::GetSkyboxLayout()); // skybox Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
 	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway
@@ -674,6 +676,17 @@ namespace highlo
 		// Render selected geometry
 		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
 	
+		// Skybox
+	//	m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
+	//	m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
+	//
+	//	const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment 
+	//		? m_SceneData.SceneEnvironment->GetRadianceMap() 
+	//		: Renderer::GetBlackCubeTexture();
+	//	m_SkyboxMaterial->Set("u_Texture", radianceMap);
+	//
+	//	Renderer::RenderFullscreenQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
+
 		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);

@@ -51,6 +51,12 @@ namespace highlo
 			IncRef();
 		}
 
+		HLAPI SharedReference(const SharedReference<T> &other)
+			: m_Instance(other.m_Instance)
+		{
+			IncRef();
+		}
+
 		template<typename T2>
 		HLAPI SharedReference(const SharedReference<T2> &other)
 		{
@@ -68,12 +74,6 @@ namespace highlo
 		HLAPI ~SharedReference()
 		{
 			DecRef();
-		}
-
-		HLAPI SharedReference(const SharedReference<T> &other)
-			: m_Instance(other.m_Instance)
-		{
-			IncRef();
 		}
 
 		HLAPI SharedReference &operator=(std::nullptr_t)

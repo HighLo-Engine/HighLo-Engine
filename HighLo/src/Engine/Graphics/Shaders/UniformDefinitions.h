@@ -28,6 +28,12 @@ namespace highlo
 		float ShadowTolerance;
 	};
 
+	struct UniformSkyboxData
+	{
+		float TextureLod;
+		float Intensity;
+	};
+
 	struct UniformBufferShadow
 	{
 		glm::mat4 ViewProjection[4];

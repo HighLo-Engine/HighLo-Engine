@@ -26,6 +26,15 @@ namespace highlo
 	{
 	public:
 
+		struct ReflectionData
+		{
+			std::vector<ShaderBuffer> ShaderDescriptorSets;
+			std::unordered_map<HLString, ShaderResourceDeclaration> Resources;
+			std::unordered_map<HLString, ShaderBuffer> ConstantBuffers;
+		};
+
+	public:
+
 		OpenGLShader(const FileSystemPath &filePath, bool forceCompile);
 		OpenGLShader(const HLString &source, const HLString &name = "undefined", ShaderLanguage language = ShaderLanguage::GLSL);
 		virtual ~OpenGLShader();
@@ -68,6 +77,7 @@ namespace highlo
 	private:
 
 		void Load(const HLString &source, bool forceCompile);
+		void RT_Reload(bool forceCompile);
 		
 		// Pre-Processing
 		std::unordered_map<GLenum, HLString> PreProcess(const HLString &source);
@@ -90,6 +100,7 @@ namespace highlo
 	private:
 
 		HLString m_Name;
+		HLString m_SingleShaderSource = "";
 		HLRendererID m_RendererID = 0;
 		bool m_Loaded = false;
 		bool m_IsCompute = false;

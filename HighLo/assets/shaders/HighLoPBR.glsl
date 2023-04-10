@@ -136,17 +136,17 @@ layout(location = 0) out vec4 o_Color;
 	layout(set = 1, binding = 21) uniform sampler2D u_SpotShadowTexture;
 #else
 	// PBR texture inputs
-	layout(binding = 5) uniform sampler2D u_DiffuseTexture;
-	layout(binding = 6) uniform sampler2D u_NormalTexture;
-	layout(binding = 7) uniform sampler2D u_MetalnessTexture;
-	layout(binding = 8) uniform sampler2D u_RoughnessTexture;
+	//layout(binding = 5) uniform sampler2D u_DiffuseTexture;
+	//layout(binding = 6) uniform sampler2D u_NormalTexture;
+	//layout(binding = 7) uniform sampler2D u_MetalnessTexture;
+	//layout(binding = 8) uniform sampler2D u_RoughnessTexture;
 
 	// Environment maps
-	layout(binding = 9) uniform samplerCube u_EnvRadianceTex;
-	layout(binding = 10) uniform samplerCube u_EnvIrradianceTex;
+	//layout(binding = 9) uniform samplerCube u_EnvRadianceTex;
+	//layout(binding = 10) uniform samplerCube u_EnvIrradianceTex;
 
 	// BRDF LUT
-	layout(binding = 11) uniform sampler2D u_BRDFLUTTexture;
+	//layout(binding = 11) uniform sampler2D u_BRDFLUTTexture;
 
 	// TODO
 	// Shadow maps
@@ -156,55 +156,7 @@ layout(location = 0) out vec4 o_Color;
 
 void main()
 {
-	// Standard PBR inputs
-//	vec4 diffuseTexColor = texture(u_DiffuseTexture, Input.TexCoord);
-//	m_Params.Diffuse = diffuseTexColor.rgb * u_MaterialUniforms.DiffuseColor;
-//	float alpha = diffuseTexColor.a;
-//
-//	m_Params.Metalness = texture(u_MetalnessTexture, Input.TexCoord).r * u_MaterialUniforms.Metalness;
-//	m_Params.Roughness = texture(u_RoughnessTexture, Input.TexCoord).r * u_MaterialUniforms.Roughness;
-//	o_MetalnessRoughness = vec4(m_Params.Metalness, m_Params.Roughness, 0.f, 1.f);
-//	m_Params.Roughness = max(m_Params.Roughness, 0.05); // Minimum roughness of 0.05 to keep specular highlight
-//
-//	// Normals (either from vertex or map)
-//	m_Params.Normal = normalize(Input.Normal);
-//	if (u_MaterialUniforms.UseNormalMap)
-//	{
-//		m_Params.Normal = normalize(texture(u_NormalTexture, Input.TexCoord).rgb * 2.0f - 1.0f);
-//		m_Params.Normal = normalize(Input.WorldNormals * m_Params.Normal);
-//	}
-//	// View normals
-//	o_ViewNormalsLuminance.xyz = Input.CameraView * m_Params.Normal;
-//
-//	m_Params.View = normalize(u_Scene.CameraPosition - Input.WorldPosition);
-//	m_Params.NdotV = max(dot(m_Params.Normal, m_Params.View), 0.0);
-//
-//	// Specular reflection vector
-//	vec3 Lr = 2.0 * m_Params.NdotV * m_Params.Normal - m_Params.View;
-//
-//	// Fresnel reflectance, metals use diffuse
-//	vec3 F0 = mix(Fdielectric, m_Params.Diffuse, m_Params.Metalness);
-//
-//	// Direct lighting
-//	vec3 lightContribution = CalculateDirLights(F0);
-//	lightContribution += CalculatePointLights(F0, Input.WorldPosition);
-//	lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
-//
-//	// Indirect lighting
-//	vec3 iblContribution = IBL(F0, Lr, u_EnvRadianceTex, u_EnvIrradianceTex, u_BRDFLUTTexture, u_MaterialUniforms.EnvMapRotation, m_Params.NdotV, m_Params.Roughness, m_Params.Metalness, m_Params.Diffuse, m_Params.Normal, m_Params.View);
-//	iblContribution *= u_Scene.EnvironmentMapIntensity;
-
-	// Final color
-//	o_Color = vec4(iblContribution + lightContribution, 1.0);	
-	
 	// TEMP
 	o_Color = vec4(u_MaterialUniforms.DiffuseColor, 1.0);
-	vec4 tex = texture(u_DiffuseTexture, Input.TexCoord);
-	vec4 normal = texture(u_NormalTexture, Input.TexCoord);
-	vec4 metal = texture(u_MetalnessTexture, Input.TexCoord);
-	vec4 roughness = texture(u_RoughnessTexture, Input.TexCoord);
-	vec4 tmpEnvRadiance = texture(u_EnvRadianceTex, vec3(Input.TexCoord, 1.0));
-	vec4 tmpEnvIrradiance = texture(u_EnvIrradianceTex, vec3(Input.TexCoord, 1.0));
-	vec4 brdfMap = texture(u_BRDFLUTTexture, Input.TexCoord);
 }
 

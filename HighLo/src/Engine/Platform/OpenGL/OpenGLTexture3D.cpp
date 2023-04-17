@@ -30,7 +30,7 @@ namespace highlo
 
 		if (data)
 		{
-			m_Buffer = Allocator::Copy(data, width * height * 4 * sizeof(float));
+			m_Buffer = Allocator::Copy(data, width * height * nrComponents * sizeof(float));
 			m_Loaded = true;
 			stbi_image_free(data);
 

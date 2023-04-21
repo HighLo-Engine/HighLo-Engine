@@ -49,7 +49,7 @@ git checkout -q f183fcf
 
 ```sh
 # Now get all submodules
-git submodules update --init --recursive
+git submodule update --init --recursive
 ```
 
 ```sh

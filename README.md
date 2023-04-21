@@ -33,7 +33,7 @@ For detailed information, see the [Build guide](BUILDING.md).
 
 # Building the working demo
 
-Currently, the demo project is now working anymore due to heavy architecture and feature changes.
+Currently, the demo project is not working anymore, due to heavy architecture and feature changes.
 But you can build the demo application, by building an older version of the engine.
 To build the demo application and run the state of the screenshots, follow these instructions:
 

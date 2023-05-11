@@ -58,7 +58,12 @@ namespace highlo
 	//	m_StorageBufferSet->CreateStorage(1, 23);
 
 		const uint64 transformBufferCount = 100 * 1024; // 10240 transforms for now
-		m_TransformVertexData = new TransformVertexData[transformBufferCount];
+		m_SubmeshTransformBuffers.resize(framesInFlight);
+		for (uint32 i = 0; i < framesInFlight; ++i)
+		{
+			m_SubmeshTransformBuffers[i].Buffer = VertexBuffer::Create(sizeof(TransformVertexData) * transformBufferCount);
+			m_SubmeshTransformBuffers[i].Data = new TransformVertexData[transformBufferCount];
+		}
 
 		// yea ... we have a lot of render passes to initialize in the future :)
 	//	InitLightCullingCompute();
@@ -83,8 +88,8 @@ namespace highlo
 
 	void SceneRenderer::Shutdown()
 	{
-		delete[] m_TransformVertexData;
-		m_TransformVertexData = nullptr;
+		for (auto &transformBuffer : m_SubmeshTransformBuffers)
+			delete[] transformBuffer.Data;
 	}
 
 	void SceneRenderer::SetScene(const Ref<Scene> &scene)
@@ -296,9 +301,9 @@ namespace highlo
 			MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 			TransformVertexData &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
-			transformStorage.Row0 = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
-			transformStorage.Row1 = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
-			transformStorage.Row2 = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
+			transformStorage.MRow[0] = {submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0]};
+			transformStorage.MRow[1] = {submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1]};
+			transformStorage.MRow[2] = {submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2]};
 
 			{
 				// Main geometry
@@ -358,9 +363,9 @@ namespace highlo
 		MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
-		transformStorage.Row0 = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
-		transformStorage.Row1 = { transform[0][1], transform[1][1], transform[2][1], transform[3][1] };
-		transformStorage.Row2 = { transform[0][2], transform[1][2], transform[2][2], transform[3][2] };
+		transformStorage.MRow[0] = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
+		transformStorage.MRow[1] = { transform[0][1], transform[1][1], transform[2][1], transform[3][1] };
+		transformStorage.MRow[2] = { transform[0][2], transform[1][2], transform[2][2], transform[3][2] };
 
 		{
 			// Main geometry pass
@@ -404,9 +409,9 @@ namespace highlo
 			MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
-			transformStorage.Row0 = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
-			transformStorage.Row1 = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
-			transformStorage.Row2 = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
+			transformStorage.MRow[0] = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
+			transformStorage.MRow[1] = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
+			transformStorage.MRow[2] = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
 
 			uint32 instanceIndex = 0;
 
@@ -449,9 +454,9 @@ namespace highlo
 		MeshKey key = { model->Handle, materialHandle, submeshIndex, false };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
-		transformStorage.Row0 = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
-		transformStorage.Row1 = { transform[0][1], transform[1][1], transform[2][1], transform[3][1] };
-		transformStorage.Row2 = { transform[0][2], transform[1][2], transform[2][2], transform[3][2] };
+		transformStorage.MRow[0] = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
+		transformStorage.MRow[1] = { transform[0][1], transform[1][1], transform[2][1], transform[3][1] };
+		transformStorage.MRow[2] = { transform[0][2], transform[1][2], transform[2][2], transform[3][2] };
 
 		uint32 instanceIndex = 0;
 
@@ -481,9 +486,9 @@ namespace highlo
 			MeshKey key = { model->Handle, 42, submeshIndex, false };
 			auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
-			transformStorage.Row0 = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
-			transformStorage.Row1 = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
-			transformStorage.Row2 = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
+			transformStorage.MRow[0] = { submeshTransform[0][0], submeshTransform[1][0], submeshTransform[2][0], submeshTransform[3][0] };
+			transformStorage.MRow[1] = { submeshTransform[0][1], submeshTransform[1][1], submeshTransform[2][1], submeshTransform[3][1] };
+			transformStorage.MRow[2] = { submeshTransform[0][2], submeshTransform[1][2], submeshTransform[2][2], submeshTransform[3][2] };
 
 			auto &dc = m_StaticColliderDrawList[key];
 			dc.Model = model;
@@ -498,9 +503,9 @@ namespace highlo
 		MeshKey key = { model->Handle, 42, submeshIndex, false };
 		auto &transformStorage = m_MeshTransformMap[key].Transforms.emplace_back();
 
-		transformStorage.Row0 = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
-		transformStorage.Row1 = { transform[0][1], transform[1][1], transform[2][1], transform[3][1] };
-		transformStorage.Row2 = { transform[0][2], transform[1][2], transform[2][2], transform[3][2] };
+		transformStorage.MRow[0] = { transform[0][0], transform[1][0], transform[2][0], transform[3][0] };
+		transformStorage.MRow[1] = { transform[0][1], transform[1][1], transform[2][1], transform[3][1] };
+		transformStorage.MRow[2] = { transform[0][2], transform[1][2], transform[2][2], transform[3][2] };
 
 		auto &dc = m_DynamicColliderDrawList[key];
 		dc.Model = model;
@@ -593,15 +598,18 @@ namespace highlo
 	void SceneRenderer::PreRender()
 	{
 		uint32 offset = 0;
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 		for (auto &[key, transformData] : m_MeshTransformMap)
 		{
 			transformData.TransformOffset = offset * sizeof(TransformVertexData);
 			for (const auto &transform : transformData.Transforms)
 			{
-				m_TransformVertexData[offset] = transform;
+				m_SubmeshTransformBuffers[frameIndex].Data[offset] = transform;
 				++offset;
 			}
 		}
+
+		m_SubmeshTransformBuffers[frameIndex].Buffer->SetData(m_SubmeshTransformBuffers[frameIndex].Data, offset * sizeof(TransformVertexData));
 	}
 
 	void SceneRenderer::ClearPass()
@@ -678,6 +686,7 @@ namespace highlo
 		// Render selected geometry
 		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
 	
+		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
 		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
 		{
 			const auto &transformData = m_MeshTransformMap.at(mk);
@@ -688,7 +697,7 @@ namespace highlo
 				nullptr, 
 				dc.Model, 
 				dc.SubmeshIndex, 
-				m_TransformVertexData,
+				m_SubmeshTransformBuffers[frameIndex].Buffer,
 				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
 				dc.InstanceCount, 
 				m_SelectedGeometryMaterial);
@@ -704,7 +713,7 @@ namespace highlo
 				nullptr, 
 				dc.Model, 
 				dc.SubmeshIndex, 
-				m_TransformVertexData,
+				m_SubmeshTransformBuffers[frameIndex].Buffer,
 				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData), 
 				dc.InstanceCount, 
 				m_SelectedGeometryMaterial);
@@ -727,7 +736,7 @@ namespace highlo
 				dc.Model,
 				dc.SubmeshIndex, 
 				dc.Materials ? dc.Materials : dc.Model->GetMaterials(),
-				m_TransformVertexData,
+				m_SubmeshTransformBuffers[frameIndex].Buffer,
 				transformData.TransformOffset, 
 				dc.InstanceCount);
 		}
@@ -743,7 +752,7 @@ namespace highlo
 				dc.Model, 
 				dc.SubmeshIndex, 
 				dc.Materials ? dc.Materials : dc.Model->GetMaterials(), 
-				m_TransformVertexData,
+				m_SubmeshTransformBuffers[frameIndex].Buffer,
 				transformData.TransformOffset, 
 				dc.InstanceCount);
 		}
@@ -796,7 +805,7 @@ namespace highlo
 				nullptr,
 				dc.Model,
 				dc.SubmeshIndex,
-				m_TransformVertexData,
+				m_SubmeshTransformBuffers[frameIndex].Buffer,
 				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
 				dc.InstanceCount, 
 				m_WireframeMaterial);
@@ -812,7 +821,7 @@ namespace highlo
 				nullptr,
 				dc.Model,
 				dc.SubmeshIndex,
-				m_TransformVertexData,
+				m_SubmeshTransformBuffers[frameIndex].Buffer,
 				transformData.TransformOffset + dc.InstanceOffset * sizeof(TransformVertexData),
 				dc.InstanceCount,
 				m_WireframeMaterial
@@ -981,7 +990,7 @@ namespace highlo
 		spec.DebugName = "ShadowPass";
 		spec.Shader = shader;
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
-		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout(spec.Layout.GetElementCount() * sizeof(BufferElement));
 
 		for (int32 i = 0; i < 4; ++i)
 		{
@@ -1015,7 +1024,7 @@ namespace highlo
 		spec.Shader = shader;
 		spec.RenderPass = RenderPass::Create(renderpassSpec);
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
-		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout(spec.Layout.GetElementCount() * sizeof(BufferElement));
 		
 		m_PreDepthVertexArray = VertexArray::Create(spec);
 		m_PreDepthMaterial = Material::Create(shader, "Pre-Depth-Material");
@@ -1037,7 +1046,7 @@ namespace highlo
 		spec.DebugName = "PBR-Static";
 		spec.LineWidth = Renderer::GetCurrentLineWidth();
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
-		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout(spec.Layout.GetElementCount() * sizeof(BufferElement));
 		spec.Shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
 		spec.RenderPass = RenderPass::Create(renderPassSpec);
 		m_GeometryVertexArray = VertexArray::Create(spec);
@@ -1056,7 +1065,7 @@ namespace highlo
 		VertexArraySpecification selectedSpec;
 		selectedSpec.DebugName = "SelectedGeometry";
 		selectedSpec.Layout = BufferLayout::GetStaticShaderLayout();
-		selectedSpec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+		selectedSpec.InstanceLayout = BufferLayout::GetTransformBufferLayout(selectedSpec.Layout.GetElementCount() * sizeof(BufferElement));
 		selectedSpec.RenderPass = RenderPass::Create(selectedRenderPassSpec);
 		selectedSpec.Shader = Renderer::GetShaderLibrary()->Get("SelectedGeometry");
 		m_SelectedGeometryVertexArray = VertexArray::Create(selectedSpec);
@@ -1174,7 +1183,7 @@ namespace highlo
 		VertexArraySpecification spec;
 		spec.DebugName = "Wireframe";
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
-		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
+		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout(spec.Layout.GetElementCount() * sizeof(BufferElement));
 		spec.Shader = shader;
 		spec.RenderPass = m_ExternalCompositingRenderPass;
 		spec.Wireframe = true;

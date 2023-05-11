@@ -52,6 +52,30 @@ namespace highlo
 			_aligned_free(memory);
 	}
 
+	void Allocator::Resize(uint32 size)
+	{
+		if (size >= Size)
+		{
+			// Make the buffer bigger
+			Byte *new_buffer = new Byte[size];
+			memcpy(new_buffer, Data, Size);
+			delete[] Data;
+
+			Data = new_buffer;
+			Size = size;
+		}
+		else
+		{
+			// Make the buffer smaller
+			Byte *new_buffer = new Byte[size];
+			memcpy(new_buffer, Data, size);
+			delete[] Data;
+			
+			Data = new_buffer;
+			Size = size;
+		}
+	}
+
 	void Allocator::ZeroInitialize()
 	{
 		if (Data)

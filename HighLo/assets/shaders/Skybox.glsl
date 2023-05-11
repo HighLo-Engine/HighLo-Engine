@@ -26,17 +26,17 @@ layout(location = 2) out vec4 o_Unused2;
 layout(binding = 1) uniform samplerCube u_Texture;
 
 #ifdef __VULKAN__
-layout(push_constant) uniform Uniforms
-{
-	float TextureLod;
-	float Intensity;
-} u_Uniforms;
+	layout(push_constant) uniform Uniforms
+	{
+		float TextureLod;
+		float Intensity;
+	} u_Uniforms;
 #else
-layout(binding = 0, std140) uniform Uniforms
-{
-	float TextureLod;
-	float Intensity;
-} u_Uniforms;
+	layout(binding = 0, std140) uniform Uniforms
+	{
+		float TextureLod;
+		float Intensity;
+	} u_Uniforms;
 #endif
 
 layout(location = 0) in vec3 v_Position;

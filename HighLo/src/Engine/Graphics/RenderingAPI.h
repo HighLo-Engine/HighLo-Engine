@@ -72,7 +72,7 @@ namespace highlo
 			Ref<StaticModel> &model,
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
-			const TransformVertexData *transformBuffer,
+			const Ref<VertexBuffer> &transformBuffer,
 			uint32 transformBufferOffset
 		) = 0;
 
@@ -84,7 +84,7 @@ namespace highlo
 			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
-			const TransformVertexData *transformBuffer,
+			const Ref<VertexBuffer> &transformBuffer,
 			uint32 transformBufferOffset
 		) = 0;
 
@@ -96,7 +96,7 @@ namespace highlo
 			Ref<StaticModel> &model,
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
-			const TransformVertexData *transformBuffer,
+			const Ref<VertexBuffer> &transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount
 		) = 0;
@@ -109,7 +109,7 @@ namespace highlo
 			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
 			const Ref<MaterialTable> &materials,
-			const TransformVertexData *transformBuffer,
+			const Ref<VertexBuffer> &transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount
 		) = 0;
@@ -121,7 +121,7 @@ namespace highlo
 			const Ref<StorageBufferSet> &storageBufferSet,
 			Ref<StaticModel> &model,
 			uint32 submeshIndex,
-			const TransformVertexData *transformBuffer,
+			const Ref<VertexBuffer> &transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial
@@ -134,7 +134,7 @@ namespace highlo
 			const Ref<StorageBufferSet> &storageBufferSet,
 			Ref<DynamicModel> &model,
 			uint32 submeshIndex,
-			const TransformVertexData *transformBuffer,
+			const Ref<VertexBuffer> &transformBuffer,
 			uint32 transformBufferOffset,
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial

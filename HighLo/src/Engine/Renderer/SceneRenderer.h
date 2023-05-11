@@ -109,12 +109,6 @@ namespace highlo
 		}
 	};
 
-	struct TransformMapData
-	{
-		std::vector<TransformVertexData> Transforms;
-		uint32 TransformOffset = 0;
-	};
-
 	/// <summary>
 	/// Currently, the SceneRenderer is designed to be a Forward/Forward+ Renderer.
 	/// This means, that all meshes and light objects are deeply connected with each other, 
@@ -220,6 +214,28 @@ namespace highlo
 
 	private:
 
+		/// <summary>
+		/// Represents the object local transform in shaders
+		/// </summary>
+		struct TransformVertexData
+		{
+			glm::vec4 MRow[3];
+		};
+
+		struct TransformBuffer
+		{
+			Ref<VertexBuffer> Buffer = nullptr;
+			TransformVertexData *Data = nullptr;
+		};
+
+		struct TransformMapData
+		{
+			std::vector<TransformVertexData> Transforms;
+			uint32 TransformOffset = 0;
+		};
+
+	private:
+
 		uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 		float m_InvertedViewportWidth = 0.0f, m_InvertedViewportHeight = 0.0f;
 		bool m_NeedsResize = false;
@@ -248,9 +264,9 @@ namespace highlo
 		// Debug draw lists
 		std::map<MeshKey, StaticDrawCommand> m_StaticColliderDrawList;
 		std::map<MeshKey, DynamicDrawCommand> m_DynamicColliderDrawList;
-		std::map<MeshKey, TransformMapData> m_MeshTransformMap;
 
-		TransformVertexData *m_TransformVertexData = nullptr;
+		std::map<MeshKey, TransformMapData> m_MeshTransformMap;
+		std::vector<TransformBuffer> m_SubmeshTransformBuffers;
 
 		// Bloom
 		Ref<Shader> m_BloomBlurShader = nullptr;

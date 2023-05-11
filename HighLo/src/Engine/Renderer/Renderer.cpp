@@ -216,7 +216,7 @@ namespace highlo
 		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer,
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset)
 	{
 		s_RenderingAPI->DrawDynamicMesh(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset);
@@ -230,7 +230,7 @@ namespace highlo
 		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset)
 	{
 		s_RenderingAPI->DrawStaticMesh(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materials, transformBuffer, transformBufferOffset);
@@ -244,7 +244,7 @@ namespace highlo
 		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
@@ -259,7 +259,7 @@ namespace highlo
 		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
@@ -273,7 +273,7 @@ namespace highlo
 		const Ref<StorageBufferSet> &storageBufferSet, 
 		Ref<StaticModel> &model,
 		uint32 submeshIndex, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
@@ -288,7 +288,7 @@ namespace highlo
 		const Ref<StorageBufferSet> &storageBufferSet, 
 		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)

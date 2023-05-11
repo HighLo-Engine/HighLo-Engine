@@ -116,7 +116,8 @@ namespace highlo
 		HLAPI static BufferLayout GetGridLayout();
 		HLAPI static BufferLayout GetCompositeLayout();
 
-		HLAPI static BufferLayout GetTransformBufferLayout();
+		HLAPI static BufferLayout GetTransformBufferLayout(uint32 offset);
+		HLAPI static uint32 GetTransformBufferSize();
 
 	private:
 		void CalculateOffsetsAndStride();

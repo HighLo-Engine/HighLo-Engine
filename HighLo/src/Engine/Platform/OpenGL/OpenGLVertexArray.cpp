@@ -63,6 +63,7 @@ namespace highlo
 		}
 
 		uint32 attribIndex = 0;
+		uint32 transformBufferOffset = 0;
 		const auto &layout = m_Specification.Layout;
 		for (const auto &element : layout)
 		{
@@ -87,6 +88,36 @@ namespace highlo
 									  (const void*)(intptr_t)element.Offset);
 			}
 			++attribIndex;
+			transformBufferOffset += element.Offset;
+		}
+
+		// Transform buffer
+		const auto &transformLayout = m_Specification.InstanceLayout;
+		for (const auto &element : transformLayout)
+		{
+			GLenum glBaseType = utils::ShaderDataTypeToOpenGLBaseType(element.Type);
+			glEnableVertexAttribArray(attribIndex);
+
+			if (glBaseType == GL_INT)
+			{
+				glVertexAttribIPointer(attribIndex,
+									   element.GetComponentCount(),
+									   glBaseType,
+									   transformLayout.GetStride(),
+									   (const void *)(intptr_t)transformBufferOffset);
+			}
+			else
+			{
+				glVertexAttribPointer(attribIndex,
+									  element.GetComponentCount(),
+									  glBaseType,
+									  element.Normalized,
+									  transformLayout.GetStride(),
+									  (const void *)(intptr_t)transformBufferOffset);
+			}
+
+			++attribIndex;
+			transformBufferOffset += element.Offset;
 		}
 	}
 

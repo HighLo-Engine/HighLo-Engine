@@ -32,7 +32,7 @@ namespace highlo
 	OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32 size, VertexBufferUsage usage)
 		: m_Usage(usage), m_Size(size)
 	{
-		m_LocalData = Allocator::Copy(data, size);
+		m_LocalData = Allocator::Copy(data, m_Size);
 
 		glCreateBuffers(1, &m_ID);
 		Bind();
@@ -66,7 +66,7 @@ namespace highlo
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	
-	void OpenGLVertexBuffer::UpdateContents(void *data, uint32 size, uint32 offset)
+	void OpenGLVertexBuffer::SetData(void *data, uint32 size, uint32 offset)
 	{
 		Bind();
 

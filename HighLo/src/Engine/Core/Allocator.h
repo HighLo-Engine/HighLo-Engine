@@ -24,6 +24,8 @@ namespace highlo
 		HLAPI static void *AllocateAligned(uint64 size, uint64 alignment = 16);
 		HLAPI static void Free(void *memory);
 
+		HLAPI void Resize(uint32 size);
+
 		HLAPI void Allocate(uint32 size);
 		HLAPI void Release();
 		HLAPI void ZeroInitialize();

@@ -282,7 +282,7 @@ namespace highlo
 		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
@@ -302,10 +302,6 @@ namespace highlo
 
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
-
-			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-			objUB->SetData(&objTransform, sizeof(objTransform));
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
@@ -350,7 +346,7 @@ namespace highlo
 		Ref<DynamicModel> &model,
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
@@ -370,11 +366,6 @@ namespace highlo
 
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
-
-			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-			Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-			objUB->SetData(&objTransform, sizeof(objTransform));
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 			UniformBufferMaterial ubMaterial = {};
@@ -418,18 +409,13 @@ namespace highlo
 		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer,
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
 
 		if (model->IsAnimated())
 		{
@@ -487,18 +473,13 @@ namespace highlo
 		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
 		const Ref<MaterialTable> &materials, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
 
 		if (model->IsAnimated())
 		{
@@ -555,19 +536,15 @@ namespace highlo
 		const Ref<StorageBufferSet> &storageBufferSet, 
 		Ref<StaticModel> &model, 
 		uint32 submeshIndex, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
 	{
 		model->Get()->GetVertexBuffer()->Bind();
+		transformBuffer->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
 
 		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 		if (model->IsAnimated())
@@ -581,7 +558,6 @@ namespace highlo
 
 			animatedUB->SetData(&buffer, sizeof(buffer));
 		}
-
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
@@ -601,7 +577,6 @@ namespace highlo
 			mat.UseNormalMap = (bool)material->GetNormalMap();
 			materialUB->SetData(&mat, sizeof(mat));
 
-			objUB->Bind();
 			animatedUB->Bind();
 			materialUB->Bind();
 
@@ -619,7 +594,7 @@ namespace highlo
 		const Ref<StorageBufferSet> &storageBufferSet, 
 		Ref<DynamicModel> &model, 
 		uint32 submeshIndex, 
-		const TransformVertexData *transformBuffer, 
+		const Ref<VertexBuffer> &transformBuffer,
 		uint32 transformBufferOffset, 
 		uint32 instanceCount, 
 		Ref<Material> &overrideMaterial)
@@ -627,10 +602,6 @@ namespace highlo
 		model->Get()->GetVertexBuffer()->Bind();
 		va->Bind();
 		model->Get()->GetIndexBuffer()->Bind();
-
-		TransformVertexData objTransform = transformBuffer[transformBufferOffset];
-		Ref<UniformBuffer> objUB = UniformBuffer::Create(sizeof(TransformVertexData), 16, UniformLayout::GetTransformBufferLayout());
-		objUB->SetData(&objTransform, sizeof(objTransform));
 
 		Ref<UniformBuffer> animatedUB = UniformBuffer::Create(sizeof(AnimatedBoneTransformUniformBuffer), 22, UniformLayout::GetAnimatedBoneTransformBufferLayout());
 		if (model->IsAnimated())
@@ -664,7 +635,6 @@ namespace highlo
 			mat.UseNormalMap = (bool)material->GetNormalMap();
 			materialUB->SetData(&mat, sizeof(mat));
 
-			objUB->Bind();
 			animatedUB->Bind();
 			materialUB->Bind();
 

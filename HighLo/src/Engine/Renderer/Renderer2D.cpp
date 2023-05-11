@@ -399,7 +399,7 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->QuadVertexBufferPtr - (uint8*)s_2DData->QuadVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->QuadVertexBuffers[frameIndex]->UpdateContents(s_2DData->QuadVertexBufferBase[frameIndex], dataSize);
+			s_2DData->QuadVertexBuffers[frameIndex]->SetData(s_2DData->QuadVertexBufferBase[frameIndex], dataSize);
 
 			for (uint32 i = 0; i < s_2DData->TextureSlots.size(); ++i)
 			{
@@ -431,7 +431,7 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->CircleVertexBufferPtr - (uint8*)s_2DData->CircleVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->CircleVertexBuffers[frameIndex]->UpdateContents(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
+			s_2DData->CircleVertexBuffers[frameIndex]->SetData(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
 
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
@@ -453,7 +453,7 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->LineVertexBufferPtr - (uint8*)s_2DData->LineVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->LineVertexBuffers[frameIndex]->UpdateContents(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
+			s_2DData->LineVertexBuffers[frameIndex]->SetData(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
 
 			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
@@ -476,7 +476,7 @@ namespace highlo
 		uint32 dataSize = (uint32)((uint8*)s_2DData->TextVertexBufferPtr - (uint8*)s_2DData->TextVertexBufferBase[frameIndex]);
 		if (dataSize)
 		{
-			s_2DData->TextVertexBuffers[frameIndex]->UpdateContents(s_2DData->TextVertexBufferBase[frameIndex], dataSize);
+			s_2DData->TextVertexBuffers[frameIndex]->SetData(s_2DData->TextVertexBufferBase[frameIndex], dataSize);
 			s_2DData->TextShader->Bind();
 
 			for (uint32 i = 0; i < s_2DData->FontTextureSlots.size(); ++i)

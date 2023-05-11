@@ -17,16 +17,6 @@
 
 namespace highlo
 {
-	/// <summary>
-	/// Represents the object local transform in shaders
-	/// </summary>
-	struct TransformVertexData
-	{
-		glm::vec4 Row0;
-		glm::vec4 Row1;
-		glm::vec4 Row2;
-	};
-
 	class Transform
 	{
 	public:

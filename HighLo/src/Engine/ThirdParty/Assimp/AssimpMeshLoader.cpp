@@ -416,15 +416,20 @@ namespace highlo
 				m_Materials.push_back(mi);
 			}
 
+			uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
 			if (m_IsAnimated)
 			{
 				m_Layout = BufferLayout::GetAnimatedShaderLayout();
-				m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(), (uint32)(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
+				uint32 size = (uint32)((m_AnimatedVertices.size() * sizeof(AnimatedVertex)) + transformBufferSize);
+				m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(), size);
+				HL_CORE_TRACE("Generating new dynamic vertex data of size {0}", size);
 			}
 			else
 			{
 				m_Layout = BufferLayout::GetStaticShaderLayout();
-				m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)(m_StaticVertices.size() * sizeof(Vertex)));
+				uint32 size = (uint32)((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize);
+				m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), size);
+				HL_CORE_TRACE("Generating new static vertex data of size {0}", size);
 			}
 
 			m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));

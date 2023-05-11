@@ -55,7 +55,8 @@ namespace highlo
 		submesh.WorldTransform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
 		m_SubMeshes.push_back(submesh);
 
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) (m_StaticVertices.size() * sizeof(Vertex)));
+		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
+		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) ((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32) (m_Indices.size() * sizeof(VertexIndex)));
 		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 	}
@@ -72,7 +73,8 @@ namespace highlo
 		submesh.WorldTransform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
 		m_SubMeshes.push_back(submesh);
 
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) (m_StaticVertices.size() * sizeof(Vertex)));
+		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
+		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) ((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32) (m_Indices.size() * sizeof(VertexIndex)));
 		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 		m_BoundingBox = aabb;
@@ -90,21 +92,23 @@ namespace highlo
 		submesh.WorldTransform = transform;
 		m_SubMeshes.push_back(submesh);
 
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)(m_StaticVertices.size() * sizeof(Vertex)));
+		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
+		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
 		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 
-// TODO: generate bounding box for submeshes,
+		// TODO: generate bounding box for submeshes,
 	}
 
 	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const std::vector<Mesh> &subMeshes)
 		: m_StaticVertices(vertices), m_Indices(indices), m_SubMeshes(subMeshes), m_IsAnimated(false)
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)(m_StaticVertices.size() * sizeof(Vertex)));
+		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
+		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
 		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
 
-// TODO: generate bounding box for submeshes,
+		// TODO: generate bounding box for submeshes,
 	}
 
 	MeshFile::~MeshFile()

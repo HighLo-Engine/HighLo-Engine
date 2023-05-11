@@ -106,14 +106,35 @@ namespace highlo
 		};
 	}
 
-	BufferLayout BufferLayout::GetTransformBufferLayout()
+	BufferLayout BufferLayout::GetTransformBufferLayout(uint32 offset)
 	{
-		return
-		{
-			{ "a_MRow0", ShaderDataType::Float4 },
-			{ "a_MRow1", ShaderDataType::Float4 },
-			{ "a_MRow2", ShaderDataType::Float4 }
-		};
+		BufferElement mrow0;
+		mrow0.Name = "a_MRow0";
+		mrow0.Type = ShaderDataType::Float4;
+		mrow0.Size = 4 * sizeof(float);
+		mrow0.Offset = offset;
+		mrow0.Normalized = false;
+
+		BufferElement mrow1;
+		mrow1.Name = "a_MRow1";
+		mrow1.Type = ShaderDataType::Float4;
+		mrow1.Size = 4 * sizeof(float);
+		mrow1.Offset = mrow0.Size + mrow0.Offset;
+		mrow1.Normalized = false;
+
+		BufferElement mrow2;
+		mrow2.Name = "a_MRow2";
+		mrow2.Type = ShaderDataType::Float4;
+		mrow2.Size = 4 * sizeof(float);
+		mrow2.Offset = mrow0.Offset + (2 * mrow0.Size);
+		mrow2.Normalized = false;
+
+		return { mrow0, mrow1, mrow2 };
+	}
+
+	uint32 BufferLayout::GetTransformBufferSize()
+	{
+		return (3 * (4 * sizeof(float)));
 	}
 
 	void BufferLayout::CalculateOffsetsAndStride()

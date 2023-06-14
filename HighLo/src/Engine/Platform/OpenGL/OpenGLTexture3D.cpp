@@ -20,7 +20,40 @@ namespace highlo
 	OpenGLTexture3D::OpenGLTexture3D(const FileSystemPath &filePath, bool flipOnLoad)
 		: m_FilePath(filePath)
 	{
-		HL_ASSERT(false, "Not implemented");
+		m_Specification.Format = TextureFormat::RGBA32F;
+
+		glGenTextures(1, &RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
+
+		stbi_set_flip_vertically_on_load(flipOnLoad);
+
+		int32 width, height, nrComponents;
+		Byte *data = (Byte*)stbi_loadf(*filePath.String(), &width, &height, &nrComponents, 0);
+
+		if (data)
+		{
+			m_Buffer = Allocator::Copy(data, width * height * nrComponents * sizeof(float));
+			m_Loaded = true;
+			stbi_image_free(data);
+
+			uint32 levels = utils::CalculateMipCount(width, height);
+			m_Specification.Width = width;
+			m_Specification.Height = height;
+
+			glTextureStorage2D(RendererID, levels, utils::OpenGLTextureInternalFormat(m_Specification.Format), m_Specification.Width, m_Specification.Height);
+			glTextureSubImage3D(RendererID, 0, 0, 0, 0, m_Specification.Width, m_Specification.Height, 6, utils::OpenGLTextureFormat(m_Specification.Format), utils::OpenGLFormatDataType(m_Specification.Format), m_Buffer.Data);
+		}
+		else
+		{
+			HL_CORE_ERROR(TEXTURE3D_LOG_PREFIX "[-] Failed to load Texture3D: {0} (reason: {1}) [-]", **filePath, stbi_failure_reason());
+			stbi_image_free(data);
+		}
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, utils::OpenGLSamplerFilter(m_Specification.Properties.SamplerFilter, false));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, utils::OpenGLSamplerWrap(m_Specification.Properties.SamplerWrap));
 	}
 
 	OpenGLTexture3D::OpenGLTexture3D(TextureFormat format, uint32 width, uint32 height, const void *data)

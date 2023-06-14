@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -55,7 +55,7 @@ namespace highlo
 		HLAPI AssetHandle GetAssetHandleFromFilePath(const FileSystemPath &path);
 		HLAPI bool IsAssetHandleValid(AssetHandle handle) { return GetMetaData(handle).IsValid(); }
 
-		HLAPI AssetType GetAssetTypeFromExtension(const HLString &extension);
+		HLAPI AssetType GetAssetTypeFromExtension(HLString &extension);
 		HLAPI AssetType GetAssetTypeFromPath(const FileSystemPath &path);
 
 		HLAPI AssetHandle ImportAsset(const FileSystemPath &path);

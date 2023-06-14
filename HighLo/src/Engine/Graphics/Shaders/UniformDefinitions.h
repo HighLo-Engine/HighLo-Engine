@@ -50,19 +50,15 @@ namespace highlo
 	struct UniformBufferRendererData
 	{
 		glm::vec4 CascadeSplits;
-		uint32 TilesCountX{ 0 };
-		bool ShowCascades = false;
-		char Padding0[3] = { 0, 0, 0 };
-		bool SoftShadows = true;
-		char Padding1[3] = { 0, 0, 0 };
-		float LightSize = 0.5f;
-		float MaxShadowDistance = 200.0f;
-		float ShadowFade = 1.0f;
-		bool CascadeFading = true;
-		char Padding2[3] = { 0, 0, 0 };
-		float CascadeTransitionFade = 1.0f;
-		bool ShowLightComplexity = false;
-		char Padding3[3] = { 0, 0, 0 };
+		float LightSize;
+		float MaxShadowDistance;
+		float ShadowFade;
+		float CascadeTransitionFade;
+		int32 TilesCountX;
+		bool ShowLightComplexity;
+		bool ShowCascades;
+		bool SoftShadows;
+		bool CascadeFading;
 	};
 
 	struct UniformBufferScreenData
@@ -78,6 +74,19 @@ namespace highlo
 		float Exposure;
 		float BloomIntensity;
 		float BloomDirtIntensity;
+	};
+
+	struct UniformBufferMaterial
+	{
+		glm::vec3 DiffuseColor;
+		float Metalness;
+		float Roughness;
+		float Emission;
+		float Transparency;
+		float EnvMapRotation;
+		
+		bool UseNormalMap;
+		bool Padding1;
 	};
 }
 

@@ -9,7 +9,7 @@ namespace highlo
 	{
 	public:
 
-		HLAPI MaterialAsset();
+		HLAPI MaterialAsset(bool transparent);
 		HLAPI MaterialAsset(const Ref<Material> &material);
 		HLAPI ~MaterialAsset();
 
@@ -48,6 +48,14 @@ namespace highlo
 		HLAPI void SetRoughnessMap(const Ref<Texture2D> &texture);
 		HLAPI void ClearRoughnessMap();
 		
+		HLAPI float &GetTransparency();
+		HLAPI void SetTransparency(float transparency);
+
+		HLAPI bool IsShadowCasting() const { return m_Material->GetFlag(MaterialFlag::DisableShadowCasting); }
+		HLAPI void SetShadowCasting(bool castShadows) { m_Material->SetFlag(MaterialFlag::DisableShadowCasting, !castShadows); }
+
+		HLAPI bool IsTransparent() const { return m_Transparent; }
+
 		// Inherited via Asset
 		HLAPI static AssetType GetStaticType() { return AssetType::Material; }
 		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
@@ -55,12 +63,13 @@ namespace highlo
 		HLAPI Ref<Material> &GetMaterial() { return m_Material; }
 		HLAPI const Ref<Material> &GetMaterial() const { return m_Material; }
 
-		HLAPI static Ref<MaterialAsset> Create();
+		HLAPI static Ref<MaterialAsset> Create(bool transparent);
 		HLAPI static Ref<MaterialAsset> Create(const Ref<Material> &material);
 
 	private:
 
-		Ref<Material> m_Material;
+		Ref<Material> m_Material = nullptr;
+		bool m_Transparent = false;
 	};
 }
 

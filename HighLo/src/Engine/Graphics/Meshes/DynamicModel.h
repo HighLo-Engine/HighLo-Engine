@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -34,6 +34,10 @@ namespace highlo
 		const std::vector<uint32> &GetSubmeshIndices() const { return m_SubMeshIndices; }
 
 		void SetSubmeshIndices(const std::vector<uint32> &indices);
+		bool IsAnimated() const { return m_MeshFile->m_IsAnimated; }
+
+		std::vector<glm::mat4> &GetBoneTransforms() { return m_MeshFile->m_BoneTransforms; }
+		const std::vector<glm::mat4> &GetBoneTransforms() const { return m_MeshFile->m_BoneTransforms; }
 
 		// MeshFile
 		Ref<MeshFile> &Get() { return m_MeshFile; }

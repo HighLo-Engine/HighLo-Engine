@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "AssetManager.h"
@@ -86,7 +86,7 @@ namespace highlo
 		return s_AssetRegistry.Contains(*path) ? s_AssetRegistry[*path].Handle : 0;
 	}
 
-	AssetType AssetManager::GetAssetTypeFromExtension(const HLString &extension)
+	AssetType AssetManager::GetAssetTypeFromExtension(HLString &extension)
 	{
 		if (s_AssetExtesions.find(extension.ToLowerCase()) == s_AssetExtesions.end())
 			return AssetType::None;
@@ -96,7 +96,8 @@ namespace highlo
 
 	AssetType AssetManager::GetAssetTypeFromPath(const FileSystemPath &path)
 	{
-		return GetAssetTypeFromExtension(path.Extension());
+		HLString extension = path.Extension();
+		return GetAssetTypeFromExtension(extension);
 	}
 
 	AssetHandle AssetManager::ImportAsset(const FileSystemPath &path)

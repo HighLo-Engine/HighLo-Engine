@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "EditorCamera.h"
@@ -13,6 +13,7 @@ namespace highlo
 		m_ProjectionMatrix = projectionMatrix;
 		m_Rotation = glm::vec3(90.0f, 0.0f, 0.0f);
 		m_FocalPoint = glm::vec3(0.0f);
+		m_InitialMousePosition = { 0.0f, 0.0f };
 
 		glm::vec3 position = { -5.0f, 5.0f, 5.0f };
 		m_Distance = glm::distance(position, m_FocalPoint);
@@ -34,7 +35,7 @@ namespace highlo
 		}
 	}
 
-	void EditorCamera::Update()
+	void EditorCamera::Update(Timestep ts)
 	{
 		const glm::vec2 &mouse = { Input::GetMouseX(), Input::GetMouseY() };
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
@@ -60,6 +61,7 @@ namespace highlo
 	{
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
+		UpdateCameraView();
 	}
 
 	void EditorCamera::OnEvent(Event &e)

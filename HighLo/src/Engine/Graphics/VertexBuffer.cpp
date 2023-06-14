@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "VertexBuffer.h"
@@ -8,9 +8,11 @@
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11VertexBuffer.h"
 #elif HIGHLO_API_DX12
-// TODO
+#include "Engine/Platform/DX12/DX12VertexBuffer.h"
 #elif HIGHLO_API_VULKAN
 #include "Engine/Platform/Vulkan/VulkanVertexBuffer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalVertexBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -22,10 +24,13 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexBuffer>::Create(data, size, usage);
 	#elif HIGHLO_API_DX12
-		return nullptr;
+		return Ref<DX12VertexBuffer>::Create(data, size, usage);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanVertexBuffer>::Create(data, size, usage);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalVertexBuffer>::Create(data, size, usage);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}
@@ -37,10 +42,13 @@ namespace highlo
 	#elif HIGHLO_API_DX11
 		return Ref<DX11VertexBuffer>::Create(size, usage);
 	#elif HIGHLO_API_DX12
-		return nullptr;
+		return Ref<DX12VertexBuffer>::Create(size, usage);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanVertexBuffer>::Create(size, usage);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalVertexBuffer>::Create(size, usage);
 	#else
+		HL_ASSERT(false);
 		return nullptr;
 	#endif // HIGHLO_API_OPENGL
 	}

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ShaderCache.h"
@@ -6,6 +6,8 @@
 #include "Engine/Application/Application.h"
 #include "Engine/Loaders/DocumentWriter.h"
 #include "Engine/Loaders/DocumentReader.h"
+
+#define SHADER_CACHE_LOG_PREFIX "ShaderCache>  "
 
 namespace highlo
 {
@@ -39,61 +41,25 @@ namespace highlo
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
 		Ref<DocumentWriter> writer = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
 
-	//	writer->BeginArray();
-	//	for (auto &[filePath, hash] : shaderCache)
-	//	{
-	//		writer->BeginObject();
-	//		writer->WriteUInt64(filePath, hash);
-	//		writer->EndObject();
-	//	}
-	//	writer->EndArray();
+		writer->WriteUInt64ArrayMap("shaderCache", shaderCache);
 
-	//	if (writer->WriteUInt64ArrayMap("shaderCache", shaderCache))
-	//	{
-	//		bool success = writer->WriteOut();
-	//		HL_ASSERT(success);
-	//	}
-	//	else
-	//	{
-	//		HL_CORE_ERROR("Could not write array map!");
-	//	}
-
-		writer->BeginArray();
-		for (auto &[filePath, hash] : shaderCache)
-		{
-			writer->BeginObject();
-			writer->WriteUInt64(filePath, hash);
-			writer->EndObject();
-		}
-		writer->EndArray();
-
-		bool success = writer->WriteOut();
-		HL_ASSERT(success);
+		bool writeSuccess = writer->WriteOut();
+		HL_ASSERT(writeSuccess);
 	}
 	
 	void ShaderCache::Deserialize(std::map<HLString, uint64> &shaderCache)
 	{
 		FileSystemPath shaderRegistryPath = HLApplication::Get().GetApplicationSettings().ShaderRegistryPath;
-	//	Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::Json);
-		Ref<DocumentWriter> reader = DocumentWriter::Create(shaderRegistryPath, DocumentType::Json);
-
-
-	//	if (reader->ReadContents())
-	//	{
-	//		if (!reader->ReadUInt64ArrayMap("shaderCache", shaderCache))
-	//		{
-	//			HL_CORE_ERROR("Could not read ShaderCache!");
-	//			HL_ASSERT(false);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		HL_CORE_ERROR("Could not read file contents!");
-	//	}
+		Ref<DocumentReader> reader = DocumentReader::Create(shaderRegistryPath, DocumentType::Json);
 
 		bool readSuccess = reader->ReadContents();
-		bool success = reader->ReadUInt64ArrayMap("", shaderCache);
-	//	HL_ASSERT(success);
+		if (readSuccess)
+		{
+			if (!reader->ReadUInt64ArrayMap("shaderCache", shaderCache))
+			{
+				HL_CORE_ERROR(SHADER_CACHE_LOG_PREFIX "[-] Error: Could not read shader cache! [-]");
+			}
+		}
 	}
 }
 

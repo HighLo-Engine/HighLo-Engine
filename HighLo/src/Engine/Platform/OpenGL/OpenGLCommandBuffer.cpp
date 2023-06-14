@@ -46,6 +46,7 @@ namespace highlo
 	void OpenGLCommandBuffer::EndTimestampQuery(uint32 queryID)
 	{
 	}
+
 	const PipelineStatistics &OpenGLCommandBuffer::GetPipelineStatistics(uint32 frameIndex) const
 	{
 		HL_ASSERT(frameIndex < m_PipelineStatisticsQueryResults.size());

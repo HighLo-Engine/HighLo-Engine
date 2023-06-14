@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -8,8 +8,6 @@
 #pragma once
 
 #include "Engine/Loaders/DocumentReader.h"
-
-#if 0
 
 #include <rapidxml/rapidxml.hpp>
 
@@ -71,15 +69,39 @@ namespace highlo
 		virtual bool ReadMat4ArrayMap(const HLString &key, std::map<HLString, glm::mat4> &result) override;
 		virtual bool ReadQuatArrayMap(const HLString &key, std::map<HLString, glm::quat> &result) override;
 
+		virtual bool ReadStringArrayMap(const HLString &key, std::unordered_map<HLString, HLString> &result) override;
+		virtual bool ReadInt32ArrayMap(const HLString &key, std::unordered_map<HLString, int32> &result) override;
+		virtual bool ReadUInt32ArrayMap(const HLString &key, std::unordered_map<HLString, uint32> &result) override;
+		virtual bool ReadInt64ArrayMap(const HLString &key, std::unordered_map<HLString, int64> &result) override;
+		virtual bool ReadUInt64ArrayMap(const HLString &key, std::unordered_map<HLString, uint64> &result) override;
+		virtual bool ReadBoolArrayMap(const HLString &key, std::unordered_map<HLString, bool> &result) override;
+		virtual bool ReadFloatArrayMap(const HLString &key, std::unordered_map<HLString, float> &result) override;
+		virtual bool ReadDoubleArrayMap(const HLString &key, std::unordered_map<HLString, double> &result) override;
+		virtual bool ReadVec2ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec2> &result) override;
+		virtual bool ReadVec3ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec3> &result) override;
+		virtual bool ReadVec4ArrayMap(const HLString &key, std::unordered_map<HLString, glm::vec4> &result) override;
+		virtual bool ReadMat2ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat2> &result) override;
+		virtual bool ReadMat3ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat3> &result) override;
+		virtual bool ReadMat4ArrayMap(const HLString &key, std::unordered_map<HLString, glm::mat4> &result) override;
+		virtual bool ReadQuatArrayMap(const HLString &key, std::unordered_map<HLString, glm::quat> &result) override;
+
 		virtual bool ReadContents(const FileSystemPath &filePath = "") override;
 		virtual HLString GetContent(bool prettify = false) override;
 		virtual void SetContent(const HLString &content) override;
 
 	private:
 
+		bool Read(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArray(const HLString &key, DocumentDataType type, const std::function<bool(rapidxml::xml_node<>*)> &insertFunc);
+		bool ReadArrayMap(const HLString &key, DocumentDataType type, const std::function<bool(HLString&, rapidxml::xml_node<>*)> &insertFunc);
+
+	private:
+
 		FileSystemPath m_FilePath;
-		rapidxml::xml_document<> *m_Document;
+		HLString m_EngineVersion;
+
+		rapidxml::xml_document<> m_Document;
+		rapidxml::xml_node<> *m_RootNode = nullptr;
 	};
 }
 
-#endif

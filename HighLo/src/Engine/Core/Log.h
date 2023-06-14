@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -29,12 +29,6 @@ namespace highlo
 		HLAPI static std::shared_ptr<spdlog::logger> &GetCoreLogger();
 		HLAPI static std::shared_ptr<spdlog::logger> &GetClientLogger();
 		HLAPI static std::shared_ptr<spdlog::logger> &GetEditorConsoleLogger();
-
-	private:
-
-		static std::shared_ptr<spdlog::logger> s_EngineLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-		static std::shared_ptr<spdlog::logger> s_EditorLogger;
 	};
 
 	template<typename T>

@@ -2,6 +2,8 @@
   <img src="/HighLo.png" alt="HighLo-Logo" width="1024">
 </p>
 
+[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/HighLo-Engine/HighLo-Engine)](https://www.tickgit.com/browse?repo=github.com/HighLo-Engine/HighLo-Engine)
+
 # HighLo-Engine
 
 The HighLo Engine is a free open source game engine made only by two very passionate programmers.
@@ -22,12 +24,41 @@ cd HighLo-Engine
 
 ```sh
 # generate the solution files for mac or the makefiles for linux or the visual studio solution files for windows
-python scripts/GenerateEngine.py
+python Scripts/GenerateEngine.py
 ```
 
 # Building the engine
 
 For detailed information, see the [Build guide](BUILDING.md).
+
+# Building the working demo
+
+Currently, the demo project is not working anymore, due to heavy architecture and feature changes.
+But you can build the demo application, by building an older version of the engine.
+To build the demo application and run the state of the screenshots, follow these instructions:
+
+```sh
+# Clone the repository without submodules
+git clone https://github.com/HighLo-Engine/HighLo-Engine.git
+```
+
+```sh
+# Then checkout the commit, that contains the working demo version (f183fcf)
+git checkout -q f183fcf
+```
+
+```sh
+# Now get all submodules
+git submodule update --init --recursive
+```
+
+```sh
+# Execute the setup script, you can just double-click the file
+./scripts/GenerateEngine.bat
+```
+
+Now you should be able to open the visual studio solution and build and run the demo application.
+The demo application is located in `Demos/PBRSceneDemo` and you have to select this project as the **startup project** inside visual studio.
 
 # Supported platforms
 

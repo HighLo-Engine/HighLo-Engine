@@ -96,6 +96,13 @@ layout(std140, binding = 4) uniform PointLightData
 	PointLight Lights[1000];
 } u_PointLights;
 
+layout(std140, binding = 16) uniform ObjectTransformation
+{
+	vec4 Row0;
+	vec4 Row1;
+	vec4 Row2;
+} u_ObjectTransformation;
+
 struct PBRParameters
 {
 	vec3 Diffuse;

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "UniformBuffer.h"
@@ -11,6 +11,8 @@
 #include "Engine/Platform/DX11/DX11UniformBuffer.h"
 #elif HIGHLO_API_DX12
 #include "Engine/Platform/DX12/DX12UniformBuffer.h"
+#elif HIGHLO_API_METAL
+#include "Engine/Platform/Metal/MetalUniformBuffer.h"
 #endif // HIGHLO_API_OPENGL
 
 namespace highlo
@@ -25,6 +27,8 @@ namespace highlo
 		return Ref<DX12UniformBuffer>::Create(size, binding, layout);
 	#elif HIGHLO_API_VULKAN
 		return Ref<VulkanUniformBuffer>::Create(size, binding, layout);
+	#elif HIGHLO_API_METAL
+		return Ref<MetalUniformBuffer>::Create(size, binding, layout);
 	#else
 		HL_ASSERT(false);
 		return nullptr;
@@ -56,8 +60,16 @@ namespace highlo
 
 	void UniformBuffer::SetData(const void *data, uint32 size, uint32 offset)
 	{
-		// TODO: this could be potentially dangerous, if size is less the m_DataSize, because then we would not have the complete m_DataSize space filled with actual data
-		memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), m_DataSize);
+		HL_ASSERT(offset < size);
+
+		uint32 elementSize = m_DataSize;
+		if (m_DataSize < size)
+		{
+			HL_CORE_WARN("UniformBuffer::SetData - the copied buffer is larger than expected!");
+			HL_ASSERT(false);
+		}
+
+		memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), elementSize);
 		UploadToShader();
 	}
 
@@ -69,9 +81,8 @@ namespace highlo
 			uint32 size = entry->second.first;
 			uint32 offset = entry->second.second;
 			memcpy_s((void*)((char*)m_Data + offset), size, value, size);
+			UploadToShader();
 		}
-
-		UploadToShader();
 	}
 	
 	void *UniformBuffer::GetVariable(const HLString &name)

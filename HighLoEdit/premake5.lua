@@ -1,3 +1,10 @@
+-- create empty cache files
+shaderFileHandle = io.open("assets/shaders.registry", "w")
+shaderFileHandle:close()
+assetFileHandle = io.open("assets/assets.registry", "w")
+assetFileHandle:close()
+
+
 project "HighLoEdit"
     kind "ConsoleApp"
     language "C++"

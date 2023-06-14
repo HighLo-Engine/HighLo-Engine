@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "OpenGLFramebuffer.h"
@@ -48,33 +48,14 @@ namespace highlo
 		{
 			switch (format)
 			{
-			case TextureFormat::DEPTH32F:
-				return GL_DEPTH_ATTACHMENT;
+				case TextureFormat::DEPTH32F:
+					return GL_DEPTH_ATTACHMENT;
 
-			case TextureFormat::DEPTH24STENCIL8:
-				return GL_DEPTH_STENCIL_ATTACHMENT;
+				case TextureFormat::DEPTH24STENCIL8:
+					return GL_DEPTH_STENCIL_ATTACHMENT;
 			}
 			HL_ASSERT(false, "Unknown format");
 			return 0;
-		}
-
-		static Ref<Texture> CreateTexture(int32 samples, TextureFormat format, uint32 width, uint32 height, int32 index, const Ref<Texture> &existingTexture = nullptr)
-		{
-			bool multisampled = samples > 1;
-
-			if (!existingTexture)
-			{
-				Ref<Texture> texture = Texture2D::Create(format, width, height);
-				Ref<OpenGLTexture2D> glTexture = texture.As<OpenGLTexture2D>();
-				glBindTexture(utils::TextureTarget(multisampled), glTexture->GetRendererID());
-				glTexture->CreateSampler(TextureProperties());
-				return texture;
-			}
-
-			Ref<OpenGLTexture2D> glTexture = existingTexture.As<OpenGLTexture2D>();
-			glBindTexture(utils::TextureTarget(multisampled), glTexture->GetRendererID());
-			glTexture->CreateSampler(TextureProperties());
-			return existingTexture;
 		}
 
 		static void AttachColorAttachment(HLRendererID id, int32 samples, GLenum internalFormat, GLenum format, uint32 width, uint32 height, int32 index)
@@ -82,10 +63,12 @@ namespace highlo
 			bool multisampled = samples > 1;
 			if (multisampled)
 			{
+				glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, id);
 				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_FALSE);
 			}
 			else
 			{
+				glBindTexture(GL_TEXTURE_2D, id);
 				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -103,10 +86,12 @@ namespace highlo
 			bool multisampled = samples > 1;
 			if (multisampled)
 			{
+				glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, id);
 				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
 			}
 			else
 			{
+				glBindTexture(GL_TEXTURE_2D, id);
 				glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -136,64 +121,7 @@ namespace highlo
 		: m_Specification(spec)
 	{
 		HL_ASSERT(spec.Attachments.Attachments.size());
-
-		// First make sure, that all pre-existing formats are loaded
-		if (!m_Specification.SwapChainTarget)
-		{
-			uint32 attachmentIndex = 0;
-			for (auto format : m_Specification.Attachments.Attachments)
-			{
-				if (m_Specification.ExistingImage && m_Specification.ExistingImage->GetSpecification().Layers > 1)
-				{
-					if (utils::IsDepthFormat(format.Format))
-					{
-						m_DepthAttachmentFormat = format.Format;
-						m_DepthAttachment = m_Specification.ExistingImage.As<Texture>();
-					}
-					else
-					{
-						m_ColorAttachmentFormats.push_back(format.Format);
-						m_ColorAttachments.push_back(m_Specification.ExistingImage.As<Texture>());
-					}
-				}
-				else if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
-				{
-					if (!utils::IsDepthFormat(format.Format))
-					{
-						m_ColorAttachmentFormats.push_back(format.Format);
-						Ref<Texture> &existingTexture = m_Specification.ExistingImages.at(attachmentIndex).As<Texture>();
-						m_ColorAttachments.push_back(existingTexture);
-					}
-				}
-				else if (m_Specification.ExistingFramebuffer)
-				{
-					if (utils::IsDepthFormat(format.Format))
-					{
-						Ref<Texture> &depthTexture = m_Specification.ExistingFramebuffer->GetDepthImage();
-						m_DepthAttachment = depthTexture;
-					}
-					else
-					{
-						for (uint32 i = 0; i < m_Specification.ExistingFramebuffer->GetColorAttachmentCount(); ++i)
-						{
-							Ref<Texture> &colorTexture = m_Specification.ExistingFramebuffer->GetImage(i);
-							m_ColorAttachments.push_back(colorTexture);
-						}
-					}
-				}
-				else if (utils::IsDepthFormat(format.Format))
-				{
-					m_DepthAttachmentFormat = format.Format;
-				}
-				else
-				{
-					m_ColorAttachmentFormats.emplace_back(format.Format);
-				}
-
-				++attachmentIndex;
-			}
-		}
-
+		
 		uint32 width = spec.Width;
 		uint32 height = spec.Height;
 		if (0 == width)
@@ -201,6 +129,60 @@ namespace highlo
 
 		if (0 == height)
 			height = HLApplication::Get().GetWindow().GetHeight();
+
+		// Create all image objects immediately so we can start referencing them
+		// elsewhere
+		uint32 attachmentIndex = 0;
+		if (!m_Specification.ExistingFramebuffer)
+		{
+			for (auto &attachmentSpec : m_Specification.Attachments.Attachments)
+			{
+				if (m_Specification.ExistingImage && m_Specification.ExistingImage->GetSpecification().Layers > 1)
+				{
+					if (utils::IsDepthFormat(attachmentSpec.Format))
+					{
+						m_DepthAttachment = m_Specification.ExistingImage;
+						m_DepthAttachmentFormat = attachmentSpec.Format;
+					}
+					else
+					{
+						m_ColorAttachments.emplace_back(m_Specification.ExistingImage);
+						m_ColorAttachmentFormats.emplace_back(attachmentSpec.Format);
+					}
+				}
+				else if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
+				{
+					if (!utils::IsDepthFormat(attachmentSpec.Format))
+					{
+						m_ColorAttachments.emplace_back(); // This will be set later
+						m_ColorAttachmentFormats.emplace_back(attachmentSpec.Format);
+					}
+				}
+				else if (utils::IsDepthFormat(attachmentSpec.Format))
+				{
+					TextureSpecification spec;
+					spec.Format = attachmentSpec.Format;
+					spec.Usage = TextureUsage::Attachment;
+					spec.Width = width * (uint32)m_Specification.Scale;
+					spec.Height = height * (uint32)m_Specification.Scale;
+					spec.DebugName = fmt::format("{0}-DepthAttachment{1}", m_Specification.DebugName.IsEmpty() ? "Unnamed FB" : m_Specification.DebugName, attachmentIndex);
+					m_DepthAttachment = Texture2D::CreateFromSpecification(spec);
+					m_DepthAttachmentFormat = attachmentSpec.Format;
+				}
+				else
+				{
+					TextureSpecification spec;
+					spec.Format = attachmentSpec.Format;
+					spec.Usage = TextureUsage::Attachment;
+					spec.Width = width * (uint32)m_Specification.Scale;
+					spec.Height = height * (uint32)m_Specification.Scale;
+					spec.DebugName = fmt::format("{0}-ColorAttachment{1}", m_Specification.DebugName.IsEmpty() ? "Unnamed FB" : m_Specification.DebugName, attachmentIndex);
+					m_ColorAttachments.emplace_back(Texture2D::CreateFromSpecification(spec));
+					m_ColorAttachmentFormats.emplace_back(attachmentSpec.Format);
+				}
+				attachmentIndex++;
+			}
+		}
 
 		Resize(width, height, true);
 	}
@@ -212,101 +194,173 @@ namespace highlo
 
 	void OpenGLFramebuffer::Invalidate()
 	{
-		if (m_RendererID)
-		{
-			glDeleteFramebuffers(1, &m_RendererID);
-			for (uint32 i = 0; i < m_ColorAttachments.size(); ++i)
-			{
-				m_ColorAttachments[i]->Release();
-				m_ColorAttachments[i] = nullptr;
-			}
-
-			m_ColorAttachments.clear();
-
-			if (m_DepthAttachment)
-			{
-				m_DepthAttachment->Release();
-				m_DepthAttachment = nullptr;
-			}
-		}
+		Release();
 
 		glGenFramebuffers(1, &m_RendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+
 		bool multisampled = m_Specification.Samples > 1;
+		bool createImages = m_ColorAttachments.empty();
 
-		if (m_ColorAttachmentFormats.size())
+		if (m_Specification.ExistingFramebuffer)
+			m_ColorAttachments.clear();
+
+		uint32 attachmentIndex = 0;
+		for (auto attachmentSpec : m_Specification.Attachments.Attachments)
 		{
-			m_ColorAttachments.resize(m_ColorAttachmentFormats.size());
-
-			// Create color attachments
-			for (size_t i = 0; i < m_ColorAttachments.size(); i++)
+			if (utils::IsDepthFormat(attachmentSpec.Format))
 			{
-				m_ColorAttachments[i] = utils::CreateTexture(m_Specification.Samples, m_ColorAttachmentFormats[i], m_Specification.Width, m_Specification.Height, int32(i), m_ColorAttachments[i]);
+				if (m_Specification.ExistingImage)
+				{
+					m_DepthAttachment = m_Specification.ExistingImage;
+				}
+				else if (m_Specification.ExistingFramebuffer)
+				{
+					Ref<Framebuffer> existingFramebuffer = m_Specification.ExistingFramebuffer;
+					m_DepthAttachment = existingFramebuffer->GetDepthImage();
+				}
+				else if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
+				{
+					Ref<Texture2D> existingImage = m_Specification.ExistingImages.at(attachmentIndex);
+					HL_ASSERT(utils::IsDepthFormat(existingImage->GetSpecification().Format), "Trying to attach non-depth image as depth attachment");
+					m_DepthAttachment = existingImage;
+				}
+				else
+				{
+					if (!m_DepthAttachment)
+					{
+						TextureSpecification spec;
+						spec.Format = attachmentSpec.Format;
+						spec.Usage = TextureUsage::Attachment;
+						spec.Width = m_Specification.Width * (uint32)m_Specification.Scale;
+						spec.Height = m_Specification.Height * (uint32)m_Specification.Scale;
+						spec.DebugName = fmt::format("{0}-DepthAttachment{1}", m_Specification.DebugName.IsEmpty() ? "Unnamed FB" : m_Specification.DebugName, attachmentIndex);
+						m_DepthAttachment = Texture2D::CreateFromSpecification(spec);
+						m_DepthAttachmentFormat = attachmentSpec.Format;
+					}
+					else
+					{
+						auto &spec = m_DepthAttachment->GetSpecification();
+						spec.Width = m_Specification.Width * (uint32)m_Specification.Scale;
+						spec.Height = m_Specification.Height * (uint32)m_Specification.Scale;
+						m_DepthAttachment->Invalidate(); // Create immediately
+					}
+				}
 
-				switch (m_ColorAttachmentFormats[i])
+				glBindTexture(utils::TextureTarget(multisampled), m_DepthAttachment->GetRendererID());
+				switch (m_DepthAttachmentFormat)
+				{
+					case TextureFormat::DEPTH24STENCIL8:
+						utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+						break;
+
+					case TextureFormat::DEPTH32F:
+						utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH_COMPONENT32F, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+						break;
+				}
+			}
+			else
+			{
+				Ref<Texture2D> colorAttachment = nullptr;
+				if (m_Specification.ExistingFramebuffer)
+				{
+					Ref<Framebuffer> existingFramebuffer = m_Specification.ExistingFramebuffer;
+					Ref<Texture2D> existingImage = existingFramebuffer->GetImage(attachmentIndex);
+					colorAttachment = m_ColorAttachments.emplace_back(existingImage).As<Texture2D>();
+				}
+				else if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
+				{
+					Ref<Texture2D> existingImage = m_Specification.ExistingImages[attachmentIndex];
+					HL_ASSERT(!utils::IsDepthFormat(existingImage->GetSpecification().Format), "Trying to attach depth image as color attachment");
+					colorAttachment = existingImage;
+					m_ColorAttachments[attachmentIndex] = existingImage;
+				}
+				else
+				{
+					if (createImages)
+					{
+						TextureSpecification spec;
+						spec.Format = attachmentSpec.Format;
+						spec.Usage = TextureUsage::Attachment;
+						spec.Width = m_Specification.Width * (uint32)m_Specification.Scale;
+						spec.Height = m_Specification.Height * (uint32)m_Specification.Scale;
+						colorAttachment = m_ColorAttachments.emplace_back(Texture2D::CreateFromSpecification(spec)).As<Texture2D>();
+					}
+					else
+					{
+						Ref<Texture2D> image = m_ColorAttachments[attachmentIndex];
+						TextureSpecification &spec = image->GetSpecification();
+						spec.Width = m_Specification.Width * (uint32)m_Specification.Scale;
+						spec.Height = m_Specification.Height * (uint32)m_Specification.Scale;
+						colorAttachment = image;
+
+						if (colorAttachment->GetSpecification().Layers == 1)
+							colorAttachment->Invalidate(); // Create immediately
+						else if (attachmentIndex == 0 && m_Specification.ExistingImageLayers[0] == 0)// Only invalidate the first layer from only the first framebuffer
+						{
+							colorAttachment->Invalidate(); // Create immediately
+							colorAttachment->CreatePerSpecificLayerImageViews(m_Specification.ExistingImageLayers);
+						}
+						else if (attachmentIndex == 0)
+						{
+							colorAttachment->CreatePerSpecificLayerImageViews(m_Specification.ExistingImageLayers);
+						}
+					}
+				}
+
+				HL_ASSERT(colorAttachment);
+
+				switch (m_ColorAttachmentFormats[attachmentIndex])
 				{
 					case TextureFormat::SRGB:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_SRGB8, GL_SRGB, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_SRGB8, GL_SRGB, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RGB:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGB8, GL_RGB, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RGB8, GL_RGB, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RGBA8:
 					case TextureFormat::RGBA:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RG16F:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RG16F, GL_RG, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RG16F, GL_RG, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RGBA16:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA16, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RGBA16, GL_RGBA, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RGBA16F:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA16F, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RGBA16F, GL_RGBA, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RG32F:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RG32F, GL_RG, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RG32F, GL_RG, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RGBA32:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA32I, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RGBA32I, GL_RGBA, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RGBA32F:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_RGBA32F, GL_RGBA, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_RGBA32F, GL_RGBA, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RED32F:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_R32F, GL_RED, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_R32F, GL_RED, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 
 					case TextureFormat::RED_INTEGER:
-						utils::AttachColorAttachment(m_ColorAttachments[i]->GetRendererID(), m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, int32(i));
+						utils::AttachColorAttachment(colorAttachment->GetRendererID(), m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, attachmentIndex);
 						break;
 				}
-			}
-		}
 
-		if (m_DepthAttachmentFormat != TextureFormat::None)
-		{
-			m_DepthAttachment = utils::CreateTexture(m_Specification.Samples, m_DepthAttachmentFormat, m_Specification.Width, m_Specification.Height, 0);
-			glBindTexture(utils::TextureTarget(multisampled), m_DepthAttachment->GetRendererID());
-			switch (m_DepthAttachmentFormat)
-			{
-				case TextureFormat::DEPTH24STENCIL8:
-					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
-					break;
-
-				case TextureFormat::DEPTH32F:
-					utils::AttachDepthAttachment(m_DepthAttachment->GetRendererID(), m_Specification.Samples, GL_DEPTH_COMPONENT32F, GL_DEPTH_ATTACHMENT, m_Specification.Width, m_Specification.Height);
-					break;
 			}
+
+			++attachmentIndex;
 		}
 
 		if (m_ColorAttachments.size() > 1)
@@ -329,11 +383,35 @@ namespace highlo
 	{
 		glDeleteFramebuffers(1, &m_RendererID);
 		m_RendererID = 0;
+
+		// Don't free the images if we don't own them
+		if (!m_Specification.ExistingFramebuffer)
+		{
+			uint32 attachmentIndex = 0;
+			for (Ref<Texture2D> image : m_ColorAttachments)
+			{
+				if (m_Specification.ExistingImages.find(attachmentIndex) != m_Specification.ExistingImages.end())
+					continue;
+
+				// Only destroy deinterleaved image once and prevent clearing layer views on second framebuffer invalidation
+				// TODO
+			//	if (image->GetSpecification().Layers == 1 || attachmentIndex == 0 && !image->GetLayerImageView(0)) // TODO
+			//		image->Release();
+				attachmentIndex++;
+			}
+
+			if (m_DepthAttachment)
+			{
+				// Do we own the depth image?
+				if (m_Specification.ExistingImages.find((uint32)m_Specification.Attachments.Attachments.size() - 1) == m_Specification.ExistingImages.end())
+					m_DepthAttachment->Release();
+			}
+		}
 	}
 
 	void OpenGLFramebuffer::Resize(uint32 width, uint32 height, bool forceRecreate)
 	{
-		if (!forceRecreate && (m_Specification.Width == width && m_Specification.Height == height) && m_Specification.NoResize)
+		if ((!forceRecreate && (m_Specification.Width == width && m_Specification.Height == height)) || m_Specification.NoResize)
 			return;
 
 		m_Specification.Width = width * (uint32)m_Specification.Scale;

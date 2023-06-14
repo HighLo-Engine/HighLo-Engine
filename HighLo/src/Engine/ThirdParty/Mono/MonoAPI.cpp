@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "MonoAPI.h"
@@ -205,7 +205,10 @@ namespace highlo
 	bool MonoAPI::LoadCoreAssembly()
 	{
 		if (!s_ScriptingData->Config.CoreAssemblyPath.Exists())
+		{
+			HL_CORE_WARN("Could not find core assembly at path {0}", **s_ScriptingData->Config.CoreAssemblyPath);
 			return false;
+		}
 
 		s_ScriptingData->AppDomain = mono_domain_create_appdomain("HighLoScriptRuntime", nullptr);
 		HL_ASSERT(s_ScriptingData->AppDomain);

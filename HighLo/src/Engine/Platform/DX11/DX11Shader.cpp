@@ -1,9 +1,10 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "DX11Shader.h"
 
 #include "Engine/Core/FileSystem.h"
+#include "Engine/Utils/ShaderUtils.h"
 
 /// @note @FlareFlax:
 /// for DirectX we probably need HLSL, but our shaders are only written in glsl. (no problem with SPIR-V ;))
@@ -21,11 +22,16 @@ namespace highlo
 		: m_AssetPath(filePath)
 	{
 		m_Name = filePath.Filename();
+		m_Language = utils::ShaderLanguageFromExtension(filePath.Extension());
+		HLString source = FileSystem::Get()->ReadTextFile(filePath);
+	//	Load(source, forceCompile);
 	}
 
-	DX11Shader::DX11Shader(const HLString &source)
+	DX11Shader::DX11Shader(const HLString &source, const HLString &name, ShaderLanguage language)
 	{
-m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for all apis, so that the user can still access this shader through the shader library
+		m_Name = name;
+		m_Language = language;
+	//	Load(source, true);
 	}
 
 	DX11Shader::~DX11Shader()
@@ -57,6 +63,16 @@ m_Name = "unknown"; // TODO: maybe we should add this as a parameter as well for
 	void DX11Shader::SetMacro(const HLString &name, const HLString &value)
 	{
 		m_Macros[name] = value;
+	}
+	
+	const ShaderResourceDeclaration *DX11Shader::GetResource(const HLString &name) const
+	{
+		if (m_Resources.find(name) == m_Resources.end())
+		{
+			return nullptr;
+		}
+
+		return &m_Resources.at(name);
 	}
 }
 

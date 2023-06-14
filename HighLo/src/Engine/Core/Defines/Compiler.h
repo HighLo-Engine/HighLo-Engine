@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -29,7 +29,7 @@
 #define HL_DEPRECATED __declspec(deprecated)
 
 #ifdef HL_DEBUG
-	#define HL_DEBUG_BREAK __debugbreak();
+	#define HL_DEBUG_BREAK __debugbreak()
 #else
 	#define HL_DEBUG_BREAK
 #endif

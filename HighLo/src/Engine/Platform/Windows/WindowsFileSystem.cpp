@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Engine/Core/FileSystem.h"
@@ -181,10 +181,10 @@ namespace highlo
 
     FileSystemPath FileSystem::GetCurrentWorkingDirectory()
     {
-        TCHAR buffer[MAX_PATH];
+        CHAR buffer[MAX_PATH];
         DWORD dwRet;
 
-        dwRet = ::GetCurrentDirectoryW(MAX_PATH, buffer);
+        dwRet = ::GetCurrentDirectoryA(MAX_PATH, buffer);
 
         if (dwRet == 0)
         {
@@ -192,13 +192,14 @@ namespace highlo
             return FileSystemPath::INVALID_PATH;
         }
 
-        if (dwRet > MAX_PATH)
+        if (dwRet >= MAX_PATH)
         {
             HL_CORE_ERROR("Buffer too small; need {} characters", dwRet);
             return FileSystemPath::INVALID_PATH;
         }
 
-        return FileSystemPath(HLString::FromWideString(buffer));
+        buffer[dwRet] = '\0';
+        return FileSystemPath(buffer);
     }
 
     bool FileSystem::FolderExists(const FileSystemPath &path)
@@ -242,7 +243,11 @@ namespace highlo
     {
         HANDLE file = utils::OpenFileInternal(path.String());
         if (file == INVALID_HANDLE_VALUE)
+        {
+            const DWORD error = GetLastError();
+            HLString errorText = utils::TranslateErrorCodeIntoHumanReadable(error);
             return -1;
+        }
 
         int64 size = utils::GetFileSizeInternal(file);
         CloseHandle(file);
@@ -335,10 +340,12 @@ namespace highlo
         HANDLE file = utils::OpenFileInternal(path.String());
         uint32 size = (uint32)utils::GetFileSizeInternal(file);
 
-        HLString result;
-        result.Resize(size);
+        char *readBuffer = new char[size + 1];
+        readBuffer[size] = '\0';
+        bool success = utils::ReadFileInternal(file, &readBuffer[0], size);
+        HLString result = HLString(readBuffer);
+        delete[] readBuffer;
 
-        bool success = utils::ReadFileInternal(file, &result[0], size);
         CloseHandle(file);
         return success ? result : "";
     }

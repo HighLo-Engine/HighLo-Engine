@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "AssetBrowserItem.h"
@@ -152,7 +152,7 @@ namespace highlo
 				ImGui::Spring();
 
 				const AssetMetaData &metaData = AssetManager::Get()->GetMetaData(m_ID);
-				const HLString &assetType = utils::AssetTypeToString(metaData.Type);
+				HLString &assetType = utils::AssetTypeToString(metaData.Type);
 
 				UI::ScopedColor textColor(ImGuiCol_Text, Colors::Theme::TextDarker);
 				ImGui::TextUnformatted(*assetType.ToUpperCase());

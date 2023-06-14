@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -18,7 +18,7 @@
 // __VA_ARGS__ expansion to get past MSVC "bug"
 #define HL_EXPAND_VARGS(x) x
 
-#define HL_ASSERT_NO_MESSAGE(x) { if(!(x)) { HL_CORE_ERROR("Assertion Failed!"); highlo::CrashReporter::Crash(); HL_DEBUG_BREAK; } }
+#define HL_ASSERT_NO_MESSAGE(x) { if(!(x)) { highlo::CrashReporter::Crash(); HL_DEBUG_BREAK; } }
 #define HL_ASSERT_MESSAGE(x, ...) { if(!(x)) { HL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); highlo::CrashReporter::Crash(); HL_DEBUG_BREAK; } }
 
 #define HL_ASSERT_RESOLVE(arg1, arg2, macro, ...) macro

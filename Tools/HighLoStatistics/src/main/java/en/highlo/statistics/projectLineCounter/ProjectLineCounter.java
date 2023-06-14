@@ -41,7 +41,7 @@ public class ProjectLineCounter
         return mFileCount;
     }
 
-    public int getTotalDirectoyCount()
+    public int getTotalDirectoryCount()
     {
         return mDirectoryCount;
     }

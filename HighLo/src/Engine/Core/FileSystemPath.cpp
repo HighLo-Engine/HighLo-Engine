@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "FileSystemPath.h"
@@ -42,8 +42,7 @@ namespace highlo
 
 	FileSystemPath &FileSystemPath::operator=(const char *str)
 	{
-		HLString s = str;
-		Assign(s);
+		Assign(str);
 		return *this;
 	}
 
@@ -55,6 +54,14 @@ namespace highlo
 
 	void FileSystemPath::Assign(const HLString &source)
 	{
+		// If path is invalid, skip the assignment
+		if (source == "INVALID_PATH" || source.IsEmpty())
+		{
+			m_CurrentAbsolutePath = "";
+			m_CurrentPath = "";
+			return;
+		}
+
 		m_CurrentPath = source;
 		if (m_CurrentPath.Contains('\\'))
 			m_CurrentPath = m_CurrentPath.Replace("\\", "/");
@@ -62,7 +69,17 @@ namespace highlo
 		m_Handle = std::filesystem::path(*m_CurrentPath);
 		m_File.ExistsOnHardDrive = Exists();
 		m_File.IsFile = !std::filesystem::is_directory(m_Handle);
-		m_File.Size = Size();
+		m_File.Size = 0;
+
+		if (m_File.IsFile)
+		{
+			m_File.Size = Size();
+			if (m_File.Size == -1)
+			{
+				m_File.ExistsOnHardDrive = false;
+			}
+		}
+
 		m_File.FullPath = std::filesystem::absolute(m_Handle).string();
 
 		if (m_File.FullPath.Contains('\\'))
@@ -72,7 +89,7 @@ namespace highlo
 
 		if (m_File.IsFile)
 		{
-			m_File.Name = ExtractFileNameFromPath(m_File.FullPath);
+			m_File.Name = ExtractFileNameFromPath(m_File.FullPath, false);
 			m_File.FileName = ExtractFileNameFromPath(m_File.FullPath, true);
 			m_File.Extension = ExtractFileExtensionFromPath(m_File.FullPath, true);
 		}
@@ -332,7 +349,7 @@ namespace highlo
 		{
 			HLString result = m_CurrentPath;
 			
-			if (result.EndsWith("/"))
+			if (result.EndsWith('/'))
 				result = result.Substr(0, result.LastIndexOf('/'));
 
 			result = result.Substr(0, result.LastIndexOf('/'));
@@ -442,50 +459,33 @@ namespace highlo
 		return *this;
 	}
 
-	HLString FileSystemPath::ExtractFileNameFromPath(const HLString &path, bool excludeExtension)
+	HLString FileSystemPath::ExtractFileNameFromPath(HLString &path, bool excludeExtension)
 	{
-		HLString result;
-		int32 pos = path.FirstIndexOf('/');
-		int32 i = 1;
-
-		while (pos != HLString::NPOS)
-		{
-			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', i);
-			++i;
-		}
+		HLString result = path;
+		
+		uint32 pos = result.LastIndexOf('/');
+		result = result.Substr(pos + 1);
 
 		if (excludeExtension)
 		{
-			if (result.Contains("."))
-			{
-				result = result.Substr(0, result.IndexOf("."));
-			}
+			pos = result.LastIndexOf('.');
+			result = result.Substr(0, pos);
 		}
 
 		return result;
 	}
 
-	HLString FileSystemPath::ExtractFileExtensionFromPath(const HLString &path, bool excludeDot)
+	HLString FileSystemPath::ExtractFileExtensionFromPath(HLString &path, bool excludeDot)
 	{
-		HLString result;
-		int32 pos = path.FirstIndexOf('/');
-		int32 i = 1;
-
-		while (pos != HLString::NPOS)
-		{
-			result = path.Substr(pos + 1);
-			pos = path.FirstIndexOf('/', i);
-			++i;
-		}
-
-		if (!result.Contains("."))
-			return "-1";
+		HLString result = path;
+		
+		uint32 pos = result.LastIndexOf('.');
+		result = result.Substr(pos);
 
 		if (excludeDot)
-			result = result.Substr(result.IndexOf(".") + 1);
-		else
-			result = result.Substr(result.IndexOf("."));
+		{
+			result = result.Substr(1);
+		}
 
 		return result;
 	}

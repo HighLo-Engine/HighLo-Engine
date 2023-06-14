@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Thread.h"
@@ -24,7 +24,7 @@ namespace highlo
 		result = Ref<WindowsThread>::Create(runnable, name, priority);
 	#endif // HL_PLATFORM_WINDOWS
 
-		if (result->Start(stackSize))
+		if (!result->Start(stackSize))
 			result = nullptr;
 
 		return result;

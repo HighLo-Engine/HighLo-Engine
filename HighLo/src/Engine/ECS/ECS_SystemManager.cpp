@@ -1,14 +1,14 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "ECS_SystemManager.h"
 
 namespace highlo
 {
-	void ECS_SystemManager::Update()
+	void ECS_SystemManager::Update(Timestep ts)
 	{
 		for (auto& system : m_Systems)
-			system->OnUpdate(Time::GetTimestep(), ECS_Registry::Get());
+			system->OnUpdate(ts, ECS_Registry::Get());
 	}
 
 	void ECS_SystemManager::Shutdown()

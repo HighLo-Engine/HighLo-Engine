@@ -187,9 +187,30 @@ void HighLoEditor::OnInitialize()
 	GetWindow().SetMenuBar(m_MenuBar);
 
 	// Temp: Try to create a new asset and submit it for rendering
-//	AssetHandle cubeHandle = AssetFactory::CreateCube({ 1.0f, 1.0f, 1.0f });
-//	Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(cubeHandle);
-//	m_ViewportRenderer->SubmitStaticModel(model, model->GetMaterials());
+	Entity modelEntity = m_CurrentScene->CreateEntity("CubeModel");
+	StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
+	comp->Model = AssetFactory::CreateCube({ 5.0f, 5.0f, 5.0f });
+
+	// change the color of the cube to red
+	Ref<StaticModel> &cubeModel = AssetManager::Get()->GetAsset<StaticModel>(comp->Model);
+	cubeModel->GetMaterials()->GetMaterial(0)->SetDiffuseColor({ 1.0f, 0.0f, 0.0f });
+
+	//Entity sphereEntity = m_CurrentScene->CreateEntity("SphereModel");
+	//StaticModelComponent *sphereComp = sphereEntity.AddComponent<StaticModelComponent>();
+	//sphereComp->Model = AssetFactory::CreateSphere(2.0f);
+	//
+	//// change the color of the sphere to red
+	//Ref<StaticModel> &sphereModel = AssetManager::Get()->GetAsset<StaticModel>(sphereComp->Model);
+	//sphereModel->GetMaterials()->GetMaterial(0)->SetDiffuseColor({ 1.0f, 0.0f, 0.0f });
+
+	//Ref<Environment> env = Environment::Create("assets/textures/PBR_Scene_Arena.hdr");
+	//m_CurrentScene->SetEnvironment(env);
+
+	//Entity modelEntity = m_CurrentScene->CreateEntity("CapsuleModel");
+	//StaticModelComponent *comp = modelEntity.AddComponent<StaticModelComponent>();
+	//comp->Model = AssetFactory::CreateCapsule(2.0f, 5.0f);
+
+	// END TMP
 }
 
 void HighLoEditor::OnUpdate(Timestep ts)
@@ -201,17 +222,17 @@ void HighLoEditor::OnUpdate(Timestep ts)
 		case SceneState::Edit:
 		{
 			m_EditorCamera.SetActive(m_AllowViewportCameraEvents);
-			m_EditorCamera.Update();
+			m_EditorCamera.Update(ts);
 			UI::SetMouseEnabled(true);
 
 			// Update Scene entities
 			m_EditorScene->UpdateScene(ts);
 
 			// Render scene content
-			m_EditorScene->OnUpdateEditor(m_ViewportRenderer, ts, m_EditorCamera);
+			m_EditorScene->OnRenderEditor(m_ViewportRenderer, ts, m_EditorCamera);
 
 			// Render overlay
-			m_EditorScene->OnUpdateOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
+			m_EditorScene->OnRenderOverlay(m_ViewportRenderer, ts, m_OverlayCamera);
 			break;
 		}
 
@@ -221,23 +242,23 @@ void HighLoEditor::OnUpdate(Timestep ts)
 			m_RuntimeScene->UpdateScene(ts);
 
 			// Render scene content
-			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
+			m_RuntimeScene->OnRenderRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 
 		case SceneState::Pause:
 		{
-			m_EditorCamera.Update();
+			m_EditorCamera.Update(ts);
 			UI::SetMouseEnabled(true);
 			
 			// Render last scene content without updating any transforms or attributes
-			m_RuntimeScene->OnUpdateRuntime(m_ViewportRenderer, ts);
+			m_RuntimeScene->OnRenderRuntime(m_ViewportRenderer, ts);
 			break;
 		}
 
 		case SceneState::Simulate:
 		{
-			m_EditorCamera.Update();
+			m_EditorCamera.Update(ts);
 
 			// Render scene content
 			m_SimulationScene->UpdateScene(ts);
@@ -359,8 +380,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	{
 		auto &selection = m_SelectionContext[0];
 
-		float width = (float)ImGui::GetWindowWidth();
-		float height = (float)ImGui::GetWindowHeight();
+		float width = ImGui::GetWindowWidth();
+		float height = ImGui::GetWindowHeight();
 
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();

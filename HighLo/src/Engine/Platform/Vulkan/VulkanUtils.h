@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -294,7 +294,8 @@ namespace highlo::utils
 
 	static VkShaderStageFlagBits ShaderStageFromString(const HLString &str)
 	{
-		HLString type = str.ToLowerCase();
+		HLString type = str;
+		type = type.ToLowerCase();
 
 		if (type == "vertex")
 			return VK_SHADER_STAGE_VERTEX_BIT;
@@ -319,7 +320,8 @@ namespace highlo::utils
 
 	static HLString ShaderStageStringToMacro(const HLString &str)
 	{
-		HLString type = str.ToLowerCase();
+		HLString type = str;
+		type = type.ToLowerCase();
 
 		if (type == "vertex")
 			return "__VERTEX_STAGE__";

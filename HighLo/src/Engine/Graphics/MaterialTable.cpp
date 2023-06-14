@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "MaterialTable.h"
@@ -18,6 +18,11 @@ namespace highlo
 		{
 			SetMaterial(index, materialAsset);
 		}
+	}
+
+	void MaterialTable::Resize(uint32 newMaterialCount)
+	{
+		m_MaterialCount = newMaterialCount;
 	}
 	
 	void MaterialTable::SetMaterial(uint32 index, const Ref<MaterialAsset> &material)

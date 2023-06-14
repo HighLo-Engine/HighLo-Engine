@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "WindowsThread.h"
@@ -79,8 +79,8 @@ namespace highlo
 
 		ClearHandleInternal();
 		m_Running = false;
-		ThreadRegistry::Get()->Remove(this);
 		m_Runnable->OnThreadEnd(exitCode);
+		ThreadRegistry::Get()->Remove(this);
 
 		return exitCode;
 	}
@@ -90,9 +90,9 @@ namespace highlo
 		DWORD id;
 		m_Handle = (void*)CreateThread(nullptr, stackSize, (LPTHREAD_START_ROUTINE)ThreadProc, this, STACK_SIZE_PARAM_IS_A_RESERVATION, &id);
 		if (!m_Handle)
-			return true;
+			return false;
 
-		return false;
+		return true;
 	}
 
 	void WindowsThread::Kill(bool waitForJoin)

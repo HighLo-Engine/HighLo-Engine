@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "BufferLayout.h"
@@ -58,10 +58,10 @@ namespace highlo
 		return
 		{
 			{ "a_Position", ShaderDataType::Float3 },
-			{ "a_TexCoord", ShaderDataType::Float2 },
 			{ "a_Normal", ShaderDataType::Float3 },
 			{ "a_Tangent", ShaderDataType::Float3 },
 			{ "a_Binormal", ShaderDataType::Float3 },
+			{ "a_TexCoord", ShaderDataType::Float2 },
 		};
 	}
 

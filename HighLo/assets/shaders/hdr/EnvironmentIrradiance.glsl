@@ -4,7 +4,12 @@
 #include <EnvironmentMapping.glslh>
 
 layout(binding = 0, rgba32f) restrict writeonly uniform imageCube o_IrradianceMap;
-layout(binding = 1) uniform samplerCube u_RadianceMap;
+
+#ifdef __GPU_IS_DEDICATED__
+	layout(binding = 1) uniform samplerCube u_RadianceMap;
+#else
+	uniform samplerCube u_RadianceMap;
+#endif
 
 #ifdef __VULKAN__
 layout(push_constant) uniform Uniforms

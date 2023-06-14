@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -46,9 +46,24 @@ namespace highlo
 
 		virtual const std::unordered_map<HLString, ShaderBuffer> &GetShaderBuffers() const override { return m_Buffers; }
 		virtual const std::unordered_map<HLString, ShaderResourceDeclaration> &GetResources() const override { return m_Resources; }
+		virtual const ShaderResourceDeclaration *GetResource(const HLString &name) const override;
 
 		// OpenGL-specific
 		static void ClearUniformBuffers();
+
+		int32 GetUniformLocation(const HLString &name);
+		void SetUniform(const HLString &name, int32 value);
+		void SetUniform(const HLString &name, uint32 value);
+		void SetUniform(const HLString &name, float value);
+		void SetUniform(const HLString &name, const glm::vec2 &value);
+		void SetUniform(const HLString &name, const glm::vec3 &value);
+		void SetUniform(const HLString &name, const glm::vec4 &value);
+		void SetUniform(const HLString &name, const glm::mat2 &value);
+		void SetUniform(const HLString &name, const glm::mat3 &value);
+		void SetUniform(const HLString &name, const glm::mat4 &value);
+		void SetUniform(const HLString &name, const glm::ivec2 &value);
+		void SetUniform(const HLString &name, const glm::ivec3 &value);
+		void SetUniform(const HLString &name, const glm::ivec4 &value);
 
 	private:
 
@@ -62,6 +77,7 @@ namespace highlo
 		// Shader-Reflection
 		void ReflectAllShaderStages(const std::unordered_map<GLenum, std::vector<uint32>> &shaderData);
 		void Reflect(GLenum shaderStage, const std::vector<uint32> &shaderData);
+		void LoadCachedReflectionData();
 
 		// Shader-compilation
 		HLString Compile(std::unordered_map<GLenum, std::vector<uint32>> &outputBinary, const GLenum stage) const;
@@ -77,11 +93,12 @@ namespace highlo
 		HLRendererID m_RendererID = 0;
 		bool m_Loaded = false;
 		bool m_IsCompute = false;
-		FileSystemPath m_AssetPath;
+		FileSystemPath m_AssetPath = "";
 		ShaderLanguage m_Language = ShaderLanguage::None;
 		uint32 m_ConstantBufferOffset = 0;
 
 		std::unordered_map<HLString, HLString> m_Macros;
+		std::unordered_map<HLString, int32> m_UniformLocations;
 		std::unordered_set<HLString> m_AcknowledgedMacros;
 		std::vector<OpenGLShaderDescriptorSet> m_ShaderDescriptorSets;
 		std::vector<OpenGLShaderPushConstantRange> m_PushConstantRanges;

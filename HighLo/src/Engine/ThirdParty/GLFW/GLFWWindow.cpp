@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "GLFWWindow.h"
@@ -14,6 +14,7 @@
 #include "Engine/Events/Events.h"
 #include "Engine/ImGui/ImGui.h"
 #include "Engine/Core/Input.h"
+#include "Engine/Core/Time.h"
 
 namespace highlo
 {
@@ -181,6 +182,11 @@ namespace highlo
 			// restore last window size and position
 			glfwSetWindowMonitor(m_NativeHandle, nullptr, m_Placement.WindowPosX, m_Placement.WindowPosY, m_Placement.WindowWidth, m_Placement.WindowHeight, 0);
 		}
+	}
+
+	void GLFWWindow::SetResizable(bool bEnabled)
+	{
+		glfwSetWindowAttrib(m_NativeHandle, GLFW_RESIZABLE, bEnabled ? GLFW_TRUE : GLFW_FALSE);
 	}
 
 	void GLFWWindow::ShowCursor()
@@ -406,6 +412,11 @@ namespace highlo
 			WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Focused = (bool) focused;
 		});
+	}
+
+	float GetTime()
+	{
+		return (float)glfwGetTime();
 	}
 }
 

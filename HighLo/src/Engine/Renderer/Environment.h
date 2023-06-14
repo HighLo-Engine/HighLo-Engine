@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -42,7 +42,7 @@ namespace highlo
 		HLAPI static AssetType GetStaticType() { return AssetType::EnvMap; }
 		HLAPI virtual AssetType GetAssetType() const { return GetStaticType(); }
 
-		HLAPI static Ref<Environment> Create(const FileSystemPath &filePath);
+		HLAPI static Ref<Environment> Create(const FileSystemPath &filePath, uint32 cubemapSize = 2048, uint32 irradianceMapSize = 32);
 
 	private:
 

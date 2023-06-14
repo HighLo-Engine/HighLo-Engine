@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -108,7 +108,7 @@ namespace highlo
 		friend class Scene;
 		friend class SceneRenderer;
 		friend class DynamicModel;
-		friend class OpenGLRenderingAPI;
+		friend class StaticModel;
 	};
 }
 

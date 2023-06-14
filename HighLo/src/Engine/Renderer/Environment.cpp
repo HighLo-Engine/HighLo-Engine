@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 #include "HighLoPch.h"
 #include "Environment.h"
@@ -26,9 +26,9 @@ namespace highlo
 		m_BRDFMap = Renderer::GetBRDFLutTexture();
 	}
 
-	Ref<Environment> Environment::Create(const FileSystemPath &path)
+	Ref<Environment> Environment::Create(const FileSystemPath &path, uint32 cubemapSize, uint32 irradianceMapSize)
 	{
-		return Renderer::CreateEnvironment(path);
+		return Renderer::CreateEnvironment(path, cubemapSize, irradianceMapSize);
 	}
 }
 

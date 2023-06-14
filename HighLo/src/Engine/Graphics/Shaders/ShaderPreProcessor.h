@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Can Karka and Albert Slepak. All rights reserved.
+// Copyright (c) 2021-2023 Can Karka and Albert Slepak. All rights reserved.
 
 //
 // version history:
@@ -377,6 +377,11 @@ namespace highlo
 
 		uint64 startOfStage = 0;
 		uint64 pos = newSource.find('#');
+		if (pos == std::string::npos)
+		{
+			HL_CORE_FATAL("[-] Could not find any '#' symbol. Aborting. [-]");
+			return shaderSources;
+		}
 
 		// Check first #version
 		if (Lang == ShaderLanguage::GLSL)
@@ -471,6 +476,7 @@ namespace highlo
 			shaderSources[stage] = stageStr;
 		}
 
+		// TODO: Investigate why weird characters are before the #version
 		// Cleanup: make sure nothing is before a #version command
 		for (auto &[stage, source] : shaderSources)
 		{

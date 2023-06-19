@@ -3,6 +3,8 @@
 #include "Engine/Assets/Asset.h"
 #include "Engine/Graphics/Material.h"
 
+#include "Engine/Graphics/Shaders/UniformDefinitions.h"
+
 namespace highlo
 {
 	class MaterialAsset : public Asset
@@ -12,6 +14,8 @@ namespace highlo
 		HLAPI MaterialAsset(bool transparent);
 		HLAPI MaterialAsset(const Ref<Material> &material);
 		HLAPI ~MaterialAsset();
+
+		HLAPI void UploadToGPU();
 
 		// Default values
 
@@ -56,6 +60,9 @@ namespace highlo
 
 		HLAPI bool IsTransparent() const { return m_Transparent; }
 
+		HLAPI Ref<UniformBuffer> &GetMaterialProperties() { return m_MaterialUniform; }
+		HLAPI const Ref<UniformBuffer> &GetMaterialProperties() const { return m_MaterialUniform; }
+
 		// Inherited via Asset
 		HLAPI static AssetType GetStaticType() { return AssetType::Material; }
 		HLAPI virtual AssetType GetAssetType() const override { return GetStaticType(); }
@@ -70,6 +77,9 @@ namespace highlo
 
 		Ref<Material> m_Material = nullptr;
 		bool m_Transparent = false;
+
+		UniformBufferMaterial m_MaterialProperties;
+		Ref<UniformBuffer> m_MaterialUniform = nullptr;
 	};
 }
 

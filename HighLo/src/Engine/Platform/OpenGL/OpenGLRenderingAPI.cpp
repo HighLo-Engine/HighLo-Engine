@@ -303,19 +303,10 @@ namespace highlo
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-			materialUB->Bind();
-
 			glMaterial->UpdateForRendering(uniformBufferSet);
+
+			material->GetMaterialProperties()->Bind();
+
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
 
 			if (model->IsAnimated())
@@ -367,18 +358,9 @@ namespace highlo
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-
 			glMaterial->UpdateForRendering(uniformBufferSet);
+			material->GetMaterialProperties()->Bind();
+
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
 
 			if (model->IsAnimated())
@@ -444,18 +426,9 @@ namespace highlo
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
-			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-
 			glMaterial->UpdateForRendering(uniformBufferSet);
+			material->GetMaterialProperties()->Bind();
+
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
@@ -495,7 +468,6 @@ namespace highlo
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
-		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		for (Mesh submesh : submeshes)
 		{
 			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
@@ -506,20 +478,12 @@ namespace highlo
 				HL_ASSERT(material);
 			}
 
-			UniformBufferMaterial ubMaterial = {};
-			ubMaterial.DiffuseColor = material->GetDiffuseColor();
-			ubMaterial.Emission = material->GetEmission();
-			ubMaterial.Metalness = material->GetMetalness();
-			ubMaterial.Roughness = material->GetRoughness();
-			ubMaterial.Transparency = material->GetTransparency();
-			ubMaterial.EnvMapRotation = 0.0f;
-			ubMaterial.UseNormalMap = false;
-			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
-
 			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
 			glMaterial->UpdateForRendering(uniformBufferSet);
+			material->GetMaterialProperties()->Bind();
+
 			SetDepthTest(glMaterial->GetFlag(MaterialFlag::DepthTest));
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
@@ -560,25 +524,17 @@ namespace highlo
 		}
 
 		auto &submeshes = model->Get()->GetSubmeshes();
-		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		Ref<MaterialTable> &allMaterials = model->GetMaterials();
 		for (Mesh &submesh : submeshes)
 		{
+			Ref<MaterialAsset> &material = allMaterials->GetMaterial(submesh.MaterialIndex);
+
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
+			material->GetMaterialProperties()->Bind();
+
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Ref<MaterialAsset> &material = allMaterials->GetMaterial(submesh.MaterialIndex);
-			UniformBufferMaterial mat = {};
-			mat.DiffuseColor = material->GetDiffuseColor();
-			mat.Emission = material->GetEmission();
-			mat.Metalness = material->GetMetalness();
-			mat.Roughness = material->GetRoughness();
-			mat.Transparency = material->GetTransparency();
-			mat.UseNormalMap = (bool)material->GetNormalMap();
-			materialUB->SetData(&mat, sizeof(mat));
-
 			animatedUB->Bind();
-			materialUB->Bind();
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 
@@ -617,26 +573,18 @@ namespace highlo
 			animatedUB->SetData(&buffer, sizeof(buffer));
 		}
 
-		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		auto &submeshes = model->Get()->GetSubmeshes();
 		Ref<MaterialTable> &allMaterials = model->GetMaterials();
 		for (Mesh &submesh : submeshes)
 		{
+			Ref<MaterialAsset> &material = allMaterials->GetMaterial(submesh.MaterialIndex);
+
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
+			material->GetMaterialProperties()->Bind();
+
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Ref<MaterialAsset> &material = allMaterials->GetMaterial(submesh.MaterialIndex);
-			UniformBufferMaterial mat = {};
-			mat.DiffuseColor = material->GetDiffuseColor();
-			mat.Emission = material->GetEmission();
-			mat.Metalness = material->GetMetalness();
-			mat.Roughness = material->GetRoughness();
-			mat.Transparency = material->GetTransparency();
-			mat.UseNormalMap = (bool)material->GetNormalMap();
-			materialUB->SetData(&mat, sizeof(mat));
-
 			animatedUB->Bind();
-			materialUB->Bind();
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32) * submesh.BaseIndex), instanceCount, submesh.BaseVertex);
 

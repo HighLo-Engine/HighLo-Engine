@@ -33,8 +33,23 @@ layout(location = 0) in VertexOutput Input;
 
 layout(binding = 0) uniform sampler2D u_Texture;
 
+//#ifdef __VULKAN__
+//layout(push_constant) uniform Uniforms
+//{
+//	float Exposure;
+//} u_Uniforms;
+//#else
+//layout(std140, binding = 15) uniform Uniforms
+//{
+//	float Exposure;
+//} u_Uniforms;
+//#endif
+
 void main()
 {
+//	vec4 color = texture(u_Texture, Input.TexCoord);
+//	color *= u_Uniforms.Exposure;
+//	o_Color = color;
 	o_Color = texture(u_Texture, Input.TexCoord);
 }
 

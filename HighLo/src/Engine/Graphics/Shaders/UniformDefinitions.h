@@ -55,10 +55,10 @@ namespace highlo
 		float ShadowFade;
 		float CascadeTransitionFade;
 		int32 TilesCountX;
-		bool ShowLightComplexity;
-		bool ShowCascades;
-		bool SoftShadows;
-		bool CascadeFading;
+		int32 ShowLightComplexity;
+		int32 ShowCascades;
+		int32 SoftShadows;
+		int32 CascadeFading;
 	};
 
 	struct UniformBufferScreenData
@@ -85,8 +85,8 @@ namespace highlo
 		float Transparency;
 		float EnvMapRotation;
 		
-		bool UseNormalMap;
-		bool Padding1;
+		int32 UseNormalMap;
+		int32 Padding1;
 	};
 }
 

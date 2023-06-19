@@ -19,11 +19,17 @@ precise invariant gl_Position;
 
 void main()
 {
+//	mat4 transform = mat4(
+//		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),
+//		vec4(a_MRow0.y, a_MRow1.y, a_MRow2.y, 0.0),
+//		vec4(a_MRow0.z, a_MRow1.z, a_MRow2.z, 0.0),
+//		vec4(a_MRow0.w, a_MRow1.w, a_MRow2.w, 1.0)
+//	);
 	mat4 transform = mat4(
-		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),
-		vec4(a_MRow0.y, a_MRow1.y, a_MRow2.y, 0.0),
-		vec4(a_MRow0.z, a_MRow1.z, a_MRow2.z, 0.0),
-		vec4(a_MRow0.w, a_MRow1.w, a_MRow2.w, 1.0)
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
 	);
 
 	vec4 worldPos = transform * vec4(a_Position, 1.0);

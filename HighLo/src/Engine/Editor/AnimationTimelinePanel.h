@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Engine/Events/Events.h"
-#include "Engine/Renderer/Animation.h"
 
 namespace highlo
 {
@@ -43,9 +42,6 @@ namespace highlo
 		int32 m_NumFrames = 1;
 		int32 m_BeginFrame = 0;
 		int32 m_EndFrame = 1000;
-
-		Ref<Animation> m_Animation = nullptr;
-		Ref<Bone> m_SelectedBone = nullptr;
 	};
 }
 

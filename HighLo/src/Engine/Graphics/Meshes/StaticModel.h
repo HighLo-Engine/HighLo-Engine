@@ -15,48 +15,48 @@
 
 namespace highlo
 {
+	// Static Mesh - no skeletal animation, flattened hierarchy
 	class StaticModel : public Asset
 	{
 	public:
 
-		// Constructors
-		explicit StaticModel(Ref<MeshFile> &mesh);
-		StaticModel(Ref<MeshFile> &mesh, const std::vector<uint32> &subMeshIndices);
+		explicit StaticModel(const Ref<MeshFile> &meshSource);
+		StaticModel(const Ref<MeshFile> &meshSource, const std::vector<uint32> &submeshes);
 		StaticModel(const Ref<StaticModel> &other);
 		virtual ~StaticModel();
 
-		// Submesh indices
-		std::vector<uint32> &GetSubmeshIndices() { return m_SubMeshIndices; }
-		const std::vector<uint32> &GetSubmeshIndices() const { return m_SubMeshIndices; }
-		
-		void SetSubmeshIndices(const std::vector<uint32> &submeshIndices);
-		bool IsAnimated() const { return m_MeshFile->m_IsAnimated; }
+		void Release();
+		void Invalidate();
 
-		std::vector<glm::mat4> &GetBoneTransforms() { return m_MeshFile->m_BoneTransforms; }
-		const std::vector<glm::mat4> &GetBoneTransforms() const { return m_MeshFile->m_BoneTransforms; }
+		std::vector<uint32> &GetSubmeshes() { return m_Submeshes; }
+		const std::vector<uint32> &GetSubmeshes() const { return m_Submeshes; }
 
-		// MeshFile
-		Ref<MeshFile> &Get() { return m_MeshFile; }
-		const Ref<MeshFile> &Get() const { return m_MeshFile; }
+		// Pass in an empty vector to set ALL submeshes for MeshSource
+		void SetSubmeshes(const std::vector<uint32> &submeshes);
 
-		void Set(const Ref<MeshFile> &subMesh) { m_MeshFile = subMesh; }
+		Ref<MeshFile> &Get() { return m_MeshSource; }
+		const Ref<MeshFile> &Get() const { return m_MeshSource; }
+		void SetMeshAsset(const Ref<MeshFile> &meshAsset);
 
-		// Materials
 		Ref<MaterialTable> GetMaterials() const { return m_Materials; }
 
-		// Inherited via Asset
 		static AssetType GetStaticType() { return AssetType::StaticMesh; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 
 	private:
 
-		Ref<MeshFile> m_MeshFile;
-		std::vector<uint32> m_SubMeshIndices;
+		Ref<MeshFile> m_MeshSource;
+		std::vector<uint32> m_Submeshes;
 
+		// Materials
 		Ref<MaterialTable> m_Materials;
 
 		friend class Scene;
-		friend class SceneRenderer;
+		friend class Renderer;
+		friend class VulkanRenderer;
+		friend class OpenGLRenderer;
+		friend class SceneHierarchyPanel;
+		friend class MeshViewerPanel;
 	};
 }
 

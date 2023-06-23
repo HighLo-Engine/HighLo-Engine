@@ -136,7 +136,7 @@ namespace highlo
 
 			if (model && !model->IsFlagSet(AssetFlag::Missing))
 			{
-				model->OnUpdate(ts);
+			//	model->OnUpdate(ts);
 
 				Entity &e = FindEntityByUUID(uuid);
 				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
@@ -147,7 +147,7 @@ namespace highlo
 
 		renderer->EndScene();
 
-		if (renderer->GetFinalRenderTexture())
+		if (renderer->GetFinalPassImage())
 		{
 			Renderer2D::BeginScene(cameraComp->Camera);
 			Renderer2D::SetTargetRenderPass(renderer->GetExternalCompositeRenderPass());
@@ -221,7 +221,7 @@ namespace highlo
 
 			if (model && !model->IsFlagSet(AssetFlag::Missing))
 			{
-				model->OnUpdate(ts);
+			//	model->OnUpdate(ts);
 
 				Entity &e = FindEntityByUUID(uuid);
 				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
@@ -232,7 +232,7 @@ namespace highlo
 
 		renderer->EndScene();
 
-		if (renderer->GetFinalRenderTexture())
+		if (renderer->GetFinalPassImage())
 		{
 			Renderer2D::BeginScene(editorCamera);
 			Renderer2D::SetTargetRenderPass(renderer->GetExternalCompositeRenderPass());

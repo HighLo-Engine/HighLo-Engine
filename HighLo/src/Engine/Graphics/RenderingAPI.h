@@ -140,6 +140,47 @@ namespace highlo
 			Ref<Material> &overrideMaterial
 		) = 0;
 
+		HLAPI virtual void DrawQuad(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<Material> &material,
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		) = 0;
+
+		HLAPI virtual void DrawInstancedDynamicSubmesh(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<DynamicModel> &model, uint32 submeshIndex,
+			const Ref<MaterialTable> &materialTable,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount) = 0;
+
+		HLAPI virtual void DrawInstancedStaticMeshWithMaterial(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<StaticModel> &model, uint32 submeshIndex,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount,
+			const Ref<Material> &material,
+			Allocator additionalUniforms = Allocator()) = 0;
+
+		HLAPI virtual void DrawInstancedDynamicMeshWithMaterial(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<DynamicModel> &model, uint32 submeshIndex,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount,
+			const Ref<Material> &material,
+			Allocator additionalUniforms = Allocator()) = 0;
+
 		HLAPI virtual void SetWireframe(bool wf) = 0;
 		HLAPI virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;
 		HLAPI virtual void SetBlendMode(bool bEnabled) = 0;

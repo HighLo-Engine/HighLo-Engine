@@ -30,7 +30,7 @@ project "PBRSceneDemo"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/assimp-vc142-mtd.dll*"),
+		("{COPY} %{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/assimp-vc143-mtd.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/libcrypto-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/libssl-3-x64.dll*"),
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}demos/%{prj.name}/bin/" .. outputdir .. "/%{prj.name}/assets"),

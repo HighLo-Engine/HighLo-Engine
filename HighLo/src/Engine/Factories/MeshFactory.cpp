@@ -12,7 +12,7 @@ namespace highlo
 		std::vector<Vertex> vertices;
 		vertices.resize(8);
 
-		std::vector<VertexIndex> indices;
+		std::vector<Index> indices;
 		indices.resize(12);
 
 		// Generate Vertices
@@ -54,7 +54,8 @@ namespace highlo
 			glm::vec3(size.x / 2, size.y / 2, size.z / 2)
 		);
 
-		return MeshFile::Create(vertices, indices, boundingBox);
+	//	return new MeshFile(vertices, indices, boundingBox);
+		return new MeshFile(vertices, indices, glm::mat4(1.0f));
 	}
 
 	Ref<MeshFile> MeshFactory::CreateSphere(float radius)
@@ -72,7 +73,7 @@ namespace highlo
 		float sectorAngle, stackAngle;
 
 		std::vector<Vertex> vertices;
-		std::vector<VertexIndex> indices;
+		std::vector<Index> indices;
 
 		for (int32 i = 0; i <= stackCount; ++i)
 		{
@@ -126,32 +127,32 @@ namespace highlo
 
 				if (i != 0)
 				{
-					VertexIndex index;
-					index.P1 = k1;
-					index.P2 = k2;
-					index.P3 = k1 + 1;
+					Index index;
+					index.V1 = k1;
+					index.V2 = k2;
+					index.V3 = k1 + 1;
 					indices.push_back(index);
 				}
 
 				// k1+1 => k2 => k2+1
 				if (i != (stackCount - 1))
 				{
-					VertexIndex index;
-					index.P1 = k1 + 1;
-					index.P2 = k2;
-					index.P3 = k2 + 1;
+					Index index;
+					index.V1 = k1 + 1;
+					index.V2 = k2;
+					index.V3 = k2 + 1;
 					indices.push_back(index);
 				}
 			}
 		}
 
-		return MeshFile::Create(vertices, indices, glm::mat4(1.0f));
+		return new MeshFile(vertices, indices, glm::mat4(1.0f));
 	}
 
 	Ref<MeshFile> MeshFactory::CreateCapsule(float radius, float height)
 	{
 		std::vector<Vertex> vertices;
-		std::vector<VertexIndex> indices;
+		std::vector<Index> indices;
 
 		constexpr int32 segments = 36;
 		constexpr int32 pointCount = segments + 1;
@@ -211,19 +212,19 @@ namespace highlo
 		{
 			for (int32 s = 0; s < segments; s++)
 			{
-				VertexIndex &index1 = indices.emplace_back();
-				index1.P1 = (uint32) (r * segments + s + 1);
-				index1.P2 = (uint32) (r * segments + s + 0);
-				index1.P3 = (uint32) ((r + 1) * segments + s + 1);
+				Index &index1 = indices.emplace_back();
+				index1.V1 = (uint32) (r * segments + s + 1);
+				index1.V2 = (uint32) (r * segments + s + 0);
+				index1.V3 = (uint32) ((r + 1) * segments + s + 1);
 
-				VertexIndex &index2 = indices.emplace_back();
-				index2.P1 = (uint32) ((r + 1) * segments + s + 0);
-				index2.P2 = (uint32) ((r + 1) * segments + s + 1);
-				index2.P3 = (uint32) (r * segments + s);
+				Index &index2 = indices.emplace_back();
+				index2.V1 = (uint32) ((r + 1) * segments + s + 0);
+				index2.V2 = (uint32) ((r + 1) * segments + s + 1);
+				index2.V3 = (uint32) (r * segments + s);
 			}
 		}
 
-		return MeshFile::Create(vertices, indices, glm::mat4(1.0f));
+		return new MeshFile(vertices, indices, glm::mat4(1.0f));
 	}
 }
 

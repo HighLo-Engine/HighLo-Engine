@@ -132,7 +132,6 @@
 #include "Engine/Scene/Project.h"
 #include "Engine/Scene/UserSettings.h"
 
-#include "Engine/Loaders/MeshLoader.h"
 #include "Engine/Loaders/DocumentWriter.h"
 #include "Engine/Loaders/DocumentReader.h"
 

@@ -4,176 +4,144 @@
 #include "MeshFile.h"
 
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Scene/Project.h"
+
+#include "Engine/ThirdParty/Assimp/AssimpMeshLoader.h"
+#include "Engine/Core/UniqueReference.h"
+#include "Engine/Assets/AssetManager.h"
 
 #define MESH_FILE_LOG_PREFIX "         >"
 
+#define MESH_DEBUG_LOG 0
+#if MESH_DEBUG_LOG
+#define HL_MESH_LOG(...) HL_CORE_TRACE(__VA_ARGS__)
+#define HL_MESH_ERROR(...) HL_CORE_ERROR(__VA_ARGS__)
+#else
+#define HL_MESH_LOG(...)
+#define HL_MESH_ERROR(...)
+#endif
+
 namespace highlo
 {
-	MeshFile::MeshFile(const FileSystemPath &filePath, bool shouldBeAnimated)
+	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<Index> &indices, const glm::mat4 &transform)
+		: m_Vertices(vertices), m_Indices(indices)
 	{
-		HL_CORE_INFO(MESH_FILE_LOG_PREFIX "Trying to load model {0}", **filePath);
-		m_MeshShader = shouldBeAnimated ? Renderer::GetShaderLibrary()->Get("HighLoPBRAnimated") : Renderer::GetShaderLibrary()->Get("HighLoPBR");
-		m_MeshLoader = MeshLoader::Create(filePath, m_MeshShader);
-		m_IsAnimated = m_MeshLoader->IsAnimated();
-		m_SubMeshes = m_MeshLoader->GetSubmeshes();
-		m_InverseTransform.SetTransform(m_MeshLoader->GetInverseTransform());
+		// Generate a new asset handle
+		Handle = {};
 
-		// actual rendering-api specific draw data
-		m_VertexBuffer = m_MeshLoader->GetVertexBuffer();
-		m_IndexBuffer = m_MeshLoader->GetIndexBuffer();
-		m_VertexBufferLayout = m_MeshLoader->GetLayout();
-
-		// Engine-specific draw data
-		m_StaticVertices = m_MeshLoader->GetStaticVertices();
-		m_AnimatedVertices = m_MeshLoader->GetAnimatedVertices();
-		m_Indices = m_MeshLoader->GetIndices();
-		m_BoneMapping = m_MeshLoader->GetBoneMappings();
-		m_BoneInfos = m_MeshLoader->GetBoneInfos();
-		m_BoneCount = m_MeshLoader->GetBoneCount();
-		m_BoundingBox = m_MeshLoader->GetBoundingBox();
-
-		m_AnimationDuration = m_MeshLoader->GetAnimationDuration();
-		m_TicksPerSecond = m_MeshLoader->GetTicksPerSecond();
-		m_BoneTransforms = m_MeshLoader->GetBoneTransforms();
-
-		// Materials
-		m_Textures = m_MeshLoader->GetTextures();
-		m_Materials = m_MeshLoader->GetMaterials();
-		m_TriangleCache = m_MeshLoader->GetTriangleCache();
-		m_NormalMaps = m_MeshLoader->GetNormalMaps();
-	}
-
-	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices)
-		: m_StaticVertices(vertices), m_Indices(indices)
-	{
 		Mesh submesh;
 		submesh.BaseVertex = 0;
 		submesh.BaseIndex = 0;
-		submesh.MaterialIndex = 0;
-		submesh.IndexCount = (uint32)indices.size() * 3u;
-		submesh.VertexCount = (uint32)vertices.size();
-		submesh.WorldTransform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
-		m_SubMeshes.push_back(submesh);
+		submesh.IndexCount = (uint32)(indices.size() * 3);
+		submesh.Transform = transform;
+		m_Submeshes.push_back(submesh);
 
-		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) ((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
-		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32) (m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
+		m_VertexBuffer = VertexBuffer::Create(m_Vertices.data(), (uint32)(m_Vertices.size() * sizeof(Vertex)));
+		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(Index)));
+
+		// TODO: generate bounding box for submeshes, etc.
 	}
 
-	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const AABB &aabb)
-		: m_StaticVertices(vertices), m_Indices(indices)
+	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<Index> &indices, const std::vector<Mesh> &submeshes)
+		: m_Vertices(vertices), m_Indices(indices), m_Submeshes(submeshes)
 	{
-		Mesh submesh;
-		submesh.BaseVertex = 0;
-		submesh.BaseIndex = 0;
-		submesh.MaterialIndex = 0;
-		submesh.IndexCount = (uint32) indices.size() * 3u;
-		submesh.VertexCount = (uint32)vertices.size();
-		submesh.WorldTransform = Transform::FromPosition({ 0.0f, 0.0f, 0.0f });
-		m_SubMeshes.push_back(submesh);
+		// Generate a new asset handle
+		Handle = {};
 
-		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32) ((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
-		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32) (m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
-		m_BoundingBox = aabb;
-	}
+		m_VertexBuffer = VertexBuffer::Create(m_Vertices.data(), (uint32)(m_Vertices.size() * sizeof(Vertex)));
+		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(Index)));
 
-	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const Transform &transform)
-		: m_StaticVertices(vertices), m_Indices(indices), m_IsAnimated(false)
-	{
-		Mesh submesh;
-		submesh.BaseVertex = 0;
-		submesh.BaseIndex = 0;
-		submesh.MaterialIndex = 0;
-		submesh.IndexCount = (uint32)indices.size() * 3u;
-		submesh.VertexCount = (uint32)vertices.size();
-		submesh.WorldTransform = transform;
-		m_SubMeshes.push_back(submesh);
-
-		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
-		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
-
-		// TODO: generate bounding box for submeshes,
-	}
-
-	MeshFile::MeshFile(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const std::vector<Mesh> &subMeshes)
-		: m_StaticVertices(vertices), m_Indices(indices), m_SubMeshes(subMeshes), m_IsAnimated(false)
-	{
-		uint32 transformBufferSize = BufferLayout::GetTransformBufferSize();
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), (uint32)((m_StaticVertices.size() * sizeof(Vertex)) + transformBufferSize));
-		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32)(m_Indices.size() * sizeof(VertexIndex)));
-		m_VertexBufferLayout = BufferLayout::GetStaticShaderLayout();
-
-		// TODO: generate bounding box for submeshes,
+		// TODO: generate bounding box for submeshes, etc.
 	}
 
 	MeshFile::~MeshFile()
 	{
 	}
 
+	static HLString LevelToSpaces(uint32 level)
+	{
+		std::string result = "";
+		for (uint32 i = 0; i < level; i++)
+			result += "--";
+		return result;
+	}
+
 	void MeshFile::DumpVertexBuffer()
 	{
-		HL_CORE_TRACE("Mesh: {0}", **m_FilePath);
-		if (m_IsAnimated)
+		HL_MESH_LOG("------------------------------------------------------");
+		HL_MESH_LOG("Vertex Buffer Dump");
+		HL_MESH_LOG("Mesh: {0}", **m_FilePath);
+		for (size_t i = 0; i < m_Vertices.size(); i++)
 		{
-			for (uint32 i = 0; i < m_AnimatedVertices.size(); ++i)
-			{
-				auto &vertex = m_AnimatedVertices[i];
-				HL_CORE_TRACE("Vertex: {0}", i);
-				HL_CORE_TRACE("Position: {0}, {1}, {2}", vertex.Position.x, vertex.Position.y, vertex.Position.z);
-				HL_CORE_TRACE("Normal: {0}, {1}, {2}", vertex.Normal.x, vertex.Normal.y, vertex.Normal.z);
-				HL_CORE_TRACE("Binormal: {0}, {1}, {2}", vertex.BiNormal.x, vertex.BiNormal.y, vertex.BiNormal.z);
-				HL_CORE_TRACE("Tangent: {0}, {1}, {2}", vertex.Tangent.x, vertex.Tangent.y, vertex.Tangent.z);
-				HL_CORE_TRACE("TexCoord: {0}, {1}", vertex.TexCoord.x, vertex.TexCoord.y);
-			}
+			auto &vertex = m_Vertices[i];
+			HL_MESH_LOG("Vertex: {0}", i);
+			HL_MESH_LOG("Position: {0}, {1}, {2}", vertex.Position.x, vertex.Position.y, vertex.Position.z);
+			HL_MESH_LOG("Normal: {0}, {1}, {2}", vertex.Normal.x, vertex.Normal.y, vertex.Normal.z);
+			HL_MESH_LOG("Binormal: {0}, {1}, {2}", vertex.Binormal.x, vertex.Binormal.y, vertex.Binormal.z);
+			HL_MESH_LOG("Tangent: {0}, {1}, {2}", vertex.Tangent.x, vertex.Tangent.y, vertex.Tangent.z);
+			HL_MESH_LOG("TexCoord: {0}, {1}", vertex.Texcoord.x, vertex.Texcoord.y);
+			HL_MESH_LOG("--");
 		}
-		else
+		HL_MESH_LOG("------------------------------------------------------");
+	}
+
+
+	// TODO: this is temporary.. and will eventually be replaced with some kind of skeleton retargeting
+	bool MeshFile::IsCompatibleSkeleton(const uint32 animationIndex, const Skeleton &skeleton) const
+	{
+		if (!m_Skeleton)
 		{
-			for (uint32 i = 0; i < m_StaticVertices.size(); ++i)
-			{
-				auto &vertex = m_StaticVertices[i];
-				HL_CORE_TRACE("Vertex: {0}", i);
-				HL_CORE_TRACE("Position: {0}, {1}, {2}", vertex.Position.x, vertex.Position.y, vertex.Position.z);
-				HL_CORE_TRACE("Normal: {0}, {1}, {2}", vertex.Normal.x, vertex.Normal.y, vertex.Normal.z);
-				HL_CORE_TRACE("Binormal: {0}, {1}, {2}", vertex.BiNormal.x, vertex.BiNormal.y, vertex.BiNormal.z);
-				HL_CORE_TRACE("Tangent: {0}, {1}, {2}", vertex.Tangent.x, vertex.Tangent.y, vertex.Tangent.z);
-				HL_CORE_TRACE("TexCoord: {0}, {1}", vertex.TexCoord.x, vertex.TexCoord.y);
-			}
+			HL_ASSERT(!m_Runtime);
+		
+		//	auto path = Project::GetEditorAssetManager()->GetFileSystemPath(Handle);
+
+			Ref<const MeshFile> instance = this;
+			AssetMetaData meta = AssetManager::Get()->GetMetaData(instance);
+			FileSystemPath path = AssetManager::Get()->GetFileSystemPath(meta);
+			
+			AssimpMeshImporter importer(path);
+			return importer.IsCompatibleSkeleton(animationIndex, skeleton);
 		}
-	}
-	
-	void MeshFile::ManipulateBoneTransform(float time)
-	{
-		m_MeshLoader->ManipulateBoneTransform(time, m_BoneTransforms);
+
+		return m_Skeleton->GetBoneNames() == skeleton.GetBoneNames();
 	}
 
-	Ref<MeshFile> MeshFile::Create(const FileSystemPath &filePath, bool shouldBeAnimated)
+	uint32 MeshFile::GetAnimationCount() const
 	{
-		return Ref<MeshFile>::Create(filePath, shouldBeAnimated);
+		if (m_Runtime)
+			return (uint32)m_Animations.size();
+
+	//	auto path = Project::GetEditorAssetManager()->GetFileSystemPath(Handle);
+		
+		Ref<const MeshFile> instance = this;
+		AssetMetaData meta = AssetManager::Get()->GetMetaData(instance);
+		FileSystemPath path = AssetManager::Get()->GetFileSystemPath(meta);
+
+		AssimpMeshImporter importer(path);
+		return importer.GetAnimationCount();
 	}
 
-	Ref<MeshFile> MeshFile::Create(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices)
+	const Animation &MeshFile::GetAnimation(const uint32 animationIndex, const Skeleton &skeleton) const
 	{
-		return Ref<MeshFile>::Create(vertices, indices);
+		if (!m_Skeleton)
+		{
+			HL_ASSERT(!m_Runtime);
+
+		//	auto path = Project::GetEditorAssetManager()->GetFileSystemPath(Handle);
+
+			Ref<const MeshFile> instance = this;
+			AssetMetaData meta = AssetManager::Get()->GetMetaData(instance);
+			FileSystemPath path = AssetManager::Get()->GetFileSystemPath(meta);
+			
+			AssimpMeshImporter importer(path);
+			m_Skeleton = UniqueReference<Skeleton>::Create(skeleton);
+			importer.ImportAnimations(animationIndex, *m_Skeleton, m_Animations);
+		}
+
+		HL_ASSERT(animationIndex < m_Animations.size(), "Animation index out of range!");
+		HL_ASSERT(m_Animations[animationIndex], "Attempted to access null animation!");
+		return *m_Animations[animationIndex];
 	}
 
-	Ref<MeshFile> MeshFile::Create(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const AABB &aabb)
-	{
-		return Ref<MeshFile>::Create(vertices, indices, aabb);
-	}
-
-	Ref<MeshFile> MeshFile::Create(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const Transform &transform)
-	{
-		return Ref<MeshFile>::Create(vertices, indices, transform);
-	}
-
-	Ref<MeshFile> MeshFile::Create(const std::vector<Vertex> &vertices, const std::vector<VertexIndex> &indices, const std::vector<Mesh> &subMeshes)
-	{
-		return Ref<MeshFile>::Create(vertices, indices, subMeshes);
-	}
 }
 

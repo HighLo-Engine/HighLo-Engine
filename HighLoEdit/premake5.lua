@@ -97,7 +97,7 @@ project "HighLoEdit"
 		
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
 			'{COPY} "%{VULKAN_SDK}/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
@@ -107,7 +107,7 @@ project "HighLoEdit"
 		
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
 			'{COPY} "%{VULKAN_SDK}/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
@@ -117,7 +117,7 @@ project "HighLoEdit"
 		
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
 			'{COPY} "%{VULKAN_SDK}/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
@@ -127,7 +127,7 @@ project "HighLoEdit"
 		
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
 			'{COPY} "%{VULKAN_SDK}/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
@@ -137,7 +137,7 @@ project "HighLoEdit"
 		
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
 			'{COPY} "%{VULKAN_SDK}/Bin/shaderc_sharedd.dll" "%{cfg.targetdir}"'
 		}
 
@@ -147,8 +147,8 @@ project "HighLoEdit"
 
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc143-mt.dll" "%{cfg.targetdir}"',
 		}
 		
 	filter "configurations:Release-Vulkan"
@@ -157,8 +157,8 @@ project "HighLoEdit"
 
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc143-mt.dll" "%{cfg.targetdir}"',
 		}
 
 	filter "configurations:Release-DX11"
@@ -167,8 +167,8 @@ project "HighLoEdit"
 
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc143-mt.dll" "%{cfg.targetdir}"',
 		}
 
 	filter "configurations:Release-DX12"
@@ -177,8 +177,8 @@ project "HighLoEdit"
 
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc143-mt.dll" "%{cfg.targetdir}"',
 		}
 
 	filter "configurations:Release-Metal"
@@ -187,6 +187,6 @@ project "HighLoEdit"
 
 		postbuildcommands
 		{
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
-			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc143-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc143-mt.dll" "%{cfg.targetdir}"',
 		}

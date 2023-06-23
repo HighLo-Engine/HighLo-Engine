@@ -113,6 +113,13 @@ namespace highlo
 		HLAPI static void SetGlobalMacroInShaders(const HLString &name, const HLString &value = "");
 
 		HLAPI static void WaitAndRender();
+
+		HLAPI static void RenderQuad(
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<Material> &material, 
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		);
+
 		HLAPI static void RenderFullscreenQuad(
 			const Ref<CommandBuffer> &renderCommandBuffer, 
 			const Ref<VertexArray> &va, 
@@ -192,6 +199,41 @@ namespace highlo
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial);
 
+		HLAPI static void RenderInstancedDynamicSubmesh(
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<VertexArray> &va, 
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			const Ref<DynamicModel> &model, uint32 submeshIndex, 
+			const Ref<MaterialTable> &materialTable, 
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset, 
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset, 
+			uint32 instanceCount);
+
+		HLAPI static void RenderInstancedStaticMeshWithMaterial(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<StaticModel> &model, uint32 submeshIndex,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount,
+			const Ref<Material> &material,
+			Allocator additionalUniforms = Allocator());
+
+		HLAPI static void RenderInstancedDynamicMeshWithMaterial(
+			const Ref<CommandBuffer> &renderCommandBuffer, 
+			const Ref<VertexArray> &va, 
+			const Ref<UniformBufferSet> &uniformBufferSet, 
+			const Ref<StorageBufferSet> &storageBufferSet, 
+			const Ref<DynamicModel> &model, uint32 submeshIndex, 
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset, 
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset, 
+			uint32 instanceCount, 
+			const Ref<Material> &material, 
+			Allocator additionalUniforms = Allocator());
+
 		HLAPI static void OnShaderReloaded(uint64 hash);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<ComputePipeline> computePipeline);
 		HLAPI static void RegisterShaderDependency(Ref<Shader> shader, Ref<VertexArray> va);
@@ -199,6 +241,7 @@ namespace highlo
 
 		HLAPI static Ref<Texture3D> GetBlackCubeTexture();
 		HLAPI static Ref<Texture2D> GetWhiteTexture();
+		HLAPI static Ref<Texture2D> GetBlackTexture();
 		HLAPI static Ref<Environment> GetEmptyEnvironment();
 		HLAPI static RendererConfig &GetConfig();
 		HLAPI static Ref<ShaderLibrary> GetShaderLibrary();

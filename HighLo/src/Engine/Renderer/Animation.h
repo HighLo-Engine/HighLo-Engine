@@ -9,6 +9,8 @@
 
 #pragma once
 
+#if 0
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <vector>
@@ -113,3 +115,6 @@ namespace highlo
 		Transform InterpolatePoses(BoneTransform previous_pose, BoneTransform next_pose, float progression);
 	};
 }
+
+#endif 
+

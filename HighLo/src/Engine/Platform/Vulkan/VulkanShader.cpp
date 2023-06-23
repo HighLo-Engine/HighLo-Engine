@@ -307,7 +307,7 @@ namespace highlo
     {
         VulkanShaderMaterialDescriptorSet result;
         VkDevice device = VulkanContext::GetCurrentDevice()->GetNativeDevice();
-        std::unordered_map<uint32_t, std::vector<VkDescriptorPoolSize>> poolSizes;
+        std::unordered_map<uint32, std::vector<VkDescriptorPoolSize>> poolSizes;
 
         for (uint32 i = 0; i < m_ShaderDescriptorSets.size(); ++i)
         {

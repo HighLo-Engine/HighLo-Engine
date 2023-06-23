@@ -16,7 +16,6 @@
 
 #include "Engine/Core/FileSystemPath.h"
 #include "Engine/Events/Events.h"
-#include "Engine/Loaders/MeshLoader.h"
 #include "Engine/Loaders/AssetImporter.h"
 
 namespace highlo

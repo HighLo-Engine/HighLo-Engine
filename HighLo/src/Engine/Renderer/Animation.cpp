@@ -3,8 +3,12 @@
 #include "HighLoPch.h"
 #include "Animation.h"
 
+#if 0
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "Animation.h"
+#include "Animation.h"
 
 namespace highlo
 {
@@ -210,4 +214,6 @@ namespace highlo
 		CurrentAnimationTime += (ts * AnimationSpeed) / AnimationSpeedDenominator;
 	}
 }
+
+#endif
 

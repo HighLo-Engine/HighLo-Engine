@@ -62,6 +62,7 @@ namespace highlo::Math
 	HLAPI glm::vec3 WorldToScreen(const glm::vec3 &point, const glm::mat4 &view_matrix, const glm::mat4 &projection, const glm::vec2 &view_size, const glm::vec2 &view_offset = glm::vec2(0, 0));
 
 	HLAPI bool Decompose(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::vec3 &rotation);
+	bool DecomposeQuat(const glm::mat4 &transform, glm::vec3 &translation, glm::vec3 &scale, glm::quat &rotation);
 
 	HLAPI void CreateCacheSin(float cacheSize = 100.0f);
 	HLAPI void CreateCacheCos(float cacheSize = 100.0f);

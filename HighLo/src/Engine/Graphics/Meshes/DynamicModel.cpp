@@ -4,81 +4,96 @@
 #include "DynamicModel.h"
 
 #include "Engine/Assets/AssetMaterial.h"
+#include "Engine/Assets/AssetManager.h"
 
 namespace highlo
 {
-	DynamicModel::DynamicModel(Ref<MeshFile> &mesh)
-		: m_MeshFile(mesh)
+	DynamicModel::DynamicModel(const Ref<MeshFile> &meshSource)
+		: m_MeshSource(meshSource)
 	{
-		SetSubmeshIndices({});
+		// Generate a new asset handle
+		Handle = {};
 
-		const auto &meshMaterials = mesh->GetMaterials();
-		m_Materials = MaterialTable::Create((uint32)meshMaterials.size());
+		SetSubmeshes({});
 
-		if (meshMaterials.size() == 0)
+		const auto &meshMaterials = meshSource->GetMaterials();
+		m_Materials = Ref<MaterialTable>::Create((uint32)meshMaterials.size());
+		for (size_t i = 0; i < meshMaterials.size(); i++)
 		{
-			m_Materials->SetMaterial(0, MaterialAsset::Create(false));
-		}
-		else
-		{
-			for (uint32 i = 0; i < meshMaterials.size(); ++i)
-				m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
+			AssetHandle materialHandle = AssetManager::Get()->CreateMemoryOnlyAsset<MaterialAsset>(meshMaterials[i]);
+			m_Materials->SetMaterial((uint32)i, AssetManager::Get()->GetAsset<MaterialAsset>(materialHandle));
 		}
 	}
 
-	DynamicModel::DynamicModel(Ref<MeshFile> &mesh, const std::vector<uint32> &submeshIndices)
-		: m_MeshFile(mesh)
+	DynamicModel::DynamicModel(const Ref<MeshFile> &meshSource, const std::vector<uint32> &submeshes)
+		: m_MeshSource(meshSource)
 	{
-		SetSubmeshIndices(submeshIndices);
+		// Generate a new asset handle
+		Handle = {};
 
-		const auto &meshMaterials = m_MeshFile->GetMaterials();
-		m_Materials = MaterialTable::Create((uint32)meshMaterials.size());
+		SetSubmeshes(submeshes);
 
-		if (meshMaterials.size() == 0)
+		const auto &meshMaterials = meshSource->GetMaterials();
+		m_Materials = Ref<MaterialTable>::Create((uint32)meshMaterials.size());
+		for (size_t i = 0; i < meshMaterials.size(); i++)
 		{
-			m_Materials->SetMaterial(0, MaterialAsset::Create(false));
+			AssetHandle materialHandle = AssetManager::Get()->CreateMemoryOnlyAsset<MaterialAsset>(meshMaterials[i]);
+			m_Materials->SetMaterial((uint32)i, AssetManager::Get()->GetAsset<MaterialAsset>(materialHandle));
 		}
-		else
-		{
-			for (uint32 i = 0; i < meshMaterials.size(); ++i)
-				m_Materials->SetMaterial(i, MaterialAsset::Create(meshMaterials[i]));
-		}
+	}
+
+	DynamicModel::DynamicModel(const Ref<DynamicModel> &other)
+		: m_MeshSource(other->m_MeshSource), m_Materials(other->m_Materials)
+	{
+		SetSubmeshes(other->m_Submeshes);
 	}
 
 	DynamicModel::~DynamicModel()
 	{
+		Release();
 	}
 
-	void DynamicModel::OnUpdate(Timestep ts)
+	void DynamicModel::Release()
 	{
-		if (m_IsAnimated)
+		m_Submeshes.clear();
+		m_Submeshes.shrink_to_fit();
+
+		m_Materials->Clear();
+	}
+
+	void DynamicModel::Invalidate()
+	{
+		Release();
+
+		SetSubmeshes({});
+
+		const auto &meshMaterials = m_MeshSource->GetMaterials();
+		m_Materials = Ref<MaterialTable>::Create((uint32)meshMaterials.size());
+		for (size_t i = 0; i < meshMaterials.size(); i++)
 		{
-			if (m_AnimationPlaying)
-			{
-				m_WorldTime += ts;
-
-				float ticksPerSecond = (float)(m_MeshFile->m_TicksPerSecond != 0 ? m_MeshFile->m_TicksPerSecond : 25.0f) * m_TimeMultiplier;
-				m_AnimationTime += ts * ticksPerSecond;
-				m_AnimationTime = fmod(m_AnimationTime, m_MeshFile->m_AnimationDuration);
-			}
-
-			m_MeshFile->ManipulateBoneTransform(m_AnimationTime);
+			AssetHandle materialHandle = AssetManager::Get()->CreateMemoryOnlyAsset<MaterialAsset>(meshMaterials[i]);
+			m_Materials->SetMaterial((uint32)i, AssetManager::Get()->GetAsset<MaterialAsset>(materialHandle));
 		}
 	}
 
-	void DynamicModel::SetSubmeshIndices(const std::vector<uint32> &indices)
+	void DynamicModel::SetSubmeshes(const std::vector<uint32> &submeshes)
 	{
-		if (!indices.empty())
+		if (!submeshes.empty())
 		{
-			m_SubMeshIndices = indices;
+			m_Submeshes = submeshes;
 		}
 		else
 		{
-			const auto &submeshes = m_MeshFile->GetSubmeshes();
-			m_SubMeshIndices.resize(submeshes.size());
-			for (uint32 i = 0; i < submeshes.size(); ++i)
-				m_SubMeshIndices[i] = i;
+			const auto &submeshes = m_MeshSource->GetSubmeshes();
+			m_Submeshes.resize(submeshes.size());
+			for (uint32 i = 0; i < submeshes.size(); i++)
+				m_Submeshes[i] = i;
 		}
+	}
+	void DynamicModel::SetMeshAsset(const Ref<MeshFile> &meshSource)
+	{
+		m_MeshSource = meshSource;
+		Invalidate();
 	}
 }
 

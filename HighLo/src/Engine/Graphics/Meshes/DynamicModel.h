@@ -16,60 +16,51 @@
 
 namespace highlo
 {
+	// Dynamic Mesh - supports skeletal animation and retains hierarchy
 	class DynamicModel : public Asset
 	{
 	public:
 
-		// Constructors
-		explicit DynamicModel(Ref<MeshFile> &mesh);
-		DynamicModel(Ref<MeshFile> &mesh, const std::vector<uint32> &submeshIndices);
+		explicit DynamicModel(const Ref<MeshFile> &meshSource);
+		DynamicModel(const Ref<MeshFile> &meshSource, const std::vector<uint32> &submeshes);
 		DynamicModel(const Ref<DynamicModel> &other);
 		virtual ~DynamicModel();
 
-		// update function
-		void OnUpdate(Timestep ts);
+		void Release();
+		void Invalidate();
 
-		// Submesh indices
-		std::vector<uint32> &GetSubmeshIndices() { return m_SubMeshIndices; }
-		const std::vector<uint32> &GetSubmeshIndices() const { return m_SubMeshIndices; }
+		bool HasSkeleton() const { return m_MeshSource && m_MeshSource->HasSkeleton(); }
 
-		void SetSubmeshIndices(const std::vector<uint32> &indices);
-		bool IsAnimated() const { return m_MeshFile->m_IsAnimated; }
+		std::vector<uint32> &GetSubmeshes() { return m_Submeshes; }
+		const std::vector<uint32> &GetSubmeshes() const { return m_Submeshes; }
 
-		std::vector<glm::mat4> &GetBoneTransforms() { return m_MeshFile->m_BoneTransforms; }
-		const std::vector<glm::mat4> &GetBoneTransforms() const { return m_MeshFile->m_BoneTransforms; }
+		// Pass in an empty vector to set ALL submeshes for MeshSource
+		void SetSubmeshes(const std::vector<uint32> &submeshes);
 
-		// MeshFile
-		Ref<MeshFile> &Get() { return m_MeshFile; }
-		const Ref<MeshFile> &Get() const { return m_MeshFile; }
+		Ref<MeshFile> &Get() { return m_MeshSource; }
+		const Ref<MeshFile> &Get() const { return m_MeshSource; }
+		void SetMeshAsset(const Ref<MeshFile> &meshSource);
 
-		void Set(const Ref<MeshFile> &subMesh) { m_MeshFile = subMesh; }
-
-		// Materials
 		Ref<MaterialTable> GetMaterials() const { return m_Materials; }
 
-		// Inherited via Asset
+		// Inherited from Asset
 		static AssetType GetStaticType() { return AssetType::DynamicMesh; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 
 	private:
 
-		Ref<MeshFile> m_MeshFile;
-		std::vector<uint32> m_SubMeshIndices;
+		Ref<MeshFile> m_MeshSource;
+		std::vector<uint32> m_Submeshes;
 
-		uint32 m_BoneCount = 0;
-		std::vector<BoneInfo> m_BoneInfos;
-
+		// Materials
 		Ref<MaterialTable> m_Materials;
 
-		bool m_IsAnimated = false;			// Whether or not this model is animated
-		bool m_AnimationPlaying = false;	// Whether or not the animation is currently playing
-		float m_AnimationTime = 0.0f;		// The duration of the current animation
-		float m_WorldTime = 0.0f;			// The global deltatime
-		float m_TimeMultiplier = 1.0f;		// used to control the speed of the animations
-
 		friend class Scene;
-		friend class SceneRenderer;
+		friend class Renderer;
+		friend class VulkanRenderer;
+		friend class OpenGLRenderer;
+		friend class SceneHierarchyPanel;
+		friend class MeshViewerPanel;
 	};
 }
 

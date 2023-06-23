@@ -111,10 +111,11 @@ namespace highlo
 		HLAPI static BufferLayout GetCircleLayout();
 		HLAPI static BufferLayout GetTextLayout();
 		HLAPI static BufferLayout GetStaticShaderLayout();
-		HLAPI static BufferLayout GetAnimatedShaderLayout();
+	//	HLAPI static BufferLayout GetAnimatedShaderLayout();
 		HLAPI static BufferLayout GetSkyboxLayout();
 		HLAPI static BufferLayout GetGridLayout();
 		HLAPI static BufferLayout GetCompositeLayout();
+		HLAPI static BufferLayout GetBoneInfluenceLayout();
 
 		HLAPI static BufferLayout GetTransformBufferLayout(uint32 offset);
 		HLAPI static uint32 GetTransformBufferSize();

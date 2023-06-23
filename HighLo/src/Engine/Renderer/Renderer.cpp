@@ -37,6 +37,7 @@ namespace highlo
 		RendererCapabilities Capabilities;
 		Ref<Texture3D> BlackCubeTexture;
 		Ref<Texture2D> WhiteTexture;
+		Ref<Texture2D> BlackTexture;
 		Ref<Texture2D> BRDFLut;
 		Ref<Environment> EmptyEnvironment;
 		Ref<ShaderLibrary> ShaderLib;
@@ -107,6 +108,10 @@ namespace highlo
 		uint32 whiteTextureData[6] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
 		s_MainRendererData->WhiteTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &whiteTextureData);
 		s_MainRendererData->WhiteTexture->GetSpecification().DebugName = "WhiteTexture";
+
+		uint32 bTextureData = 0xff000000;
+		s_MainRendererData->BlackTexture = Texture2D::Create(TextureFormat::RGBA, 1, 1, &bTextureData);
+		s_MainRendererData->BlackTexture->GetSpecification().DebugName = "BlackTexture";
 
 		s_MainRendererData->BRDFLut = Texture2D::LoadFromFile("assets/Resources/brdfMap.png");
 		s_MainRendererData->BRDFLut->GetSpecification().DebugName = "BRDFLutTexture";
@@ -195,6 +200,11 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 		s_CommandQueue->Execute();
+	}
+
+	void Renderer::RenderQuad(const Ref<CommandBuffer> &renderCommandBuffer, const Ref<Material> &material, const glm::mat4 &transform)
+	{
+		s_RenderingAPI->DrawQuad(renderCommandBuffer, material, transform);
 	}
 
 	void Renderer::RenderFullscreenQuad(
@@ -294,6 +304,59 @@ namespace highlo
 		Ref<Material> &overrideMaterial)
 	{
 		s_RenderingAPI->DrawInstancedDynamicMeshWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformBufferOffset, instanceCount, overrideMaterial);
+	}
+
+	void Renderer::RenderInstancedDynamicSubmesh(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		const Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<MaterialTable> &materialTable, 
+		const Ref<VertexBuffer> &transformBuffer, 
+		uint32 transformOffset, 
+		const std::vector<Ref<StorageBuffer>> &boneTransformUBs, 
+		uint32 boneTransformsOffset, 
+		uint32 instanceCount)
+	{
+		s_RenderingAPI->DrawInstancedDynamicSubmesh(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, materialTable, transformBuffer, transformOffset, boneTransformUBs, boneTransformsOffset, instanceCount);
+	}
+
+	void Renderer::RenderInstancedStaticMeshWithMaterial(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		const Ref<StaticModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<VertexBuffer> &transformBuffer, 
+		uint32 transformOffset, 
+		const std::vector<Ref<StorageBuffer>> &boneTransformUBs, 
+		uint32 boneTransformsOffset, 
+		uint32 instanceCount, 
+		const Ref<Material> &material, 
+		Allocator additionalUniforms)
+	{
+		s_RenderingAPI->DrawInstancedStaticMeshWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformOffset, boneTransformUBs, boneTransformsOffset, instanceCount, material, additionalUniforms);
+	}
+
+	void Renderer::RenderInstancedDynamicMeshWithMaterial(
+		const Ref<CommandBuffer> &renderCommandBuffer, 
+		const Ref<VertexArray> &va, 
+		const Ref<UniformBufferSet> &uniformBufferSet, 
+		const Ref<StorageBufferSet> &storageBufferSet, 
+		const Ref<DynamicModel> &model, 
+		uint32 submeshIndex, 
+		const Ref<VertexBuffer> &transformBuffer, 
+		uint32 transformOffset, 
+		const std::vector<Ref<StorageBuffer>> &boneTransformUBs, 
+		uint32 boneTransformsOffset, 
+		uint32 instanceCount, 
+		const Ref<Material> &material, 
+		Allocator additionalUniforms)
+	{
+		s_RenderingAPI->DrawInstancedDynamicMeshWithMaterial(renderCommandBuffer, va, uniformBufferSet, storageBufferSet, model, submeshIndex, transformBuffer, transformOffset, boneTransformUBs, boneTransformsOffset, instanceCount, material, additionalUniforms);
 	}
 
 	void Renderer::OnShaderReloaded(uint64 hash)
@@ -398,6 +461,11 @@ namespace highlo
 	Ref<Texture2D> Renderer::GetWhiteTexture()
 	{
 		return s_MainRendererData->WhiteTexture;
+	}
+
+	Ref<Texture2D> Renderer::GetBlackTexture()
+	{
+		return s_MainRendererData->BlackTexture;
 	}
 
 	Ref<Environment> Renderer::GetEmptyEnvironment()

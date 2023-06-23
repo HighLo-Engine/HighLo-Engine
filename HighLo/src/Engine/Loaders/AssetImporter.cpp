@@ -6,6 +6,8 @@
 #include "Engine/Assets/AssetManager.h"
 #include "Engine/Renderer/Renderer.h"
 
+#include "Engine/ThirdParty/Assimp/AssimpMeshLoader.h"
+
 namespace highlo
 {
 	void AssetImporter::Init()
@@ -30,7 +32,9 @@ namespace highlo
 
 			case AssetType::DynamicMesh:
 			{
-				Ref<MeshFile> source = MeshFile::Create(AssetManager::Get()->GetFileSystemPath(assetInfo), false);
+				AssimpMeshImporter importer(AssetManager::Get()->GetFileSystemPath(assetInfo));
+				Ref<MeshFile> source = importer.ImportToMeshSource();
+
 				asset = Ref<StaticModel>::Create(source);
 				asset->Handle = assetInfo.Handle;
 				loaded = asset->IsFlagSet(AssetFlag::None);
@@ -39,7 +43,9 @@ namespace highlo
 
 			case AssetType::StaticMesh:
 			{
-				Ref<MeshFile> source = MeshFile::Create(AssetManager::Get()->GetFileSystemPath(assetInfo), false);
+				AssimpMeshImporter importer(AssetManager::Get()->GetFileSystemPath(assetInfo));
+				Ref<MeshFile> source = importer.ImportToMeshSource();
+
 				asset = Ref<StaticModel>::Create(source);
 				asset->Handle = assetInfo.Handle;
 				loaded = asset->IsFlagSet(AssetFlag::None);

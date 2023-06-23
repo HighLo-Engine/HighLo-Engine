@@ -83,7 +83,8 @@ void HighLoEditor::OnInitialize()
 	m_CurrentScene = m_EditorScene;
 
 	// Editor Panels
-	m_ViewportRenderer = Ref<SceneRenderer>::Create(m_CurrentScene);
+	SceneRendererSpecification sceneSpec;
+	m_ViewportRenderer = SceneRenderer::Create(m_CurrentScene, sceneSpec);
 	m_ViewportRenderer->SetViewportSize(width, height);
 
 	m_AssetBrowserPanel = UniqueRef<AssetBrowserPanel>::Create(project);
@@ -360,7 +361,6 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 		viewportSize.y = (float)GetWindow().GetHeight();
 
 	m_ViewportRenderer->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
-	m_ViewportRenderer->SetClearColor(m_ClearColor);
 	m_EditorScene->SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 
 	if (m_RuntimeScene)
@@ -370,7 +370,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_EditorCamera.SetViewportSize((uint32)viewportSize.x, (uint32)viewportSize.y);
 
 	// Render viewport image
-	Ref<Texture2D> viewportImage = m_ViewportRenderer->GetFinalRenderTexture();
+	Ref<Texture2D> viewportImage = m_ViewportRenderer->GetFinalPassImage();
 	UI::Image(viewportImage, viewportSize, { 0, 1 }, { 1, 0 });
 
 	// TODO: Add Guizmo Toolbar to be able to select the current guizmo type
@@ -439,7 +439,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 		}
 		else
 		{
-			glm::mat4 transformBase = rawTransform * selection.Mesh->LocalTransform.GetTransform();
+			glm::mat4 transformBase = rawTransform * selection.Mesh->LocalTransform;
 			ImGuizmo::Manipulate(
 				glm::value_ptr(m_EditorCamera.GetViewMatrix()), 
 				glm::value_ptr(m_EditorCamera.GetProjection()), 
@@ -451,7 +451,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 
 			Transform newTransform;
 			newTransform.SetTransform(glm::inverse(rawTransform) * transformBase);
-			selection.Mesh->LocalTransform = newTransform;
+			selection.Mesh->LocalTransform = newTransform.GetTransform();
 			selection.Entity.SetTransform(entityTransform);
 			SelectEntity(selection.Entity);
 		}
@@ -491,7 +491,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 					else if (asset->GetAssetType() == AssetType::DynamicMesh)
 					{
 						Ref<DynamicModel> model = asset.As<DynamicModel>();
-						const auto &submeshIndices = model->GetSubmeshIndices();
+						const auto &submeshIndices = model->GetSubmeshes();
 						const auto &submeshes = model->Get()->GetSubmeshes();
 						HL_TRACE("Creating Dynamic Model by drag and drop");
 
@@ -526,7 +526,8 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 	m_SettingsPanel->OnUIRender(&m_ShowSettingsPanel);
 	m_AnimTimelinePanel->OnUIRender(&m_ShowAnimTimelinePanel);
 	
-	m_ViewportRenderer->OnUIRender();
+	// TODO: re-add this to the renderer
+	//m_ViewportRenderer->OnUIRender();
 
 	AssetManager::Get()->OnUIRender(m_AssetManagerPanelOpen);
 

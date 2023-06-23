@@ -65,6 +65,7 @@ namespace highlo
 		};
 	}
 
+	/*
 	BufferLayout BufferLayout::GetAnimatedShaderLayout()
 	{
 		return
@@ -78,6 +79,7 @@ namespace highlo
 			{ "a_BoneWeights", ShaderDataType::Float4 },
 		};
 	}
+	*/
 
 	BufferLayout BufferLayout::GetSkyboxLayout()
 	{
@@ -103,6 +105,15 @@ namespace highlo
 		{
 			{ "a_Position", ShaderDataType::Float3 },
 			{ "a_TexCoord", ShaderDataType::Float2 },
+		};
+	}
+
+	BufferLayout BufferLayout::GetBoneInfluenceLayout()
+	{
+		return
+		{
+			{ "a_BoneIndices", ShaderDataType::Int4 },
+			{ "a_BoneWeights", ShaderDataType::Float4 },
 		};
 	}
 

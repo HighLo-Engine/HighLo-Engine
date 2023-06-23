@@ -116,6 +116,47 @@ namespace highlo
 			uint32 instanceCount,
 			Ref<Material> &overrideMaterial) override;
 
+		virtual void DrawQuad(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<Material> &material,
+			const glm::mat4 &transform = glm::mat4(1.0f)
+		) override;
+
+		virtual void DrawInstancedDynamicSubmesh(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<DynamicModel> &model, uint32 submeshIndex,
+			const Ref<MaterialTable> &materialTable,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount) override;
+
+		virtual void DrawInstancedStaticMeshWithMaterial(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<StaticModel> &model, uint32 submeshIndex,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount,
+			const Ref<Material> &material,
+			Allocator additionalUniforms = Allocator()) override;
+
+		virtual void DrawInstancedDynamicMeshWithMaterial(
+			const Ref<CommandBuffer> &renderCommandBuffer,
+			const Ref<VertexArray> &va,
+			const Ref<UniformBufferSet> &uniformBufferSet,
+			const Ref<StorageBufferSet> &storageBufferSet,
+			const Ref<DynamicModel> &model, uint32 submeshIndex,
+			const Ref<VertexBuffer> &transformBuffer, uint32 transformOffset,
+			const std::vector<Ref<StorageBuffer>> &boneTransformUBs, uint32 boneTransformsOffset,
+			uint32 instanceCount,
+			const Ref<Material> &material,
+			Allocator additionalUniforms = Allocator()) override;
+
 		virtual void SetWireframe(bool wf) override;
 		virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
 		virtual void SetBlendMode(bool bEnabled) override;

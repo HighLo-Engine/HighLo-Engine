@@ -10,6 +10,8 @@
 #include "Engine/Math/Transform.h"
 #include "Engine/Math/AABB.h"
 
+#include <glm/glm.hpp>
+
 #define NUM_ATTRIBS 5
 
 namespace highlo
@@ -97,16 +99,6 @@ namespace highlo
 	};
 
 	/// <summary>
-	/// Represents a Index per Vertex (indices for the submesh)
-	/// </summary>
-	struct VertexIndex
-	{
-		uint32 P1;
-		uint32 P2;
-		uint32 P3;
-	};
-
-	/// <summary>
 	/// Represents a single bone
 	/// </summary>
 	struct VertexBone
@@ -141,8 +133,19 @@ namespace highlo
 	/// </summary>
 	struct BoneInfo
 	{
-		Transform BoneOffset;
-		Transform BoneTransform;
+		glm::mat4 SubMeshInverseTransform;
+		glm::mat4 InverseBindPose;
+		uint32 SubMeshIndex;
+		uint32 BoneIndex;
+
+		BoneInfo() = default;
+		BoneInfo(glm::mat4 subMeshInverseTransform, glm::mat4 inverseBindPose, uint32 subMeshIndex, uint32 boneIndex)
+			: SubMeshInverseTransform(subMeshInverseTransform)
+			, InverseBindPose(inverseBindPose)
+			, SubMeshIndex(subMeshIndex)
+			, BoneIndex(boneIndex)
+		{
+		}
 	};
 
 	/// <summary>
@@ -158,6 +161,66 @@ namespace highlo
 		}
 	};
 
+	struct MeshNode
+	{
+		uint32 Parent = 0xffffffff;
+		std::vector<uint32> Children;
+		std::vector<uint32> Submeshes;
+
+		HLString Name;
+		glm::mat4 LocalTransform;
+
+		inline bool IsRoot() const { return Parent == 0xffffffff; }
+	};
+
+	struct BoneInfluence
+	{
+		uint32 BoneInfoIndices[4] = { 0, 0, 0, 0 };
+		float Weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		void AddBoneData(uint32 boneInfoIndex, float weight)
+		{
+			if (weight < 0.0f || weight > 1.0f)
+			{
+				HL_CORE_WARN("Vertex bone weight is out of range. We will clamp it to [0, 1] (BoneID={0}, Weight={1})", boneInfoIndex, weight);
+				weight = std::clamp(weight, 0.0f, 1.0f);
+			}
+			if (weight > 0.0f)
+			{
+				for (size_t i = 0; i < 4; i++)
+				{
+					if (Weights[i] == 0.0f)
+					{
+						BoneInfoIndices[i] = boneInfoIndex;
+						Weights[i] = weight;
+						return;
+					}
+				}
+
+				// Note: when importing from assimp we are passing aiProcess_LimitBoneWeights which automatically keeps only the top N (where N defaults to 4)
+				//       bone weights (and normalizes the sum to 1), which is exactly what we want.
+				//       So, we should never get here.
+				HL_CORE_WARN("Vertex has more than four bones affecting it, extra bone influences will be discarded (BoneID={0}, Weight={1})", boneInfoIndex, weight);
+			}
+		}
+
+		void NormalizeWeights()
+		{
+			float sumWeights = 0.0f;
+			for (size_t i = 0; i < 4; i++)
+			{
+				sumWeights += Weights[i];
+			}
+			if (sumWeights > 0.0f)
+			{
+				for (size_t i = 0; i < 4; i++)
+				{
+					Weights[i] /= sumWeights;
+				}
+			}
+		}
+	};
+
 	/// <summary>
 	/// Represents a mesh inside of a model (this is basically a submesh)
 	/// </summary>
@@ -169,12 +232,19 @@ namespace highlo
 		uint32 IndexCount;
 		uint32 VertexCount;
 
-		Transform WorldTransform;
-		Transform LocalTransform;
+		glm::mat4 Transform{ 1.0f }; // World transform
+		glm::mat4 LocalTransform{ 1.0f };
 		AABB BoundingBox;
 
-		HLString NodeName;
-		HLString MeshName;
+		HLString NodeName, MeshName;
+		bool IsRigged = false;
 	};
+
+	struct Index
+	{
+		uint32 V1, V2, V3;
+	};
+
+	static_assert(sizeof(Index) == 3 * sizeof(uint32));
 }
 

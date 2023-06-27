@@ -21,7 +21,7 @@ namespace highlo
 		HLAPI void Mount(const HLString &virtualPath, const HLString &physicalPath);
 		HLAPI void Unmount(const HLString &path);
 
-		HLAPI bool ResolvePhysicalPath(HLString &path, HLString &outPath);
+		HLAPI bool ResolvePhysicalPath(const HLString &path, HLString &outPath);
 
 		HLAPI Byte *ReadFile(const HLString &path, int64 *outSize);
 		HLAPI HLString ReadTextFile(const HLString &path);

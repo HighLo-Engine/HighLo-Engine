@@ -5,13 +5,13 @@
 
 static highlo::HLAllocationMetrics AllocationMetrics;
 
-void *operator new(uint64 size)
+void *operator new(size_t size)
 {
 	AllocationMetrics.TotalAllocated += size;
 	return malloc(size);
 }
 
-void operator delete(void *memory, uint64 size)
+void operator delete(void *memory, size_t size)
 {
 	AllocationMetrics.TotalFreed += size;
 	free(memory);

@@ -36,7 +36,11 @@ namespace highlo
 
 	void *Allocator::AllocateAligned(uint64 size, uint64 alignment)
 	{
+#ifdef HL_PLATFORM_WINDOWS
 		return _aligned_malloc((size_t)size, (size_t)alignment);
+#elif HL_PLATFORM_LINUX
+		return aligned_alloc((size_t)size, (size_t)alignment);
+#endif
 	}
 
 	void Allocator::Release()
@@ -48,8 +52,14 @@ namespace highlo
 
 	void Allocator::Free(void *memory)
 	{
-		if (memory)
-			_aligned_free(memory);
+		if (!memory)
+			return;
+
+#if HL_PLATFORM_WINDOWS
+		_aligned_free(memory);
+#elif HL_PLATFORM_LINUX
+		free(memory);
+#endif
 	}
 
 	void Allocator::ZeroInitialize()

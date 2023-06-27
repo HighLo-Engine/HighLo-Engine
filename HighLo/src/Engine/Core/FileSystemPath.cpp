@@ -333,14 +333,14 @@ namespace highlo
 	FileSystemPath FileSystemPath::RelativePath() const
 	{
 		std::filesystem::path relativeHandle = std::filesystem::relative(m_Handle);
-		return relativeHandle.string();
+		return HLString(relativeHandle.string());
 	}
 
 	FileSystemPath FileSystemPath::RelativePath(const FileSystemPath &parentPath) const
 	{
 		std::filesystem::path parentHandle(**parentPath);
 		std::filesystem::path relativeHandle = std::filesystem::relative(m_Handle, parentHandle);
-		return relativeHandle.string();
+		return HLString(relativeHandle.string());
 	}
 
 	FileSystemPath FileSystemPath::ParentPath() const
@@ -362,7 +362,7 @@ namespace highlo
 
 	FileSystemPath FileSystemPath::LexicallyNormal() const
 	{
-		return m_Handle.lexically_normal().string();
+		return HLString(m_Handle.lexically_normal().string());
 	}
 	
 	bool FileSystemPath::operator==(const FileSystemPath &other) const

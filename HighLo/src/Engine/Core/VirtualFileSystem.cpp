@@ -5,6 +5,8 @@
 
 #include "Engine/Core/FileSystem.h"
 
+// TODO: change all path parameters to FileSystemPath instead of HLString.
+
 namespace highlo
 {
 	void VirtualFileSystem::Mount(const HLString &virtualPath, const HLString &physicalPath)
@@ -26,7 +28,7 @@ namespace highlo
 		m_MountPoints[path].clear();
 	}
 
-	bool VirtualFileSystem::ResolvePhysicalPath(HLString &path, HLString &outPath)
+	bool VirtualFileSystem::ResolvePhysicalPath(const HLString &path, HLString &outPath)
 	{
 		if (path.IsEmpty())
 			return false;
@@ -37,8 +39,10 @@ namespace highlo
 			return FileSystem::Get()->FileExists(path);
 		}
 
-		path = path.Substr(1);
-		std::vector<HLString> dirs = path.Split('/');
+		// TODO: Find better solution than this useless copy (needed bc of const)
+		HLString tmp = path;
+		tmp = tmp.Substr(1);
+		std::vector<HLString> dirs = tmp.Split('/');
 		const HLString &virtualDir = dirs.front();
 		const HLString &fileName = dirs.back();
 
@@ -61,61 +65,61 @@ namespace highlo
 	Byte *VirtualFileSystem::ReadFile(const HLString &path, int64 *outSize)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->ReadFile(physicalPath, outSize) : nullptr;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->ReadFile(physicalPath, outSize) : nullptr;
 	}
 
 	HLString VirtualFileSystem::ReadTextFile(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->ReadTextFile(physicalPath) : HLString();
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->ReadTextFile(physicalPath) : HLString();
 	}
 
 	bool VirtualFileSystem::WriteFile(const HLString &path, Byte *buffer, int64 size)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->WriteFile(physicalPath, buffer, size) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->WriteFile(physicalPath, buffer, size) : false;
 	}
 
 	bool VirtualFileSystem::WriteTextFile(const HLString &path, const HLString &text)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->WriteTextFile(physicalPath, text) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->WriteTextFile(physicalPath, text) : false;
 	}
 
 	bool VirtualFileSystem::RemoveFile(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->RemoveFile(physicalPath) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->RemoveFile(physicalPath) : false;
 	}
 
 	int64 VirtualFileSystem::GetFileSize(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->GetFileSize(physicalPath) : -1;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->GetFileSize(physicalPath) : -1;
 	}
 
 	bool VirtualFileSystem::FileExists(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->FileExists(physicalPath) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->FileExists(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::PathExists(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->FolderExists(physicalPath) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->FolderExists(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::CreateFolder(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->CreateFolder(physicalPath) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->CreateFolder(physicalPath) : false;
 	}
 
 	bool VirtualFileSystem::RemoveFolder(const HLString &path)
 	{
 		HLString physicalPath;
-		return ResolvePhysicalPath(HLString(path), physicalPath) ? FileSystem::Get()->RemoveFolder(physicalPath) : false;
+		return ResolvePhysicalPath(path, physicalPath) ? FileSystem::Get()->RemoveFolder(physicalPath) : false;
 	}
 
 	void VirtualFileSystem::OpenInExplorer(const HLString &path)

@@ -116,7 +116,6 @@ project "HighLo"
 
 	filter "system:linux"
 		systemversion "latest"
-        disablewarnings { "5033", "4996" }
 
 		defines
         {

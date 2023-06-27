@@ -311,13 +311,21 @@ namespace highlo
 			if (!m_UsingShortStr)
 			{
 				LongStringData *data = (LongStringData*)m_DataPointer;
+				
 				delete[] data->Data;
 				data->Data = nullptr;
+
+				delete data;
+				m_DataPointer = nullptr;
+				return;
 			}
 
-			delete m_DataPointer;
+			ShortStringData *data = (ShortStringData*)m_DataPointer;
+			delete data;
 			m_DataPointer = nullptr;
-			m_UsingShortStr = true; // Restore default
+			
+			// Restore default state
+			m_UsingShortStr = true;
 		}
 
 		HLAPI void Resize(uint32 size)

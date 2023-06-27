@@ -33,6 +33,6 @@ namespace highlo
 		HLString m_Name;
 		HLString m_OutputString;
 		bool m_Stopped;
-		std::chrono::time_point<std::chrono::steady_clock> m_StartPoint;
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_StartPoint;
 	};
 }

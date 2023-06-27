@@ -5,6 +5,10 @@
 
 #include <iomanip>
 
+#ifdef HL_PLATFORM_LINUX
+#include <ctime>
+#endif
+
 namespace highlo
 {
 	double Time::s_TimeScale = 1.0;
@@ -27,6 +31,7 @@ namespace highlo
 
 	HLString Time::GetCurrentTimeStamp(HLDateFormat format, HLTimePrecision precision)
 	{
+#ifdef HL_PLATFORM_WINDOWS
 		std::time_t t = std::time(0);
 		std::tm now;
 		localtime_s(&now, &t);
@@ -140,6 +145,123 @@ namespace highlo
 		}
 
 		return result;
+
+#elif HL_PLATFORM_LINUX
+		time_t rawtime;
+		struct tm *now;
+		time(&rawtime);
+		now = localtime(&rawtime);
+		HLString result = "None";
+
+		switch (format)
+		{
+			case HLDateFormat::English_US:
+			{
+				switch (precision)
+				{
+					case HLTimePrecision::Milliseconds:
+					{
+						strftime(&result[0], result.Length(), "%m/%d/%Y - %H:%M:%S", now);
+						break;
+					}
+
+					case HLTimePrecision::Seconds:
+					{
+						strftime(&result[0], result.Length(), "%m/%d/%Y - %H:%M", now);
+						break;
+					}
+
+					case HLTimePrecision::None:
+					default:
+					{
+						strftime(&result[0], result.Length(), "%m/%d/%Y - %H:%M:%S", now);
+						break;
+					}
+				}
+				break;
+			}
+
+			case HLDateFormat::English_GB:
+			{
+				switch (precision)
+				{
+					case HLTimePrecision::Milliseconds:
+					{
+						strftime(&result[0], result.Length(), "%d/%m/%Y - %H:%M:%S", now);
+						break;
+					}
+
+					case HLTimePrecision::Seconds:
+					{
+						strftime(&result[0], result.Length(), "%d/%m/%Y - %H:%M", now);
+						break;
+					}
+
+					case HLTimePrecision::None:
+					default:
+					{
+						strftime(&result[0], result.Length(), "%d/%m/%Y - %H:%M:%S", now);
+						break;
+					}
+				}
+				break;
+			}
+
+			case HLDateFormat::German:
+			{
+				switch (precision)
+				{
+					case HLTimePrecision::Milliseconds:
+					{
+						strftime(&result[0], result.Length(), "%d.%m.%Y - %H:%M:%S", now);
+						break;
+					}
+
+					case HLTimePrecision::Seconds:
+					{
+						strftime(&result[0], result.Length(), "%d.%m.%Y - %H:%M", now);
+						break;
+					}
+
+					case HLTimePrecision::None:
+					default:
+					{
+						strftime(&result[0], result.Length(), "%d.%m.%Y - %H:%M:%S", now);
+						break;
+					}
+				}
+				break;
+			}
+
+			default:
+			{
+				switch (precision)
+				{
+					case HLTimePrecision::Milliseconds:
+					{
+						strftime(&result[0], result.Length(), "%m/%d/%Y - %H:%M:%S", now);
+						break;
+					}
+
+					case HLTimePrecision::Seconds:
+					{
+						strftime(&result[0], result.Length(), "%m/%d/%Y - %H:%M", now);
+						break;
+					}
+
+					case HLTimePrecision::None:
+					default:
+					{
+						strftime(&result[0], result.Length(), "%m/%d/%Y - %H:%M:%S", now);
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		return result;
+#endif
 	}
 }
 

@@ -3,7 +3,7 @@
 #include "HighLoPch.h"
 #include "AnimationTimelinePanel.h"
 
-#include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGui.h"
 #include "Engine/ImGui/ImGuiAnimationTimeline.h"
 
 #include "Engine/Application/Application.h"

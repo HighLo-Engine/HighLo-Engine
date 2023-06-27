@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "imgui.h"
+#include "ImGui.h"
 #include "ImGuiScopeHelpers.h"
 #include "Engine/Math/Color.h"
 
@@ -95,7 +95,10 @@ namespace highlo::UI
 
 				// Only copy the content if any is available, otherwise strcpy_s will throw a weird exception ("" seems not be copyable)
 				if (!searchString.IsEmpty())
-					strcpy_s<BufferSize>(searchBuffer, *searchString);
+				{
+					//strcpy_s<BufferSize>(searchBuffer, *searchString);
+					memcpy(searchBuffer, *searchString, BufferSize);
+				}
 
 				if (ImGui::InputText(GenerateID(), searchBuffer, BufferSize))
 				{

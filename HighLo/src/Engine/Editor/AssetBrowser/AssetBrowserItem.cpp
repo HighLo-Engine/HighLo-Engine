@@ -9,7 +9,7 @@
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Scene/Project.h"
 #include "Engine/Math/Color.h"
-#include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGui.h"
 #include "Engine/ImGui/ImGuiScopeHelpers.h"
 #include "Engine/Application/Application.h"
 
@@ -113,7 +113,7 @@ namespace highlo
 			else
 			{
 				ImGui::SetNextItemWidth(textWidth);
-				ImGui::Text(*m_Name);
+				ImGui::Text("%s", m_Name.C_Str());
 			}
 
 			ImGui::PopTextWrapPos();
@@ -137,7 +137,7 @@ namespace highlo
 			}
 			else
 			{
-				ImGui::Text(*m_Name);
+				ImGui::Text("%s", m_Name.C_Str());
 			}
 
 			ImGui::PopTextWrapPos();
@@ -152,7 +152,7 @@ namespace highlo
 				ImGui::Spring();
 
 				const AssetMetaData &metaData = AssetManager::Get()->GetMetaData(m_ID);
-				HLString &assetType = utils::AssetTypeToString(metaData.Type);
+				HLString assetType = utils::AssetTypeToString(metaData.Type);
 
 				UI::ScopedColor textColor(ImGuiCol_Text, Colors::Theme::TextDarker);
 				ImGui::TextUnformatted(*assetType.ToUpperCase());
@@ -188,8 +188,8 @@ namespace highlo
 			{
 				const bool mouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsItemHovered();
 				ImColor transitionColor = UI::ColorWithMultipliedValue(Colors::Theme::Selection, 0.8f);
-
-				drawList->AddRect(itemRect.Min, itemRect.Max, mouseDown ? transitionColor : Colors::Theme::Selection, 6.0f, m_Type == ItemType::Directory ? 0 : ImDrawFlags_RoundCornersBottom, 1.0f);
+				ImColor defaultColor = UI::ColorWithMultipliedValue(Colors::Theme::Selection, 1.0f); // NOTE: workaround for passing the Colors::Theme::Selection, as it is just a uint32 instead of ImColor
+				drawList->AddRect(itemRect.Min, itemRect.Max, mouseDown ? transitionColor : defaultColor, 6.0f, m_Type == ItemType::Directory ? 0 : ImDrawFlags_RoundCornersBottom, 1.0f);
 			}
 			else // Item is hovered
 			{
@@ -442,7 +442,7 @@ namespace highlo
 			return;
 		}
 
-		auto &currentDir = AssetBrowserPanel::Get().GetDirectory(m_AssetInfo.FilePath.ParentPath());
+		auto currentDir = AssetBrowserPanel::Get().GetDirectory(m_AssetInfo.FilePath.ParentPath());
 		currentDir->Assets.erase(std::remove(currentDir->Assets.begin(), currentDir->Assets.end(), m_AssetInfo.Handle), currentDir->Assets.end());
 
 		AssetManager::OnAssetDeleted(m_AssetInfo.Handle);
@@ -451,7 +451,7 @@ namespace highlo
 	void AssetBrowserItem::OnRenamed(const HLString &newName)
 	{
 		auto filepath = AssetManager::Get()->GetFileSystemPath(m_AssetInfo);
-		FileSystemPath newFilepath = fmt::format("{0}\\{1}{2}", filepath.ParentPath().String(), newName, filepath.Extension());
+		FileSystemPath newFilepath = fmt::format("{0}\\{1}{2}", filepath.ParentPath().String(), newName, filepath.Extension()).c_str();
 
 		if (!FileSystem::Get()->FileExists(newFilepath))
 		{

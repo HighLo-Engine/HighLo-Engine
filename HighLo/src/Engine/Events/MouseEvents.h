@@ -25,7 +25,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("MouseMovedEvent: ") << m_MouseDX << ", " << m_MouseDY;
+			return HLString("MouseMovedEvent: ") + HLString::ToString(m_MouseDX) + ", " + HLString::ToString(m_MouseDY);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseMoved)
@@ -49,7 +49,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("MouseScrolledEvent: ") << m_XOffset << ", " << m_YOffset;
+			return HLString("MouseScrolledEvent: ") + HLString::ToString(m_XOffset) + ", " + HLString::ToString(m_YOffset);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseScrolled)
@@ -85,7 +85,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("MouseButtonPressedEvent: ") << m_MouseButton;
+			return HLString("MouseButtonPressedEvent: ") + HLString::ToString(m_MouseButton);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseButtonPressed)
@@ -100,7 +100,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("MouseButtonReleasedEvent") << m_MouseButton;
+			return HLString("MouseButtonReleasedEvent") + HLString::ToString(m_MouseButton);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(MouseButtonReleased)

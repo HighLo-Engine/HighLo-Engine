@@ -19,6 +19,8 @@
 #include "Engine/Loaders/MeshLoader.h"
 #include "Engine/Loaders/AssetImporter.h"
 
+#include "Engine/Core/FileSystem.h"
+
 namespace highlo
 {
 	struct AssetManagerConfig

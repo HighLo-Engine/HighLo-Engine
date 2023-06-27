@@ -13,7 +13,7 @@ namespace highlo
 {
 	struct RenderPassSpecification
 	{
-		Ref<Framebuffer> Framebuffer;
+		Ref<Framebuffer> AssociatedFramebuffer;
 		HLString DebugName;
 		glm::vec4 DebugMarkerColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};

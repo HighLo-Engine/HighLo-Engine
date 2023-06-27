@@ -80,8 +80,8 @@ namespace highlo
 		HLAPI UUID GetUUID() const { return m_ID; }
 		
 		HLAPI void SetTransform(const Transform &transform) { m_Transform = transform; }
-		HLAPI Transform &Transform() { return m_Transform; }
-		HLAPI const highlo::Transform &Transform() const { return m_Transform; }
+		HLAPI Transform &GetTransform() { return m_Transform; }
+		HLAPI const highlo::Transform &GetTransform() const { return m_Transform; }
 		
 		HLAPI void SetTag(const HLString &tag) { m_Tag = tag; }
 		HLAPI HLString &Tag() { return m_Tag; }

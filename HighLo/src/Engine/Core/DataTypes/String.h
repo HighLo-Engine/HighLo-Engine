@@ -1162,6 +1162,17 @@ namespace highlo
 			return str.Append(newStr);
 		}
 
+		HLAPI HL_FORCE_INLINE friend HLStringBase &operator<<(HLStringBase &str, const HLStringBase &other)
+		{
+			return str.Append(other);
+		}
+
+		HLAPI HL_FORCE_INLINE friend HLStringBase &operator<<(HLStringBase &str, int32 value)
+		{
+			HLStringBase newStr = HLStringBase::ToString(value);
+			return str.Append(newStr);
+		}
+
 		template<typename T>
 		HLAPI HL_FORCE_INLINE friend HLStringBase &operator>>(HLStringBase &str, const T &value)
 		{

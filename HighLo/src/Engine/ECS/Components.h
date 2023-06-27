@@ -39,7 +39,7 @@ namespace highlo
 
 	struct CameraComponent
 	{
-		Camera Camera;
+		Camera CameraInstance;
 		bool Primary = true;
 		bool FixedAspectRatio = false;
 	};

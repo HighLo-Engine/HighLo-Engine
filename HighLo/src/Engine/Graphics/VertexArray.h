@@ -31,8 +31,8 @@ namespace highlo
 
 	struct VertexArraySpecification
 	{
-		Ref<Shader> Shader;
-		Ref<RenderPass> RenderPass;
+		Ref<Shader> AssociatedShader;
+		Ref<RenderPass> AssociatedRenderPass;
 		BufferLayout Layout;
 		BufferLayout InstanceLayout;
 

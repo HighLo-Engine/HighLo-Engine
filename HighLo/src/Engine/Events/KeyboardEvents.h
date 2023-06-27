@@ -37,7 +37,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("KeyPressedEvent: ") << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			return HLString("KeyPressedEvent: ") + HLString::ToString(m_KeyCode) + " (" + HLString::ToString(m_RepeatCount) + " repeats)";
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(KeyPressed)
@@ -55,7 +55,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("KeyReleasedEvent: ") << m_KeyCode;
+			return HLString("KeyReleasedEvent: ") + HLString::ToString(m_KeyCode);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(KeyReleased)

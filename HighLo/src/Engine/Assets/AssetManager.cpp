@@ -3,9 +3,8 @@
 #include "HighLoPch.h"
 #include "AssetManager.h"
 
-#include <Engine/ImGui/imgui.h>
+#include <Engine/ImGui/ImGui.h>
 
-#include "Engine/Core/FileSystem.h"
 #include "Engine/Core/FileSystemWatcher.h"
 #include "AssetExtensions.h"
 
@@ -83,7 +82,7 @@ namespace highlo
 
 	AssetHandle AssetManager::GetAssetHandleFromFilePath(const FileSystemPath &path)
 	{
-		return s_AssetRegistry.Contains(*path) ? s_AssetRegistry[*path].Handle : 0;
+		return s_AssetRegistry.Contains(path) ? s_AssetRegistry[path].Handle : (AssetHandle){0};
 	}
 
 	AssetType AssetManager::GetAssetTypeFromExtension(HLString &extension)

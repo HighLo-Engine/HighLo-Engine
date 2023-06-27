@@ -44,7 +44,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("WindowResizeEvent: ") << m_Width << ", " << m_Height;
+			return HLString("WindowResizeEvent: ") + HLString::ToString(m_Width) + ", " + HLString::ToString(m_Height);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(WindowResize)
@@ -66,7 +66,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("FileMenuEvent: ") << m_ID;
+			return HLString("FileMenuEvent: ") + HLString::ToString(m_ID);
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(FileMenu)
@@ -89,7 +89,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("FileMenuChangedEvent: ") << m_Item->Name;
+			return HLString("FileMenuChangedEvent: ") + m_Item->Name;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(FileMenuChanged)
@@ -120,10 +120,10 @@ namespace highlo
 		{
 			if (!OldName.IsEmpty())
 			{
-				return HLString("FileSystemChangedEvent: ") << OldName << " -> " << NewName;
+				return HLString("FileSystemChangedEvent: ") + OldName + " -> " + NewName;
 			}
 
-			return HLString("FileSystemChangedEvent: ") << NewName;
+			return HLString("FileSystemChangedEvent: ") + NewName;
 		}
 
 		REGISTER_EVENT_CLASS_TYPE(FileSystemChanged)
@@ -164,7 +164,7 @@ namespace highlo
 
 		HLAPI HLString ToString() const override
 		{
-			return HLString("ThreadEnding: " + m_Thread->GetName() + " with exit code: " + m_ExitCode);
+			return HLString("ThreadEnding: " + m_Thread->GetName() + " with exit code: " + HLString::ToString(m_ExitCode));
 		}
 
 		HLAPI Thread *GetThread() const

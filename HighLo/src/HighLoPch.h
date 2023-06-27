@@ -9,11 +9,6 @@
 
 #pragma once
 
-#ifdef HL_PLATFORM_LINUX
-    #define STDC_LIB_EXT1
-    #define STDC_WANT_LIB_EXT1 1
-#endif
-
 /* Basic Stuff */
 #include <atomic>
 #include <iostream>

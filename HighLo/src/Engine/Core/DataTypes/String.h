@@ -153,9 +153,14 @@ namespace highlo
 				LongStringData *data = (LongStringData*)m_DataPointer;
 				delete[] data->Data;
 				data->Data = nullptr;
+
+				delete data;
+				m_DataPointer = nullptr;
+				return;
 			}
 
-			delete m_DataPointer;
+			ShortStringData *data = (ShortStringData*)m_DataPointer;
+			delete data;
 			m_DataPointer = nullptr;
 		}
 
@@ -174,7 +179,8 @@ namespace highlo
 
 				if (str)
 				{
-					memcpy_s(data->Data, HL_STRING_MAX_STRING_SIZE, str + startOffset, new_size);
+					//memcpy_s(data->Data, HL_STRING_MAX_STRING_SIZE, str + startOffset, new_size);
+					memcpy(data->Data, str + startOffset, new_size);
 				}
 
 				// Delete old data, if exists
@@ -189,7 +195,8 @@ namespace highlo
 				}
 				else if (m_UsingShortStr && m_DataPointer)
 				{
-					delete m_DataPointer;
+					ShortStringData *data = (ShortStringData*)m_DataPointer;
+					delete data;
 				}
 
 				m_DataPointer = data;
@@ -205,7 +212,8 @@ namespace highlo
 
 			if (str)
 			{
-				memcpy_s(data->Data, data->Size, str + startOffset, new_size);
+				//memcpy_s(data->Data, data->Size, str + startOffset, new_size);
+				memcpy(data->Data, str + startOffset, new_size);
 			}
 
 			// Delete old data, if exists
@@ -214,13 +222,24 @@ namespace highlo
 				LongStringData *old_data = (LongStringData*)m_DataPointer;
 				if (old_data)
 				{
-					delete[] old_data;
-					old_data = nullptr;
+					if (old_data->Data)
+					{
+						delete[] old_data->Data;
+						old_data->Data = nullptr;
+					}
+
+					delete old_data;
+					m_DataPointer = nullptr;
 				}
 			}
 			else if (m_UsingShortStr && m_DataPointer)
 			{
-				delete m_DataPointer;
+				ShortStringData *data = (ShortStringData*)m_DataPointer;
+				if (data)
+				{
+					delete data;
+					m_DataPointer = nullptr;
+				}
 			}
 
 			m_DataPointer = data;

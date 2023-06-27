@@ -25,7 +25,7 @@ namespace highlo
 		HBAOBinding = 18,
 	};
 
-	SceneRenderer::SceneRenderer(Ref<Scene> &scene, SceneRendererSpecification &specification)
+	SceneRenderer::SceneRenderer(Ref<Scene> &scene, const SceneRendererSpecification &specification)
 		: m_Scene(scene), m_Specification(specification)
 	{
 		Init();

@@ -128,10 +128,10 @@ namespace highlo
 		if (m_NeedsResize)
 		{
 			m_NeedsResize = false;
-			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-		//	m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-			m_ExternalCompositingRenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_GeometryVertexArray->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+		//	m_PreDepthVertexArray->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_CompositeVertexArray->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+			m_ExternalCompositingRenderPass->GetSpecification().AssociatedFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 
 			// TODO: Resize bloom texture
 
@@ -515,12 +515,12 @@ namespace highlo
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return m_CompositeVertexArray->GetSpecification().RenderPass;
+		return m_CompositeVertexArray->GetSpecification().AssociatedRenderPass;
 	}
 
 	Ref<Texture2D> SceneRenderer::GetFinalRenderTexture()
 	{
-		return GetFinalRenderPass()->GetSpecification().Framebuffer->GetImage();
+		return GetFinalRenderPass()->GetSpecification().AssociatedFramebuffer->GetImage();
 	}
 
 	void SceneRenderer::OnUIRender()
@@ -606,7 +606,7 @@ namespace highlo
 
 	void SceneRenderer::ClearPass()
 	{
-		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().AssociatedRenderPass, true);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -665,7 +665,7 @@ namespace highlo
 
 	void SceneRenderer::PreDepthPass()
 	{
-		Renderer::BeginRenderPass(m_CommandBuffer, m_PreDepthVertexArray->GetSpecification().RenderPass);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_PreDepthVertexArray->GetSpecification().AssociatedRenderPass);
 		Renderer::EndRenderPass(m_CommandBuffer);
 	}
 
@@ -676,7 +676,7 @@ namespace highlo
 	void SceneRenderer::GeometryPass()
 	{
 		// Render selected geometry
-		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().RenderPass);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_SelectedGeometryVertexArray->GetSpecification().AssociatedRenderPass);
 	
 		for (auto &[mk, dc] : m_StaticSelectedMeshDrawList)
 		{
@@ -713,7 +713,7 @@ namespace highlo
 		Renderer::EndRenderPass(m_CommandBuffer);
 
 		// Render normal geometry
-		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
+		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().AssociatedRenderPass);
 
 		// Now render static and dynamic meshes
 		for (auto &[mk, dc] : m_StaticDrawList)
@@ -761,9 +761,9 @@ namespace highlo
 
 	void SceneRenderer::CompositePass()
 	{
-		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().RenderPass, true);
-	//	auto &framebuffer = m_ExternalCompositingRenderPass->GetSpecification().Framebuffer;
-		auto &framebuffer = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer;
+		Renderer::BeginRenderPass(m_CommandBuffer, m_CompositeVertexArray->GetSpecification().AssociatedRenderPass, true);
+	//	auto &framebuffer = m_ExternalCompositingRenderPass->GetSpecification().AssociatedFramebuffer;
+		auto &framebuffer = m_GeometryVertexArray->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer;
 		float exposure = m_SceneData.SceneCamera.GetExposure();
 		int32 textureSamples = framebuffer->GetSpecification().Samples;
 	
@@ -926,7 +926,7 @@ namespace highlo
 
 			// Offset to texel space to avoid shimmering (@see https://stackoverflow.com/questions/33499053/cascaded-shadow-map-shimmering)
 			glm::mat4 shadowMatrix = lightOrthoMatrix * lightViewMatrix;
-			float shadowMapRes = (float)m_ShadowPassVertexArrays[0]->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetWidth();
+			float shadowMapRes = (float)m_ShadowPassVertexArrays[0]->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer->GetWidth();
 			glm::vec4 shadowOrigin = (shadowMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)) * shadowMapRes / 2.0f;
 			glm::vec4 roundedOrigin = glm::round(shadowOrigin);
 			glm::vec4 roundOffset = roundedOrigin - shadowOrigin;
@@ -979,7 +979,7 @@ namespace highlo
 		auto &shader = Renderer::GetShaderLibrary()->Get("ShadowMap");
 		VertexArraySpecification spec;
 		spec.DebugName = "ShadowPass";
-		spec.Shader = shader;
+		spec.AssociatedShader = shader;
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
 		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 
@@ -990,8 +990,8 @@ namespace highlo
 
 			RenderPassSpecification shadowMapRenderPassSpec;
 			shadowMapRenderPassSpec.DebugName = "ShadowMap";
-			shadowMapRenderPassSpec.Framebuffer = Framebuffer::Create(shadowMapFramebufferSpec);
-			spec.RenderPass = RenderPass::Create(shadowMapRenderPassSpec);
+			shadowMapRenderPassSpec.AssociatedFramebuffer = Framebuffer::Create(shadowMapFramebufferSpec);
+			spec.AssociatedRenderPass = RenderPass::Create(shadowMapRenderPassSpec);
 			m_ShadowPassVertexArrays[i] = VertexArray::Create(spec);
 		}
 		m_ShadowPassMaterial = Material::Create(shader, "ShadowPassMaterial");
@@ -1006,14 +1006,14 @@ namespace highlo
 
 		RenderPassSpecification renderpassSpec;
 		renderpassSpec.DebugName = "Pre-Depth";
-		renderpassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+		renderpassSpec.AssociatedFramebuffer = Framebuffer::Create(framebufferSpec);
 
 		auto &shader = Renderer::GetShaderLibrary()->Get("PreDepth");
 
 		VertexArraySpecification spec;
 		spec.DebugName = "Pre-Depth";
-		spec.Shader = shader;
-		spec.RenderPass = RenderPass::Create(renderpassSpec);
+		spec.AssociatedShader = shader;
+		spec.AssociatedRenderPass = RenderPass::Create(renderpassSpec);
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
 		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
 		
@@ -1031,15 +1031,15 @@ namespace highlo
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Geometry";
-		renderPassSpec.Framebuffer = Framebuffer::Create(frameBufferSpec);
+		renderPassSpec.AssociatedFramebuffer = Framebuffer::Create(frameBufferSpec);
 
 		VertexArraySpecification spec;
 		spec.DebugName = "PBR-Static";
 		spec.LineWidth = Renderer::GetCurrentLineWidth();
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
 		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
-		spec.Shader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
-		spec.RenderPass = RenderPass::Create(renderPassSpec);
+		spec.AssociatedShader = Renderer::GetShaderLibrary()->Get("HighLoPBR");
+		spec.AssociatedRenderPass = RenderPass::Create(renderPassSpec);
 		m_GeometryVertexArray = VertexArray::Create(spec);
 
 		// Selected Geometry pipeline
@@ -1051,16 +1051,16 @@ namespace highlo
 
 		RenderPassSpecification selectedRenderPassSpec;
 		selectedRenderPassSpec.DebugName = renderPassSpec.DebugName;
-		selectedRenderPassSpec.Framebuffer = Framebuffer::Create(selectedFrameBufferSpec);
+		selectedRenderPassSpec.AssociatedFramebuffer = Framebuffer::Create(selectedFrameBufferSpec);
 
 		VertexArraySpecification selectedSpec;
 		selectedSpec.DebugName = "SelectedGeometry";
 		selectedSpec.Layout = BufferLayout::GetStaticShaderLayout();
 		selectedSpec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
-		selectedSpec.RenderPass = RenderPass::Create(selectedRenderPassSpec);
-		selectedSpec.Shader = Renderer::GetShaderLibrary()->Get("SelectedGeometry");
+		selectedSpec.AssociatedRenderPass = RenderPass::Create(selectedRenderPassSpec);
+		selectedSpec.AssociatedShader = Renderer::GetShaderLibrary()->Get("SelectedGeometry");
 		m_SelectedGeometryVertexArray = VertexArray::Create(selectedSpec);
-		m_SelectedGeometryMaterial = Material::Create(selectedSpec.Shader, "SelectedGeometryMaterial");
+		m_SelectedGeometryMaterial = Material::Create(selectedSpec.AssociatedShader, "SelectedGeometryMaterial");
 	}
 
 	void SceneRenderer::InitBloomCompute()
@@ -1100,9 +1100,9 @@ namespace highlo
 		VertexArraySpecification spec;
 		spec.DebugName = "Grid";
 		spec.Layout = BufferLayout::GetGridLayout();
-		spec.Shader = m_GridShader;
+		spec.AssociatedShader = m_GridShader;
 		spec.BackfaceCulling = false;
-		spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
+		spec.AssociatedRenderPass = m_GeometryVertexArray->GetSpecification().AssociatedRenderPass;
 		m_GridVertexArray = VertexArray::Create(spec);
 	}
 
@@ -1114,8 +1114,8 @@ namespace highlo
 		spec.DebugName = "Skybox";
 		spec.Layout = BufferLayout::GetSkyboxLayout();
 		spec.InstanceLayout = {};
-		spec.Shader = shader;
-		spec.RenderPass = m_GeometryVertexArray->GetSpecification().RenderPass;
+		spec.AssociatedShader = shader;
+		spec.AssociatedRenderPass = m_GeometryVertexArray->GetSpecification().AssociatedRenderPass;
 		m_SkyboxVertexArray = VertexArray::Create(spec);
 
 		m_SkyboxMaterial = Material::Create(shader, "SkyboxMaterial");
@@ -1135,7 +1135,7 @@ namespace highlo
 			framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::Depth };
 
 		RenderPassSpecification renderPassSpec;
-		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+		renderPassSpec.AssociatedFramebuffer = Framebuffer::Create(framebufferSpec);
 		renderPassSpec.DebugName = "SceneComposite";
 
 		auto &shader = Renderer::GetShaderLibrary()->Get("SceneComposite");
@@ -1143,8 +1143,8 @@ namespace highlo
 		VertexArraySpecification spec;
 		spec.Layout = BufferLayout::GetCompositeLayout();
 		spec.InstanceLayout = {};
-		spec.Shader = shader;
-		spec.RenderPass = RenderPass::Create(renderPassSpec);
+		spec.AssociatedShader = shader;
+		spec.AssociatedRenderPass = RenderPass::Create(renderPassSpec);
 		spec.DebugName = "SceneComposite";
 		m_CompositeVertexArray = VertexArray::Create(spec);
 		m_CompositeMaterial = Material::Create(shader, "SceneCompositeMaterial");
@@ -1161,12 +1161,12 @@ namespace highlo
 		framebufferSpec.Attachments = { TextureFormat::RGBA, TextureFormat::DEPTH32FSTENCIL8UINT };
 		framebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 		framebufferSpec.ClearOnLoad = false;
-		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetImage().As<Texture2D>();
-		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->GetDepthImage().As<Texture2D>();
+		framebufferSpec.ExistingImages[0] = m_CompositeVertexArray->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer->GetImage().As<Texture2D>();
+		framebufferSpec.ExistingImages[1] = m_GeometryVertexArray->GetSpecification().AssociatedRenderPass->GetSpecification().AssociatedFramebuffer->GetDepthImage().As<Texture2D>();
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "ExternalCompositing";
-		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
+		renderPassSpec.AssociatedFramebuffer = Framebuffer::Create(framebufferSpec);
 
 		auto &shader = Renderer::GetShaderLibrary()->Get("Wireframe");
 		m_ExternalCompositingRenderPass = RenderPass::Create(renderPassSpec);
@@ -1175,8 +1175,8 @@ namespace highlo
 		spec.DebugName = "Wireframe";
 		spec.Layout = BufferLayout::GetStaticShaderLayout();
 		spec.InstanceLayout = BufferLayout::GetTransformBufferLayout();
-		spec.Shader = shader;
-		spec.RenderPass = m_ExternalCompositingRenderPass;
+		spec.AssociatedShader = shader;
+		spec.AssociatedRenderPass = m_ExternalCompositingRenderPass;
 		spec.Wireframe = true;
 		spec.DepthTest = true;
 		spec.LineWidth = 2.0f;

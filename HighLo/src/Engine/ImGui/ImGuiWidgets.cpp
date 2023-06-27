@@ -223,13 +223,12 @@ namespace highlo::UI
 						if (!isValidType)
 							continue;
 
-						const std::string assetName = metadata.FilePath.Filename();
-
+						const HLString &assetName = metadata.FilePath.Filename();
 						if (!searchedString.IsEmpty() && !UI::IsMatchingSearch(assetName, searchedString))
 							continue;
 
 						bool isSelected = (current == metadata.Handle);
-						if (ImGui::Selectable(assetName.c_str(), isSelected))
+						if (ImGui::Selectable(assetName.C_Str(), isSelected))
 						{
 							current = metadata.Handle;
 							selected = metadata.Handle;
@@ -237,7 +236,7 @@ namespace highlo::UI
 						}
 
 						{
-							HLString &assetType = utils::AssetTypeToString(metadata.Type);
+							HLString assetType = utils::AssetTypeToString(metadata.Type);
 							ImVec2 textSize = ImGui::CalcTextSize(*assetType);
 							ImVec2 rectSize = ImGui::GetItemRectSize();
 							float paddingX = ImGui::GetStyle().FramePadding.x;

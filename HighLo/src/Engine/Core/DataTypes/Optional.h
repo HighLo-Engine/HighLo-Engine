@@ -31,7 +31,7 @@ namespace highlo
 			}
 		}
 
-		HLAPI Optional(T &ref)
+		HLAPI Optional(const T &ref)
 		{
 			if (&ref != nullptr)
 			{
@@ -47,11 +47,11 @@ namespace highlo
 			return *this;
 		}
 
-		HLAPI Optional<T> &operator=(T &value)
+		HLAPI Optional<T> &operator=(const T &value)
 		{
 			if (&value != nullptr)
 			{
-				m_Data = &value;
+				m_Data = (T*)&value;
 				m_HasValue = true;
 			}
 
@@ -79,9 +79,9 @@ namespace highlo
 			return nullptr;
 		}
 
-		HLAPI T *ValueOrDefault(const T &default)
+		HLAPI T *ValueOrDefault(const T &default_value)
 		{
-			return m_HasValue ? m_Data : &default;
+			return m_HasValue ? m_Data : &default_value;
 		}
 
 		HLAPI void Reset()

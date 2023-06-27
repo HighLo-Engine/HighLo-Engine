@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef HL_PLATFORM_WINDOWS
+
 #include <Windows.h>
 #include <shobjidl_core.h>
 
@@ -107,3 +109,6 @@ namespace highlo
 }
 
 #endif // HIGHLO_API_GLFW
+
+#endif // HL_PLATFORM_WINDOWS
+

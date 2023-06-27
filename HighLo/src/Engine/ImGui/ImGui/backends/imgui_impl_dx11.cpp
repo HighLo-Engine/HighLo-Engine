@@ -32,6 +32,9 @@
 //  2016-05-07: DirectX11: Disabling depth-write.
 
 #include "HighLoPch.h"
+
+#ifdef HIGHLO_API_DX11
+
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_dx11.h"
 
@@ -720,3 +723,6 @@ static void ImGui_ImplDX11_ShutdownPlatformInterface()
 {
     ImGui::DestroyPlatformWindows();
 }
+
+#endif // HIGHLO_API_DX11
+

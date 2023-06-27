@@ -640,7 +640,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 		return &s_ImGuiIDBuffer[0];
 	}
 
@@ -1049,7 +1049,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		_itoa(s_ImGuiIDCounter++, s_ImGuiIDBuffer + 2, 14);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		ImGui::InputText(s_ImGuiIDBuffer, (char*)*value, value.Length(), ImGuiInputTextFlags_ReadOnly);
@@ -1073,12 +1073,13 @@ namespace highlo::UI
 			ImGui::PushItemWidth(-1);
 
 		char buffer[256];
-		strcpy_s<256>(buffer, *value);
+	//	strcpy_s<256>(buffer, *value);
+		memcpy(buffer, *value, 256);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1109,7 +1110,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1139,7 +1140,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1180,7 +1181,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1205,7 +1206,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1240,7 +1241,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1269,7 +1270,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1297,7 +1298,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1325,7 +1326,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1353,7 +1354,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1381,7 +1382,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1409,7 +1410,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1441,7 +1442,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1469,7 +1470,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1497,7 +1498,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1525,7 +1526,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		snprintf(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);

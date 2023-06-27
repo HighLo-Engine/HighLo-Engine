@@ -14,6 +14,8 @@
 
 #include "HighLoPch.h"
 
+#if defined(HL_PLATFORM_WINDOWS) && !defined(HIGHLO_API_GLFW)
+
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_win32.h"
 #ifndef WIN32_LEAN_AND_MEAN
@@ -1050,3 +1052,5 @@ static void ImGui_ImplWin32_ShutdownPlatformInterface()
 {
     ::UnregisterClass(_T("ImGui Platform"), ::GetModuleHandle(NULL));
 }
+
+#endif // defined(HL_PLATFORM_WINDOWS) && !defined(HIGHLO_API_GLFW)

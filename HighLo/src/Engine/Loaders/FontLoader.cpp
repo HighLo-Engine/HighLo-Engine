@@ -38,9 +38,9 @@ namespace highlo
 		result.Fonts = nullptr;
 
 		// Try to load a font config file
-		FileSystemPath &config_path = filePath.ParentPath();
+		FileSystemPath config_path = filePath.ParentPath();
 		const HLString &config_name = filePath.Filename();
-		FileSystemPath config_file_name = fmt::format("{0}{1}", **(config_path / config_name), ".fontcfg");;
+		FileSystemPath config_file_name = fmt::format("{0}{1}", **(config_path / config_name), ".fontcfg").c_str();
 
 		Ref<DocumentReader> reader = DocumentReader::Create(config_file_name, DocumentType::Json);
 		if (reader->ReadContents())

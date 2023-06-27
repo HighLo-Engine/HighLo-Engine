@@ -69,32 +69,35 @@ namespace highlo
 			HL_ASSERT(false);
 		}
 
-		memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), elementSize);
+	//	memcpy_s(m_Data, m_DataSize, (void*)((char*)data + offset), elementSize);
+		memcpy(m_Data, (void*)((char*)data + offset), elementSize);
 		UploadToShader();
 	}
 
 	void UniformBuffer::SetVariable(const HLString &name, void *value)
 	{
-		auto &entry = m_UniformVariables.find(name);
+		auto entry = m_UniformVariables.find(name);
 		if (entry != m_UniformVariables.end())
 		{
 			uint32 size = entry->second.first;
 			uint32 offset = entry->second.second;
-			memcpy_s((void*)((char*)m_Data + offset), size, value, size);
+		//	memcpy_s((void*)((char*)m_Data + offset), size, value, size);
+			memcpy((void*)((char*)m_Data + offset), value, size);
 			UploadToShader();
 		}
 	}
 	
 	void *UniformBuffer::GetVariable(const HLString &name)
 	{
-		auto &entry = m_UniformVariables.find(name);
+		auto entry = m_UniformVariables.find(name);
 		if (entry != m_UniformVariables.end())
 		{
 			uint32 size = entry->second.first;
 			uint32 offset = entry->second.second;
 
 			void *result = malloc(size);
-			memcpy_s(result, size, (void*)((char*)m_Data + offset), size);
+		//	memcpy_s(result, size, (void*)((char*)m_Data + offset), size);
+			memcpy(result, (void*)((char*)m_Data + offset), size);
 			return result;
 		}
 

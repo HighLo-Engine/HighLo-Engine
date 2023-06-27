@@ -102,7 +102,7 @@ namespace highlo
 			return;
 
 		renderer->SetScene(this);
-		renderer->BeginScene(cameraComp->Camera);
+		renderer->BeginScene(cameraComp->CameraInstance);
 
 		// Static models
 		std::vector<UUID> staticModelIds = m_Registry.View<StaticModelComponent>();
@@ -110,12 +110,12 @@ namespace highlo
 		{
 			StaticModelComponent *component = m_Registry.GetComponent<StaticModelComponent>(uuid);
 			HL_ASSERT(component);
-			Ref<StaticModel> &model = AssetManager::Get()->GetAsset<StaticModel>(component->Model);
+			Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(component->Model);
 			HL_ASSERT(model);
 
 			if (model && !model->IsFlagSet(AssetFlag::Missing))
 			{
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
 
 				renderer->SubmitStaticModel(model, component->Materials, transform);
@@ -128,14 +128,14 @@ namespace highlo
 		{
 			DynamicModelComponent *component = m_Registry.GetComponent<DynamicModelComponent>(uuid);
 			HL_ASSERT(component);
-			Ref<DynamicModel> &model = AssetManager::Get()->GetAsset<DynamicModel>(component->Model);
+			Ref<DynamicModel> model = AssetManager::Get()->GetAsset<DynamicModel>(component->Model);
 			HL_ASSERT(model);
 
 			if (model && !model->IsFlagSet(AssetFlag::Missing))
 			{
 				model->OnUpdate(ts);
 
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
 
 				renderer->SubmitDynamicModel(model, component->SubmeshIndex, component->Materials, transform);
@@ -146,13 +146,13 @@ namespace highlo
 
 		if (renderer->GetFinalRenderTexture())
 		{
-			Renderer2D::BeginScene(cameraComp->Camera);
+			Renderer2D::BeginScene(cameraComp->CameraInstance);
 			Renderer2D::SetTargetRenderPass(renderer->GetExternalCompositeRenderPass());
 
 			std::vector<UUID> spriteIds = m_Registry.View<SpriteComponent>();
 			for (UUID &uuid : spriteIds)
 			{
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				Transform transform = GetWorldSpaceTransform(e);
 
 				SpriteComponent *component = m_Registry.GetComponent<SpriteComponent>(uuid);
@@ -170,10 +170,10 @@ namespace highlo
 			std::vector<UUID> textIds = m_Registry.View<TextComponent>();
 			for (UUID &uuid : textIds)
 			{
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				Transform transform = GetWorldSpaceTransform(e);
 				TextComponent *component = m_Registry.GetComponent<TextComponent>(uuid);
-				Ref<Font> &font = AssetManager::Get()->GetAsset<Font>(component->FontAsset);
+				Ref<Font> font = AssetManager::Get()->GetAsset<Font>(component->FontAsset);
 				
 				Renderer2D::DrawText(component->Text, font, transform, component->MaxWidth, component->Color);
 			}
@@ -195,12 +195,12 @@ namespace highlo
 		{
 			StaticModelComponent *component = m_Registry.GetComponent<StaticModelComponent>(uuid);
 			HL_ASSERT(component);
-			Ref<StaticModel> &model = AssetManager::Get()->GetAsset<StaticModel>(component->Model);
+			Ref<StaticModel> model = AssetManager::Get()->GetAsset<StaticModel>(component->Model);
 			HL_ASSERT(model);
 
 			if (model && !model->IsFlagSet(AssetFlag::Missing))
 			{
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
 
 				renderer->SubmitStaticModel(model, component->Materials, transform);
@@ -213,14 +213,14 @@ namespace highlo
 		{
 			DynamicModelComponent *component = m_Registry.GetComponent<DynamicModelComponent>(uuid);
 			HL_ASSERT(component);
-			Ref<DynamicModel> &model = AssetManager::Get()->GetAsset<DynamicModel>(component->Model);
+			Ref<DynamicModel> model = AssetManager::Get()->GetAsset<DynamicModel>(component->Model);
 			HL_ASSERT(model);
 
 			if (model && !model->IsFlagSet(AssetFlag::Missing))
 			{
 				model->OnUpdate(ts);
 
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				glm::mat4 transform = GetWorldSpaceTransformMatrix(e);
 
 				renderer->SubmitDynamicModel(model, component->SubmeshIndex, component->Materials, transform);
@@ -237,7 +237,7 @@ namespace highlo
 			std::vector<UUID> spriteIds = m_Registry.View<SpriteComponent>();
 			for (UUID &uuid : spriteIds)
 			{
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				Transform transform = GetWorldSpaceTransform(e);
 
 				SpriteComponent *component = m_Registry.GetComponent<SpriteComponent>(uuid);
@@ -255,10 +255,10 @@ namespace highlo
 			std::vector<UUID> textIds = m_Registry.View<TextComponent>();
 			for (UUID &uuid : textIds)
 			{
-				Entity &e = FindEntityByUUID(uuid);
+				Entity e = FindEntityByUUID(uuid);
 				Transform transform = GetWorldSpaceTransform(e);
 				TextComponent *component = m_Registry.GetComponent<TextComponent>(uuid);
-				Ref<Font> &font = AssetManager::Get()->GetAsset<Font>(component->FontAsset);
+				Ref<Font> font = AssetManager::Get()->GetAsset<Font>(component->FontAsset);
 
 				Renderer2D::DrawText(component->Text, font, transform, component->MaxWidth, component->Color);
 			}
@@ -306,7 +306,7 @@ namespace highlo
 		m_ViewportHeight = height;
 
 		// Resize all cameras
-		std::vector<UUID> &cameras = m_Registry.View<CameraComponent>();
+		std::vector<UUID> cameras = m_Registry.View<CameraComponent>();
 		for (UUID &uuid : cameras)
 		{
 			CameraComponent *component = m_Registry.GetComponent<CameraComponent>(uuid);
@@ -323,13 +323,13 @@ namespace highlo
 				continue;
 
 			// Do the actual resize
-			component->Camera.SetViewportSize(width, height);
+			component->CameraInstance.SetViewportSize(width, height);
 		}
 	}
 	
 	Entity Scene::FindEntityByUUID(UUID id)
 	{
-		auto &view = m_Registry.View<RelationshipComponent>();
+		std::vector<UUID> view = m_Registry.View<RelationshipComponent>();
 		for (UUID entityID : view)
 		{
 			if (entityID == id && m_EntityIDMap.find(id) != m_EntityIDMap.end())
@@ -341,7 +341,7 @@ namespace highlo
 	
 	Entity Scene::FindEntityByTag(const HLString &tag)
 	{
-		auto &view = m_Registry.View<RelationshipComponent>();
+		std::vector<UUID> view = m_Registry.View<RelationshipComponent>();
 		for (UUID entityID : view)
 		{
 			HL_ASSERT(m_EntityIDMap.find(entityID) != m_EntityIDMap.end());
@@ -359,7 +359,7 @@ namespace highlo
 	{
 		HL_PROFILE_FUNCTION();
 
-		auto &view = m_Registry.View<CameraComponent>();
+		std::vector<UUID> view = m_Registry.View<CameraComponent>();
 		for (UUID entityID : view)
 		{
 			HL_ASSERT(m_EntityIDMap.find(entityID) != m_EntityIDMap.end());
@@ -383,7 +383,7 @@ namespace highlo
 		if (!parent)
 			return;
 
-		auto &transform = entity.Transform();
+		auto &transform = entity.GetTransform();
 		glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
 
 		glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
@@ -419,17 +419,17 @@ namespace highlo
 		if (parent)
 			transform = GetTransformRelativeToParent(parent);
 
-		return transform * entity.Transform().GetTransform();
+		return transform * entity.GetTransform().GetTransform();
 	}
 	
 	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity &entity)
 	{
 		HL_PROFILE_FUNCTION();
 
-		glm::mat4 transform = entity.Transform().GetTransform();
+		glm::mat4 transform = entity.GetTransform().GetTransform();
 		while (Entity parent = FindEntityByUUID(entity.GetParentUUID()))
 		{
-			transform = parent.Transform().GetTransform();
+			transform = parent.GetTransform().GetTransform();
 			entity = parent;
 		}
 
@@ -566,8 +566,8 @@ namespace highlo
 	{
 		m_Registry.Sort([&](const UUID &lhs, const UUID &rhs)
 		{
-			auto &lhsEntity = m_EntityIDMap.find(lhs);
-			auto &rhsEntity = m_EntityIDMap.find(rhs);
+			auto lhsEntity = m_EntityIDMap.find(lhs);
+			auto rhsEntity = m_EntityIDMap.find(rhs);
 			return static_cast<uint32>(lhsEntity->second) < static_cast<uint32>(rhsEntity->second);
 		});
 	}
@@ -651,13 +651,14 @@ namespace highlo
 		HL_PROFILE_FUNCTION();
 
 		Entity newEntity = CreateEntity(entity.Tag());
-		newEntity.SetTransform(entity.Transform());
+		newEntity.SetTransform(entity.GetTransform());
 		CopyAllComponents(newEntity, entity);
 
 		auto childIds = entity.Children();
 		for (auto childId : childIds)
 		{
-			Entity childDuplicate = DuplicateEntity(FindEntityByUUID(childId));
+			Entity child_original = FindEntityByUUID(childId);
+			Entity childDuplicate = DuplicateEntity(child_original);
 			UnparentEntity(childDuplicate, false);
 
 			childDuplicate.SetParentUUID(newEntity.GetUUID());

@@ -22,6 +22,7 @@ project "HighLo"
     includedirs
     {
 		"src",
+		"%{IncludeDir.GLAD}",
 		"%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.GLFW}",
@@ -45,7 +46,8 @@ project "HighLo"
 
     links
     {
-        "GLFW",
+		"GLAD",
+		"GLFW",
         "stbimage",
         "stbtruetype",
         "%{LibDir.assimp}",
@@ -87,15 +89,9 @@ project "HighLo"
             "HL_PLATFORM_WINDOWS",
 			"HIGHLO_API_GLFW"	
         }
-
-		includedirs
-		{
-		    "%{IncludeDir.GLAD}",
-		}
 		
 		links
 		{
-		    "GLAD",
 			"opengl32.lib",
 			
 			"%{LibDir.WinSock}",
@@ -122,6 +118,11 @@ project "HighLo"
             "HL_PLATFORM_LINUX",
 			"HIGHLO_API_GLFW"	
         }
+
+		links
+		{
+			"libGL.so"
+		}
 
     filter "configurations:Debug-OpenGL"
         symbols "On"

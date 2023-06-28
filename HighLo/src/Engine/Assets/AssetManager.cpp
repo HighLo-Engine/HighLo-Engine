@@ -82,7 +82,7 @@ namespace highlo
 
 	AssetHandle AssetManager::GetAssetHandleFromFilePath(const FileSystemPath &path)
 	{
-		return s_AssetRegistry.Contains(path) ? s_AssetRegistry[path].Handle : (AssetHandle){0};
+		return s_AssetRegistry.Contains(path) ? s_AssetRegistry[path].Handle : AssetHandle(0);
 	}
 
 	AssetType AssetManager::GetAssetTypeFromExtension(HLString &extension)

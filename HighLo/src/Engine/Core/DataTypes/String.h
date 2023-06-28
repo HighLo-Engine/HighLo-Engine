@@ -151,11 +151,15 @@ namespace highlo
 			if (!m_UsingShortStr)
 			{
 				LongStringData *data = (LongStringData*)m_DataPointer;
-				delete[] data->Data;
-				data->Data = nullptr;
+				if (data)
+				{
+					delete[] data->Data;
+					data->Data = nullptr;
 
-				delete data;
-				m_DataPointer = nullptr;
+					delete data;
+					m_DataPointer = nullptr;
+				}
+
 				return;
 			}
 
@@ -311,18 +315,24 @@ namespace highlo
 			if (!m_UsingShortStr)
 			{
 				LongStringData *data = (LongStringData*)m_DataPointer;
-				
-				delete[] data->Data;
-				data->Data = nullptr;
+				if (data)
+				{
+					delete[] data->Data;
+					data->Data = nullptr;
 
-				delete data;
-				m_DataPointer = nullptr;
+					delete data;
+					m_DataPointer = nullptr;
+				}
+
 				return;
 			}
 
 			ShortStringData *data = (ShortStringData*)m_DataPointer;
-			delete data;
-			m_DataPointer = nullptr;
+			if (data)
+			{
+				delete data;
+				m_DataPointer = nullptr;
+			}
 			
 			// Restore default state
 			m_UsingShortStr = true;
@@ -330,17 +340,29 @@ namespace highlo
 
 		HLAPI void Resize(uint32 size)
 		{
-			if (!m_DataPointer)
+			if (!m_DataPointer || size == 0)
 				return;
 
+			uint32 currentStringSize = SelectStringSize();
+			uint32 copySize = currentStringSize > size ? size : currentStringSize;
+			StringType *tmp = new StringType[size];
+			memcpy(tmp, SelectStringSource(), copySize);
+
+			// Free the existing string resources
 			Clear();
+
+			// Allocate new size and copy the contents from the temporary buffer.
 			if (size < HL_STRING_MAX_STRING_SIZE)
 			{
 				ShortStringData *data = new ShortStringData;
 				data->Size = size;
 				data->Data[data->Size] = '\0';
-				m_DataPointer = data;
 
+				memcpy(data->Data, tmp, copySize);
+				delete[] tmp;
+				tmp = nullptr;
+
+				m_DataPointer = data;
 				m_UsingShortStr = true;
 				return;
 			}
@@ -349,6 +371,11 @@ namespace highlo
 			data->Data = new StringType[size];
 			data->Size = size;
 			data->Data[data->Size] = '\0';
+
+			memcpy(data->Data, tmp, copySize);
+			delete[] tmp;
+			tmp = nullptr;
+
 			m_DataPointer = data;
 			m_UsingShortStr = false;
 		}

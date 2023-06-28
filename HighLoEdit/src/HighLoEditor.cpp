@@ -388,7 +388,7 @@ void HighLoEditor::OnUIRender(Timestep timestep)
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
 		bool snap = Input::IsKeyPressed(HL_KEY_LEFT_CONTROL);
 
-		Transform &entityTransform = selection.Entity.Transform();
+		Transform &entityTransform = selection.Entity.GetTransform();
 		glm::mat4 rawTransform = m_CurrentScene->GetWorldSpaceTransformMatrix(selection.Entity);
 
 		float snapValue = GetSnapValue();
@@ -669,7 +669,7 @@ bool HighLoEditor::OnKeyPressedEvent(const KeyPressedEvent &e)
 					break;
 
 				Entity selectedEntity = m_SelectionContext[0].Entity;
-				m_EditorCamera.Focus(selectedEntity.Transform().GetPosition());
+				m_EditorCamera.Focus(selectedEntity.GetTransform().GetPosition());
 				break;
 			}
 

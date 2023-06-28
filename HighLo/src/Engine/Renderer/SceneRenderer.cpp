@@ -21,6 +21,7 @@ namespace highlo
 		SceneBinding = 2,
 		RendererBinding = 3,
 		PointLightsBinding = 4,
+		VisiblePointLightIndicesBuffer = 14,
 		ScreenBinding = 17,
 		HBAOBinding = 18,
 	};
@@ -54,7 +55,7 @@ namespace highlo
 		m_UniformBufferSet->CreateUniform(sizeof(UniformBufferHBAOData), HBAOBinding, UniformLayout::GetHBAODataLayout()); // HBAO data Uniform block
 
 		m_StorageBufferSet = StorageBufferSet::Create(framesInFlight);
-	//	m_StorageBufferSet->CreateStorage(1, 14); // size is set to 1 because the storage buffer gets resized later anyway
+		m_StorageBufferSet->CreateStorage(1, VisiblePointLightIndicesBuffer); // size is set to 1 because the storage buffer gets resized later anyway
 	//	m_StorageBufferSet->CreateStorage(1, 23);
 
 		const uint64 transformBufferCount = 100 * 1024; // 10240 transforms for now
@@ -81,7 +82,7 @@ namespace highlo
 		InitExternalCompositePass();
 	//	InitJumpFlood();
 		InitGrid();
-	//	InitSkybox();
+		InitSkybox();
 
 		m_ResourcesCreated = true;
 	}
@@ -133,6 +134,8 @@ namespace highlo
 		if (m_NeedsResize)
 		{
 			m_NeedsResize = false;
+			const glm::uvec2 viewportSize = { m_ViewportWidth, m_ViewportHeight };
+
 			m_GeometryVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 		//	m_PreDepthVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
 			m_CompositeVertexArray->GetSpecification().RenderPass->GetSpecification().Framebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
@@ -143,11 +146,13 @@ namespace highlo
 			if (m_Specification.SwapChain)
 				m_CommandBuffer = CommandBuffer::CreateFromSwapChain("SceneRenderer");
 
-			m_LightCullingWorkGroups = { (m_ViewportWidth + m_ViewportWidth % 16) / 16, (m_ViewportHeight + m_ViewportHeight % 16) / 16, 1};
+			// Light Culling
+			constexpr uint32 TILE_SIZE = 16u;
+			glm::uvec2 size = viewportSize;
+			size += TILE_SIZE - viewportSize % TILE_SIZE;
+			m_LightCullingWorkGroups = { size / TILE_SIZE, 1 };
 			m_RendererDataUniformBuffer.TilesCountX = m_LightCullingWorkGroups.x;
-
-			// ?
-		//	m_StorageBufferSet->Resize(14, 0, m_LightCullingWorkGroups.x * m_LightCullingWorkGroups.y * 4096);
+		//	m_StorageBufferSet->Resize(VisiblePointLightIndicesBuffer, 0, m_LightCullingWorkGroups.x * m_LightCullingWorkGroups.y * 4096);
 		}
 
 		auto &sceneCamera = m_SceneData.SceneCamera;
@@ -171,31 +176,39 @@ namespace highlo
 		const auto &dirLight = m_SceneData.ActiveLight;
 
 		// calculate cascades shadows
-	//	UniformBufferShadow &shadowData = m_ShadowUniformBuffer;
-	//	CascadeData cascades[4];
+		UniformBufferShadow &shadowData = m_ShadowUniformBuffer;
+		CascadeData cascades[4];
 	//	CalculateCascades(cascades, m_SceneData.SceneCamera, dirLight.Direction);
-	//
-	//	for (uint32 i = 0; i < 4; ++i)
-	//	{
-	//		m_CascadeSplits[i] = cascades[i].SplitDepth;
-	//		shadowData.ViewProjection[i] = cascades[i].ViewProjection;
-	//	}
+		// TODO: TEMP
+		for (uint32 i = 0; i < 4; ++i)
+		{
+			cascades[i].View = glm::mat4(1.0f);
+			cascades[i].ViewProjection = glm::mat4(1.0f);
+			cascades[i].SplitDepth = 1.0f;
+		}
+		// TODO: End TEMP
 
-	//	Renderer::Submit([instance, shadowData]() mutable
-	//	{
-	//		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-	//		instance->m_UniformBufferSet->GetUniform(ShadowBinding, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
-	//	});
+		for (uint32 i = 0; i < 4; ++i)
+		{
+			m_CascadeSplits[i] = cascades[i].SplitDepth;
+			shadowData.ViewProjection[i] = cascades[i].ViewProjection;
+		}
 
-	//	UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
-	//
-	//	UpdateHBAOData();
-	//
-	//	Renderer::Submit([instance, hbaoData]() mutable
-	//	{
-	//		uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-	//		instance->m_UniformBufferSet->GetUniform(HBAOBinding, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
-	//	});
+		Renderer::Submit([instance, shadowData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(ShadowBinding, 0, frameIndex)->SetData(&shadowData, sizeof(shadowData));
+		});
+
+		UniformBufferHBAOData &hbaoData = m_HBAOUniformBuffer;
+		
+		UpdateHBAOData();
+	
+		Renderer::Submit([instance, hbaoData]() mutable
+		{
+			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
+			instance->m_UniformBufferSet->GetUniform(HBAOBinding, 0, frameIndex)->SetData(&hbaoData, sizeof(hbaoData));
+		});
 
 		UniformBufferScene &sceneData = m_SceneUniformBuffer;
 		UniformBufferPointLights &pointLightData = m_PointLightsUniformBuffer;
@@ -227,6 +240,10 @@ namespace highlo
 
 		UniformBufferRendererData &rendererData = m_RendererDataUniformBuffer;
 		rendererData.CascadeSplits = m_CascadeSplits;
+
+		// TODO: TEMP
+		rendererData.SoftShadows = 1;
+		rendererData.CascadeFading = 1;
 
 		Renderer::Submit([instance, rendererData]() mutable
 		{
@@ -723,6 +740,15 @@ namespace highlo
 
 		// Render normal geometry
 		Renderer::BeginRenderPass(m_CommandBuffer, m_GeometryVertexArray->GetSpecification().RenderPass);
+
+		// Skybox
+		m_SkyboxMaterial->Set("u_Uniforms.TextureLod", m_SceneData.SkyboxLod);
+		m_SkyboxMaterial->Set("u_Uniforms.Intensity", m_SceneData.EnvironmentIntensity);
+
+		const Ref<Texture3D> radianceMap = m_SceneData.SceneEnvironment ? m_SceneData.SceneEnvironment->GetRadianceMap() : Renderer::GetBlackCubeTexture();
+		m_SkyboxMaterial->Set("u_Texture", radianceMap);
+
+		Renderer::RenderFullscreenQuad(m_CommandBuffer, m_SkyboxVertexArray, m_UniformBufferSet, nullptr, m_SkyboxMaterial);
 
 		// Now render static and dynamic meshes
 		for (auto &[mk, dc] : m_StaticDrawList)

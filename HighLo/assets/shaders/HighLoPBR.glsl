@@ -36,11 +36,18 @@ invariant gl_Position;
 
 void main()
 {
+//	mat4 transform = mat4(
+//		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),
+//		vec4(a_MRow0.y, a_MRow1.y, a_MRow2.y, 0.0),
+//		vec4(a_MRow0.z, a_MRow1.z, a_MRow2.z, 0.0),
+//		vec4(a_MRow0.w, a_MRow1.w, a_MRow2.w, 1.0)
+//	);
+
 	mat4 transform = mat4(
-		vec4(a_MRow0.x, a_MRow1.x, a_MRow2.x, 0.0),
-		vec4(a_MRow0.y, a_MRow1.y, a_MRow2.y, 0.0),
-		vec4(a_MRow0.z, a_MRow1.z, a_MRow2.z, 0.0),
-		vec4(a_MRow0.w, a_MRow1.w, a_MRow2.w, 1.0)
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
 	);
 	vec4 worldPosition = transform * vec4(a_Position, 1.0);
 
@@ -97,9 +104,8 @@ struct VertexOutput
 		float Emission;
 		float Transparency;
 		float EnvMapRotation;
-	
-		bool UseNormalMap;
-		bool Padding1;
+		int UseNormalMap;
+		int Padding1;
 	} u_MaterialUniforms;
 #else
 	layout(std140, binding = 13) uniform Material
@@ -110,9 +116,8 @@ struct VertexOutput
 		float Emission;
 		float Transparency;
 		float EnvMapRotation;
-	
-		bool UseNormalMap;
-		bool Padding1;
+		int UseNormalMap;
+		int Padding1;
 	} u_MaterialUniforms;
 #endif
 
@@ -170,7 +175,7 @@ void main()
 
 	// Normals (either from vertex or map)
 	m_Params.Normal = normalize(Input.Normal);
-	if (u_MaterialUniforms.UseNormalMap)
+	if (u_MaterialUniforms.UseNormalMap == 1)
 	{
 		m_Params.Normal = normalize(texture(u_NormalTexture, Input.TexCoord).rgb * 2.0f - 1.0f);
 		m_Params.Normal = normalize(Input.WorldNormals * m_Params.Normal);
@@ -188,9 +193,10 @@ void main()
 	vec3 F0 = mix(Fdielectric, m_Params.Diffuse, m_Params.Metalness);
 
 	// Direct lighting
-	vec3 lightContribution = CalculateDirLights(F0);
-	lightContribution += CalculatePointLights(F0, Input.WorldPosition);
-	lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
+	//vec3 lightContribution = CalculateDirLights(F0);
+	//lightContribution += CalculatePointLights(F0, Input.WorldPosition);
+	//lightContribution += m_Params.Diffuse * u_MaterialUniforms.Emission;
+	vec3 lightContribution = m_Params.Diffuse * u_MaterialUniforms.Emission;
 
 	// Indirect lighting
 	vec3 iblContribution = IBL(F0, Lr, u_EnvRadianceTex, u_EnvIrradianceTex, u_BRDFLUTTexture, u_MaterialUniforms.EnvMapRotation, m_Params.NdotV, m_Params.Roughness, m_Params.Metalness, m_Params.Diffuse, m_Params.Normal, m_Params.View);

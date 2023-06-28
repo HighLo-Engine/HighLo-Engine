@@ -49,7 +49,10 @@ namespace highlo
 		indices[10] = { 3, 2, 6 };
 		indices[11] = { 6, 7, 3 };
 
-		AABB boundingBox = AABB(glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), glm::vec3(size.x / 2, size.y / 2, size.z / 2));
+		AABB boundingBox = AABB(
+			glm::vec3(-size.x / 2, -size.y / 2, -size.z / 2), 
+			glm::vec3(size.x / 2, size.y / 2, size.z / 2)
+		);
 
 		return MeshFile::Create(vertices, indices, boundingBox);
 	}

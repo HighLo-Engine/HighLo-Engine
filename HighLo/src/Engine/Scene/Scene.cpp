@@ -44,6 +44,9 @@ namespace highlo
 		m_SkyboxMaterial->SetFlag(MaterialFlag::DepthTest, false);
 
 		m_DemoTexture = Texture2D::LoadFromFile("assets/Resources/HighLo.png");
+
+		// TODO: TEMP
+		m_Environment = Environment::Create("assets/textures/PBR_Scene_Apartment.hdr");
 	}
 	
 	void Scene::UpdateScene(Timestep ts)

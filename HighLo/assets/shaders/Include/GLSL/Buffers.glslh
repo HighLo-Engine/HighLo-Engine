@@ -30,10 +30,10 @@ layout(std140, binding = 3) uniform RendererData
 	float ShadowFade;
 	float CascadeTransitionFade;
 	int TilesCountX;
-	bool ShowLightComplexity;
-	bool ShowCascades;
-	bool SoftShadows;
-	bool CascadeFading;
+	int ShowLightComplexity;
+	int ShowCascades;
+	int SoftShadows;
+	int CascadeFading;
 } u_RendererData;
 
 layout(std140, binding = 18) uniform HBAOData

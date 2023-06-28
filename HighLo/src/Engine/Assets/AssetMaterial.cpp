@@ -30,6 +30,7 @@ namespace highlo
 	MaterialAsset::MaterialAsset(bool transparent)
 	{
 		Handle = {}; // Assign a new UUID
+		m_MaterialUniform = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 
 		m_Transparent = transparent;
 
@@ -57,6 +58,7 @@ namespace highlo
 	{
 		Handle = {}; // Assign a new UUID
 		m_Material = Material::Copy(material);
+		m_MaterialUniform = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 
 		// Set Default values
 		SetDiffuseColor(glm::vec3(0.8f));
@@ -74,46 +76,56 @@ namespace highlo
 	
 	MaterialAsset::~MaterialAsset()
 	{
+		m_MaterialUniform = nullptr;
+	}
+
+	void MaterialAsset::UploadToGPU()
+	{
+		m_MaterialUniform->SetData(&m_MaterialProperties, sizeof(UniformBufferMaterial));
 	}
 	
 	glm::vec3 &MaterialAsset::GetDiffuseColor()
 	{
-		return m_Material->GetVector3(s_DiffuseColorUniform);
+		return m_MaterialProperties.DiffuseColor;
 	}
 	
 	void MaterialAsset::SetDiffuseColor(const glm::vec3 &value)
 	{
-		m_Material->Set(s_DiffuseColorUniform, value);
+		m_MaterialProperties.DiffuseColor = value;
+		UploadToGPU();
 	}
 	
 	float &MaterialAsset::GetMetalness()
 	{
-		return m_Material->GetFloat(s_MetalnessUniform);
+		return m_MaterialProperties.Metalness;
 	}
 	
 	void MaterialAsset::SetMetalness(float value)
 	{
-		m_Material->Set(s_MetalnessUniform, value);
+		m_MaterialProperties.Metalness = value;
+		UploadToGPU();
 	}
 	
 	float &MaterialAsset::GetRoughness()
 	{
-		return m_Material->GetFloat(s_RoughnessUniform);
+		return m_MaterialProperties.Roughness;
 	}
 	
 	void MaterialAsset::SetRoughness(float value)
 	{
-		m_Material->Set(s_RoughnessUniform, value);
+		m_MaterialProperties.Roughness = value;
+		UploadToGPU();
 	}
 	
 	float &MaterialAsset::GetEmission()
 	{
-		return m_Material->GetFloat(s_EmissionUniform);
+		return m_MaterialProperties.Emission;
 	}
 	
 	void MaterialAsset::SetEmission(float value)
 	{
-		m_Material->Set(s_EmissionUniform, value);
+		m_MaterialProperties.Emission = value;
+		UploadToGPU();
 	}
 	
 	Ref<Texture2D> MaterialAsset::GetDiffuseMap()
@@ -148,12 +160,13 @@ namespace highlo
 	
 	bool MaterialAsset::IsUsingNormalMap()
 	{
-		return m_Material->GetBool(s_UseNormalMapUniform);
+		return (bool)m_MaterialProperties.UseNormalMap;
 	}
 	
 	void MaterialAsset::SetUsingNormalMap(bool value)
 	{
-		m_Material->Set(s_UseNormalMapUniform, value);
+		m_MaterialProperties.UseNormalMap = value;
+		UploadToGPU();
 	}
 	
 	Ref<Texture2D> MaterialAsset::GetMetalnessMap()
@@ -188,12 +201,13 @@ namespace highlo
 	
 	float &MaterialAsset::GetTransparency()
 	{
-		return m_Material->GetFloat(s_TransparencyUniform);
+		return m_MaterialProperties.Transparency;
 	}
 
 	void MaterialAsset::SetTransparency(float transparency)
 	{
-		m_Material->Set(s_TransparencyUniform, transparency);
+		m_MaterialProperties.Transparency = transparency;
+		UploadToGPU();
 	}
 }
 

@@ -40,10 +40,10 @@ namespace highlo
 			{ "u_RendererData.ShadowFade", UniformLayoutDataType::Float, 1, sizeof(glm::vec4) + 2 * sizeof(float) },
 			{ "u_RendererData.CascadeTransitionFade", UniformLayoutDataType::Float, 1, sizeof(glm::vec4) + 3 * sizeof(float) },
 			{ "u_RendererData.TilesCountX", UniformLayoutDataType::Int, 1, sizeof(glm::vec4) + 4 * sizeof(float) },
-			{ "u_RendererData.ShowLightComplexity", UniformLayoutDataType::Bool, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) },
-			{ "u_RendererData.ShowCascades", UniformLayoutDataType::Bool, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) + sizeof(bool) },
-			{ "u_RendererData.SoftShadows", UniformLayoutDataType::Bool, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) + 2 * sizeof(bool) },
-			{ "u_RendererData.CascadeFading", UniformLayoutDataType::Bool, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) + 3 * sizeof(bool) },
+			{ "u_RendererData.ShowLightComplexity", UniformLayoutDataType::Int, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) },
+			{ "u_RendererData.ShowCascades", UniformLayoutDataType::Int, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) + sizeof(int32) },
+			{ "u_RendererData.SoftShadows", UniformLayoutDataType::Int, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) + 2 * sizeof(int32) },
+			{ "u_RendererData.CascadeFading", UniformLayoutDataType::Int, 1, sizeof(glm::vec4) + 4 * sizeof(float) + sizeof(int32) + 3 * sizeof(int32) },
 		};
 	}
 
@@ -133,8 +133,8 @@ namespace highlo
 			{ "u_MaterialUniforms.Emission", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 2) },
 			{ "u_MaterialUniforms.Transparency", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 3) },
 			{ "u_MaterialUniforms.EnvMapRotation", UniformLayoutDataType::Float, 1, sizeof(glm::vec3) + (sizeof(float) * 4) },
-			{ "u_MaterialUniforms.UseNormalMap", UniformLayoutDataType::Bool, 1, sizeof(glm::vec3) + (sizeof(float) * 5) },
-			{ "u_MaterialUniforms.Padding1", UniformLayoutDataType::Bool, 1, sizeof(glm::vec3) + (sizeof(float) * 5) + sizeof(bool) },
+			{ "u_MaterialUniforms.UseNormalMap", UniformLayoutDataType::Int, 1, sizeof(glm::vec3) + (sizeof(float) * 5) },
+			{ "u_MaterialUniforms.Padding1", UniformLayoutDataType::Int, 1, sizeof(glm::vec3) + (sizeof(float) * 5) + sizeof(int32) },
 		};
 	}
 

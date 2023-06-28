@@ -136,8 +136,8 @@ layout(location = 2) out vec4 o_MetalnessRoughness;
 	layout(set = 1, binding = 11) uniform sampler2D u_BRDFLUTTexture;
 
 	// Shadow maps
-	layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
-	layout(set = 1, binding = 21) uniform sampler2D u_SpotShadowTexture;
+	//layout(set = 1, binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+	//layout(set = 1, binding = 21) uniform sampler2D u_SpotShadowTexture;
 #else
 	layout(binding = 5) uniform sampler2D u_DiffuseTexture;
 	layout(binding = 6) uniform sampler2D u_NormalTexture;
@@ -152,8 +152,8 @@ layout(location = 2) out vec4 o_MetalnessRoughness;
 	layout(binding = 11) uniform sampler2D u_BRDFLUTTexture;
 
 	// Shadow maps
-	layout(binding = 12) uniform sampler2DArray u_ShadowMapTexture;
-	layout(binding = 21) uniform sampler2D u_SpotShadowTexture;
+	//layout(binding = 12) uniform sampler2DArray u_ShadowMapTexture;
+	//layout(binding = 21) uniform sampler2D u_SpotShadowTexture;
 #endif
 
 void main()

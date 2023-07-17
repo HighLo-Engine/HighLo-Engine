@@ -3,7 +3,7 @@
 #include "HighLoPch.h"
 #include "EditorConsolePanel.h"
 
-#include "Engine/ImGui/ImGui.h"
+#include "Engine/ImGui/imgui.h"
 #include "EditorColors.h"
 
 namespace highlo

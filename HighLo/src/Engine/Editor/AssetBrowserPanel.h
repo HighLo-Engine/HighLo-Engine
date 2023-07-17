@@ -14,9 +14,6 @@
 #include "Engine/Scene/Project.h"
 #include "Engine/Events/Events.h"
 
-#include "Engine/Core/FileSystemWatcher.h"
-#include "Engine/Assets/AssetManager.h"
-
 // From Windows Header
 #undef RemoveDirectory
 

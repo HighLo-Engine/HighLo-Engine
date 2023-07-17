@@ -134,7 +134,7 @@ namespace highlo::UI
 			: m_Count((sizeof... (otherStylePairs) / 2) + 1)
 		{
 			static_assert((sizeof... (otherStylePairs) & 1u) == 0);
-			PushStyle(id, style, std::forward<OtherStyles>(otherStylePairs)...);
+			PushStyle(id, style, otherStylePairs);
 		}
 
 		HLAPI ~ScopedStyleStack()

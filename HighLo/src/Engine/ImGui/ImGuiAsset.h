@@ -40,7 +40,7 @@ namespace highlo::UI
 			*outResult = AssetReferenceResult::Ok;
 
 		UI::ShiftCursor(10.0f, 9.0f);
-		ImGui::Text("%s", *label);
+		ImGui::Text(*label);
 		ImGui::NextColumn();
 		UI::ShiftCursorY(4.0f);
 		ImGui::PushItemWidth(-1);
@@ -117,7 +117,7 @@ namespace highlo::UI
 			*outResult = AssetReferenceResult::Ok;
 
 		UI::ShiftCursor(10.0f, 9.0f);
-		ImGui::Text("%s", *label);
+		ImGui::Text(*label);
 		ImGui::NextColumn();
 		UI::ShiftCursorY(4.0f);
 		ImGui::PushItemWidth(-1);
@@ -209,7 +209,7 @@ namespace highlo::UI
 		bool receivedValudEntity = false;
 
 		UI::ShiftCursor(10.0f, 9.0f);
-		ImGui::Text("%s", *label);
+		ImGui::Text(*label);
 		ImGui::NextColumn();
 		UI::ShiftCursorY(4.0f);
 		ImGui::PushItemWidth(-1);
@@ -316,7 +316,7 @@ namespace highlo::UI
 		UI::ShiftCursor(10.0f, 9.0f);
 		ImGui::Text(*label);
 		ImGui::NextColumn();
-		UI::ShiftCursorY(4.0f);
+		UI::ShiftCursor(4.0f);
 		ImGui::PushItemWidth(-1);
 
 		if (settings.NoItemSpacing)
@@ -448,7 +448,7 @@ namespace highlo::UI
 				{
 					AssetHandle assetHandle = *(AssetHandle*)payload->Data;
 					Ref<Asset> asset = AssetManager::Get()->GetAsset<Asset>(assetHandle);
-					if (asset && asset->GetAssetType() == supportedType)
+					if (asset && asset->GetAssetType == supportedType)
 					{
 						object = asset.As<T>();
 						assetDropped = true;
@@ -488,7 +488,7 @@ namespace highlo::UI
 			preview = "Null";
 		}
 
-		auto &assets = AssetManager::Get()->GetLoadedAssets();
+		auto &asset = AssetManager::Get()->GetLoadedAssets();
 		AssetHandle current = *selectedAsset;
 
 		if (UI::IsItemDisabled())

@@ -172,7 +172,7 @@ namespace highlo
 
 		ImGui::AlignTextToFramePadding();
 
-		UUID id = entity.GetUUID();
+		auto id = entity.GetUUID();
 
 		const char *addText = " ADD NEW COMPONENT            ";
 		if (translation->GetLanguageCode() == "de-DE")
@@ -187,7 +187,7 @@ namespace highlo
 		#ifdef HL_DEBUG
 			// Draw ID
 			ImGui::SameLine(ImGui::GetContentRegionAvail().x - (ImGui::CalcTextSize(HLString::ToString(id)).x));
-			ImGui::TextDisabled("%llx", (uint64)id);
+			ImGui::TextDisabled("%llx", id);
 		#endif // HL_DEBUG
 
 			// Draw Tag
@@ -326,7 +326,7 @@ namespace highlo
 			ImGui::TableSetupColumn("label_col", 0, 100.0f);
 			ImGui::TableSetupColumn("value_col", ImGuiTableColumnFlags_IndentEnable | ImGuiTableColumnFlags_NoClip, ImGui::GetContentRegionAvail().x - 100.0f);
 
-			Transform &entityTransform = entity.GetTransform();
+			Transform &entityTransform = entity.Transform();
 
 			ImGui::TableNextRow();
 			bool translationChanged = UI::DrawVec3("Translation", entityTransform.GetPosition());
@@ -383,7 +383,7 @@ namespace highlo
 				{
 					UI::BeginPropertyGrid();
 
-					Ref<MaterialTable> meshMaterialTable = mesh->GetMaterials();
+					auto &meshMaterialTable = mesh->GetMaterials();
 					if (component.Materials->GetMaterialCount() < meshMaterialTable->GetMaterialCount())
 						component.Materials->SetMaterialCount(meshMaterialTable->GetMaterialCount());
 
@@ -471,7 +471,7 @@ namespace highlo
 				{
 					UI::BeginPropertyGrid();
 
-					Ref<MaterialTable> meshMaterialTable = mesh->GetMaterials();
+					auto &meshMaterialTable = mesh->GetMaterials();
 					if (component.Materials->GetMaterialCount() < meshMaterialTable->GetMaterialCount())
 						component.Materials->SetMaterialCount(meshMaterialTable->GetMaterialCount());
 
@@ -528,7 +528,7 @@ namespace highlo
 			std::vector<HLString> projectionTypes;
 			projectionTypes.push_back(translation->GetText("object-properties-camera-component-perspective"));
 			projectionTypes.push_back(translation->GetText("object-properties-camera-component-orthographic"));
-			int32 currentProjectionType = (int32)component.CameraInstance.GetCurrentProjectionType();
+			int32 currentProjectionType = (int32)component.Camera.GetCurrentProjectionType();
 
 			bool primary = component.Primary;
 			if (UI::DrawCheckbox(translation->GetText("object-properties-camera-component-primary"), primary))
@@ -538,43 +538,43 @@ namespace highlo
 
 			if (UI::DrawDropdown(translation->GetText("object-properties-camera-component-projection"), projectionTypes, &currentProjectionType))
 			{
-				component.CameraInstance.SetProjectionType((Camera::ProjectionType)currentProjectionType);
+				component.Camera.SetProjectionType((Camera::ProjectionType)currentProjectionType);
 			}
 
-			if (component.CameraInstance.GetCurrentProjectionType() == Camera::ProjectionType::Orthographic)
+			if (component.Camera.GetCurrentProjectionType() == Camera::ProjectionType::Orthographic)
 			{
-				float orthographicSize = component.CameraInstance.GetOrthographicSize();
-				float nearPlane = component.CameraInstance.GetOrthographicNearPlane();
-				float farPlane = component.CameraInstance.GetOrthographicFarPlane();
+				float orthographicSize = component.Camera.GetOrthographicSize();
+				float nearPlane = component.Camera.GetOrthographicNearPlane();
+				float farPlane = component.Camera.GetOrthographicFarPlane();
 
 				if (UI::DrawDragFloat(translation->GetText("object-properties-camera-component-orthographic-size"), orthographicSize))
 				{
-					component.CameraInstance.SetOrthographicSize(orthographicSize);
+					component.Camera.SetOrthographicSize(orthographicSize);
 				}
 
 				glm::vec2 values = { nearPlane, farPlane };
 				if (UI::DrawDragFloat2(translation->GetText("object-properties-camera-component-near-far-planes"), values))
 				{
-					component.CameraInstance.SetOrthographicNearPlane(values[0]);
-					component.CameraInstance.SetOrthographicFarPlane(values[1]);
+					component.Camera.SetOrthographicNearPlane(values[0]);
+					component.Camera.SetOrthographicFarPlane(values[1]);
 				}
 			}
-			else if (component.CameraInstance.GetCurrentProjectionType() == Camera::ProjectionType::Perspective)
+			else if (component.Camera.GetCurrentProjectionType() == Camera::ProjectionType::Perspective)
 			{
-				float verticalFOV = component.CameraInstance.GetPerspectiveFOV();
-				float nearPlane = component.CameraInstance.GetPerspectiveNearPlane();
-				float farPlane = component.CameraInstance.GetPerspectiveFarPlane();
+				float verticalFOV = component.Camera.GetPerspectiveFOV();
+				float nearPlane = component.Camera.GetPerspectiveNearPlane();
+				float farPlane = component.Camera.GetPerspectiveFarPlane();
 
 				if (UI::DrawDragFloat(translation->GetText("object-properties-camera-component-vertical-fov"), verticalFOV))
 				{
-					component.CameraInstance.SetPerspectiveFOV(verticalFOV);
+					component.Camera.SetPerspectiveFOV(verticalFOV);
 				}
 
 				glm::vec2 values = { nearPlane, farPlane };
 				if (UI::DrawDragFloat2(translation->GetText("object-properties-camera-component-near-far-planes"), values))
 				{
-					component.CameraInstance.SetPerspectiveNearPlane(values[0]);
-					component.CameraInstance.SetPerspectiveFarPlane(values[1]);
+					component.Camera.SetPerspectiveNearPlane(values[0]);
+					component.Camera.SetPerspectiveFarPlane(values[1]);
 				}
 			}
 

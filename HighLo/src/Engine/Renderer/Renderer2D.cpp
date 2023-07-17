@@ -125,7 +125,7 @@ namespace highlo
 
 		bool DepthTest = true;
 		bool SwapChainTarget = false;
-		Ref<UniformBufferSet> ActiveUniformBufferSet = nullptr;
+		Ref<UniformBufferSet> UniformBufferSet = nullptr;
 		Renderer2DStats Statistics;
 	};
 
@@ -180,7 +180,7 @@ namespace highlo
 
 		RenderPassSpecification renderPassSpec;
 		renderPassSpec.DebugName = "Renderer2D RenderPass";
-		renderPassSpec.AssociatedFramebuffer = Framebuffer::Create(framebufferSpec);
+		renderPassSpec.Framebuffer = Framebuffer::Create(framebufferSpec);
 		s_2DData->ActiveRenderPass = RenderPass::Create(renderPassSpec);
 
 		std::vector<int32> textIndices;
@@ -205,8 +205,8 @@ namespace highlo
 		// Quad Vertex array
 		VertexArraySpecification quadVertexArraySpec;
 		quadVertexArraySpec.Layout = BufferLayout::GetTextureLayout();
-		quadVertexArraySpec.AssociatedShader = s_2DData->TextureShader;
-		quadVertexArraySpec.AssociatedRenderPass = s_2DData->ActiveRenderPass;
+		quadVertexArraySpec.Shader = s_2DData->TextureShader;
+		quadVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->QuadVertexArray = VertexArray::Create(quadVertexArraySpec);
 		s_2DData->QuadVertexArray->Bind();
 
@@ -230,8 +230,8 @@ namespace highlo
 
 		VertexArraySpecification circleVertexArraySpec;
 		circleVertexArraySpec.Layout = BufferLayout::GetCircleLayout();
-		circleVertexArraySpec.AssociatedShader = s_2DData->CircleShader;
-		circleVertexArraySpec.AssociatedRenderPass = s_2DData->ActiveRenderPass;
+		circleVertexArraySpec.Shader = s_2DData->CircleShader;
+		circleVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->CircleVertexArray = VertexArray::Create(circleVertexArraySpec);
 		s_2DData->CircleVertexArray->Bind();
 
@@ -250,8 +250,8 @@ namespace highlo
 
 		VertexArraySpecification lineVertexArraySpec;
 		lineVertexArraySpec.Layout = BufferLayout::GetLineLayout();
-		lineVertexArraySpec.AssociatedShader = s_2DData->LineShader;
-		lineVertexArraySpec.AssociatedRenderPass = s_2DData->ActiveRenderPass;
+		lineVertexArraySpec.Shader = s_2DData->LineShader;
+		lineVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->LineVertexArray = VertexArray::Create(lineVertexArraySpec);
 		s_2DData->LineVertexArray->Bind();
 
@@ -273,8 +273,8 @@ namespace highlo
 
 		VertexArraySpecification textVertexArraySpec;
 		textVertexArraySpec.Layout = BufferLayout::GetTextLayout();
-		textVertexArraySpec.AssociatedShader = s_2DData->TextShader;
-		textVertexArraySpec.AssociatedRenderPass = s_2DData->ActiveRenderPass;
+		textVertexArraySpec.Shader = s_2DData->TextShader;
+		textVertexArraySpec.RenderPass = s_2DData->ActiveRenderPass;
 		s_2DData->TextVertexArray = VertexArray::Create(textVertexArraySpec);
 		s_2DData->TextVertexArray->Bind();
 
@@ -291,8 +291,8 @@ namespace highlo
 		s_2DData->TextVertexArray->SetIndexBuffer(s_2DData->TextIndexBuffer);
 
 		// Uniform Buffer
-		s_2DData->ActiveUniformBufferSet = UniformBufferSet::Create(framesInFlight);
-		s_2DData->ActiveUniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout());
+		s_2DData->UniformBufferSet = UniformBufferSet::Create(framesInFlight);
+		s_2DData->UniformBufferSet->CreateUniform(sizeof(UniformBufferCamera), 0, UniformLayout::GetCameraLayout());
 	}
 
 	void Renderer2D::Shutdown()
@@ -331,7 +331,7 @@ namespace highlo
 		Renderer::Submit([cameraStruct]()
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			s_2DData->ActiveUniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 		});
 
 		StartBatch();
@@ -355,7 +355,7 @@ namespace highlo
 		Renderer::Submit([cameraStruct]()
 		{
 			uint32 frameIndex = Renderer::GetCurrentFrameIndex();
-			s_2DData->ActiveUniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->SetData(&cameraStruct, sizeof(cameraStruct));
 		});
 
 		StartBatch();
@@ -410,13 +410,13 @@ namespace highlo
 			}
 
 			// Bind Camera Uniform Buffer block
-			s_2DData->ActiveUniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextureShader->Bind();
 			s_2DData->QuadVertexBuffers[frameIndex]->Bind();
 			s_2DData->QuadVertexArray->Bind();
 			s_2DData->QuadIndexBuffer->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->ActiveUniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->QuadIndexCount, s_2DData->TextureMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
 	}
@@ -433,12 +433,12 @@ namespace highlo
 		{
 			s_2DData->CircleVertexBuffers[frameIndex]->UpdateContents(s_2DData->CircleVertexBufferBase[frameIndex], dataSize);
 
-			s_2DData->ActiveUniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->CircleShader->Bind();
 			s_2DData->CircleVertexBuffers[frameIndex]->Bind();
 			s_2DData->CircleVertexArray->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, s_2DData->CircleMaterial, s_2DData->ActiveUniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->CircleIndexCount, s_2DData->CircleMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
 	}
@@ -455,13 +455,13 @@ namespace highlo
 		{
 			s_2DData->LineVertexBuffers[frameIndex]->UpdateContents(s_2DData->LineVertexBufferBase[frameIndex], dataSize);
 
-			s_2DData->ActiveUniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->LineShader->Bind();
 			s_2DData->LineVertexBuffers[frameIndex]->Bind();
 			s_2DData->LineVertexArray->Bind();
 			s_2DData->LineIndexBuffer->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, s_2DData->LineMaterial, s_2DData->ActiveUniformBufferSet, PrimitiveType::Lines, s_2DData->DepthTest);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->LineIndexCount, s_2DData->LineMaterial, s_2DData->UniformBufferSet, PrimitiveType::Lines, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
 	}
@@ -487,12 +487,12 @@ namespace highlo
 					s_2DData->TextMaterial->Set("u_FontAtlases", s_2DData->WhiteTexture, i);
 			}
 
-			s_2DData->ActiveUniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
+			s_2DData->UniformBufferSet->GetUniform(0, 0, frameIndex)->Bind();
 
 			s_2DData->TextVertexBuffers[frameIndex]->Bind();
 			s_2DData->TextVertexArray->Bind();
 			s_2DData->TextIndexBuffer->Bind();
-			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->ActiveUniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
+			Renderer::s_RenderingAPI->DrawIndexed(s_2DData->TextIndexCount, s_2DData->TextMaterial, s_2DData->UniformBufferSet, PrimitiveType::Triangles, s_2DData->DepthTest);
 			s_2DData->Statistics.DrawCalls++;
 		}
 	}
@@ -1058,19 +1058,19 @@ namespace highlo
 		if (renderPass != s_2DData->ActiveRenderPass)
 		{
 			VertexArraySpecification &quadSpec = s_2DData->QuadVertexArray->GetSpecification();
-			quadSpec.AssociatedRenderPass = renderPass;
+			quadSpec.RenderPass = renderPass;
 			s_2DData->QuadVertexArray = VertexArray::Create(quadSpec);
 
 			VertexArraySpecification &lineSpec = s_2DData->LineVertexArray->GetSpecification();
-			lineSpec.AssociatedRenderPass = renderPass;
+			lineSpec.RenderPass = renderPass;
 			s_2DData->LineVertexArray = VertexArray::Create(lineSpec);
 
 			VertexArraySpecification &circleSpec = s_2DData->CircleVertexArray->GetSpecification();
-			circleSpec.AssociatedRenderPass = renderPass;
+			circleSpec.RenderPass = renderPass;
 			s_2DData->CircleVertexArray = VertexArray::Create(circleSpec);
 
 			VertexArraySpecification &textSpec = s_2DData->TextVertexArray->GetSpecification();
-			textSpec.AssociatedRenderPass = renderPass;
+			textSpec.RenderPass = renderPass;
 			s_2DData->TextVertexArray = VertexArray::Create(textSpec);
 
 			s_2DData->ActiveRenderPass = renderPass;

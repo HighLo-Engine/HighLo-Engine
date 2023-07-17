@@ -15,9 +15,6 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #include "HighLoPch.h"
-
-#ifdef HL_PLATFORM_MAC
-
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_osx.h"
 #import <Cocoa/Cocoa.h>
@@ -372,6 +369,3 @@ bool ImGui_ImplOSX_HandleEvent(NSEvent* event, NSView* view)
 
     return false;
 }
-
-#endif // HL_PLATFORM_MAC
-

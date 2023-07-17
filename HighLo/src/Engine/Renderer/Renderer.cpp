@@ -161,7 +161,7 @@ namespace highlo
 	{
 		shader->SetMacro(name, value);
 
-		auto it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
+		auto &it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
 		if (it != s_GlobalShaderInfo.DirtyShaders.end())
 		{
 			// Shader is already part of the dirty shaders, so we can safely skip the next step
@@ -180,7 +180,7 @@ namespace highlo
 			shader->SetMacro(name, value);
 
 			// First check if the shader is already part of the dirty shaders
-			auto it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
+			auto &it = std::find(s_GlobalShaderInfo.DirtyShaders.begin(), s_GlobalShaderInfo.DirtyShaders.end(), shader);
 			if (it != s_GlobalShaderInfo.DirtyShaders.end())
 			{
 				// Shader is already part of the dirty shaders, so we can safely skip the next step

@@ -3,8 +3,6 @@
 #include "HighLoPch.h"
 #include "WindowsWindow.h"
 
-#ifdef HL_PLATFORM_WINDOWS
-
 #ifndef HIGHLO_API_GLFW
 
 #include <windowsx.h>
@@ -634,6 +632,3 @@ namespace highlo
 }
 
 #endif // HIGHLO_API_GLFW
-
-#endif // HL_PLATFORM_WINDOWS
-

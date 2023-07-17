@@ -88,7 +88,7 @@ namespace highlo
 	{
 		glm::mat4 boneFrameTransform = bone.UserTransformation * m_CorrectionMatrix * bone.FinalTransform;
 
-		if (!std::isnan(boneFrameTransform[0][0]))
+		if (!isnan(boneFrameTransform[0][0]))
 			m_BoneFrameTransforms[bone.ID] = boneFrameTransform;
 
 		for (auto& child : bone.Children)

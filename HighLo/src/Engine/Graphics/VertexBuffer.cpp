@@ -4,7 +4,7 @@
 #include "VertexBuffer.h"
 
 #ifdef HIGHLO_API_OPENGL
-#include "Engine/Platform/OpenGL/OpenGLVertexBuffer.h"
+#include "Engine/Platform/Opengl/OpenGLVertexBuffer.h"
 #elif HIGHLO_API_DX11
 #include "Engine/Platform/DX11/DX11VertexBuffer.h"
 #elif HIGHLO_API_DX12

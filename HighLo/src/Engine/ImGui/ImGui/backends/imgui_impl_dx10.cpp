@@ -31,9 +31,6 @@
 //  2016-05-07: DirectX10: Disabling depth-write.
 
 #include "HighLoPch.h"
-
-#if 0
-
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_dx10.h"
 
@@ -706,6 +703,4 @@ void ImGui_ImplDX10_ShutdownPlatformInterface()
 {
     ImGui::DestroyPlatformWindows();
 }
-
-#endif
 

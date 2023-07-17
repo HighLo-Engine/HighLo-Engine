@@ -84,9 +84,6 @@
 //----------------------------------------
 
 #include "HighLoPch.h"
-
-#ifdef HIGHLO_API_OPENGL
-
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
@@ -814,6 +811,3 @@ static void ImGui_ImplOpenGL3_ShutdownPlatformInterface()
 {
     ImGui::DestroyPlatformWindows();
 }
-
-#endif // HIGHLO_API_OPENGL
-

@@ -19,9 +19,6 @@
 // The GL2 code is unable to reset attributes or even call e.g. "glUseProgram(0)" because they don't exist in that API.
 
 #pragma once
-
-#if 0
-
 #include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 
 IMGUI_IMPL_API bool     ImGui_ImplOpenGL2_Init();
@@ -34,6 +31,3 @@ IMGUI_IMPL_API bool     ImGui_ImplOpenGL2_CreateFontsTexture();
 IMGUI_IMPL_API void     ImGui_ImplOpenGL2_DestroyFontsTexture();
 IMGUI_IMPL_API bool     ImGui_ImplOpenGL2_CreateDeviceObjects();
 IMGUI_IMPL_API void     ImGui_ImplOpenGL2_DestroyDeviceObjects();
-
-#endif
-

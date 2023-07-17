@@ -37,9 +37,6 @@
 //  2016-09-05: OpenGL: Fixed save and restore of current scissor rectangle.
 
 #include "HighLoPch.h"
-
-#if 0
-
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_opengl2.h"
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
@@ -329,6 +326,3 @@ static void ImGui_ImplOpenGL2_ShutdownPlatformInterface()
 {
     ImGui::DestroyPlatformWindows();
 }
-
-#endif
-

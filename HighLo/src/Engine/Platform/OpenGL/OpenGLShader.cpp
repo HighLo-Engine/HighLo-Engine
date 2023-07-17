@@ -526,7 +526,7 @@ namespace highlo
 	#endif // PRINT_DEBUG_OUTPUTS
 
 		spirv_cross::Compiler compiler(shaderData);
-		auto resources = compiler.get_shader_resources();
+		auto &resources = compiler.get_shader_resources();
 
 	#if PRINT_DEBUG_OUTPUTS
 		HL_CORE_TRACE("Uniform Buffers: {0}", resources.uniform_buffers.size());
@@ -534,7 +534,7 @@ namespace highlo
 
 		for (const auto &resource : resources.uniform_buffers)
 		{
-			auto activeBuffers = compiler.get_active_buffer_ranges(resource.id);
+			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
 			if (activeBuffers.size())
 			{
 				const auto &name = compiler.get_name(resource.id); // this is necessary to get the instance name instead of the structure name
@@ -612,7 +612,7 @@ namespace highlo
 
 		for (const auto &resource : resources.storage_buffers)
 		{
-			auto activeBuffers = compiler.get_active_buffer_ranges(resource.id);
+			auto &activeBuffers = compiler.get_active_buffer_ranges(resource.id);
 			if (activeBuffers.size())
 			{
 				const auto &name = resource.name;
@@ -873,18 +873,10 @@ namespace highlo
 	{
 		FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
-		// TODO: Use own filesystem abstraction
 		FILE *f = nullptr;
-#if HL_PLATFORM_WINDOWS
-		errno_t err;
-		err = fopen_s(&f, **p, "rb");
+		errno_t err = fopen_s(&f, **p, "rb");
 		if (err || !f)
 			return;
-#elif HL_PLATFORM_LINUX
-		f = fopen(**p, "rb");
-		if (!f)
-			return;
-#endif
 
 		fseek(f, 0, SEEK_END);
 		uint64 size = ftell(f);
@@ -1011,24 +1003,13 @@ namespace highlo
 					// Compile success
 					FileSystemPath p = cacheDirectory / (m_AssetPath.Filename() + extension);
 
-					// TODO: Use own filesystem abstraction
 					FILE *f = nullptr;
-#ifdef HL_PLATFORM_WINDOWS
-					errno_t fileError;
-					fileError = fopen_s(&f, **p, "wb");
+					errno_t fileError = fopen_s(&f, **p, "wb");
 					if (fileError || !f)
 					{
 						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to cache shader binary! [-]");
 						return;
 					}
-#elif HL_PLATFORM_LINUX
-					f = fopen(**p, "wb");
-					if (!f)
-					{
-						HL_CORE_ERROR(GL_SHADER_LOG_PREFIX "[-]     Failed to cache shader binary! [-]");
-						return;
-					}
-#endif
 
 					fwrite(shaderData[stage].data(), sizeof(uint32), shaderData[stage].size(), f);
 					fclose(f);

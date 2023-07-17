@@ -14,8 +14,6 @@
 
 #pragma once
 
-#if defined(HL_PLATFORM_WINDOWS) && !defined(HIGHLO_API_GLFW)
-
 #include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 
 IMGUI_IMPL_API bool     ImGui_ImplWin32_Init(void *hwnd, void *context);
@@ -43,6 +41,3 @@ IMGUI_IMPL_API float    ImGui_ImplWin32_GetDpiScaleForMonitor(void *monitor); //
 // - Use to enable alpha compositing transparency with the desktop.
 // - Use together with e.g. clearing your framebuffer with zero-alpha.
 IMGUI_IMPL_API void     ImGui_ImplWin32_EnableAlphaCompositing(void *hwnd);   // HWND hwnd
-
-#endif // defined(HL_PLATFORM_WINDOWS) && !defined(HIGHLO_API_GLFW)
-

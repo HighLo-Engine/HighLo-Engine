@@ -24,10 +24,6 @@
 //  2018-07-05: Metal: Added new Metal backend implementation.
 
 #include "imgui.h"
-
-// TODO
-#if 0
-
 #include "imgui_impl_metal.h"
 
 #import <Metal/Metal.h>
@@ -558,6 +554,3 @@ void ImGui_ImplMetal_DestroyDeviceObjects()
 }
 
 @end
-
-#endif
-

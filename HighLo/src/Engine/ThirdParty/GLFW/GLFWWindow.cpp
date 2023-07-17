@@ -105,7 +105,6 @@ namespace highlo
 
 	bool GLFWWindow::SetProgress(WindowProgressState state)
 	{
-#ifdef HL_PLATFORM_WINDOWS
 		TBPFLAG flag = TBPF_NORMAL;
 		switch (state)
 		{
@@ -131,20 +130,11 @@ namespace highlo
 		}
 
 		return m_Taskbar->SetProgressState(glfwGetWin32Window(m_NativeHandle), flag) == S_OK;
-#else
-		// TODO
-		return false;
-#endif
 	}
 
 	bool GLFWWindow::SetProgressValue(uint64 completed, uint64 total)
 	{
-#ifdef HL_PLATFORM_WINDOWS
 		return m_Taskbar->SetProgressValue(glfwGetWin32Window(m_NativeHandle), completed, total) == S_OK;
-#else
-		// TODO
-		return false;
-#endif
 	}
 
 	void GLFWWindow::SetVSync(bool bEnabled)
@@ -280,7 +270,6 @@ namespace highlo
 		
 		glfwSetCursor(m_NativeHandle, m_NativeCursor);
 
-#ifdef HL_PLATFORM_WINDOWS
 		HRESULT hr = ::CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITaskbarList4), reinterpret_cast<void**>(&m_Taskbar));
 		if (SUCCEEDED(hr))
 		{
@@ -290,7 +279,6 @@ namespace highlo
 				HL_CORE_ERROR("Error: Taskbar could not be created!");
 			}
 		}
-#endif
 
 		m_Context = RenderingContext::Create((void*)m_NativeHandle, m_Properties);
 		m_Context->Init();

@@ -63,7 +63,7 @@ namespace highlo
 
 	Ref<Font> FontManager::GetDefaultFont()
 	{
-		std::vector<Ref<Font>> fonts = GetFonts();
+		auto &fonts = GetFonts();
 		HL_ASSERT(fonts.size() >= 1);
 		return fonts[0];
 	}

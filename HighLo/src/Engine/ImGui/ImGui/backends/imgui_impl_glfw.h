@@ -22,9 +22,6 @@
 // Only override if your GL version doesn't handle this GLSL version. Keep NULL if unsure!
 
 #pragma once
-
-#ifdef HIGHLO_API_GLFW
-
 #include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 
 struct GLFWwindow;
@@ -46,6 +43,3 @@ IMGUI_IMPL_API void     ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double
 IMGUI_IMPL_API void     ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 IMGUI_IMPL_API void     ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c);
 IMGUI_IMPL_API void     ImGui_ImplGlfw_MonitorCallback(GLFWmonitor* monitor, int event);
-
-#endif // HIGHLO_API_GLFW
-

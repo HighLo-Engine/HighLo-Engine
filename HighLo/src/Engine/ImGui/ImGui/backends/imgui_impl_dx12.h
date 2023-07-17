@@ -16,9 +16,6 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #pragma once
-
-#ifdef HIGHLO_API_DX12
-
 #include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 
 #ifdef _MSC_VER
@@ -50,6 +47,4 @@ IMGUI_IMPL_API bool     ImGui_ImplDX12_CreateDeviceObjects();
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
-
-#endif // HIGHLO_API_DX12
 

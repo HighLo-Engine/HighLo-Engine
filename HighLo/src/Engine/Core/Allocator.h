@@ -35,14 +35,14 @@ namespace highlo
 		HLAPI const Byte &operator[](uint32 i) const;
 
 		template<typename T>
-		HLAPI HL_FORCE_INLINE T &Read(uint32 offset = 0)
+		HLAPI FORCEINLINE T &Read(uint32 offset = 0)
 		{
 			HL_ASSERT(offset < Size);
 			return *(T*)(Data + offset);
 		}
 
 		template<typename T>
-		HLAPI HL_FORCE_INLINE T *As()
+		HLAPI FORCEINLINE T *As()
 		{
 			return (T*)Data;
 		}

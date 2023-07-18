@@ -10,6 +10,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
 
+#ifdef HL_PLATFORM_LINUX
+#include <smmintrin.h> 
+#endif
+
 #define SHUFFLE_PARAM(x, y, z, w) \
     (z<<6) | (y<<4) | (x<<2) | w//((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
 

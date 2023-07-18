@@ -33,6 +33,8 @@
 #ifndef __gl3w_h_
 #define __gl3w_h_
 
+#ifdef HIGHLO_API_OPENGL
+
 // Adapted from KHR/khrplatform.h to avoid including entire file.
 typedef          float         khronos_float_t;
 typedef signed   char          khronos_int8_t;
@@ -728,3 +730,6 @@ static void load_procs(GL3WGetProcAddressProc proc)
 }
 #endif
 #endif
+
+#endif // HIGHLO_API_OPENGL
+

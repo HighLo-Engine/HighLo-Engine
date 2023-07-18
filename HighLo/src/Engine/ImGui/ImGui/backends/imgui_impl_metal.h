@@ -12,6 +12,9 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
+#pragma once
+#if 0
+
 #include "imgui.h"      // IMGUI_IMPL_API
 
 @class MTLRenderPassDescriptor;
@@ -29,3 +32,6 @@ IMGUI_IMPL_API bool ImGui_ImplMetal_CreateFontsTexture(id<MTLDevice> device);
 IMGUI_IMPL_API void ImGui_ImplMetal_DestroyFontsTexture();
 IMGUI_IMPL_API bool ImGui_ImplMetal_CreateDeviceObjects(id<MTLDevice> device);
 IMGUI_IMPL_API void ImGui_ImplMetal_DestroyDeviceObjects();
+
+#endif
+

@@ -23,6 +23,8 @@
 //  2018-11-30: Misc: Setting up io.BackendRendererName so it can be displayed in the About Window.
 //  2018-07-05: Metal: Added new Metal backend implementation.
 
+#if 0
+
 #include "imgui.h"
 #include "imgui_impl_metal.h"
 
@@ -554,3 +556,6 @@ void ImGui_ImplMetal_DestroyDeviceObjects()
 }
 
 @end
+
+#endif
+

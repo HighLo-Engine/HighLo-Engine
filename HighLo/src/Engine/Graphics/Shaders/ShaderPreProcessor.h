@@ -75,12 +75,12 @@ namespace highlo
 
 	namespace utils
 	{
-		static std::vector<std::string> SplitStringsAndKeepDelimiters(std::string &str)
+		static std::vector<std::string> SplitStringsAndKeepDelimiters(const std::string &str)
 		{
 			const static std::regex re(R"((^\W|^\w+)|(\w+)|[:()])", std::regex_constants::optimize);
 
-			std::regex_iterator<std::string::iterator> rit(str.begin(), str.end(), re);
-			std::regex_iterator<std::string::iterator> rend;
+			std::regex_iterator<std::string::const_iterator> rit(str.begin(), str.end(), re);
+			std::regex_iterator<std::string::const_iterator> rend;
 			std::vector<std::string> result;
 
 			while (rit != rend)
@@ -266,7 +266,7 @@ namespace highlo
 		while (startOfShaderStage != std::string::npos)
 		{
 			const uint64 endOfLine = newSource.find_first_of("\r\n", startOfShaderStage) + 1;
-			auto &tokens = utils::SplitStringsAndKeepDelimiters(newSource.substr(startOfShaderStage, endOfLine - startOfShaderStage));
+			const auto &tokens = utils::SplitStringsAndKeepDelimiters(newSource.substr(startOfShaderStage, endOfLine - startOfShaderStage));
 
 			uint32 index = 0;
 			if (tokens[index] == "#")
@@ -395,7 +395,7 @@ namespace highlo
 		while (pos != std::string::npos)
 		{
 			const uint64 endOfLine = newSource.find_first_of("\r\n", pos) + 1;
-			std::vector<std::string> &tokens = utils::SplitStringsAndKeepDelimiters(newSource.substr(pos, endOfLine - pos));
+			const std::vector<std::string> &tokens = utils::SplitStringsAndKeepDelimiters(newSource.substr(pos, endOfLine - pos));
 
 			uint64 index = 1; // Skip #
 			if (tokens[index] == "pragma") // Parse stage. example: #pragma stage : vert

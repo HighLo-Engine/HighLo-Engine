@@ -904,7 +904,7 @@ namespace highlo
 	{
 		bool result = false;
 
-		auto &[typeKey, typeVal] = utils::ConvertDocumentTypeToRenderableFormat(m_Document, type);
+		auto [typeKey, typeVal] = utils::ConvertDocumentTypeToRenderableFormat(m_Document, type);
 
 		if (m_ShouldWriteIntoArray || m_ShouldWriteIntoObject)
 		{

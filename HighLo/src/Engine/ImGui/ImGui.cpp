@@ -640,7 +640,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 		return &s_ImGuiIDBuffer[0];
 	}
 
@@ -674,7 +674,7 @@ namespace highlo::UI
 		}
 
 		ImGui::SameLine(width, fontSize + (fontSize / 2));
-		ImGui::Text(*text);
+		ImGui::Text("%s", *text);
 		return { width, fontSize + (fontSize / 2)};
 	}
 
@@ -752,7 +752,7 @@ namespace highlo::UI
 
 	void BeginCheckboxGroup(const HLString &label)
 	{
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 	}
@@ -1037,19 +1037,19 @@ namespace highlo::UI
 
 	void DrawText(const HLString &text)
 	{
-		ImGui::Text(*text);
+		ImGui::Text("%s", *text);
 	}
 
 	void DrawInputText(const HLString &label, const HLString &value)
 	{
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		_itoa(s_ImGuiIDCounter++, s_ImGuiIDBuffer + 2, 14);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		ImGui::InputText(s_ImGuiIDBuffer, (char*)*value, value.Length(), ImGuiInputTextFlags_ReadOnly);
@@ -1065,7 +1065,7 @@ namespace highlo::UI
 
 		if (!label.IsEmpty())
 		{
-			ImGui::Text(*label);
+			ImGui::Text("%s", *label);
 			ImGui::NextColumn();
 		}
 
@@ -1073,12 +1073,12 @@ namespace highlo::UI
 			ImGui::PushItemWidth(-1);
 
 		char buffer[256];
-		strcpy_s<256>(buffer, *value);
+		memcpy(buffer, *value, 256);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1102,14 +1102,14 @@ namespace highlo::UI
 
 	bool DrawInputTextWithLength(const HLString &label, HLString &value, size_t length)
 	{
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1130,7 +1130,7 @@ namespace highlo::UI
 
 		if (alignment == LabelAlignment::Left)
 		{
-			ImGui::Text(*label);
+			ImGui::Text("%s", *label);
 			ImGui::NextColumn();
 		}
 
@@ -1139,7 +1139,7 @@ namespace highlo::UI
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1155,7 +1155,7 @@ namespace highlo::UI
 		if (alignment == LabelAlignment::Right)
 		{
 			ImGui::SameLine();
-			ImGui::Text(*label);
+			ImGui::Text("%s", *label);
 		}
 
 		if (IsItemDisabled())
@@ -1174,13 +1174,13 @@ namespace highlo::UI
 		if (++s_ImGuiCheckboxCount > 1)
 			ImGui::SameLine();
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::SameLine();
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1198,14 +1198,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1233,14 +1233,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1262,14 +1262,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1290,14 +1290,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1318,14 +1318,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1346,14 +1346,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1374,14 +1374,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1402,14 +1402,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1434,14 +1434,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1462,14 +1462,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1490,14 +1490,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1518,14 +1518,14 @@ namespace highlo::UI
 	{
 		bool modified = false;
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
 		s_ImGuiIDBuffer[0] = '#';
 		s_ImGuiIDBuffer[1] = '#';
 		memset(s_ImGuiIDBuffer + 2, 0, 14);
-		sprintf_s(s_ImGuiIDBuffer + 2, 14, "%o", s_ImGuiIDCounter++);
+		sprintf(s_ImGuiIDBuffer + 2, "%o", s_ImGuiIDCounter++);
 
 		if (IsItemDisabled())
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -1550,7 +1550,7 @@ namespace highlo::UI
 		ImGui::TableSetColumnIndex(0);
 		UI::ShiftCursor(17.0f, 7.0f);
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		UI::DrawUnderline(false, 0.0f, 2.0f);
 
 		ImGui::TableSetColumnIndex(1);
@@ -1625,7 +1625,7 @@ namespace highlo::UI
 		ImGui::TableSetColumnIndex(0);
 		UI::ShiftCursor(17.0f, 7.0f);
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		UI::DrawUnderline(false, 0.0f, 2.0f);
 
 		ImGui::TableSetColumnIndex(1);
@@ -1703,7 +1703,7 @@ namespace highlo::UI
 		ImGui::TableSetColumnIndex(0);
 		UI::ShiftCursor(17.0f, 7.0f);
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		UI::DrawUnderline(false, 0.0f, 2.0f);
 
 		ImGui::TableSetColumnIndex(1);
@@ -1807,7 +1807,7 @@ namespace highlo::UI
 		bool changed = false;
 		const HLString id = "##" + HLString(label);
 
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
@@ -1849,7 +1849,7 @@ namespace highlo::UI
 		bool changed = false;
 		const HLString id = "##" + HLString(label);
 		
-		ImGui::Text(*label);
+		ImGui::Text("%s", *label);
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 

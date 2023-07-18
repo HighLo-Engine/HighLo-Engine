@@ -19,6 +19,9 @@
 //  Only override if your GL version doesn't handle this GLSL version. See GLSL version table at the top of imgui_impl_opengl3.cpp.
 
 #pragma once
+
+#ifdef HIGHLO_API_OPENGL
+
 #include "Engine/ImGui/ImGui/imgui.h"      // IMGUI_IMPL_API
 
 // Backend API
@@ -54,3 +57,6 @@ IMGUI_IMPL_API void     ImGui_ImplOpenGL3_DestroyDeviceObjects();
 #endif
 
 #endif
+
+#endif // HIGHLO_API_OPENGL
+

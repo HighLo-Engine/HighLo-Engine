@@ -999,7 +999,7 @@ namespace highlo
 
 		if (m_Document.IsObject())
 		{
-			auto &member = m_Document.FindMember(*key);
+			const auto &member = m_Document.FindMember(*key);
 			if (member == m_Document.MemberEnd())
 			{
 				HL_CORE_ERROR("Could not find key {0} in json object!", *key);
@@ -1056,7 +1056,7 @@ namespace highlo
 			rapidjson::GenericObject obj = arrayElement.GetObject();
 
 			// First check, if we got a type declaration
-			auto &typeIterator = obj.FindMember("type");
+			const auto &typeIterator = obj.FindMember("type");
 			if (typeIterator == obj.MemberEnd())
 			{
 				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Parsing Error: Did not find type declaration! [-]");
@@ -1073,7 +1073,7 @@ namespace highlo
 			}
 
 			// Try to find the value definition
-			auto &valueIterator = obj.FindMember("value");
+			const auto &valueIterator = obj.FindMember("value");
 			if (valueIterator == obj.MemberEnd())
 			{
 				HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Parsing Error: Expected to find value declaration! [-]");
@@ -1127,7 +1127,7 @@ namespace highlo
 		}
 
 		HL_ASSERT(doc.IsObject());
-		auto &it = doc.FindMember(*key);
+		const auto &it = doc.FindMember(*key);
 		if (it == doc.MemberEnd())
 		{
 			HL_CORE_ERROR(JSON_LOG_PREFIX "[-] Could not find key {0} in json format! [-]", *key);

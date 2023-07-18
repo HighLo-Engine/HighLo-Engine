@@ -192,10 +192,10 @@ namespace highlo
 		HL_ASSERT(!s_GLRendererData->ActiveRenderPass, "Another RenderPass has already been started and not ended!");
 		s_GLRendererData->ActiveRenderPass = renderPass;
 	
-		s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Bind();
+		s_GLRendererData->ActiveRenderPass->GetSpecification().AssociatedFramebuffer->Bind();
 		if (shouldClear)
 		{
-			const glm::vec4 &clearColor = s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->GetSpecification().ClearColor;
+			const glm::vec4 &clearColor = s_GLRendererData->ActiveRenderPass->GetSpecification().AssociatedFramebuffer->GetSpecification().ClearColor;
 			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
@@ -205,7 +205,7 @@ namespace highlo
 	{
 		HL_ASSERT(s_GLRendererData->ActiveRenderPass, "Did you forget to call BeginRenderPass() ?");
 	
-		s_GLRendererData->ActiveRenderPass->GetSpecification().Framebuffer->Unbind();
+		s_GLRendererData->ActiveRenderPass->GetSpecification().AssociatedFramebuffer->Unbind();
 		s_GLRendererData->ActiveRenderPass = nullptr;
 	}
 
@@ -292,7 +292,7 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			Ref<MaterialAsset> material = materials->GetMaterial(submesh.MaterialIndex);
 			if (!material)
 			{
 			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
@@ -300,7 +300,7 @@ namespace highlo
 				HL_ASSERT(material);
 			}
 
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			Ref<OpenGLMaterial> glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
 			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
@@ -360,7 +360,7 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			Ref<MaterialAsset> material = materials->GetMaterial(submesh.MaterialIndex);
 			if (!material)
 			{
 			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
@@ -368,7 +368,7 @@ namespace highlo
 				HL_ASSERT(material);
 			}
 
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			Ref<OpenGLMaterial> glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
 			TransformVertexData objTransform = transformBuffer[transformBufferOffset];
@@ -447,7 +447,7 @@ namespace highlo
 		auto &submeshes = model->Get()->GetSubmeshes();
 		for (Mesh submesh : submeshes)
 		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			Ref<MaterialAsset> material = materials->GetMaterial(submesh.MaterialIndex);
 			if (!material)
 			{
 			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
@@ -455,7 +455,7 @@ namespace highlo
 				HL_ASSERT(material);
 			}
 
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			Ref<OpenGLMaterial> glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
 			Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
@@ -517,7 +517,7 @@ namespace highlo
 		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		for (Mesh submesh : submeshes)
 		{
-			Ref<MaterialAsset> &material = materials->GetMaterial(submesh.MaterialIndex);
+			Ref<MaterialAsset> material = materials->GetMaterial(submesh.MaterialIndex);
 			if (!material)
 			{
 			//	HL_CORE_WARN("submitted material table has no material for index {0}. Falling back to material table of model.", submesh.MaterialIndex);
@@ -535,7 +535,7 @@ namespace highlo
 			ubMaterial.UseNormalMap = false;
 			materialUB->SetData(&ubMaterial, sizeof(ubMaterial));
 
-			Ref<OpenGLMaterial> &glMaterial = material->GetMaterial().As<OpenGLMaterial>();
+			Ref<OpenGLMaterial> glMaterial = material->GetMaterial().As<OpenGLMaterial>();
 			HL_ASSERT(glMaterial);
 
 			glMaterial->UpdateForRendering(uniformBufferSet);
@@ -585,13 +585,13 @@ namespace highlo
 
 		auto &submeshes = model->Get()->GetSubmeshes();
 		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
-		Ref<MaterialTable> &allMaterials = model->GetMaterials();
+		const Ref<MaterialTable> &allMaterials = model->GetMaterials();
 		for (Mesh &submesh : submeshes)
 		{
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Ref<MaterialAsset> &material = allMaterials->GetMaterial(submesh.MaterialIndex);
+			Ref<MaterialAsset> material = allMaterials->GetMaterial(submesh.MaterialIndex);
 			UniformBufferMaterial mat = {};
 			mat.DiffuseColor = material->GetDiffuseColor();
 			mat.Emission = material->GetEmission();
@@ -648,13 +648,13 @@ namespace highlo
 
 		Ref<UniformBuffer> materialUB = UniformBuffer::Create(sizeof(UniformBufferMaterial), 13, UniformLayout::GetMaterialLayout());
 		auto &submeshes = model->Get()->GetSubmeshes();
-		Ref<MaterialTable> &allMaterials = model->GetMaterials();
+		const Ref<MaterialTable> &allMaterials = model->GetMaterials();
 		for (Mesh &submesh : submeshes)
 		{
 			overrideMaterial->UpdateForRendering(uniformBufferSet);
 			SetDepthTest(overrideMaterial->GetFlag(MaterialFlag::DepthTest));
 
-			Ref<MaterialAsset> &material = allMaterials->GetMaterial(submesh.MaterialIndex);
+			Ref<MaterialAsset> material = allMaterials->GetMaterial(submesh.MaterialIndex);
 			UniformBufferMaterial mat = {};
 			mat.DiffuseColor = material->GetDiffuseColor();
 			mat.Emission = material->GetEmission();

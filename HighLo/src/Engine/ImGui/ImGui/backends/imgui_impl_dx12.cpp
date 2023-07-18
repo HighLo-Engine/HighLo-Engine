@@ -41,6 +41,9 @@
 //  2018-02-22: Merged into master with all Win32 code synchronized to other examples.
 
 #include "HighLoPch.h"
+
+#ifdef HIGHLO_API_DX12
+
 #include "Engine/ImGui/ImGui/imgui.h"
 #include "imgui_impl_dx12.h"
 
@@ -1068,3 +1071,6 @@ void ImGui_ImplDX12_ShutdownPlatformInterface()
 {
     ImGui::DestroyPlatformWindows();
 }
+
+#endif // HIGHLO_API_DX12
+

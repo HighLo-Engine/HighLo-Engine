@@ -4,7 +4,7 @@
 #include "SceneHierarchyPanel.h"
 
 #include "Engine/Assets/AssetManager.h"
-#include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGui.h"
 #include "Engine/ImGui/ImGuiWidgets.h"
 #include "Engine/Application/Application.h"
 #include "Engine/Core/Input.h"
@@ -125,8 +125,7 @@ namespace highlo
 						{
 							UI::ScopedColorStack entitySelection(ImGuiCol_Header, IM_COL32_DISABLE, ImGuiCol_HeaderHovered, IM_COL32_DISABLE, ImGuiCol_HeaderActive, IM_COL32_DISABLE);
 
-							auto &view = m_Scene->m_Registry.View<RelationshipComponent>();
-
+							const auto &view = m_Scene->m_Registry.View<RelationshipComponent>();
 							for (UUID entityId : view)
 							{
 								Entity e = m_Scene->FindEntityByUUID(entityId);
@@ -216,7 +215,7 @@ namespace highlo
 								{
 									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-directional-light"));
 									newEntity.AddComponent<DirectionalLightComponent>();
-									newEntity.Transform().FromRotation({ 80.0f, 10.0f, 0.0f });
+									newEntity.GetTransform().FromRotation({ 80.0f, 10.0f, 0.0f });
 									SetSelected(newEntity);
 
 									if (m_EntityAddedCallback)
@@ -227,7 +226,7 @@ namespace highlo
 								{
 									Entity newEntity = m_Scene->CreateEntity(translation->GetText("scene-hierarchy-right-click-menu-new-point-light"));
 									newEntity.AddComponent<PointLightComponent>();
-									newEntity.Transform().FromPosition({ 0.0f, 0.0f, 0.0f });
+									newEntity.GetTransform().FromPosition({ 0.0f, 0.0f, 0.0f });
 									SetSelected(newEntity);
 
 									if (m_EntityAddedCallback)
@@ -300,7 +299,7 @@ namespace highlo
 					Scene *currentScene = Scene::GetActiveScene();
 					HL_ASSERT(currentScene);
 
-					Entity &e = currentScene->FindEntityByUUID(entityId);
+					Entity e = currentScene->FindEntityByUUID(entityId);
 					m_Scene->UnparentEntity(e);
 				}
 
@@ -312,7 +311,7 @@ namespace highlo
 			ImGui::End();
 	}
 
-	void SceneHierarchyPanel::DrawEntityNode(Entity entity, const HLString &searchFilter)
+	void SceneHierarchyPanel::DrawEntityNode(Entity &entity, const HLString &searchFilter)
 	{
 		const char *name = entity.Tag().C_Str();
 
@@ -510,8 +509,9 @@ namespace highlo
 		// Drag && drop
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 		{
-			ImGui::Text(entity.Tag().C_Str());
-			ImGui::SetDragDropPayload("scene_entity_hierarchy", &entity.GetUUID(), sizeof(UUID));
+			UUID dragged_uuid = entity.GetUUID();
+			ImGui::Text("%s", entity.Tag().C_Str());
+			ImGui::SetDragDropPayload("scene_entity_hierarchy", &dragged_uuid, sizeof(UUID));
 			ImGui::EndDragDropSource();
 		}
 
@@ -521,7 +521,7 @@ namespace highlo
 			if (payload)
 			{
 				UUID &droppedEntityID = *(UUID*)payload->Data;
-				Entity &droppedEntity = m_Scene->FindEntityByUUID(droppedEntityID);
+				Entity droppedEntity = m_Scene->FindEntityByUUID(droppedEntityID);
 				HL_CORE_TRACE("DROPPED ENTITY {0}", *droppedEntity.Tag());
 
 				m_Scene->ParentEntity(droppedEntity, entity);
@@ -592,7 +592,7 @@ namespace highlo
 			DeleteEntity(entity);
 	}
 	
-	void SceneHierarchyPanel::DeleteEntity(Entity entity)
+	void SceneHierarchyPanel::DeleteEntity(Entity &entity)
 	{
 		if (m_EntityDeletedCallback)
 			m_EntityDeletedCallback(entity);

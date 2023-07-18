@@ -70,12 +70,12 @@ namespace highlo
 		HLAPI const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
 		HLAPI UUID GetUUID() const { return m_SceneID; }
 
-		HLAPI void AddEntity(Entity &entity);
-		HLAPI void UpdateEntity(Entity &entity);
+		HLAPI void AddEntity(const Entity &entity);
+		HLAPI void UpdateEntity(const Entity &entity);
 		HLAPI Entity CreateEntity(const HLString &name = "");
 		HLAPI Entity CreateEntityWithUUID(UUID uuid, const HLString &name = "");
 		HLAPI void DestroyEntity(Entity &entity, bool excludeChildren = false, bool first = true);
-		HLAPI Entity DuplicateEntity(Entity &entity);
+		HLAPI Entity DuplicateEntity(const Entity &entity);
 
 		template<typename T>
 		HLAPI auto GetAllEntitiesWith()

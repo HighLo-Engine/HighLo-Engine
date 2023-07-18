@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include "Engine/Core/FileSystemWatcher.h"
+#include "Engine/Assets/AssetManager.h"
+
 #include "AssetBrowser/AssetBrowserItem.h"
 #include "AssetBrowser/AssetBrowserItemList.h"
 #include "AssetBrowser/SelectionStack.h"

@@ -165,7 +165,7 @@ namespace highlo::utils
 		{
 			// NOTE: Create strings every iteration (even for valueStrDecl), because rapidjson handles value objects only by reference
 			//       and if the references get added as a member they lose their attributes in the next iteration and rapidjson asserts
-			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(doc, type);
+			auto [typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(doc, type);
 
 			rapidjson::Value currentObj(rapidjson::kObjectType);
 			rapidjson::Value valueWrapper(rapidjson::kObjectType);
@@ -291,7 +291,7 @@ namespace highlo::utils
 		{
 			// NOTE: Create strings every iteration (even for valueStrDecl), because rapidjson handles value objects only by reference
 			//       and if the references get added as a member they lose their attributes in the next iteration and rapidjson asserts
-			auto &[typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(doc, type);
+			auto [typeKey, typeValue] = utils::ConvertDocumentTypeToRenderableFormat(doc, type);
 
 			rapidjson::Value currentObj(rapidjson::kObjectType);
 			rapidjson::Value valueWrapper(rapidjson::kObjectType);

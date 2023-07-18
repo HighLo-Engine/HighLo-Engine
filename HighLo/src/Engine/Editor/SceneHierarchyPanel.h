@@ -30,8 +30,8 @@ namespace highlo
 
 	private:
 
-		void DrawEntityNode(Entity entity, const HLString &searchFilter = "");
-		void DeleteEntity(Entity entity);
+		void DrawEntityNode(Entity &entity, const HLString &searchFilter = "");
+		void DeleteEntity(Entity &entity);
 
 		Ref<Scene> m_Scene;
 		Entity m_SelectedEntity;

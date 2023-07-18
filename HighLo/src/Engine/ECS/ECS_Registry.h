@@ -42,7 +42,7 @@ namespace highlo
 		HLAPI T *AddComponent(UUID entityID)
 		{
 			auto comp = std::make_any<T>();
-			auto &type = std::type_index(typeid(T));
+			const auto &type = std::type_index(typeid(T));
 
 			// Add to the list of components
 			m_Components[type].push_back({ entityID, comp });
@@ -67,12 +67,12 @@ namespace highlo
 		template<typename T>
 		HLAPI T *AddOrReplace(UUID dstEntityID, UUID srcEntityID, T *componentToReplace)
 		{
-			auto &type = std::type_index(typeid(T));
+			const auto &type = std::type_index(typeid(T));
 			std::vector<std::pair<std::type_index, uint64>> &matchingEntity = m_EntityComponents[srcEntityID];
 
 			// First try to find the requested component in the source entity
 			int32 componentIndex = -1;
-			for (auto &[currentType, index] : matchingEntity)
+			for (const auto &[currentType, index] : matchingEntity)
 			{
 				std::pair<UUID, std::any> &matchingComponent = m_Components[currentType][index];
 				T *component = std::any_cast<T>(&matchingComponent.second);
@@ -119,7 +119,7 @@ namespace highlo
 		template<typename T>
 		HLAPI T *GetComponent(UUID entityID)
 		{
-			auto &type = std::type_index(typeid(T));
+			const auto &type = std::type_index(typeid(T));
 
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return nullptr;
@@ -155,9 +155,9 @@ namespace highlo
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return false;
 
-			auto &type = std::type_index(typeid(T));
+			const auto &type = std::type_index(typeid(T));
 			auto &componentInfos = m_EntityComponents[entityID];
-			for (auto &it = componentInfos.begin(); it != componentInfos.end(); ++it)
+			for (auto it = componentInfos.begin(); it != componentInfos.end(); ++it)
 			{
 				if (it->first == type)
 					return true;
@@ -235,13 +235,13 @@ namespace highlo
 		template<typename T>
 		HLAPI void RemoveComponent(UUID entityID)
 		{
-			auto &type = std::type_index(typeid(T));
+			const auto &type = std::type_index(typeid(T));
 			if (m_EntityComponents.find(entityID) == m_EntityComponents.end())
 				return; // No component with this entityID
 
 			// Find and remove actual component pointer.
 			auto &componentInfos = m_EntityComponents[entityID];
-			for (auto &it = componentInfos.begin(); it != componentInfos.end(); ++it)
+			for (auto it = componentInfos.begin(); it != componentInfos.end(); ++it)
 			{
 				if (it->first == type)
 				{

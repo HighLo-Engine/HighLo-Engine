@@ -7,13 +7,13 @@
 
 #pragma once
 
+#ifndef HIGHLO_API_GLFW
+
 #include <Windows.h>
 #include <shobjidl_core.h>
 
 #include "Engine/Window/Window.h"
 #include "Engine/Graphics/RenderingContext.h"
-
-#ifndef HIGHLO_API_GLFW
 
 namespace highlo
 {

@@ -51,9 +51,19 @@ namespace highlo
 	template<typename T>
 	using EventFn = std::function<bool(T&)>;
 
+#ifdef HL_PLATFORM_LINUX
+
+	#define REGISTER_EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
+	virtual EventType GetEventType() const override { return GetStaticType(); }\
+	virtual const char *GetName() const override { return #type; }
+
+#else
+
 	#define REGISTER_EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
 	virtual EventType GetEventType() const override { return GetStaticType(); }\
 	virtual const char *GetName() const override { return #type; }
+
+#endif // HL_PLATFORM_LINUX
 
 	#define REGISTER_EVENT_CLASS_CATEGORY(type) virtual int GetCategoryFlags() const override { return type; }
 

@@ -6,7 +6,7 @@
 #include "Engine/Core/Input.h"
 #include "Engine/Core/FileSystem.h"
 #include "Engine/Core/FileSystemWatcher.h"
-#include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGui.h"
 #include "Engine/ImGui/ImGuiScopeHelpers.h"
 #include "Engine/ImGui/ImGuiTreeNode.h"
 #include "Engine/ImGui/ImGuiWidgets.h"
@@ -260,7 +260,7 @@ namespace highlo
 						Scene *currentScene = Scene::GetActiveScene();
 						HL_ASSERT(currentScene, "No scene has been created yet");
 
-						Entity &e = currentScene->FindEntityByUUID(entityId);
+						const Entity &e = currentScene->FindEntityByUUID(entityId);
 						Ref<Prefab> prefab = CreateAssetRepresentation<Prefab>("New Prefab.hprefab");
 						prefab->Create(e);
 

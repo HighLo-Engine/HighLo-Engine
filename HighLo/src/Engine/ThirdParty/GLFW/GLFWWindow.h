@@ -9,10 +9,18 @@
 
 #ifdef HIGHLO_API_GLFW
 
+#ifdef HL_PLATFORM_WINDOWS
+
 #define GLFW_EXPOSE_NATIVE_WIN32
+
+#endif
+
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+
+#ifdef HL_PLATFORM_WINDOWS
 #include <shobjidl_core.h>
+#endif
 
 #include "Engine/Window/Window.h"
 #include "Engine/Graphics/RenderingContext.h"
@@ -85,7 +93,10 @@ namespace highlo
 
 		WindowData m_Properties;
 		WNDPlacement m_Placement;
+
+#ifdef HL_PLATFORM_WINDOWS		
 		ITaskbarList4 *m_Taskbar;
+#endif
 
 		Ref<MenuBar> m_MenuBar = nullptr;
 		Ref<RenderingContext> m_Context = nullptr;

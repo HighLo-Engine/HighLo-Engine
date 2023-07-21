@@ -3,7 +3,7 @@
 #include "HighLoPch.h"
 #include "XMLReader.h"
 
-#include <rapidxml/rapidxml_print.hpp>
+#include "rapidxml_ext.hpp"
 
 #include "XMLHelper.h"
 #include "Engine/Application/Application.h"

@@ -387,20 +387,58 @@ namespace highlo
 
 	bool JSONWriter::WriteInt64Array(const HLString &key, const std::vector<int64> &value)
 	{
+#ifdef HL_PLATFORM_LINUX
+
+		// TODO: temporary work around, until rapidjson supports uint64 natively on unix systems
+		std::vector<int32> tmp;
+		for (uint32 i = 0; i < value.size(); ++i)
+		{
+			tmp.push_back(static_cast<int32>(value[i]));
+		}
+
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::Int32, [instance, tmp]() mutable -> rapidjson::Value
+		{
+			return instance->ConvertStdArrToRapidJsonArr(tmp);
+		});
+
+#else
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::Int64, [instance, value]() mutable -> rapidjson::Value
 		{
 			return instance->ConvertStdArrToRapidJsonArr(value);
 		});
+
+#endif
 	}
 
 	bool JSONWriter::WriteUInt64Array(const HLString &key, const std::vector<uint64> &value)
 	{
+#ifdef HL_PLATFORM_LINUX
+
+		// TODO: temporary work around, until rapidjson supports uint64 natively on unix systems
+		std::vector<uint32> tmp;
+		for (uint32 i = 0; i < value.size(); ++i)
+		{
+			tmp.push_back(static_cast<uint32>(value[i]));
+		}
+
+		Ref<JSONWriter> instance = this;
+		return Write(key, DocumentDataType::UInt32, [instance, tmp]() mutable -> rapidjson::Value
+		{
+			return instance->ConvertStdArrToRapidJsonArr(tmp);
+		});
+
+#else
+
 		Ref<JSONWriter> instance = this;
 		return Write(key, DocumentDataType::UInt64, [instance, value]() mutable -> rapidjson::Value
 		{
 			return instance->ConvertStdArrToRapidJsonArr(value);
 		});
+
+#endif
 	}
 
 	bool JSONWriter::WriteBoolArray(const HLString &key, const std::vector<bool> &value)

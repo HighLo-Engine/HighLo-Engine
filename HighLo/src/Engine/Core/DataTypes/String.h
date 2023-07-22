@@ -15,6 +15,7 @@
 #include "Engine/Core/Defines/BaseTypes.h"
 
 #include <iostream>
+#include <sstream>
 
 #define HASH_LENGTH 20
 #define HL_STRING_MAX_STRING_SIZE 16

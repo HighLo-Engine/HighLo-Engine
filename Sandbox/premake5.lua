@@ -38,9 +38,6 @@ project "Sandbox"
 
 	postbuildcommands
 	{
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libcrypto-3-x64.dll*"),
-		("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libssl-3-x64.dll*"),
-		
 		("{COPY} %{wks.location}HighLo/assets %{wks.location}Sandbox/assets")
 	}
 
@@ -53,9 +50,33 @@ project "Sandbox"
             "HL_PLATFORM_WINDOWS"
         }
 
+		postbuildcommands
+		{
+			("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libcrypto-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libcrypto-3-x64.dll*"),
+			("{COPY} %{wks.location}HighLo/vendor/openssl/lib/libssl-3-x64.dll %{wks.location}Sandbox/bin/" .. outputdir .. "/Sandbox/libssl-3-x64.dll*"),	
+		}
+
+	filter "system:linux"
+        systemversion "latest"
+
+        defines
+        {
+            "HL_PLATFORM_LINUX"
+        }
+
+	filter "system:macosx"
+        systemversion "latest"
+		
+        defines
+        {
+            "HL_PLATFORM_MAC"
+        }
+
     filter "configurations:Debug-OpenGL"
         defines "HL_DEBUG"
         symbols "On"
+
+	filter { "configurations:Debug-OpenGL", "system:windows" }
 
 		postbuildcommands
 		{
@@ -67,6 +88,8 @@ project "Sandbox"
         defines "HL_DEBUG"
         symbols "On"
 
+	filter { "configurations:Debug-Vulkan", "system:windows" }
+
 		postbuildcommands
 		{
 			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
@@ -76,6 +99,8 @@ project "Sandbox"
     filter "configurations:Debug-DX11"
         defines "HL_DEBUG"
         symbols "On"
+
+	filter { "configurations:Debug-DX11", "system:windows" }
 
 		postbuildcommands
 		{
@@ -87,6 +112,8 @@ project "Sandbox"
         defines "HL_DEBUG"
         symbols "On"
 
+	filter { "configurations:Debug-DX12", "system:windows" }
+	
 		postbuildcommands
 		{
 			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Debug/assimp-vc142-mtd.dll" "%{cfg.targetdir}"',
@@ -96,6 +123,8 @@ project "Sandbox"
     filter "configurations:Debug-Metal"
         defines "HL_DEBUG"
         symbols "On"
+
+	filter { "configurations:Debug-Metal", "system:windows" }
 
 		postbuildcommands
 		{
@@ -107,6 +136,8 @@ project "Sandbox"
         defines "HL_RELEASE"
         optimize "On"
 
+	filter { "configurations:Release-OpenGL", "system:windows" }
+
 		postbuildcommands
 		{
 			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
@@ -115,6 +146,8 @@ project "Sandbox"
     filter "configurations:Release-Vulkan"
         defines "HL_RELEASE"
         optimize "On"
+
+	filter { "configurations:Release-Vulkan", "system:windows" }
 
 		postbuildcommands
 		{
@@ -125,6 +158,8 @@ project "Sandbox"
         defines "HL_RELEASE"
         optimize "On"
 
+	filter { "configurations:Release-DX11", "system:windows" }
+
 		postbuildcommands
 		{
 			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
@@ -134,6 +169,8 @@ project "Sandbox"
         defines "HL_RELEASE"
         optimize "On"
 
+	filter { "configurations:Release-DX12", "system:windows" }
+
 		postbuildcommands
 		{
 			'{COPY} "%{wks.location}HighLo/vendor/assimp/lib/Release/assimp-vc142-mt.dll" "%{cfg.targetdir}"',
@@ -142,6 +179,8 @@ project "Sandbox"
 	filter "configurations:Release-Metal"
         defines "HL_RELEASE"
         optimize "On"
+
+	filter { "configurations:Release-Metal", "system:windows" }
 
 		postbuildcommands
 		{

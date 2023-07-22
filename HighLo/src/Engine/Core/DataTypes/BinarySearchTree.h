@@ -34,7 +34,7 @@ namespace highlo
 				if (this->Right)
 					rightVal = this->Right->CalcHeight();
 
-				return 1 + MAX(leftVal, rightVal);
+				return 1 + HL_MAX(leftVal, rightVal);
 			}
 		};
 

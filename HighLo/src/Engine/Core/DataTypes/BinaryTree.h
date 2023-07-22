@@ -262,7 +262,7 @@ namespace highlo
 			HLQueue<Node*> q;
 			q.Enqueue(node);
 
-			T min = fake_max_value<T>();
+			T min = std::numeric_limits<T>::max();
 			while (!q.IsEmpty())
 			{
 				Node *current = q.Front();
@@ -287,7 +287,7 @@ namespace highlo
 			HLQueue<Node*> q;
 			q.Enqueue(node);
 
-			T max = fake_min_value<T>();
+			T max = std::numeric_limits<T>::min();
 			while (!q.IsEmpty())
 			{
 				Node *current = q.Front();
@@ -312,7 +312,7 @@ namespace highlo
 			HLQueue<Node*> q;
 			q.Enqueue(node);
 
-			T min = fake_max_value<T>();
+			T min = std::numeric_limits<T>::max();
 			Node *ret = nullptr;
 			while (!q.IsEmpty())
 			{
@@ -341,7 +341,7 @@ namespace highlo
 			HLQueue<Node*> q;
 			q.Enqueue(node);
 
-			T max = fake_min_value<T>();
+			T max = std::numeric_limits<T>::min();
 			Node *ret = nullptr;
 			while (!q.IsEmpty())
 			{

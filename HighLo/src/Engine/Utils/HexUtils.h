@@ -13,6 +13,7 @@ namespace highlo
 {
 	namespace utils
 	{
+#if 0
 		static void Hexdump(const char *headline, const void *addr, int32 size, const int32 width)
 		{
             int32  offset;
@@ -27,7 +28,7 @@ namespace highlo
         #pragma warning(push)
         #pragma warning(disable : 4311)
         #pragma warning(disable : 4302)
-            sprintf_s(strBuf, "Hexdump([%s], $%08lx, %d, %d)", headline, (int32)p, size, width);
+            sprintf(strBuf, "Hexdump([%s], $%08lx, %d, %d)", headline, (int32)p, size, width);
         #pragma warning(pop)
             HL_CORE_TRACE("{0}", strBuf);
 
@@ -35,11 +36,12 @@ namespace highlo
             {
                 if (0 == offset % width)
                 {
-                    sprintf_s(strBuf, "%06lx: ", offset);
+                    sprintf(strBuf, "%06lx: ", offset);
                     HL_CORE_TRACE("{0}", strBuf);
                 }
 
-                sprintf_s(strBuf, "%02x ", p[offset] & 0xFF); HL_CORE_TRACE("{0}", strBuf);
+                sprintf(strBuf, "%02x ", p[offset] & 0xFF);
+                HL_CORE_TRACE("{0}", strBuf);
                 c[offset % width] = isprint(p[offset]) ? p[offset] : '.';
 
                 if ((width / 2 - 1) == offset % width) 
@@ -47,7 +49,7 @@ namespace highlo
 
                 if ((width - 1) == offset % width)
                 {
-                    c[width] = 0;  sprintf_s(strBuf, " : %s", c);
+                    c[width] = 0;  sprintf(strBuf, " : %s", c);
                     HL_CORE_TRACE("{0}", strBuf);
                 }
             }
@@ -69,6 +71,7 @@ namespace highlo
             if (more)
                 HL_CORE_TRACE(" : {0}", c);
 		}
+#endif
 	}
 }
 

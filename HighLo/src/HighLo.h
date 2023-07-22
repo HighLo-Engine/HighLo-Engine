@@ -46,7 +46,7 @@
 #include "Engine/Core/Profiler/Profiler.h"
 #include "Engine/Core/Profiler/ProfilerTimer.h"
 
-#include "Engine/ImGui/imgui.h"
+#include "Engine/ImGui/ImGui.h"
 #include "Engine/ImGui/ImGuiTreeNode.h"
 #include "Engine/ImGui/ImGuiWidgets.h"
 #include "Engine/ImGui/ImGuiScopeHelpers.h"

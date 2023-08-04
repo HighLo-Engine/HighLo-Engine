@@ -257,31 +257,7 @@ namespace highlo
 		{
 			if (this != &other)
 			{
-				if (other.m_UsingShortStr)
-				{
-					ShortStringData *data = (ShortStringData*)other.m_DataPointer;
-					ShortStringData *new_data = new ShortStringData();
-					new_data->Size = data->Size;
-					
-					new_data->Data[new_data->Size] = '\0';
-					memcpy(new_data->Data, data->Data, data->Size);
-
-					m_UsingShortStr = true;
-					m_DataPointer = new_data;
-				}
-				else
-				{
-					LongStringData *data = (LongStringData*)other.m_DataPointer;
-					LongStringData *new_data = new LongStringData();
-					new_data->Size = data->Size;
-					new_data->Data = new StringType[data->Size + 1];
-					
-					new_data->Data[new_data->Size] = '\0';
-					memcpy(new_data->Data, data->Data, data->Size);
-					
-					m_UsingShortStr = false;
-					m_DataPointer = new_data;
-				}
+				Assign(other.C_Str(), other.Length(), 0);
 			}
 
 			return *this;

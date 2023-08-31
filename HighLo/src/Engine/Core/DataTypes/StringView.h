@@ -54,7 +54,7 @@ namespace highlo
 		{
 		}
 
-		HLAPI HLStringViewBase(const HLStringViewBase<StringType> &&other)
+		HLAPI HLStringViewBase(HLStringViewBase<StringType> &&other)
 		{
 			m_Data = other.m_Data;
 			m_Size = other.m_Size;
@@ -140,7 +140,7 @@ namespace highlo
 
 	private:
 
-		StringType *m_Data = nullptr;
+		const StringType *m_Data = nullptr;
 		uint32 m_Size = 0;
 	};
 }

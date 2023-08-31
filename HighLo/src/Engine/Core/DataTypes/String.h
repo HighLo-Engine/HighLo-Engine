@@ -410,16 +410,17 @@ namespace highlo
 
 		HLAPI HLStringBase &Append(const StringType letter)
 		{
-			StringType *new_data = new StringType[SelectStringSize() + 2]; // +1 for a character and another +1 for the null terminator
-			new_data[SelectStringSize()] = letter;
-			new_data[SelectStringSize() + 1] = '\0';
+			uint32 new_size = SelectStringSize() + 1; // +1 for a character
+			StringType *new_data = new StringType[new_size + 1]; // +1 for the null terminator
+			new_data[new_size] = letter;
+			new_data[new_size + 1] = '\0';
 
 			if (SelectStringSource())
 			{
 				memcpy(new_data, SelectStringSource(), SelectStringSize());
 			}
 
-			return Assign(new_data, SelectStringSize());
+			return Assign(new_data, new_size);
 		}
 
 		HLAPI HLStringBase &Append(const HLStringBase &other)
